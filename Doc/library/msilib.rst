@@ -1,15 +1,14 @@
-:mod:`!msilib` --- Read and write Microsoft Installer files
-===========================================================
+:mod:`!msilib` --- Đọc và ghi các tệp Microsoft Installer
+=========================================================
 
 .. module:: msilib
-   :synopsis: Removed in 3.13.
+   :synopsis: Đã bị xóa trong phiên bản 3.13.
    :deprecated:
 
 .. deprecated-removed:: 3.11 3.13
 
-This module is no longer part of the Python standard library.
-It was :ref:`removed in Python 3.13 <whatsnew313-pep594>` after
-being deprecated in Python 3.11.  The removal was decided in :pep:`594`.
+Mô-đun này không còn thuộc thư viện chuẩn của Python. Mô-đun đã bị :ref:`xóa trong Python 3.13 <whatsnew313-pep594>` sau khi không còn được khuyến nghị sử dụng trong Python 3.11. Việc xóa mô-đun được quyết định trong :pep:`594`.
 
-The last version of Python that provided the :mod:`!msilib` module was
-`Python 3.12 <https://docs.python.org/3.12/library/msilib.html>`_.
+Phiên bản Python cuối cùng cung cấp mô-đun :mod:`!msilib` là `Python 3.12 <https://docs.python.org/3.12/library/msilib.html>`_.
+
+.. _`Python 3.12`: https://docs.python.org/3.12/library/msilib.html

@@ -1,8 +1,8 @@
-:mod:`!secrets` --- Generate secure random numbers for managing secrets
-=======================================================================
+:mod:`!secrets` --- secrets --- Tạo các số ngẫu nhiên an toàn để quản lý secret
+===============================================================================
 
 .. module:: secrets
-   :synopsis: Generate secure random numbers for managing secrets.
+   :synopsis: Tạo các số ngẫu nhiên an toàn để quản lý secret.
 
 .. moduleauthor:: Steven D'Aprano <steve+python@pearwood.info>
 .. sectionauthor:: Steven D'Aprano <steve+python@pearwood.info>
@@ -13,61 +13,52 @@
    from secrets import *
    __name__ = '<doctest>'
 
-**Source code:** :source:`Lib/secrets.py`
+**Mã nguồn:** :source:`Lib/secrets.py`
 
 -------------
 
-The :mod:`!secrets` module is used for generating cryptographically strong
-random numbers suitable for managing data such as passwords, account
-authentication, security tokens, and related secrets.
+Module :mod:`!secrets` được dùng để tạo các số ngẫu nhiên có độ mạnh mật mã, phù hợp để quản lý những dữ liệu như mật khẩu, thông tin xác thực tài khoản, security token và các secret liên quan.
 
-In particular, :mod:`!secrets` should be used in preference to the
-default pseudo-random number generator in the :mod:`random` module, which
-is designed for modelling and simulation, not security or cryptography.
+Cụ thể, nên ưu tiên sử dụng :mod:`!secrets` thay cho bộ tạo số giả ngẫu nhiên mặc định trong module :mod:`random`, vốn được thiết kế cho việc lập mô hình và mô phỏng, không phải cho bảo mật hay mật mã.
 
 .. seealso::
 
    :pep:`506`
 
 
-Random numbers
---------------
+Các số ngẫu nhiên
+-----------------
 
-The :mod:`!secrets` module provides access to the most secure source of
-randomness that your operating system provides.
+Module :mod:`!secrets` cung cấp quyền truy cập vào nguồn ngẫu nhiên an toàn nhất mà hệ điều hành của bạn cung cấp.
 
 .. class:: SystemRandom
 
-   A class for generating random numbers using the highest-quality
-   sources provided by the operating system.  See
-   :class:`random.SystemRandom` for additional details.
+   Lớp dùng để tạo số ngẫu nhiên bằng các nguồn có chất lượng cao nhất do hệ điều hành cung cấp. Xem
+   :class:`random.SystemRandom` để biết thêm chi tiết.
 
 .. function:: choice(seq)
 
-   Return a randomly chosen element from a non-empty sequence.
+   Trả về một phần tử được chọn ngẫu nhiên từ một sequence không rỗng.
 
 .. function:: randbelow(exclusive_upper_bound)
 
-   Return a random int in the range [0, *exclusive_upper_bound*).
+   Trả về một số nguyên ngẫu nhiên trong phạm vi [0, *exclusive_upper_bound*).
 
 .. function:: randbits(k)
 
-   Return a non-negative int with *k* random bits.
+   Trả về một số nguyên không âm có *k* bit ngẫu nhiên.
 
 
-Generating tokens
------------------
+Tạo token
+---------
 
-The :mod:`!secrets` module provides functions for generating secure
-tokens, suitable for applications such as password resets,
-hard-to-guess URLs, and similar.
+Module :mod:`!secrets` cung cấp các hàm để tạo token bảo mật, phù hợp cho các ứng dụng như đặt lại mật khẩu, URL khó đoán và những trường hợp tương tự.
 
 .. function:: token_bytes(nbytes=None)
 
-   Return a random byte string containing *nbytes* number of bytes.
+   Trả về một chuỗi byte ngẫu nhiên chứa *nbytes* byte.
 
-   If *nbytes* is not specified or ``None``, :const:`DEFAULT_ENTROPY`
-   is used instead.
+   Nếu *nbytes* không được chỉ định hoặc ``None``, :const:`DEFAULT_ENTROPY` được sử dụng thay thế.
 
    .. doctest::
 
@@ -77,11 +68,9 @@ hard-to-guess URLs, and similar.
 
 .. function:: token_hex(nbytes=None)
 
-   Return a random text string, in hexadecimal.  The string has *nbytes*
-   random bytes, each byte converted to two hex digits.
+   Trả về một chuỗi văn bản ngẫu nhiên ở dạng thập lục phân. Chuỗi này có *nbytes* byte ngẫu nhiên, mỗi byte được chuyển thành hai chữ số hex.
 
-   If *nbytes* is not specified or ``None``, :const:`DEFAULT_ENTROPY`
-   is used instead.
+   Nếu *nbytes* không được chỉ định hoặc ``None``, :const:`DEFAULT_ENTROPY` được sử dụng thay thế.
 
    .. doctest::
 
@@ -90,12 +79,9 @@ hard-to-guess URLs, and similar.
 
 .. function:: token_urlsafe(nbytes=None)
 
-   Return a random URL-safe text string, containing *nbytes* random
-   bytes.  The text is Base64 encoded, so on average each byte results
-   in approximately 1.3 characters.
+   Trả về một chuỗi văn bản ngẫu nhiên an toàn cho URL, chứa *nbytes* byte ngẫu nhiên. Văn bản được mã hóa Base64, vì vậy trung bình mỗi byte tạo ra khoảng 1,3 ký tự.
 
-   If *nbytes* is not specified or ``None``, :const:`DEFAULT_ENTROPY`
-   is used instead.
+   Nếu *nbytes* không được chỉ định hoặc ``None``, :const:`DEFAULT_ENTROPY` được sử dụng thay thế.
 
    .. doctest::
 
@@ -103,53 +89,37 @@ hard-to-guess URLs, and similar.
       'Drmhze6EPcv0fN_81Bj-nA'
 
 
-How many bytes should tokens use?
+Token nên sử dụng bao nhiêu byte?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To be secure against
-`brute-force attacks <https://en.wikipedia.org/wiki/Brute-force_attack>`_,
-tokens need to have sufficient randomness.  Unfortunately, what is
-considered sufficient will necessarily increase as computers get more
-powerful and able to make more guesses in a shorter period.  As of 2015,
-it is believed that 32 bytes (256 bits) of randomness is sufficient for
-the typical use-case expected for the :mod:`!secrets` module.
+Để an toàn trước các cuộc tấn công `brute-force attacks <https://en.wikipedia.org/wiki/Brute-force_attack>`_, token cần có đủ tính ngẫu nhiên. Đáng tiếc là mức được xem là đủ chắc chắn sẽ tăng lên khi máy tính trở nên mạnh hơn và có khả năng thực hiện nhiều lần đoán hơn trong thời gian ngắn hơn. Tính đến năm 2015, người ta cho rằng 32 byte (256 bit) tính ngẫu nhiên là đủ cho trường hợp sử dụng điển hình dự kiến của module :mod:`!secrets`.
 
-For those who want to manage their own token length, you can explicitly
-specify how much randomness is used for tokens by giving an :class:`int`
-argument to the various ``token_*`` functions.  That argument is taken
-as the number of bytes of randomness to use.
+Nếu muốn tự quản lý độ dài token, bạn có thể chỉ định rõ lượng tính ngẫu nhiên được sử dụng cho token bằng cách cung cấp một đối số :class:`int` cho các hàm ``token_*`` khác nhau. Đối số đó được hiểu là số byte tính ngẫu nhiên cần sử dụng.
 
-Otherwise, if no argument is provided, or if the argument is ``None``,
-the ``token_*`` functions use :const:`DEFAULT_ENTROPY` instead.
+Nếu không cung cấp đối số hoặc đối số là ``None``, các hàm ``token_*`` sẽ sử dụng :const:`DEFAULT_ENTROPY` thay thế.
 
 .. data:: DEFAULT_ENTROPY
 
-   Default number of bytes of randomness used by the ``token_*`` functions.
+   Số byte tính ngẫu nhiên mặc định được các hàm ``token_*`` sử dụng.
 
-   The exact value is subject to change at any time, including during
-   maintenance releases.
+   Giá trị chính xác có thể thay đổi bất cứ lúc nào, kể cả trong các bản phát hành bảo trì.
 
 
-Other functions
----------------
+Các hàm khác
+------------
 
 .. function:: compare_digest(a, b)
 
-   Return ``True`` if strings or
-   :term:`bytes-like objects <bytes-like object>`
-   *a* and *b* are equal, otherwise ``False``,
-   using a "constant-time compare" to reduce the risk of
-   `timing attacks <https://web.archive.org/web/20250815071532/https://codahale.com/a-lesson-in-timing-attacks/>`__.
-   See :func:`hmac.compare_digest` for additional details.
+   Trả về ``True`` nếu các chuỗi hoặc
+   :term:`đối tượng dạng byte <bytes-like object>` *a* và *b* bằng nhau; nếu không thì ``False``, sử dụng phép so sánh "constant-time" để giảm nguy cơ `tấn công timing <https://web.archive.org/web/20250815071532/https://codahale.com/a-lesson-in-timing-attacks/>`__. Xem :func:`hmac.compare_digest` để biết thêm chi tiết.
 
 
-Recipes and best practices
---------------------------
+Công thức và phương pháp hay nhất
+---------------------------------
 
-This section shows recipes and best practices for using :mod:`!secrets`
-to manage a basic level of security.
+Phần này trình bày các công thức và phương pháp hay nhất để sử dụng :mod:`!secrets` nhằm quản lý mức độ bảo mật cơ bản.
 
-Generate an eight-character alphanumeric password:
+Tạo mật khẩu chữ và số gồm tám ký tự:
 
 .. testcode::
 
@@ -161,15 +131,11 @@ Generate an eight-character alphanumeric password:
 
 .. note::
 
-   Applications should not
-   :cwe:`store passwords in a recoverable format <257>`,
-   whether plain text or encrypted.  They should be salted and hashed
-   using a cryptographically strong one-way (irreversible) hash function.
+   Ứng dụng không nên
+   :cwe:`store passwords in a recoverable format <257>`, dù ở dạng văn bản thuần túy hay được mã hóa. Chúng nên được thêm salt và băm bằng hàm băm một chiều mạnh về mặt mật mã (không thể đảo ngược).
 
 
-Generate a ten-character alphanumeric password with at least one
-lowercase character, at least one uppercase character, and at least
-three digits:
+Tạo mật khẩu gồm mười ký tự chữ và số, trong đó có ít nhất một ký tự viết thường, ít nhất một ký tự viết hoa và ít nhất ba chữ số:
 
 .. testcode::
 
@@ -184,20 +150,19 @@ three digits:
            break
 
 
-Generate an `XKCD-style passphrase <https://xkcd.com/936/>`_:
+Tạo một `cụm mật khẩu theo phong cách XKCD <https://xkcd.com/936/>`_:
 
 .. testcode::
 
    import secrets
-   # On standard Linux systems, use a convenient dictionary file.
-   # Other platforms may need to provide their own word-list.
+   # Trên các hệ thống Linux tiêu chuẩn, hãy sử dụng một tệp từ điển tiện lợi.
+   # Các nền tảng khác có thể cần cung cấp danh sách từ riêng.
    with open('/usr/share/dict/words') as f:
        words = [word.strip() for word in f]
        password = ' '.join(secrets.choice(words) for i in range(4))
 
 
-Generate a hard-to-guess temporary URL containing a security token
-suitable for password recovery applications:
+Tạo một URL tạm thời khó đoán, chứa security token phù hợp cho các ứng dụng khôi phục mật khẩu:
 
 .. testcode::
 
@@ -207,5 +172,7 @@ suitable for password recovery applications:
 
 
 ..
-   # This modeline must appear within the last ten lines of the file.
-   kate: indent-width 3; remove-trailing-space on; replace-tabs on; encoding utf-8;
+   # Dòng modeline này phải xuất hiện trong mười dòng cuối cùng của tệp. kate: indent-width 3; remove-trailing-space on; replace-tabs on; encoding utf-8;
+
+.. _`brute-force attacks`: https://en.wikipedia.org/wiki/Brute-force_attack
+.. _`XKCD-style passphrase`: https://xkcd.com/936/

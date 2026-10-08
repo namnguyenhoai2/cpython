@@ -1,246 +1,182 @@
-:mod:`!gzip` --- Support for :program:`gzip` files
-==================================================
+:mod:`!gzip` --- Hỗ trợ các tệp :program:`gzip`
+===============================================
 
 .. module:: gzip
-   :synopsis: Interfaces for gzip compression and decompression using file objects.
+   :synopsis: Các giao diện để nén và giải nén gzip bằng các đối tượng tệp.
 
-**Source code:** :source:`Lib/gzip.py`
+**Mã nguồn:** :source:`Lib/gzip.py`
 
 --------------
 
-This module provides a simple interface to compress and decompress files just
-like the GNU programs :program:`gzip` and :program:`gunzip` would.
+Mô-đun này cung cấp một giao diện đơn giản để nén và giải nén tệp, giống như các chương trình GNU :program:`gzip` và :program:`gunzip`.
 
 .. include:: ../includes/optional-module.rst
 
-The data compression is provided by the :mod:`zlib` module.
+Mô-đun :mod:`zlib` cung cấp chức năng nén dữ liệu.
 
-The :mod:`!gzip` module provides the :class:`GzipFile` class, as well as the
-:func:`.open`, :func:`compress` and :func:`decompress` convenience functions.
-The :class:`GzipFile` class reads and writes :program:`gzip`\ -format files,
-automatically compressing or decompressing the data so that it looks like an
-ordinary :term:`file object`.
+Mô-đun :mod:`!gzip` cung cấp lớp :class:`GzipFile`, cùng với các
+:func:`.open`, :func:`compress` và :func:`decompress` hàm tiện ích. Lớp :class:`GzipFile` đọc và ghi các tệp định dạng :program:`gzip`\ , tự động nén hoặc giải nén dữ liệu để dữ liệu trông giống như một :term:`file object` thông thường.
 
-Note that additional file formats which can be decompressed by the
-:program:`gzip` and :program:`gunzip` programs, such  as those produced by
-:program:`compress` and :program:`pack`, are not supported by this module.
+Lưu ý rằng các định dạng tệp bổ sung có thể được giải nén bằng các
+:program:`gzip` và :program:`gunzip` chương trình, chẳng hạn như những chương trình được tạo bởi
+:program:`compress` và :program:`pack`, không được mô-đun này hỗ trợ.
 
-The module defines the following items:
+Mô-đun này định nghĩa các mục sau:
 
 
 .. function:: open(filename, mode='rb', compresslevel=9, encoding=None, errors=None, newline=None)
 
-   Open a gzip-compressed file in binary or text mode, returning a :term:`file
-   object`.
+   Mở một tệp được nén bằng gzip ở chế độ nhị phân hoặc văn bản, trả về một :term:`file object`.
 
-   The *filename* argument can be an actual filename (a :class:`str` or
-   :class:`bytes` object), or an existing file object to read from or write to.
+   Đối số *filename* có thể là một tên tệp thực tế (một :class:`str` hoặc
+   :class:`bytes` object), hoặc một đối tượng tệp hiện có để đọc hoặc ghi.
 
-   The *mode* argument can be any of ``'r'``, ``'rb'``, ``'a'``, ``'ab'``,
-   ``'w'``, ``'wb'``, ``'x'`` or ``'xb'`` for binary mode, or ``'rt'``,
-   ``'at'``, ``'wt'``, or ``'xt'`` for text mode. The default is ``'rb'``.
+   Đối số *mode* có thể là bất kỳ giá trị nào trong số ``'r'``, ``'rb'``, ``'a'``, ``'ab'``, ``'w'``, ``'wb'``, ``'x'`` hoặc ``'xb'`` cho chế độ nhị phân, hoặc ``'rt'``, ``'at'``, ``'wt'`` hoặc ``'xt'`` cho chế độ văn bản. Giá trị mặc định là ``'rb'``.
 
-   The *compresslevel* argument is an integer from 0 to 9, as for the
-   :class:`GzipFile` constructor.
+   Đối số *compresslevel* là một số nguyên từ 0 đến 9, tương tự như
+   hàm khởi tạo :class:`GzipFile`.
 
-   For binary mode, this function is equivalent to the :class:`GzipFile`
-   constructor: ``GzipFile(filename, mode, compresslevel)``. In this case, the
-   *encoding*, *errors* and *newline* arguments must not be provided.
+   Đối với chế độ nhị phân, hàm này tương đương với hàm khởi tạo :class:`GzipFile`: ``GzipFile(filename, mode, compresslevel)``. Trong trường hợp này, không được cung cấp các đối số *encoding*, *errors* và *newline*.
 
-   For text mode, a :class:`GzipFile` object is created, and wrapped in an
-   :class:`io.TextIOWrapper` instance with the specified encoding, error
-   handling behavior, and line ending(s).
+   Đối với chế độ văn bản, một đối tượng :class:`GzipFile` được tạo và bọc trong một
+   :class:`io.TextIOWrapper` instance với encoding, cách xử lý lỗi và (các) ký tự kết thúc dòng được chỉ định.
 
    .. versionchanged:: 3.3
-      Added support for *filename* being a file object, support for text mode,
-      and the *encoding*, *errors* and *newline* arguments.
+      Đã bổ sung hỗ trợ để *filename* là một đối tượng tệp, hỗ trợ chế độ văn bản và các đối số *encoding*, *errors* và *newline*.
 
    .. versionchanged:: 3.4
-      Added support for the ``'x'``, ``'xb'`` and ``'xt'`` modes.
+      Đã bổ sung hỗ trợ cho các chế độ ``'x'``, ``'xb'`` và ``'xt'``.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 .. exception:: BadGzipFile
 
-   An exception raised for invalid gzip files.  It inherits from :exc:`OSError`.
-   :exc:`EOFError` and :exc:`zlib.error` can also be raised for invalid gzip
-   files.
+   Một ngoại lệ được đưa ra khi tệp gzip không hợp lệ. Ngoại lệ này kế thừa từ :exc:`OSError`.
+   :exc:`EOFError` và :exc:`zlib.error` cũng có thể được đưa ra khi tệp gzip không hợp lệ.
 
    .. versionadded:: 3.8
 
 .. class:: GzipFile(filename=None, mode=None, compresslevel=9, fileobj=None, mtime=None)
 
-   Constructor for the :class:`GzipFile` class, which simulates most of the
-   methods of a :term:`file object`, with the exception of the :meth:`~io.IOBase.truncate`
-   method.  At least one of *fileobj* and *filename* must be given a non-trivial
-   value.
+   Hàm khởi tạo cho lớp :class:`GzipFile`, mô phỏng hầu hết các phương thức của một :term:`file object`, ngoại trừ phương thức :meth:`~io.IOBase.truncate`. Ít nhất một trong *fileobj* và *filename* phải được cung cấp một giá trị khác rỗng.
 
-   The new class instance is based on *fileobj*, which can be a regular file, an
-   :class:`io.BytesIO` object, or any other object which simulates a file.  It
-   defaults to ``None``, in which case *filename* is opened to provide a file
-   object.
+   Thể hiện lớp mới dựa trên *fileobj*, có thể là một tệp thông thường, một
+   đối tượng :class:`io.BytesIO`, hoặc bất kỳ đối tượng nào khác mô phỏng một tệp. Mặc định là ``None``; trong trường hợp đó, *filename* được mở để cung cấp một đối tượng tệp.
 
-   When *fileobj* is not ``None``, the *filename* argument is only used to be
-   included in the :program:`gzip` file header, which may include the original
-   filename of the uncompressed file.  It defaults to the filename of *fileobj*, if
-   discernible; otherwise, it defaults to the empty string, and in this case the
-   original filename is not included in the header.
+   Khi *fileobj* không phải là ``None``, đối số *filename* chỉ được dùng để đưa vào phần đầu :program:`gzip` của tệp, phần này có thể chứa tên tệp gốc của tệp chưa nén. Theo mặc định, đối số này là tên tệp của *fileobj*, nếu có thể xác định được; nếu không, mặc định là chuỗi rỗng, và trong trường hợp này tên tệp gốc sẽ không được đưa vào phần đầu tệp.
 
-   The *mode* argument can be any of ``'r'``, ``'rb'``, ``'a'``, ``'ab'``, ``'w'``,
-   ``'wb'``, ``'x'``, or ``'xb'``, depending on whether the file will be read or
-   written.  The default is the mode of *fileobj* if discernible; otherwise, the
-   default is ``'rb'``.  In future Python releases the mode of *fileobj* will
-   not be used.  It is better to always specify *mode* for writing.
+   Đối số *mode* có thể là bất kỳ giá trị nào trong số ``'r'``, ``'rb'``, ``'a'``, ``'ab'``, ``'w'``, ``'wb'``, ``'x'`` hoặc ``'xb'``, tùy thuộc vào việc tệp sẽ được đọc hay ghi. Mặc định là mode của *fileobj* nếu có thể xác định được; nếu không, mặc định là ``'rb'``. Trong các bản phát hành Python sau này, mode của *fileobj* sẽ không được sử dụng. Tốt hơn hết là luôn chỉ định *mode* khi ghi.
 
-   Note that the file is always opened in binary mode. To open a compressed file
-   in text mode, use :func:`.open` (or wrap your :class:`GzipFile` with an
+   Lưu ý rằng tệp luôn được mở ở binary mode. Để mở tệp đã nén ở text mode, hãy dùng :func:`.open` (hoặc bọc :class:`GzipFile` của bạn bằng một
    :class:`io.TextIOWrapper`).
 
-   The *compresslevel* argument is an integer from ``0`` to ``9`` controlling
-   the level of compression; ``1`` is fastest and produces the least
-   compression, and ``9`` is slowest and produces the most compression. ``0``
-   is no compression. The default is ``9``.
+   Đối số *compresslevel* là một số nguyên từ ``0`` đến ``9``, dùng để điều khiển mức độ nén; ``1`` nhanh nhất và cho mức nén thấp nhất, còn ``9`` chậm nhất và cho mức nén cao nhất. ``0`` là không nén. Giá trị mặc định là ``9``.
 
-   The optional *mtime* argument is the timestamp requested by gzip. The time
-   is in Unix format, i.e., seconds since 00:00:00 UTC, January 1, 1970.
-   If *mtime* is omitted or ``None``, the current time is used. Use *mtime* = 0
-   to generate a compressed stream that does not depend on creation time.
+   Đối số tùy chọn *mtime* là dấu thời gian được gzip yêu cầu. Thời gian được biểu diễn theo định dạng Unix, tức là số giây kể từ 00:00:00 UTC ngày 1 tháng 1 năm 1970. Nếu *mtime* bị bỏ qua hoặc là ``None``, thời gian hiện tại sẽ được sử dụng. Dùng *mtime* = 0 để tạo một luồng đã nén không phụ thuộc vào thời điểm tạo.
 
-   See below for the :attr:`mtime` attribute that is set when decompressing.
+   Xem phần bên dưới để biết thuộc tính :attr:`mtime` được thiết lập khi giải nén.
 
-   Calling a :class:`GzipFile` object's :meth:`!close` method does not close
-   *fileobj*, since you might wish to append more material after the compressed
-   data.  This also allows you to pass an :class:`io.BytesIO` object opened for
-   writing as *fileobj*, and retrieve the resulting memory buffer using the
-   :class:`io.BytesIO` object's :meth:`~io.BytesIO.getvalue` method.
+   Việc gọi phương thức :meth:`!close` của một đối tượng :class:`GzipFile` không đóng *fileobj*, vì bạn có thể muốn nối thêm dữ liệu sau phần dữ liệu đã nén. Điều này cũng cho phép bạn truyền một đối tượng :class:`io.BytesIO` được mở để ghi làm *fileobj*, rồi lấy bộ đệm bộ nhớ thu được bằng cách sử dụng
+   :class:`io.BytesIO` phương thức :meth:`~io.BytesIO.getvalue` của đối tượng.
 
-   :class:`GzipFile` supports the :class:`io.BufferedIOBase` interface,
-   including iteration and the :keyword:`with` statement.  Only the
-   :meth:`~io.IOBase.truncate` method isn't implemented.
+   :class:`GzipFile` hỗ trợ giao diện :class:`io.BufferedIOBase`, bao gồm phép lặp và câu lệnh :keyword:`with`. Chỉ
+   Phương thức :meth:`~io.IOBase.truncate` chưa được triển khai.
 
-   :class:`GzipFile` also provides the following method and attribute:
+   :class:`GzipFile` cũng cung cấp phương thức và thuộc tính sau:
 
    .. method:: peek(n)
 
-      Read *n* uncompressed bytes without advancing the file position.
-      The number of bytes returned may be more or less than requested.
+      Đọc *n* byte chưa nén mà không làm thay đổi vị trí tệp. Số byte được trả về có thể nhiều hơn hoặc ít hơn số lượng được yêu cầu.
 
-      .. note:: While calling :meth:`peek` does not change the file position of
-         the :class:`GzipFile`, it may change the position of the underlying
-         file object (e.g. if the :class:`GzipFile` was constructed with the
-         *fileobj* parameter).
+      .. note:: Mặc dù việc gọi :meth:`peek` không thay đổi vị trí tệp của :class:`GzipFile`, nó có thể thay đổi vị trí của đối tượng tệp bên dưới (ví dụ: nếu :class:`GzipFile` được tạo bằng tham số *fileobj*).
 
       .. versionadded:: 3.2
 
    .. attribute:: mode
 
-      ``'rb'`` for reading and ``'wb'`` for writing.
+      ``'rb'`` để đọc và ``'wb'`` để ghi.
 
       .. versionchanged:: 3.13
-         In previous versions it was an integer ``1`` or ``2``.
+         Trong các phiên bản trước, đây là một số nguyên ``1`` hoặc ``2``.
 
    .. attribute:: mtime
 
-      When decompressing, this attribute is set to the last timestamp in the most
-      recently read header.  It is an integer, holding the number of seconds
-      since the Unix epoch (00:00:00 UTC, January 1, 1970).
-      The initial value before reading any headers is ``None``.
+      Khi giải nén, thuộc tính này được đặt thành dấu thời gian cuối cùng trong header được đọc gần đây nhất. Đây là một số nguyên, chứa số giây kể từ Unix epoch (00:00:00 UTC, ngày 1 tháng 1 năm 1970). Giá trị ban đầu trước khi đọc bất kỳ header nào là ``None``.
 
    .. attribute:: name
 
-      The path to the gzip file on disk, as a :class:`str` or :class:`bytes`.
-      Equivalent to the output of :func:`os.fspath` on the original input path,
-      with no other normalization, resolution or expansion.
+      Đường dẫn đến tệp gzip trên đĩa, dưới dạng :class:`str` hoặc :class:`bytes`. Tương đương với kết quả của :func:`os.fspath` trên đường dẫn đầu vào ban đầu, không thực hiện bất kỳ việc chuẩn hóa, phân giải hoặc mở rộng nào khác.
 
    .. versionchanged:: 3.1
-      Support for the :keyword:`with` statement was added, along with the
-      *mtime* constructor argument and :attr:`mtime` attribute.
+      Đã bổ sung hỗ trợ cho câu lệnh :keyword:`with`, cùng với đối số constructor *mtime* và thuộc tính :attr:`mtime`.
 
    .. versionchanged:: 3.2
-      Support for zero-padded and unseekable files was added.
+      Đã bổ sung hỗ trợ cho các tệp có đệm bằng số 0 và các tệp không thể seek.
 
    .. versionchanged:: 3.3
-      The :meth:`io.BufferedIOBase.read1` method is now implemented.
+      Phương thức :meth:`io.BufferedIOBase.read1` hiện đã được triển khai.
 
    .. versionchanged:: 3.4
-      Added support for the ``'x'`` and ``'xb'`` modes.
+      Đã bổ sung hỗ trợ cho các chế độ ``'x'`` và ``'xb'``.
 
    .. versionchanged:: 3.5
-      Added support for writing arbitrary
-      :term:`bytes-like objects <bytes-like object>`.
-      The :meth:`~io.BufferedIOBase.read` method now accepts an argument of
-      ``None``.
+      Đã bổ sung hỗ trợ ghi các
+      :term:`đối tượng giống bytes <bytes-like object>`. Phương thức :meth:`~io.BufferedIOBase.read` hiện chấp nhận một đối số thuộc ``None``.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
    .. deprecated:: 3.9
-      Opening :class:`GzipFile` for writing without specifying the *mode*
-      argument is deprecated.
+      Việc mở :class:`GzipFile` để ghi mà không chỉ định đối số *mode* đã không còn được khuyến nghị.
 
    .. versionchanged:: 3.12
-      Remove the ``filename`` attribute, use the :attr:`~GzipFile.name`
-      attribute instead.
+      Xóa thuộc tính ``filename``, thay vào đó hãy sử dụng thuộc tính :attr:`~GzipFile.name`.
 
 
 .. function:: compress(data, compresslevel=9, *, mtime=0)
 
-   Compress the *data*, returning a :class:`bytes` object containing
-   the compressed data.  *compresslevel* and *mtime* have the same meaning as in
-   the :class:`GzipFile` constructor above,
-   but *mtime* defaults to 0 for reproducible output.
+   Nén *dữ liệu*, trả về một đối tượng :class:`bytes` chứa dữ liệu đã nén. *compresslevel* và *mtime* có cùng ý nghĩa như trong hàm khởi tạo :class:`GzipFile` ở trên, nhưng *mtime* mặc định là 0 để tạo đầu ra có thể tái lập.
 
    .. versionadded:: 3.2
    .. versionchanged:: 3.8
-      Added the *mtime* parameter for reproducible output.
+      Đã bổ sung tham số *mtime* để tạo đầu ra có thể tái lập.
    .. versionchanged:: 3.11
-      Speed is improved by compressing all data at once instead of in a
-      streamed fashion. Calls with *mtime* set to ``0`` are delegated to
-      :func:`zlib.compress` for better speed. In this situation the
-      output may contain a gzip header "OS" byte value other than 255
-      "unknown" as supplied by the underlying zlib implementation.
+      Tốc độ được cải thiện bằng cách nén toàn bộ dữ liệu cùng lúc thay vì theo kiểu streaming. Các lệnh gọi có *mtime* được đặt thành ``0`` sẽ được ủy quyền cho
+      :func:`zlib.compress` để có tốc độ tốt hơn. Trong trường hợp này, đầu ra có thể chứa giá trị byte "OS" trong header gzip khác với 255 "unknown" do triển khai zlib bên dưới cung cấp.
 
    .. versionchanged:: 3.13
-      The gzip header OS byte is guaranteed to be set to 255 when this function
-      is used as was the case in 3.10 and earlier.
+      Byte OS trong header gzip được đảm bảo đặt thành 255 khi sử dụng hàm này, như trong 3.10 và các phiên bản trước.
    .. versionchanged:: 3.14
-      The *mtime* parameter now defaults to 0 for reproducible output.
-      For the previous behaviour of using the current time,
-      pass ``None`` to *mtime*.
+      Tham số *mtime* hiện mặc định là 0 để tạo đầu ra có thể tái lập. Để sử dụng hành vi trước đây là dùng thời gian hiện tại, hãy truyền ``None`` cho *mtime*.
 
 .. function:: decompress(data)
 
-   Decompress the *data*, returning a :class:`bytes` object containing the
-   uncompressed data. This function is capable of decompressing multi-member
-   gzip data (multiple gzip blocks concatenated together). When the data is
-   certain to contain only one member the :func:`zlib.decompress` function with
-   *wbits* set to 31 is faster.
+   Giải nén *data*, trả về một đối tượng :class:`bytes` chứa dữ liệu chưa nén. Hàm này có khả năng giải nén dữ liệu gzip gồm nhiều member (nhiều khối gzip được nối với nhau). Khi chắc chắn dữ liệu chỉ chứa một member, hàm :func:`zlib.decompress` với *wbits* được đặt thành 31 sẽ nhanh hơn.
 
    .. versionadded:: 3.2
    .. versionchanged:: 3.11
-      Speed is improved by decompressing members at once in memory instead of in
-      a streamed fashion.
+      Tốc độ được cải thiện bằng cách giải nén các member cùng lúc trong bộ nhớ thay vì theo kiểu streaming.
 
 .. _gzip-usage-examples:
 
-Examples of usage
------------------
+Ví dụ sử dụng
+-------------
 
-Example of how to read a compressed file::
+Ví dụ về cách đọc tệp đã nén::
 
    import gzip
    with gzip.open('/home/joe/file.txt.gz', 'rb') as f:
        file_content = f.read()
 
-Example of how to create a compressed GZIP file::
+Ví dụ về cách tạo tệp GZIP đã nén::
 
    import gzip
    content = b"Lots of content here"
    with gzip.open('/home/joe/file.txt.gz', 'wb') as f:
        f.write(content)
 
-Example of how to GZIP compress an existing file::
+Ví dụ về cách nén GZIP một tệp hiện có::
 
    import gzip
    import shutil
@@ -248,7 +184,7 @@ Example of how to GZIP compress an existing file::
        with gzip.open('/home/joe/file.txt.gz', 'wb') as f_out:
            shutil.copyfileobj(f_in, f_out)
 
-Example of how to GZIP compress a binary string::
+Ví dụ về cách nén GZIP một chuỗi nhị phân::
 
    import gzip
    s_in = b"Lots of content here"
@@ -256,12 +192,10 @@ Example of how to GZIP compress a binary string::
 
 .. seealso::
 
-   Module :mod:`zlib`
-      The basic data compression module needed to support the :program:`gzip` file
-      format.
+   Mô-đun :mod:`zlib`
+      Mô-đun nén dữ liệu cơ bản cần thiết để hỗ trợ định dạng tệp :program:`gzip`.
 
-   In case gzip (de)compression is a bottleneck, the `python-isal`_
-   package speeds up (de)compression with a mostly compatible API.
+   Trong trường hợp (giải) nén bằng gzip là một nút thắt cổ chai, gói `python-isal`_ sẽ tăng tốc quá trình (giải) nén với API phần lớn tương thích.
 
    .. _python-isal: https://github.com/pycompression/python-isal
 
@@ -269,38 +203,36 @@ Example of how to GZIP compress a binary string::
 
 .. _gzip-cli:
 
-Command-line interface
-----------------------
+Giao diện dòng lệnh
+-------------------
 
-The :mod:`!gzip` module provides a simple command line interface to compress or
-decompress files.
+Mô-đun :mod:`!gzip` cung cấp một giao diện dòng lệnh đơn giản để nén hoặc giải nén tệp.
 
-Once executed the :mod:`!gzip` module keeps the input file(s).
+Sau khi được thực thi, mô-đun :mod:`!gzip` sẽ giữ lại (các) tệp đầu vào.
 
 .. versionchanged:: 3.8
 
-   Add a new command line interface with a usage.
-   By default, when you will execute the CLI, the default compression level is 6.
+   Thêm một giao diện dòng lệnh mới kèm theo hướng dẫn sử dụng. Theo mặc định, khi bạn thực thi CLI, mức nén mặc định là 6.
 
-Command-line options
-^^^^^^^^^^^^^^^^^^^^
+Các tùy chọn dòng lệnh
+^^^^^^^^^^^^^^^^^^^^^^
 
 .. option:: file
 
-   If *file* is not specified, read from :data:`sys.stdin`.
+   Nếu *file* không được chỉ định, hãy đọc từ :data:`sys.stdin`.
 
 .. option:: --fast
 
-   Indicates the fastest compression method (less compression).
+   Cho biết phương pháp nén nhanh nhất (độ nén thấp hơn).
 
 .. option:: --best
 
-   Indicates the slowest compression method (best compression).
+   Cho biết phương thức nén chậm nhất (nén tốt nhất).
 
 .. option:: -d, --decompress
 
-   Decompress the given file.
+   Giải nén tệp đã cho.
 
 .. option:: -h, --help
 
-   Show the help message.
+   Hiển thị thông báo trợ giúp.

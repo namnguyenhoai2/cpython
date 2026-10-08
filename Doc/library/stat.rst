@@ -1,104 +1,93 @@
-:mod:`!stat` --- Interpreting :func:`~os.stat` results
-======================================================
+:mod:`!stat` --- Diễn giải kết quả của :func:`~os.stat`
+=======================================================
 
 .. module:: stat
-   :synopsis: Utilities for interpreting the results of os.stat(),
-              os.lstat() and os.fstat().
+   :synopsis: Các tiện ích để diễn giải kết quả của os.stat(), os.lstat() và os.fstat().
 
 .. sectionauthor:: Skip Montanaro <skip@automatrix.com>
 
-**Source code:** :source:`Lib/stat.py`
+**Mã nguồn:** :source:`Lib/stat.py`
 
 --------------
 
-The :mod:`!stat` module defines constants and functions for interpreting the
-results of :func:`os.stat`, :func:`os.fstat` and :func:`os.lstat` (if they
-exist).  For complete details about the :c:func:`stat`, :c:func:`!fstat` and
-:c:func:`!lstat` calls, consult the documentation for your system.
+Mô-đun :mod:`!stat` định nghĩa các hằng số và hàm để diễn giải kết quả của :func:`os.stat`, :func:`os.fstat` và :func:`os.lstat` (nếu chúng tồn tại). Để biết đầy đủ chi tiết về các :c:func:`stat`, :c:func:`!fstat` và
+:c:func:`!lstat` lệnh gọi, hãy tham khảo tài liệu dành cho hệ thống của bạn.
 
 .. versionchanged:: 3.4
-   The stat module is backed by a C implementation.
+   Mô-đun stat được hỗ trợ bởi một triển khai C.
 
-The :mod:`!stat` module defines the following functions to test for specific file
-types:
+Mô-đun :mod:`!stat` định nghĩa các hàm sau để kiểm tra các loại tệp cụ thể:
 
 
 .. function:: S_ISDIR(mode)
 
-   Return non-zero if the mode is from a directory.
+   Trả về giá trị khác 0 nếu mode là của một thư mục.
 
 
 .. function:: S_ISCHR(mode)
 
-   Return non-zero if the mode is from a character special device file.
+   Trả về giá trị khác 0 nếu mode là của một tệp thiết bị đặc biệt kiểu ký tự.
 
 
 .. function:: S_ISBLK(mode)
 
-   Return non-zero if the mode is from a block special device file.
+   Trả về giá trị khác 0 nếu mode là của một tệp thiết bị đặc biệt kiểu khối.
 
 
 .. function:: S_ISREG(mode)
 
-   Return non-zero if the mode is from a regular file.
+   Trả về giá trị khác 0 nếu mode là của một tệp thông thường.
 
 
 .. function:: S_ISFIFO(mode)
 
-   Return non-zero if the mode is from a FIFO (named pipe).
+   Trả về giá trị khác 0 nếu mode là của một FIFO (đường ống có tên).
 
 
 .. function:: S_ISLNK(mode)
 
-   Return non-zero if the mode is from a symbolic link.
+   Trả về giá trị khác 0 nếu mode là của một symbolic link.
 
 
 .. function:: S_ISSOCK(mode)
 
-   Return non-zero if the mode is from a socket.
+   Trả về giá trị khác 0 nếu mode là của một socket.
 
 .. function:: S_ISDOOR(mode)
 
-   Return non-zero if the mode is from a door.
+   Trả về giá trị khác 0 nếu mode là của một door.
 
    .. versionadded:: 3.4
 
 .. function:: S_ISPORT(mode)
 
-   Return non-zero if the mode is from an event port.
+   Trả về giá trị khác 0 nếu mode là của một event port.
 
    .. versionadded:: 3.4
 
 .. function:: S_ISWHT(mode)
 
-   Return non-zero if the mode is from a whiteout.
+   Trả về giá trị khác 0 nếu mode là của một whiteout.
 
    .. versionadded:: 3.4
 
-Two additional functions are defined for more general manipulation of the file's
-mode:
+Hai hàm bổ sung được định nghĩa để thao tác tổng quát hơn với mode của tệp:
 
 
 .. function:: S_IMODE(mode)
 
-   Return the portion of the file's mode that can be set by
-   :func:`os.chmod`\ ---that is, the file's permission bits, plus the sticky
-   bit, set-group-id, and set-user-id bits (on systems that support them).
+   Trả về phần mode của tệp có thể được thiết lập bởi
+   :func:`os.chmod`\ ---tức là các bit quyền của tệp, cùng với bit sticky, bit set-group-id và bit set-user-id (trên những hệ thống hỗ trợ chúng).
 
 
 .. function:: S_IFMT(mode)
 
-   Return the portion of the file's mode that describes the file type (used by the
-   :func:`!S_IS\*` functions above).
+   Trả về phần mode của tệp mô tả loại tệp (được dùng bởi
+   các hàm :func:`!S_IS\*` ở trên).
 
-Normally, you would use the :func:`!os.path.is\*` functions for testing the type
-of a file; the functions here are useful when you are doing multiple tests of
-the same file and wish to avoid the overhead of the :c:func:`stat` system call
-for each test.  These are also useful when checking for information about a file
-that isn't handled by :mod:`os.path`, like the tests for block and character
-devices.
+Thông thường, bạn sẽ sử dụng các hàm :func:`!os.path.is\*` để kiểm tra loại tệp; các hàm ở đây hữu ích khi bạn thực hiện nhiều phép kiểm tra trên cùng một tệp và muốn tránh chi phí của lời gọi hệ thống :c:func:`stat` cho mỗi phép kiểm tra. Các hàm này cũng hữu ích khi kiểm tra thông tin về một tệp mà :mod:`os.path` không xử lý, chẳng hạn như các phép kiểm tra đối với thiết bị khối và thiết bị ký tự.
 
-Example::
+Ví dụ::
 
    import os, sys
    from stat import *
@@ -111,13 +100,13 @@ Example::
            pathname = os.path.join(top, f)
            mode = os.lstat(pathname).st_mode
            if S_ISDIR(mode):
-               # It's a directory, recurse into it
+               # Đây là một thư mục, đệ quy vào đó
                walktree(pathname, callback)
            elif S_ISREG(mode):
-               # It's a file, call the callback function
+               # Đây là một tệp, gọi hàm callback
                callback(pathname)
            else:
-               # Unknown file type, print a message
+               # Không rõ loại tệp, in một thông báo
                print('Skipping %s' % pathname)
 
    def visitfile(file):
@@ -126,87 +115,77 @@ Example::
    if __name__ == '__main__':
        walktree(sys.argv[1], visitfile)
 
-An additional utility function is provided to convert a file's mode in a human
-readable string:
+Một hàm tiện ích bổ sung được cung cấp để chuyển mode của tệp thành chuỗi mà con người có thể đọc được:
 
 .. function:: filemode(mode)
 
-   Convert a file's mode to a string of the form '-rwxrwxrwx'.
+   Chuyển mode của một tệp thành chuỗi có dạng '-rwxrwxrwx'.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.4
-      The function supports :data:`S_IFDOOR`, :data:`S_IFPORT` and
+      Hàm hỗ trợ :data:`S_IFDOOR`, :data:`S_IFPORT` và
       :data:`S_IFWHT`.
 
 
-All the variables below are simply symbolic indexes into the 10-tuple returned
-by :func:`os.stat`, :func:`os.fstat` or :func:`os.lstat`.
+Tất cả các biến dưới đây chỉ đơn giản là các chỉ mục mang tính ký hiệu trong bộ 10 phần tử được trả về bởi :func:`os.stat`, :func:`os.fstat` hoặc :func:`os.lstat`.
 
 
 .. data:: ST_MODE
 
-   Inode protection mode.
+   Mode bảo vệ inode.
 
 
 .. data:: ST_INO
 
-   Inode number.
+   Số inode.
 
 
 .. data:: ST_DEV
 
-   Device inode resides on.
+   Thiết bị lưu trữ inode.
 
 
 .. data:: ST_NLINK
 
-   Number of links to the inode.
+   Số lượng liên kết đến inode.
 
 
 .. data:: ST_UID
 
-   User id of the owner.
+   ID người dùng của chủ sở hữu.
 
 
 .. data:: ST_GID
 
-   Group id of the owner.
+   ID nhóm của chủ sở hữu.
 
 
 .. data:: ST_SIZE
 
-   Size in bytes of a plain file; amount of data waiting on some special files.
+   Kích thước tính bằng byte của tệp thông thường; lượng dữ liệu đang chờ trên một số tệp đặc biệt.
 
 
 .. data:: ST_ATIME
 
-   Time of last access.
+   Thời điểm truy cập gần nhất.
 
 
 .. data:: ST_MTIME
 
-   Time of last modification.
+   Thời điểm sửa đổi gần nhất.
 
 
 .. data:: ST_CTIME
 
-   The "ctime" as reported by the operating system.  On some systems (like Unix) is
-   the time of the last metadata change, and, on others (like Windows), is the
-   creation time (see platform documentation for details).
+   Giá trị "ctime" do hệ điều hành báo cáo. Trên một số hệ thống (như Unix), đây là thời điểm thay đổi metadata gần nhất; trên các hệ thống khác (như Windows), đây là thời điểm tạo (xem tài liệu về nền tảng để biết chi tiết).
 
-The interpretation of "file size" changes according to the file type.  For plain
-files this is the size of the file in bytes.  For FIFOs and sockets under most
-flavors of Unix (including Linux in particular), the "size" is the number of
-bytes waiting to be read at the time of the call to :func:`os.stat`,
-:func:`os.fstat`, or :func:`os.lstat`; this can sometimes be useful, especially
-for polling one of these special files after a non-blocking open.  The meaning
-of the size field for other character and block devices varies more, depending
-on the implementation of the underlying system call.
+Cách diễn giải "kích thước tệp" thay đổi tùy theo loại tệp. Đối với tệp thông thường, đây là kích thước của tệp tính bằng byte. Đối với FIFO và socket trên hầu hết các biến thể Unix (đặc biệt là Linux), "kích thước" là số byte đang chờ được đọc tại thời điểm gọi :func:`os.stat`,
+:func:`os.fstat`, hoặc :func:`os.lstat`; đôi khi điều này có thể hữu ích, đặc biệt khi thăm dò một trong các tệp đặc biệt này sau khi mở ở chế độ không chặn. Ý nghĩa của trường size đối với các thiết bị ký tự và thiết bị khối khác thay đổi nhiều hơn, tùy thuộc vào cách triển khai system call cơ bản.
 
-The variables below define the flags used in the :data:`ST_MODE` field.
+Các biến dưới đây xác định những flag được sử dụng trong trường :data:`ST_MODE`.
 
-Use of the functions above is more portable than use of the first set of flags:
+Việc sử dụng các hàm trên có tính portable cao hơn việc sử dụng nhóm flag đầu tiên:
 
 .. data:: S_IFSOCK
 
@@ -214,23 +193,23 @@ Use of the functions above is more portable than use of the first set of flags:
 
 .. data:: S_IFLNK
 
-   Symbolic link.
+   Liên kết tượng trưng.
 
 .. data:: S_IFREG
 
-   Regular file.
+   Tệp thông thường.
 
 .. data:: S_IFBLK
 
-   Block device.
+   Thiết bị khối.
 
 .. data:: S_IFDIR
 
-   Directory.
+   Thư mục.
 
 .. data:: S_IFCHR
 
-   Character device.
+   Thiết bị ký tự.
 
 .. data:: S_IFIFO
 
@@ -244,7 +223,7 @@ Use of the functions above is more portable than use of the first set of flags:
 
 .. data:: S_IFPORT
 
-   Event port.
+   Cổng sự kiện.
 
    .. versionadded:: 3.4
 
@@ -256,155 +235,143 @@ Use of the functions above is more portable than use of the first set of flags:
 
 .. note::
 
-   :data:`S_IFDOOR`, :data:`S_IFPORT` or :data:`S_IFWHT` are defined as
-   0 when the platform does not have support for the file types.
+   :data:`S_IFDOOR`, :data:`S_IFPORT` hoặc :data:`S_IFWHT` được định nghĩa là 0 khi nền tảng không hỗ trợ các loại tệp này.
 
-The following flags can also be used in the *mode* argument of :func:`os.chmod`:
+Các cờ sau đây cũng có thể được sử dụng trong đối số *mode* của :func:`os.chmod`:
 
 .. data:: S_ISUID
 
-   Set UID bit.
+   Bit Set UID.
 
 .. data:: S_ISGID
 
-   Set-group-ID bit.  This bit has several special uses.  For a directory
-   it indicates that BSD semantics is to be used for that directory:
-   files created there inherit their group ID from the directory, not
-   from the effective group ID of the creating process, and directories
-   created there will also get the :data:`S_ISGID` bit set.  For a
-   file that does not have the group execution bit (:data:`S_IXGRP`)
-   set, the set-group-ID bit indicates mandatory file/record locking
-   (see also :data:`S_ENFMT`).
+   Bit Set-group-ID. Bit này có một số cách sử dụng đặc biệt. Đối với một thư mục, bit này cho biết thư mục đó sẽ sử dụng ngữ nghĩa BSD: các tệp được tạo tại đó sẽ kế thừa group ID từ thư mục, không phải từ group ID hiệu dụng của tiến trình tạo tệp, và các thư mục được tạo tại đó cũng sẽ được đặt bit :data:`S_ISGID`. Đối với một tệp không được đặt bit thực thi nhóm (:data:`S_IXGRP`), bit Set-group-ID cho biết cơ chế khóa tệp/bản ghi bắt buộc (xem thêm :data:`S_ENFMT`).
 
 .. data:: S_ISVTX
 
-   Sticky bit.  When this bit is set on a directory it means that a file
-   in that directory can be renamed or deleted only by the owner of the
-   file, by the owner of the directory, or by a privileged process.
+   Bit sticky. Khi bit này được đặt trên một thư mục, điều đó có nghĩa là một tệp trong thư mục đó chỉ có thể được đổi tên hoặc xóa bởi chủ sở hữu tệp, chủ sở hữu thư mục hoặc một tiến trình có đặc quyền.
 
 .. data:: S_IRWXU
 
-   Mask for file owner permissions.
+   Mặt nạ cho các quyền của chủ sở hữu tệp.
 
 .. data:: S_IRUSR
 
-   Owner has read permission.
+   Chủ sở hữu có quyền đọc.
 
 .. data:: S_IWUSR
 
-   Owner has write permission.
+   Chủ sở hữu có quyền ghi.
 
 .. data:: S_IXUSR
 
-   Owner has execute permission.
+   Chủ sở hữu có quyền thực thi.
 
 .. data:: S_IRWXG
 
-   Mask for group permissions.
+   Mặt nạ cho quyền của nhóm.
 
 .. data:: S_IRGRP
 
-   Group has read permission.
+   Nhóm có quyền đọc.
 
 .. data:: S_IWGRP
 
-   Group has write permission.
+   Nhóm có quyền ghi.
 
 .. data:: S_IXGRP
 
-   Group has execute permission.
+   Nhóm có quyền thực thi.
 
 .. data:: S_IRWXO
 
-   Mask for permissions for others (not in group).
+   Mặt nạ cho quyền của những người khác (không thuộc nhóm).
 
 .. data:: S_IROTH
 
-   Others have read permission.
+   Những người khác có quyền đọc.
 
 .. data:: S_IWOTH
 
-   Others have write permission.
+   Những người dùng khác có quyền ghi.
 
 .. data:: S_IXOTH
 
-   Others have execute permission.
+   Những người dùng khác có quyền thực thi.
 
 .. data:: S_ENFMT
 
-   System V file locking enforcement.  This flag is shared with :data:`S_ISGID`:
-   file/record locking is enforced on files that do not have the group
-   execution bit (:data:`S_IXGRP`) set.
+   Cơ chế thực thi khóa tệp của System V. Cờ này được dùng chung với :data:`S_ISGID`: việc khóa tệp/bản ghi được thực thi trên các tệp không có bit thực thi nhóm (:data:`S_IXGRP`) được đặt.
 
 .. data:: S_IREAD
 
-   Unix V7 synonym for :data:`S_IRUSR`.
+   Từ đồng nghĩa trong Unix V7 của :data:`S_IRUSR`.
 
 .. data:: S_IWRITE
 
-   Unix V7 synonym for :data:`S_IWUSR`.
+   Từ đồng nghĩa trong Unix V7 của :data:`S_IWUSR`.
 
 .. data:: S_IEXEC
 
-   Unix V7 synonym for :data:`S_IXUSR`.
+   Từ đồng nghĩa trong Unix V7 của :data:`S_IXUSR`.
 
-The following flags can be used in the *flags* argument of :func:`os.chflags`:
+Các cờ sau đây có thể được sử dụng trong đối số *flags* của :func:`os.chflags`:
 
 .. data:: UF_SETTABLE
 
-   All user settable flags.
+   Tất cả các cờ người dùng có thể thiết lập.
 
    .. versionadded:: 3.13
 
 .. data:: UF_NODUMP
 
-   Do not dump the file.
+   Không kết xuất tệp.
 
 .. data:: UF_IMMUTABLE
 
-   The file may not be changed.
+   Không được thay đổi tệp.
 
 .. data:: UF_APPEND
 
-   The file may only be appended to.
+   Tệp chỉ được phép nối thêm dữ liệu.
 
 .. data:: UF_OPAQUE
 
-   The directory is opaque when viewed through a union stack.
+   Thư mục không trong suốt khi được xem qua ngăn xếp union.
 
 .. data:: UF_NOUNLINK
 
-   The file may not be renamed or deleted.
+   Không được đổi tên hoặc xóa tệp.
 
 .. data:: UF_COMPRESSED
 
-   The file is stored compressed (macOS 10.6+).
+   Tệp được lưu trữ ở dạng nén (macOS 10.6 trở lên).
 
 .. data:: UF_TRACKED
 
-   Used for handling document IDs (macOS)
+   Dùng để xử lý ID tài liệu (macOS)
 
    .. versionadded:: 3.13
 
 .. data:: UF_DATAVAULT
 
-   The file needs an entitlement for reading or writing (macOS 10.13+)
+   Tệp cần có entitlement để đọc hoặc ghi (macOS 10.13+)
 
    .. versionadded:: 3.13
 
 .. data:: UF_HIDDEN
 
-   The file should not be displayed in a GUI (macOS 10.5+).
+   Không nên hiển thị tệp trong GUI (macOS 10.5+).
 
 .. data:: SF_SETTABLE
 
-   All super-user changeable flags
+   Tất cả các cờ mà super-user có thể thay đổi
 
    .. versionadded:: 3.13
 
 .. data:: SF_SUPPORTED
 
-   All super-user supported flags
+   Tất cả các cờ được super-user hỗ trợ
 
    .. availability:: macOS
 
@@ -412,7 +379,7 @@ The following flags can be used in the *flags* argument of :func:`os.chflags`:
 
 .. data:: SF_SYNTHETIC
 
-   All super-user read-only synthetic flags
+   Tất cả các cờ tổng hợp chỉ đọc của super-user
 
    .. availability:: macOS
 
@@ -420,76 +387,56 @@ The following flags can be used in the *flags* argument of :func:`os.chflags`:
 
 .. data:: SF_ARCHIVED
 
-   The file may be archived.
+   Tệp có thể được lưu trữ.
 
 .. data:: SF_IMMUTABLE
 
-   The file may not be changed.
+   Không được thay đổi tệp.
 
 .. data:: SF_APPEND
 
-   The file may only be appended to.
+   Tệp chỉ được phép nối thêm dữ liệu.
 
 .. data:: SF_RESTRICTED
 
-   The file needs an entitlement to write to (macOS 10.13+)
+   Tệp cần có entitlement để ghi vào (macOS 10.13+)
 
    .. versionadded:: 3.13
 
 .. data:: SF_NOUNLINK
 
-   The file may not be renamed or deleted.
+   Không được đổi tên hoặc xóa tệp.
 
 .. data:: SF_SNAPSHOT
 
-   The file is a snapshot file.
+   Tệp là một tệp snapshot.
 
 .. data:: SF_FIRMLINK
 
-   The file is a firmlink (macOS 10.15+)
+   Tệp là một firmlink (macOS 10.15+)
 
    .. versionadded:: 3.13
 
 .. data:: SF_DATALESS
 
-   The file is a dataless object (macOS 10.15+)
+   Tệp là một đối tượng không có dữ liệu (macOS 10.15+)
 
    .. versionadded:: 3.13
 
-See the \*BSD or macOS systems man page :manpage:`chflags(2)` for more information.
+Xem \*trang man của hệ thống BSD hoặc macOS :manpage:`chflags(2)` để biết thêm thông tin.
 
-On Windows, the following file attribute constants are available for use when
-testing bits in the ``st_file_attributes`` member returned by :func:`os.stat`.
-See the `Windows API documentation
-<https://msdn.microsoft.com/en-us/library/windows/desktop/gg258117.aspx>`_
-for more detail on the meaning of these constants.
+Trên Windows, các hằng số thuộc tính tệp sau đây có thể được sử dụng khi kiểm tra các bit trong thành viên ``st_file_attributes`` được trả về bởi :func:`os.stat`. Xem `tài liệu Windows API <https://msdn.microsoft.com/en-us/library/windows/desktop/gg258117.aspx>`_ để biết thêm chi tiết về ý nghĩa của các hằng số này.
 
 .. data:: FILE_ATTRIBUTE_ARCHIVE
-          FILE_ATTRIBUTE_COMPRESSED
-          FILE_ATTRIBUTE_DEVICE
-          FILE_ATTRIBUTE_DIRECTORY
-          FILE_ATTRIBUTE_ENCRYPTED
-          FILE_ATTRIBUTE_HIDDEN
-          FILE_ATTRIBUTE_INTEGRITY_STREAM
-          FILE_ATTRIBUTE_NORMAL
-          FILE_ATTRIBUTE_NOT_CONTENT_INDEXED
-          FILE_ATTRIBUTE_NO_SCRUB_DATA
-          FILE_ATTRIBUTE_OFFLINE
-          FILE_ATTRIBUTE_READONLY
-          FILE_ATTRIBUTE_REPARSE_POINT
-          FILE_ATTRIBUTE_SPARSE_FILE
-          FILE_ATTRIBUTE_SYSTEM
-          FILE_ATTRIBUTE_TEMPORARY
-          FILE_ATTRIBUTE_VIRTUAL
+          FILE_ATTRIBUTE_COMPRESSED FILE_ATTRIBUTE_DEVICE FILE_ATTRIBUTE_DIRECTORY FILE_ATTRIBUTE_ENCRYPTED FILE_ATTRIBUTE_HIDDEN FILE_ATTRIBUTE_INTEGRITY_STREAM FILE_ATTRIBUTE_NORMAL FILE_ATTRIBUTE_NOT_CONTENT_INDEXED FILE_ATTRIBUTE_NO_SCRUB_DATA FILE_ATTRIBUTE_OFFLINE FILE_ATTRIBUTE_READONLY FILE_ATTRIBUTE_REPARSE_POINT FILE_ATTRIBUTE_SPARSE_FILE FILE_ATTRIBUTE_SYSTEM FILE_ATTRIBUTE_TEMPORARY FILE_ATTRIBUTE_VIRTUAL
 
    .. versionadded:: 3.5
 
-On Windows, the following constants are available for comparing against the
-``st_reparse_tag`` member returned by :func:`os.lstat`. These are well-known
-constants, but are not an exhaustive list.
+Trên Windows, các hằng số sau đây có thể được sử dụng để so sánh với thành viên ``st_reparse_tag`` được trả về bởi :func:`os.lstat`. Đây là các hằng số quen thuộc, nhưng không phải là danh sách đầy đủ.
 
 .. data:: IO_REPARSE_TAG_SYMLINK
-          IO_REPARSE_TAG_MOUNT_POINT
-          IO_REPARSE_TAG_APPEXECLINK
+          IO_REPARSE_TAG_MOUNT_POINT IO_REPARSE_TAG_APPEXECLINK
 
    .. versionadded:: 3.8
+
+.. _`Windows API documentation`: https://msdn.microsoft.com/en-us/library/windows/desktop/gg258117.aspx

@@ -1,8 +1,8 @@
-:mod:`!math` --- Mathematical functions
-=======================================
+:mod:`!math` --- Các hàm toán học
+=================================
 
 .. module:: math
-   :synopsis: Mathematical functions (sin() etc.).
+   :synopsis: Các hàm toán học (sin() v.v.).
 
 .. testsetup::
 
@@ -10,20 +10,11 @@
 
 --------------
 
-This module provides access to common mathematical functions and constants,
-including those defined by the C standard.
+Mô-đun này cung cấp quyền truy cập vào các hàm và hằng số toán học phổ biến, bao gồm cả những hàm và hằng số được định nghĩa theo tiêu chuẩn C.
 
-These functions cannot be used with complex numbers; use the functions of the
-same name from the :mod:`cmath` module if you require support for complex
-numbers.  The distinction between functions which support complex numbers and
-those which don't is made since most users do not want to learn quite as much
-mathematics as required to understand complex numbers.  Receiving an exception
-instead of a complex result allows earlier detection of the unexpected complex
-number used as a parameter, so that the programmer can determine how and why it
-was generated in the first place.
+Không thể sử dụng các hàm này với số phức; nếu cần hỗ trợ số phức, hãy sử dụng các hàm cùng tên từ mô-đun :mod:`cmath`. Sự phân biệt giữa các hàm hỗ trợ số phức và các hàm không hỗ trợ được đưa ra vì hầu hết người dùng không muốn học nhiều kiến thức toán học đến mức cần thiết để hiểu số phức. Việc nhận được một exception thay vì kết quả phức cho phép phát hiện sớm hơn số phức không mong muốn được sử dụng làm tham số, để lập trình viên có thể xác định nó được tạo ra ngay từ đầu như thế nào và vì sao.
 
-The following functions are provided by this module.  Except when explicitly
-noted otherwise, all return values are floats.
+Mô-đun này cung cấp các hàm sau. Trừ khi có ghi chú rõ ràng khác, tất cả đều trả về giá trị dạng float.
 
 
 ====================================================  ============================================
@@ -121,359 +112,252 @@ noted otherwise, all return values are floats.
 ====================================================  ============================================
 
 
-Number-theoretic functions
---------------------------
+Các hàm lý thuyết số
+--------------------
 
 .. function:: comb(n, k)
 
-   Return the number of ways to choose *k* items from *n* items without repetition
-   and without order.
+   Trả về số cách chọn *k* phần tử từ *n* phần tử mà không lặp lại và không xét thứ tự.
 
-   Evaluates to ``n! / (k! * (n - k)!)`` when ``k <= n`` and evaluates
-   to zero when ``k > n``.
+   Cho kết quả là ``n! / (k! * (n - k)!)`` khi ``k <= n`` và cho kết quả bằng không khi ``k > n``.
 
-   Also called the binomial coefficient because it is equivalent
-   to the coefficient of k-th term in polynomial expansion of
-   ``(1 + x)ⁿ``.
+   Còn được gọi là hệ số nhị thức vì nó tương đương với hệ số của số hạng thứ k trong khai triển đa thức của ``(1 + x)ⁿ``.
 
-   Raises :exc:`TypeError` if either of the arguments are not integers.
-   Raises :exc:`ValueError` if either of the arguments are negative.
+   Phát sinh :exc:`TypeError` nếu một trong hai đối số không phải là số nguyên. Phát sinh :exc:`ValueError` nếu một trong hai đối số là số âm.
 
    .. versionadded:: 3.8
 
 
 .. function:: factorial(n)
 
-   Return factorial of the nonnegative integer *n*.
+   Trả về giai thừa của số nguyên không âm *n*.
 
    .. versionchanged:: 3.10
-      Floats with integral values (like ``5.0``) are no longer accepted.
+      Các số thực có giá trị nguyên (như ``5.0``) không còn được chấp nhận.
 
 
 .. function:: gcd(*integers)
 
-   Return the greatest common divisor of the specified integer arguments.
-   If any of the arguments is nonzero, then the returned value is the largest
-   positive integer that is a divisor of all arguments.  If all arguments
-   are zero, then the returned value is ``0``.  ``gcd()`` without arguments
-   returns ``0``.
+   Trả về ước chung lớn nhất của các đối số nguyên đã chỉ định. Nếu bất kỳ đối số nào khác không, giá trị trả về là số nguyên dương lớn nhất là ước của tất cả các đối số. Nếu tất cả các đối số đều bằng không, giá trị trả về là ``0``. ``gcd()`` không có đối số sẽ trả về ``0``.
 
    .. versionadded:: 3.5
 
    .. versionchanged:: 3.9
-      Added support for an arbitrary number of arguments. Formerly, only two
-      arguments were supported.
+      Đã thêm hỗ trợ cho số lượng đối số tùy ý. Trước đây, chỉ hỗ trợ hai đối số.
 
 
 .. function:: isqrt(n)
 
-   Return the integer square root of the nonnegative integer *n*. This is the
-   floor of the exact square root of *n*, or equivalently the greatest integer
-   *a* such that *a*\ ² |nbsp| ≤ |nbsp| *n*.
+   Trả về căn bậc hai nguyên của số nguyên không âm *n*. Đây là phần nguyên của căn bậc hai chính xác của *n*, hay tương đương là số nguyên lớn nhất *a* sao cho *a*\ ² |nbsp| ≤ |nbsp| *n*.
 
-   For some applications, it may be more convenient to have the least integer
-   *a* such that *n* |nbsp| ≤ |nbsp| *a*\ ², or in other words the ceiling of
-   the exact square root of *n*. For positive *n*, this can be computed using
-   ``a = 1 + isqrt(n - 1)``.
+   Trong một số ứng dụng, sẽ thuận tiện hơn nếu có số nguyên nhỏ nhất *a* sao cho *n* |nbsp| ≤ |nbsp| *a*\ ², hay nói cách khác là giá trị làm tròn lên của căn bậc hai chính xác của *n*. Với *n* dương, có thể tính giá trị này bằng ``a = 1 + isqrt(n - 1)``.
 
    .. versionadded:: 3.8
 
 
 .. function:: lcm(*integers)
 
-   Return the least common multiple of the specified integer arguments.
-   If all arguments are nonzero, then the returned value is the smallest
-   positive integer that is a multiple of all arguments.  If any of the arguments
-   is zero, then the returned value is ``0``.  ``lcm()`` without arguments
-   returns ``1``.
+   Trả về bội chung nhỏ nhất của các đối số nguyên được chỉ định. Nếu tất cả các đối số đều khác không, giá trị trả về là số nguyên dương nhỏ nhất chia hết cho tất cả các đối số. Nếu bất kỳ đối số nào bằng không, giá trị trả về là ``0``. ``lcm()`` không có đối số sẽ trả về ``1``.
 
    .. versionadded:: 3.9
 
 
 .. function:: perm(n, k=None)
 
-   Return the number of ways to choose *k* items from *n* items
-   without repetition and with order.
+   Trả về số cách chọn *k* phần tử từ *n* phần tử mà không lặp lại và có xét thứ tự.
 
-   Evaluates to ``n! / (n - k)!`` when ``k <= n`` and evaluates
-   to zero when ``k > n``.
+   Cho kết quả là ``n! / (n - k)!`` khi ``k <= n`` và cho kết quả bằng 0 khi ``k > n``.
 
-   If *k* is not specified or is ``None``, then *k* defaults to *n*
-   and the function returns ``n!``.
+   Nếu *k* không được chỉ định hoặc là ``None``, thì *k* mặc định là *n* và hàm trả về ``n!``.
 
-   Raises :exc:`TypeError` if either of the arguments are not integers.
-   Raises :exc:`ValueError` if either of the arguments are negative.
+   Phát sinh :exc:`TypeError` nếu một trong hai đối số không phải là số nguyên. Phát sinh :exc:`ValueError` nếu một trong hai đối số là số âm.
 
    .. versionadded:: 3.8
 
 
-Floating point arithmetic
--------------------------
+Số học dấu phẩy động
+--------------------
 
 .. function:: ceil(x)
 
-   Return the ceiling of *x*, the smallest integer greater than or equal to *x*.
-   If *x* is not a float, delegates to :meth:`x.__ceil__ <object.__ceil__>`,
-   which should return an :class:`~numbers.Integral` value.
+   Trả về giá trị trần của *x*, là số nguyên nhỏ nhất lớn hơn hoặc bằng *x*. Nếu *x* không phải là một số thực, ủy quyền cho :meth:`x.__ceil__ <object.__ceil__>`, hàm này phải trả về một giá trị :class:`~numbers.Integral`.
 
 
 .. function:: fabs(x)
 
-   Return the absolute value of *x*.
+   Trả về giá trị tuyệt đối của *x*.
 
 
 .. function:: floor(x)
 
-   Return the floor of *x*, the largest integer less than or equal to *x*.  If
-   *x* is not a float, delegates to :meth:`x.__floor__ <object.__floor__>`, which
-   should return an :class:`~numbers.Integral` value.
+   Trả về giá trị sàn của *x*, là số nguyên lớn nhất nhỏ hơn hoặc bằng *x*. Nếu *x* không phải là một số thực, ủy quyền cho :meth:`x.__floor__ <object.__floor__>`, hàm này phải trả về một giá trị :class:`~numbers.Integral`.
 
 
 .. function:: fma(x, y, z)
 
-   Fused multiply-add operation. Return ``(x * y) + z``, computed as though with
-   infinite precision and range followed by a single round to the ``float``
-   format. This operation often provides better accuracy than the direct
-   expression ``(x * y) + z``.
+   Phép toán fused multiply-add. Trả về ``(x * y) + z``, được tính như thể với độ chính xác và phạm vi vô hạn, sau đó làm tròn một lần duy nhất về định dạng ``float``. Phép toán này thường cho độ chính xác cao hơn biểu thức trực tiếp ``(x * y) + z``.
 
-   This function follows the specification of the fusedMultiplyAdd operation
-   described in the IEEE 754 standard. The standard leaves one case
-   implementation-defined, namely the result of ``fma(0, inf, nan)``
-   and ``fma(inf, 0, nan)``. In these cases, ``math.fma`` returns a NaN,
-   and does not raise any exception.
+   Hàm này tuân theo đặc tả của phép toán fusedMultiplyAdd được mô tả trong tiêu chuẩn IEEE 754. Tiêu chuẩn để việc triển khai tự định nghĩa trong một trường hợp, cụ thể là kết quả của ``fma(0, inf, nan)`` và ``fma(inf, 0, nan)``. Trong các trường hợp này, ``math.fma`` trả về một NaN và không phát sinh ngoại lệ nào.
 
    .. versionadded:: 3.13
 
 
 .. function:: fmod(x, y)
 
-   Return the floating-point remainder of ``x / y``,
-   as defined by the platform C library function ``fmod(x, y)``. Note that the
-   Python expression ``x % y`` may not return the same result.  The intent of the C
-   standard is that ``fmod(x, y)`` be exactly (mathematically; to infinite
-   precision) equal to ``x - n*y`` for some integer *n* such that the result has
-   the same sign as *x* and magnitude less than ``abs(y)``.  Python's ``x % y``
-   returns a result with the sign of *y* instead, and may not be exactly computable
-   for float arguments. For example, ``fmod(-1e-100, 1e100)`` is ``-1e-100``, but
-   the result of Python's ``-1e-100 % 1e100`` is ``1e100-1e-100``, which cannot be
-   represented exactly as a float, and rounds to the surprising ``1e100``.  For
-   this reason, function :func:`fmod` is generally preferred when working with
-   floats, while Python's ``x % y`` is preferred when working with integers.
+   Trả về phần dư dấu phẩy động của ``x / y``, như được định nghĩa bởi hàm thư viện C của nền tảng ``fmod(x, y)``. Lưu ý rằng biểu thức Python ``x % y`` có thể không trả về cùng một kết quả. Mục đích của tiêu chuẩn C là ``fmod(x, y)`` phải chính xác (về mặt toán học; với độ chính xác vô hạn) bằng ``x - n*y`` với một số nguyên *n* nào đó, sao cho kết quả có cùng dấu với *x* và độ lớn nhỏ hơn ``abs(y)``. ``x % y`` của Python thay vào đó trả về kết quả có dấu của *y*, và có thể không tính được chính xác với các đối số float. Ví dụ, ``fmod(-1e-100, 1e100)`` là ``-1e-100``, nhưng kết quả của ``-1e-100 % 1e100`` trong Python là ``1e100-1e-100``, không thể được biểu diễn chính xác dưới dạng float và được làm tròn thành giá trị đáng ngạc nhiên ``1e100``. Vì lý do này, hàm :func:`fmod` thường được ưu tiên khi làm việc với float, trong khi ``x % y`` của Python được ưu tiên khi làm việc với số nguyên.
 
 
 .. function:: modf(x)
 
-   Return the fractional and integer parts of *x*.  Both results carry the sign
-   of *x* and are floats.
+   Trả về phần phân số và phần nguyên của *x*. Cả hai kết quả đều mang dấu của *x* và là số thực.
 
-   Note that :func:`modf` has a different call/return pattern
-   than its C equivalents: it takes a single argument and return a pair of
-   values, rather than returning its second return value through an 'output
-   parameter' (there is no such thing in Python).
+   Lưu ý rằng :func:`modf` có mẫu gọi/trả về khác với các phiên bản tương đương trong C: hàm này nhận một đối số và trả về một cặp giá trị, thay vì trả về giá trị thứ hai thông qua một “tham số đầu ra” (trong Python không có khái niệm như vậy).
 
 
 .. function:: remainder(x, y)
 
-   Return the IEEE 754-style remainder of *x* with respect to *y*.  For
-   finite *x* and finite nonzero *y*, this is the difference ``x - n*y``,
-   where ``n`` is the closest integer to the exact value of the quotient ``x /
-   y``.  If ``x / y`` is exactly halfway between two consecutive integers, the
-   nearest *even* integer is used for ``n``.  The remainder ``r = remainder(x,
-   y)`` thus always satisfies ``abs(r) <= 0.5 * abs(y)``.
+   Trả về phần dư theo kiểu IEEE 754 của *x* đối với *y*. Với *x* hữu hạn và *y* hữu hạn, khác 0, đây là hiệu ``x - n*y``, trong đó ``n`` là số nguyên gần nhất với giá trị chính xác của thương ``x / y``. Nếu ``x / y`` nằm chính xác giữa hai số nguyên liên tiếp, số nguyên chẵn gần nhất *even* được dùng cho ``n``. Do đó, phần dư ``r = remainder(x, y)`` luôn thỏa mãn ``abs(r) <= 0.5 * abs(y)``.
 
-   Special cases follow IEEE 754: in particular, ``remainder(x, math.inf)`` is
-   *x* for any finite *x*, and ``remainder(x, 0)`` and
-   ``remainder(math.inf, x)`` raise :exc:`ValueError` for any non-NaN *x*.
-   If the result of the remainder operation is zero, that zero will have
-   the same sign as *x*.
+   Các trường hợp đặc biệt tuân theo IEEE 754: cụ thể, ``remainder(x, math.inf)`` là *x* với mọi *x* hữu hạn, còn ``remainder(x, 0)`` và ``remainder(math.inf, x)`` phát sinh :exc:`ValueError` với mọi *x* không phải NaN. Nếu kết quả của phép tính phần dư bằng 0, số 0 đó sẽ có cùng dấu với *x*.
 
-   On platforms using IEEE 754 binary floating point, the result of this
-   operation is always exactly representable: no rounding error is introduced.
+   Trên các nền tảng sử dụng số thực nhị phân theo IEEE 754, kết quả của phép toán này luôn biểu diễn được chính xác: không phát sinh sai số làm tròn.
 
    .. versionadded:: 3.7
 
 
 .. function:: trunc(x)
 
-   Return *x* with the fractional part
-   removed, leaving the integer part.  This rounds toward 0: ``trunc()`` is
-   equivalent to :func:`floor` for positive *x*, and equivalent to :func:`ceil`
-   for negative *x*. If *x* is not a float, delegates to :meth:`x.__trunc__
-   <object.__trunc__>`, which should return an :class:`~numbers.Integral` value.
+   Trả về *x* sau khi loại bỏ phần phân số, giữ lại phần nguyên. Phép toán này làm tròn về 0: ``trunc()`` tương đương với :func:`floor` đối với *x* dương và tương đương với :func:`ceil` đối với *x* âm. Nếu *x* không phải là số thực, hàm ủy quyền cho :meth:`x.__trunc__ <object.__trunc__>`, hàm này sẽ trả về một giá trị :class:`~numbers.Integral`.
 
 
-For the :func:`ceil`, :func:`floor`, and :func:`modf` functions, note that *all*
-floating-point numbers of sufficiently large magnitude are exact integers.
-Python floats typically carry no more than 53 bits of precision (the same as the
-platform C double type), in which case any float *x* with ``abs(x) >= 2**52``
-necessarily has no fractional bits.
+Đối với các hàm :func:`ceil`, :func:`floor` và :func:`modf`, lưu ý rằng *mọi* số thực có độ lớn đủ lớn đều là số nguyên chính xác. Các số thực Python thường có không quá 53 bit độ chính xác (giống kiểu double của C trên nền tảng), trong trường hợp đó, mọi số thực *x* thỏa mãn ``abs(x) >= 2**52`` nhất thiết không có bit phân số.
 
 
-Floating point manipulation functions
+Các hàm thao tác với số dấu phẩy động
 -------------------------------------
 
 .. function:: copysign(x, y)
 
-   Return a float with the magnitude (absolute value) of *x* but the sign of
-   *y*.  On platforms that support signed zeros, ``copysign(1.0, -0.0)``
-   returns *-1.0*.
+   Trả về một số thực có độ lớn (giá trị tuyệt đối) của *x* nhưng có dấu của *y*. Trên các nền tảng hỗ trợ số 0 có dấu, ``copysign(1.0, -0.0)`` trả về *-1.0*.
 
 
 .. function:: frexp(x)
 
-   Return the mantissa and exponent of *x* as the pair ``(m, e)``.
-   If *x* is a finite nonzero number, then *m* is a float with
-   ``0.5 <= abs(m) < 1.0`` and an integer *e* is such that
-   ``x == m * 2**e`` exactly.  Else, return ``(x, 0)``.
-   This is used to "pick apart" the internal representation of
-   a float in a portable way.
+   Trả về phần định trị và số mũ của *x* dưới dạng cặp ``(m, e)``. Nếu *x* là một số hữu hạn khác không, thì *m* là một số thực với ``0.5 <= abs(m) < 1.0`` và số nguyên *e* sao cho ``x == m * 2**e`` chính xác. Nếu không, trả về ``(x, 0)``. Cách này được dùng để “tách rời” biểu diễn nội bộ của một số thực theo cách khả chuyển.
 
-   Note that :func:`frexp` has a different call/return pattern
-   than its C equivalents: it takes a single argument and return a pair of
-   values, rather than returning its second return value through an 'output
-   parameter' (there is no such thing in Python).
+   Lưu ý rằng :func:`frexp` có cách gọi và trả về khác với các hàm tương đương trong C: hàm này nhận một đối số và trả về một cặp giá trị, thay vì trả về giá trị thứ hai thông qua một “tham số đầu ra” (Python không có khái niệm này).
 
 .. function:: isclose(a, b, *, rel_tol=1e-09, abs_tol=0.0)
 
-   Return ``True`` if the values *a* and *b* are close to each other and
-   ``False`` otherwise.
+   Trả về ``True`` nếu các giá trị *a* và *b* gần nhau, và ``False`` nếu không.
 
-   Whether or not two values are considered close is determined according to
-   given absolute and relative tolerances.  If no errors occur, the result will
-   be: ``abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)``.
+   Việc hai giá trị có được xem là gần nhau hay không được xác định dựa trên các dung sai tuyệt đối và tương đối đã cho. Nếu không xảy ra lỗi, kết quả sẽ là: ``abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)``.
 
-   *rel_tol* is the relative tolerance -- it is the maximum allowed difference
-   between *a* and *b*, relative to the larger absolute value of *a* or *b*.
-   For example, to set a tolerance of 5%, pass ``rel_tol=0.05``.  The default
-   tolerance is ``1e-09``, which assures that the two values are the same
-   within about 9 decimal digits.  *rel_tol* must be nonnegative and less
-   than ``1.0``.
+   *rel_tol* là dung sai tương đối -- đây là độ chênh lệch tối đa được phép giữa *a* và *b*, tính tương đối so với giá trị tuyệt đối lớn hơn giữa *a* và *b*. Ví dụ, để đặt dung sai là 5%, hãy truyền ``rel_tol=0.05``. Dung sai mặc định là ``1e-09``, đảm bảo rằng hai giá trị giống nhau với độ chính xác khoảng 9 chữ số thập phân. *rel_tol* phải không âm và nhỏ hơn ``1.0``.
 
-   *abs_tol* is the absolute tolerance; it defaults to ``0.0`` and it must be
-   nonnegative.  When comparing ``x`` to ``0.0``, ``isclose(x, 0)`` is computed
-   as ``abs(x) <= rel_tol  * abs(x)``, which is ``False`` for any nonzero ``x`` and
-   *rel_tol* less than ``1.0``.  So add an appropriate positive *abs_tol* argument
-   to the call.
+   *abs_tol* là dung sai tuyệt đối; giá trị mặc định là ``0.0`` và phải không âm. Khi so sánh ``x`` với ``0.0``, ``isclose(x, 0)`` được tính là ``abs(x) <= rel_tol  * abs(x)``, tức là ``False`` với mọi ``x`` khác không và *rel_tol* nhỏ hơn ``1.0``. Vì vậy, hãy thêm đối số *abs_tol* dương phù hợp vào lệnh gọi.
 
-   The IEEE 754 special values of ``NaN``, ``inf``, and ``-inf`` will be
-   handled according to IEEE rules.  Specifically, ``NaN`` is not considered
-   close to any other value, including ``NaN``.  ``inf`` and ``-inf`` are only
-   considered close to themselves.
+   Các giá trị đặc biệt theo IEEE 754 của ``NaN``, ``inf`` và ``-inf`` sẽ được xử lý theo các quy tắc của IEEE. Cụ thể, ``NaN`` không được xem là gần với bất kỳ giá trị nào khác, kể cả ``NaN``. ``inf`` và ``-inf`` chỉ được xem là gần với chính chúng.
 
    .. versionadded:: 3.5
 
    .. seealso::
 
-      :pep:`485` -- A function for testing approximate equality
+      :pep:`485` -- Một hàm dùng để kiểm tra tính gần bằng nhau
 
 
 .. function:: isfinite(x)
 
-   Return ``True`` if *x* is neither an infinity nor a NaN, and
-   ``False`` otherwise.  (Note that ``0.0`` *is* considered finite.)
+   Trả về ``True`` nếu *x* không phải là vô cực cũng không phải NaN, và trả về ``False`` trong trường hợp ngược lại. (Lưu ý rằng ``0.0`` *is* được xem là hữu hạn.)
 
    .. versionadded:: 3.2
 
 
 .. function:: isinf(x)
 
-   Return ``True`` if *x* is a positive or negative infinity, and
-   ``False`` otherwise.
+   Trả về ``True`` nếu *x* là vô cực dương hoặc vô cực âm, và trả về ``False`` trong trường hợp ngược lại.
 
 
 .. function:: isnan(x)
 
-   Return ``True`` if *x* is a NaN (not a number), and ``False`` otherwise.
+   Trả về ``True`` nếu *x* là NaN (không phải số), và trả về ``False`` trong trường hợp ngược lại.
 
 
 .. function:: ldexp(x, i)
 
-   Return ``x * (2**i)``.  This is essentially the inverse of function
+   Trả về ``x * (2**i)``. Về cơ bản, đây là nghịch đảo của hàm
    :func:`frexp`.
 
 
 .. function:: nextafter(x, y, steps=1)
 
-   Return the floating-point value *steps* steps after *x* towards *y*.
+   Trả về giá trị dấu phẩy động *steps* bước tính từ *x* theo hướng về phía *y*.
 
-   If *x* is equal to *y*, return *y*, unless *steps* is zero.
+   Nếu *x* bằng *y*, trả về *y*, trừ khi *steps* bằng không.
 
-   Examples:
+   Ví dụ:
 
-   * ``math.nextafter(x, math.inf)`` goes up: towards positive infinity.
-   * ``math.nextafter(x, -math.inf)`` goes down: towards minus infinity.
-   * ``math.nextafter(x, 0.0)`` goes towards zero.
-   * ``math.nextafter(x, math.copysign(math.inf, x))`` goes away from zero.
+   * ``math.nextafter(x, math.inf)`` tăng lên: về phía vô cực dương.
+   * ``math.nextafter(x, -math.inf)`` giảm xuống: về phía vô cực âm.
+   * ``math.nextafter(x, 0.0)`` tiến về số không.
+   * ``math.nextafter(x, math.copysign(math.inf, x))`` ra xa số không.
 
-   See also :func:`math.ulp`.
+   Xem thêm :func:`math.ulp`.
 
    .. versionadded:: 3.9
 
    .. versionchanged:: 3.12
-      Added the *steps* argument.
+      Đã thêm đối số *steps*.
 
 
 .. function:: ulp(x)
 
-   Return the value of the least significant bit of the float *x*:
+   Trả về giá trị của bit ít có ý nghĩa nhất của số thực *x*:
 
-   * If *x* is a NaN (not a number), return *x*.
-   * If *x* is negative, return ``ulp(-x)``.
-   * If *x* is a positive infinity, return *x*.
-   * If *x* is equal to zero, return the smallest positive
-     *denormalized* representable float (smaller than the minimum positive
-     *normalized* float, :data:`sys.float_info.min <sys.float_info>`).
-   * If *x* is equal to the largest positive representable float,
-     return the value of the least significant bit of *x*, such that the first
-     float smaller than *x* is ``x - ulp(x)``.
-   * Otherwise (*x* is a positive finite number), return the value of the least
-     significant bit of *x*, such that the first float bigger than *x*
-     is ``x + ulp(x)``.
+   * Nếu *x* là NaN (không phải là một số), trả về *x*.
+   * Nếu *x* là số âm, trả về ``ulp(-x)``.
+   * Nếu *x* là vô cực dương, trả về *x*.
+   * Nếu *x* bằng 0, trả về số thực dương *denormalized* nhỏ nhất có thể biểu diễn (nhỏ hơn số thực dương *normalized* nhỏ nhất, :data:`sys.float_info.min <sys.float_info>`).
+   * Nếu *x* bằng số thực dương lớn nhất có thể biểu diễn, trả về giá trị của bit ít quan trọng nhất của *x*, sao cho số thực đầu tiên nhỏ hơn *x* là ``x - ulp(x)``.
+   * Nếu không (*x* là một số hữu hạn dương), trả về giá trị của bit ít quan trọng nhất của *x*, sao cho số thực đầu tiên lớn hơn *x* là ``x + ulp(x)``.
 
-   ULP stands for "Unit in the Last Place".
+   ULP là viết tắt của "Unit in the Last Place".
 
-   See also :func:`math.nextafter` and :data:`sys.float_info.epsilon
-   <sys.float_info>`.
+   Xem thêm :func:`math.nextafter` và :data:`sys.float_info.epsilon <sys.float_info>`.
 
    .. versionadded:: 3.9
 
 
-Power, exponential and logarithmic functions
---------------------------------------------
+Các hàm lũy thừa, hàm mũ và hàm logarithm
+-----------------------------------------
 
 .. function:: cbrt(x)
 
-   Return the cube root of *x*.
+   Trả về căn bậc ba của *x*.
 
    .. versionadded:: 3.11
 
 
 .. function:: exp(x)
 
-   Return *e* raised to the power *x*, where *e* = 2.718281... is the base
-   of natural logarithms.  This is usually more accurate than ``math.e ** x``
-   or ``pow(math.e, x)``.
+   Trả về *e* lũy thừa *x*, trong đó *e* = 2.718281... là cơ số của logarithm tự nhiên.  Giá trị này thường chính xác hơn ``math.e ** x`` hoặc ``pow(math.e, x)``.
 
 
 .. function:: exp2(x)
 
-   Return *2* raised to the power *x*.
+   Trả về *2* lũy thừa *x*.
 
    .. versionadded:: 3.11
 
 
 .. function:: expm1(x)
 
-   Return *e* raised to the power *x*, minus 1.  Here *e* is the base of natural
-   logarithms.  For small floats *x*, the subtraction in ``exp(x) - 1``
-   can result in a `significant loss of precision
-   <https://en.wikipedia.org/wiki/Loss_of_significance>`_\; the :func:`expm1`
-   function provides a way to compute this quantity to full precision:
+   Trả về *e* lũy thừa *x*, rồi trừ 1.  Ở đây, *e* là cơ số của logarit tự nhiên.  Với các số thực dấu phẩy động *x* nhỏ, phép trừ trong ``exp(x) - 1`` có thể dẫn đến `sự mất độ chính xác đáng kể <https://en.wikipedia.org/wiki/Loss_of_significance>`_\;, hàm :func:`expm1` cung cấp một cách để tính đại lượng này với đầy đủ độ chính xác:
 
       >>> from math import exp, expm1
-      >>> exp(1e-5) - 1  # gives result accurate to 11 places
+      >>> exp(1e-5) - 1  # cho kết quả chính xác đến 11 chữ số
       1.0000050000069649e-05
-      >>> expm1(1e-5)    # result accurate to full precision
+      >>> expm1(1e-5)    # kết quả chính xác với đầy đủ độ chính xác
       1.0000050000166668e-05
 
    .. versionadded:: 3.2
@@ -481,71 +365,56 @@ Power, exponential and logarithmic functions
 
 .. function:: log(x[, base])
 
-   With one argument, return the natural logarithm of *x* (to base *e*).
+   Với một đối số, trả về logarit tự nhiên của *x* (theo cơ số *e*).
 
-   With two arguments, return the logarithm of *x* to the given *base*,
-   calculated as ``log(x)/log(base)``.
+   Với hai đối số, trả về logarit của *x* theo *cơ số* được chỉ định, được tính là ``log(x)/log(base)``.
 
 
 .. function:: log1p(x)
 
-   Return the natural logarithm of *1+x* (base *e*). The
-   result is calculated in a way which is accurate for *x* near zero.
+   Trả về logarit tự nhiên của *1+x* (cơ số *e*). Kết quả được tính theo cách đảm bảo độ chính xác cho *x* gần bằng không.
 
 
 .. function:: log2(x)
 
-   Return the base-2 logarithm of *x*. This is usually more accurate than
-   ``log(x, 2)``.
+   Trả về logarithm cơ số 2 của *x*. Giá trị này thường chính xác hơn ``log(x, 2)``.
 
    .. versionadded:: 3.3
 
    .. seealso::
 
-      :meth:`int.bit_length` returns the number of bits necessary to represent
-      an integer in binary, excluding the sign and leading zeros.
+      :meth:`int.bit_length` trả về số bit cần thiết để biểu diễn một số nguyên ở dạng nhị phân, không bao gồm dấu và các số 0 ở đầu.
 
 
 .. function:: log10(x)
 
-   Return the base-10 logarithm of *x*.  This is usually more accurate
-   than ``log(x, 10)``.
+   Trả về logarithm cơ số 10 của *x*. Giá trị này thường chính xác hơn ``log(x, 10)``.
 
 
 .. function:: pow(x, y)
 
-   Return *x* raised to the power *y*.  Exceptional cases follow
-   the IEEE 754 standard as far as possible.  In particular,
-   ``pow(1.0, x)`` and ``pow(x, 0.0)`` always return ``1.0``, even
-   when *x* is a zero or a NaN.  If both *x* and *y* are finite,
-   *x* is negative, and *y* is not an integer then ``pow(x, y)``
-   is undefined, and raises :exc:`ValueError`.
+   Trả về *x* lũy thừa *y*. Các trường hợp đặc biệt tuân theo tiêu chuẩn IEEE 754 trong phạm vi có thể. Cụ thể, ``pow(1.0, x)`` và ``pow(x, 0.0)`` luôn trả về ``1.0``, ngay cả khi *x* là số 0 hoặc NaN. Nếu cả *x* và *y* đều hữu hạn, *x* là số âm và *y* không phải là số nguyên, thì ``pow(x, y)`` không được xác định và sẽ phát sinh :exc:`ValueError`.
 
-   Unlike the built-in ``**`` operator, :func:`math.pow` converts both
-   its arguments to type :class:`float`.  Use ``**`` or the built-in
-   :func:`pow` function for computing exact integer powers.
+   Không giống toán tử dựng sẵn ``**``, :func:`math.pow` chuyển đổi cả hai đối số sang kiểu :class:`float`. Sử dụng ``**`` hoặc toán tử dựng sẵn
+   :func:`pow` để tính các lũy thừa số nguyên chính xác.
 
    .. versionchanged:: 3.11
-      The special cases ``pow(0.0, -inf)`` and ``pow(-0.0, -inf)`` were
-      changed to return ``inf`` instead of raising :exc:`ValueError`,
-      for consistency with IEEE 754.
+      Các trường hợp đặc biệt ``pow(0.0, -inf)`` và ``pow(-0.0, -inf)`` đã được thay đổi để trả về ``inf`` thay vì phát sinh :exc:`ValueError`, nhằm nhất quán với IEEE 754.
 
 
 .. function:: sqrt(x)
 
-   Return the square root of *x*.
+   Trả về căn bậc hai của *x*.
 
 
-Summation and product functions
--------------------------------
+Các hàm tính tổng và tích
+-------------------------
 
 .. function:: dist(p, q)
 
-   Return the Euclidean distance between two points *p* and *q*, each
-   given as a sequence (or iterable) of coordinates.  The two points
-   must have the same dimension.
+   Trả về khoảng cách Euclid giữa hai điểm *p* và *q*, mỗi điểm được cung cấp dưới dạng một chuỗi (hoặc iterable) các tọa độ. Hai điểm phải có cùng số chiều.
 
-   Roughly equivalent to::
+   Gần tương đương với::
 
        sqrt(sum((px - qx) ** 2.0 for px, qx in zip(p, q)))
 
@@ -554,175 +423,144 @@ Summation and product functions
 
 .. function:: fsum(iterable)
 
-   Return an accurate floating-point sum of values in the iterable.  Avoids
-   loss of precision by tracking multiple intermediate partial sums.
+   Trả về tổng số thực dấu phẩy động chính xác của các giá trị trong iterable. Tránh mất độ chính xác bằng cách theo dõi nhiều tổng bộ phận trung gian.
 
-   The algorithm's accuracy depends on IEEE-754 arithmetic guarantees and the
-   typical case where the rounding mode is half-even.  On some non-Windows
-   builds, the underlying C library uses extended precision addition and may
-   occasionally double-round an intermediate sum causing it to be off in its
-   least significant bit.
+   Độ chính xác của thuật toán phụ thuộc vào các đảm bảo của phép tính IEEE-754 và trường hợp điển hình khi chế độ làm tròn là nửa về số chẵn. Trên một số bản dựng không phải Windows, thư viện C bên dưới sử dụng phép cộng với độ chính xác mở rộng và đôi khi có thể làm tròn hai lần một tổng trung gian, khiến bit có trọng số thấp nhất của tổng bị sai.
 
-   For further discussion and two alternative approaches, see the `ASPN cookbook
-   recipes for accurate floating-point summation
-   <https://code.activestate.com/recipes/393090-binary-floating-point-summation-accurate-to-full-p/>`_\.
+   Để xem thảo luận thêm và hai phương pháp thay thế, hãy xem `các công thức trong cookbook ASPN để tính tổng số thực dấu phẩy động chính xác <https://code.activestate.com/recipes/393090-binary-floating-point-summation-accurate-to-full-p/>`_\.
 
 
 .. function:: hypot(*coordinates)
 
-   Return the Euclidean norm, ``sqrt(sum(x**2 for x in coordinates))``.
-   This is the length of the vector from the origin to the point
-   given by the coordinates.
+   Trả về chuẩn Euclid, ``sqrt(sum(x**2 for x in coordinates))``. Đây là độ dài của vectơ từ gốc tọa độ đến điểm được xác định bởi các tọa độ.
 
-   For a two dimensional point ``(x, y)``, this is equivalent to computing
-   the hypotenuse of a right triangle using the Pythagorean theorem,
-   ``sqrt(x*x + y*y)``.
+   Đối với một điểm hai chiều ``(x, y)``, điều này tương đương với việc tính cạnh huyền của một tam giác vuông bằng định lý Pythagore, ``sqrt(x*x + y*y)``.
 
    .. versionchanged:: 3.8
-      Added support for n-dimensional points. Formerly, only the two
-      dimensional case was supported.
+      Đã bổ sung hỗ trợ cho các điểm n chiều. Trước đây, chỉ trường hợp hai chiều được hỗ trợ.
 
    .. versionchanged:: 3.10
-      Improved the algorithm's accuracy so that the maximum error is
-      under 1 ulp (unit in the last place).  More typically, the result
-      is almost always correctly rounded to within 1/2 ulp.
+      Đã cải thiện độ chính xác của thuật toán để sai số tối đa nhỏ hơn 1 ulp (đơn vị ở chữ số cuối cùng). Thông thường hơn, kết quả hầu như luôn được làm tròn chính xác trong phạm vi 1/2 ulp.
 
 
 .. function:: prod(iterable, *, start=1)
 
-   Calculate the product of all the elements in the input *iterable*.
-   The default *start* value for the product is ``1``.
+   Tính tích của tất cả các phần tử trong *iterable* đầu vào. Giá trị *start* mặc định cho tích là ``1``.
 
-   When the iterable is empty, return the start value.  This function is
-   intended specifically for use with numeric values and may reject
-   non-numeric types.
+   Khi iterable trống, trả về giá trị start. Hàm này được thiết kế riêng để sử dụng với các giá trị số và có thể từ chối các kiểu không phải số.
 
    .. versionadded:: 3.8
 
 
 .. function:: sumprod(p, q)
 
-   Return the sum of products of values from two iterables *p* and *q*.
+   Trả về tổng các tích của các giá trị từ hai iterable *p* và *q*.
 
-   Raises :exc:`ValueError` if the inputs do not have the same length.
+   Phát sinh :exc:`ValueError` nếu các đầu vào không có cùng độ dài.
 
-   Roughly equivalent to::
+   Gần tương đương với::
 
        sum(map(operator.mul, p, q, strict=True))
 
-   For float and mixed int/float inputs, the intermediate products
-   and sums are computed with extended precision.
+   Đối với đầu vào float và int/float hỗn hợp, các tích và tổng trung gian được tính với độ chính xác mở rộng.
 
    .. versionadded:: 3.12
 
 
-Angular conversion
-------------------
+Chuyển đổi góc
+--------------
 
 .. function:: degrees(x)
 
-   Convert angle *x* from radians to degrees.
+   Chuyển đổi góc *x* từ radian sang độ.
 
 
 .. function:: radians(x)
 
-   Convert angle *x* from degrees to radians.
+   Chuyển đổi góc *x* từ độ sang radian.
 
 
-Trigonometric functions
------------------------
+Các hàm lượng giác
+------------------
 
 .. function:: acos(x)
 
-   Return the arc cosine of *x*, in radians. The result is between ``0`` and
-   ``pi``.
+   Trả về arc cosine của *x*, tính bằng radian. Kết quả nằm trong khoảng từ ``0`` đến ``pi``.
 
 
 .. function:: asin(x)
 
-   Return the arc sine of *x*, in radians. The result is between ``-pi/2`` and
-   ``pi/2``.
+   Trả về arc sine của *x*, tính bằng radian. Kết quả nằm trong khoảng từ ``-pi/2`` đến ``pi/2``.
 
 
 .. function:: atan(x)
 
-   Return the arc tangent of *x*, in radians. The result is between ``-pi/2`` and
-   ``pi/2``.
+   Trả về arc tangent của *x*, tính bằng radian. Kết quả nằm trong khoảng từ ``-pi/2`` đến ``pi/2``.
 
 
 .. function:: atan2(y, x)
 
-   Return ``atan(y / x)``, in radians. The result is between ``-pi`` and ``pi``.
-   The vector in the plane from the origin to point ``(x, y)`` makes this angle
-   with the positive X axis. The point of :func:`atan2` is that the signs of both
-   inputs are known to it, so it can compute the correct quadrant for the angle.
-   For example, ``atan(1)`` and ``atan2(1, 1)`` are both ``pi/4``, but ``atan2(-1,
-   -1)`` is ``-3*pi/4``.
+   Trả về ``atan(y / x)``, tính bằng radian. Kết quả nằm trong khoảng từ ``-pi`` đến ``pi``. Vector trong mặt phẳng từ gốc tọa độ đến điểm ``(x, y)`` tạo với trục X dương một góc bằng góc này. Điểm đặc biệt của :func:`atan2` là nó biết dấu của cả hai đầu vào, nên có thể tính đúng góc phần tư của góc. Ví dụ, ``atan(1)`` và ``atan2(1, 1)`` đều là ``pi/4``, nhưng ``atan2(-1, -1)`` là ``-3*pi/4``.
 
 
 .. function:: cos(x)
 
-   Return the cosine of *x* radians.
+   Trả về cosine của *x* radian.
 
 
 .. function:: sin(x)
 
-   Return the sine of *x* radians.
+   Trả về sine của *x* radian.
 
 
 .. function:: tan(x)
 
-   Return the tangent of *x* radians.
+   Trả về tangent của *x* radian.
 
 
-Hyperbolic functions
---------------------
+Các hàm hyperbolic
+------------------
 
-`Hyperbolic functions <https://en.wikipedia.org/wiki/Hyperbolic_functions>`_
-are analogs of trigonometric functions that are based on hyperbolas
-instead of circles.
+`Các hàm hyperbolic <https://en.wikipedia.org/wiki/Hyperbolic_functions>`_ là các hàm tương tự hàm lượng giác, nhưng dựa trên hyperbol thay vì đường tròn.
 
 .. function:: acosh(x)
 
-   Return the inverse hyperbolic cosine of *x*.
+   Trả về cos hyperbolic ngược của *x*.
 
 
 .. function:: asinh(x)
 
-   Return the inverse hyperbolic sine of *x*.
+   Trả về sin hyperbolic ngược của *x*.
 
 
 .. function:: atanh(x)
 
-   Return the inverse hyperbolic tangent of *x*.
+   Trả về tan hyperbolic ngược của *x*.
 
 
 .. function:: cosh(x)
 
-   Return the hyperbolic cosine of *x*.
+   Trả về cos hyperbolic của *x*.
 
 
 .. function:: sinh(x)
 
-   Return the hyperbolic sine of *x*.
+   Trả về sin hyperbolic của *x*.
 
 
 .. function:: tanh(x)
 
-   Return the hyperbolic tangent of *x*.
+   Trả về tang hyperbolic của *x*.
 
 
-Special functions
------------------
+Các hàm đặc biệt
+----------------
 
 .. function:: erf(x)
 
-   Return the `error function <https://en.wikipedia.org/wiki/Error_function>`_ at
-   *x*.
+   Trả về `hàm sai số <https://en.wikipedia.org/wiki/Error_function>`_ tại *x*.
 
-   The :func:`erf` function can be used to compute traditional statistical
-   functions such as the `cumulative standard normal distribution
-   <https://en.wikipedia.org/wiki/Cumulative_distribution_function>`_::
+   Hàm :func:`erf` có thể được sử dụng để tính các hàm thống kê truyền thống như `phân phối chuẩn tích lũy <https://en.wikipedia.org/wiki/Cumulative_distribution_function>`_::
 
      def phi(x):
          'Cumulative distribution function for the standard normal distribution'
@@ -733,72 +571,55 @@ Special functions
 
 .. function:: erfc(x)
 
-   Return the complementary error function at *x*.  The `complementary error
-   function <https://en.wikipedia.org/wiki/Error_function>`_ is defined as
-   ``1.0 - erf(x)``.  It is used for large values of *x* where a subtraction
-   from one would cause a `loss of significance
-   <https://en.wikipedia.org/wiki/Loss_of_significance>`_\.
+   Trả về hàm sai số bù tại *x*.  `Hàm sai số bù <https://en.wikipedia.org/wiki/Error_function>`_ được định nghĩa là ``1.0 - erf(x)``.  Hàm này được sử dụng cho các giá trị lớn của *x* khi phép trừ một sẽ gây ra `mất độ chính xác <https://en.wikipedia.org/wiki/Loss_of_significance>`_\.
 
    .. versionadded:: 3.2
 
 
 .. function:: gamma(x)
 
-   Return the `Gamma function <https://en.wikipedia.org/wiki/Gamma_function>`_ at
-   *x*.
+   Trả về `hàm Gamma <https://en.wikipedia.org/wiki/Gamma_function>`_ tại *x*.
 
    .. versionadded:: 3.2
 
 
 .. function:: lgamma(x)
 
-   Return the natural logarithm of the absolute value of the Gamma
-   function at *x*.
+   Trả về logarit tự nhiên của giá trị tuyệt đối của hàm Gamma tại *x*.
 
    .. versionadded:: 3.2
 
 
-Constants
----------
+Các hằng số
+-----------
 
 .. data:: pi
 
-   The mathematical constant *π* = 3.141592..., to available precision.
+   Hằng số toán học *π* = 3.141592..., với độ chính xác khả dụng.
 
 
 .. data:: e
 
-   The mathematical constant *e* = 2.718281..., to available precision.
+   Hằng số toán học *e* = 2.718281..., với độ chính xác khả dụng.
 
 
 .. data:: tau
 
-   The mathematical constant *τ* = 6.283185..., to available precision.
-   Tau is a circle constant equal to 2\ *π*, the ratio of a circle's circumference to
-   its radius. To learn more about Tau, check out Vi Hart's video `Pi is (still)
-   Wrong <https://vimeo.com/147792667>`_, and start celebrating
-   `Tau day <https://tauday.com/>`_ by eating twice as much pie!
+   Hằng số toán học *τ* = 6.283185..., với độ chính xác khả dụng. Tau là hằng số đường tròn bằng 2\ *π*, tức tỷ số giữa chu vi và bán kính của một đường tròn. Để tìm hiểu thêm về Tau, hãy xem video `Pi vẫn sai <https://vimeo.com/147792667>`_ của Vi Hart và bắt đầu ăn mừng `ngày Tau <https://tauday.com/>`_ bằng cách ăn nhiều bánh gấp đôi!
 
    .. versionadded:: 3.6
 
 
 .. data:: inf
 
-   A floating-point positive infinity.  (For negative infinity, use
-   ``-math.inf``.)  Equivalent to the output of ``float('inf')``.
+   Giá trị dương vô cực dạng số thực dấu phẩy động. (Để biểu diễn âm vô cực, hãy dùng ``-math.inf``.) Tương đương với kết quả đầu ra của ``float('inf')``.
 
    .. versionadded:: 3.5
 
 
 .. data:: nan
 
-   A floating-point "not a number" (NaN) value. Equivalent to the output of
-   ``float('nan')``. Due to the requirements of the `IEEE-754 standard
-   <https://en.wikipedia.org/wiki/IEEE_754>`_, ``math.nan`` and ``float('nan')`` are
-   not considered to equal to any other numeric value, including themselves. To check
-   whether a number is a NaN, use the :func:`isnan` function to test
-   for NaNs instead of ``is`` or ``==``.
-   Example:
+   Giá trị "không phải là một số" (NaN) dạng số thực dấu phẩy động. Tương đương với kết quả đầu ra của ``float('nan')``. Theo yêu cầu của `tiêu chuẩn IEEE-754 <https://en.wikipedia.org/wiki/IEEE_754>`_, ``math.nan`` và ``float('nan')`` không được xem là bằng bất kỳ giá trị số nào khác, kể cả chính chúng. Để kiểm tra xem một số có phải là NaN hay không, hãy dùng :func:`isnan` để kiểm tra NaN thay vì ``is`` hoặc ``==``. Ví dụ:
 
       >>> import math
       >>> math.nan == math.nan
@@ -813,32 +634,33 @@ Constants
    .. versionadded:: 3.5
 
    .. versionchanged:: 3.11
-      It is now always available.
+      Hiện tại, nó luôn khả dụng.
 
 
 .. impl-detail::
 
-   The :mod:`!math` module consists mostly of thin wrappers around the platform C
-   math library functions.  Behavior in exceptional cases follows Annex F of
-   the C99 standard where appropriate.  The current implementation will raise
-   :exc:`ValueError` for invalid operations like ``sqrt(-1.0)`` or ``log(0.0)``
-   (where C99 Annex F recommends signaling invalid operation or divide-by-zero),
-   and :exc:`OverflowError` for results that overflow (for example,
-   ``exp(1000.0)``).  A NaN will not be returned from any of the functions
-   above unless one or more of the input arguments was a NaN; in that case,
-   most functions will return a NaN, but (again following C99 Annex F) there
-   are some exceptions to this rule, for example ``pow(float('nan'), 0.0)`` or
-   ``hypot(float('nan'), float('inf'))``.
+   Mô-đun :mod:`!math` chủ yếu gồm các wrapper mỏng quanh các hàm thư viện toán học C của nền tảng. Khi phù hợp, hành vi trong các trường hợp ngoại lệ tuân theo Phụ lục F của tiêu chuẩn C99. Trong bản triển khai hiện tại, các hàm sẽ phát sinh
+   :exc:`ValueError` đối với các phép toán không hợp lệ như ``sqrt(-1.0)`` hoặc ``log(0.0)`` (khi Phụ lục F của C99 khuyến nghị báo hiệu phép toán không hợp lệ hoặc phép chia cho 0), và :exc:`OverflowError` đối với các kết quả bị tràn (ví dụ: ``exp(1000.0)``). Không hàm nào ở trên trả về NaN, trừ khi một hoặc nhiều đối số đầu vào là NaN; trong trường hợp đó, hầu hết các hàm sẽ trả về NaN, nhưng (một lần nữa, theo Phụ lục F của C99) có một số ngoại lệ đối với quy tắc này, chẳng hạn như ``pow(float('nan'), 0.0)`` hoặc ``hypot(float('nan'), float('inf'))``.
 
-   Note that Python makes no effort to distinguish signaling NaNs from
-   quiet NaNs, and behavior for signaling NaNs remains unspecified.
-   Typical behavior is to treat all NaNs as though they were quiet.
+   Lưu ý rằng Python không cố gắng phân biệt NaN signaling với NaN quiet, và hành vi đối với NaN signaling vẫn chưa được đặc tả. Hành vi thông thường là xử lý mọi NaN như thể chúng là NaN quiet.
 
 
 .. seealso::
 
-   Module :mod:`cmath`
-      Complex number versions of many of these functions.
+   Mô-đun :mod:`cmath`
+      Các phiên bản dành cho số phức của nhiều hàm trong số này.
 
 .. |nbsp| unicode:: 0xA0
    :trim:
+
+.. _`significant loss of precision`: https://en.wikipedia.org/wiki/Loss_of_significance
+.. _`ASPN cookbook recipes for accurate floating-point summation`: https://code.activestate.com/recipes/393090-binary-floating-point-summation-accurate-to-full-p/
+.. _`Hyperbolic functions`: https://en.wikipedia.org/wiki/Hyperbolic_functions
+.. _`error function`: https://en.wikipedia.org/wiki/Error_function
+.. _`cumulative standard normal distribution`: https://en.wikipedia.org/wiki/Cumulative_distribution_function
+.. _`complementary error function`: https://en.wikipedia.org/wiki/Error_function
+.. _`loss of significance`: https://en.wikipedia.org/wiki/Loss_of_significance
+.. _`Gamma function`: https://en.wikipedia.org/wiki/Gamma_function
+.. _`Pi is (still) Wrong`: https://vimeo.com/147792667
+.. _`Tau day`: https://tauday.com/
+.. _`IEEE-754 standard`: https://en.wikipedia.org/wiki/IEEE_754

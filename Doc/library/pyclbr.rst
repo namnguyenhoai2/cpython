@@ -1,172 +1,137 @@
-:mod:`!pyclbr` --- Python module browser support
-================================================
+:mod:`!pyclbr` --- Hỗ trợ trình duyệt mô-đun Python
+===================================================
 
 .. module:: pyclbr
-   :synopsis: Supports information extraction for a Python module browser.
+   :synopsis: Hỗ trợ trích xuất thông tin cho trình duyệt mô-đun Python.
 
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 
-**Source code:** :source:`Lib/pyclbr.py`
+**Mã nguồn:** :source:`Lib/pyclbr.py`
 
 --------------
 
-The :mod:`!pyclbr` module provides limited information about the
-functions, classes, and methods defined in a Python-coded module.  The
-information is sufficient to implement a module browser.  The
-information is extracted from the Python source code rather than by
-importing the module, so this module is safe to use with untrusted code.
-This restriction makes it impossible to use this module with modules not
-implemented in Python, including all standard and optional extension
-modules.
+Mô-đun :mod:`!pyclbr` cung cấp thông tin hạn chế về các hàm, lớp và phương thức được định nghĩa trong một mô-đun được viết bằng Python. Thông tin này đủ để triển khai một trình duyệt mô-đun. Thông tin được trích xuất từ mã nguồn Python thay vì bằng cách import mô-đun, vì vậy mô-đun này an toàn khi sử dụng với mã không đáng tin cậy. Hạn chế này khiến không thể sử dụng mô-đun này với các mô-đun không được triển khai bằng Python, bao gồm tất cả các mô-đun mở rộng chuẩn và tùy chọn.
 
 
 .. function:: readmodule(module, path=None)
 
-   Return a dictionary mapping module-level class names to class
-   descriptors.  If possible, descriptors for imported base classes are
-   included.  Parameter *module* is a string with the name of the module
-   to read; it may be the name of a module within a package.  If given,
-   *path* is a sequence of directory paths prepended to ``sys.path``,
-   which is used to locate the module source code.
+   Trả về một dictionary ánh xạ tên lớp cấp mô-đun tới các mô tả lớp. Nếu có thể, các mô tả cho những lớp cơ sở được import cũng được đưa vào. Tham số *module* là một chuỗi chứa tên của mô-đun cần đọc; tên này có thể là tên của một mô-đun trong một package. Nếu được cung cấp, *path* là một chuỗi các đường dẫn thư mục được thêm vào trước ``sys.path``, vốn được dùng để định vị mã nguồn mô-đun.
 
-   This function is the original interface and is only kept for back
-   compatibility.  It returns a filtered version of the following.
+   Hàm này là giao diện ban đầu và chỉ được giữ lại để tương thích ngược. Hàm trả về một phiên bản đã lọc của nội dung sau.
 
 
 .. function:: readmodule_ex(module, path=None)
 
-   Return a dictionary-based tree containing a function or class
-   descriptors for each function and class defined in the module with a
-   ``def`` or ``class`` statement.  The returned dictionary maps
-   module-level function and class names to their descriptors.  Nested
-   objects are entered into the children dictionary of their parent.  As
-   with readmodule, *module* names the module to be read and *path* is
-   prepended to sys.path.  If the module being read is a package, the
-   returned dictionary has a key ``'__path__'`` whose value is a list
-   containing the package search path.
+   Trả về một cây dựa trên dictionary chứa mô tả hàm hoặc lớp cho mỗi hàm và lớp được định nghĩa trong mô-đun bằng một câu lệnh ``def`` hoặc ``class``. Dictionary được trả về ánh xạ tên hàm và lớp cấp mô-đun tới các mô tả tương ứng. Các đối tượng lồng nhau được đưa vào dictionary children của đối tượng cha. Giống như readmodule, *module* chỉ định mô-đun cần đọc và *path* được thêm vào trước sys.path. Nếu mô-đun đang được đọc là một package, dictionary được trả về có một khóa ``'__path__'`` với giá trị là danh sách chứa đường dẫn tìm kiếm của package.
 
 .. versionadded:: 3.7
-   Descriptors for nested definitions.  They are accessed through the
-   new children attribute.  Each has a new parent attribute.
+   Các descriptor dành cho những định nghĩa lồng nhau. Chúng được truy cập thông qua attribute children mới. Mỗi descriptor có một attribute parent mới.
 
-The descriptors returned by these functions are instances of
-Function and Class classes.  Users are not expected to create instances
-of these classes.
+Các descriptor được những hàm này trả về là các instance của các class Function và Class. Người dùng không cần tự tạo các instance của những class này.
 
 
 .. _pyclbr-function-objects:
 
-Function Objects
-----------------
+Đối tượng hàm
+-------------
 
 .. class:: Function
 
-   Class :class:`!Function` instances describe functions defined by def
-   statements.  They have the following attributes:
+   Các instance của class Function :class:`!Function` mô tả những hàm được định nghĩa bằng các câu lệnh def. Chúng có các attribute sau:
 
 
    .. attribute:: file
 
-      Name of the file in which the function is defined.
+      Tên tệp chứa định nghĩa của hàm.
 
 
    .. attribute:: module
 
-      The name of the module defining the function described.
+      Tên module định nghĩa hàm được mô tả.
 
 
    .. attribute:: name
 
-      The name of the function.
+      Tên của hàm.
 
 
    .. attribute:: lineno
 
-      The line number in the file where the definition starts.
+      Số dòng trong tệp nơi phần định nghĩa bắt đầu.
 
 
    .. attribute:: parent
 
-      For top-level functions, ``None``.  For nested functions, the parent.
+      Đối với các hàm cấp cao nhất, ``None``. Đối với các hàm lồng nhau, là hàm cha.
 
       .. versionadded:: 3.7
 
 
    .. attribute:: children
 
-      A :class:`dictionary <dict>` mapping names to descriptors for nested functions and
-      classes.
+      Một ánh xạ :class:`dictionary <dict>` tên với các descriptor cho các hàm và lớp lồng nhau.
 
       .. versionadded:: 3.7
 
 
    .. attribute:: is_async
 
-      ``True`` for functions that are defined with the
-      :keyword:`async <async def>` prefix, ``False`` otherwise.
+      ``True`` đối với các hàm được định nghĩa bằng tiền tố
+      :keyword:`async <async def>` tiền tố, ``False`` nếu không.
 
       .. versionadded:: 3.10
 
 
 .. _pyclbr-class-objects:
 
-Class Objects
+Đối tượng lớp
 -------------
 
 .. class:: Class
 
-   Class :class:`!Class` instances describe classes defined by class
-   statements.  They have the same attributes as :class:`Functions <Function>`
-   and two more.
+   Các thực thể Class :class:`!Class` mô tả những lớp được định nghĩa bằng các câu lệnh class. Chúng có các thuộc tính giống như :class:`Functions <Function>` và thêm hai thuộc tính nữa.
 
 
    .. attribute:: file
 
-      Name of the file in which the class is defined.
+      Tên tệp trong đó lớp được định nghĩa.
 
 
    .. attribute:: module
 
-      The name of the module defining the class described.
+      Tên module định nghĩa lớp được mô tả.
 
 
    .. attribute:: name
 
-      The name of the class.
+      Tên của lớp.
 
 
    .. attribute:: lineno
 
-      The line number in the file where the definition starts.
+      Số dòng trong tệp nơi định nghĩa bắt đầu.
 
 
    .. attribute:: parent
 
-      For top-level classes, ``None``.  For nested classes, the parent.
+      Đối với các lớp cấp cao nhất, ``None``. Đối với các lớp lồng nhau, lớp cha.
 
       .. versionadded:: 3.7
 
 
    .. attribute:: children
 
-      A dictionary mapping names to descriptors for nested functions and
-      classes.
+      Một dictionary ánh xạ tên tới các descriptor của những hàm và lớp lồng nhau.
 
       .. versionadded:: 3.7
 
 
    .. attribute:: super
 
-      A list of :class:`!Class` objects which describe the immediate base
-      classes of the class being described.  Classes which are named as
-      superclasses but which are not discoverable by :func:`readmodule_ex`
-      are listed as a string with the class name instead of as
-      :class:`!Class` objects.
+      Danh sách các đối tượng :class:`!Class` mô tả các lớp cơ sở trực tiếp của lớp đang được mô tả. Các lớp được nêu tên là lớp cha nhưng không thể được tìm thấy bằng :func:`readmodule_ex` sẽ được liệt kê dưới dạng một chuỗi chứa tên lớp thay vì dưới dạng
+      Các đối tượng :class:`!Class`.
 
 
    .. attribute:: methods
 
-      A :class:`dictionary <dict>` mapping method names to line numbers.
-      This can be derived from the newer :attr:`children` dictionary,
-      but remains for
-      back-compatibility.
+      Một :class:`dictionary <dict>` ánh xạ tên phương thức tới số dòng. Có thể suy ra điều này từ từ điển :attr:`children` mới hơn, nhưng vẫn được giữ lại để đảm bảo khả năng tương thích ngược.

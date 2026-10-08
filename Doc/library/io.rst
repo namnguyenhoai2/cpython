@@ -1,8 +1,8 @@
-:mod:`!io` --- Core tools for working with streams
-==================================================
+:mod:`!io` --- Công cụ cốt lõi để làm việc với stream
+=====================================================
 
 .. module:: io
-   :synopsis: Core tools for working with streams.
+   :synopsis: Công cụ cốt lõi để làm việc với stream.
 
 .. moduleauthor:: Guido van Rossum <guido@python.org>
 .. moduleauthor:: Mike Verdone <mike.verdone@gmail.com>
@@ -12,753 +12,541 @@
 .. moduleauthor:: Benjamin Peterson <benjamin@python.org>
 .. sectionauthor:: Benjamin Peterson <benjamin@python.org>
 
-**Source code:** :source:`Lib/io.py`
+**Mã nguồn:** :source:`Lib/io.py`
 
 --------------
 
 .. _io-overview:
 
-Overview
---------
+Tổng quan
+---------
 
 .. index::
    single: file object; io module
 
-The :mod:`!io` module provides Python's main facilities for dealing with various
-types of I/O.  There are three main types of I/O: *text I/O*, *binary I/O*
-and *raw I/O*.  These are generic categories, and various backing stores can
-be used for each of them.  A concrete object belonging to any of these
-categories is called a :term:`file object`.  Other common terms are *stream*
-and *file-like object*.
+Mô-đun :mod:`!io` cung cấp các phương tiện chính của Python để xử lý nhiều loại I/O. Có ba loại I/O chính: *I/O văn bản*, *I/O nhị phân* và *I/O thô*. Đây là các danh mục tổng quát và mỗi danh mục có thể sử dụng nhiều loại kho lưu trữ phía sau khác nhau. Một đối tượng cụ thể thuộc bất kỳ danh mục nào trong số này được gọi là :term:`file object`. Các thuật ngữ phổ biến khác là *stream* và *đối tượng giống tệp*.
 
-Independent of its category, each concrete stream object will also have
-various capabilities: it can be read-only, write-only, or read-write. It can
-also allow arbitrary random access (seeking forwards or backwards to any
-location), or only sequential access (for example in the case of a socket or
-pipe).
+Bất kể thuộc danh mục nào, mỗi đối tượng stream cụ thể cũng sẽ có nhiều khả năng khác nhau: có thể chỉ đọc, chỉ ghi hoặc vừa đọc vừa ghi. Đối tượng cũng có thể cho phép truy cập ngẫu nhiên tùy ý (tìm kiếm tiến hoặc lùi đến bất kỳ vị trí nào), hoặc chỉ cho phép truy cập tuần tự (ví dụ trong trường hợp socket hoặc pipe).
 
-All streams are careful about the type of data you give to them.  For example
-giving a :class:`str` object to the :meth:`!write` method of a binary stream
-will raise a :exc:`TypeError`.  So will giving a :class:`bytes` object to the
-:meth:`!write` method of a text stream.
+Tất cả stream đều xử lý cẩn thận kiểu dữ liệu mà bạn cung cấp cho chúng. Ví dụ, truyền một đối tượng :class:`str` cho phương thức :meth:`!write` của một stream nhị phân sẽ gây ra :exc:`TypeError`. Việc truyền một đối tượng :class:`bytes` cho
+Phương thức :meth:`!write` của một luồng văn bản.
 
 .. versionchanged:: 3.3
-   Operations that used to raise :exc:`IOError` now raise :exc:`OSError`, since
-   :exc:`IOError` is now an alias of :exc:`OSError`.
+   Các thao tác trước đây gây ra :exc:`IOError` giờ đây gây ra :exc:`OSError`, vì
+   :exc:`IOError` hiện là bí danh của :exc:`OSError`.
 
 .. _text-io:
 
-Text I/O
-^^^^^^^^
+I/O văn bản
+^^^^^^^^^^^
 
-Text I/O expects and produces :class:`str` objects.  This means that whenever
-the backing store is natively made of bytes (such as in the case of a file),
-encoding and decoding of data is made transparently as well as optional
-translation of platform-specific newline characters.
+I/O văn bản tiếp nhận và tạo ra các đối tượng :class:`str`. Điều này có nghĩa là khi bộ lưu trữ nền vốn được tạo thành từ các byte (chẳng hạn như trong trường hợp tệp), dữ liệu sẽ được mã hóa và giải mã một cách minh bạch, đồng thời việc chuyển đổi tùy chọn các ký tự dòng mới dành riêng cho từng nền tảng cũng được thực hiện.
 
-The easiest way to create a text stream is with :meth:`open`, optionally
-specifying an encoding::
+Cách dễ nhất để tạo một luồng văn bản là sử dụng :meth:`open`, với việc chỉ định encoding nếu muốn::
 
    f = open("myfile.txt", "r", encoding="utf-8")
 
-In-memory text streams are also available as :class:`StringIO` objects::
+Các luồng văn bản trong bộ nhớ cũng có sẵn dưới dạng các đối tượng :class:`StringIO`::
 
    f = io.StringIO("some initial text data")
 
 .. note::
 
-   When working with a non-blocking stream, be aware that read operations on text I/O objects
-   might raise a :exc:`BlockingIOError` if the stream cannot perform the operation
-   immediately.
+   Khi làm việc với một stream không chặn, hãy lưu ý rằng các thao tác đọc trên các đối tượng I/O văn bản có thể phát sinh :exc:`BlockingIOError` nếu stream không thể thực hiện thao tác ngay lập tức.
 
-The text stream API is described in detail in the documentation of
+API stream văn bản được mô tả chi tiết trong tài liệu của
 :class:`TextIOBase`.
 
 .. _binary-io:
 
-Binary I/O
-^^^^^^^^^^
+I/O nhị phân
+^^^^^^^^^^^^
 
-Binary I/O (also called *buffered I/O*) expects
-:term:`bytes-like objects <bytes-like object>` and produces :class:`bytes`
-objects.  No encoding, decoding, or newline translation is performed.  This
-category of streams can be used for all kinds of non-text data, and also when
-manual control over the handling of text data is desired.
+I/O nhị phân (còn được gọi là *buffered I/O*) yêu cầu
+:term:`bytes-like objects <bytes-like object>` và tạo ra các đối tượng :class:`bytes`. Không thực hiện mã hóa, giải mã hoặc chuyển đổi ký tự xuống dòng. Có thể sử dụng loại stream này cho mọi loại dữ liệu không phải văn bản, cũng như khi cần kiểm soát thủ công cách xử lý dữ liệu văn bản.
 
-The easiest way to create a binary stream is with :meth:`open` with ``'b'`` in
-the mode string::
+Cách dễ nhất để tạo một stream nhị phân là sử dụng :meth:`open` với ``'b'`` trong chuỗi mode::
 
    f = open("myfile.jpg", "rb")
 
-In-memory binary streams are also available as :class:`BytesIO` objects::
+Các stream nhị phân trong bộ nhớ cũng có sẵn dưới dạng các đối tượng :class:`BytesIO`::
 
    f = io.BytesIO(b"some initial binary data: \x00\x01")
 
-The binary stream API is described in detail in the docs of
+API binary stream được mô tả chi tiết trong tài liệu về
 :class:`BufferedIOBase`.
 
-Other library modules may provide additional ways to create text or binary
-streams.  See :meth:`socket.socket.makefile` for example.
+Các module thư viện khác có thể cung cấp thêm cách tạo text stream hoặc binary stream. Xem :meth:`socket.socket.makefile` để biết ví dụ.
 
 
 Raw I/O
 ^^^^^^^
 
-Raw I/O (also called *unbuffered I/O*) is generally used as a low-level
-building-block for binary and text streams; it is rarely useful to directly
-manipulate a raw stream from user code.  Nevertheless, you can create a raw
-stream by opening a file in binary mode with buffering disabled::
+Raw I/O (còn gọi là *unbuffered I/O*) thường được dùng làm khối xây dựng cấp thấp cho binary stream và text stream; hiếm khi mã người dùng cần trực tiếp thao tác với raw stream. Tuy vậy, bạn có thể tạo raw stream bằng cách mở một tệp ở chế độ binary với buffering bị tắt::
 
    f = open("myfile.jpg", "rb", buffering=0)
 
-The raw stream API is described in detail in the docs of :class:`RawIOBase`.
+API raw stream được mô tả chi tiết trong tài liệu về :class:`RawIOBase`.
 
 .. warning::
-   Raw I/O is a low-level interface and methods generally must have their return
-   values checked and be explicitly retried to ensure an operation completes.
-   For instance :meth:`~RawIOBase.write` returns the number of bytes written
-   which may be less than the number of bytes provided (a partial write).
-   High-level I/O objects like :ref:`binary-io` and :ref:`text-io` implement
-   retry behavior.
+   Raw I/O là một giao diện cấp thấp và các method thường phải được kiểm tra giá trị trả về cũng như retry một cách tường minh để đảm bảo thao tác hoàn tất. Ví dụ, :meth:`~RawIOBase.write` trả về số byte đã ghi, có thể ít hơn số byte được cung cấp (ghi một phần). Các đối tượng I/O cấp cao như :ref:`binary-io` và :ref:`text-io` triển khai hành vi retry.
 
 .. _io-text-encoding:
 
-Text Encoding
--------------
+Mã hóa văn bản
+--------------
 
-The default encoding of :class:`TextIOWrapper` and :func:`open` is
-locale-specific (:func:`locale.getencoding`).
+Mã hóa mặc định của :class:`TextIOWrapper` và :func:`open` phụ thuộc vào locale (:func:`locale.getencoding`).
 
-However, many developers forget to specify the encoding when opening text files
-encoded in UTF-8 (e.g. JSON, TOML, Markdown, etc...) since most Unix
-platforms use UTF-8 locale by default. This causes bugs because the locale
-encoding is not UTF-8 for most Windows users. For example::
+Tuy nhiên, nhiều developer quên chỉ định encoding khi mở các tệp văn bản được mã hóa bằng UTF-8 (ví dụ: JSON, TOML, Markdown, v.v.) vì hầu hết nền tảng Unix mặc định sử dụng locale UTF-8. Điều này gây ra lỗi vì encoding của locale không phải là UTF-8 đối với hầu hết người dùng Windows. Ví dụ::
 
-   # May not work on Windows when non-ASCII characters in the file.
+   # Có thể không hoạt động trên Windows khi tệp chứa các ký tự không phải ASCII.
    with open("README.md") as f:
        long_description = f.read()
 
-Accordingly, it is highly recommended that you specify the encoding
-explicitly when opening text files. If you want to use UTF-8, pass
-``encoding="utf-8"``. To use the current locale encoding,
-``encoding="locale"`` is supported since Python 3.10.
+Do đó, bạn nên chỉ định rõ encoding khi mở các tệp văn bản. Nếu muốn sử dụng UTF-8, hãy truyền ``encoding="utf-8"``. Để sử dụng encoding của locale hiện tại, ``encoding="locale"`` được hỗ trợ kể từ Python 3.10.
 
 .. seealso::
 
    :ref:`utf8-mode`
-      Python UTF-8 Mode can be used to change the default encoding to
-      UTF-8 from locale-specific encoding.
+      Python UTF-8 Mode có thể được sử dụng để thay đổi encoding mặc định từ encoding phụ thuộc vào locale thành UTF-8.
 
    :pep:`686`
-      Python 3.15 will make :ref:`utf8-mode` default.
+      Python 3.15 sẽ đặt :ref:`utf8-mode` làm mặc định.
 
 .. _io-encoding-warning:
 
-Opt-in EncodingWarning
-^^^^^^^^^^^^^^^^^^^^^^
+Bật tùy chọn EncodingWarning
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. versionadded:: 3.10
-   See :pep:`597` for more details.
+   Xem :pep:`597` để biết thêm chi tiết.
 
-To find where the default locale encoding is used, you can enable
-the :option:`-X warn_default_encoding <-X>` command line option or set the
-:envvar:`PYTHONWARNDEFAULTENCODING` environment variable, which will
-emit an :exc:`EncodingWarning` when the default encoding is used.
+Để tìm nơi encoding mặc định của locale được sử dụng, bạn có thể bật tùy chọn dòng lệnh :option:`-X warn_default_encoding <-X>` hoặc đặt
+biến môi trường :envvar:`PYTHONWARNDEFAULTENCODING`, biến này sẽ phát ra một :exc:`EncodingWarning` khi encoding mặc định được sử dụng.
 
-If you are providing an API that uses :func:`open` or
-:class:`TextIOWrapper` and passes ``encoding=None`` as a parameter, you
-can use :func:`text_encoding` so that callers of the API will emit an
-:exc:`EncodingWarning` if they don't pass an ``encoding``. However,
-please consider using UTF-8 by default (i.e. ``encoding="utf-8"``) for
-new APIs.
+Nếu bạn cung cấp một API sử dụng :func:`open` hoặc
+:class:`TextIOWrapper` và truyền ``encoding=None`` làm tham số, bạn có thể sử dụng :func:`text_encoding` để các bên gọi API phát ra một
+:exc:`EncodingWarning` nếu họ không truyền một ``encoding``. Tuy nhiên, hãy cân nhắc sử dụng UTF-8 theo mặc định (tức là ``encoding="utf-8"``) cho các API mới.
 
 
-High-level Module Interface
----------------------------
+Giao diện mô-đun cấp cao
+------------------------
 
 .. data:: DEFAULT_BUFFER_SIZE
 
-   An int containing the default buffer size used by the module's buffered I/O
-   classes.  :func:`open` uses the file's blksize (as obtained by
-   :func:`os.stat`) if possible.
+   Một giá trị int chứa kích thước bộ đệm mặc định được các lớp I/O có bộ đệm của mô-đun sử dụng.  :func:`open` sử dụng blksize của tệp (lấy được bằng
+   :func:`os.stat`) nếu có thể.
 
 
 .. function:: open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)
 
-   This is an alias for the builtin :func:`open` function.
+   Đây là bí danh của hàm builtin :func:`open`.
 
    .. audit-event:: open path,mode,flags io.open
 
-      This function raises an :ref:`auditing event <auditing>` ``open`` with
-      arguments *path*, *mode* and *flags*. The *mode* and *flags*
-      arguments may have been modified or inferred from the original call.
+      Hàm này phát sinh một sự kiện :ref:`auditing event <auditing>` ``open`` với các đối số *path*, *mode* và *flags*. Các đối số *mode* và *flags* có thể đã được sửa đổi hoặc suy ra từ lệnh gọi ban đầu.
 
 
 .. function:: open_code(path)
 
-   Opens the provided file with mode ``'rb'``. This function should be used
-   when the intent is to treat the contents as executable code.
+   Mở tệp được cung cấp với mode ``'rb'``. Nên sử dụng hàm này khi mục đích là coi nội dung như mã thực thi.
 
-   *path* should be a :class:`str` and an absolute path.
+   *path* phải là một :class:`str` và là một đường dẫn tuyệt đối.
 
-   The behavior of this function may be overridden by an earlier call to the
-   :c:func:`PyFile_SetOpenCodeHook`. However, assuming that *path* is a
-   :class:`str` and an absolute path, ``open_code(path)`` should always behave
-   the same as ``open(path, 'rb')``. Overriding the behavior is intended for
-   additional validation or preprocessing of the file.
+   Hành vi của hàm này có thể bị ghi đè bởi một lệnh gọi trước đó đến
+   :c:func:`PyFile_SetOpenCodeHook`. Tuy nhiên, với giả định rằng *path* là một
+   :class:`str` và là một đường dẫn tuyệt đối, ``open_code(path)`` phải luôn hoạt động giống như ``open(path, 'rb')``. Việc ghi đè hành vi này nhằm thực hiện thêm validation hoặc tiền xử lý tệp.
 
    .. versionadded:: 3.8
 
 
 .. function:: text_encoding(encoding, stacklevel=2, /)
 
-   This is a helper function for callables that use :func:`open` or
-   :class:`TextIOWrapper` and have an ``encoding=None`` parameter.
+   Đây là một hàm trợ giúp dành cho các callable sử dụng :func:`open` hoặc
+   :class:`TextIOWrapper` và có tham số ``encoding=None``.
 
-   This function returns *encoding* if it is not ``None``.
-   Otherwise, it returns ``"locale"`` or ``"utf-8"`` depending on
+   Hàm này trả về *encoding* nếu nó không phải là ``None``. Nếu không, hàm trả về ``"locale"`` hoặc ``"utf-8"`` tùy thuộc vào
    :ref:`UTF-8 Mode <utf8-mode>`.
 
-   This function emits an :class:`EncodingWarning` if
-   :data:`sys.flags.warn_default_encoding <sys.flags>` is true and *encoding*
-   is ``None``. *stacklevel* specifies where the warning is emitted.
-   For example::
+   Hàm này phát ra một :class:`EncodingWarning` nếu
+   :data:`sys.flags.warn_default_encoding <sys.flags>` là true và *encoding* là ``None``. *stacklevel* xác định nơi cảnh báo được phát ra. Ví dụ::
 
       def read_text(path, encoding=None):
           encoding = io.text_encoding(encoding)  # stacklevel=2
           with open(path, encoding) as f:
               return f.read()
 
-   In this example, an :class:`EncodingWarning` is emitted for the caller of
-   ``read_text()``.
+   Trong ví dụ này, một :class:`EncodingWarning` được phát ra cho caller của ``read_text()``.
 
-   See :ref:`io-text-encoding` for more information.
+   Xem :ref:`io-text-encoding` để biết thêm thông tin.
 
    .. versionadded:: 3.10
 
    .. versionchanged:: 3.11
       :func:`text_encoding` returns "utf-8" when UTF-8 mode is enabled and
-      *encoding* is ``None``.
+      *encoding* là ``None``.
 
 
 .. exception:: BlockingIOError
 
-   This is a compatibility alias for the builtin :exc:`BlockingIOError`
-   exception.
+   Đây là bí danh tương thích cho exception tích hợp sẵn :exc:`BlockingIOError`.
 
 
 .. exception:: UnsupportedOperation
 
-   An exception inheriting :exc:`OSError` and :exc:`ValueError` that is raised
-   when an unsupported operation is called on a stream.
+   Một exception kế thừa :exc:`OSError` và :exc:`ValueError`, được raise khi một thao tác không được hỗ trợ được gọi trên một stream.
 
 
 .. seealso::
 
    :mod:`sys`
-       contains the standard IO streams: :data:`sys.stdin`, :data:`sys.stdout`,
-       and :data:`sys.stderr`.
+       chứa các luồng IO tiêu chuẩn: :data:`sys.stdin`, :data:`sys.stdout` và :data:`sys.stderr`.
 
 
-Class hierarchy
----------------
+Phân cấp lớp
+------------
 
-The implementation of I/O streams is organized as a hierarchy of classes.  First
-:term:`abstract base classes <abstract base class>` (ABCs), which are used to
-specify the various categories of streams, then concrete classes providing the
-standard stream implementations.
+Việc triển khai các luồng I/O được tổ chức theo một hệ thống phân cấp các lớp. Trước hết
+:term:`các lớp cơ sở trừu tượng <abstract base class>` (ABCs), được dùng để xác định nhiều danh mục luồng khác nhau, sau đó là các lớp cụ thể cung cấp các triển khai luồng tiêu chuẩn.
 
 .. note::
 
-   The abstract base classes also provide default implementations of some
-   methods in order to help implementation of concrete stream classes.  For
-   example, :class:`BufferedIOBase` provides unoptimized implementations of
-   :meth:`!readinto` and :meth:`!readline`.
+   Các lớp cơ sở trừu tượng cũng cung cấp triển khai mặc định cho một số phương thức nhằm hỗ trợ việc triển khai các lớp luồng cụ thể. Ví dụ: :class:`BufferedIOBase` cung cấp các triển khai chưa được tối ưu hóa cho
+   :meth:`!readinto` và :meth:`!readline`.
 
-At the top of the I/O hierarchy is the abstract base class :class:`IOBase`.  It
-defines the basic interface to a stream.  Note, however, that there is no
-separation between reading and writing to streams; implementations are allowed
-to raise :exc:`UnsupportedOperation` if they do not support a given operation.
+Ở đỉnh của hệ thống phân cấp I/O là lớp cơ sở trừu tượng :class:`IOBase`. Lớp này định nghĩa giao diện cơ bản cho một luồng. Tuy nhiên, cần lưu ý rằng không có sự phân tách giữa việc đọc và ghi vào luồng; các triển khai được phép phát sinh :exc:`UnsupportedOperation` nếu chúng không hỗ trợ một thao tác nhất định.
 
-The :class:`RawIOBase` ABC extends :class:`IOBase`.  It deals with the reading
-and writing of bytes to a stream.  :class:`FileIO` subclasses :class:`RawIOBase`
-to provide an interface to files in the machine's file system.
+ABC :class:`RawIOBase` kế thừa :class:`IOBase`. Nó xử lý việc đọc và ghi byte vào một stream. :class:`FileIO` kế thừa :class:`RawIOBase` để cung cấp interface cho các tệp trong hệ thống tệp của máy.
 
-The :class:`BufferedIOBase` ABC extends :class:`IOBase`.  It deals with
-buffering on a raw binary stream (:class:`RawIOBase`).  Its subclasses,
-:class:`BufferedWriter`, :class:`BufferedReader`, and :class:`BufferedRWPair`
-buffer raw binary streams that are writable, readable, and both readable and writable,
-respectively. :class:`BufferedRandom` provides a buffered interface to seekable streams.
-Another :class:`BufferedIOBase` subclass, :class:`BytesIO`, is a stream of
-in-memory bytes.
+ABC :class:`BufferedIOBase` kế thừa :class:`IOBase`. Nó xử lý việc buffering trên một raw binary stream (:class:`RawIOBase`). Các subclass của nó là:
+:class:`BufferedWriter`, :class:`BufferedReader` và :class:`BufferedRWPair` lần lượt thực hiện buffering cho các raw binary stream có thể ghi, có thể đọc và vừa có thể đọc vừa có thể ghi. :class:`BufferedRandom` cung cấp interface đã buffer cho các stream có thể seek. Một subclass :class:`BufferedIOBase` khác là :class:`BytesIO`, một stream gồm các byte trong bộ nhớ.
 
-The :class:`TextIOBase` ABC extends :class:`IOBase`.  It deals with
-streams whose bytes represent text, and handles encoding and decoding to and
-from strings.  :class:`TextIOWrapper`, which extends :class:`TextIOBase`, is a buffered text
-interface to a buffered raw stream (:class:`BufferedIOBase`).  Finally,
-:class:`StringIO` is an in-memory stream for text.
+ABC :class:`TextIOBase` kế thừa :class:`IOBase`. Nó xử lý các stream có byte biểu diễn văn bản, đồng thời thực hiện encoding và decoding từ và sang string. :class:`TextIOWrapper`, kế thừa :class:`TextIOBase`, là một text interface đã buffer cho một raw stream đã buffer (:class:`BufferedIOBase`). Cuối cùng,
+:class:`StringIO` là một stream văn bản trong bộ nhớ.
 
-Argument names are not part of the specification, and only the arguments of
-:func:`open` are intended to be used as keyword arguments.
+Tên của các đối số không thuộc đặc tả, và chỉ các đối số của
+:func:`open` được dùng làm keyword argument.
 
-The following table summarizes the ABCs provided by the :mod:`!io` module:
+Bảng sau đây tóm tắt các ABC được cung cấp bởi module :mod:`!io`:
 
 .. tabularcolumns:: |l|l|L|L|
 
-=========================  ==================  ========================  ==================================================
-ABC                        Inherits            Stub Methods              Mixin Methods and Properties
-=========================  ==================  ========================  ==================================================
-:class:`IOBase`                                ``fileno``, ``seek``,     ``close``, ``closed``, ``__enter__``,
-                                               and ``truncate``          ``__exit__``, ``flush``, ``isatty``, ``__iter__``,
-                                                                         ``__next__``, ``readable``, ``readline``,
-                                                                         ``readlines``, ``seekable``, ``tell``,
-                                                                         ``writable``, and ``writelines``
-:class:`RawIOBase`         :class:`IOBase`     ``readinto`` and          Inherited :class:`IOBase` methods, ``read``,
-                                               ``write``                 and ``readall``
-:class:`BufferedIOBase`    :class:`IOBase`     ``detach``, ``read``,     Inherited :class:`IOBase` methods, ``readinto``,
-                                               ``read1``, and ``write``  and ``readinto1``
-:class:`TextIOBase`        :class:`IOBase`     ``detach``, ``read``,     Inherited :class:`IOBase` methods, ``encoding``,
-                                               ``readline``, and         ``errors``, and ``newlines``
-                                               ``write``
-=========================  ==================  ========================  ==================================================
++-------------------------+-----------------+-------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ABC                     | Kế thừa         | Các phương thức stub                            | Các phương thức và thuộc tính mixin                                                                                                                                                                      |
++=========================+=================+=================================================+==========================================================================================================================================================================================================+
+| :class:`IOBase`         |                 | ``fileno``, ``seek`` và ``truncate``            | ``close``, ``closed``, ``__enter__``, ``__exit__``, ``flush``, ``isatty``, ``__iter__``, ``__next__``, ``readable``, ``readline``, ``readlines``, ``seekable``, ``tell``, ``writable`` và ``writelines`` |
++-------------------------+-----------------+-------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| :class:`RawIOBase`      | :class:`IOBase` | ``readinto`` và ``write``                       | Các phương thức :class:`IOBase` được kế thừa, ``read`` và ``readall``                                                                                                                                    |
++-------------------------+-----------------+-------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| :class:`BufferedIOBase` | :class:`IOBase` | ``detach``, ``read``, ``read1`` và ``write``    | Các phương thức :class:`IOBase` được kế thừa, ``readinto`` và ``readinto1``                                                                                                                              |
++-------------------------+-----------------+-------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| :class:`TextIOBase`     | :class:`IOBase` | ``detach``, ``read``, ``readline`` và ``write`` | Các phương thức :class:`IOBase` được kế thừa, ``encoding``, ``errors`` và ``newlines``                                                                                                                   |
++-------------------------+-----------------+-------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
-I/O Base Classes
-^^^^^^^^^^^^^^^^
+Các lớp cơ sở I/O
+^^^^^^^^^^^^^^^^^
 
 .. class:: IOBase
 
-   The abstract base class for all I/O classes.
+   Lớp cơ sở trừu tượng cho tất cả các lớp I/O.
 
-   This class provides empty abstract implementations for many methods
-   that derived classes can override selectively; the default
-   implementations represent a file that cannot be read, written or
-   seeked.
+   Lớp này cung cấp các triển khai trừu tượng rỗng cho nhiều phương thức mà các lớp dẫn xuất có thể chọn ghi đè; các triển khai mặc định biểu thị một tệp không thể đọc, ghi hoặc tìm vị trí.
 
-   Even though :class:`IOBase` does not declare :meth:`!read`
-   or :meth:`!write` because their signatures will vary, implementations and
-   clients should consider those methods part of the interface.  Also,
-   implementations may raise a :exc:`ValueError` (or :exc:`UnsupportedOperation`)
-   when operations they do not support are called.
+   Mặc dù :class:`IOBase` không khai báo :meth:`!read` hoặc :meth:`!write` vì chữ ký của chúng sẽ khác nhau, các triển khai và client vẫn nên xem những phương thức đó là một phần của interface. Ngoài ra, các triển khai có thể phát sinh :exc:`ValueError` (hoặc :exc:`UnsupportedOperation`) khi các thao tác mà chúng không hỗ trợ được gọi.
 
-   The basic type used for binary data read from or written to a file is
-   :class:`bytes`.  Other :term:`bytes-like objects <bytes-like object>` are
-   accepted as method arguments too.  Text I/O classes work with :class:`str` data.
+   Kiểu cơ bản được dùng cho dữ liệu nhị phân được đọc từ hoặc ghi vào tệp là
+   :class:`bytes`. Các :term:`đối tượng kiểu bytes <bytes-like object>` khác cũng được chấp nhận làm đối số phương thức. Các lớp I/O văn bản làm việc với dữ liệu :class:`str`.
 
-   Note that calling any method (even inquiries) on a closed stream is
-   undefined.  Implementations may raise :exc:`ValueError` in this case.
+   Lưu ý rằng việc gọi bất kỳ phương thức nào (kể cả các phương thức truy vấn) trên một stream đã đóng đều không được xác định. Trong trường hợp này, các triển khai có thể phát sinh :exc:`ValueError`.
 
-   :class:`IOBase` (and its subclasses) supports the iterator protocol, meaning
-   that an :class:`IOBase` object can be iterated over yielding the lines in a
-   stream.  Lines are defined slightly differently depending on whether the
-   stream is a binary stream (yielding bytes), or a text stream (yielding
-   character strings).  See :meth:`~IOBase.readline` below.
+   :class:`IOBase` (và các lớp con của nó) hỗ trợ iterator protocol, nghĩa là có thể lặp qua một đối tượng :class:`IOBase` để nhận từng dòng trong stream. Các dòng được định nghĩa hơi khác nhau tùy thuộc vào việc stream là binary stream (trả về bytes) hay text stream (trả về các chuỗi ký tự). Xem :meth:`~IOBase.readline` bên dưới.
 
-   :class:`IOBase` is also a context manager and therefore supports the
-   :keyword:`with` statement.  In this example, *file* is closed after the
-   :keyword:`!with` statement's suite is finished---even if an exception occurs::
+   :class:`IOBase` cũng là một context manager và do đó hỗ trợ
+   :keyword:`with` câu lệnh. Trong ví dụ này, *file* được đóng sau khi
+   suite của câu lệnh :keyword:`!with` hoàn tất---ngay cả khi xảy ra ngoại lệ::
 
       with open('spam.txt', 'w') as file:
           file.write('Spam and eggs!')
 
-   :class:`IOBase` provides these data attributes and methods:
+   :class:`IOBase` cung cấp các thuộc tính dữ liệu và phương thức sau:
 
    .. method:: close()
 
-      Flush and close this stream. This method has no effect if the file is
-      already closed. Once the file is closed, any operation on the file
-      (e.g. reading or writing) will raise a :exc:`ValueError`.
+      Xả và đóng stream này. Phương thức này không có tác dụng nếu tệp đã được đóng. Khi tệp đã đóng, mọi thao tác trên tệp (ví dụ: đọc hoặc ghi) sẽ phát sinh :exc:`ValueError`.
 
-      As a convenience, it is allowed to call this method more than once;
-      only the first call, however, will have an effect.
+      Để thuận tiện, bạn có thể gọi phương thức này nhiều lần; tuy nhiên, chỉ lần gọi đầu tiên mới có tác dụng.
 
    .. attribute:: closed
 
-      ``True`` if the stream is closed.
+      ``True`` nếu stream đã đóng.
 
    .. method:: fileno()
 
-      Return the underlying file descriptor (an integer) of the stream if it
-      exists.  An :exc:`OSError` is raised if the IO object does not use a file
-      descriptor.
+      Trả về file descriptor bên dưới (một số nguyên) của stream nếu nó tồn tại. Một :exc:`OSError` sẽ được phát sinh nếu đối tượng IO không sử dụng file descriptor.
 
    .. method:: flush()
 
-      Flush the write buffers of the stream if applicable.  This does nothing
-      for read-only and non-blocking streams.
+      Flush các write buffer của stream nếu có thể. Thao tác này không làm gì với các stream chỉ đọc và không blocking.
 
    .. method:: isatty()
 
-      Return ``True`` if the stream is interactive (i.e., connected to
-      a terminal/tty device).
+      Trả về ``True`` nếu stream là interactive (tức là được kết nối với terminal hoặc thiết bị tty).
 
    .. method:: readable()
 
-      Return ``True`` if the stream can be read from.
-      If ``False``, :meth:`!read` will raise :exc:`OSError`.
+      Trả về ``True`` nếu có thể đọc từ stream. Nếu ``False``, :meth:`!read` sẽ phát sinh :exc:`OSError`.
 
    .. method:: readline(size=-1, /)
 
-      Read and return one line from the stream.  If *size* is specified, at
-      most *size* bytes will be read.
+      Đọc và trả về một dòng từ stream. Nếu chỉ định *size*, nhiều nhất *size* byte sẽ được đọc.
 
-      The line terminator is always ``b'\n'`` for binary files; for text files,
-      the *newline* argument to :func:`open` can be used to select the line
-      terminator(s) recognized.
+      Ký tự kết thúc dòng luôn là ``b'\n'`` đối với các tệp nhị phân; đối với các tệp văn bản, có thể sử dụng đối số *newline* của :func:`open` để chọn (các) ký tự kết thúc dòng được nhận diện.
 
    .. method:: readlines(hint=-1, /)
 
-      Read and return a list of lines from the stream.  *hint* can be specified
-      to control the number of lines read: no more lines will be read if the
-      total size (in bytes/characters) of all lines so far exceeds *hint*.
+      Đọc và trả về một danh sách các dòng từ stream. Có thể chỉ định *hint* để kiểm soát số dòng được đọc: sẽ không đọc thêm dòng nào nếu tổng kích thước (tính bằng byte/ký tự) của tất cả các dòng đã đọc vượt quá *hint*.
 
-      *hint* values of ``0`` or less, as well as ``None``, are treated as no
-      hint.
+      Các giá trị *hint* bằng ``0`` hoặc nhỏ hơn, cũng như ``None``, được xem là không có gợi ý.
 
-      Note that it's already possible to iterate on file objects using ``for
-      line in file: ...`` without calling :meth:`!file.readlines`.
+      Lưu ý rằng bạn đã có thể lặp qua các đối tượng tệp bằng ``for line in file: ...`` mà không cần gọi :meth:`!file.readlines`.
 
    .. method:: seek(offset, whence=os.SEEK_SET, /)
 
-      Change the stream position to the given byte *offset*,
-      interpreted relative to the position indicated by *whence*,
-      and return the new absolute position.
-      Values for *whence* are:
+      Thay đổi vị trí của stream đến *offset* byte đã cho, được diễn giải tương đối so với vị trí được chỉ báo bởi *whence*, rồi trả về vị trí tuyệt đối mới. Các giá trị của *whence* là:
 
-      * :data:`os.SEEK_SET` or ``0`` -- start of the stream (the default);
-        *offset* should be zero or positive
-      * :data:`os.SEEK_CUR` or ``1`` -- current stream position;
-        *offset* may be negative
-      * :data:`os.SEEK_END` or ``2`` -- end of the stream;
-        *offset* is usually negative
+      * :data:`os.SEEK_SET` hoặc ``0`` -- đầu stream (mặc định); *offset* phải bằng không hoặc là số dương
+      * :data:`os.SEEK_CUR` hoặc ``1`` -- vị trí hiện tại của stream; *offset* có thể là số âm
+      * :data:`os.SEEK_END` hoặc ``2`` -- cuối stream; *offset* thường là số âm
 
       .. versionadded:: 3.1
-         The :data:`!SEEK_*` constants.
+         Các hằng số :data:`!SEEK_*`.
 
       .. versionadded:: 3.3
-         Some operating systems could support additional values, like
-         :const:`os.SEEK_HOLE` or :const:`os.SEEK_DATA`. The valid values
-         for a file could depend on it being open in text or binary mode.
+         Một số hệ điều hành có thể hỗ trợ các giá trị bổ sung, chẳng hạn như
+         :const:`os.SEEK_HOLE` hoặc :const:`os.SEEK_DATA`. Các giá trị hợp lệ cho một tệp có thể phụ thuộc vào việc tệp đó được mở ở chế độ văn bản hay nhị phân.
 
    .. method:: seekable()
 
-      Return ``True`` if the stream supports random access.  If ``False``,
-      :meth:`seek`, :meth:`tell` and :meth:`truncate` will raise :exc:`OSError`.
+      Trả về ``True`` nếu stream hỗ trợ truy cập ngẫu nhiên. Nếu ``False``,
+      :meth:`seek`, :meth:`tell` và :meth:`truncate` sẽ phát sinh :exc:`OSError`.
 
    .. method:: tell()
 
-      Return the current stream position.
+      Trả về vị trí hiện tại của stream.
 
    .. method:: truncate(size=None, /)
 
-      Resize the stream to the given *size* in bytes (or the current position
-      if *size* is not specified).  The current stream position isn't changed.
-      This resizing can extend or reduce the current file size.  In case of
-      extension, the contents of the new file area depend on the platform
-      (on most systems, additional bytes are zero-filled).  The new file size
-      is returned.
+      Thay đổi kích thước stream thành *size* đã cho, tính bằng byte (hoặc vị trí hiện tại nếu *size* không được chỉ định). Vị trí hiện tại của stream không thay đổi. Thao tác thay đổi kích thước này có thể mở rộng hoặc thu nhỏ kích thước tệp hiện tại. Khi mở rộng, nội dung của vùng tệp mới phụ thuộc vào nền tảng (trên hầu hết các hệ thống, các byte bổ sung được điền bằng số 0). Kích thước tệp mới được trả về.
 
       .. versionchanged:: 3.5
-         Windows will now zero-fill files when extending.
+         Windows hiện sẽ điền bằng số 0 khi mở rộng tệp.
 
    .. method:: writable()
 
-      Return ``True`` if the stream supports writing.  If ``False``,
-      :meth:`!write` and :meth:`truncate` will raise :exc:`OSError`.
+      Trả về ``True`` nếu stream hỗ trợ ghi. Nếu ``False``,
+      :meth:`!write` và :meth:`truncate` sẽ phát sinh :exc:`OSError`.
 
    .. method:: writelines(lines, /)
 
-      Write a list of lines to the stream.  Line separators are not added, so it
-      is usual for each of the lines provided to have a line separator at the
-      end.
+      Ghi một danh sách các dòng vào stream. Không thêm dấu phân cách dòng, vì vậy thông thường mỗi dòng được cung cấp sẽ có dấu phân cách dòng ở cuối.
 
    .. method:: __del__()
 
-      Prepare for object destruction. :class:`IOBase` provides a default
-      implementation of this method that calls the instance's
-      :meth:`~IOBase.close` method.
+      Chuẩn bị cho việc hủy đối tượng. :class:`IOBase` cung cấp triển khai mặc định cho phương thức này, gọi phương thức
+      :meth:`~IOBase.close` của instance.
 
 
 .. class:: RawIOBase
 
-   Base class for raw binary streams.  It inherits from :class:`IOBase`.
+   Lớp cơ sở cho các raw binary stream. Lớp này kế thừa từ :class:`IOBase`.
 
-   Raw binary streams typically provide low-level access to an underlying OS
-   device or API, and do not try to encapsulate it in high-level primitives
-   (this functionality is done at a higher-level in buffered binary streams and text streams, described later
-   in this page).
+   Raw binary stream thường cung cấp quyền truy cập cấp thấp vào thiết bị hoặc API bên dưới của hệ điều hành và không cố gắng đóng gói chúng trong các primitive cấp cao (chức năng này được thực hiện ở cấp cao hơn trong buffered binary stream và text stream, được mô tả ở phần sau của trang này).
 
-   :class:`RawIOBase` provides these methods in addition to those from
+   :class:`RawIOBase` cung cấp các phương thức này ngoài các phương thức từ
    :class:`IOBase`:
 
    .. method:: read(size=-1, /)
 
-      Read up to *size* bytes from the object and return them.  As a convenience,
-      if *size* is unspecified or -1, all bytes until EOF are returned.
+      Đọc tối đa *size* byte từ đối tượng và trả về chúng. Để thuận tiện, nếu *size* không được chỉ định hoặc là -1, tất cả các byte cho đến EOF sẽ được trả về.
 
-      Attempts to make only one system call but will retry if interrupted and
-      the signal handler does not raise an exception (see :pep:`475` for the
-      rationale). This means fewer than *size* bytes may be returned if the
-      operating system call returns fewer than *size* bytes.
+      Cố gắng chỉ thực hiện một lệnh gọi hệ thống nhưng sẽ thử lại nếu bị gián đoạn và trình xử lý tín hiệu không phát sinh ngoại lệ (xem :pep:`475` để biết lý do). Điều này có nghĩa là có thể trả về ít hơn *size* byte nếu lệnh gọi hệ điều hành trả về ít hơn *size* byte.
 
-      If 0 bytes are returned, and *size* was not 0, this indicates end of file.
-      If the object is in non-blocking mode and no bytes are available,
-      ``None`` is returned.
+      Nếu trả về 0 byte và *size* không phải là 0, điều này cho biết đã đến cuối tệp. Nếu đối tượng ở chế độ non-blocking và không có byte nào khả dụng, ``None`` sẽ được trả về.
 
-      The default implementation defers to :meth:`readall` and
+      Phần triển khai mặc định chuyển tiếp đến :meth:`readall` và
       :meth:`readinto`.
 
    .. method:: readall()
 
-      Read and return all the bytes from the stream until EOF, using multiple
-      calls to the stream if necessary.
+      Đọc và trả về tất cả các byte từ stream cho đến EOF, sử dụng nhiều lệnh gọi đến stream nếu cần.
 
-      If ``0`` bytes are returned this indicates end of file. If the object is in
-      non-blocking mode and the underlying :meth:`read` returns ``None``
-      indicating no bytes are available, ``None`` is returned.
+      Nếu trả về ``0`` byte, điều này cho biết đã đến cuối tệp. Nếu đối tượng ở chế độ non-blocking và :meth:`read` bên dưới trả về ``None``, cho biết không có byte nào khả dụng, thì ``None`` sẽ được trả về.
 
    .. method:: readinto(b, /)
 
-      Read bytes into a pre-allocated, writable
-      :term:`bytes-like object` *b*, and return the
-      number of bytes read.  For example, *b* might be a :class:`bytearray`.
+      Đọc các byte vào một vùng đệm có thể ghi được cấp phát trước
+      :term:`bytes-like object` *b*, và trả về số byte đã đọc. Ví dụ, *b* có thể là một :class:`bytearray`.
 
-      If ``0`` is returned and ``len(b)`` is not ``0``, this indicates end of file. If
-      the object is in non-blocking mode and no bytes are available, ``None`` is
-      returned.
+      Nếu trả về ``0`` và ``len(b)`` không phải là ``0``, điều này cho biết đã đến cuối tệp. Nếu đối tượng ở chế độ non-blocking và không có byte nào khả dụng, ``None`` sẽ được trả về.
 
    .. method:: write(b, /)
 
-      Write the given :term:`bytes-like object`, *b*, to the
-      underlying raw stream, and return the number of
-      bytes written.  This can be less than the length of *b* in
-      bytes, depending on specifics of the underlying raw
-      stream, and especially if it is in non-blocking mode.  ``None`` is
-      returned if the raw stream is set not to block and no single byte could
-      be readily written to it.  The caller may release or mutate *b* after
-      this method returns, so the implementation should only access *b*
-      during the method call.
+      Ghi :term:`bytes-like object` đã cho, *b*, vào raw stream bên dưới và trả về số byte đã ghi. Giá trị này có thể nhỏ hơn độ dài tính theo byte của *b*, tùy thuộc vào đặc điểm của raw stream bên dưới, đặc biệt nếu stream đang ở chế độ non-blocking. ``None`` được trả về nếu raw stream được đặt ở chế độ không chặn và không thể ghi ngay cả một byte nào vào đó. Bên gọi có thể giải phóng hoặc thay đổi *b* sau khi phương thức này trả về, vì vậy phần triển khai chỉ nên truy cập *b* trong khi phương thức đang được gọi.
 
       .. warning::
 
-         This function does not ensure all bytes are written or an exception is
-         thrown. Callers may implement that behavior by checking the return
-         value and, if it is less than the length of *b*, looping with additional
-         write calls until all unwritten bytes are written. High-level I/O
-         objects like :ref:`binary-io` and :ref:`text-io` implement retry behavior.
+         Hàm này không đảm bảo tất cả các byte đều được ghi hoặc một ngoại lệ được ném ra. Bên gọi có thể triển khai hành vi đó bằng cách kiểm tra giá trị trả về và, nếu giá trị này nhỏ hơn độ dài tính theo byte của *b*, lặp lại với các lần gọi write bổ sung cho đến khi tất cả các byte chưa ghi được ghi xong. Các đối tượng I/O cấp cao như :ref:`binary-io` và :ref:`text-io` triển khai hành vi retry.
 
 .. class:: BufferedIOBase
 
-   Base class for binary streams that support some kind of buffering.
-   It inherits from :class:`IOBase`.
+   Lớp cơ sở cho các binary stream hỗ trợ một dạng buffering nào đó. Lớp này kế thừa từ :class:`IOBase`.
 
-   The main difference with :class:`RawIOBase` is that methods :meth:`read`,
-   :meth:`readinto` and :meth:`write` will try (respectively) to read
-   as much input as requested or to emit all provided data.
+   Điểm khác biệt chính so với :class:`RawIOBase` là các phương thức :meth:`read`,
+   :meth:`readinto` và :meth:`write` sẽ lần lượt cố gắng đọc lượng dữ liệu đầu vào được yêu cầu hoặc phát ra toàn bộ dữ liệu đã cung cấp.
 
-   In addition, if the underlying raw stream is in non-blocking mode, when the
-   system returns would block :meth:`write` will raise :exc:`BlockingIOError`
-   with :attr:`BlockingIOError.characters_written` and :meth:`read` will return
-   data read so far or ``None`` if no data is available.
+   Ngoài ra, nếu raw stream bên dưới đang ở chế độ non-blocking, khi hệ thống trả về trạng thái would block, :meth:`write` sẽ raise :exc:`BlockingIOError` với :attr:`BlockingIOError.characters_written`, còn :meth:`read` sẽ trả về dữ liệu đã đọc được cho đến lúc đó hoặc ``None`` nếu không có dữ liệu.
 
-   Besides, the :meth:`read` method does not have a default
-   implementation that defers to :meth:`readinto`.
+   Ngoài ra, phương thức :meth:`read` không có triển khai mặc định ủy quyền cho :meth:`readinto`.
 
-   A typical :class:`BufferedIOBase` implementation should not inherit from a
-   :class:`RawIOBase` implementation, but wrap one, like
-   :class:`BufferedWriter` and :class:`BufferedReader` do.
+   Một triển khai :class:`BufferedIOBase` điển hình không nên kế thừa từ một
+   triển khai :class:`RawIOBase`, mà nên bọc một triển khai, như
+   :class:`BufferedWriter` và :class:`BufferedReader`.
 
-   :class:`BufferedIOBase` provides or overrides these data attributes and
-   methods in addition to those from :class:`IOBase`:
+   :class:`BufferedIOBase` cung cấp hoặc ghi đè các thuộc tính dữ liệu và phương thức sau, ngoài những thuộc tính và phương thức của :class:`IOBase`:
 
    .. attribute:: raw
 
-      The underlying raw stream (a :class:`RawIOBase` instance) that
-      :class:`BufferedIOBase` deals with.  This is not part of the
-      :class:`BufferedIOBase` API and may not exist on some implementations.
+      Luồng raw nền tảng (một thực thể :class:`RawIOBase`) mà
+      :class:`BufferedIOBase` xử lý. Đây không phải là một phần của
+      API :class:`BufferedIOBase` và có thể không tồn tại trên một số bản triển khai.
 
    .. method:: detach()
 
-      Separate the underlying raw stream from the buffer and return it.
+      Tách luồng raw nền tảng khỏi buffer và trả về luồng đó.
 
-      After the raw stream has been detached, the buffer is in an unusable
-      state.
+      Sau khi luồng raw được tách ra, buffer sẽ ở trạng thái không thể sử dụng.
 
-      Some buffers, like :class:`BytesIO`, do not have the concept of a single
-      raw stream to return from this method.  They raise
+      Một số buffer, chẳng hạn như :class:`BytesIO`, không có khái niệm về một luồng raw duy nhất để trả về từ phương thức này. Chúng sẽ đưa ra
       :exc:`UnsupportedOperation`.
 
       .. versionadded:: 3.1
 
    .. method:: read(size=-1, /)
 
-      Read and return up to *size* bytes. If the argument is omitted, ``None``,
-      or negative read as much as possible.
+      Đọc và trả về tối đa *size* byte. Nếu đối số bị bỏ qua, ``None``, hoặc là số âm, hãy đọc nhiều nhất có thể.
 
-      Fewer bytes may be returned than requested. An empty :class:`bytes` object
-      is returned if the stream is already at EOF. More than one read may be
-      made and calls may be retried if specific errors are encountered, see
-      :meth:`os.read` and :pep:`475` for more details. Less than size bytes
-      being returned does not imply that EOF is imminent.
+      Có thể trả về ít byte hơn số byte được yêu cầu. Một đối tượng :class:`bytes` rỗng được trả về nếu luồng đã ở EOF. Có thể thực hiện nhiều lần đọc và thử lại các lệnh gọi nếu gặp lỗi cụ thể, xem
+      :meth:`os.read` và :pep:`475` để biết thêm chi tiết. Việc trả về ít hơn số byte size không có nghĩa là EOF sắp xảy ra.
 
-      When reading as much as possible the default implementation will use
-      ``raw.readall`` if available (which should implement
-      :meth:`RawIOBase.readall`), otherwise will read in a loop until read
-      returns ``None``, an empty :class:`bytes`, or a non-retryable error. For
-      most streams this is to EOF, but for non-blocking streams more data may
-      become available.
+      Khi đọc nhiều nhất có thể, phần triển khai mặc định sẽ sử dụng ``raw.readall`` nếu có (vốn phải triển khai
+      :meth:`RawIOBase.readall`), nếu không thì sẽ đọc trong một vòng lặp cho đến khi read trả về ``None``, một :class:`bytes` rỗng hoặc một lỗi không thể thử lại. Với hầu hết các luồng, quá trình này sẽ tiếp tục đến EOF, nhưng đối với các luồng không blocking, có thể sẽ có thêm dữ liệu khả dụng.
 
       .. note::
 
-         When the underlying raw stream is non-blocking, implementations may
-         either raise :exc:`BlockingIOError` or return ``None`` if no data is
-         available. :mod:`!io` implementations return ``None``.
+         Khi raw stream bên dưới không blocking, các phần triển khai có thể raise :exc:`BlockingIOError` hoặc return ``None`` nếu không có dữ liệu. Các phần triển khai :mod:`!io` trả về ``None``.
 
    .. method:: read1(size=-1, /)
 
-      Read and return up to *size* bytes, calling :meth:`~RawIOBase.readinto`
-      which may retry if :py:const:`~errno.EINTR` is encountered per
-      :pep:`475`. If *size* is ``-1`` or not provided, the implementation will
-      choose an arbitrary value for *size*.
+      Đọc và trả về tối đa *size* byte, gọi :meth:`~RawIOBase.readinto`, vốn có thể thử lại nếu gặp :py:const:`~errno.EINTR` theo
+      :pep:`475`. Nếu *size* là ``-1`` hoặc không được cung cấp, phần triển khai sẽ chọn một giá trị tùy ý cho *size*.
 
       .. note::
 
-         When the underlying raw stream is non-blocking, implementations may
-         either raise :exc:`BlockingIOError` or return ``None`` if no data is
-         available. :mod:`!io` implementations return ``None``.
+         Khi raw stream bên dưới không blocking, các phần triển khai có thể raise :exc:`BlockingIOError` hoặc return ``None`` nếu không có dữ liệu. Các phần triển khai :mod:`!io` trả về ``None``.
 
    .. method:: readinto(b, /)
 
-      Read bytes into a pre-allocated, writable
-      :term:`bytes-like object` *b* and return the number of bytes read.
-      For example, *b* might be a :class:`bytearray`.
+      Đọc các byte vào một vùng đệm có thể ghi được cấp phát trước
+      Đọc các byte vào một đối tượng dạng byte có thể ghi, được cấp phát trước :term:`bytes-like object` *b* và trả về số byte đã đọc. Ví dụ, *b* có thể là một :class:`bytearray`.
 
-      Like :meth:`read`, multiple reads may be issued to the underlying raw
-      stream, unless the latter is interactive.
+      Tương tự như :meth:`read`, có thể thực hiện nhiều lần đọc trên raw stream bên dưới, trừ khi raw stream đó ở chế độ tương tác.
 
-      A :exc:`BlockingIOError` is raised if the underlying raw stream is in non
-      blocking-mode, and has no data available at the moment.
+      Một :exc:`BlockingIOError` sẽ được phát sinh nếu raw stream bên dưới đang ở chế độ non-blocking và hiện không có dữ liệu.
 
    .. method:: readinto1(b, /)
 
-      Read bytes into a pre-allocated, writable
-      :term:`bytes-like object` *b*, using at most one call to
-      the underlying raw stream's :meth:`~RawIOBase.read` (or
-      :meth:`~RawIOBase.readinto`) method. Return the number of bytes read.
+      Đọc các byte vào một vùng đệm có thể ghi được cấp phát trước
+      Đọc tối đa các byte vào :term:`bytes-like object` *b*, chỉ sử dụng nhiều nhất một lần gọi đến :meth:`~RawIOBase.read` của raw stream bên dưới (hoặc
+      :meth:`~RawIOBase.readinto`) method. Trả về số byte đã đọc.
 
-      A :exc:`BlockingIOError` is raised if the underlying raw stream is in non
-      blocking-mode, and has no data available at the moment.
+      Một :exc:`BlockingIOError` sẽ được phát sinh nếu raw stream bên dưới đang ở chế độ non-blocking và hiện không có dữ liệu.
 
       .. versionadded:: 3.5
 
    .. method:: write(b, /)
 
-      Write the given :term:`bytes-like object`, *b*, and return the number
-      of bytes written (always equal to the length of *b* in bytes, since if
-      the write fails an :exc:`OSError` will be raised).  Depending on the
-      actual implementation, these bytes may be readily written to the
-      underlying stream, or held in a buffer for performance and latency
-      reasons.
+      Ghi :term:`bytes-like object` đã cho, *b*, và trả về số byte đã ghi (luôn bằng độ dài của *b* tính theo byte, vì nếu thao tác ghi thất bại, một :exc:`OSError` sẽ được phát sinh). Tùy thuộc vào cách triển khai thực tế, các byte này có thể được ghi ngay vào stream bên dưới hoặc được giữ trong bộ đệm vì lý do hiệu năng và độ trễ.
 
-      When in non-blocking mode, a :exc:`BlockingIOError` is raised if the
-      data needed to be written to the raw stream but it couldn't accept
-      all the data without blocking.
+      Khi ở chế độ không chặn, một :exc:`BlockingIOError` sẽ được phát sinh nếu dữ liệu cần ghi vào raw stream nhưng raw stream không thể nhận toàn bộ dữ liệu mà không bị chặn.
 
-      The caller may release or mutate *b* after this method returns,
-      so the implementation should only access *b* during the method call.
+      Caller có thể giải phóng hoặc thay đổi *b* sau khi phương thức này trả về, vì vậy phần triển khai chỉ nên truy cập *b* trong lúc gọi phương thức.
 
 
-Raw File I/O
-^^^^^^^^^^^^
+I/O tệp thô
+^^^^^^^^^^^
 
 .. class:: FileIO(name, mode='r', closefd=True, opener=None)
 
-   A raw binary stream representing an OS-level file containing bytes data.  It
-   inherits from :class:`RawIOBase` and implements its low-level access design.
-   This means :meth:`~RawIOBase.write` does not guarantee all bytes are written
-   and :meth:`~RawIOBase.read` may read less bytes than requested even when more
-   bytes may be present in the underlying file. To get "write all" and
-   "read at least" behavior, use :ref:`binary-io`.
+   Một binary stream thô đại diện cho một tệp ở cấp hệ điều hành chứa dữ liệu dạng byte. Nó kế thừa từ :class:`RawIOBase` và triển khai thiết kế truy cập cấp thấp của lớp đó. Điều này có nghĩa là :meth:`~RawIOBase.write` không đảm bảo tất cả byte đều được ghi và :meth:`~RawIOBase.read` có thể đọc ít byte hơn số byte được yêu cầu ngay cả khi tệp bên dưới còn nhiều byte hơn. Để có hành vi "ghi tất cả" và "đọc ít nhất", hãy sử dụng :ref:`binary-io`.
 
-   The *name* can be one of two things:
+   Đối số *name* có thể là một trong hai dạng:
 
-   * a character string or :class:`bytes` object representing the path to the
-     file which will be opened. In this case closefd must be ``True`` (the default)
-     otherwise an error will be raised.
-   * an integer representing the number of an existing OS-level file descriptor
-     to which the resulting :class:`FileIO` object will give access. When the
-     FileIO object is closed this fd will be closed as well, unless *closefd*
-     is set to ``False``.
+   * một chuỗi ký tự hoặc một đối tượng :class:`bytes` đại diện cho đường dẫn đến tệp sẽ được mở. Trong trường hợp này, closefd phải là ``True`` (mặc định), nếu không sẽ phát sinh lỗi.
+   * một số nguyên đại diện cho số hiệu của một file descriptor ở cấp hệ điều hành hiện có mà đối tượng :class:`FileIO` được tạo ra sẽ cung cấp quyền truy cập. Khi đối tượng FileIO được đóng, fd này cũng sẽ được đóng, trừ khi *closefd* được đặt thành ``False``.
 
-   The *mode* can be ``'r'``, ``'w'``, ``'x'`` or ``'a'`` for reading
-   (default), writing, exclusive creation or appending. The file will be
-   created if it doesn't exist when opened for writing or appending; it will be
-   truncated when opened for writing. :exc:`FileExistsError` will be raised if
-   it already exists when opened for creating. Opening a file for creating
-   implies writing, so this mode behaves in a similar way to ``'w'``. Add a
-   ``'+'`` to the mode to allow simultaneous reading and writing.
+   *mode* có thể là ``'r'``, ``'w'``, ``'x'`` hoặc ``'a'`` tương ứng với đọc (mặc định), ghi, tạo độc quyền hoặc nối thêm. Tệp sẽ được tạo nếu chưa tồn tại khi mở để ghi hoặc nối thêm; tệp sẽ bị cắt ngắn khi mở để ghi. :exc:`FileExistsError` sẽ được phát sinh nếu tệp đã tồn tại khi mở để tạo. Việc mở tệp để tạo ngụ ý thao tác ghi, vì vậy mode này hoạt động tương tự như ``'w'``. Thêm ``'+'`` vào mode để cho phép đọc và ghi đồng thời.
 
-   A custom opener can be used by passing a callable as *opener*. The underlying
-   file descriptor for the file object is then obtained by calling *opener* with
-   (*name*, *flags*). *opener* must return an open file descriptor (passing
-   :mod:`os.open` as *opener* results in functionality similar to passing
-   ``None``).
+   Có thể sử dụng một opener tùy chỉnh bằng cách truyền một callable làm *opener*. Sau đó, file descriptor nền tảng của đối tượng tệp được lấy bằng cách gọi *opener* với (*name*, *flags*). *opener* phải trả về một file descriptor đang mở (truyền
+   :mod:`os.open` làm *opener* cho chức năng tương tự như truyền ``None``).
 
-   The newly created file is :ref:`non-inheritable <fd_inheritance>`.
+   Tệp mới được tạo là :ref:`non-inheritable <fd_inheritance>`.
 
-   See the :func:`open` built-in function for examples on using the *opener*
-   parameter.
+   Xem hàm dựng sẵn :func:`open` để biết các ví dụ về cách sử dụng tham số *opener*.
 
    .. warning::
       :class:`FileIO` is a low-level I/O object and members, such as
       :meth:`~RawIOBase.read` and :meth:`~RawIOBase.write`, need to have their
-      return values checked explicitly in a retry loop to implement "write all"
-      and "read at least" behavior. High-level I/O objects :ref:`binary-io` and
-      :ref:`text-io` implement retry behavior.
+      các giá trị trả về được kiểm tra rõ ràng trong một vòng lặp thử lại để triển khai hành vi "ghi toàn bộ" và "đọc ít nhất". Các đối tượng I/O cấp cao :ref:`binary-io` và
+      :ref:`text-io` triển khai cơ chế thử lại.
 
    .. versionchanged:: 3.3
-      The *opener* parameter was added.
-      The ``'x'`` mode was added.
+      Tham số *opener* đã được bổ sung. Chế độ ``'x'`` đã được bổ sung.
 
    .. versionchanged:: 3.4
-      The file is now non-inheritable.
+      Tệp hiện không thể kế thừa.
 
-   :class:`FileIO` provides these data attributes in addition to those from
-   :class:`RawIOBase` and :class:`IOBase`:
+   :class:`FileIO` cung cấp các thuộc tính dữ liệu sau, ngoài những thuộc tính từ
+   :class:`RawIOBase` và :class:`IOBase`:
 
    .. attribute:: mode
 
-      The mode as given in the constructor.
+      Chế độ được cung cấp trong hàm khởi tạo.
 
    .. attribute:: name
 
-      The file name.  This is the file descriptor of the file when no name is
-      given in the constructor.
+      Tên tệp.  Đây là bộ mô tả tệp của tệp khi không cung cấp tên trong hàm khởi tạo.
 
 
-Buffered Streams
-^^^^^^^^^^^^^^^^
+Các luồng có bộ đệm
+^^^^^^^^^^^^^^^^^^^
 
-Buffered I/O streams provide a higher-level interface to an I/O device
-than raw I/O does.
+Các luồng I/O có bộ đệm cung cấp giao diện cấp cao hơn để tương tác với thiết bị I/O so với I/O thô.
 
 .. class:: BytesIO(initial_bytes=b'')
 
-   A binary stream using an in-memory bytes buffer.  It inherits from
-   :class:`BufferedIOBase`.  The buffer is discarded when the
-   :meth:`~IOBase.close` method is called.
+   Một luồng nhị phân sử dụng bộ đệm bytes trong bộ nhớ.  Nó kế thừa từ
+   :class:`BufferedIOBase`.  Bộ đệm sẽ bị loại bỏ khi
+   :meth:`~IOBase.close` được gọi.
 
-   The optional argument *initial_bytes* is a :term:`bytes-like object` that
-   contains initial data.
+   Đối số tùy chọn *initial_bytes* là một :term:`bytes-like object` chứa dữ liệu ban đầu.
 
-   :class:`BytesIO` provides or overrides these methods in addition to those
-   from :class:`BufferedIOBase` and :class:`IOBase`:
+   :class:`BytesIO` cung cấp hoặc ghi đè các phương thức này, ngoài các phương thức từ :class:`BufferedIOBase` và :class:`IOBase`:
 
    .. method:: getbuffer()
 
-      Return a readable and writable view over the contents of the buffer
-      without copying them.  Also, mutating the view will transparently
-      update the contents of the buffer::
+      Trả về một view có thể đọc và ghi trên nội dung của buffer mà không sao chép nội dung. Ngoài ra, việc thay đổi view sẽ tự động cập nhật nội dung của buffer::
 
          >>> b = io.BytesIO(b"abcdef")
          >>> view = b.getbuffer()
@@ -767,392 +555,291 @@ than raw I/O does.
          b'ab56ef'
 
       .. note::
-         As long as the view exists, the :class:`BytesIO` object cannot be
-         resized or closed.
+         Chừng nào view còn tồn tại, đối tượng :class:`BytesIO` không thể được thay đổi kích thước hoặc đóng.
 
       .. versionadded:: 3.2
 
    .. method:: getvalue()
 
-      Return :class:`bytes` containing the entire contents of the buffer.
+      Trả về :class:`bytes` chứa toàn bộ nội dung của buffer.
 
 
    .. method:: read1(size=-1, /)
 
-      In :class:`BytesIO`, this is the same as :meth:`~BufferedIOBase.read`.
+      Trong :class:`BytesIO`, điều này giống với :meth:`~BufferedIOBase.read`.
 
       .. versionchanged:: 3.7
-         The *size* argument is now optional.
+         Đối số *size* hiện là tùy chọn.
 
    .. method:: readinto1(b, /)
 
-      In :class:`BytesIO`, this is the same as :meth:`~BufferedIOBase.readinto`.
+      Trong :class:`BytesIO`, điều này tương đương với :meth:`~BufferedIOBase.readinto`.
 
       .. versionadded:: 3.5
 
 .. class:: BufferedReader(raw, buffer_size=DEFAULT_BUFFER_SIZE)
 
-   A buffered binary stream providing higher-level access to a readable, non
-   seekable :class:`RawIOBase` raw binary stream.  It inherits from
+   Một binary stream có bộ đệm, cung cấp quyền truy cập ở cấp cao hơn vào :class:`RawIOBase` raw binary stream có thể đọc nhưng không thể seek. Nó kế thừa từ
    :class:`BufferedIOBase`.
 
-   When reading data from this object, a larger amount of data may be
-   requested from the underlying raw stream, and kept in an internal buffer.
-   The buffered data can then be returned directly on subsequent reads.
+   Khi đọc dữ liệu từ đối tượng này, có thể yêu cầu một lượng dữ liệu lớn hơn từ raw stream bên dưới và giữ dữ liệu đó trong một bộ đệm nội bộ. Sau đó, dữ liệu trong bộ đệm có thể được trả về trực tiếp trong các lần đọc tiếp theo.
 
-   The constructor creates a :class:`BufferedReader` for the given readable
-   *raw* stream and *buffer_size*.  If *buffer_size* is omitted,
-   :data:`DEFAULT_BUFFER_SIZE` is used.
+   Hàm khởi tạo tạo một :class:`BufferedReader` cho *raw* stream có thể đọc đã cho và *buffer_size*. Nếu *buffer_size* bị bỏ qua,
+   :data:`DEFAULT_BUFFER_SIZE` được sử dụng.
 
-   :class:`BufferedReader` provides or overrides these methods in addition to
-   those from :class:`BufferedIOBase` and :class:`IOBase`:
+   :class:`BufferedReader` cung cấp hoặc ghi đè các phương thức sau, ngoài những phương thức từ :class:`BufferedIOBase` và :class:`IOBase`:
 
    .. method:: peek(size=0, /)
 
-      Return bytes from the stream without advancing the position. The number of
-      bytes returned may be less or more than requested. If the underlying raw
-      stream is non-blocking and the operation would block, returns empty bytes.
+      Trả về các byte từ stream mà không làm thay đổi vị trí. Số byte được trả về có thể ít hơn hoặc nhiều hơn số byte được yêu cầu. Nếu raw stream bên dưới hoạt động ở chế độ non-blocking và thao tác sẽ bị block, trả về các byte rỗng.
 
    .. method:: read(size=-1, /)
 
-      In :class:`BufferedReader` this is the same as :meth:`io.BufferedIOBase.read`
+      Trong :class:`BufferedReader`, điều này tương đương với :meth:`io.BufferedIOBase.read`
 
    .. method:: read1(size=-1, /)
 
-      In :class:`BufferedReader` this is the same as :meth:`io.BufferedIOBase.read1`
+      Trong :class:`BufferedReader`, điều này tương đương với :meth:`io.BufferedIOBase.read1`
 
       .. versionchanged:: 3.7
-         The *size* argument is now optional.
+         Đối số *size* hiện là tùy chọn.
 
 .. class:: BufferedWriter(raw, buffer_size=DEFAULT_BUFFER_SIZE)
 
-   A buffered binary stream providing higher-level access to a writeable, non
-   seekable :class:`RawIOBase` raw binary stream.  It inherits from
+   Một buffered binary stream cung cấp quyền truy cập ở mức cao hơn vào :class:`RawIOBase`, một raw binary stream có thể ghi nhưng không thể seek. Nó kế thừa từ
    :class:`BufferedIOBase`.
 
-   When writing to this object, data is normally placed into an internal
-   buffer.  The buffer will be written out to the underlying :class:`RawIOBase`
-   object under various conditions, including:
+   Khi ghi vào đối tượng này, dữ liệu thường được đặt vào một buffer nội bộ. Buffer sẽ được ghi ra đối tượng :class:`RawIOBase` bên dưới trong nhiều trường hợp khác nhau, bao gồm:
 
-   * when the buffer gets too small for all pending data;
-   * when :meth:`flush` is called;
-   * when a :meth:`~IOBase.seek` is requested (for :class:`BufferedRandom` objects);
-   * when the :class:`BufferedWriter` object is closed or destroyed.
+   * khi buffer trở nên quá nhỏ để chứa toàn bộ dữ liệu đang chờ;
+   * khi gọi :meth:`flush`;
+   * khi yêu cầu :meth:`~IOBase.seek` (đối với các đối tượng :class:`BufferedRandom`);
+   * khi đối tượng :class:`BufferedWriter` được đóng hoặc hủy.
 
-   The constructor creates a :class:`BufferedWriter` for the given writeable
-   *raw* stream.  If the *buffer_size* is not given, it defaults to
+   Hàm khởi tạo tạo một :class:`BufferedWriter` cho stream *raw* có thể ghi đã cho. Nếu *buffer_size* không được cung cấp, giá trị mặc định là
    :data:`DEFAULT_BUFFER_SIZE`.
 
-   :class:`BufferedWriter` provides or overrides these methods in addition to
-   those from :class:`BufferedIOBase` and :class:`IOBase`:
+   :class:`BufferedWriter` cung cấp hoặc ghi đè các phương thức này, ngoài các phương thức từ :class:`BufferedIOBase` và :class:`IOBase`:
 
    .. method:: flush()
 
-      Force bytes held in the buffer into the raw stream.  A
-      :exc:`BlockingIOError` should be raised if the raw stream blocks.
+      Buộc các byte được lưu trong bộ đệm vào raw stream. Một
+      :exc:`BlockingIOError` nên được phát sinh nếu raw stream bị chặn.
 
    .. method:: write(b, /)
 
-      Write the :term:`bytes-like object`, *b*, and return the
-      number of bytes written.  When in non-blocking mode, a
-      :exc:`BlockingIOError` with :attr:`BlockingIOError.characters_written` set
-      is raised if the buffer needs to be written out but the raw stream blocks.
+      Ghi :term:`bytes-like object`, *b*, và trả về số byte đã ghi. Khi ở chế độ non-blocking, một
+      Ngoại lệ :exc:`BlockingIOError` với :attr:`BlockingIOError.characters_written` được đặt sẽ được phát sinh nếu bộ đệm cần được ghi ra nhưng raw stream bị chặn.
 
 
 .. class:: BufferedRandom(raw, buffer_size=DEFAULT_BUFFER_SIZE)
 
-   A buffered binary stream implementing :class:`BufferedIOBase` interfaces
-   providing higher-level access to a seekable :class:`RawIOBase` raw binary
-   stream.
+   Một buffered binary stream triển khai các interface :class:`BufferedIOBase`, cung cấp quyền truy cập cấp cao hơn vào một raw binary stream :class:`RawIOBase` có thể seek.
 
-   The constructor creates a reader and writer for a seekable raw stream, given
-   in the first argument.  If the *buffer_size* is omitted it defaults to
+   Constructor tạo một reader và writer cho raw stream có thể seek, được truyền trong đối số đầu tiên. Nếu *buffer_size* bị bỏ qua, giá trị mặc định là
    :data:`DEFAULT_BUFFER_SIZE`.
 
-   :class:`BufferedRandom` is capable of anything :class:`BufferedReader` or
-   :class:`BufferedWriter` can do.  In addition, :meth:`~IOBase.seek` and
-   :meth:`~IOBase.tell` are guaranteed to be implemented.
+   :class:`BufferedRandom` có thể thực hiện mọi việc mà :class:`BufferedReader` hoặc
+   :class:`BufferedWriter` có thể thực hiện. Ngoài ra, :meth:`~IOBase.seek` và
+   :meth:`~IOBase.tell` được đảm bảo là đã được triển khai.
 
 
 .. class:: BufferedRWPair(reader, writer, buffer_size=DEFAULT_BUFFER_SIZE, /)
 
-   A buffered binary stream providing higher-level access to two non seekable
-   :class:`RawIOBase` raw binary streams---one readable, the other writeable.
-   It inherits from :class:`BufferedIOBase`.
+   Một buffered binary stream cung cấp quyền truy cập cấp cao hơn vào hai stream không hỗ trợ seek
+   :class:`RawIOBase` là các luồng nhị phân thô—một luồng có thể đọc, luồng kia có thể ghi. Nó kế thừa từ :class:`BufferedIOBase`.
 
-   *reader* and *writer* are :class:`RawIOBase` objects that are readable and
-   writeable respectively.  If the *buffer_size* is omitted it defaults to
+   *reader* và *writer* lần lượt là các đối tượng :class:`RawIOBase` có thể đọc và ghi. Nếu *buffer_size* bị bỏ qua, giá trị mặc định là
    :data:`DEFAULT_BUFFER_SIZE`.
 
-   :class:`BufferedRWPair` implements all of :class:`BufferedIOBase`\'s methods
-   except for :meth:`~BufferedIOBase.detach`, which raises
+   :class:`BufferedRWPair` triển khai tất cả các phương thức của :class:`BufferedIOBase`\'s, ngoại trừ :meth:`~BufferedIOBase.detach`, phương thức này sẽ phát sinh
    :exc:`UnsupportedOperation`.
 
    .. warning::
 
-      :class:`BufferedRWPair` does not attempt to synchronize accesses to
-      its underlying raw streams.  You should not pass it the same object
-      as reader and writer; use :class:`BufferedRandom` instead.
+      :class:`BufferedRWPair` không cố gắng đồng bộ hóa việc truy cập vào các raw stream bên dưới. Bạn không nên truyền cùng một đối tượng cho reader và writer; thay vào đó, hãy sử dụng :class:`BufferedRandom`.
 
 
-Text I/O
-^^^^^^^^
+I/O văn bản
+^^^^^^^^^^^
 
 .. class:: TextIOBase
 
-   Base class for text streams.  This class provides a character and line based
-   interface to stream I/O.  It inherits from :class:`IOBase`.
+   Lớp cơ sở cho các luồng văn bản. Lớp này cung cấp giao diện I/O dựa trên ký tự và dòng. Nó kế thừa từ :class:`IOBase`.
 
-   :class:`TextIOBase` provides or overrides these data attributes and
-   methods in addition to those from :class:`IOBase`:
+   :class:`TextIOBase` cung cấp hoặc ghi đè các thuộc tính dữ liệu và phương thức sau, ngoài những thuộc tính và phương thức từ :class:`IOBase`:
 
    .. attribute:: encoding
 
-      The name of the encoding used to decode the stream's bytes into
-      strings, and to encode strings into bytes.
+      Tên của encoding được dùng để giải mã các byte của stream thành các chuỗi và mã hóa các chuỗi thành byte.
 
    .. attribute:: errors
 
-      The error setting of the decoder or encoder.
+      Thiết lập lỗi của decoder hoặc encoder.
 
    .. attribute:: newlines
 
-      A string, a tuple of strings, or ``None``, indicating the newlines
-      translated so far.  Depending on the implementation and the initial
-      constructor flags, this may not be available.
+      Một chuỗi, một tuple gồm các chuỗi hoặc ``None``, cho biết các ký tự xuống dòng đã được chuyển đổi cho đến thời điểm hiện tại. Tùy thuộc vào cách triển khai và các cờ constructor ban đầu, thông tin này có thể không khả dụng.
 
    .. attribute:: buffer
 
-      The underlying binary buffer (a :class:`BufferedIOBase`
-      or :class:`RawIOBase` instance) that :class:`TextIOBase` deals with.
-      This is not part of the :class:`TextIOBase` API and may not exist
-      in some implementations.
+      Bộ đệm nhị phân bên dưới (một instance của :class:`BufferedIOBase` hoặc :class:`RawIOBase`) mà :class:`TextIOBase` xử lý. Đây không phải là một phần của API :class:`TextIOBase` và có thể không tồn tại trong một số cách triển khai.
 
    .. method:: detach()
 
-      Separate the underlying binary buffer from the :class:`TextIOBase` and
-      return it.
+      Tách bộ đệm nhị phân bên dưới khỏi :class:`TextIOBase` và trả về bộ đệm đó.
 
-      After the underlying buffer has been detached, the :class:`TextIOBase` is
-      in an unusable state.
+      Sau khi bộ đệm bên dưới được tách ra, :class:`TextIOBase` sẽ ở trạng thái không thể sử dụng.
 
-      Some :class:`TextIOBase` implementations, like :class:`StringIO`, may not
-      have the concept of an underlying buffer and calling this method will
-      raise :exc:`UnsupportedOperation`.
+      Một số cách triển khai :class:`TextIOBase`, chẳng hạn như :class:`StringIO`, có thể không có khái niệm về bộ đệm bên dưới; việc gọi phương thức này sẽ phát sinh :exc:`UnsupportedOperation`.
 
       .. versionadded:: 3.1
 
    .. method:: read(size=-1, /)
 
-      Read and return at most *size* characters from the stream as a single
-      :class:`str`.  If *size* is negative or ``None``, reads until EOF.
+      Đọc và trả về nhiều nhất *size* ký tự từ stream dưới dạng một
+      :class:`str`.  Nếu *size* là số âm hoặc ``None``, đọc cho đến EOF.
 
    .. method:: readline(size=-1, /)
 
-      Read until newline or EOF and return a single :class:`str`.  If the stream is
-      already at EOF, an empty string is returned.
+      Đọc cho đến dòng mới hoặc EOF và trả về một :class:`str`.  Nếu stream đã ở EOF, một chuỗi rỗng sẽ được trả về.
 
-      If *size* is specified, at most *size* characters will be read.
+      Nếu *size* được chỉ định, nhiều nhất *size* ký tự sẽ được đọc.
 
    .. method:: seek(offset, whence=SEEK_SET, /)
 
-      Change the stream position to the given *offset*.  Behaviour depends on
-      the *whence* parameter.  The default value for *whence* is
+      Thay đổi vị trí của stream thành *offset* đã cho.  Hành vi phụ thuộc vào tham số *whence*.  Giá trị mặc định của *whence* là
       :data:`!SEEK_SET`.
 
-      * :data:`!SEEK_SET` or ``0``: seek from the start of the stream
-        (the default); *offset* must either be a number returned by
-        :meth:`TextIOBase.tell`, or zero.  Any other *offset* value
-        produces undefined behaviour.
-      * :data:`!SEEK_CUR` or ``1``: "seek" to the current position;
-        *offset* must be zero, which is a no-operation (all other values
-        are unsupported).
-      * :data:`!SEEK_END` or ``2``: seek to the end of the stream;
-        *offset* must be zero (all other values are unsupported).
+      * :data:`!SEEK_SET` hoặc ``0``: tìm vị trí từ đầu stream (mặc định); *offset* phải là một số được trả về bởi
+        :meth:`TextIOBase.tell`, hoặc bằng không.  Bất kỳ giá trị *offset* nào khác đều tạo ra hành vi không xác định.
+      * :data:`!SEEK_CUR` hoặc ``1``: "seek" đến vị trí hiện tại; *offset* phải bằng không, đây là thao tác không làm gì (no-op) (mọi giá trị khác đều không được hỗ trợ).
+      * :data:`!SEEK_END` hoặc ``2``: seek đến cuối stream; *offset* phải bằng không (mọi giá trị khác đều không được hỗ trợ).
 
-      Return the new absolute position as an opaque number.
+      Trả về vị trí tuyệt đối mới dưới dạng một số opaque.
 
       .. versionadded:: 3.1
-         The :data:`!SEEK_*` constants.
+         Các hằng số :data:`!SEEK_*`.
 
    .. method:: tell()
 
-      Return the current stream position as an opaque number.  The number
-      does not usually represent a number of bytes in the underlying
-      binary storage.
+      Trả về vị trí hiện tại của stream dưới dạng một số opaque. Số này thường không biểu thị số byte trong bộ lưu trữ nhị phân bên dưới.
 
    .. method:: write(s, /)
 
-      Write the string *s* to the stream and return the number of characters
-      written.
+      Ghi chuỗi *s* vào stream và trả về số ký tự đã ghi.
 
 
 .. class:: TextIOWrapper(buffer, encoding=None, errors=None, newline=None, \
                          line_buffering=False, write_through=False)
 
-   A buffered text stream providing higher-level access to a
-   :class:`BufferedIOBase` buffered binary stream.  It inherits from
+   Một luồng văn bản có bộ đệm cung cấp quyền truy cập cấp cao hơn vào một
+   :class:`BufferedIOBase` luồng nhị phân có bộ đệm. Nó kế thừa từ
    :class:`TextIOBase`.
 
-   *encoding* gives the name of the encoding that the stream will be decoded or
-   encoded with.  In :ref:`UTF-8 Mode <utf8-mode>`, this defaults to UTF-8.
-   Otherwise, it defaults to :func:`locale.getencoding`.
-   ``encoding="locale"`` can be used to specify the current locale's encoding
-   explicitly. See :ref:`io-text-encoding` for more information.
+   *encoding* chỉ định tên của encoding mà luồng sẽ được giải mã hoặc mã hóa bằng encoding đó. Trong :ref:`UTF-8 Mode <utf8-mode>`, giá trị mặc định là UTF-8. Nếu không, giá trị mặc định là :func:`locale.getencoding`. Có thể sử dụng ``encoding="locale"`` để chỉ định rõ ràng encoding của locale hiện tại. Xem :ref:`io-text-encoding` để biết thêm thông tin.
 
-   *errors* is an optional string that specifies how encoding and decoding
-   errors are to be handled.  Pass ``'strict'`` to raise a :exc:`ValueError`
-   exception if there is an encoding error (the default of ``None`` has the same
-   effect), or pass ``'ignore'`` to ignore errors.  (Note that ignoring encoding
-   errors can lead to data loss.)  ``'replace'`` causes a replacement marker
-   (such as ``'?'``) to be inserted where there is malformed data.
-   ``'backslashreplace'`` causes malformed data to be replaced by a
-   backslashed escape sequence.  When writing, ``'xmlcharrefreplace'``
-   (replace with the appropriate XML character reference)  or ``'namereplace'``
-   (replace with ``\N{...}`` escape sequences) can be used.  Any other error
-   handling name that has been registered with
-   :func:`codecs.register_error` is also valid.
+   *errors* là một chuỗi tùy chọn chỉ định cách xử lý các lỗi mã hóa và giải mã. Truyền ``'strict'`` để raise một ngoại lệ :exc:`ValueError` nếu xảy ra lỗi mã hóa (giá trị mặc định ``None`` cũng có tác dụng tương tự), hoặc truyền ``'ignore'`` để bỏ qua lỗi. (Lưu ý rằng việc bỏ qua lỗi mã hóa có thể dẫn đến mất dữ liệu.) ``'replace'`` khiến một dấu đánh dấu thay thế (chẳng hạn như ``'?'``) được chèn vào vị trí có dữ liệu không đúng định dạng. ``'backslashreplace'`` khiến dữ liệu không đúng định dạng được thay thế bằng một chuỗi escape có dấu gạch chéo ngược. Khi ghi, có thể sử dụng ``'xmlcharrefreplace'`` (thay thế bằng tham chiếu ký tự XML thích hợp) hoặc ``'namereplace'`` (thay thế bằng các chuỗi escape ``\N{...}``). Bất kỳ tên xử lý lỗi nào khác đã được đăng ký với
+   :func:`codecs.register_error` cũng hợp lệ.
 
    .. index::
       single: universal newlines; io.TextIOWrapper class
 
-   *newline* controls how line endings are handled.  It can be ``None``,
-   ``''``, ``'\n'``, ``'\r'``, and ``'\r\n'``.  It works as follows:
+   *newline* kiểm soát cách xử lý các ký tự kết thúc dòng. Nó có thể là ``None``, ``''``, ``'\n'``, ``'\r'`` hoặc ``'\r\n'``. Cách hoạt động như sau:
 
-   * When reading input from the stream, if *newline* is ``None``,
-     :term:`universal newlines` mode is enabled.  Lines in the input can end in
-     ``'\n'``, ``'\r'``, or ``'\r\n'``, and these are translated into ``'\n'``
-     before being returned to the caller.  If *newline* is ``''``, universal
-     newlines mode is enabled, but line endings are returned to the caller
-     untranslated.  If *newline* has any of the other legal values, input lines
-     are only terminated by the given string, and the line ending is returned to
-     the caller untranslated.
+   * Khi đọc dữ liệu đầu vào từ luồng, nếu *newline* là ``None``,
+     Chế độ :term:`universal newlines` đã được bật. Các dòng trong đầu vào có thể kết thúc bằng ``'\n'``, ``'\r'`` hoặc ``'\r\n'``, và các giá trị này được chuyển thành ``'\n'`` trước khi trả về cho caller. Nếu *newline* là ``''``, chế độ universal newlines được bật, nhưng các ký tự kết thúc dòng được trả về cho caller mà không được dịch. Nếu *newline* có bất kỳ giá trị hợp lệ nào khác, các dòng đầu vào chỉ được kết thúc bằng chuỗi đã cho, và ký tự kết thúc dòng được trả về cho caller mà không được dịch.
 
-   * When writing output to the stream, if *newline* is ``None``, any ``'\n'``
-     characters written are translated to the system default line separator,
-     :data:`os.linesep`.  If *newline* is ``''`` or ``'\n'``, no translation
-     takes place.  If *newline* is any of the other legal values, any ``'\n'``
-     characters written are translated to the given string.
+   * Khi ghi đầu ra vào stream, nếu *newline* là ``None``, mọi ký tự ``'\n'`` được ghi sẽ được chuyển thành dấu phân cách dòng mặc định của hệ thống,
+     :data:`os.linesep`. Nếu *newline* là ``''`` hoặc ``'\n'``, sẽ không có quá trình dịch nào diễn ra. Nếu *newline* có bất kỳ giá trị hợp lệ nào khác, mọi ký tự ``'\n'`` được ghi sẽ được chuyển thành chuỗi đã cho.
 
-   If *line_buffering* is ``True``, :meth:`~IOBase.flush` is implied when a call to
-   write contains a newline character or a carriage return.
+   Nếu *line_buffering* là ``True``, :meth:`~IOBase.flush` được ngầm định khi một lần gọi write chứa ký tự newline hoặc carriage return.
 
-   If *write_through* is ``True``, calls to :meth:`~BufferedIOBase.write` are guaranteed
-   not to be buffered: any data written on the :class:`TextIOWrapper`
-   object is immediately handled to its underlying binary *buffer*.
+   Nếu *write_through* là ``True``, các lần gọi :meth:`~BufferedIOBase.write` được đảm bảo không bị buffered: mọi dữ liệu được ghi vào đối tượng :class:`TextIOWrapper` sẽ ngay lập tức được xử lý bởi *buffer* nhị phân bên dưới.
 
    .. versionchanged:: 3.3
-      The *write_through* argument has been added.
+      Đối số *write_through* đã được thêm vào.
 
    .. versionchanged:: 3.3
-      The default *encoding* is now ``locale.getpreferredencoding(False)``
-      instead of ``locale.getpreferredencoding()``. Don't change temporary the
-      locale encoding using :func:`locale.setlocale`, use the current locale
-      encoding instead of the user preferred encoding.
+      *encoding* mặc định hiện là ``locale.getpreferredencoding(False)`` thay vì ``locale.getpreferredencoding()``. Không tạm thời thay đổi encoding của locale bằng :func:`locale.setlocale`; thay vào đó, hãy sử dụng encoding của locale hiện tại thay vì encoding được người dùng ưu tiên.
 
    .. versionchanged:: 3.10
-      The *encoding* argument now supports the ``"locale"`` dummy encoding name.
+      Đối số *encoding* giờ đây hỗ trợ tên encoding dummy ``"locale"``.
 
    .. note::
 
-      When the underlying raw stream is non-blocking, a :exc:`BlockingIOError`
-      may be raised if a read operation cannot be completed immediately.
+      Khi raw stream bên dưới không chặn, một :exc:`BlockingIOError` có thể được phát sinh nếu thao tác đọc không thể hoàn tất ngay lập tức.
 
-   :class:`TextIOWrapper` provides these data attributes and methods in
-   addition to those from :class:`TextIOBase` and :class:`IOBase`:
+   :class:`TextIOWrapper` cung cấp các thuộc tính dữ liệu và phương thức sau, ngoài những thuộc tính và phương thức từ :class:`TextIOBase` và :class:`IOBase`:
 
    .. attribute:: line_buffering
 
-      Whether line buffering is enabled.
+      Cho biết line buffering có được bật hay không.
 
    .. attribute:: write_through
 
-      Whether writes are passed immediately to the underlying binary
-      buffer.
+      Cho biết các thao tác ghi có được chuyển ngay đến binary buffer bên dưới hay không.
 
       .. versionadded:: 3.7
 
    .. method:: reconfigure(*, encoding=None, errors=None, newline=None, \
                            line_buffering=None, write_through=None)
 
-      Reconfigure this text stream using new settings for *encoding*,
-      *errors*, *newline*, *line_buffering* and *write_through*.
+      Cấu hình lại text stream này bằng các thiết lập mới cho *encoding*, *errors*, *newline*, *line_buffering* và *write_through*.
 
-      Parameters not specified keep current settings, except
-      ``errors='strict'`` is used when *encoding* is specified but
-      *errors* is not specified.
+      Các tham số không được chỉ định sẽ giữ nguyên cài đặt hiện tại, ngoại trừ ``errors='strict'`` được sử dụng khi *encoding* được chỉ định nhưng *errors* không được chỉ định.
 
-      It is not possible to change the encoding or newline if some data
-      has already been read from the stream. On the other hand, changing
-      encoding after write is possible.
+      Không thể thay đổi encoding hoặc ký tự dòng mới nếu một phần dữ liệu đã được đọc từ stream. Mặt khác, có thể thay đổi encoding sau khi ghi.
 
-      This method does an implicit stream flush before setting the
-      new parameters.
+      Phương thức này sẽ ngầm flush stream trước khi thiết lập các tham số mới.
 
       .. versionadded:: 3.7
 
       .. versionchanged:: 3.11
-         The method supports ``encoding="locale"`` option.
+         Phương thức này hỗ trợ tùy chọn ``encoding="locale"``.
 
    .. method:: seek(cookie, whence=os.SEEK_SET, /)
 
-      Set the stream position.
-      Return the new stream position as an :class:`int`.
+      Đặt vị trí của stream. Trả về vị trí mới của stream dưới dạng :class:`int`.
 
-      Four operations are supported,
-      given by the following argument combinations:
+      Bốn thao tác được hỗ trợ, tương ứng với các tổ hợp đối số sau:
 
-      * ``seek(0, SEEK_SET)``: Rewind to the start of the stream.
-      * ``seek(cookie, SEEK_SET)``: Restore a previous position;
-        *cookie* **must be** a number returned by :meth:`tell`.
-      * ``seek(0, SEEK_END)``: Fast-forward to the end of the stream.
-      * ``seek(0, SEEK_CUR)``: Leave the current stream position unchanged.
+      * ``seek(0, SEEK_SET)``: Tua lại về đầu stream.
+      * ``seek(cookie, SEEK_SET)``: Khôi phục một vị trí trước đó; *cookie* **phải là** một số được trả về bởi :meth:`tell`.
+      * ``seek(0, SEEK_END)``: Tua nhanh đến cuối stream.
+      * ``seek(0, SEEK_CUR)``: Giữ nguyên vị trí hiện tại của stream.
 
-      Any other argument combinations are invalid,
-      and may raise exceptions.
+      Mọi tổ hợp đối số khác đều không hợp lệ và có thể gây ra ngoại lệ.
 
       .. seealso::
 
-         :data:`os.SEEK_SET`, :data:`os.SEEK_CUR`, and :data:`os.SEEK_END`.
+         :data:`os.SEEK_SET`, :data:`os.SEEK_CUR` và :data:`os.SEEK_END`.
 
    .. method:: tell()
 
-      Return the stream position as an opaque number.
-      The return value of :meth:`!tell` can be given as input to :meth:`seek`,
-      to restore a previous stream position.
+      Trả về vị trí của stream dưới dạng một số không trong suốt. Giá trị trả về của :meth:`!tell` có thể được cung cấp làm đầu vào cho :meth:`seek` để khôi phục một vị trí trước đó của stream.
 
 
 .. class:: StringIO(initial_value='', newline='\n')
 
-   A text stream using an in-memory text buffer.  It inherits from
+   Một text stream sử dụng bộ đệm văn bản trong bộ nhớ. Nó kế thừa từ
    :class:`TextIOBase`.
 
-   The text buffer is discarded when the :meth:`~IOBase.close` method is
-   called.
+   Bộ đệm văn bản bị loại bỏ khi phương thức :meth:`~IOBase.close` được gọi.
 
-   The initial value of the buffer can be set by providing *initial_value*.
-   If newline translation is enabled, newlines will be encoded as if by
-   :meth:`~TextIOBase.write`.  The stream is positioned at the start of the
-   buffer which emulates opening an existing file in a ``w+`` mode, making it
-   ready for an immediate write from the beginning or for a write that
-   would overwrite the initial value.  To emulate opening a file in an ``a+``
-   mode ready for appending, use ``f.seek(0, io.SEEK_END)`` to reposition the
-   stream at the end of the buffer.
+   Có thể đặt giá trị ban đầu của bộ đệm bằng cách cung cấp *initial_value*. Nếu bật tính năng chuyển đổi dòng mới, các dòng mới sẽ được mã hóa như thể bằng
+   :meth:`~TextIOBase.write`. Luồng được đặt ở đầu bộ đệm, mô phỏng việc mở một tệp hiện có ở chế độ ``w+``, sẵn sàng để ghi ngay từ đầu hoặc ghi đè lên giá trị ban đầu. Để mô phỏng việc mở tệp ở chế độ ``a+`` sẵn sàng để ghi nối tiếp, hãy dùng ``f.seek(0, io.SEEK_END)`` để định vị lại luồng ở cuối bộ đệm.
 
-   The *newline* argument works like that of :class:`TextIOWrapper`,
-   except that when writing output to the stream, if *newline* is ``None``,
-   newlines are written as ``\n`` on all platforms.
+   Đối số *newline* hoạt động giống như đối số của :class:`TextIOWrapper`, ngoại trừ khi ghi đầu ra vào luồng, nếu *newline* là ``None``, các dòng mới sẽ được ghi dưới dạng ``\n`` trên mọi nền tảng.
 
-   :class:`StringIO` provides this method in addition to those from
-   :class:`TextIOBase` and :class:`IOBase`:
+   :class:`StringIO` cung cấp phương thức này ngoài các phương thức từ
+   :class:`TextIOBase` và :class:`IOBase`:
 
    .. method:: getvalue()
 
-      Return a :class:`str` containing the entire contents of the buffer.
-      Newlines are decoded as if by :meth:`~TextIOBase.read`, although
-      the stream position is not changed.
+      Trả về một :class:`str` chứa toàn bộ nội dung của bộ đệm. Các dòng mới được giải mã như thể bằng :meth:`~TextIOBase.read`, mặc dù vị trí luồng không thay đổi.
 
-   Example usage::
+   Ví dụ sử dụng::
 
       import io
 
@@ -1160,12 +847,12 @@ Text I/O
       output.write('First line.\n')
       print('Second line.', file=output)
 
-      # Retrieve file contents -- this will be
+      # Lấy nội dung tệp -- nội dung này sẽ là
       # 'First line.\nSecond line.\n'
       contents = output.getvalue()
 
-      # Close object and discard memory buffer --
-      # .getvalue() will now raise an exception.
+      # Đóng đối tượng và loại bỏ bộ đệm trong bộ nhớ --
+      # .getvalue() giờ đây sẽ phát sinh một ngoại lệ.
       output.close()
 
 
@@ -1174,33 +861,26 @@ Text I/O
 
 .. class:: IncrementalNewlineDecoder
 
-   A helper codec that decodes newlines for :term:`universal newlines` mode.
-   It inherits from :class:`codecs.IncrementalDecoder`.
+   Một codec hỗ trợ giải mã ký tự xuống dòng cho chế độ :term:`universal newlines`. Nó kế thừa từ :class:`codecs.IncrementalDecoder`.
 
 
-Static Typing
--------------
+Kiểu tĩnh
+---------
 
-The following protocols can be used for annotating function and method
-arguments for simple stream reading or writing operations. They are decorated
-with :deco:`typing.runtime_checkable`.
+Các protocol sau đây có thể được sử dụng để chú thích các đối số của hàm và method cho các thao tác đọc hoặc ghi stream đơn giản. Chúng được trang trí bằng :deco:`typing.runtime_checkable`.
 
 .. class:: Reader[T]
 
-   Generic protocol for reading from a file or other input stream. ``T`` will
-   usually be :class:`str` or :class:`bytes`, but can be any type that is
-   read from the stream.
+   Protocol tổng quát để đọc từ tệp hoặc stream đầu vào khác. ``T`` thường sẽ là :class:`str` hoặc :class:`bytes`, nhưng có thể là bất kỳ kiểu nào được đọc từ stream.
 
    .. versionadded:: 3.14
 
    .. method:: read()
                read(size, /)
 
-      Read data from the input stream and return it. If *size* is
-      specified, it should be an integer, and at most *size* items
-      (bytes/characters) will be read.
+      Đọc dữ liệu từ stream đầu vào và trả về dữ liệu đó. Nếu chỉ định *size*, giá trị này phải là một số nguyên và tối đa *size* mục (byte/ký tự) sẽ được đọc.
 
-   For example::
+   Ví dụ::
 
      def read_it(reader: Reader[str]):
          data = reader.read(11)
@@ -1208,81 +888,53 @@ with :deco:`typing.runtime_checkable`.
 
 .. class:: Writer[T]
 
-   Generic protocol for writing to a file or other output stream. ``T`` will
-   usually be :class:`str` or :class:`bytes`, but can be any type that can be
-   written to the stream.
+   Protocol tổng quát để ghi vào tệp hoặc stream đầu ra khác. ``T`` thường sẽ là :class:`str` hoặc :class:`bytes`, nhưng có thể là bất kỳ kiểu nào có thể được ghi vào stream.
 
    .. versionadded:: 3.14
 
    .. method:: write(data, /)
 
-      Write *data* to the output stream and return the number of items
-      (bytes/characters) written.
+      Ghi *data* vào stream đầu ra và trả về số mục (byte/ký tự) đã được ghi.
 
-   For example::
+   Ví dụ::
 
      def write_binary(writer: Writer[bytes]):
          writer.write(b"Hello world!\n")
 
-See :ref:`typing-io` for other I/O related protocols and classes that can be
-used for static type checking.
+Xem :ref:`typing-io` để biết các giao thức và lớp liên quan đến I/O khác có thể được sử dụng cho static type checking.
 
-Performance
------------
+Hiệu năng
+---------
 
-This section discusses the performance of the provided concrete I/O
-implementations.
+Phần này thảo luận về hiệu năng của các triển khai I/O cụ thể được cung cấp.
 
-Binary I/O
-^^^^^^^^^^
+I/O nhị phân
+^^^^^^^^^^^^
 
-By reading and writing only large chunks of data even when the user asks for a
-single byte, buffered I/O hides any inefficiency in calling and executing the
-operating system's unbuffered I/O routines.  The gain depends on the OS and the
-kind of I/O which is performed.  For example, on some modern OSes such as Linux,
-unbuffered disk I/O can be as fast as buffered I/O.  The bottom line, however,
-is that buffered I/O offers predictable performance regardless of the platform
-and the backing device.  Therefore, it is almost always preferable to use
-buffered I/O rather than unbuffered I/O for binary data.
+Bằng cách chỉ đọc và ghi các khối dữ liệu lớn ngay cả khi người dùng yêu cầu một byte duy nhất, buffered I/O che giấu mọi sự kém hiệu quả trong việc gọi và thực thi các routine I/O không có bộ đệm của hệ điều hành. Mức cải thiện phụ thuộc vào hệ điều hành và loại I/O được thực hiện. Ví dụ, trên một số hệ điều hành hiện đại như Linux, disk I/O không có bộ đệm có thể nhanh bằng buffered I/O. Tuy nhiên, điểm mấu chốt là buffered I/O mang lại hiệu năng ổn định, bất kể nền tảng và thiết bị lưu trữ. Do đó, gần như luôn nên sử dụng buffered I/O thay vì I/O không có bộ đệm cho dữ liệu nhị phân.
 
-Text I/O
+I/O văn bản
+^^^^^^^^^^^
+
+I/O văn bản trên bộ lưu trữ nhị phân (chẳng hạn như một tệp) chậm hơn đáng kể so với I/O nhị phân trên cùng bộ lưu trữ, vì nó yêu cầu chuyển đổi giữa dữ liệu unicode và dữ liệu nhị phân bằng codec ký tự. Điều này có thể trở nên rõ rệt khi xử lý lượng dữ liệu văn bản khổng lồ, chẳng hạn như các tệp nhật ký lớn. Ngoài ra,
+:meth:`~TextIOBase.tell` và :meth:`~TextIOBase.seek` đều khá chậm do thuật toán tái tạo được sử dụng.
+
+Tuy nhiên, :class:`StringIO` là một vùng chứa unicode gốc trong bộ nhớ và sẽ có tốc độ tương tự như :class:`BytesIO`.
+
+Đa luồng
 ^^^^^^^^
 
-Text I/O over a binary storage (such as a file) is significantly slower than
-binary I/O over the same storage, because it requires conversions between
-unicode and binary data using a character codec.  This can become noticeable
-handling huge amounts of text data like large log files.  Also,
-:meth:`~TextIOBase.tell` and :meth:`~TextIOBase.seek` are both quite slow
-due to the reconstruction algorithm used.
+Các đối tượng :class:`FileIO` an toàn với luồng (thread-safe) trong phạm vi các lệnh gọi hệ điều hành (chẳng hạn như :manpage:`read(2)` trên Unix) mà chúng bao bọc cũng an toàn với luồng.
 
-:class:`StringIO`, however, is a native in-memory unicode container and will
-exhibit similar speed to :class:`BytesIO`.
+Các đối tượng đệm nhị phân (các thể hiện của :class:`BufferedReader`,
+:class:`BufferedWriter`, :class:`BufferedRandom` và :class:`BufferedRWPair`) bảo vệ các cấu trúc bên trong bằng một khóa; do đó, việc gọi chúng từ nhiều luồng cùng lúc là an toàn.
 
-Multi-threading
-^^^^^^^^^^^^^^^
+Các đối tượng :class:`TextIOWrapper` không an toàn khi sử dụng trong môi trường đa luồng.
 
-:class:`FileIO` objects are thread-safe to the extent that the operating system
-calls (such as :manpage:`read(2)` under Unix) they wrap are thread-safe too.
+Tính tái nhập
+^^^^^^^^^^^^^
 
-Binary buffered objects (instances of :class:`BufferedReader`,
-:class:`BufferedWriter`, :class:`BufferedRandom` and :class:`BufferedRWPair`)
-protect their internal structures using a lock; it is therefore safe to call
-them from multiple threads at once.
+Các đối tượng đệm nhị phân (các thực thể của :class:`BufferedReader`,
+:class:`BufferedWriter`, :class:`BufferedRandom` và :class:`BufferedRWPair`) không có tính tái nhập. Mặc dù các lời gọi tái nhập sẽ không xảy ra trong những tình huống thông thường, chúng có thể phát sinh khi thực hiện I/O trong một trình xử lý :mod:`signal`. Nếu một thread cố gắng tái nhập vào một đối tượng đệm mà nó đang truy cập, một :exc:`RuntimeError` sẽ được phát sinh. Lưu ý rằng điều này không ngăn một thread khác truy cập vào đối tượng đệm.
 
-:class:`TextIOWrapper` objects are not thread-safe.
-
-Reentrancy
-^^^^^^^^^^
-
-Binary buffered objects (instances of :class:`BufferedReader`,
-:class:`BufferedWriter`, :class:`BufferedRandom` and :class:`BufferedRWPair`)
-are not reentrant.  While reentrant calls will not happen in normal situations,
-they can arise from doing I/O in a :mod:`signal` handler.  If a thread tries to
-re-enter a buffered object which it is already accessing, a :exc:`RuntimeError`
-is raised.  Note this doesn't prohibit a different thread from entering the
-buffered object.
-
-The above implicitly extends to text files, since the :func:`open` function
-will wrap a buffered object inside a :class:`TextIOWrapper`.  This includes
-standard streams and therefore affects the built-in :func:`print` function as
-well.
+Điều trên mặc nhiên cũng áp dụng cho các tệp văn bản, vì hàm :func:`open` sẽ bọc một đối tượng đệm bên trong một :class:`TextIOWrapper`. Điều này bao gồm cả các luồng tiêu chuẩn và do đó cũng ảnh hưởng đến hàm dựng sẵn :func:`print`.

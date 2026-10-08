@@ -1,64 +1,52 @@
-:mod:`!grp` --- The group database
+:mod:`!grp` --- Cơ sở dữ liệu nhóm
 ==================================
 
 .. module:: grp
-   :synopsis: The group database (getgrnam() and friends).
+   :synopsis: Cơ sở dữ liệu nhóm (getgrnam() và các hàm liên quan).
 
 --------------
 
-This module provides access to the Unix group database. It is available on all
-Unix versions.
+Mô-đun này cung cấp quyền truy cập vào cơ sở dữ liệu nhóm Unix. Mô-đun này khả dụng trên tất cả các phiên bản Unix.
 
 .. availability:: Unix, not WASI, not Android, not iOS.
 
-Group database entries are reported as a tuple-like object, whose attributes
-correspond to the members of the ``group`` structure (Attribute field below, see
-``<grp.h>``):
+Các mục trong cơ sở dữ liệu nhóm được trả về dưới dạng một đối tượng giống tuple, với các thuộc tính tương ứng với các thành phần của cấu trúc ``group`` (trường Attribute bên dưới, xem ``<grp.h>``):
 
-+-------+-----------+---------------------------------+
-| Index | Attribute | Meaning                         |
-+=======+===========+=================================+
-| 0     | gr_name   | the name of the group           |
-+-------+-----------+---------------------------------+
-| 1     | gr_passwd | the (encrypted) group password; |
-|       |           | often empty                     |
-+-------+-----------+---------------------------------+
-| 2     | gr_gid    | the numerical group ID          |
-+-------+-----------+---------------------------------+
-| 3     | gr_mem    | all the group member's  user    |
-|       |           | names                           |
-+-------+-----------+---------------------------------+
++---------+------------+---------------------------------------------------+
+| Chỉ mục | Thuộc tính | Ý nghĩa                                           |
++=========+============+===================================================+
+| 0       | gr_name    | tên của group                                     |
++---------+------------+---------------------------------------------------+
+| 1       | gr_passwd  | mật khẩu (được mã hóa) của group; thường để trống |
++---------+------------+---------------------------------------------------+
+| 2       | gr_gid     | ID dạng số của group                              |
++---------+------------+---------------------------------------------------+
+| 3       | gr_mem     | tất cả tên người dùng của thành viên nhóm         |
++---------+------------+---------------------------------------------------+
 
-The gid is an integer, name and password are strings, and the member list is a
-list of strings. (Note that most users are not explicitly listed as members of
-the group they are in according to the password database.  Check both databases
-to get complete membership information.  Also note that a ``gr_name`` that
-starts with a ``+`` or ``-`` is likely to be a YP/NIS reference and may not be
-accessible via :func:`getgrnam` or :func:`getgrgid`.)
+gid là một số nguyên, name và password là các chuỗi, còn danh sách thành viên là một danh sách các chuỗi. (Lưu ý rằng hầu hết người dùng không được liệt kê rõ ràng là thành viên của nhóm mà họ thuộc về theo password database. Hãy kiểm tra cả hai database để lấy thông tin thành viên đầy đủ. Cũng lưu ý rằng một ``gr_name`` bắt đầu bằng ``+`` hoặc ``-`` có khả năng là một tham chiếu YP/NIS và có thể không thể truy cập thông qua :func:`getgrnam` hoặc :func:`getgrgid`.)
 
-It defines the following items:
+Mô-đun này định nghĩa các mục sau:
 
 
 .. function:: getgrgid(id)
 
-   Return the group database entry for the given numeric group ID. :exc:`KeyError`
-   is raised if the entry asked for cannot be found.
+   Trả về mục trong group database tương ứng với group ID dạng số đã cho. :exc:`KeyError` được phát sinh nếu không tìm thấy mục được yêu cầu.
 
    .. versionchanged:: 3.10
       :exc:`TypeError` is raised for non-integer arguments like floats or strings.
 
 .. function:: getgrnam(name)
 
-   Return the group database entry for the given group name. :exc:`KeyError` is
-   raised if the entry asked for cannot be found.
+   Trả về mục trong group database tương ứng với tên nhóm đã cho. :exc:`KeyError` được phát sinh nếu không tìm thấy mục được yêu cầu.
 
 
 .. function:: getgrall()
 
-   Return a list of all available group entries, in arbitrary order.
+   Trả về danh sách tất cả các mục nhóm hiện có, theo thứ tự bất kỳ.
 
 
 .. seealso::
 
-   Module :mod:`pwd`
-      An interface to the user database, similar to this.
+   Mô-đun :mod:`pwd`
+      Một interface tới cơ sở dữ liệu người dùng, tương tự như thế này.

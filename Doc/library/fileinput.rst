@@ -1,228 +1,168 @@
-:mod:`!fileinput` --- Iterate over lines from multiple input streams
-====================================================================
+:mod:`!fileinput` --- Lặp qua các dòng từ nhiều luồng đầu vào
+=============================================================
 
 .. module:: fileinput
-   :synopsis: Loop over standard input or a list of files.
+   :synopsis: Lặp qua đầu vào chuẩn hoặc một danh sách tệp.
 
 .. moduleauthor:: Guido van Rossum <guido@python.org>
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 
-**Source code:** :source:`Lib/fileinput.py`
+**Mã nguồn:** :source:`Lib/fileinput.py`
 
 --------------
 
-This module implements a helper class and functions to quickly write a
-loop over standard input or a list of files. If you just want to read or
-write one file see :func:`open`.
+Mô-đun này triển khai một lớp trợ giúp và các hàm để nhanh chóng viết vòng lặp qua đầu vào chuẩn hoặc một danh sách tệp. Nếu bạn chỉ muốn đọc hoặc ghi một tệp, hãy xem :func:`open`.
 
-The typical use is::
+Cách sử dụng điển hình là::
 
    import fileinput
    for line in fileinput.input(encoding="utf-8"):
        process(line)
 
-This iterates over the lines of all files listed in ``sys.argv[1:]``, defaulting
-to ``sys.stdin`` if the list is empty.  If a filename is ``'-'``, it is also
-replaced by ``sys.stdin`` and the optional arguments *mode* and *openhook*
-are ignored.  To specify an alternative list of filenames, pass it as the
-first argument to :func:`.input`.  A single file name is also allowed.
+Lệnh này lặp qua các dòng của tất cả các tệp được liệt kê trong ``sys.argv[1:]``, mặc định là ``sys.stdin`` nếu danh sách trống. Nếu tên tệp là ``'-'``, tên đó cũng được thay thế bằng ``sys.stdin`` và các đối số tùy chọn *mode* và *openhook* sẽ bị bỏ qua. Để chỉ định một danh sách tên tệp thay thế, hãy truyền danh sách đó làm đối số đầu tiên cho :func:`.input`. Cũng có thể sử dụng một tên tệp duy nhất.
 
-All files are opened in text mode by default, but you can override this by
-specifying the *mode* parameter in the call to :func:`.input` or
-:class:`FileInput`.  If an I/O error occurs during opening or reading a file,
-:exc:`OSError` is raised.
+Theo mặc định, tất cả các tệp được mở ở chế độ văn bản, nhưng bạn có thể ghi đè điều này bằng cách chỉ định tham số *mode* trong lệnh gọi đến :func:`.input` hoặc
+:class:`FileInput`. Nếu xảy ra lỗi I/O trong khi mở hoặc đọc tệp,
+:exc:`OSError` sẽ được phát sinh.
 
 .. versionchanged:: 3.3
    :exc:`IOError` used to be raised; it is now an alias of :exc:`OSError`.
 
-If ``sys.stdin`` is used more than once, the second and further use will return
-no lines, except perhaps for interactive use, or if it has been explicitly reset
-(e.g. using ``sys.stdin.seek(0)``).
+Nếu ``sys.stdin`` được sử dụng nhiều hơn một lần, lần sử dụng thứ hai và các lần tiếp theo sẽ không trả về dòng nào, ngoại trừ khi sử dụng tương tác hoặc khi nó đã được đặt lại một cách rõ ràng (ví dụ: bằng cách sử dụng ``sys.stdin.seek(0)``).
 
-Empty files are opened and immediately closed; the only time their presence in
-the list of filenames is noticeable at all is when the last file opened is
-empty.
+Các tệp rỗng được mở rồi đóng ngay lập tức; sự hiện diện của chúng trong danh sách tên tệp hầu như chỉ có thể nhận thấy khi tệp cuối cùng được mở là tệp rỗng.
 
-Lines are returned with any newlines intact, which means that the last line in
-a file may not have one.
+Các dòng được trả về với mọi ký tự xuống dòng còn nguyên, nghĩa là dòng cuối cùng trong một tệp có thể không có ký tự xuống dòng.
 
-You can control how files are opened by providing an opening hook via the
-*openhook* parameter to :func:`fileinput.input` or :func:`FileInput`. The
-hook must be a function that takes two arguments, *filename* and *mode*, and
-returns an accordingly opened file-like object. If *encoding* and/or *errors*
-are specified, they will be passed to the hook as additional keyword arguments.
-This module provides a :func:`hook_compressed` to support compressed files.
+Bạn có thể kiểm soát cách mở tệp bằng cách cung cấp một opening hook thông qua tham số *openhook* cho :func:`fileinput.input` hoặc :func:`FileInput`. Hook này phải là một hàm nhận hai đối số, *filename* và *mode*, đồng thời trả về một đối tượng tương tự tệp đã được mở tương ứng. Nếu *encoding* và/hoặc *errors* được chỉ định, chúng sẽ được truyền cho hook dưới dạng các đối số từ khóa bổ sung. Mô-đun này cung cấp một :func:`hook_compressed` để hỗ trợ các tệp nén.
 
-The following function is the primary interface of this module:
+Hàm sau đây là giao diện chính của mô-đun này:
 
 
 .. function:: input(files=None, inplace=False, backup='', *, mode='r', openhook=None, encoding=None, errors=None)
 
-   Create an instance of the :class:`FileInput` class.  The instance will be used
-   as global state for the functions of this module, and is also returned to use
-   during iteration.  The parameters to this function will be passed along to the
-   constructor of the :class:`FileInput` class.
+   Tạo một instance của lớp :class:`FileInput`. Instance này sẽ được dùng làm trạng thái toàn cục cho các hàm của module này, đồng thời cũng được trả về để sử dụng trong quá trình lặp. Các tham số truyền vào hàm này sẽ được chuyển tiếp đến hàm khởi tạo của lớp :class:`FileInput`.
 
-   The :class:`FileInput` instance can be used as a context manager in the
-   :keyword:`with` statement.  In this example, *input* is closed after the
-   :keyword:`!with` statement is exited, even if an exception occurs::
+   Có thể sử dụng instance :class:`FileInput` làm context manager trong câu lệnh
+   :keyword:`with`. Trong ví dụ này, *input* được đóng sau khi
+   thoát khỏi câu lệnh :keyword:`!with`, ngay cả khi xảy ra ngoại lệ::
 
       with fileinput.input(files=('spam.txt', 'eggs.txt'), encoding="utf-8") as f:
           for line in f:
               process(line)
 
    .. versionchanged:: 3.2
-      Can be used as a context manager.
+      Có thể sử dụng làm context manager.
 
    .. versionchanged:: 3.8
-      The keyword parameters *mode* and *openhook* are now keyword-only.
+      Các tham số từ khóa *mode* và *openhook* hiện chỉ có thể được truyền dưới dạng từ khóa.
 
    .. versionchanged:: 3.10
-      The keyword-only parameter *encoding* and *errors* are added.
+      Đã thêm các tham số chỉ dùng dưới dạng từ khóa *encoding* và *errors*.
 
 
-The following functions use the global state created by :func:`fileinput.input`;
-if there is no active state, :exc:`RuntimeError` is raised.
+Các hàm sau đây sử dụng trạng thái toàn cục được tạo bởi :func:`fileinput.input`; nếu không có trạng thái nào đang hoạt động, :exc:`RuntimeError` sẽ được phát sinh.
 
 
 .. function:: filename()
 
-   Return the name of the file currently being read.  Before the first line has
-   been read, returns ``None``.
+   Trả về tên của tệp hiện đang được đọc. Trước khi dòng đầu tiên được đọc, trả về ``None``.
 
 
 .. function:: fileno()
 
-   Return the integer "file descriptor" for the current file. When no file is
-   opened (before the first line and between files), returns ``-1``.
+   Trả về số nguyên "file descriptor" của tệp hiện tại. Khi không có tệp nào được mở (trước dòng đầu tiên và giữa các tệp), trả về ``-1``.
 
 
 .. function:: lineno()
 
-   Return the cumulative line number of the line that has just been read.  Before
-   the first line has been read, returns ``0``.  After the last line of the last
-   file has been read, returns the line number of that line.
+   Trả về số dòng tích lũy của dòng vừa được đọc. Trước khi dòng đầu tiên được đọc, trả về ``0``. Sau khi dòng cuối cùng của tệp cuối cùng được đọc, trả về số dòng của dòng đó.
 
 
 .. function:: filelineno()
 
-   Return the line number in the current file.  Before the first line has been
-   read, returns ``0``.  After the last line of the last file has been read,
-   returns the line number of that line within the file.
+   Trả về số dòng trong tệp hiện tại. Trước khi dòng đầu tiên được đọc, trả về ``0``. Sau khi dòng cuối cùng của tệp cuối cùng được đọc, trả về số dòng của dòng đó trong tệp.
 
 
 .. function:: isfirstline()
 
-   Return ``True`` if the line just read is the first line of its file, otherwise
-   return ``False``.
+   Trả về ``True`` nếu dòng vừa đọc là dòng đầu tiên của tệp đó, nếu không thì trả về ``False``.
 
 
 .. function:: isstdin()
 
-   Return ``True`` if the last line was read from ``sys.stdin``, otherwise return
-   ``False``.
+   Trả về ``True`` nếu dòng cuối cùng được đọc từ ``sys.stdin``, nếu không thì trả về ``False``.
 
 
 .. function:: nextfile()
 
-   Close the current file so that the next iteration will read the first line from
-   the next file (if any); lines not read from the file will not count towards the
-   cumulative line count.  The filename is not changed until after the first line
-   of the next file has been read.  Before the first line has been read, this
-   function has no effect; it cannot be used to skip the first file.  After the
-   last line of the last file has been read, this function has no effect.
+   Đóng tệp hiện tại để lần lặp tiếp theo đọc dòng đầu tiên từ tệp tiếp theo (nếu có); các dòng chưa được đọc từ tệp sẽ không được tính vào tổng số dòng. Tên tệp chỉ được thay đổi sau khi dòng đầu tiên của tệp tiếp theo đã được đọc. Trước khi dòng đầu tiên được đọc, hàm này không có tác dụng; không thể dùng hàm này để bỏ qua tệp đầu tiên. Sau khi dòng cuối cùng của tệp cuối cùng đã được đọc, hàm này không có tác dụng.
 
 
 .. function:: close()
 
-   Close the sequence.
+   Đóng chuỗi.
 
-The class which implements the sequence behavior provided by the module is
-available for subclassing as well:
+Lớp triển khai hành vi chuỗi do module cung cấp cũng có thể được phân lớp:
 
 
 .. class:: FileInput(files=None, inplace=False, backup='', *, mode='r', openhook=None, encoding=None, errors=None)
 
-   Class :class:`FileInput` is the implementation; its methods :meth:`filename`,
+   Lớp :class:`FileInput` là phần triển khai; các phương thức của lớp là :meth:`filename`,
    :meth:`fileno`, :meth:`lineno`, :meth:`filelineno`, :meth:`isfirstline`,
-   :meth:`isstdin`, :meth:`nextfile` and :meth:`close` correspond to the
-   functions of the same name in the module. In addition it is :term:`iterable`
-   and has a :meth:`~io.TextIOBase.readline` method which returns the next
-   input line. The sequence must be accessed in strictly sequential order;
-   random access and :meth:`~io.TextIOBase.readline` cannot be mixed.
+   :meth:`isstdin`, :meth:`nextfile` và :meth:`close` tương ứng với các hàm cùng tên trong module. Ngoài ra, lớp này còn là :term:`iterable` và có một phương thức :meth:`~io.TextIOBase.readline` trả về dòng đầu vào tiếp theo. Chuỗi phải được truy cập theo đúng thứ tự tuần tự; không thể kết hợp truy cập ngẫu nhiên với :meth:`~io.TextIOBase.readline`.
 
-   With *mode* you can specify which file mode will be passed to :func:`open`. It
-   must be one of ``'r'`` and ``'rb'``.
+   Với *mode*, bạn có thể chỉ định chế độ tệp sẽ được truyền cho :func:`open`. Giá trị này phải là một trong ``'r'`` và ``'rb'``.
 
-   The *openhook*, when given, must be a function that takes two arguments,
-   *filename* and *mode*, and returns an accordingly opened file-like object. You
-   cannot use *inplace* and *openhook* together.
+   Khi được cung cấp, *openhook* phải là một hàm nhận hai đối số, *filename* và *mode*, rồi trả về một đối tượng tương tự tệp đã được mở tương ứng. Bạn không thể sử dụng *inplace* cùng với *openhook*.
 
-   You can specify *encoding* and *errors* that is passed to :func:`open` or *openhook*.
+   Bạn có thể chỉ định *encoding* và *errors*, được truyền vào :func:`open` hoặc *openhook*.
 
-   A :class:`FileInput` instance can be used as a context manager in the
-   :keyword:`with` statement.  In this example, *input* is closed after the
-   :keyword:`!with` statement is exited, even if an exception occurs::
+   Một thực thể :class:`FileInput` có thể được sử dụng như một context manager trong
+   :keyword:`with`. Trong ví dụ này, *input* được đóng sau khi
+   thoát khỏi câu lệnh :keyword:`!with`, ngay cả khi xảy ra ngoại lệ::
 
       with FileInput(files=('spam.txt', 'eggs.txt')) as input:
           process(input)
 
    .. versionchanged:: 3.2
-      Can be used as a context manager.
+      Có thể sử dụng làm context manager.
 
    .. versionchanged:: 3.8
-      The keyword parameter *mode* and *openhook* are now keyword-only.
+      Các tham số từ khóa *mode* và *openhook* hiện chỉ có thể được truyền dưới dạng tham số từ khóa.
 
    .. versionchanged:: 3.10
-      The keyword-only parameter *encoding* and *errors* are added.
+      Đã thêm các tham số chỉ dùng dưới dạng từ khóa *encoding* và *errors*.
 
    .. versionchanged:: 3.11
-      The ``'rU'`` and ``'U'`` modes and the :meth:`!__getitem__` method have
-      been removed.
+      Các chế độ ``'rU'`` và ``'U'``, cùng với phương thức :meth:`!__getitem__`, đã bị loại bỏ.
 
 
-**Optional in-place filtering:** if the keyword argument ``inplace=True`` is
-passed to :func:`fileinput.input` or to the :class:`FileInput` constructor, the
-file is moved to a backup file and standard output is directed to the input file
-(if a file of the same name as the backup file already exists, it will be
-replaced silently).  This makes it possible to write a filter that rewrites its
-input file in place.  If the *backup* parameter is given (typically as
-``backup='.<some extension>'``), it specifies the extension for the backup file,
-and the backup file remains around; by default, the extension is ``'.bak'`` and
-it is deleted when the output file is closed.  In-place filtering is disabled
-when standard input is read.
+**Bộ lọc tại chỗ tùy chọn:** nếu đối số từ khóa ``inplace=True`` được truyền cho :func:`fileinput.input` hoặc hàm khởi tạo :class:`FileInput`, tệp sẽ được chuyển thành tệp sao lưu và đầu ra tiêu chuẩn được chuyển hướng đến tệp đầu vào (nếu đã tồn tại tệp có cùng tên với tệp sao lưu, tệp đó sẽ bị thay thế một cách im lặng).  Điều này cho phép viết một bộ lọc để ghi lại tệp đầu vào ngay tại chỗ.  Nếu tham số *backup* được cung cấp (thường là ``backup='.<some extension>'``), tham số này chỉ định phần mở rộng cho tệp sao lưu và tệp sao lưu sẽ được giữ lại; theo mặc định, phần mở rộng là ``'.bak'`` và tệp sẽ bị xóa khi tệp đầu ra được đóng.  Bộ lọc tại chỗ bị vô hiệu hóa khi đọc đầu vào tiêu chuẩn.
 
 
-The two following opening hooks are provided by this module:
+Mô-đun này cung cấp hai hook mở sau đây:
 
 .. function:: hook_compressed(filename, mode, *, encoding=None, errors=None)
 
-   Transparently opens files compressed with gzip and bzip2 (recognized by the
-   extensions ``'.gz'`` and ``'.bz2'``) using the :mod:`gzip` and :mod:`bz2`
-   modules.  If the filename extension is not ``'.gz'`` or ``'.bz2'``, the file is
-   opened normally (ie, using :func:`open` without any decompression).
+   Tự động mở các tệp được nén bằng gzip và bzip2 (được nhận diện qua các phần mở rộng ``'.gz'`` và ``'.bz2'``) bằng các mô-đun :mod:`gzip` và :mod:`bz2`.  Nếu phần mở rộng tên tệp không phải là ``'.gz'`` hoặc ``'.bz2'``, tệp sẽ được mở bình thường (tức là sử dụng :func:`open` mà không giải nén).
 
-   The *encoding* and *errors* values are passed to :class:`io.TextIOWrapper`
-   for compressed files and open for normal files.
+   Các giá trị *encoding* và *errors* được truyền cho :class:`io.TextIOWrapper` đối với các tệp nén và cho open đối với các tệp thông thường.
 
-   Usage example:  ``fi = fileinput.FileInput(openhook=fileinput.hook_compressed, encoding="utf-8")``
+   Ví dụ sử dụng:  ``fi = fileinput.FileInput(openhook=fileinput.hook_compressed, encoding="utf-8")``
 
    .. versionchanged:: 3.10
-      The keyword-only parameter *encoding* and *errors* are added.
+      Đã thêm các tham số chỉ dùng dưới dạng từ khóa *encoding* và *errors*.
 
 
 .. function:: hook_encoded(encoding, errors=None)
 
-   Returns a hook which opens each file with :func:`open`, using the given
-   *encoding* and *errors* to read the file.
+   Trả về một hook mở từng tệp bằng :func:`open`, sử dụng *encoding* và *errors* đã cho để đọc tệp.
 
-   Usage example: ``fi =
-   fileinput.FileInput(openhook=fileinput.hook_encoded("utf-8",
-   "surrogateescape"))``
+   Ví dụ sử dụng: ``fi = fileinput.FileInput(openhook=fileinput.hook_encoded("utf-8", "surrogateescape"))``
 
    .. versionchanged:: 3.6
-      Added the optional *errors* parameter.
+      Đã bổ sung tham số *errors* tùy chọn.
 
    .. deprecated:: 3.10
-      This function is deprecated since :func:`fileinput.input` and :class:`FileInput`
-      now have *encoding* and *errors* parameters.
+      Hàm này đã lỗi thời kể từ :func:`fileinput.input` và :class:`FileInput` hiện đã có các tham số *mã hóa* và *lỗi*.

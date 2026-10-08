@@ -1,8 +1,8 @@
-:mod:`!imaplib` --- IMAP4 protocol client
-=========================================
+:mod:`!imaplib` --- ứng dụng khách giao thức IMAP4
+==================================================
 
 .. module:: imaplib
-   :synopsis: IMAP4 protocol client (requires sockets).
+   :synopsis: Ứng dụng khách giao thức IMAP4 (yêu cầu sockets).
 
 .. moduleauthor:: Piers Lauder <piers@communitysolutions.com.au>
 .. sectionauthor:: Piers Lauder <piers@communitysolutions.com.au>
@@ -12,7 +12,7 @@
    November 2002
 .. changes for IMAP4 IDLE by Forest <forestix@nom.one>, August 2024
 
-**Source code:** :source:`Lib/imaplib.py`
+**Mã nguồn:** :source:`Lib/imaplib.py`
 
 .. index::
    pair: IMAP4; protocol
@@ -21,30 +21,21 @@
 
 --------------
 
-This module defines three classes, :class:`IMAP4`, :class:`IMAP4_SSL` and
-:class:`IMAP4_stream`, which encapsulate a connection to an IMAP4 server and
-implement a large subset of the IMAP4rev1 client protocol as defined in
-:rfc:`3501`. It is backward compatible with IMAP4 (:rfc:`1730`) servers, but
-note that the ``STATUS`` command is not supported in IMAP4.
+Mô-đun này định nghĩa ba lớp, :class:`IMAP4`, :class:`IMAP4_SSL` và
+:class:`IMAP4_stream`, đóng gói một kết nối đến máy chủ IMAP4 và triển khai một phần lớn giao thức ứng dụng khách IMAP4rev1 như được định nghĩa trong
+:rfc:`3501`. Nó tương thích ngược với các máy chủ IMAP4 (:rfc:`1730`), nhưng lưu ý rằng lệnh ``STATUS`` không được hỗ trợ trong IMAP4.
 
 .. include:: ../includes/wasm-notavail.rst
 
-Three classes are provided by the :mod:`!imaplib` module, :class:`IMAP4` is the
-base class:
+Mô-đun :mod:`!imaplib` cung cấp ba lớp, trong đó :class:`IMAP4` là lớp cơ sở:
 
 
 .. class:: IMAP4(host='', port=IMAP4_PORT, timeout=None)
 
-   This class implements the actual IMAP4 protocol.  The connection is created and
-   protocol version (IMAP4 or IMAP4rev1) is determined when the instance is
-   initialized. If *host* is not specified, ``''`` (the local host) is used. If
-   *port* is omitted, the standard IMAP4 port (143) is used. The optional *timeout*
-   parameter specifies a timeout in seconds for the connection attempt.
-   If timeout is not given or is ``None``, the global default socket timeout is used.
+   Lớp này triển khai giao thức IMAP4 thực tế. Kết nối được tạo và phiên bản giao thức (IMAP4 hoặc IMAP4rev1) được xác định khi instance được khởi tạo. Nếu không chỉ định *host*, ``''`` (host cục bộ) sẽ được sử dụng. Nếu bỏ qua *port*, cổng IMAP4 tiêu chuẩn (143) sẽ được sử dụng. Tham số *timeout* tùy chọn chỉ định thời gian chờ tính bằng giây cho lần thử kết nối. Nếu không cung cấp timeout hoặc timeout là ``None``, thời gian chờ socket mặc định toàn cục sẽ được sử dụng.
 
-   The :class:`IMAP4` class supports the :keyword:`with` statement.  When used
-   like this, the IMAP4 ``LOGOUT`` command is issued automatically when the
-   :keyword:`!with` statement exits.  E.g.::
+   Lớp :class:`IMAP4` hỗ trợ câu lệnh :keyword:`with`. Khi được sử dụng như vậy, lệnh ``LOGOUT`` của IMAP4 sẽ tự động được thực thi khi
+   câu lệnh :keyword:`!with` kết thúc. Ví dụ:::
 
     >>> from imaplib import IMAP4
     >>> with IMAP4("domain.org") as M:
@@ -53,302 +44,222 @@ base class:
     ('OK', [b'Nothing Accomplished. d25if65hy903weo.87'])
 
    .. versionchanged:: 3.5
-      Support for the :keyword:`with` statement was added.
+      Đã bổ sung hỗ trợ cho câu lệnh :keyword:`with`.
 
    .. versionchanged:: 3.9
-      The optional *timeout* parameter was added.
+      Đã bổ sung tham số *timeout* tùy chọn.
 
-Three exceptions are defined as attributes of the :class:`IMAP4` class:
+Ba ngoại lệ được định nghĩa dưới dạng các thuộc tính của lớp :class:`IMAP4`:
 
 
 .. exception:: IMAP4.error
 
-   Exception raised on any errors.  The reason for the exception is passed to the
-   constructor as a string.
+   Ngoại lệ được phát sinh khi xảy ra bất kỳ lỗi nào. Nguyên nhân của ngoại lệ được truyền cho hàm khởi tạo dưới dạng một chuỗi.
 
 
 .. exception:: IMAP4.abort
 
-   IMAP4 server errors cause this exception to be raised.  This is a sub-class of
-   :exc:`IMAP4.error`.  Note that closing the instance and instantiating a new one
-   will usually allow recovery from this exception.
+   Lỗi máy chủ IMAP4 khiến ngoại lệ này được phát sinh. Đây là một lớp con của
+   :exc:`IMAP4.error`. Lưu ý rằng việc đóng đối tượng và khởi tạo một đối tượng mới thường sẽ cho phép khôi phục sau ngoại lệ này.
 
 
 .. exception:: IMAP4.readonly
 
-   This exception is raised when a writable mailbox has its status changed by the
-   server.  This is a sub-class of :exc:`IMAP4.error`.  Some other client now has
-   write permission, and the mailbox will need to be re-opened to re-obtain write
-   permission.
+   Ngoại lệ này được phát sinh khi máy chủ thay đổi trạng thái của một mailbox có quyền ghi. Đây là một lớp con của :exc:`IMAP4.error`. Một client khác hiện có quyền ghi, và mailbox sẽ cần được mở lại để lấy lại quyền ghi.
 
 
-There's also a subclass for secure connections:
+Ngoài ra còn có một lớp con dành cho các kết nối bảo mật:
 
 
 .. class:: IMAP4_SSL(host='', port=IMAP4_SSL_PORT, *, ssl_context=None, \
                      timeout=None)
 
-   This is a subclass derived from :class:`IMAP4` that connects over an SSL
-   encrypted socket (to use this class you need a socket module that was compiled
-   with SSL support).  If *host* is not specified, ``''`` (the local host) is used.
-   If *port* is omitted, the standard IMAP4-over-SSL port (993) is used.
-   *ssl_context* is a :class:`ssl.SSLContext` object which allows bundling
-   SSL configuration options, certificates and private keys into a single
-   (potentially long-lived) structure.  Please read :ref:`ssl-security` for
-   best practices.
+   Đây là một lớp con bắt nguồn từ :class:`IMAP4`, kết nối qua socket được mã hóa SSL (để sử dụng lớp này, bạn cần một module socket được biên dịch với hỗ trợ SSL). Nếu không chỉ định *host*, sẽ sử dụng ``''`` (máy chủ cục bộ). Nếu bỏ qua *port*, cổng IMAP4-over-SSL tiêu chuẩn (993) sẽ được sử dụng. *ssl_context* là một đối tượng :class:`ssl.SSLContext` cho phép gộp các tùy chọn cấu hình SSL, chứng chỉ và khóa riêng vào một cấu trúc duy nhất (có thể tồn tại trong thời gian dài). Vui lòng đọc :ref:`ssl-security` để biết các phương pháp tốt nhất.
 
    .. note::
 
-      With the default *ssl_context*, the connection is encrypted but the
-      server certificate and hostname are not verified.
-      To verify them, pass a context created by
+      Với *ssl_context* mặc định, kết nối được mã hóa nhưng chứng chỉ máy chủ và tên máy chủ không được xác minh. Để xác minh chúng, hãy truyền vào một context được tạo bởi
       :func:`ssl.create_default_context`.
 
-   The optional *timeout* parameter specifies a timeout in seconds for the
-   connection attempt. If timeout is not given or is ``None``, the global default
-   socket timeout is used.
+   Tham số tùy chọn *timeout* chỉ định thời gian chờ tính bằng giây cho lần thử kết nối. Nếu không cung cấp timeout hoặc timeout là ``None``, thời gian chờ socket mặc định toàn cục sẽ được sử dụng.
 
    .. versionchanged:: 3.3
-      *ssl_context* parameter was added.
+      Đã bổ sung tham số *ssl_context*.
 
    .. versionchanged:: 3.4
-      The class now supports hostname check with
-      :attr:`ssl.SSLContext.check_hostname` and *Server Name Indication* (see
+      Lớp này hiện hỗ trợ kiểm tra hostname với
+      :attr:`ssl.SSLContext.check_hostname` và *Server Name Indication* (xem
       :const:`ssl.HAS_SNI`).
 
    .. versionchanged:: 3.9
-      The optional *timeout* parameter was added.
+      Đã bổ sung tham số *timeout* tùy chọn.
 
    .. versionchanged:: 3.12
-      The deprecated *keyfile* and *certfile* parameters have been removed.
+      Các tham số *keyfile* và *certfile* đã bị loại bỏ.
 
-The second subclass allows for connections created by a child process:
+Lớp con thứ hai cho phép tạo các kết nối bởi một tiến trình con:
 
 
 .. class:: IMAP4_stream(command)
 
-   This is a subclass derived from :class:`IMAP4` that connects to the
-   ``stdin/stdout`` file descriptors created by passing *command* to
-   ``subprocess.Popen()``.
+   Đây là một lớp con kế thừa từ :class:`IMAP4`, kết nối với các bộ mô tả tệp ``stdin/stdout`` được tạo bằng cách truyền *command* cho ``subprocess.Popen()``.
 
 
-The following utility functions are defined:
+Các hàm tiện ích sau được định nghĩa:
 
 
 .. function:: Internaldate2tuple(resp)
 
-   Parse a :term:`bytes-like object` containing an IMAP4 ``INTERNALDATE``
-   response and return the corresponding local time.  The return value is a
-   :class:`time.struct_time` tuple or ``None`` if the input has wrong format.
+   Phân tích cú pháp một :term:`bytes-like object` chứa phản hồi ``INTERNALDATE`` của IMAP4 và trả về thời gian cục bộ tương ứng. Giá trị trả về là một
+   tuple :class:`time.struct_time` hoặc ``None`` nếu đầu vào có định dạng không đúng.
 
 .. function:: Int2AP(num)
 
-   Converts an integer into a bytes representation using characters from the set
-   [``A`` .. ``P``].
+   Chuyển đổi một số nguyên thành dạng biểu diễn bytes bằng các ký tự trong tập [``A`` .. ``P``].
 
 
 .. function:: ParseFlags(resp)
 
-   Converts a :term:`bytes-like object` containing an IMAP4 ``FLAGS`` response
-   to a tuple of individual flags as :class:`bytes`.  The return value is an
-   empty tuple if the input has wrong format.
+   Chuyển đổi một :term:`bytes-like object` chứa phản hồi ``FLAGS`` của IMAP4 thành một tuple gồm các flag riêng lẻ dưới dạng :class:`bytes`. Giá trị trả về là một tuple rỗng nếu đầu vào có định dạng không đúng.
 
 
 .. function:: Time2Internaldate(date_time)
 
-   Convert *date_time* to an IMAP4 ``INTERNALDATE`` representation.
-   The return value is a string in the form: ``"DD-Mmm-YYYY HH:MM:SS
-   +HHMM"`` (including double-quotes).  The *date_time* argument can
-   be a number (int or float) representing seconds since epoch (as
-   returned by :func:`time.time`), a 9-tuple representing local time
-   an instance of :class:`time.struct_time` (as returned by
-   :func:`time.localtime`), an aware instance of
-   :class:`datetime.datetime`, or a double-quoted string.  In the last
-   case, it is assumed to already be in the correct format.
+   Chuyển đổi *date_time* thành dạng biểu diễn ``INTERNALDATE`` của IMAP4. Giá trị trả về là một chuỗi có dạng: ``"DD-Mmm-YYYY HH:MM:SS +HHMM"`` (bao gồm cả dấu ngoặc kép). Đối số *date_time* có thể là một số (int hoặc float) biểu thị số giây kể từ epoch (do :func:`time.time` trả về), một tuple 9 phần tử biểu thị thời gian cục bộ, một instance của :class:`time.struct_time` (do trả về
+   :func:`time.localtime`), một thực thể aware của
+   :class:`datetime.datetime`, hoặc một chuỗi được đặt trong dấu ngoặc kép. Trong trường hợp cuối, chuỗi được giả định là đã ở đúng định dạng.
 
-Note that IMAP4 message numbers change as the mailbox changes; in particular,
-after an ``EXPUNGE`` command performs deletions the remaining messages are
-renumbered. So it is highly advisable to use UIDs instead, with the UID command.
+Lưu ý rằng số thứ tự thư IMAP4 thay đổi khi mailbox thay đổi; cụ thể, sau khi lệnh ``EXPUNGE`` thực hiện việc xóa, các thư còn lại sẽ được đánh lại số. Vì vậy, bạn nên sử dụng UID thay thế, với lệnh UID.
 
-At the end of the module, there is a test section that contains a more extensive
-example of usage.
+Ở cuối module có một phần kiểm thử chứa ví dụ sử dụng đầy đủ hơn.
 
 
 .. seealso::
 
-   Documents describing the protocol, sources for servers
-   implementing it, by the University of Washington's IMAP Information Center
-   can all be found at (**Source Code**) https://github.com/uw-imap/imap (**Not Maintained**).
+   Bạn có thể tìm thấy các tài liệu mô tả giao thức và mã nguồn của các server triển khai giao thức này do University of Washington's IMAP Information Center cung cấp tại (**Mã nguồn**) https://github.com/uw-imap/imap (**Không được duy trì**).
 
 
 .. _imap4-objects:
 
-IMAP4 Objects
--------------
+Đối tượng IMAP4
+---------------
 
-All IMAP4rev1 commands are represented by methods of the same name, either
-uppercase or lowercase.
+Tất cả các lệnh IMAP4rev1 đều được biểu diễn bằng các phương thức có cùng tên, viết hoa hoặc viết thường.
 
-All arguments to commands are converted to strings, except for ``AUTHENTICATE``,
-and the last argument to ``APPEND`` which is passed as an IMAP4 literal.  If
-necessary (the string contains IMAP4 protocol-sensitive characters and isn't
-enclosed with either parentheses or double quotes) each string is quoted.
-However, the *password* argument to the ``LOGIN`` command is always quoted. If
-you want to avoid having an argument string quoted (eg: the *flags* argument to
-``STORE``) then enclose the string in parentheses (eg: ``r'(\Deleted)'``).
-In general, pass arguments unquoted and let the module quote them as needed.
-An argument that is already enclosed in double quotes is left unchanged,
-so that code which quotes arguments itself keeps working.
+Tất cả đối số của các lệnh đều được chuyển đổi thành chuỗi, ngoại trừ ``AUTHENTICATE``, và đối số cuối cùng của ``APPEND`` được truyền dưới dạng literal IMAP4. Nếu cần (chuỗi chứa các ký tự nhạy cảm với giao thức IMAP4 và không được đặt trong dấu ngoặc đơn hoặc dấu ngoặc kép) thì mỗi chuỗi sẽ được đặt trong dấu ngoặc kép. Tuy nhiên, đối số *password* của lệnh ``LOGIN`` luôn được đặt trong dấu ngoặc kép. Nếu muốn tránh việc một chuỗi đối số được đặt trong dấu ngoặc kép (ví dụ: đối số *flags* của ``STORE``) thì hãy đặt chuỗi đó trong dấu ngoặc đơn (ví dụ: ``r'(\Deleted)'``). Nhìn chung, hãy truyền các đối số không có dấu ngoặc và để module tự đặt chúng vào dấu ngoặc khi cần. Một đối số đã được đặt trong dấu ngoặc kép sẽ được giữ nguyên, nhờ đó mã tự đặt dấu ngoặc cho các đối số vẫn tiếp tục hoạt động.
 
-Most commands return a tuple: ``(type, [data, ...])`` where *type* is usually
-``'OK'`` or ``'NO'``, and *data* is either the text from the command response,
-or mandated results from the command. Each *data* is either a ``bytes``, or a
-tuple. If a tuple, then the first part is the header of the response, and the
-second part contains the data (ie: 'literal' value).
+Hầu hết các lệnh đều trả về một tuple: ``(type, [data, ...])``, trong đó *type* thường là ``'OK'`` hoặc ``'NO'``, còn *data* là văn bản từ phản hồi của lệnh hoặc các kết quả bắt buộc do lệnh quy định. Mỗi *data* либо là một ``bytes`` hoặc một tuple. Nếu là tuple, phần đầu tiên là phần đầu của phản hồi, còn phần thứ hai chứa dữ liệu (tức là giá trị 'literal').
 
-The *message_set* options to commands below is a string specifying one or more
-messages to be acted upon.  It may be a simple message number (``'1'``), a range
-of message numbers (``'2:4'``), or a group of non-contiguous ranges separated by
-commas (``'1:3,6:9'``).  A range can contain an asterisk to indicate an infinite
-upper bound (``'3:*'``).
+Tùy chọn *message_set* của các lệnh dưới đây là một chuỗi chỉ định một hoặc nhiều thư để thực hiện thao tác. Chuỗi này có thể là một số thư đơn giản (``'1'``), một dải số thư (``'2:4'``) hoặc một nhóm các dải không liên tiếp được phân tách bằng dấu phẩy (``'1:3,6:9'``). Một dải có thể chứa dấu hoa thị để biểu thị giới hạn trên vô hạn (``'3:*'``).
 
-An :class:`IMAP4` instance has the following methods:
+Một thực thể :class:`IMAP4` có các phương thức sau:
 
 
 .. method:: IMAP4.append(mailbox, flags, date_time, message)
 
-   Append *message* to named mailbox.
+   Append *message* vào hộp thư được chỉ định tên.
 
-   *flags* may be ``None`` or a string of IMAP flag tokens.  Multiple
-   flags are separated by spaces, for example ``r'\Seen \Answered'``.
-   If *flags* is not already enclosed in parentheses, parentheses are
-   added automatically.
+   *flags* có thể là ``None`` hoặc một chuỗi các token cờ IMAP. Nhiều cờ được phân tách bằng dấu cách, ví dụ ``r'\Seen \Answered'``. Nếu *flags* chưa được đặt trong dấu ngoặc đơn, dấu ngoặc đơn sẽ được tự động thêm vào.
 
 
 .. method:: IMAP4.authenticate(mechanism, authobject)
 
-   Authenticate command --- requires response processing.
+   Lệnh Authenticate --- yêu cầu xử lý phản hồi.
 
-   *mechanism* specifies which authentication mechanism is to be used - it should
-   appear in the instance variable ``capabilities`` in the form ``AUTH=mechanism``.
+   *mechanism* chỉ định cơ chế xác thực sẽ được sử dụng - nó phải xuất hiện trong biến instance ``capabilities`` dưới dạng ``AUTH=mechanism``.
 
-   *authobject* must be a callable object::
+   *authobject* phải là một callable object::
 
       data = authobject(response)
 
-   It will be called to process server continuation responses; the *response*
-   argument it is passed will be ``bytes``.  It should return ``bytes`` *data*
-   that will be base64 encoded and sent to the server.  It should return
-   ``None`` if the client abort response ``*`` should be sent instead.
+   Nó sẽ được gọi để xử lý các phản hồi tiếp tục từ server; đối số *response* được truyền cho nó sẽ là ``bytes``. Nó phải trả về ``bytes`` *data*, dữ liệu này sẽ được mã hóa base64 và gửi đến server. Nó phải trả về ``None`` nếu thay vào đó cần gửi phản hồi hủy của client ``*``.
 
    .. versionchanged:: 3.5
-      string usernames and passwords are now encoded to ``utf-8`` instead of
-      being limited to ASCII.
+      username và password dạng string giờ được encode thành ``utf-8`` thay vì bị giới hạn ở ASCII.
 
 
 .. method:: IMAP4.check()
 
-   Checkpoint mailbox on server.
+   Tạo checkpoint cho mailbox trên server.
 
 
 .. method:: IMAP4.close()
 
-   Close currently selected mailbox. Deleted messages are removed from writable
-   mailbox. This is the recommended command before ``LOGOUT``.
+   Đóng mailbox hiện đang được chọn. Các message đã xóa sẽ bị loại khỏi mailbox có thể ghi. Đây là command được khuyến nghị trước ``LOGOUT``.
 
 
 .. method:: IMAP4.copy(message_set, new_mailbox)
 
-   Copy *message_set* messages onto end of *new_mailbox*.
+   Sao chép các message *message_set* vào cuối *new_mailbox*.
 
 
 .. method:: IMAP4.create(mailbox)
 
-   Create new mailbox named *mailbox*.
+   Tạo mailbox mới có tên *mailbox*.
 
 
 .. method:: IMAP4.delete(mailbox)
 
-   Delete old mailbox named *mailbox*.
+   Xóa mailbox cũ có tên *mailbox*.
 
 
 .. method:: IMAP4.deleteacl(mailbox, who)
 
-   Delete the ACLs (remove any rights) set for who on mailbox.
+   Xóa các ACL (gỡ mọi quyền) được thiết lập cho who trên mailbox.
 
 
 .. method:: IMAP4.enable(capability)
 
-   Enable *capability* (see :rfc:`5161`).  Most capabilities do not need to be
-   enabled.  Currently only the ``UTF8=ACCEPT`` capability is supported
-   (see :RFC:`6855`).
+   Bật *capability* (xem :rfc:`5161`). Hầu hết capability không cần được bật. Hiện tại chỉ hỗ trợ capability ``UTF8=ACCEPT`` (xem :RFC:`6855`).
 
    .. versionadded:: 3.5
-      The :meth:`enable` method itself, and :RFC:`6855` support.
+      Bản thân phương thức :meth:`enable` và hỗ trợ :RFC:`6855`.
 
 
 .. method:: IMAP4.expunge()
 
-   Permanently remove deleted items from selected mailbox. Generates an ``EXPUNGE``
-   response for each deleted message. Returned data contains a list of ``EXPUNGE``
-   message numbers in order received.
+   Xóa vĩnh viễn các mục đã xóa khỏi mailbox được chọn. Tạo một phản hồi ``EXPUNGE`` cho mỗi thư đã xóa. Dữ liệu trả về chứa danh sách số thư ``EXPUNGE`` theo thứ tự nhận được.
 
 
 .. method:: IMAP4.fetch(message_set, message_parts)
 
-   Fetch (parts of) messages.  *message_parts* should be a string of message part
-   names enclosed within parentheses, eg: ``"(UID BODY[TEXT])"``.  Returned data
-   are tuples of message part envelope and data.
+   Lấy (các phần của) thư. *message_parts* phải là một chuỗi gồm tên các phần của thư được đặt trong dấu ngoặc đơn, ví dụ: ``"(UID BODY[TEXT])"``. Dữ liệu trả về là các tuple gồm envelope và dữ liệu của phần thư.
 
 
 .. method:: IMAP4.getacl(mailbox)
 
-   Get the ``ACL``\ s for *mailbox*. The method is non-standard, but is supported
-   by the ``Cyrus`` server.
+   Lấy các ``ACL``\ s cho *mailbox*. Phương thức này không theo tiêu chuẩn, nhưng được ``Cyrus`` server hỗ trợ.
 
 
 .. method:: IMAP4.getannotation(mailbox, entry, attribute)
 
-   Retrieve the specified ``ANNOTATION``\ s for *mailbox*. The method is
-   non-standard, but is supported by the ``Cyrus`` server.
+   Truy xuất các ``ANNOTATION``\ s được chỉ định cho *mailbox*. Phương thức này không theo tiêu chuẩn, nhưng được ``Cyrus`` server hỗ trợ.
 
 
 .. method:: IMAP4.getquota(root)
 
-   Get the ``quota`` *root*'s resource usage and limits. This method is part of the
-   IMAP4 QUOTA extension defined in rfc2087.
+   Lấy mức sử dụng tài nguyên và các giới hạn của ``quota`` *root*. Phương thức này thuộc phần mở rộng IMAP4 QUOTA được định nghĩa trong rfc2087.
 
 
 .. method:: IMAP4.getquotaroot(mailbox)
 
-   Get the list of ``quota`` ``roots`` for the named *mailbox*. This method is part
-   of the IMAP4 QUOTA extension defined in rfc2087.
+   Lấy danh sách ``quota`` ``roots`` cho *mailbox* có tên. Phương thức này thuộc phần mở rộng IMAP4 QUOTA được định nghĩa trong rfc2087.
 
 
 .. method:: IMAP4.idle(duration=None)
 
-   Return an :class:`!Idler`: an iterable context manager implementing the
-   IMAP4 ``IDLE`` command as defined in :rfc:`2177`.
+   Trả về một :class:`!Idler`: một context manager có thể lặp, triển khai lệnh ``IDLE`` của IMAP4 như được định nghĩa trong :rfc:`2177`.
 
-   The returned object sends the ``IDLE`` command when activated by the
-   :keyword:`with` statement, produces IMAP untagged responses via the
-   :term:`iterator` protocol, and sends ``DONE`` upon context exit.
+   Đối tượng được trả về sẽ gửi lệnh ``IDLE`` khi được kích hoạt bởi
+   câu lệnh :keyword:`with`, tạo ra các phản hồi không gắn thẻ của IMAP thông qua
+   :term:`iterator` protocol và gửi ``DONE`` khi thoát khỏi context.
 
-   All untagged responses that arrive after sending the ``IDLE`` command
-   (including any that arrive before the server acknowledges the command) will
-   be available via iteration. Any leftover responses (those not iterated in
-   the :keyword:`with` context) can be retrieved in the usual way after
-   ``IDLE`` ends, using :meth:`IMAP4.response`.
+   Tất cả các phản hồi không gắn thẻ đến sau khi gửi lệnh ``IDLE`` (bao gồm cả những phản hồi đến trước khi máy chủ xác nhận lệnh) sẽ có thể được lấy qua phép lặp. Mọi phản hồi còn lại (những phản hồi không được lặp qua trong context :keyword:`with`) có thể được lấy theo cách thông thường sau khi ``IDLE`` kết thúc, bằng cách sử dụng :meth:`IMAP4.response`.
 
-   Responses are represented as ``(type, [data, ...])`` tuples, as described
-   in :ref:`IMAP4 Objects <imap4-objects>`.
+   Các phản hồi được biểu diễn dưới dạng các tuple ``(type, [data, ...])``, như mô tả trong :ref:`IMAP4 Objects <imap4-objects>`.
 
-   The *duration* argument sets a maximum duration (in seconds) to keep idling,
-   after which any ongoing iteration will stop. It can be an :class:`int` or
-   :class:`float`, or ``None`` for no time limit.
-   Callers wishing to avoid inactivity timeouts on servers that impose them
-   should keep this at most 29 minutes (1740 seconds).
-   Requires a socket connection; *duration* must be ``None`` on
+   Đối số *duration* đặt thời lượng tối đa (tính bằng giây) để duy trì trạng thái chờ, sau đó mọi phép lặp đang diễn ra sẽ dừng. Đối số này có thể là một :class:`int` hoặc
+   :class:`float`, hoặc ``None`` để không giới hạn thời gian. Những bên gọi muốn tránh timeout do không hoạt động trên các máy chủ áp dụng giới hạn này nên đặt giá trị này không quá 29 phút (1740 giây). Yêu cầu kết nối socket; *duration* phải là ``None`` trên
    :class:`IMAP4_stream` connections.
 
    .. code-block:: pycon
@@ -363,22 +274,16 @@ An :class:`IMAP4` instance has the following methods:
 
    .. method:: Idler.burst(interval=0.1)
 
-      Yield a burst of responses no more than *interval* seconds apart
-      (expressed as an :class:`int` or :class:`float`).
+      Trả về một loạt phản hồi cách nhau không quá *interval* giây (được biểu diễn dưới dạng :class:`int` hoặc :class:`float`).
 
-      This :term:`generator` is an alternative to iterating one response at a
-      time, intended to aid in efficient batch processing. It retrieves the
-      next response along with any immediately available subsequent responses.
-      (For example, a rapid series of ``EXPUNGE`` responses after a bulk
-      delete.)
+      :term:`generator` này là một giải pháp thay thế cho việc lần lượt lặp qua từng response, nhằm hỗ trợ xử lý theo lô hiệu quả. Nó lấy response tiếp theo cùng với mọi response tiếp sau đang có sẵn ngay lập tức. (Ví dụ: một loạt response ``EXPUNGE`` nhanh sau khi xóa hàng loạt.)
 
-      Requires a socket connection; does not work on :class:`IMAP4_stream`
-      connections.
+      Yêu cầu kết nối socket; không hoạt động với các kết nối :class:`IMAP4_stream`.
 
       .. code-block:: pycon
 
          >>> with M.idle() as idler:
-         ...     # get a response and any others following by < 0.1 seconds
+         ...     # lấy một response và mọi response khác theo sau trong vòng < 0.1 giây
          ...     batch = list(idler.burst())
          ...     print(f'processing {len(batch)} responses...')
          ...     print(batch)
@@ -388,251 +293,198 @@ An :class:`IMAP4` instance has the following methods:
 
       .. tip::
 
-         The ``IDLE`` context's maximum duration, as passed to
-         :meth:`IMAP4.idle`, is respected when waiting for the first response
-         in a burst. Therefore, an expired :class:`!Idler` will cause this
-         generator to return immediately without producing anything. Callers
-         should consider this if using it in a loop.
+         Thời lượng tối đa của context ``IDLE``, được truyền vào
+         :meth:`IMAP4.idle`, được tuân thủ khi chờ response đầu tiên trong một loạt. Do đó, một :class:`!Idler` đã hết hạn sẽ khiến generator này trả về ngay lập tức mà không tạo ra bất kỳ kết quả nào. Người gọi nên lưu ý điều này khi sử dụng nó trong một vòng lặp.
 
 
    .. note::
 
-      The iterator returned by :meth:`IMAP4.idle` is usable only within a
-      :keyword:`with` statement. Before or after that context, unsolicited
-      responses are collected internally whenever a command finishes, and can
-      be retrieved with :meth:`IMAP4.response`.
+      Iterator do :meth:`IMAP4.idle` trả về chỉ có thể được sử dụng trong một
+      câu lệnh :keyword:`with`. Trước hoặc sau context đó, các response không được yêu cầu sẽ được thu thập nội bộ mỗi khi một lệnh kết thúc và có thể được lấy bằng :meth:`IMAP4.response`.
 
    .. note::
 
-      The :class:`!Idler` class name and structure are internal interfaces,
-      subject to change. Calling code can rely on its context management,
-      iteration, and public method to remain stable, but should not subclass,
-      instantiate, compare, or otherwise directly reference the class.
+      Tên lớp và cấu trúc của :class:`!Idler` là các interface nội bộ và có thể thay đổi. Mã gọi có thể dựa vào việc lớp này duy trì ổn định cơ chế quản lý ngữ cảnh, phép lặp và phương thức public, nhưng không nên kế thừa, khởi tạo, so sánh hoặc tham chiếu trực tiếp đến lớp này theo bất kỳ cách nào khác.
 
    .. versionadded:: 3.14
 
 
 .. method:: IMAP4.list(directory='', pattern='*')
 
-   List mailbox names in *directory* matching *pattern*.  *directory* defaults to
-   the top-level mail folder, and *pattern* defaults to match anything.  Returned
-   data contains a list of ``LIST`` responses.
+   Liệt kê tên các mailbox trong *directory* khớp với *pattern*.  *directory* mặc định là thư mục thư cấp cao nhất, còn *pattern* mặc định khớp với mọi thứ.  Dữ liệu trả về chứa một danh sách các phản hồi ``LIST``.
 
 
 .. method:: IMAP4.login(user, password)
 
-   Identify the client using a plaintext password. The *password* will be quoted.
+   Xác định client bằng mật khẩu dạng văn bản thuần túy. *password* sẽ được đặt trong dấu ngoặc kép.
 
 
 .. method:: IMAP4.login_cram_md5(user, password)
 
-   Force use of ``CRAM-MD5`` authentication when identifying the client to protect
-   the password.  Will only work if the server ``CAPABILITY`` response includes the
-   phrase ``AUTH=CRAM-MD5``.
+   Buộc sử dụng phương thức xác thực ``CRAM-MD5`` khi xác định client để bảo vệ mật khẩu.  Chỉ hoạt động nếu phản hồi ``CAPABILITY`` của server bao gồm cụm từ ``AUTH=CRAM-MD5``.
 
    .. versionchanged:: 3.14
-      An :exc:`IMAP4.error` is raised if MD5 support is not available.
+      Một :exc:`IMAP4.error` sẽ được phát sinh nếu không có hỗ trợ MD5.
 
 
 .. method:: IMAP4.logout()
 
-   Shutdown connection to server. Returns server ``BYE`` response.
+   Đóng kết nối tới server. Trả về phản hồi ``BYE`` của server.
 
    .. versionchanged:: 3.8
-      The method no longer ignores silently arbitrary exceptions.
+      Phương thức này không còn âm thầm bỏ qua các ngoại lệ tùy ý.
 
 
 .. method:: IMAP4.lsub(directory='', pattern='*')
 
-   List subscribed mailbox names in directory matching pattern. *directory*
-   defaults to the top level directory and *pattern* defaults to match any mailbox.
-   Returned data are tuples of message part envelope and data.
+   Liệt kê tên các mailbox đã đăng ký trong thư mục khớp với mẫu. *directory* mặc định là thư mục cấp cao nhất và *pattern* mặc định khớp với mọi mailbox. Dữ liệu trả về là các tuple gồm envelope của phần thông báo và dữ liệu.
 
 
 .. method:: IMAP4.myrights(mailbox)
 
-   Show my ACLs for a mailbox (i.e. the rights that I have on mailbox).
+   Hiển thị các ACL của tôi cho một mailbox (tức là các quyền mà tôi có trên mailbox đó).
 
 
 .. method:: IMAP4.namespace()
 
-   Returns IMAP namespaces as defined in :rfc:`2342`.
+   Trả về các namespace IMAP như được định nghĩa trong :rfc:`2342`.
 
 
 .. method:: IMAP4.noop()
 
-   Send ``NOOP`` to server.
+   Gửi ``NOOP`` đến server.
 
 
 .. method:: IMAP4.open(host, port, timeout=None)
 
-   Opens socket to *port* at *host*. The optional *timeout* parameter
-   specifies a timeout in seconds for the connection attempt.
-   If timeout is not given or is ``None``, the global default socket timeout
-   is used. Also note that if the *timeout* parameter is set to be zero,
-   it will raise a :class:`ValueError` to reject creating a non-blocking socket.
-   This method is implicitly called by the :class:`IMAP4` constructor.
-   The connection objects established by this method will be used in
-   the :meth:`IMAP4.read`, :meth:`IMAP4.readline`, :meth:`IMAP4.send`,
-   and :meth:`IMAP4.shutdown` methods. You may override this method.
+   Mở socket đến *port* trên *host*. Tham số tùy chọn *timeout* chỉ định thời gian chờ tính bằng giây cho lần thử kết nối. Nếu không cung cấp timeout hoặc giá trị của nó là ``None``, thời gian chờ socket mặc định toàn cục sẽ được sử dụng. Cũng lưu ý rằng nếu tham số *timeout* được đặt thành 0, phương thức sẽ raise một :class:`ValueError` để từ chối tạo socket không chặn. Phương thức này được gọi ngầm bởi constructor :class:`IMAP4`. Các đối tượng kết nối được thiết lập bởi phương thức này sẽ được sử dụng trong các phương thức :meth:`IMAP4.read`, :meth:`IMAP4.readline`, :meth:`IMAP4.send` và :meth:`IMAP4.shutdown`. Bạn có thể override phương thức này.
 
    .. audit-event:: imaplib.open self,host,port imaplib.IMAP4.open
 
    .. versionchanged:: 3.9
-      The *timeout* parameter was added.
+      Tham số *timeout* đã được thêm vào.
 
 .. method:: IMAP4.partial(message_num, message_part, start, length)
 
-   Fetch truncated part of a message. Returned data is a tuple of message part
-   envelope and data.
+   Lấy phần đã bị cắt ngắn của một thông báo. Dữ liệu trả về là một tuple gồm envelope của phần thông báo và dữ liệu.
 
 
 .. method:: IMAP4.proxyauth(user)
 
-   Assume authentication as *user*. Allows an authorised administrator to proxy
-   into any user's mailbox.
+   Giả định việc xác thực với tư cách *user*. Cho phép một quản trị viên được ủy quyền proxy vào mailbox của bất kỳ người dùng nào.
 
 
 .. method:: IMAP4.read(size)
 
-   Reads *size* bytes from the remote server. You may override this method.
+   Đọc *size* byte từ máy chủ từ xa. Bạn có thể ghi đè phương thức này.
 
 
 .. method:: IMAP4.readline()
 
-   Reads one line from the remote server. You may override this method.
+   Đọc một dòng từ máy chủ từ xa. Bạn có thể ghi đè phương thức này.
 
 
 .. method:: IMAP4.recent()
 
-   Prompt server for an update. Returned data is ``None`` if no new messages, else
-   value of ``RECENT`` response.
+   Yêu cầu máy chủ cập nhật. Dữ liệu trả về là ``None`` nếu không có thư mới, nếu không thì là giá trị của phản hồi ``RECENT``.
 
 
 .. method:: IMAP4.rename(oldmailbox, newmailbox)
 
-   Rename mailbox named *oldmailbox* to *newmailbox*.
+   Đổi tên mailbox có tên *oldmailbox* thành *newmailbox*.
 
 
 .. method:: IMAP4.response(code)
 
-   Return data for response *code* if received, or ``None``. Returns the given
-   code, instead of the usual type.
+   Trả về dữ liệu cho phản hồi *code* nếu nhận được, hoặc ``None``. Trả về code đã cho thay vì kiểu thông thường.
 
 
 .. method:: IMAP4.search(charset, criterion[, ...])
 
-   Search mailbox for matching messages.  *charset* may be ``None``, in which case
-   no ``CHARSET`` will be specified in the request to the server.  The IMAP
-   protocol requires that at least one criterion be specified; an exception will be
-   raised when the server returns an error.  *charset* must be ``None`` if
-   the ``UTF8=ACCEPT`` capability was enabled using the :meth:`enable`
-   command.
+   Tìm kiếm các thư khớp trong mailbox. *charset* có thể là ``None``, trong trường hợp đó sẽ không có ``CHARSET`` nào được chỉ định trong yêu cầu gửi đến máy chủ. Giao thức IMAP yêu cầu phải chỉ định ít nhất một tiêu chí; một ngoại lệ sẽ được phát sinh khi máy chủ trả về lỗi. *charset* phải là ``None`` nếu capability ``UTF8=ACCEPT`` được bật bằng lệnh :meth:`enable`.
 
-   Example::
+   Ví dụ::
 
-      # M is a connected IMAP4 instance...
+      # M là một instance IMAP4 đã kết nối...
       typ, msgnums = M.search(None, 'FROM', '"LDJ"')
 
-      # or:
+      # hoặc:
       typ, msgnums = M.search(None, '(FROM "LDJ")')
 
 
 .. method:: IMAP4.select(mailbox='INBOX', readonly=False)
 
-   Select a mailbox. Returned data is the count of messages in *mailbox*
-   (``EXISTS`` response).  The default *mailbox* is ``'INBOX'``.  If the *readonly*
-   flag is set, modifications to the mailbox are not allowed.
+   Chọn một hộp thư. Dữ liệu được trả về là số lượng thư trong *hộp thư* (``EXISTS`` phản hồi).  Hộp thư mặc định *hộp thư* là ``'INBOX'``.  Nếu cờ *chỉ đọc* được đặt, không cho phép sửa đổi hộp thư.
 
 
 .. method:: IMAP4.send(data)
 
-   Sends ``data`` to the remote server. You may override this method.
+   Gửi ``data`` đến máy chủ từ xa. Bạn có thể ghi đè phương thức này.
 
    .. audit-event:: imaplib.send self,data imaplib.IMAP4.send
 
 
 .. method:: IMAP4.setacl(mailbox, who, what)
 
-   Set an ``ACL`` for *mailbox*. The method is non-standard, but is supported by
-   the ``Cyrus`` server.
+   Đặt một ``ACL`` cho *hộp thư*. Phương thức này không theo tiêu chuẩn, nhưng được máy chủ ``Cyrus`` hỗ trợ.
 
 
 .. method:: IMAP4.setannotation(mailbox, entry, attribute[, ...])
 
-   Set ``ANNOTATION``\ s for *mailbox*. The method is non-standard, but is
-   supported by the ``Cyrus`` server.
+   Đặt các ``ANNOTATION``\ s cho *hộp thư*. Phương thức này không theo tiêu chuẩn, nhưng được máy chủ ``Cyrus`` hỗ trợ.
 
 
 .. method:: IMAP4.setquota(root, limits)
 
-   Set the ``quota`` *root*'s resource *limits*. This method is part of the IMAP4
-   QUOTA extension defined in rfc2087.
+   Đặt ``quota`` *root*'s resource *limits*.
 
 
 .. method:: IMAP4.shutdown()
 
-   Close connection established in ``open``.  This method is implicitly
-   called by :meth:`IMAP4.logout`.  You may override this method.
+   Đóng kết nối được thiết lập trong ``open``. Phương thức này được :meth:`IMAP4.logout` gọi ngầm. Bạn có thể ghi đè phương thức này.
 
 
 .. method:: IMAP4.socket()
 
-   Returns socket instance used to connect to server.
+   Trả về socket instance được dùng để kết nối với server.
 
 
 .. method:: IMAP4.sort(sort_criteria, charset, search_criterion[, ...])
 
-   The ``sort`` command is a variant of ``search`` with sorting semantics for the
-   results.  Returned data contains a space separated list of matching message
-   numbers.
+   Lệnh ``sort`` là một biến thể của ``search`` với ngữ nghĩa sắp xếp cho kết quả. Dữ liệu trả về chứa danh sách các số hiệu thư được phân tách bằng dấu cách.
 
-   Sort has two arguments before the *search_criterion* argument(s); a
-   parenthesized list of *sort_criteria*, and the searching *charset*.  Note that
-   unlike ``search``, the searching *charset* argument is mandatory.  There is also
-   a ``uid sort`` command which corresponds to ``sort`` the way that ``uid search``
-   corresponds to ``search``.  The ``sort`` command first searches the mailbox for
-   messages that match the given searching criteria using the charset argument for
-   the interpretation of strings in the searching criteria.  It then returns the
-   numbers of matching messages.
+   Sort có hai đối số trước đối số *search_criterion*; một danh sách *sort_criteria* được đặt trong ngoặc đơn và *charset* dùng để tìm kiếm. Lưu ý rằng không giống như ``search``, đối số *charset* dùng để tìm kiếm là bắt buộc. Ngoài ra còn có lệnh ``uid sort``, tương ứng với ``sort`` giống như ``uid search`` tương ứng với ``search``. Lệnh ``sort`` trước tiên tìm kiếm mailbox để tìm các thư khớp với tiêu chí tìm kiếm đã cho, sử dụng đối số charset để diễn giải các chuỗi trong tiêu chí tìm kiếm. Sau đó, lệnh trả về số hiệu của các thư khớp.
 
-   This is an ``IMAP4rev1`` extension command.
+   Đây là một lệnh mở rộng ``IMAP4rev1``.
 
 
 .. method:: IMAP4.starttls(ssl_context=None)
 
-   Send a ``STARTTLS`` command.  The *ssl_context* argument is optional
-   and should be a :class:`ssl.SSLContext` object.  This will enable
-   encryption on the IMAP connection.  Please read :ref:`ssl-security` for
-   best practices.
+   Gửi lệnh ``STARTTLS``. Đối số *ssl_context* là tùy chọn và phải là một đối tượng :class:`ssl.SSLContext`. Điều này sẽ bật mã hóa trên kết nối IMAP. Vui lòng đọc :ref:`ssl-security` để biết các phương pháp hay nhất.
 
    .. note::
 
-      With the default *ssl_context*, the connection is encrypted but the
-      server certificate and hostname are not verified.
-      To verify them, pass a context created by
+      Với *ssl_context* mặc định, kết nối được mã hóa nhưng chứng chỉ máy chủ và hostname không được xác minh. Để xác minh chúng, hãy truyền vào một context được tạo bởi
       :func:`ssl.create_default_context`.
 
    .. versionadded:: 3.2
 
    .. versionchanged:: 3.4
-      The method now supports hostname check with
-      :attr:`ssl.SSLContext.check_hostname` and *Server Name Indication* (see
+      Phương thức này hiện hỗ trợ kiểm tra hostname với
+      :attr:`ssl.SSLContext.check_hostname` và *Server Name Indication* (xem
       :const:`ssl.HAS_SNI`).
 
 
 .. method:: IMAP4.status(mailbox, names)
 
-   Request named status conditions for *mailbox*.
+   Yêu cầu các điều kiện trạng thái được đặt tên cho *hộp thư*.
 
 
 .. method:: IMAP4.store(message_set, command, flag_list)
 
-   Alters flag dispositions for messages in mailbox.  *command* is specified by
-   section 6.4.6 of :rfc:`3501` as being one of "FLAGS", "+FLAGS", or "-FLAGS",
-   optionally with a suffix of ".SILENT".
+   Thay đổi cách xử lý các cờ cho thư trong hộp thư. *lệnh* được quy định trong mục 6.4.6 của :rfc:`3501` là một trong "FLAGS", "+FLAGS" hoặc "-FLAGS", tùy chọn kèm theo hậu tố ".SILENT".
 
-   For example, to set the delete flag on all messages::
+   Ví dụ: để đặt cờ xóa cho tất cả thư::
 
       typ, data = M.search(None, 'ALL')
       for num in data[0].split():
@@ -641,113 +493,82 @@ An :class:`IMAP4` instance has the following methods:
 
    .. note::
 
-      Creating flags containing ']' (for example: "[test]") violates
-      :rfc:`3501` (the IMAP protocol).  However, imaplib has historically
-      allowed creation of such flags, and popular IMAP servers, such as Gmail,
-      accept and produce such flags.  There are non-Python programs which also
-      create such flags.  Although it is an RFC violation and IMAP clients and
-      servers are supposed to be strict, imaplib still continues to allow
-      such flags to be created for backward compatibility reasons, and as of
-      Python 3.6, handles them if they are sent from the server, since this
-      improves real-world compatibility.
+      Việc tạo các cờ chứa ký tự ']' (ví dụ: "[test]") vi phạm
+      :rfc:`3501` (giao thức IMAP). Tuy nhiên, imaplib từ trước đến nay vẫn cho phép tạo các cờ như vậy, và các máy chủ IMAP phổ biến, chẳng hạn như Gmail, chấp nhận và tạo ra các cờ như vậy. Cũng có những chương trình không viết bằng Python tạo ra các cờ như vậy. Mặc dù đây là hành vi vi phạm RFC và các ứng dụng khách, máy chủ IMAP được cho là phải nghiêm ngặt, imaplib vẫn tiếp tục cho phép tạo các cờ như vậy vì lý do tương thích ngược; kể từ Python 3.6, imaplib cũng xử lý chúng nếu chúng được máy chủ gửi đến, nhờ đó cải thiện khả năng tương thích trong thực tế.
 
 .. method:: IMAP4.subscribe(mailbox)
 
-   Subscribe to new mailbox.
+   Đăng ký hộp thư mới.
 
 
 .. method:: IMAP4.thread(threading_algorithm, charset, search_criterion[, ...])
 
-   The ``thread`` command is a variant of ``search`` with threading semantics for
-   the results.  Returned data contains a space separated list of thread members.
+   Lệnh ``thread`` là một biến thể của ``search`` với ngữ nghĩa phân luồng cho các kết quả. Dữ liệu trả về chứa danh sách các thành viên của thread, được phân tách bằng dấu cách.
 
-   Thread members consist of zero or more messages numbers, delimited by spaces,
-   indicating successive parent and child.
+   Các thành viên của thread bao gồm không hoặc nhiều số thứ tự thư, được phân tách bằng dấu cách, cho biết lần lượt thư cha và thư con.
 
-   Thread has two arguments before the *search_criterion* argument(s); a
-   *threading_algorithm*, and the searching *charset*.  Note that unlike
-   ``search``, the searching *charset* argument is mandatory.  There is also a
-   ``uid thread`` command which corresponds to ``thread`` the way that ``uid
-   search`` corresponds to ``search``.  The ``thread`` command first searches the
-   mailbox for messages that match the given searching criteria using the *charset*
-   argument for the interpretation of strings in the searching criteria. It then
-   returns the matching messages threaded according to the specified threading
-   algorithm.
+   Thread có hai đối số trước các đối số *search_criterion* tìm kiếm: một *threading_algorithm* và *charset* dùng cho việc tìm kiếm. Lưu ý rằng không giống như ``search``, đối số *charset* dùng cho việc tìm kiếm là bắt buộc. Ngoài ra còn có lệnh ``uid thread``, tương ứng với ``thread`` giống như ``uid search`` tương ứng với ``search``. Trước tiên, lệnh ``thread`` tìm kiếm trong hộp thư các thư khớp với tiêu chí tìm kiếm đã cho, sử dụng đối số *charset* để diễn giải các chuỗi trong tiêu chí tìm kiếm. Sau đó, lệnh trả về các thư khớp được phân luồng theo thuật toán phân luồng đã chỉ định.
 
-   This is an ``IMAP4rev1`` extension command.
+   Đây là một lệnh mở rộng ``IMAP4rev1``.
 
 
 .. method:: IMAP4.uid(command, arg[, ...])
 
-   Execute command args with messages identified by UID, rather than message
-   number.  Returns response appropriate to command.  At least one argument must be
-   supplied; if none are provided, the server will return an error and an exception
-   will be raised.
+   Thực thi các đối số của lệnh với các thư được xác định bằng UID thay vì số thứ tự thư. Trả về phản hồi phù hợp với lệnh. Phải cung cấp ít nhất một đối số; nếu không cung cấp đối số nào, máy chủ sẽ trả về lỗi và một ngoại lệ sẽ được phát sinh.
 
 
 .. method:: IMAP4.unsubscribe(mailbox)
 
-   Unsubscribe from old mailbox.
+   Hủy đăng ký khỏi hộp thư cũ.
 
 .. method:: IMAP4.unselect()
 
-   :meth:`imaplib.IMAP4.unselect` frees server's resources associated with the
-   selected mailbox and returns the server to the authenticated
-   state. This command performs the same actions as :meth:`imaplib.IMAP4.close`, except
-   that no messages are permanently removed from the currently
-   selected mailbox.
+   :meth:`imaplib.IMAP4.unselect` giải phóng các tài nguyên của máy chủ liên kết với hộp thư đã chọn và đưa máy chủ trở về trạng thái đã xác thực. Lệnh này thực hiện các thao tác giống như :meth:`imaplib.IMAP4.close`, ngoại trừ việc không có thư nào bị xóa vĩnh viễn khỏi hộp thư hiện đang được chọn.
 
    .. versionadded:: 3.9
 
 .. method:: IMAP4.xatom(name[, ...])
 
-   Allow simple extension commands notified by server in ``CAPABILITY`` response.
+   Cho phép các lệnh mở rộng đơn giản được máy chủ thông báo trong phản hồi ``CAPABILITY``.
 
 
-The following attributes are defined on instances of :class:`IMAP4`:
+Các thuộc tính sau được định nghĩa trên các instance của :class:`IMAP4`:
 
 .. attribute:: IMAP4.capabilities
 
-   A tuple of the capabilities advertised by the server, in upper case.
+   Một tuple chứa các capability do máy chủ quảng bá, viết bằng chữ hoa.
 
-   It is set when the connection is established,
-   and refreshed after a successful :meth:`~IMAP4.login`,
-   :meth:`~IMAP4.authenticate` or :meth:`~IMAP4.starttls`,
-   because the server can advertise different capabilities
-   in different connection states.
+   Thuộc tính này được thiết lập khi kết nối được tạo và được làm mới sau khi :meth:`~IMAP4.login` thành công,
+   :meth:`~IMAP4.authenticate` hoặc :meth:`~IMAP4.starttls`, vì máy chủ có thể quảng bá các capability khác nhau ở những trạng thái kết nối khác nhau.
 
    .. versionchanged:: 3.14.7
-      Refreshed after :meth:`~IMAP4.login` and :meth:`~IMAP4.authenticate`.
+      Được làm mới sau :meth:`~IMAP4.login` và :meth:`~IMAP4.authenticate`.
 
 
 .. attribute:: IMAP4.PROTOCOL_VERSION
 
-   The most recent supported protocol in the ``CAPABILITY`` response from the
-   server.
+   Giao thức được hỗ trợ mới nhất trong phản hồi ``CAPABILITY`` từ máy chủ.
 
 
 .. attribute:: IMAP4.debug
 
-   Integer value to control debugging output.  The initialize value is taken from
-   the module variable ``Debug``.  Values greater than three trace each command.
+   Giá trị số nguyên dùng để kiểm soát đầu ra gỡ lỗi. Giá trị khởi tạo được lấy từ biến mô-đun ``Debug``. Các giá trị lớn hơn ba sẽ theo dõi từng lệnh.
 
 
 .. attribute:: IMAP4.utf8_enabled
 
-   Boolean value that is normally ``False``, but is set to ``True`` if an
-   :meth:`enable` command is successfully issued for the ``UTF8=ACCEPT``
-   capability.
+   Giá trị Boolean thường là ``False``, nhưng được đặt thành ``True`` nếu một
+   lệnh :meth:`enable` được gửi thành công cho capability ``UTF8=ACCEPT``.
 
    .. versionadded:: 3.5
 
 
 .. _imap4-example:
 
-IMAP4 Example
--------------
+Ví dụ về IMAP4
+--------------
 
-Here is a minimal example (without error checking) that opens a mailbox and
-retrieves and prints all messages::
+Sau đây là một ví dụ tối giản (không kiểm tra lỗi) mở một mailbox, truy xuất và in tất cả các thư::
 
    import getpass, imaplib
 
@@ -763,8 +584,5 @@ retrieves and prints all messages::
 
 .. note::
 
-   A ``FETCH`` response may contain additional or unsolicited data
-   (see :rfc:`3501`, section 7.4.2),
-   so production code should inspect the whole response
-   rather than rely on ``data[0][1]``.
+   Một phản hồi ``FETCH`` có thể chứa dữ liệu bổ sung hoặc không được yêu cầu (xem :rfc:`3501`, mục 7.4.2), vì vậy mã production nên kiểm tra toàn bộ phản hồi thay vì dựa vào ``data[0][1]``.
 

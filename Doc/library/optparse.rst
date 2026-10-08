@@ -1,64 +1,42 @@
-:mod:`!optparse` --- Parser for command line options
-====================================================
+:mod:`!optparse` --- Bộ phân tích cú pháp cho các tùy chọn dòng lệnh
+====================================================================
 
 .. module:: optparse
-   :synopsis: Command-line option parsing library.
+   :synopsis: Thư viện phân tích cú pháp tùy chọn dòng lệnh.
 
 .. moduleauthor:: Greg Ward <gward@python.net>
 .. sectionauthor:: Greg Ward <gward@python.net>
 
-**Source code:** :source:`Lib/optparse.py`
+**Mã nguồn:** :source:`Lib/optparse.py`
 
 --------------
 
 .. _choosing-an-argument-parser:
 
-Choosing an argument parsing library
-------------------------------------
+Chọn thư viện phân tích cú pháp đối số
+--------------------------------------
 
-The standard library includes three argument parsing libraries:
+Thư viện chuẩn bao gồm ba thư viện phân tích cú pháp đối số:
 
-* :mod:`getopt`: a module that closely mirrors the procedural C ``getopt`` API.
-* :mod:`!optparse`: a declarative replacement for ``getopt`` that
-  provides equivalent functionality without requiring each application
-  to implement its own procedural option parsing logic.
-* :mod:`argparse`: a more opinionated alternative to ``optparse`` that
-  provides more functionality by default, at the expense of reduced application
-  flexibility in controlling exactly how arguments are processed.
+* :mod:`getopt`: một mô-đun gần như phản chiếu API thủ tục của C ``getopt``.
+* :mod:`!optparse`: một lựa chọn thay thế mang tính khai báo cho ``getopt``, cung cấp chức năng tương đương mà không yêu cầu mỗi ứng dụng phải tự triển khai logic phân tích cú pháp tùy chọn mang tính thủ tục.
+* :mod:`argparse`: một lựa chọn thay thế có tính định hướng rõ ràng hơn cho ``optparse``, cung cấp nhiều chức năng hơn theo mặc định, đổi lại ứng dụng sẽ kém linh hoạt hơn trong việc kiểm soát chính xác cách các đối số được xử lý.
 
-In the absence of more specific argument parsing design constraints, :mod:`argparse`
-is the recommended choice for implementing command line applications, as it offers
-the highest level of baseline functionality with the least application level code.
+Nếu không có các ràng buộc thiết kế cụ thể hơn đối với việc phân tích đối số, :mod:`argparse` là lựa chọn được khuyến nghị để triển khai các ứng dụng dòng lệnh, vì nó cung cấp mức chức năng cơ sở cao nhất với ít mã ở cấp ứng dụng nhất.
 
-:mod:`getopt` is retained almost entirely for backwards compatibility reasons.
-However, it also serves a niche use case as a tool for prototyping and testing
-command line argument handling in ``getopt``-based C applications.
+:mod:`getopt` gần như chỉ được duy trì vì lý do tương thích ngược. Tuy nhiên, nó cũng phục vụ một trường hợp sử dụng chuyên biệt như một công cụ để tạo nguyên mẫu và kiểm thử việc xử lý đối số dòng lệnh trong các ứng dụng C dựa trên ``getopt``.
 
-:mod:`!optparse` should be considered as an alternative to :mod:`argparse` in the
-following cases:
+Nên cân nhắc :mod:`!optparse` như một lựa chọn thay thế cho :mod:`argparse` trong các trường hợp sau:
 
-* an application is already using :mod:`!optparse` and doesn't want to risk the
-  subtle behavioural changes that may arise when migrating to :mod:`argparse`
-* the application requires additional control over the way options and
-  positional parameters are interleaved on the command line (including
-  the ability to disable the interleaving feature completely)
-* the application requires additional control over the incremental parsing
-  of command line elements (while ``argparse`` does support this, the
-  exact way it works in practice is undesirable for some use cases)
-* the application requires additional control over the handling of options
-  which accept parameter values that may start with ``-`` (such as delegated
-  options to be passed to invoked subprocesses)
-* the application requires some other command line parameter processing
-  behavior which ``argparse`` does not support, but which can be implemented
-  in terms of the lower level interface offered by ``optparse``
+* ứng dụng đã sử dụng :mod:`!optparse` và không muốn mạo hiểm với những thay đổi hành vi tinh vi có thể phát sinh khi chuyển sang :mod:`argparse`
+* ứng dụng yêu cầu kiểm soát nhiều hơn đối với cách các tùy chọn và tham số vị trí được đan xen trên dòng lệnh (bao gồm khả năng tắt hoàn toàn tính năng đan xen)
+* ứng dụng yêu cầu kiểm soát nhiều hơn đối với việc phân tích tăng dần các thành phần dòng lệnh (mặc dù ``argparse`` có hỗ trợ việc này, cách thức chính xác mà nó hoạt động trên thực tế không phù hợp với một số trường hợp sử dụng)
+* ứng dụng cần kiểm soát nhiều hơn việc xử lý các tùy chọn chấp nhận giá trị tham số có thể bắt đầu bằng ``-`` (chẳng hạn như các tùy chọn được ủy quyền để truyền cho các tiến trình con được gọi)
+* ứng dụng cần một số hành vi xử lý tham số dòng lệnh khác mà ``argparse`` không hỗ trợ, nhưng có thể được triển khai dựa trên giao diện cấp thấp hơn do ``optparse`` cung cấp
 
-These considerations also mean that :mod:`!optparse` is likely to provide a
-better foundation for library authors writing third party command line
-argument processing libraries.
+Những cân nhắc này cũng có nghĩa là :mod:`!optparse` có khả năng cung cấp nền tảng tốt hơn cho các tác giả thư viện xây dựng các thư viện xử lý đối số dòng lệnh của bên thứ ba.
 
-As a concrete example, consider the following two command line argument
-parsing configurations, the first using ``optparse``, and the second
-using ``argparse``:
+Hãy xem xét cụ thể hai cấu hình phân tích đối số dòng lệnh sau đây: cấu hình đầu tiên sử dụng ``optparse``, còn cấu hình thứ hai sử dụng ``argparse``:
 
 .. testcode::
 
@@ -83,55 +61,31 @@ using ``argparse``:
        args = parser.parse_args()
        process(args.rest, output=args.output, verbose=args.verbose)
 
-The most obvious difference is that in the ``optparse`` version, the non-option
-arguments are processed separately by the application after the option processing
-is complete. In the ``argparse`` version, positional arguments are declared and
-processed in the same way as the named options.
+Điểm khác biệt rõ ràng nhất là trong phiên bản ``optparse``, các đối số không phải tùy chọn được ứng dụng xử lý riêng sau khi hoàn tất việc xử lý tùy chọn. Trong phiên bản ``argparse``, các đối số vị trí được khai báo và xử lý theo cùng cách với các tùy chọn được đặt tên.
 
-However, the ``argparse`` version will also handle some parameter combination
-differently from the way the ``optparse`` version would handle them.
-For example (amongst other differences):
+Tuy nhiên, phiên bản ``argparse`` cũng sẽ xử lý một số tổ hợp tham số khác với cách mà phiên bản ``optparse`` xử lý. Ví dụ (ngoài những khác biệt khác):
 
-* supplying ``-o -v`` gives ``output="-v"`` and ``verbose=False``
-  when using ``optparse``, but a usage error with ``argparse``
-  (complaining that no value has been supplied for ``-o/--output``,
-  since ``-v`` is interpreted as meaning the verbosity flag)
-* similarly, supplying ``-o --`` gives ``output="--"`` and ``args=()``
-  when using ``optparse``, but a usage error with ``argparse``
-  (also complaining that no value has been supplied for ``-o/--output``,
-  since ``--`` is interpreted as terminating the option processing
-  and treating all remaining values as positional arguments)
-* supplying ``-o=foo`` gives ``output="=foo"`` when using ``optparse``,
-  but gives ``output="foo"`` with ``argparse`` (since ``=`` is special
-  cased as an alternative separator for option parameter values)
+* cung cấp ``-o -v`` sẽ cho ``output="-v"`` và ``verbose=False`` khi sử dụng ``optparse``, nhưng gây ra lỗi sử dụng với ``argparse`` (báo rằng chưa cung cấp giá trị nào cho ``-o/--output``, vì ``-v`` được diễn giải là cờ độ chi tiết)
+* tương tự, cung cấp ``-o --`` cho kết quả ``output="--"`` và ``args=()`` khi sử dụng ``optparse``, nhưng gây ra lỗi sử dụng với ``argparse`` (đồng thời phàn nàn rằng chưa cung cấp giá trị cho ``-o/--output``, vì ``--`` được hiểu là kết thúc quá trình xử lý tùy chọn và coi tất cả giá trị còn lại là đối số vị trí)
+* cung cấp ``-o=foo`` cho kết quả ``output="=foo"`` khi sử dụng ``optparse``, nhưng cho kết quả ``output="foo"`` với ``argparse`` (vì ``=`` được xử lý đặc biệt như một dấu phân cách thay thế cho các giá trị tham số của tùy chọn)
 
-Whether these differing behaviors in the ``argparse`` version are
-considered desirable or a problem will depend on the specific command line
-application use case.
+Việc những hành vi khác nhau này trong phiên bản ``argparse`` được xem là mong muốn hay là một vấn đề sẽ phụ thuộc vào trường hợp sử dụng cụ thể của ứng dụng dòng lệnh.
 
 .. seealso::
 
-    :pypi:`click` is a third party argument processing library (originally
-    based on ``optparse``), which allows command line applications to be
-    developed as a set of decorated command implementation functions.
+    :pypi:`click` là một thư viện xử lý đối số của bên thứ ba (ban đầu dựa trên ``optparse``), cho phép phát triển các ứng dụng dòng lệnh dưới dạng một tập hợp các hàm triển khai lệnh có gắn decorator.
 
-    Other third party libraries, such as :pypi:`typer` or :pypi:`msgspec-click`,
-    allow command line interfaces to be specified in ways that more effectively
-    integrate with static checking of Python type annotations.
+    Các thư viện bên thứ ba khác, chẳng hạn như :pypi:`typer` hoặc :pypi:`msgspec-click`, cho phép chỉ định giao diện dòng lệnh theo những cách tích hợp hiệu quả hơn với việc kiểm tra tĩnh các chú thích kiểu của Python.
 
 
-Introduction
-------------
+Giới thiệu
+----------
 
-:mod:`!optparse` is a more convenient, flexible, and powerful library for parsing
-command-line options than the minimalist :mod:`getopt` module.
-:mod:`!optparse` uses a more declarative style of command-line parsing:
-you create an instance of :class:`OptionParser`,
-populate it with options, and parse the command line.
-:mod:`!optparse` allows users to specify options in the conventional
-GNU/POSIX syntax, and additionally generates usage and help messages for you.
+:mod:`!optparse` là một thư viện thuận tiện, linh hoạt và mạnh mẽ hơn để phân tích các tùy chọn dòng lệnh so với mô-đun tối giản :mod:`getopt`.
+:mod:`!optparse` sử dụng phong cách khai báo rõ ràng hơn để phân tích dòng lệnh: bạn tạo một thực thể :class:`OptionParser`, điền các tùy chọn vào đó rồi phân tích dòng lệnh.
+:mod:`!optparse` cho phép người dùng chỉ định các tùy chọn theo cú pháp GNU/POSIX thông dụng, đồng thời tự động tạo thông báo usage và help cho bạn.
 
-Here's an example of using :mod:`!optparse` in a simple script::
+Sau đây là ví dụ sử dụng :mod:`!optparse` trong một script đơn giản::
 
    from optparse import OptionParser
    ...
@@ -144,31 +98,23 @@ Here's an example of using :mod:`!optparse` in a simple script::
 
    (options, args) = parser.parse_args()
 
-With these few lines of code, users of your script can now do the "usual thing"
-on the command-line, for example::
+Với vài dòng mã này, giờ đây người dùng script của bạn có thể thực hiện "cách thông thường" trên dòng lệnh, chẳng hạn như::
 
    <yourscript> --file=outfile -q
 
-As it parses the command line, :mod:`!optparse` sets attributes of the
-``options`` object returned by :meth:`~OptionParser.parse_args` based on user-supplied
-command-line values.  When :meth:`~OptionParser.parse_args` returns from parsing this command
-line, ``options.filename`` will be ``"outfile"`` and ``options.verbose`` will be
-``False``.  :mod:`!optparse` supports both long and short options, allows short
-options to be merged together, and allows options to be associated with their
-arguments in a variety of ways.  Thus, the following command lines are all
-equivalent to the above example::
+Khi phân tích dòng lệnh, :mod:`!optparse` thiết lập các thuộc tính của đối tượng ``options`` được :meth:`~OptionParser.parse_args` trả về dựa trên các giá trị dòng lệnh do người dùng cung cấp. Khi :meth:`~OptionParser.parse_args` trả về sau khi phân tích dòng lệnh này, ``options.filename`` sẽ là ``"outfile"`` và ``options.verbose`` sẽ là ``False``. :mod:`!optparse` hỗ trợ cả tùy chọn dài và tùy chọn ngắn, cho phép gộp các tùy chọn ngắn với nhau, đồng thời cho phép liên kết tùy chọn với đối số của chúng theo nhiều cách khác nhau. Do đó, các dòng lệnh sau đây đều tương đương với ví dụ trên::
 
    <yourscript> -f outfile --quiet
    <yourscript> --quiet --file outfile
    <yourscript> -q -foutfile
    <yourscript> -qfoutfile
 
-Additionally, users can run one of the following ::
+Ngoài ra, người dùng có thể chạy một trong các lệnh sau::
 
    <yourscript> -h
    <yourscript> --help
 
-and :mod:`!optparse` will print out a brief summary of your script's options:
+và :mod:`!optparse` sẽ in ra bản tóm tắt ngắn gọn về các tùy chọn của script:
 
 .. code-block:: text
 
@@ -179,411 +125,275 @@ and :mod:`!optparse` will print out a brief summary of your script's options:
      -f FILE, --file=FILE  write report to FILE
      -q, --quiet           don't print status messages to stdout
 
-where the value of *yourscript* is determined at runtime (normally from
-``sys.argv[0]``).
+trong đó giá trị của *yourscript* được xác định tại runtime (thông thường từ ``sys.argv[0]``).
 
 
 .. _optparse-background:
 
-Background
-----------
+Bối cảnh
+--------
 
-:mod:`!optparse` was explicitly designed to encourage the creation of programs
-with straightforward command-line interfaces that follow the conventions
-established by the :c:func:`!getopt` family of functions available to C developers.
-To that end, it supports only the most common command-line syntax and semantics
-conventionally used under Unix.  If you are unfamiliar with these conventions,
-reading this section will allow you to acquaint yourself with them.
+:mod:`!optparse` được thiết kế rõ ràng nhằm khuyến khích việc tạo ra các chương trình có giao diện command-line đơn giản, tuân theo các quy ước do họ hàm :c:func:`!getopt` thiết lập, vốn có sẵn cho các lập trình viên C. Vì mục đích đó, nó chỉ hỗ trợ cú pháp và ngữ nghĩa command-line phổ biến nhất thường được sử dụng trong Unix. Nếu bạn chưa quen với các quy ước này, việc đọc phần này sẽ giúp bạn làm quen với chúng.
 
 
 .. _optparse-terminology:
 
-Terminology
-^^^^^^^^^^^
+Thuật ngữ
+^^^^^^^^^
 
-argument
-   a string entered on the command-line, and passed by the shell to ``execl()``
-   or ``execv()``.  In Python, arguments are elements of ``sys.argv[1:]``
-   (``sys.argv[0]`` is the name of the program being executed).  Unix shells
-   also use the term "word".
+đối số
+   một chuỗi được nhập trên command-line và được shell truyền cho ``execl()`` hoặc ``execv()``. Trong Python, các đối số là những phần tử của ``sys.argv[1:]`` (``sys.argv[0]`` là tên của chương trình đang được thực thi). Các Unix shell cũng sử dụng thuật ngữ "word".
 
-   It is occasionally desirable to substitute an argument list other than
-   ``sys.argv[1:]``, so you should read "argument" as "an element of
-   ``sys.argv[1:]``, or of some other list provided as a substitute for
-   ``sys.argv[1:]``".
+   Đôi khi bạn có thể muốn thay thế một danh sách đối số khác cho ``sys.argv[1:]``, vì vậy hãy hiểu "đối số" là "một phần tử của ``sys.argv[1:]``, hoặc của một danh sách khác được cung cấp để thay thế cho ``sys.argv[1:]``".
 
-option
-   an argument used to supply extra information to guide or customize the
-   execution of a program.  There are many different syntaxes for options; the
-   traditional Unix syntax is a hyphen ("-") followed by a single letter,
-   e.g. ``-x`` or ``-F``.  Also, traditional Unix syntax allows multiple
-   options to be merged into a single argument, e.g. ``-x -F`` is equivalent
-   to ``-xF``.  The GNU project introduced ``--`` followed by a series of
-   hyphen-separated words, e.g. ``--file`` or ``--dry-run``.  These are the
-   only two option syntaxes provided by :mod:`!optparse`.
+tùy chọn
+   một đối số được dùng để cung cấp thêm thông tin nhằm định hướng hoặc tùy chỉnh việc thực thi một chương trình. Có nhiều cú pháp khác nhau cho tùy chọn; cú pháp Unix truyền thống là một dấu gạch nối ("-") theo sau bởi một chữ cái đơn, ví dụ ``-x`` hoặc ``-F``. Ngoài ra, cú pháp Unix truyền thống cho phép gộp nhiều tùy chọn vào một đối số duy nhất, ví dụ ``-x -F`` tương đương với ``-xF``. Dự án GNU đã giới thiệu ``--`` theo sau bởi một chuỗi các từ được phân tách bằng dấu gạch nối, ví dụ ``--file`` hoặc ``--dry-run``. Đây là hai cú pháp tùy chọn duy nhất được :mod:`!optparse` cung cấp.
 
-   Some other option syntaxes that the world has seen include:
+   Một số cú pháp tùy chọn khác từng xuất hiện gồm:
 
-   * a hyphen followed by a few letters, e.g. ``-pf`` (this is *not* the same
-     as multiple options merged into a single argument)
+   * một dấu gạch nối theo sau bởi một vài chữ cái, ví dụ ``-pf`` (điều này *không* giống với nhiều tùy chọn được gộp vào một đối số duy nhất)
 
-   * a hyphen followed by a whole word, e.g. ``-file`` (this is technically
-     equivalent to the previous syntax, but they aren't usually seen in the same
-     program)
+   * một dấu gạch nối theo sau bởi một từ hoàn chỉnh, ví dụ ``-file`` (về mặt kỹ thuật, điều này tương đương với cú pháp trước đó, nhưng chúng thường không xuất hiện trong cùng một chương trình)
 
-   * a plus sign followed by a single letter, or a few letters, or a word, e.g.
-     ``+f``, ``+rgb``
+   * một dấu cộng theo sau bởi một chữ cái đơn, một vài chữ cái hoặc một từ, ví dụ ``+f``, ``+rgb``
 
-   * a slash followed by a letter, or a few letters, or a word, e.g. ``/f``,
-     ``/file``
+   * một dấu gạch chéo theo sau bởi một chữ cái, một vài chữ cái hoặc một từ, ví dụ ``/f``, ``/file``
 
-   These option syntaxes are not supported by :mod:`!optparse`, and they never
-   will be.  This is deliberate: the first three are non-standard on any
-   environment, and the last only makes sense if you're exclusively targeting
-   Windows or certain legacy platforms (e.g. VMS, MS-DOS).
+   :mod:`!optparse` không hỗ trợ các cú pháp tùy chọn này và sẽ không bao giờ hỗ trợ. Đây là chủ ý: ba cú pháp đầu tiên không phải là tiêu chuẩn trong bất kỳ môi trường nào, còn cú pháp cuối chỉ có ý nghĩa nếu bạn chỉ nhắm đến Windows hoặc một số nền tảng cũ (ví dụ: VMS, MS-DOS).
 
-option argument
-   an argument that follows an option, is closely associated with that option,
-   and is consumed from the argument list when that option is. With
-   :mod:`!optparse`, option arguments may either be in a separate argument from
-   their option:
+đối số của tùy chọn
+   một đối số đứng sau một tùy chọn, liên kết chặt chẽ với tùy chọn đó và được lấy khỏi danh sách đối số khi tùy chọn đó được xử lý. Với
+   :mod:`!optparse`, đối số của tùy chọn có thể nằm trong một đối số riêng biệt với tùy chọn đó:
 
    .. code-block:: text
 
       -f foo
       --file foo
 
-   or included in the same argument:
+   hoặc được đưa vào cùng một đối số:
 
    .. code-block:: text
 
       -ffoo
       --file=foo
 
-   Typically, a given option either takes an argument or it doesn't. Lots of
-   people want an "optional option arguments" feature, meaning that some options
-   will take an argument if they see it, and won't if they don't.  This is
-   somewhat controversial, because it makes parsing ambiguous: if ``-a`` takes
-   an optional argument and ``-b`` is another option entirely, how do we
-   interpret ``-ab``?  Because of this ambiguity, :mod:`!optparse` does not
-   support this feature.
+   Thông thường, một tùy chọn nhất định либо nhận một đối số, либо không. Nhiều người muốn có tính năng "đối số tùy chọn tùy ý", nghĩa là một số tùy chọn sẽ nhận một đối số nếu thấy đối số đó và không nhận nếu không thấy. Điều này gây tranh cãi phần nào vì khiến việc phân tích cú pháp trở nên mơ hồ: nếu ``-a`` nhận một đối số tùy ý và ``-b`` là một tùy chọn hoàn toàn khác, chúng ta diễn giải ``-ab`` như thế nào? Do sự mơ hồ này, :mod:`!optparse` không hỗ trợ tính năng này.
 
-positional argument
-   something leftover in the argument list after options have been parsed, i.e.
-   after options and their arguments have been parsed and removed from the
-   argument list.
+đối số vị trí
+   thứ gì đó còn lại trong danh sách đối số sau khi các tùy chọn đã được phân tích cú pháp, tức là sau khi các tùy chọn và đối số của chúng đã được phân tích cú pháp và loại bỏ khỏi danh sách đối số.
 
-required option
-   an option that must be supplied on the command-line; note that the phrase
-   "required option" is self-contradictory in English.  :mod:`!optparse` doesn't
-   prevent you from implementing required options, but doesn't give you much
-   help at it either.
+tùy chọn bắt buộc
+   một tùy chọn phải được cung cấp trên dòng lệnh; lưu ý rằng cụm từ "tùy chọn bắt buộc" tự mâu thuẫn trong tiếng Anh. :mod:`!optparse` không ngăn bạn triển khai các tùy chọn bắt buộc, nhưng cũng không hỗ trợ nhiều cho việc đó.
 
-For example, consider this hypothetical command-line::
+Ví dụ, hãy xét dòng lệnh giả định sau::
 
    prog -v --report report.txt foo bar
 
-``-v`` and ``--report`` are both options.  Assuming that ``--report``
-takes one argument, ``report.txt`` is an option argument.  ``foo`` and
-``bar`` are positional arguments.
+``-v`` và ``--report`` đều là các tùy chọn. Giả sử ``--report`` nhận một đối số, ``report.txt`` là một đối số của tùy chọn. ``foo`` và ``bar`` là các đối số vị trí.
 
 
 .. _optparse-what-options-for:
 
-What are options for?
-^^^^^^^^^^^^^^^^^^^^^
+Các tùy chọn dùng để làm gì?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Options are used to provide extra information to tune or customize the execution
-of a program.  In case it wasn't clear, options are usually *optional*.  A
-program should be able to run just fine with no options whatsoever.  (Pick a
-random program from the Unix or GNU toolsets.  Can it run without any options at
-all and still make sense?  The main exceptions are ``find``, ``tar``, and
-``dd``\ ---all of which are mutant oddballs that have been rightly criticized
-for their non-standard syntax and confusing interfaces.)
+Các tùy chọn được dùng để cung cấp thêm thông tin nhằm tinh chỉnh hoặc tùy chỉnh việc thực thi một chương trình. Nếu điều này chưa rõ, các tùy chọn thường là *tùy chọn*. Một chương trình phải có thể chạy bình thường mà không cần bất kỳ tùy chọn nào. (Hãy chọn ngẫu nhiên một chương trình trong các bộ công cụ Unix hoặc GNU. Nó có thể chạy mà không cần tùy chọn nào mà vẫn hợp lý không? Các ngoại lệ chính là ``find``, ``tar`` và ``dd``\ ---tất cả đều là những trường hợp kỳ quặc đột biến đã bị chỉ trích chính đáng vì cú pháp không theo chuẩn và giao diện khó hiểu.)
 
-Lots of people want their programs to have "required options".  Think about it.
-If it's required, then it's *not optional*!  If there is a piece of information
-that your program absolutely requires in order to run successfully, that's what
-positional arguments are for.
+Nhiều người muốn chương trình của mình có "tùy chọn bắt buộc". Hãy thử suy nghĩ: nếu đã bắt buộc thì *không phải là tùy chọn*! Nếu có một mẩu thông tin mà chương trình của bạn nhất thiết cần để chạy thành công, đó chính là lúc dùng các đối số vị trí.
 
-As an example of good command-line interface design, consider the humble ``cp``
-utility, for copying files.  It doesn't make much sense to try to copy files
-without supplying a destination and at least one source. Hence, ``cp`` fails if
-you run it with no arguments.  However, it has a flexible, useful syntax that
-does not require any options at all::
+Để lấy một ví dụ về thiết kế giao diện dòng lệnh tốt, hãy xem xét tiện ích ``cp`` đơn giản dùng để sao chép tệp. Việc cố sao chép tệp mà không cung cấp đích đến và ít nhất một nguồn sẽ chẳng có nhiều ý nghĩa. Vì vậy, ``cp`` sẽ báo lỗi nếu bạn chạy nó mà không có đối số nào. Tuy nhiên, nó có cú pháp linh hoạt, hữu ích và hoàn toàn không yêu cầu tùy chọn nào::
 
    cp SOURCE DEST
    cp SOURCE ... DEST-DIR
 
-You can get pretty far with just that.  Most ``cp`` implementations provide a
-bunch of options to tweak exactly how the files are copied: you can preserve
-mode and modification time, avoid following symlinks, ask before clobbering
-existing files, etc.  But none of this distracts from the core mission of
-``cp``, which is to copy either one file to another, or several files to another
-directory.
+Chỉ với vậy, bạn đã có thể làm được khá nhiều việc. Hầu hết các triển khai của ``cp`` đều cung cấp nhiều tùy chọn để điều chỉnh chính xác cách sao chép tệp: bạn có thể giữ nguyên mode và thời gian sửa đổi, tránh đi theo symlink, yêu cầu xác nhận trước khi ghi đè các tệp hiện có, v.v. Nhưng không điều nào trong số đó làm phân tâm khỏi nhiệm vụ cốt lõi của ``cp``, đó là sao chép một tệp sang một tệp khác hoặc sao chép nhiều tệp vào một thư mục khác.
 
 
 .. _optparse-what-positional-arguments-for:
 
-What are positional arguments for?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các đối số vị trí dùng để làm gì?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Positional arguments are for those pieces of information that your program
-absolutely, positively requires to run.
+Các đối số vị trí dùng cho những mẩu thông tin mà chương trình của bạn nhất thiết phải có để chạy.
 
-A good user interface should have as few absolute requirements as possible.  If
-your program requires 17 distinct pieces of information in order to run
-successfully, it doesn't much matter *how* you get that information from the
-user---most people will give up and walk away before they successfully run the
-program.  This applies whether the user interface is a command-line, a
-configuration file, or a GUI: if you make that many demands on your users, most
-of them will simply give up.
+Một giao diện người dùng tốt nên có càng ít yêu cầu tuyệt đối càng tốt. Nếu chương trình của bạn cần 17 mẩu thông tin riêng biệt để chạy thành công, thì *cách* bạn lấy thông tin đó từ người dùng thực ra không quan trọng---hầu hết mọi người sẽ bỏ cuộc và rời đi trước khi chạy chương trình thành công. Điều này áp dụng cho dù giao diện người dùng là dòng lệnh, tệp cấu hình hay GUI: nếu bạn đặt ra quá nhiều yêu cầu như vậy với người dùng, hầu hết họ sẽ đơn giản là bỏ cuộc.
 
-In short, try to minimize the amount of information that users are absolutely
-required to supply---use sensible defaults whenever possible.  Of course, you
-also want to make your programs reasonably flexible.  That's what options are
-for.  Again, it doesn't matter if they are entries in a config file, widgets in
-the "Preferences" dialog of a GUI, or command-line options---the more options
-you implement, the more flexible your program is, and the more complicated its
-implementation becomes.  Too much flexibility has drawbacks as well, of course;
-too many options can overwhelm users and make your code much harder to maintain.
+Tóm lại, hãy cố giảm thiểu lượng thông tin mà người dùng bắt buộc phải cung cấp---sử dụng các giá trị mặc định hợp lý bất cứ khi nào có thể. Tất nhiên, bạn cũng muốn chương trình của mình đủ linh hoạt. Đó là mục đích của các tùy chọn. Một lần nữa, không quan trọng chúng là các mục trong tệp cấu hình, các widget trong hộp thoại "Preferences" của GUI hay các tùy chọn dòng lệnh---càng triển khai nhiều tùy chọn, chương trình của bạn càng linh hoạt và phần triển khai càng trở nên phức tạp. Dĩ nhiên, tính linh hoạt quá mức cũng có nhược điểm; quá nhiều tùy chọn có thể khiến người dùng choáng ngợp và làm mã của bạn khó bảo trì hơn nhiều.
 
 
 .. _optparse-tutorial:
 
-Tutorial
---------
+Hướng dẫn
+---------
 
-While :mod:`!optparse` is quite flexible and powerful, it's also straightforward
-to use in most cases.  This section covers the code patterns that are common to
-any :mod:`!optparse`\ -based program.
+Mặc dù :mod:`!optparse` khá linh hoạt và mạnh mẽ, nhưng trong hầu hết các trường hợp, nó cũng rất dễ sử dụng. Phần này trình bày các mẫu mã thường gặp trong mọi chương trình dựa trên :mod:`!optparse`\ .
 
-First, you need to import the OptionParser class; then, early in the main
-program, create an OptionParser instance::
+Trước tiên, bạn cần import class OptionParser; sau đó, ở phần đầu của chương trình chính, hãy tạo một instance OptionParser::
 
    from optparse import OptionParser
    ...
    parser = OptionParser()
 
-Then you can start defining options.  The basic syntax is::
+Sau đó, bạn có thể bắt đầu định nghĩa các option. Cú pháp cơ bản là::
 
    parser.add_option(opt_str, ...,
                      attr=value, ...)
 
-Each option has one or more option strings, such as ``-f`` or ``--file``,
-and several option attributes that tell :mod:`!optparse` what to expect and what
-to do when it encounters that option on the command line.
+Mỗi option có một hoặc nhiều option string, chẳng hạn như ``-f`` hoặc ``--file``, cùng một số thuộc tính option cho :mod:`!optparse` biết cần mong đợi điều gì và phải làm gì khi gặp option đó trên command line.
 
-Typically, each option will have one short option string and one long option
-string, e.g.::
+Thông thường, mỗi option sẽ có một option string ngắn và một option string dài, ví dụ như::
 
    parser.add_option("-f", "--file", ...)
 
-You're free to define as many short option strings and as many long option
-strings as you like (including zero), as long as there is at least one option
-string overall.
+Bạn có thể tự do định nghĩa bao nhiêu option string ngắn và option string dài tùy thích (kể cả không có), miễn là tổng thể có ít nhất một option string.
 
-The option strings passed to :meth:`OptionParser.add_option` are effectively
-labels for the
-option defined by that call.  For brevity, we will frequently refer to
-*encountering an option* on the command line; in reality, :mod:`!optparse`
-encounters *option strings* and looks up options from them.
+Các chuỗi tùy chọn được truyền cho :meth:`OptionParser.add_option` thực chất là nhãn cho tùy chọn được định nghĩa bởi lời gọi đó. Để ngắn gọn, chúng ta sẽ thường nói đến việc *gặp một tùy chọn* trên dòng lệnh; trên thực tế, :mod:`!optparse` gặp *các chuỗi tùy chọn* rồi tra cứu các tùy chọn từ đó.
 
-Once all of your options are defined, instruct :mod:`!optparse` to parse your
-program's command line::
+Sau khi đã định nghĩa tất cả tùy chọn, hãy yêu cầu :mod:`!optparse` phân tích cú pháp dòng lệnh của chương trình::
 
    (options, args) = parser.parse_args()
 
-(If you like, you can pass a custom argument list to :meth:`~OptionParser.parse_args`, but
-that's rarely necessary: by default it uses ``sys.argv[1:]``.)
+(Nếu muốn, bạn có thể truyền một danh sách đối số tùy chỉnh cho :meth:`~OptionParser.parse_args`, nhưng trường hợp này hiếm khi cần thiết: theo mặc định, nó sử dụng ``sys.argv[1:]``.)
 
-:meth:`~OptionParser.parse_args` returns two values:
+:meth:`~OptionParser.parse_args` trả về hai giá trị:
 
-* ``options``, an object containing values for all of your options---e.g. if
-  ``--file`` takes a single string argument, then ``options.file`` will be the
-  filename supplied by the user, or ``None`` if the user did not supply that
-  option
+* ``options``, một đối tượng chứa các giá trị cho tất cả tùy chọn của bạn---ví dụ: nếu ``--file`` nhận một đối số chuỗi duy nhất, thì ``options.file`` sẽ là tên tệp do người dùng cung cấp, hoặc ``None`` nếu người dùng không cung cấp tùy chọn đó
 
-* ``args``, the list of positional arguments leftover after parsing options
+* ``args``, danh sách các đối số vị trí còn lại sau khi phân tích cú pháp các tùy chọn
 
-This tutorial section only covers the four most important option attributes:
-:attr:`~Option.action`, :attr:`~Option.type`, :attr:`~Option.dest`
-(destination), and :attr:`~Option.help`. Of these, :attr:`~Option.action` is the
-most fundamental.
+Phần hướng dẫn này chỉ đề cập đến bốn thuộc tính tùy chọn quan trọng nhất:
+:attr:`~Option.action`, :attr:`~Option.type`, :attr:`~Option.dest` (đích đến) và :attr:`~Option.help`. Trong số này, :attr:`~Option.action` là nền tảng nhất.
 
 
 .. _optparse-understanding-option-actions:
 
-Understanding option actions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Tìm hiểu về các option action
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Actions tell :mod:`!optparse` what to do when it encounters an option on the
-command line.  There is a fixed set of actions hard-coded into :mod:`!optparse`;
-adding new actions is an advanced topic covered in section
-:ref:`optparse-extending-optparse`.  Most actions tell :mod:`!optparse` to store
-a value in some variable---for example, take a string from the command line and
-store it in an attribute of ``options``.
+Các action cho :mod:`!optparse` biết phải làm gì khi gặp một option trên dòng lệnh. Có một tập hợp action cố định được hard-code trong :mod:`!optparse`; việc thêm action mới là một chủ đề nâng cao được trình bày trong phần
+:ref:`optparse-extending-optparse`. Hầu hết action đều yêu cầu :mod:`!optparse` lưu một giá trị vào một biến nào đó—ví dụ: lấy một chuỗi từ dòng lệnh và lưu chuỗi đó vào một attribute của ``options``.
 
-If you don't specify an option action, :mod:`!optparse` defaults to ``store``.
+Nếu bạn không chỉ định option action, :mod:`!optparse` sẽ mặc định sử dụng ``store``.
 
 
 .. _optparse-store-action:
 
-The store action
-^^^^^^^^^^^^^^^^
+Action store
+^^^^^^^^^^^^
 
-The most common option action is ``store``, which tells :mod:`!optparse` to take
-the next argument (or the remainder of the current argument), ensure that it is
-of the correct type, and store it to your chosen destination.
+Option action phổ biến nhất là ``store``, yêu cầu :mod:`!optparse` lấy đối số tiếp theo (hoặc phần còn lại của đối số hiện tại), đảm bảo đối số đó có đúng kiểu, rồi lưu vào đích đến bạn chọn.
 
-For example::
+Ví dụ::
 
    parser.add_option("-f", "--file",
                      action="store", type="string", dest="filename")
 
-Now let's make up a fake command line and ask :mod:`!optparse` to parse it::
+Bây giờ hãy tạo một dòng lệnh giả và yêu cầu :mod:`!optparse` phân tích cú pháp của nó::
 
    args = ["-f", "foo.txt"]
    (options, args) = parser.parse_args(args)
 
-When :mod:`!optparse` sees the option string ``-f``, it consumes the next
-argument, ``foo.txt``, and stores it in ``options.filename``.  So, after this
-call to :meth:`~OptionParser.parse_args`, ``options.filename`` is ``"foo.txt"``.
+Khi :mod:`!optparse` gặp chuỗi tùy chọn ``-f``, nó lấy đối số tiếp theo, ``foo.txt``, rồi lưu đối số đó vào ``options.filename``. Vì vậy, sau lệnh gọi :meth:`~OptionParser.parse_args` này, ``options.filename`` là ``"foo.txt"``.
 
-Some other option types supported by :mod:`!optparse` are ``int`` and ``float``.
-Here's an option that expects an integer argument::
+Một số kiểu tùy chọn khác được :mod:`!optparse` hỗ trợ là ``int`` và ``float``. Đây là một tùy chọn yêu cầu đối số là số nguyên::
 
    parser.add_option("-n", type="int", dest="num")
 
-Note that this option has no long option string, which is perfectly acceptable.
-Also, there's no explicit action, since the default is ``store``.
+Lưu ý rằng tùy chọn này không có chuỗi tùy chọn dài, điều đó hoàn toàn hợp lệ. Ngoài ra, không có action tường minh nào, vì mặc định là ``store``.
 
-Let's parse another fake command-line.  This time, we'll jam the option argument
-right up against the option: since ``-n42`` (one argument) is equivalent to
-``-n 42`` (two arguments), the code ::
+Hãy phân tích một dòng lệnh giả khác. Lần này, chúng ta sẽ đặt đối số của tùy chọn ngay sát tùy chọn: vì ``-n42`` (một đối số) tương đương với ``-n 42`` (hai đối số), đoạn mã::
 
    (options, args) = parser.parse_args(["-n42"])
    print(options.num)
 
-will print ``42``.
+sẽ in ``42``.
 
-If you don't specify a type, :mod:`!optparse` assumes ``string``.  Combined with
-the fact that the default action is ``store``, that means our first example can
-be a lot shorter::
+Nếu bạn không chỉ định type, :mod:`!optparse` sẽ giả định ``string``. Kết hợp với việc action mặc định là ``store``, điều đó có nghĩa là ví dụ đầu tiên của chúng ta có thể ngắn hơn nhiều::
 
    parser.add_option("-f", "--file", dest="filename")
 
-If you don't supply a destination, :mod:`!optparse` figures out a sensible
-default from the option strings: if the first long option string is
-``--foo-bar``, then the default destination is ``foo_bar``.  If there are no
-long option strings, :mod:`!optparse` looks at the first short option string: the
-default destination for ``-f`` is ``f``.
+Nếu bạn không cung cấp destination, :mod:`!optparse` sẽ xác định giá trị mặc định hợp lý từ các chuỗi option: nếu chuỗi option dài đầu tiên là ``--foo-bar``, thì destination mặc định là ``foo_bar``. Nếu không có chuỗi option dài nào, :mod:`!optparse` sẽ xem xét chuỗi option ngắn đầu tiên: destination mặc định cho ``-f`` là ``f``.
 
-:mod:`!optparse` also includes the built-in ``complex`` type.  Adding
-types is covered in section :ref:`optparse-extending-optparse`.
+:mod:`!optparse` cũng bao gồm type ``complex`` tích hợp sẵn. Việc thêm các type được trình bày trong phần :ref:`optparse-extending-optparse`.
 
 
 .. _optparse-handling-boolean-options:
 
-Handling boolean (flag) options
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Xử lý các tùy chọn boolean (flag)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Flag options---set a variable to true or false when a particular option is
-seen---are quite common.  :mod:`!optparse` supports them with two separate actions,
-``store_true`` and ``store_false``.  For example, you might have a ``verbose``
-flag that is turned on with ``-v`` and off with ``-q``::
+Các tùy chọn flag---đặt một biến thành true hoặc false khi gặp một tùy chọn cụ thể---khá phổ biến. :mod:`!optparse` hỗ trợ chúng bằng hai action riêng biệt, ``store_true`` và ``store_false``. Ví dụ, bạn có thể có một flag ``verbose`` được bật bằng ``-v`` và tắt bằng ``-q``::
 
    parser.add_option("-v", action="store_true", dest="verbose")
    parser.add_option("-q", action="store_false", dest="verbose")
 
-Here we have two different options with the same destination, which is perfectly
-OK.  (It just means you have to be a bit careful when setting default
-values---see below.)
+Ở đây, chúng ta có hai tùy chọn khác nhau với cùng một destination, hoàn toàn không có vấn đề gì. (Điều đó chỉ có nghĩa là bạn phải cẩn thận hơn một chút khi đặt các giá trị mặc định---xem bên dưới.)
 
-When :mod:`!optparse` encounters ``-v`` on the command line, it sets
-``options.verbose`` to ``True``; when it encounters ``-q``,
-``options.verbose`` is set to ``False``.
+Khi :mod:`!optparse` gặp ``-v`` trên dòng lệnh, nó đặt ``options.verbose`` thành ``True``; khi gặp ``-q``, ``options.verbose`` được đặt thành ``False``.
 
 
 .. _optparse-other-actions:
 
-Other actions
-^^^^^^^^^^^^^
+Các hành động khác
+^^^^^^^^^^^^^^^^^^
 
-Some other actions supported by :mod:`!optparse` are:
+Một số hành động khác được :mod:`!optparse` hỗ trợ gồm:
 
 ``"store_const"``
-   store a constant value, pre-set via :attr:`Option.const`
+   lưu trữ một giá trị hằng, được đặt trước qua :attr:`Option.const`
 
 ``"append"``
-   append this option's argument to a list
+   thêm đối số của tùy chọn này vào một danh sách
 
 ``"count"``
-   increment a counter by one
+   tăng bộ đếm lên một
 
 ``"callback"``
-   call a specified function
+   gọi một hàm được chỉ định
 
-These are covered in section :ref:`optparse-reference-guide`,
-and section :ref:`optparse-option-callbacks`.
+Các nội dung này được trình bày trong phần :ref:`optparse-reference-guide` và phần :ref:`optparse-option-callbacks`.
 
 
 .. _optparse-default-values:
 
-Default values
-^^^^^^^^^^^^^^
+Giá trị mặc định
+^^^^^^^^^^^^^^^^
 
-All of the above examples involve setting some variable (the "destination") when
-certain command-line options are seen.  What happens if those options are never
-seen?  Since we didn't supply any defaults, they are all set to ``None``.  This
-is usually fine, but sometimes you want more control.  :mod:`!optparse` lets you
-supply a default value for each destination, which is assigned before the
-command line is parsed.
+Tất cả các ví dụ trên đều liên quan đến việc đặt một biến ("đích") khi phát hiện một số tùy chọn dòng lệnh nhất định. Điều gì xảy ra nếu các tùy chọn đó không bao giờ xuất hiện? Vì chúng ta không cung cấp giá trị mặc định nào, tất cả đều được đặt thành ``None``. Điều này thường không sao, nhưng đôi khi bạn muốn kiểm soát nhiều hơn. :mod:`!optparse` cho phép bạn cung cấp một giá trị mặc định cho mỗi đích, giá trị này được gán trước khi dòng lệnh được phân tích cú pháp.
 
-First, consider the verbose/quiet example.  If we want :mod:`!optparse` to set
-``verbose`` to ``True`` unless ``-q`` is seen, then we can do this::
+Trước tiên, hãy xem xét ví dụ verbose/quiet. Nếu muốn :mod:`!optparse` đặt ``verbose`` thành ``True`` trừ khi ``-q`` xuất hiện, chúng ta có thể làm như sau::
 
    parser.add_option("-v", action="store_true", dest="verbose", default=True)
    parser.add_option("-q", action="store_false", dest="verbose")
 
-Since default values apply to the *destination* rather than to any particular
-option, and these two options happen to have the same destination, this is
-exactly equivalent::
+Vì các giá trị mặc định áp dụng cho *đích* chứ không áp dụng cho một tùy chọn cụ thể nào, và hai tùy chọn này tình cờ có cùng đích, nên điều này hoàn toàn tương đương với::
 
    parser.add_option("-v", action="store_true", dest="verbose")
    parser.add_option("-q", action="store_false", dest="verbose", default=True)
 
-Consider this::
+Hãy xem xét ví dụ này::
 
    parser.add_option("-v", action="store_true", dest="verbose", default=False)
    parser.add_option("-q", action="store_false", dest="verbose", default=True)
 
-Again, the default value for ``verbose`` will be ``True``: the last default
-value supplied for any particular destination is the one that counts.
+Một lần nữa, giá trị mặc định cho ``verbose`` sẽ là ``True``: giá trị mặc định cuối cùng được cung cấp cho một đích cụ thể sẽ được sử dụng.
 
-A clearer way to specify default values is the :meth:`set_defaults` method of
-OptionParser, which you can call at any time before calling
+Một cách rõ ràng hơn để chỉ định các giá trị mặc định là phương thức :meth:`set_defaults` của OptionParser, phương thức này bạn có thể gọi bất kỳ lúc nào trước khi gọi
 :meth:`~OptionParser.parse_args`::
 
    parser.set_defaults(verbose=True)
    parser.add_option(...)
    (options, args) = parser.parse_args()
 
-As before, the last value specified for a given option destination is the one
-that counts.  For clarity, try to use one method or the other of setting default
-values, not both.
+Như trước đây, giá trị cuối cùng được chỉ định cho một đích tùy chọn nhất định là giá trị được áp dụng. Để rõ ràng, hãy cố gắng chỉ sử dụng một trong hai phương pháp đặt giá trị mặc định, không sử dụng cả hai.
 
 
 .. _optparse-generating-help:
 
-Generating help
-^^^^^^^^^^^^^^^
+Tạo phần trợ giúp
+^^^^^^^^^^^^^^^^^
 
-:mod:`!optparse`'s ability to generate help and usage text automatically is
-useful for creating user-friendly command-line interfaces.  All you have to do
-is supply a :attr:`~Option.help` value for each option, and optionally a short
-usage message for your whole program.  Here's an OptionParser populated with
-user-friendly (documented) options::
+Khả năng tự động tạo văn bản trợ giúp và usage của :mod:`!optparse` rất hữu ích khi tạo các giao diện dòng lệnh thân thiện với người dùng. Tất cả những gì bạn cần làm là cung cấp giá trị :attr:`~Option.help` cho mỗi tùy chọn và tùy chọn thêm một thông báo usage ngắn cho toàn bộ chương trình. Dưới đây là một OptionParser được điền các tùy chọn thân thiện với người dùng (có tài liệu mô tả)::
 
    usage = "usage: %prog [options] arg1 arg2"
    parser = OptionParser(usage=usage)
@@ -600,9 +410,7 @@ user-friendly (documented) options::
                      help="interaction mode: novice, intermediate, "
                           "or expert [default: %default]")
 
-If :mod:`!optparse` encounters either ``-h`` or ``--help`` on the
-command-line, or if you just call :meth:`parser.print_help`, it prints the
-following to standard output:
+Nếu :mod:`!optparse` gặp ``-h`` hoặc ``--help`` trên dòng lệnh, hoặc nếu bạn chỉ cần gọi :meth:`parser.print_help`, nó sẽ in nội dung sau ra đầu ra tiêu chuẩn:
 
 .. code-block:: text
 
@@ -617,13 +425,11 @@ following to standard output:
      -m MODE, --mode=MODE  interaction mode: novice, intermediate, or
                            expert [default: intermediate]
 
-(If the help output is triggered by a help option, :mod:`!optparse` exits after
-printing the help text.)
+(Nếu đầu ra trợ giúp được kích hoạt bởi một tùy chọn trợ giúp, :mod:`!optparse` sẽ thoát sau khi in văn bản trợ giúp.)
 
-There's a lot going on here to help :mod:`!optparse` generate the best possible
-help message:
+Có nhiều yếu tố ở đây giúp :mod:`!optparse` tạo ra thông báo trợ giúp tốt nhất có thể:
 
-* the script defines its own usage message::
+* script tự định nghĩa thông báo usage của mình::
 
      usage = "usage: %prog [options] arg1 arg2"
 
@@ -635,62 +441,44 @@ help message:
   default: ``"Usage: %prog [options]"``, which is fine if your script doesn't
   take any positional arguments.
 
-* every option defines a help string, and doesn't worry about
-  line-wrapping---\ :mod:`!optparse` takes care of wrapping lines and making
-  the help output look good.
+* mỗi option đều định nghĩa một chuỗi trợ giúp và không cần lo về việc ngắt dòng---\ :mod:`!optparse` sẽ xử lý việc ngắt dòng và giúp phần đầu ra trợ giúp trông đẹp mắt.
 
-* options that take a value indicate this fact in their automatically generated
-  help message, e.g. for the "mode" option::
+* các option nhận một giá trị sẽ thể hiện điều này trong thông báo trợ giúp được tự động tạo, ví dụ như với option "mode"::
 
      -m MODE, --mode=MODE
 
-  Here, "MODE" is called the meta-variable: it stands for the argument that the
-  user is expected to supply to ``-m``/``--mode``.  By default,
-  :mod:`!optparse` converts the destination variable name to uppercase and uses
-  that for the meta-variable.  Sometimes, that's not what you want---for
-  example, the ``--filename`` option explicitly sets ``metavar="FILE"``,
-  resulting in this automatically generated option description::
+  Ở đây, "MODE" được gọi là meta-variable: nó đại diện cho đối số mà người dùng được kỳ vọng sẽ cung cấp cho ``-m``/``--mode``. Theo mặc định,
+  :mod:`!optparse` chuyển tên biến đích thành chữ hoa và sử dụng tên đó làm meta-variable. Đôi khi, đó không phải điều bạn muốn---ví dụ, option ``--filename`` đặt ``metavar="FILE"`` một cách rõ ràng, tạo ra phần mô tả option được tự động tạo sau đây::
 
      -f FILE, --filename=FILE
 
-  This is important for more than just saving space, though: the manually
-  written help text uses the meta-variable ``FILE`` to clue the user in that
-  there's a connection between the semi-formal syntax ``-f FILE`` and the informal
-  semantic description "write output to FILE". This is a simple but effective
-  way to make your help text a lot clearer and more useful for end users.
+  Tuy nhiên, điều này quan trọng không chỉ vì giúp tiết kiệm không gian: phần văn bản trợ giúp được viết thủ công sử dụng meta-variable ``FILE`` để gợi ý cho người dùng rằng có mối liên hệ giữa cú pháp bán hình thức ``-f FILE`` và mô tả ngữ nghĩa không hình thức "ghi đầu ra vào FILE". Đây là một cách đơn giản nhưng hiệu quả để làm cho văn bản trợ giúp của bạn rõ ràng và hữu ích hơn nhiều đối với người dùng cuối.
 
-* options that have a default value can include ``%default`` in the help
-  string---\ :mod:`!optparse` will replace it with :func:`str` of the option's
-  default value.  If an option has no default value (or the default value is
-  ``None``), ``%default`` expands to ``none``.
+* các option có giá trị mặc định có thể bao gồm ``%default`` trong chuỗi trợ giúp---\ :mod:`!optparse` sẽ thay thế nó bằng :func:`str` của giá trị mặc định của option. Nếu một option không có giá trị mặc định (hoặc giá trị mặc định là ``None``), ``%default`` sẽ được mở rộng thành ``none``.
 
-Grouping Options
-++++++++++++++++
+Nhóm các Option
++++++++++++++++
 
-When dealing with many options, it is convenient to group these options for
-better help output.  An :class:`OptionParser` can contain several option groups,
-each of which can contain several options.
+Khi xử lý nhiều tùy chọn, việc nhóm các tùy chọn này lại sẽ giúp phần trợ giúp hiển thị rõ ràng hơn. Một :class:`OptionParser` có thể chứa nhiều nhóm tùy chọn, mỗi nhóm có thể chứa nhiều tùy chọn.
 
-An option group is obtained using the class :class:`OptionGroup`:
+Có thể tạo một nhóm tùy chọn bằng class :class:`OptionGroup`:
 
 .. class:: OptionGroup(parser, title, description=None)
 
-   where
+   trong đó
 
-   * parser is the :class:`OptionParser` instance the group will be inserted in
-     to
-   * title is the group title
-   * description, optional, is a long description of the group
+   * parser là instance :class:`OptionParser` mà nhóm sẽ được chèn vào
+   * title là tiêu đề của nhóm
+   * description, là tùy chọn, là phần mô tả dài về nhóm
 
-:class:`OptionGroup` inherits from :class:`OptionContainer` (like
-:class:`OptionParser`) and so the :meth:`add_option` method can be used to add
-an option to the group.
+:class:`OptionGroup` kế thừa từ :class:`OptionContainer` (giống như
+:class:`OptionParser`) và vì vậy phương thức :meth:`add_option` có thể được sử dụng để thêm một tùy chọn vào nhóm.
 
-Once all the options are declared, using the :class:`OptionParser` method
-:meth:`add_option_group` the group is added to the previously defined parser.
+Sau khi khai báo tất cả các tùy chọn, sử dụng phương thức :class:`OptionParser`
+:meth:`add_option_group` nhóm được thêm vào parser đã được định nghĩa trước đó.
 
-Continuing with the parser defined in the previous section, adding an
-:class:`OptionGroup` to a parser is easy::
+Tiếp tục với parser được định nghĩa trong phần trước, việc thêm một
+:class:`OptionGroup` vào parser rất dễ dàng::
 
     group = OptionGroup(parser, "Dangerous Options",
                         "Caution: use these options at your own risk.  "
@@ -698,7 +486,7 @@ Continuing with the parser defined in the previous section, adding an
     group.add_option("-g", action="store_true", help="Group option.")
     parser.add_option_group(group)
 
-This would result in the following help output:
+Kết quả sẽ là đầu ra trợ giúp sau đây:
 
 .. code-block:: text
 
@@ -719,8 +507,7 @@ This would result in the following help output:
 
        -g                  Group option.
 
-A bit more complete example might involve using more than one group: still
-extending the previous example::
+Một ví dụ hoàn chỉnh hơn có thể bao gồm việc sử dụng nhiều hơn một nhóm: vẫn mở rộng ví dụ trước::
 
     group = OptionGroup(parser, "Dangerous Options",
                         "Caution: use these options at your own risk.  "
@@ -736,7 +523,7 @@ extending the previous example::
     group.add_option("-e", action="store_true", help="Print every action done")
     parser.add_option_group(group)
 
-that results in the following output:
+dẫn đến kết quả đầu ra sau đây:
 
 .. code-block:: text
 
@@ -762,85 +549,59 @@ that results in the following output:
        -s, --sql           Print all SQL statements executed
        -e                  Print every action done
 
-Another interesting method, in particular when working programmatically with
-option groups is:
+Một phương thức thú vị khác, đặc biệt khi làm việc theo cách lập trình với các nhóm option, là:
 
 .. method:: OptionParser.get_option_group(opt_str)
 
-   Return the :class:`OptionGroup` to which the short or long option
-   string *opt_str* (e.g. ``'-o'`` or ``'--option'``) belongs. If
-   there's no such :class:`OptionGroup`, return ``None``.
+   Trả về :class:`OptionGroup` mà chuỗi option ngắn hoặc dài *opt_str* (ví dụ: ``'-o'`` hoặc ``'--option'``) thuộc về. Nếu không có :class:`OptionGroup` tương ứng, hãy trả về ``None``.
 
 .. _optparse-printing-version-string:
 
-Printing a version string
-^^^^^^^^^^^^^^^^^^^^^^^^^
+In chuỗi phiên bản
+^^^^^^^^^^^^^^^^^^
 
-Similar to the brief usage string, :mod:`!optparse` can also print a version
-string for your program.  You have to supply the string as the ``version``
-argument to OptionParser::
+Tương tự như chuỗi hướng dẫn sử dụng ngắn gọn, :mod:`!optparse` cũng có thể in chuỗi phiên bản cho chương trình của bạn. Bạn phải cung cấp chuỗi này dưới dạng đối số ``version`` cho OptionParser::
 
    parser = OptionParser(usage="%prog [-f] [-q]", version="%prog 1.0")
 
-``%prog`` is expanded just like it is in ``usage``.  Apart from that,
-``version`` can contain anything you like.  When you supply it, :mod:`!optparse`
-automatically adds a ``--version`` option to your parser. If it encounters
-this option on the command line, it expands your ``version`` string (by
-replacing ``%prog``), prints it to stdout, and exits.
+``%prog`` được mở rộng giống như trong ``usage``. Ngoài ra, ``version`` có thể chứa bất kỳ nội dung nào bạn muốn. Khi bạn cung cấp nó, :mod:`!optparse` sẽ tự động thêm một option ``--version`` vào parser của bạn. Nếu gặp option này trên dòng lệnh, nó sẽ mở rộng chuỗi ``version`` của bạn (bằng cách thay thế ``%prog``), in chuỗi đó ra stdout rồi thoát.
 
-For example, if your script is called ``/usr/bin/foo``:
+Ví dụ: nếu script của bạn có tên là ``/usr/bin/foo``:
 
 .. code-block:: shell-session
 
    $ /usr/bin/foo --version
    foo 1.0
 
-The following two methods can be used to print and get the ``version`` string:
+Có thể sử dụng hai phương thức sau để in và lấy chuỗi ``version``:
 
 .. method:: OptionParser.print_version(file=None)
 
-   Print the version message for the current program (``self.version``) to
-   *file* (default stdout).  As with :meth:`print_usage`, any occurrence
-   of ``%prog`` in ``self.version`` is replaced with the name of the current
-   program.  Does nothing if ``self.version`` is empty or undefined.
+   In thông báo phiên bản của chương trình hiện tại (``self.version``) vào *file* (mặc định là stdout).  Tương tự như :meth:`print_usage`, mọi lần xuất hiện của ``%prog`` trong ``self.version`` sẽ được thay thế bằng tên của chương trình hiện tại.  Không thực hiện gì nếu ``self.version`` rỗng hoặc không được định nghĩa.
 
 .. method:: OptionParser.get_version()
 
-   Same as :meth:`print_version` but returns the version string instead of
-   printing it.
+   Giống như :meth:`print_version` nhưng trả về chuỗi phiên bản thay vì in chuỗi đó.
 
 
 .. _optparse-how-optparse-handles-errors:
 
-How :mod:`!optparse` handles errors
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Cách :mod:`!optparse` xử lý lỗi
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-There are two broad classes of errors that :mod:`!optparse` has to worry about:
-programmer errors and user errors.  Programmer errors are usually erroneous
-calls to :func:`OptionParser.add_option`, e.g. invalid option strings, unknown
-option attributes, missing option attributes, etc.  These are dealt with in the
-usual way: raise an exception (either :exc:`optparse.OptionError` or
-:exc:`TypeError`) and let the program crash.
+Có hai nhóm lỗi chính mà :mod:`!optparse` cần xử lý: lỗi của lập trình viên và lỗi của người dùng.  Lỗi của lập trình viên thường là các lời gọi không hợp lệ đến :func:`OptionParser.add_option`, chẳng hạn như chuỗi tùy chọn không hợp lệ, thuộc tính tùy chọn không xác định, thiếu thuộc tính tùy chọn, v.v.  Những lỗi này được xử lý theo cách thông thường: tăng một ngoại lệ (hoặc :exc:`optparse.OptionError` hoặc
+:exc:`TypeError`) và để chương trình bị lỗi.
 
-Handling user errors is much more important, since they are guaranteed to happen
-no matter how stable your code is.  :mod:`!optparse` can automatically detect
-some user errors, such as bad option arguments (passing ``-n 4x`` where
-``-n`` takes an integer argument), missing arguments (``-n`` at the end
-of the command line, where ``-n`` takes an argument of any type).  Also,
-you can call :func:`OptionParser.error` to signal an application-defined error
-condition::
+Việc xử lý lỗi của người dùng quan trọng hơn nhiều, vì chúng chắc chắn sẽ xảy ra bất kể mã của bạn ổn định đến đâu.  :mod:`!optparse` có thể tự động phát hiện một số lỗi của người dùng, chẳng hạn như đối số tùy chọn không hợp lệ (truyền ``-n 4x`` trong khi ``-n`` nhận một đối số số nguyên), thiếu đối số (``-n`` ở cuối dòng lệnh, trong khi ``-n`` nhận đối số thuộc bất kỳ kiểu nào).  Ngoài ra, bạn có thể gọi :func:`OptionParser.error` để báo hiệu một điều kiện lỗi do ứng dụng xác định::
 
    (options, args) = parser.parse_args()
    ...
    if options.a and options.b:
        parser.error("options -a and -b are mutually exclusive")
 
-In either case, :mod:`!optparse` handles the error the same way: it prints the
-program's usage message and an error message to standard error and exits with
-error status 2.
+Trong cả hai trường hợp, :mod:`!optparse` xử lý lỗi theo cùng một cách: in thông báo cách sử dụng của chương trình và thông báo lỗi ra stderr rồi thoát với trạng thái lỗi 2.
 
-Consider the first example above, where the user passes ``4x`` to an option
-that takes an integer:
+Hãy xem xét ví dụ đầu tiên ở trên, trong đó người dùng truyền ``4x`` cho một tùy chọn yêu cầu số nguyên:
 
 .. code-block:: shell-session
 
@@ -849,7 +610,7 @@ that takes an integer:
 
    foo: error: option -n: invalid integer value: '4x'
 
-Or, where the user fails to pass a value at all:
+Hoặc trường hợp người dùng hoàn toàn không truyền giá trị nào:
 
 .. code-block:: shell-session
 
@@ -858,21 +619,18 @@ Or, where the user fails to pass a value at all:
 
    foo: error: -n option requires an argument
 
-:mod:`!optparse`\ -generated error messages take care always to mention the
-option involved in the error; be sure to do the same when calling
-:func:`OptionParser.error` from your application code.
+Các thông báo lỗi do :mod:`!optparse`\  tạo ra luôn đề cập đến tùy chọn liên quan đến lỗi; hãy đảm bảo bạn cũng làm như vậy khi gọi
+:func:`OptionParser.error` từ mã ứng dụng của mình.
 
-If :mod:`!optparse`'s default error-handling behaviour does not suit your needs,
-you'll need to subclass OptionParser and override its :meth:`~OptionParser.exit`
-and/or :meth:`~OptionParser.error` methods.
+Nếu hành vi xử lý lỗi mặc định của :mod:`!optparse` không phù hợp với nhu cầu của bạn, bạn sẽ cần tạo lớp con của OptionParser và ghi đè các phương thức :meth:`~OptionParser.exit` và/hoặc :meth:`~OptionParser.error` của nó.
 
 
 .. _optparse-putting-it-all-together:
 
-Putting it all together
-^^^^^^^^^^^^^^^^^^^^^^^
+Tổng hợp tất cả
+^^^^^^^^^^^^^^^
 
-Here's what :mod:`!optparse`\ -based scripts usually look like::
+Dưới đây là dạng thường thấy của các script dựa trên :mod:`!optparse`\ ::
 
    from optparse import OptionParser
    ...
@@ -899,90 +657,66 @@ Here's what :mod:`!optparse`\ -based scripts usually look like::
 
 .. _optparse-reference-guide:
 
-Reference Guide
----------------
+Hướng dẫn tham khảo
+-------------------
 
 
 .. _optparse-creating-parser:
 
-Creating the parser
-^^^^^^^^^^^^^^^^^^^
+Tạo parser
+^^^^^^^^^^
 
-The first step in using :mod:`!optparse` is to create an OptionParser instance.
+Bước đầu tiên khi sử dụng :mod:`!optparse` là tạo một instance OptionParser.
 
 .. class:: OptionParser(...)
 
-   The OptionParser constructor has no required arguments, but a number of
-   optional keyword arguments.  You should always pass them as keyword
-   arguments, i.e. do not rely on the order in which the arguments are declared.
+   Hàm khởi tạo OptionParser không có đối số bắt buộc, nhưng có một số đối số keyword tùy chọn. Bạn luôn nên truyền chúng dưới dạng đối số keyword, tức là không dựa vào thứ tự khai báo các đối số.
 
-   ``usage`` (default: ``"%prog [options]"``)
-      The usage summary to print when your program is run incorrectly or with a
-      help option.  When :mod:`!optparse` prints the usage string, it expands
-      ``%prog`` to ``os.path.basename(sys.argv[0])`` (or to ``prog`` if you
-      passed that keyword argument).  To suppress a usage message, pass the
-      special value :const:`optparse.SUPPRESS_USAGE`.
+   ``usage`` (mặc định: ``"%prog [options]"``)
+      Bản tóm tắt cách sử dụng sẽ được in khi chương trình của bạn được chạy không đúng cách hoặc với tùy chọn trợ giúp. Khi :mod:`!optparse` in chuỗi cách sử dụng, nó thay thế ``%prog`` bằng ``os.path.basename(sys.argv[0])`` (hoặc bằng ``prog`` nếu bạn đã truyền đối số keyword đó). Để tắt thông báo cách sử dụng, hãy truyền giá trị đặc biệt :const:`optparse.SUPPRESS_USAGE`.
 
-   ``option_list`` (default: ``[]``)
-      A list of Option objects to populate the parser with.  The options in
-      ``option_list`` are added after any options in ``standard_option_list`` (a
-      class attribute that may be set by OptionParser subclasses), but before
-      any version or help options. Deprecated; use :meth:`add_option` after
-      creating the parser instead.
+   ``option_list`` (mặc định: ``[]``)
+      Danh sách các đối tượng Option dùng để điền vào parser. Các tùy chọn trong ``option_list`` được thêm sau mọi tùy chọn trong ``standard_option_list`` (một thuộc tính lớp có thể được đặt bởi các lớp con của OptionParser), nhưng trước mọi tùy chọn phiên bản hoặc trợ giúp. Đã lỗi thời; thay vào đó, hãy sử dụng :meth:`add_option` sau khi tạo parser.
 
-   ``option_class`` (default: optparse.Option)
-      Class to use when adding options to the parser in :meth:`add_option`.
+   ``option_class`` (mặc định: optparse.Option)
+      Lớp được sử dụng khi thêm tùy chọn vào parser trong :meth:`add_option`.
 
-   ``version`` (default: ``None``)
-      A version string to print when the user supplies a version option. If you
-      supply a true value for ``version``, :mod:`!optparse` automatically adds a
-      version option with the single option string ``--version``.  The
-      substring ``%prog`` is expanded the same as for ``usage``.
+   ``version`` (mặc định: ``None``)
+      Chuỗi phiên bản sẽ được in khi người dùng cung cấp một tùy chọn phiên bản. Nếu cung cấp giá trị true cho ``version``, :mod:`!optparse` sẽ tự động thêm một tùy chọn phiên bản với chuỗi tùy chọn duy nhất là ``--version``. Chuỗi con ``%prog`` được mở rộng giống như đối với ``usage``.
 
-   ``conflict_handler`` (default: ``"error"``)
-      Specifies what to do when options with conflicting option strings are
-      added to the parser; see section
+   ``conflict_handler`` (mặc định: ``"error"``)
+      Chỉ định cần làm gì khi các tùy chọn có chuỗi tùy chọn xung đột được thêm vào parser; xem phần
       :ref:`optparse-conflicts-between-options`.
 
-   ``description`` (default: ``None``)
-      A paragraph of text giving a brief overview of your program.
-      :mod:`!optparse` reformats this paragraph to fit the current terminal width
-      and prints it when the user requests help (after ``usage``, but before the
-      list of options).
+   ``description`` (mặc định: ``None``)
+      Một đoạn văn bản cung cấp thông tin tổng quan ngắn gọn về chương trình của bạn.
+      :mod:`!optparse` định dạng lại đoạn văn này để phù hợp với chiều rộng terminal hiện tại và in đoạn văn đó khi người dùng yêu cầu trợ giúp (sau ``usage``, nhưng trước danh sách tùy chọn).
 
-   ``formatter`` (default: a new :class:`IndentedHelpFormatter`)
-      An instance of optparse.HelpFormatter that will be used for printing help
-      text.  :mod:`!optparse` provides two concrete classes for this purpose:
-      IndentedHelpFormatter and TitledHelpFormatter.
+   ``formatter`` (mặc định: một :class:`IndentedHelpFormatter` mới)
+      Một thực thể của optparse.HelpFormatter sẽ được dùng để in văn bản trợ giúp.  :mod:`!optparse` cung cấp hai lớp cụ thể cho mục đích này: IndentedHelpFormatter và TitledHelpFormatter.
 
-   ``add_help_option`` (default: ``True``)
-      If true, :mod:`!optparse` will add a help option (with option strings ``-h``
-      and ``--help``) to the parser.
+   ``add_help_option`` (mặc định: ``True``)
+      Nếu là true, :mod:`!optparse` sẽ thêm một tùy chọn trợ giúp (với các chuỗi tùy chọn ``-h`` và ``--help``) vào parser.
 
    ``prog``
-      The string to use when expanding ``%prog`` in ``usage`` and ``version``
-      instead of ``os.path.basename(sys.argv[0])``.
+      Chuỗi được sử dụng khi mở rộng ``%prog`` trong ``usage`` và ``version`` thay cho ``os.path.basename(sys.argv[0])``.
 
-   ``epilog`` (default: ``None``)
-      A paragraph of help text to print after the option help.
+   ``epilog`` (mặc định: ``None``)
+      Một đoạn văn bản trợ giúp sẽ được in sau phần trợ giúp về tùy chọn.
 
 .. _optparse-populating-parser:
 
-Populating the parser
-^^^^^^^^^^^^^^^^^^^^^
+Thêm tùy chọn vào parser
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-There are several ways to populate the parser with options.  The preferred way
-is by using :meth:`OptionParser.add_option`, as shown in section
-:ref:`optparse-tutorial`.  :meth:`add_option` can be called in one of two ways:
+Có một số cách để thêm các tùy chọn vào parser. Cách được ưu tiên là sử dụng :meth:`OptionParser.add_option`, như được trình bày trong phần
+:ref:`optparse-tutorial`. :meth:`add_option` có thể được gọi theo một trong hai cách:
 
-* pass it an Option instance (as returned by :func:`make_option`)
+* truyền cho nó một instance Option (như được trả về bởi :func:`make_option`)
 
-* pass it any combination of positional and keyword arguments that are
-  acceptable to :func:`make_option` (i.e., to the Option constructor), and it
-  will create the Option instance for you
+* truyền cho nó bất kỳ tổ hợp đối số vị trí và đối số từ khóa nào được :func:`make_option` chấp nhận (tức là được hàm khởi tạo Option chấp nhận), và nó sẽ tạo instance Option cho bạn
 
-The other alternative is to pass a list of pre-constructed Option instances to
-the OptionParser constructor, as in::
+Cách thay thế khác là truyền một danh sách các instance Option đã được tạo sẵn cho hàm khởi tạo OptionParser, như sau::
 
    option_list = [
        make_option("-f", "--filename",
@@ -992,262 +726,212 @@ the OptionParser constructor, as in::
        ]
    parser = OptionParser(option_list=option_list)
 
-(:func:`make_option` is a factory function for creating Option instances;
-currently it is an alias for the Option constructor.  A future version of
-:mod:`!optparse` may split Option into several classes, and :func:`make_option`
-will pick the right class to instantiate.  Do not instantiate Option directly.)
+(:func:`make_option` là một hàm factory dùng để tạo các instance Option; hiện tại nó là bí danh của hàm khởi tạo Option. Một phiên bản tương lai của
+:mod:`!optparse` có thể tách Option thành nhiều lớp, và :func:`make_option` sẽ chọn đúng lớp để khởi tạo. Không khởi tạo Option trực tiếp.)
 
 
 .. _optparse-defining-options:
 
-Defining options
-^^^^^^^^^^^^^^^^
+Định nghĩa các tùy chọn
+^^^^^^^^^^^^^^^^^^^^^^^
 
-Each Option instance represents a set of synonymous command-line option strings,
-e.g. ``-f`` and ``--file``.  You can specify any number of short or
-long option strings, but you must specify at least one overall option string.
+Mỗi instance Option đại diện cho một tập hợp các chuỗi tùy chọn dòng lệnh đồng nghĩa, chẳng hạn như ``-f`` và ``--file``. Bạn có thể chỉ định bao nhiêu chuỗi tùy chọn ngắn hoặc dài tùy ý, nhưng tổng thể phải chỉ định ít nhất một chuỗi tùy chọn.
 
-The canonical way to create an :class:`Option` instance is with the
-:meth:`add_option` method of :class:`OptionParser`.
+Cách chuẩn để tạo một instance :class:`Option` là sử dụng
+phương thức :meth:`add_option` của :class:`OptionParser`.
 
 .. method:: OptionParser.add_option(option)
             OptionParser.add_option(*opt_str, attr=value, ...)
 
-   To define an option with only a short option string::
+   Để định nghĩa một option chỉ có chuỗi tùy chọn ngắn::
 
       parser.add_option("-f", attr=value, ...)
 
-   And to define an option with only a long option string::
+   Và để định nghĩa một option chỉ có chuỗi tùy chọn dài::
 
       parser.add_option("--foo", attr=value, ...)
 
-   The keyword arguments define attributes of the new Option object.  The most
-   important option attribute is :attr:`~Option.action`, and it largely
-   determines which other attributes are relevant or required.  If you pass
-   irrelevant option attributes, or fail to pass required ones, :mod:`!optparse`
-   raises an :exc:`OptionError` exception explaining your mistake.
+   Các đối số từ khóa định nghĩa các thuộc tính của đối tượng Option mới. Thuộc tính option quan trọng nhất là :attr:`~Option.action`, và thuộc tính này phần lớn xác định những thuộc tính nào khác có liên quan hoặc bắt buộc. Nếu bạn truyền các thuộc tính option không liên quan, hoặc không truyền các thuộc tính bắt buộc, :mod:`!optparse` sẽ đưa ra một ngoại lệ :exc:`OptionError` giải thích lỗi của bạn.
 
-   An option's *action* determines what :mod:`!optparse` does when it encounters
-   this option on the command-line.  The standard option actions hard-coded into
-   :mod:`!optparse` are:
+   Thuộc tính *action* của một option xác định :mod:`!optparse` thực hiện gì khi gặp option này trên dòng lệnh. Các action option tiêu chuẩn được tích hợp sẵn vào
+   :mod:`!optparse` là:
 
    ``"store"``
-      store this option's argument (default)
+      lưu đối số của tùy chọn này (mặc định)
 
    ``"store_const"``
-      store a constant value, pre-set via :attr:`Option.const`
+      lưu một giá trị hằng số, được đặt trước qua :attr:`Option.const`
 
    ``"store_true"``
-      store ``True``
+      lưu ``True``
 
    ``"store_false"``
-      store ``False``
+      lưu ``False``
 
    ``"append"``
-      append this option's argument to a list
+      thêm đối số của tùy chọn này vào một danh sách
 
    ``"append_const"``
-      append a constant value to a list, pre-set via :attr:`Option.const`
+      thêm một giá trị hằng số vào danh sách, được đặt trước qua :attr:`Option.const`
 
    ``"count"``
-      increment a counter by one
+      tăng một bộ đếm lên một
 
    ``"callback"``
-      call a specified function
+      gọi một hàm được chỉ định
 
    ``"help"``
-      print a usage message including all options and the documentation for them
+      in thông báo hướng dẫn sử dụng bao gồm tất cả các tùy chọn và tài liệu về chúng
 
-   (If you don't supply an action, the default is ``"store"``.  For this action,
-   you may also supply :attr:`~Option.type` and :attr:`~Option.dest` option
-   attributes; see :ref:`optparse-standard-option-actions`.)
+   (Nếu bạn không cung cấp một hành động, mặc định là ``"store"``. Với hành động này, bạn cũng có thể cung cấp các thuộc tính tùy chọn :attr:`~Option.type` và :attr:`~Option.dest`; xem :ref:`optparse-standard-option-actions`.)
 
-As you can see, most actions involve storing or updating a value somewhere.
-:mod:`!optparse` always creates a special object for this, conventionally called
-``options``, which is an instance of :class:`optparse.Values`.
+Như bạn có thể thấy, hầu hết các hành động đều liên quan đến việc lưu trữ hoặc cập nhật một giá trị ở đâu đó.
+:mod:`!optparse` luôn tạo một đối tượng đặc biệt cho mục đích này, theo quy ước được gọi là ``options``, là một thể hiện của :class:`optparse.Values`.
 
 .. class:: Values
 
-   An object holding parsed argument names and values as attributes.
-   Normally created by calling when calling :meth:`OptionParser.parse_args`,
-   and can be overridden by a custom subclass passed to the *values* argument of
-   :meth:`OptionParser.parse_args` (as described in :ref:`optparse-parsing-arguments`).
+   Một đối tượng chứa tên và giá trị của các đối số đã được phân tích cú pháp dưới dạng các thuộc tính. Thông thường được tạo bằng cách gọi khi gọi :meth:`OptionParser.parse_args`, và có thể được ghi đè bằng một lớp con tùy chỉnh được truyền vào đối số *values* của
+   :meth:`OptionParser.parse_args` (như được mô tả trong :ref:`optparse-parsing-arguments`).
 
-Option
-arguments (and various other values) are stored as attributes of this object,
-according to the :attr:`~Option.dest` (destination) option attribute.
+Các đối số của tùy chọn (và nhiều giá trị khác) được lưu trữ dưới dạng các thuộc tính của đối tượng này, theo thuộc tính tùy chọn :attr:`~Option.dest` (đích đến).
 
-For example, when you call ::
+Ví dụ, khi bạn gọi::
 
    parser.parse_args()
 
-one of the first things :mod:`!optparse` does is create the ``options`` object::
+một trong những việc đầu tiên :mod:`!optparse` thực hiện là tạo đối tượng ``options``::
 
    options = Values()
 
-If one of the options in this parser is defined with ::
+Nếu một trong các tùy chọn trong parser này được định nghĩa bằng::
 
    parser.add_option("-f", "--file", action="store", type="string", dest="filename")
 
-and the command-line being parsed includes any of the following::
+và dòng lệnh đang được phân tích cú pháp bao gồm bất kỳ dòng nào sau đây::
 
    -ffoo
    -f foo
    --file=foo
    --file foo
 
-then :mod:`!optparse`, on seeing this option, will do the equivalent of ::
+thì :mod:`!optparse`, khi gặp tùy chọn này, sẽ thực hiện thao tác tương đương với::
 
    options.filename = "foo"
 
-The :attr:`~Option.type` and :attr:`~Option.dest` option attributes are almost
-as important as :attr:`~Option.action`, but :attr:`~Option.action` is the only
-one that makes sense for *all* options.
+Các thuộc tính tùy chọn :attr:`~Option.type` và :attr:`~Option.dest` gần như quan trọng không kém :attr:`~Option.action`, nhưng :attr:`~Option.action` là thuộc tính duy nhất có ý nghĩa đối với các tùy chọn *all*.
 
 
 .. _optparse-option-attributes:
 
-Option attributes
-^^^^^^^^^^^^^^^^^
+Các thuộc tính tùy chọn
+^^^^^^^^^^^^^^^^^^^^^^^
 
 .. class:: Option
 
-   A single command line argument,
-   with various attributes passed by keyword to the constructor.
-   Normally created with :meth:`OptionParser.add_option` rather than directly,
-   and can be overridden by a custom class via the *option_class* argument
-   to :class:`OptionParser`.
+   Một đối số dòng lệnh duy nhất, với nhiều thuộc tính khác nhau được truyền dưới dạng keyword cho constructor. Thông thường được tạo bằng :meth:`OptionParser.add_option` thay vì tạo trực tiếp, và có thể được ghi đè bằng một class tùy chỉnh thông qua đối số *option_class* của :class:`OptionParser`.
 
-The following option attributes may be passed as keyword arguments to
-:meth:`OptionParser.add_option`.  If you pass an option attribute that is not
-relevant to a particular option, or fail to pass a required option attribute,
-:mod:`!optparse` raises :exc:`OptionError`.
+Có thể truyền các thuộc tính tùy chọn sau dưới dạng keyword arguments cho
+:meth:`OptionParser.add_option`. Nếu bạn truyền một thuộc tính tùy chọn không liên quan đến một tùy chọn cụ thể hoặc không truyền một thuộc tính tùy chọn bắt buộc,
+:mod:`!optparse` sẽ raise :exc:`OptionError`.
 
 .. attribute:: Option.action
 
-   (default: ``"store"``)
+   (mặc định: ``"store"``)
 
-   Determines :mod:`!optparse`'s behaviour when this option is seen on the
-   command line; the available options are documented :ref:`here
-   <optparse-standard-option-actions>`.
+   Xác định hành vi của :mod:`!optparse` khi tùy chọn này xuất hiện trên dòng lệnh; các tùy chọn có sẵn được ghi lại :ref:`tại đây <optparse-standard-option-actions>`.
 
 .. attribute:: Option.type
 
-   (default: ``"string"``)
+   (mặc định: ``"string"``)
 
-   The argument type expected by this option (e.g., ``"string"`` or ``"int"``);
-   the available option types are documented :ref:`here
-   <optparse-standard-option-types>`.
+   Kiểu đối số mà tùy chọn này yêu cầu (ví dụ: ``"string"`` hoặc ``"int"``); các kiểu tùy chọn có sẵn được ghi lại :ref:`tại đây <optparse-standard-option-types>`.
 
 .. attribute:: Option.dest
 
-   (default: derived from option strings)
+   (mặc định: được suy ra từ các chuỗi tùy chọn)
 
-   If the option's action implies writing or modifying a value somewhere, this
-   tells :mod:`!optparse` where to write it: :attr:`~Option.dest` names an
-   attribute of the ``options`` object that :mod:`!optparse` builds as it parses
-   the command line.
+   Nếu hành động của tùy chọn ngụ ý việc ghi hoặc sửa đổi một giá trị ở đâu đó, tùy chọn này cho :mod:`!optparse` biết nơi ghi giá trị đó: :attr:`~Option.dest` chỉ định một thuộc tính của đối tượng ``options`` mà :mod:`!optparse` tạo ra trong quá trình phân tích dòng lệnh.
 
 .. attribute:: Option.default
 
-   The value to use for this option's destination if the option is not seen on
-   the command line.  See also :meth:`OptionParser.set_defaults`.
+   Giá trị dùng cho đích của tùy chọn này nếu tùy chọn không xuất hiện trên dòng lệnh. Xem thêm :meth:`OptionParser.set_defaults`.
 
 .. attribute:: Option.nargs
 
-   (default: 1)
+   (mặc định: 1)
 
-   How many arguments of type :attr:`~Option.type` should be consumed when this
-   option is seen.  If > 1, :mod:`!optparse` will store a tuple of values to
+   Cần sử dụng bao nhiêu đối số có kiểu :attr:`~Option.type` khi gặp tùy chọn này. Nếu > 1, :mod:`!optparse` sẽ lưu một tuple các giá trị vào
    :attr:`~Option.dest`.
 
 .. attribute:: Option.const
 
-   For actions that store a constant value, the constant value to store.
+   Đối với các action lưu trữ một giá trị hằng, giá trị hằng cần lưu trữ.
 
 .. attribute:: Option.choices
 
-   For options of type ``"choice"``, the list of strings the user may choose
-   from.
+   Đối với các tùy chọn có kiểu ``"choice"``, danh sách các chuỗi mà người dùng có thể chọn.
 
 .. attribute:: Option.callback
 
-   For options with action ``"callback"``, the callable to call when this option
-   is seen.  See section :ref:`optparse-option-callbacks` for detail on the
-   arguments passed to the callable.
+   Đối với các tùy chọn có action ``"callback"``, callable cần gọi khi gặp tùy chọn này. Xem phần :ref:`optparse-option-callbacks` để biết chi tiết về các đối số được truyền cho callable.
 
 .. attribute:: Option.callback_args
                Option.callback_kwargs
 
-   Additional positional and keyword arguments to pass to ``callback`` after the
-   four standard callback arguments.
+   Các đối số vị trí và đối số từ khóa bổ sung cần truyền cho ``callback`` sau bốn đối số callback tiêu chuẩn.
 
 .. attribute:: Option.help
 
-   Help text to print for this option when listing all available options after
-   the user supplies a :attr:`~Option.help` option (such as ``--help``).  If
-   no help text is supplied, the option will be listed without help text.  To
-   hide this option, use the special value :const:`optparse.SUPPRESS_HELP`.
+   Văn bản trợ giúp cần in cho tùy chọn này khi liệt kê tất cả các tùy chọn có sẵn sau khi người dùng cung cấp tùy chọn :attr:`~Option.help` (chẳng hạn như ``--help``). Nếu không cung cấp văn bản trợ giúp, tùy chọn sẽ được liệt kê mà không có văn bản trợ giúp. Để ẩn tùy chọn này, hãy sử dụng giá trị đặc biệt :const:`optparse.SUPPRESS_HELP`.
 
 .. attribute:: Option.metavar
 
-   (default: derived from option strings)
+   (mặc định: được suy ra từ các chuỗi tùy chọn)
 
-   Stand-in for the option argument(s) to use when printing help text.  See
-   section :ref:`optparse-tutorial` for an example.
+   Giá trị thay thế cho (các) đối số option được sử dụng khi in văn bản trợ giúp. Xem phần :ref:`optparse-tutorial` để biết ví dụ.
 
 
 .. _optparse-standard-option-actions:
 
-Standard option actions
-^^^^^^^^^^^^^^^^^^^^^^^
+Các action option tiêu chuẩn
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The various option actions all have slightly different requirements and effects.
-Most actions have several relevant option attributes which you may specify to
-guide :mod:`!optparse`'s behaviour; a few have required attributes, which you
-must specify for any option using that action.
+Các action option khác nhau có những yêu cầu và hiệu ứng hơi khác nhau. Hầu hết action đều có một số thuộc tính option liên quan mà bạn có thể chỉ định để định hướng hành vi của :mod:`!optparse`; một số ít có các thuộc tính bắt buộc, và bạn phải chỉ định chúng cho mọi option sử dụng action đó.
 
-* ``"store"`` [relevant: :attr:`~Option.type`, :attr:`~Option.dest`,
+* ``"store"`` [liên quan: :attr:`~Option.type`, :attr:`~Option.dest`,
   :attr:`~Option.nargs`, :attr:`~Option.choices`]
 
-  The option must be followed by an argument, which is converted to a value
-  according to :attr:`~Option.type` and stored in :attr:`~Option.dest`.  If
-  :attr:`~Option.nargs` > 1, multiple arguments will be consumed from the
-  command line; all will be converted according to :attr:`~Option.type` and
-  stored to :attr:`~Option.dest` as a tuple.  See the
-  :ref:`optparse-standard-option-types` section.
+  Option phải được theo sau bởi một đối số, đối số này được chuyển đổi thành một giá trị theo :attr:`~Option.type` và được lưu trong :attr:`~Option.dest`. Nếu
+  :attr:`~Option.nargs` > 1, nhiều đối số sẽ được lấy từ dòng lệnh; tất cả sẽ được chuyển đổi theo :attr:`~Option.type` và được lưu vào :attr:`~Option.dest` dưới dạng một tuple. Xem
+  phần :ref:`optparse-standard-option-types`.
 
-  If :attr:`~Option.choices` is supplied (a list or tuple of strings), the type
-  defaults to ``"choice"``.
+  Nếu :attr:`~Option.choices` được cung cấp (một list hoặc tuple các chuỗi), kiểu sẽ mặc định là ``"choice"``.
 
-  If :attr:`~Option.type` is not supplied, it defaults to ``"string"``.
+  Nếu :attr:`~Option.type` không được cung cấp, giá trị mặc định là ``"string"``.
 
-  If :attr:`~Option.dest` is not supplied, :mod:`!optparse` derives a destination
-  from the first long option string (e.g., ``--foo-bar`` implies
-  ``foo_bar``). If there are no long option strings, :mod:`!optparse` derives a
-  destination from the first short option string (e.g., ``-f`` implies ``f``).
+  Nếu :attr:`~Option.dest` không được cung cấp, :mod:`!optparse` sẽ suy ra đích từ chuỗi tùy chọn dài đầu tiên (ví dụ: ``--foo-bar`` ngụ ý ``foo_bar``). Nếu không có chuỗi tùy chọn dài nào, :mod:`!optparse` sẽ suy ra đích từ chuỗi tùy chọn ngắn đầu tiên (ví dụ: ``-f`` ngụ ý ``f``).
 
-  Example::
+  Ví dụ::
 
      parser.add_option("-f")
      parser.add_option("-p", type="float", nargs=3, dest="point")
 
-  As it parses the command line ::
+  Khi phân tích dòng lệnh::
 
      -f foo.txt -p 1 -3.5 4 -fbar.txt
 
-  :mod:`!optparse` will set ::
+  :mod:`!optparse` sẽ thiết lập::
 
      options.f = "foo.txt"
      options.point = (1.0, -3.5, 4.0)
      options.f = "bar.txt"
 
-* ``"store_const"`` [required: :attr:`~Option.const`; relevant:
+* ``"store_const"`` [bắt buộc: :attr:`~Option.const`; liên quan:
   :attr:`~Option.dest`]
 
-  The value :attr:`~Option.const` is stored in :attr:`~Option.dest`.
+  Giá trị :attr:`~Option.const` được lưu trong :attr:`~Option.dest`.
 
-  Example::
+  Ví dụ::
 
      parser.add_option("-q", "--quiet",
                        action="store_const", const=0, dest="verbose")
@@ -1256,120 +940,100 @@ must specify for any option using that action.
      parser.add_option("--noisy",
                        action="store_const", const=2, dest="verbose")
 
-  If ``--noisy`` is seen, :mod:`!optparse` will set  ::
+  Nếu thấy ``--noisy``, :mod:`!optparse` sẽ đặt::
 
      options.verbose = 2
 
-* ``"store_true"`` [relevant: :attr:`~Option.dest`]
+* ``"store_true"`` [liên quan: :attr:`~Option.dest`]
 
-  A special case of ``"store_const"`` that stores ``True`` to
+  Trường hợp đặc biệt của ``"store_const"`` lưu ``True`` vào
   :attr:`~Option.dest`.
 
-* ``"store_false"`` [relevant: :attr:`~Option.dest`]
+* ``"store_false"`` [liên quan: :attr:`~Option.dest`]
 
-  Like ``"store_true"``, but stores ``False``.
+  Giống ``"store_true"``, nhưng lưu trữ ``False``.
 
-  Example::
+  Ví dụ::
 
      parser.add_option("--clobber", action="store_true", dest="clobber")
      parser.add_option("--no-clobber", action="store_false", dest="clobber")
 
-* ``"append"`` [relevant: :attr:`~Option.type`, :attr:`~Option.dest`,
+* ``"append"`` [liên quan: :attr:`~Option.type`, :attr:`~Option.dest`,
   :attr:`~Option.nargs`, :attr:`~Option.choices`]
 
-  The option must be followed by an argument, which is appended to the list in
-  :attr:`~Option.dest`.  If no default value for :attr:`~Option.dest` is
-  supplied, an empty list is automatically created when :mod:`!optparse` first
-  encounters this option on the command-line.  If :attr:`~Option.nargs` > 1,
-  multiple arguments are consumed, and a tuple of length :attr:`~Option.nargs`
-  is appended to :attr:`~Option.dest`.
+  Tùy chọn phải được theo sau bởi một đối số, đối số này được thêm vào danh sách trong
+  :attr:`~Option.dest`.  Nếu không cung cấp giá trị mặc định cho :attr:`~Option.dest`, một danh sách rỗng sẽ tự động được tạo khi :mod:`!optparse` lần đầu gặp tùy chọn này trên dòng lệnh.  Nếu :attr:`~Option.nargs` > 1, nhiều đối số sẽ được xử lý và một tuple có độ dài :attr:`~Option.nargs` sẽ được thêm vào :attr:`~Option.dest`.
 
-  The defaults for :attr:`~Option.type` and :attr:`~Option.dest` are the same as
-  for the ``"store"`` action.
+  Giá trị mặc định của :attr:`~Option.type` và :attr:`~Option.dest` giống với giá trị mặc định của action ``"store"``.
 
-  Example::
+  Ví dụ::
 
      parser.add_option("-t", "--tracks", action="append", type="int")
 
-  If ``-t3`` is seen on the command-line, :mod:`!optparse` does the equivalent
-  of::
+  Nếu ``-t3`` xuất hiện trên dòng lệnh, :mod:`!optparse` thực hiện tương đương với::
 
      options.tracks = []
      options.tracks.append(int("3"))
 
-  If, a little later on, ``--tracks=4`` is seen, it does::
+  Nếu sau đó một chút ``--tracks=4`` xuất hiện, nó sẽ thực hiện::
 
      options.tracks.append(int("4"))
 
-  The ``append`` action calls the ``append`` method on the current value of the
-  option.  This means that any default value specified must have an ``append``
-  method.  It also means that if the default value is non-empty, the default
-  elements will be present in the parsed value for the option, with any values
-  from the command line appended after those default values::
+  Action ``append`` gọi phương thức ``append`` trên giá trị hiện tại của option. Điều này có nghĩa là mọi giá trị mặc định được chỉ định đều phải có phương thức ``append``. Điều đó cũng có nghĩa là nếu giá trị mặc định không rỗng, các phần tử mặc định sẽ xuất hiện trong giá trị đã phân tích của option, với mọi giá trị từ dòng lệnh được nối thêm sau các giá trị mặc định đó::
 
      >>> parser.add_option("--files", action="append", default=['~/.mypkg/defaults'])
      >>> opts, args = parser.parse_args(['--files', 'overrides.mypkg'])
      >>> opts.files
      ['~/.mypkg/defaults', 'overrides.mypkg']
 
-* ``"append_const"`` [required: :attr:`~Option.const`; relevant:
+* ``"append_const"`` [bắt buộc: :attr:`~Option.const`; liên quan:
   :attr:`~Option.dest`]
 
-  Like ``"store_const"``, but the value :attr:`~Option.const` is appended to
-  :attr:`~Option.dest`; as with ``"append"``, :attr:`~Option.dest` defaults to
-  ``None``, and an empty list is automatically created the first time the option
-  is encountered.
+  Tương tự ``"store_const"``, nhưng giá trị :attr:`~Option.const` được nối thêm vào
+  :attr:`~Option.dest`; như với ``"append"``, :attr:`~Option.dest` mặc định là ``None``, và một danh sách rỗng sẽ được tự động tạo vào lần đầu tiên option được gặp.
 
-* ``"count"`` [relevant: :attr:`~Option.dest`]
+* ``"count"`` [liên quan: :attr:`~Option.dest`]
 
-  Increment the integer stored at :attr:`~Option.dest`.  If no default value is
-  supplied, :attr:`~Option.dest` is set to zero before being incremented the
-  first time.
+  Tăng số nguyên được lưu trong :attr:`~Option.dest`. Nếu không cung cấp giá trị mặc định, :attr:`~Option.dest` được đặt thành 0 trước khi được tăng lần đầu.
 
-  Example::
+  Ví dụ::
 
      parser.add_option("-v", action="count", dest="verbosity")
 
-  The first time ``-v`` is seen on the command line, :mod:`!optparse` does the
-  equivalent of::
+  Lần đầu tiên ``-v`` xuất hiện trên dòng lệnh, :mod:`!optparse` thực hiện tương đương với::
 
      options.verbosity = 0
      options.verbosity += 1
 
-  Every subsequent occurrence of ``-v`` results in  ::
+  Mỗi lần xuất hiện tiếp theo của ``-v`` sẽ dẫn đến::
 
      options.verbosity += 1
 
-* ``"callback"`` [required: :attr:`~Option.callback`; relevant:
+* ``"callback"`` [bắt buộc: :attr:`~Option.callback`; liên quan:
   :attr:`~Option.type`, :attr:`~Option.nargs`, :attr:`~Option.callback_args`,
   :attr:`~Option.callback_kwargs`]
 
-  Call the function specified by :attr:`~Option.callback`, which is called as ::
+  Gọi hàm được chỉ định bởi :attr:`~Option.callback`, hàm này được gọi như sau::
 
      func(option, opt_str, value, parser, *args, **kwargs)
 
-  See section :ref:`optparse-option-callbacks` for more detail.
+  Xem phần :ref:`optparse-option-callbacks` để biết thêm chi tiết.
 
 * ``"help"``
 
-  Prints a complete help message for all the options in the current option
-  parser.  The help message is constructed from the ``usage`` string passed to
-  OptionParser's constructor and the :attr:`~Option.help` string passed to every
-  option.
+  In một thông báo trợ giúp hoàn chỉnh cho tất cả các tùy chọn trong option parser hiện tại. Thông báo trợ giúp được tạo từ chuỗi ``usage`` được truyền vào hàm khởi tạo của OptionParser và chuỗi :attr:`~Option.help` được truyền vào mọi tùy chọn.
 
-  If no :attr:`~Option.help` string is supplied for an option, it will still be
-  listed in the help message.  To omit an option entirely, use the special value
+  Nếu không cung cấp chuỗi :attr:`~Option.help` cho một tùy chọn, tùy chọn đó vẫn sẽ được liệt kê trong thông báo trợ giúp. Để loại bỏ hoàn toàn một tùy chọn, hãy sử dụng giá trị đặc biệt
   :const:`optparse.SUPPRESS_HELP`.
 
-  :mod:`!optparse` automatically adds a :attr:`~Option.help` option to all
-  OptionParsers, so you do not normally need to create one.
+  :mod:`!optparse` tự động thêm tùy chọn :attr:`~Option.help` vào tất cả OptionParser, vì vậy thông thường bạn không cần tạo một tùy chọn như vậy.
 
-  Example::
+  Ví dụ::
 
      from optparse import OptionParser, SUPPRESS_HELP
 
-     # usually, a help option is added automatically, but that can
-     # be suppressed using the add_help_option argument
+     # thông thường, một tùy chọn trợ giúp được tự động thêm vào, nhưng có thể
+     # tắt tùy chọn này bằng cách sử dụng đối số add_help_option
      parser = OptionParser(add_help_option=False)
 
      parser.add_option("-h", "--help", action="help")
@@ -1379,9 +1043,7 @@ must specify for any option using that action.
                        help="Input file to read data from")
      parser.add_option("--secret", help=SUPPRESS_HELP)
 
-  If :mod:`!optparse` sees either ``-h`` or ``--help`` on the command line,
-  it will print something like the following help message to stdout (assuming
-  ``sys.argv[0]`` is ``"foo.py"``):
+  Nếu :mod:`!optparse` phát hiện ``-h`` hoặc ``--help`` trên dòng lệnh, nó sẽ in một thông báo trợ giúp tương tự như sau ra stdout (giả sử ``sys.argv[0]`` là ``"foo.py"``):
 
   .. code-block:: text
 
@@ -1392,213 +1054,165 @@ must specify for any option using that action.
        -v                Be moderately verbose
        --file=FILENAME   Input file to read data from
 
-  After printing the help message, :mod:`!optparse` terminates your process with
-  ``sys.exit(0)``.
+  Sau khi in thông báo trợ giúp, :mod:`!optparse` kết thúc tiến trình của bạn với ``sys.exit(0)``.
 
 * ``"version"``
 
-  Prints the version number supplied to the OptionParser to stdout and exits.
-  The version number is actually formatted and printed by the
-  ``print_version()`` method of OptionParser.  Generally only relevant if the
-  ``version`` argument is supplied to the OptionParser constructor.  As with
-  :attr:`~Option.help` options, you will rarely create ``version`` options,
-  since :mod:`!optparse` automatically adds them when needed.
+  In số phiên bản được cung cấp cho OptionParser ra stdout rồi thoát. Số phiên bản thực sự được định dạng và in bởi phương thức ``print_version()`` của OptionParser.  Thường chỉ liên quan nếu đối số ``version`` được cung cấp cho hàm khởi tạo OptionParser.  Cũng như
+  các tùy chọn :attr:`~Option.help`, bạn sẽ hiếm khi tạo các tùy chọn ``version``, vì :mod:`!optparse` tự động thêm chúng khi cần.
 
 
 .. _optparse-standard-option-types:
 
-Standard option types
-^^^^^^^^^^^^^^^^^^^^^
+Các kiểu tùy chọn tiêu chuẩn
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-:mod:`!optparse` has five built-in option types: ``"string"``, ``"int"``,
-``"choice"``, ``"float"`` and ``"complex"``.  If you need to add new
-option types, see section :ref:`optparse-extending-optparse`.
+:mod:`!optparse` có năm kiểu tùy chọn tích hợp sẵn: ``"string"``, ``"int"``, ``"choice"``, ``"float"`` và ``"complex"``.  Nếu cần thêm các kiểu tùy chọn mới, hãy xem phần :ref:`optparse-extending-optparse`.
 
-Arguments to string options are not checked or converted in any way: the text on
-the command line is stored in the destination (or passed to the callback) as-is.
+Các đối số của tùy chọn chuỗi không được kiểm tra hoặc chuyển đổi theo bất kỳ cách nào: văn bản trên dòng lệnh được lưu nguyên trạng vào đích (hoặc được truyền cho callback).
 
-Integer arguments (type ``"int"``) are parsed as follows:
+Các đối số số nguyên (kiểu ``"int"``) được phân tích như sau:
 
-* if the number starts with ``0x``, it is parsed as a hexadecimal number
+* nếu số bắt đầu bằng ``0x``, nó được phân tích thành số thập lục phân
 
-* if the number starts with ``0``, it is parsed as an octal number
+* nếu số bắt đầu bằng ``0``, nó được phân tích thành số bát phân
 
-* if the number starts with ``0b``, it is parsed as a binary number
+* nếu số bắt đầu bằng ``0b``, nó được phân tích thành số nhị phân
 
-* otherwise, the number is parsed as a decimal number
+* nếu không, số được phân tích thành số thập phân
 
 
-The conversion is done by calling :func:`int` with the appropriate base (2, 8,
-10, or 16).  If this fails, so will :mod:`!optparse`, although with a more useful
-error message.
+Việc chuyển đổi được thực hiện bằng cách gọi :func:`int` với cơ số tương ứng (2, 8, 10 hoặc 16). Nếu thao tác này thất bại thì :mod:`!optparse` cũng sẽ thất bại, mặc dù với thông báo lỗi hữu ích hơn.
 
-``"float"`` and ``"complex"`` option arguments are converted directly with
-:func:`float` and :func:`complex`, with similar error-handling.
+Các đối số tùy chọn ``"float"`` và ``"complex"`` được chuyển đổi trực tiếp bằng
+:func:`float` và :func:`complex`, với cách xử lý lỗi tương tự.
 
-``"choice"`` options are a subtype of ``"string"`` options.  The
-:attr:`~Option.choices` option attribute (a sequence of strings) defines the
-set of allowed option arguments.  :func:`optparse.check_choice` compares
-user-supplied option arguments against this master list and raises
-:exc:`OptionValueError` if an invalid string is given.
+``"choice"`` tùy chọn là một kiểu con của ``"string"`` tùy chọn.  The
+Thuộc tính option :attr:`~Option.choices` (một dãy chuỗi) xác định tập hợp các đối số tùy chọn được phép.  :func:`optparse.check_choice` so sánh các đối số tùy chọn do người dùng cung cấp với danh sách chuẩn này và phát sinh
+:exc:`OptionValueError` nếu một chuỗi không hợp lệ được cung cấp.
 
 
 .. _optparse-parsing-arguments:
 
-Parsing arguments
-^^^^^^^^^^^^^^^^^
+Phân tích cú pháp đối số
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-The whole point of creating and populating an OptionParser is to call its
-:meth:`~OptionParser.parse_args` method.
+Mục đích chính của việc tạo và điền dữ liệu cho một OptionParser là gọi
+phương thức :meth:`~OptionParser.parse_args` của nó.
 
 .. method:: OptionParser.parse_args(args=None, values=None)
 
-   Parse the command-line options found in *args*.
+   Phân tích các tùy chọn dòng lệnh được tìm thấy trong *args*.
 
-   The input parameters are
+   Các tham số đầu vào là
 
    ``args``
-      the list of arguments to process (default: ``sys.argv[1:]``)
+      danh sách các đối số cần xử lý (mặc định: ``sys.argv[1:]``)
 
    ``values``
-      a :class:`Values` object to store option arguments in (default: a
-      new instance of :class:`Values`) -- if you give an existing object, the
-      option defaults will not be initialized on it
+      một đối tượng :class:`Values` để lưu trữ các đối số tùy chọn (mặc định: một instance mới của :class:`Values`) -- nếu bạn cung cấp một đối tượng hiện có, các giá trị mặc định của tùy chọn sẽ không được khởi tạo trên đối tượng đó
 
-   and the return value is a pair ``(options, args)`` where
+   và giá trị trả về là một cặp ``(options, args)`` trong đó
 
    ``options``
-      the same object that was passed in as *values*, or the ``optparse.Values``
-      instance created by :mod:`!optparse`
+      chính đối tượng đã được truyền vào dưới dạng *values*, hoặc instance ``optparse.Values`` được tạo bởi :mod:`!optparse`
 
    ``args``
-      the leftover positional arguments after all options have been processed
+      các đối số vị trí còn lại sau khi tất cả tùy chọn đã được xử lý
 
-The most common usage is to supply neither keyword argument.  If you supply
-``values``, it will be modified with repeated :func:`setattr` calls (roughly one
-for every option argument stored to an option destination) and returned by
+Cách sử dụng phổ biến nhất là không cung cấp đối số từ khóa nào. Nếu bạn cung cấp ``values``, đối tượng đó sẽ được sửa đổi bằng các lần gọi :func:`setattr` lặp lại (gần như một lần cho mỗi đối số tùy chọn được lưu vào một đích tùy chọn) và được trả về bởi
 :meth:`~OptionParser.parse_args`.
 
-If :meth:`~OptionParser.parse_args` encounters any errors in the argument list, it calls the
-OptionParser's :meth:`error` method with an appropriate end-user error message.
-This ultimately terminates your process with an exit status of 2 (the
-traditional Unix exit status for command-line errors).
+Nếu :meth:`~OptionParser.parse_args` gặp bất kỳ lỗi nào trong danh sách đối số, nó sẽ gọi phương thức :meth:`error` của OptionParser cùng với thông báo lỗi phù hợp cho người dùng cuối. Cuối cùng, thao tác này sẽ kết thúc tiến trình của bạn với trạng thái thoát là 2 (trạng thái thoát Unix truyền thống cho các lỗi dòng lệnh).
 
 
 .. _optparse-querying-manipulating-option-parser:
 
-Querying and manipulating your option parser
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Truy vấn và thao tác với option parser của bạn
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The default behavior of the option parser can be customized slightly, and you
-can also poke around your option parser and see what's there.  OptionParser
-provides several methods to help you out:
+Bạn có thể tùy chỉnh đôi chút hành vi mặc định của option parser, đồng thời kiểm tra option parser để xem nó chứa những gì. OptionParser cung cấp một số phương thức giúp bạn thực hiện việc này:
 
 .. method:: OptionParser.disable_interspersed_args()
 
-   Set parsing to stop on the first non-option.  For example, if ``-a`` and
-   ``-b`` are both simple options that take no arguments, :mod:`!optparse`
-   normally accepts this syntax::
+   Đặt chế độ phân tích cú pháp dừng ở tùy chọn không phải option đầu tiên. Ví dụ, nếu ``-a`` và ``-b`` đều là các tùy chọn đơn giản không nhận đối số, :mod:`!optparse` thường chấp nhận cú pháp này::
 
       prog -a arg1 -b arg2
 
-   and treats it as equivalent to  ::
+   và xử lý nó tương đương với::
 
       prog -a -b arg1 arg2
 
-   To disable this feature, call :meth:`disable_interspersed_args`.  This
-   restores traditional Unix syntax, where option parsing stops with the first
-   non-option argument.
+   Để tắt tính năng này, hãy gọi :meth:`disable_interspersed_args`. Thao tác này khôi phục cú pháp Unix truyền thống, trong đó việc phân tích cú pháp tùy chọn sẽ dừng ở đối số đầu tiên không phải option.
 
-   Use this if you have a command processor which runs another command which has
-   options of its own and you want to make sure these options don't get
-   confused.  For example, each command might have a different set of options.
+   Hãy sử dụng cách này nếu bạn có một command processor chạy một command khác có các tùy chọn riêng và muốn đảm bảo những tùy chọn này không bị nhầm lẫn. Ví dụ: mỗi command có thể có một tập tùy chọn khác nhau.
 
 .. method:: OptionParser.enable_interspersed_args()
 
-   Set parsing to not stop on the first non-option, allowing interspersing
-   switches with command arguments.  This is the default behavior.
+   Đặt chế độ phân tích cú pháp để không dừng ở đối số đầu tiên không phải option, cho phép xen kẽ các switch với các đối số lệnh. Đây là hành vi mặc định.
 
 .. method:: OptionParser.get_option(opt_str)
 
-   Returns the Option instance with the option string *opt_str*, or ``None`` if
-   no options have that option string.
+   Trả về thực thể Option có option string *opt_str*, hoặc ``None`` nếu không có option nào có option string đó.
 
 .. method:: OptionParser.has_option(opt_str)
 
-   Return ``True`` if the OptionParser has an option with option string *opt_str*
-   (e.g., ``-q`` or ``--verbose``).
+   Trả về ``True`` nếu OptionParser có option với option string *opt_str* (ví dụ: ``-q`` hoặc ``--verbose``).
 
 .. method:: OptionParser.remove_option(opt_str)
 
-   If the :class:`OptionParser` has an option corresponding to *opt_str*, that
-   option is removed.  If that option provided any other option strings, all of
-   those option strings become invalid. If *opt_str* does not occur in any
-   option belonging to this :class:`OptionParser`, raises :exc:`ValueError`.
+   Nếu :class:`OptionParser` có option tương ứng với *opt_str*, option đó sẽ bị xóa. Nếu option đó cung cấp bất kỳ option string nào khác, tất cả các option string đó sẽ trở nên không hợp lệ. Nếu *opt_str* không xuất hiện trong bất kỳ option nào thuộc :class:`OptionParser`, sẽ phát sinh :exc:`ValueError`.
 
 
 .. _optparse-conflicts-between-options:
 
-Conflicts between options
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Xung đột giữa các option
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you're not careful, it's easy to define options with conflicting option
-strings::
+Nếu không cẩn thận, bạn rất dễ định nghĩa các option có option string xung đột với nhau::
 
    parser.add_option("-n", "--dry-run", ...)
    ...
    parser.add_option("-n", "--noisy", ...)
 
-(This is particularly true if you've defined your own OptionParser subclass with
-some standard options.)
+(Điều này đặc biệt đúng nếu bạn đã định nghĩa lớp con OptionParser của riêng mình cùng một số option tiêu chuẩn.)
 
-Every time you add an option, :mod:`!optparse` checks for conflicts with existing
-options.  If it finds any, it invokes the current conflict-handling mechanism.
-You can set the conflict-handling mechanism either in the constructor::
+Mỗi khi bạn thêm một option, :mod:`!optparse` sẽ kiểm tra xung đột với các option hiện có. Nếu phát hiện xung đột, nó sẽ gọi cơ chế xử lý xung đột hiện tại. Bạn có thể thiết lập cơ chế xử lý xung đột trong constructor::
 
    parser = OptionParser(..., conflict_handler=handler)
 
-or with a separate call::
+hoặc bằng một lệnh gọi riêng::
 
    parser.set_conflict_handler(handler)
 
-The available conflict handlers are:
+Các trình xử lý xung đột hiện có là:
 
-   ``"error"`` (default)
-      assume option conflicts are a programming error and raise
+   ``"error"`` (mặc định)
+      giả định xung đột giữa các option là lỗi lập trình và raise
       :exc:`OptionConflictError`
 
    ``"resolve"``
-      resolve option conflicts intelligently (see below)
+      giải quyết xung đột giữa các option một cách thông minh (xem bên dưới)
 
 
-As an example, let's define an :class:`OptionParser` that resolves conflicts
-intelligently and add conflicting options to it::
+Ví dụ, hãy định nghĩa một :class:`OptionParser` có khả năng giải quyết xung đột một cách thông minh và thêm các option xung đột vào đó::
 
    parser = OptionParser(conflict_handler="resolve")
    parser.add_option("-n", "--dry-run", ..., help="do no harm")
    parser.add_option("-n", "--noisy", ..., help="be noisy")
 
-At this point, :mod:`!optparse` detects that a previously added option is already
-using the ``-n`` option string.  Since ``conflict_handler`` is ``"resolve"``,
-it resolves the situation by removing ``-n`` from the earlier option's list of
-option strings.  Now ``--dry-run`` is the only way for the user to activate
-that option.  If the user asks for help, the help message will reflect that::
+Tại thời điểm này, :mod:`!optparse` phát hiện rằng một tùy chọn đã được thêm trước đó đang sử dụng chuỗi tùy chọn ``-n``. Vì ``conflict_handler`` là ``"resolve"``, nó xử lý tình huống này bằng cách xóa ``-n`` khỏi danh sách chuỗi tùy chọn của tùy chọn trước đó. Giờ đây, ``--dry-run`` là cách duy nhất để người dùng kích hoạt tùy chọn đó. Nếu người dùng yêu cầu trợ giúp, thông báo trợ giúp sẽ phản ánh điều đó::
 
    Options:
      --dry-run     do no harm
      ...
      -n, --noisy   be noisy
 
-It's possible to whittle away the option strings for a previously added option
-until there are none left, and the user has no way of invoking that option from
-the command-line.  In that case, :mod:`!optparse` removes that option completely,
-so it doesn't show up in help text or anywhere else. Carrying on with our
-existing OptionParser::
+Có thể loại bỏ dần các chuỗi tùy chọn của một tùy chọn đã được thêm trước đó cho đến khi không còn chuỗi nào, khiến người dùng không có cách nào gọi tùy chọn đó từ command-line. Trong trường hợp này, :mod:`!optparse` xóa hoàn toàn tùy chọn đó, vì vậy nó không xuất hiện trong help text hay bất kỳ nơi nào khác. Tiếp tục với OptionParser hiện có của chúng ta::
 
    parser.add_option("--dry-run", ..., help="new dry-run option")
 
-At this point, the original ``-n``/``--dry-run`` option is no longer
-accessible, so :mod:`!optparse` removes it, leaving this help text::
+Tại thời điểm này, tùy chọn ``-n``/``--dry-run`` ban đầu không còn có thể truy cập được, vì vậy :mod:`!optparse` xóa nó, để lại help text này::
 
    Options:
      ...
@@ -1608,58 +1222,44 @@ accessible, so :mod:`!optparse` removes it, leaving this help text::
 
 .. _optparse-cleanup:
 
-Cleanup
+Dọn dẹp
 ^^^^^^^
 
-OptionParser instances have several cyclic references.  This should not be a
-problem for Python's garbage collector, but you may wish to break the cyclic
-references explicitly by calling :meth:`~OptionParser.destroy` on your
-OptionParser once you are done with it.  This is particularly useful in
-long-running applications where large object graphs are reachable from your
-OptionParser.
+Các instance của OptionParser có một số tham chiếu vòng. Điều này không gây vấn đề cho bộ thu gom rác của Python, nhưng bạn có thể muốn ngắt các tham chiếu vòng một cách rõ ràng bằng cách gọi :meth:`~OptionParser.destroy` trên OptionParser sau khi sử dụng xong. Điều này đặc biệt hữu ích trong các ứng dụng chạy lâu dài, nơi các đồ thị đối tượng lớn có thể được truy cập từ OptionParser.
 
 
 .. _optparse-other-methods:
 
-Other methods
-^^^^^^^^^^^^^
+Các phương thức khác
+^^^^^^^^^^^^^^^^^^^^
 
-OptionParser supports several other public methods:
+OptionParser hỗ trợ một số phương thức public khác:
 
 .. method:: OptionParser.set_usage(usage)
 
-   Set the usage string according to the rules described above for the ``usage``
-   constructor keyword argument.  Passing ``None`` sets the default usage
-   string; use :const:`optparse.SUPPRESS_USAGE` to suppress a usage message.
+   Đặt chuỗi usage theo các quy tắc được mô tả ở trên cho đối số từ khóa constructor ``usage``. Truyền ``None`` sẽ đặt chuỗi usage mặc định; sử dụng :const:`optparse.SUPPRESS_USAGE` để bỏ qua thông báo usage.
 
 .. method:: OptionParser.print_usage(file=None)
 
-   Print the usage message for the current program (``self.usage``) to *file*
-   (default stdout).  Any occurrence of the string ``%prog`` in ``self.usage``
-   is replaced with the name of the current program.  Does nothing if
-   ``self.usage`` is empty or not defined.
+   In thông báo usage của chương trình hiện tại (``self.usage``) vào *file* (mặc định là stdout). Mọi lần xuất hiện của chuỗi ``%prog`` trong ``self.usage`` sẽ được thay thế bằng tên của chương trình hiện tại. Không làm gì nếu ``self.usage`` rỗng hoặc chưa được định nghĩa.
 
 .. method:: OptionParser.get_usage()
 
-   Same as :meth:`print_usage` but returns the usage string instead of
-   printing it.
+   Tương tự :meth:`print_usage`, nhưng trả về chuỗi usage thay vì in chuỗi đó.
 
 .. method:: OptionParser.set_defaults(dest=value, ...)
 
-   Set default values for several option destinations at once.  Using
-   :meth:`set_defaults` is the preferred way to set default values for options,
-   since multiple options can share the same destination.  For example, if
-   several "mode" options all set the same destination, any one of them can set
-   the default, and the last one wins::
+   Đặt các giá trị mặc định cho nhiều đích của option cùng lúc. Sử dụng
+   :meth:`set_defaults` là cách ưu tiên để đặt giá trị mặc định cho các option, vì nhiều option có thể dùng chung một đích. Ví dụ: nếu một số option "mode" cùng đặt một đích, bất kỳ option nào trong số đó cũng có thể đặt giá trị mặc định, và giá trị được đặt sau cùng sẽ thắng::
 
       parser.add_option("--advanced", action="store_const",
                         dest="mode", const="advanced",
-                        default="novice")    # overridden below
+                        default="novice")    # bị ghi đè bên dưới
       parser.add_option("--novice", action="store_const",
                         dest="mode", const="novice",
-                        default="advanced")  # overrides above setting
+                        default="advanced")  # ghi đè thiết lập bên trên
 
-   To avoid this confusion, use :meth:`set_defaults`::
+   Để tránh nhầm lẫn này, hãy sử dụng :meth:`set_defaults`::
 
       parser.set_defaults(mode="advanced")
       parser.add_option("--advanced", action="store_const",
@@ -1670,168 +1270,124 @@ OptionParser supports several other public methods:
 
 .. _optparse-option-callbacks:
 
-Option Callbacks
-----------------
+Callback tùy chọn
+-----------------
 
-When :mod:`!optparse`'s built-in actions and types aren't quite enough for your
-needs, you have two choices: extend :mod:`!optparse` or define a callback option.
-Extending :mod:`!optparse` is more general, but overkill for a lot of simple
-cases.  Quite often a simple callback is all you need.
+Khi các action và type tích hợp sẵn của :mod:`!optparse` chưa hoàn toàn đáp ứng nhu cầu của bạn, bạn có hai lựa chọn: mở rộng :mod:`!optparse` hoặc định nghĩa một tùy chọn callback. Việc mở rộng :mod:`!optparse` mang tính tổng quát hơn, nhưng là quá mức cần thiết đối với nhiều trường hợp đơn giản. Khá thường xuyên, một callback đơn giản là tất cả những gì bạn cần.
 
-There are two steps to defining a callback option:
+Có hai bước để định nghĩa một tùy chọn callback:
 
-* define the option itself using the ``"callback"`` action
+* định nghĩa chính tùy chọn bằng action ``"callback"``
 
-* write the callback; this is a function (or method) that takes at least four
-  arguments, as described below
+* viết callback; đây là một hàm (hoặc phương thức) nhận ít nhất bốn đối số, như mô tả bên dưới
 
 
 .. _optparse-defining-callback-option:
 
-Defining a callback option
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Định nghĩa một tùy chọn callback
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-As always, the easiest way to define a callback option is by using the
-:meth:`OptionParser.add_option` method.  Apart from :attr:`~Option.action`, the
-only option attribute you must specify is ``callback``, the function to call::
+Như mọi khi, cách dễ nhất để định nghĩa một tùy chọn callback là sử dụng
+phương thức :meth:`OptionParser.add_option`. Ngoài :attr:`~Option.action`, thuộc tính tùy chọn duy nhất bạn phải chỉ định là ``callback``, hàm cần gọi::
 
    parser.add_option("-c", action="callback", callback=my_callback)
 
-``callback`` is a function (or other callable object), so you must have already
-defined ``my_callback()`` when you create this callback option. In this simple
-case, :mod:`!optparse` doesn't even know if ``-c`` takes any arguments,
-which usually means that the option takes no arguments---the mere presence of
-``-c`` on the command-line is all it needs to know.  In some
-circumstances, though, you might want your callback to consume an arbitrary
-number of command-line arguments.  This is where writing callbacks gets tricky;
-it's covered later in this section.
+``callback`` là một hàm (hoặc đối tượng có thể gọi khác), vì vậy bạn phải định nghĩa ``my_callback()`` trước khi tạo tùy chọn callback này. Trong trường hợp đơn giản này, :mod:`!optparse` thậm chí không biết ``-c`` có nhận đối số nào hay không, điều này thường có nghĩa là tùy chọn không nhận đối số nào---chỉ cần ``-c`` xuất hiện trên command line là đủ. Tuy nhiên, trong một số trường hợp, bạn có thể muốn callback của mình nhận một số lượng đối số command line tùy ý. Đây là lúc việc viết callback trở nên phức tạp; nội dung này được đề cập ở phần sau của mục này.
 
-:mod:`!optparse` always passes four particular arguments to your callback, and it
-will only pass additional arguments if you specify them via
-:attr:`~Option.callback_args` and :attr:`~Option.callback_kwargs`.  Thus, the
-minimal callback function signature is::
+:mod:`!optparse` luôn truyền bốn đối số cụ thể cho callback của bạn và chỉ truyền thêm đối số nếu bạn chỉ định chúng thông qua
+:attr:`~Option.callback_args` và :attr:`~Option.callback_kwargs`. Vì vậy, chữ ký hàm callback tối thiểu là::
 
    def my_callback(option, opt, value, parser):
 
-The four arguments to a callback are described below.
+Bốn đối số của một callback được mô tả bên dưới.
 
-There are several other option attributes that you can supply when you define a
-callback option:
+Có một số thuộc tính tùy chọn khác mà bạn có thể cung cấp khi định nghĩa một tùy chọn callback:
 
 :attr:`~Option.type`
-   has its usual meaning: as with the ``"store"`` or ``"append"`` actions, it
-   instructs :mod:`!optparse` to consume one argument and convert it to
-   :attr:`~Option.type`.  Rather than storing the converted value(s) anywhere,
-   though, :mod:`!optparse` passes it to your callback function.
+   có ý nghĩa thông thường: giống như các action ``"store"`` hoặc ``"append"``, nó yêu cầu :mod:`!optparse` nhận một đối số và chuyển đổi đối số đó thành
+   :attr:`~Option.type`. Tuy nhiên, thay vì lưu giá trị đã chuyển đổi ở đâu đó, :mod:`!optparse` truyền giá trị đó cho callback function của bạn.
 
 :attr:`~Option.nargs`
-   also has its usual meaning: if it is supplied and > 1, :mod:`!optparse` will
-   consume :attr:`~Option.nargs` arguments, each of which must be convertible to
-   :attr:`~Option.type`.  It then passes a tuple of converted values to your
-   callback.
+   cũng có ý nghĩa thông thường: nếu được cung cấp và > 1, :mod:`!optparse` sẽ nhận :attr:`~Option.nargs` đối số, mỗi đối số phải có thể được chuyển đổi thành
+   :attr:`~Option.type`. Sau đó, nó truyền một tuple gồm các giá trị đã chuyển đổi cho callback của bạn.
 
 :attr:`~Option.callback_args`
-   a tuple of extra positional arguments to pass to the callback
+   một tuple gồm các đối số vị trí bổ sung để truyền cho callback
 
 :attr:`~Option.callback_kwargs`
-   a dictionary of extra keyword arguments to pass to the callback
+   một dictionary gồm các đối số từ khóa bổ sung để truyền cho callback
 
 
 .. _optparse-how-callbacks-called:
 
-How callbacks are called
-^^^^^^^^^^^^^^^^^^^^^^^^
+Cách gọi callback
+^^^^^^^^^^^^^^^^^
 
-All callbacks are called as follows::
+Tất cả callback đều được gọi như sau::
 
    func(option, opt_str, value, parser, *args, **kwargs)
 
-where
+trong đó
 
 ``option``
-   is the Option instance that's calling the callback
+   là instance Option đang gọi callback
 
 ``opt_str``
-   is the option string seen on the command-line that's triggering the callback.
-   (If an abbreviated long option was used, ``opt_str`` will be the full,
-   canonical option string---e.g. if the user puts ``--foo`` on the
-   command-line as an abbreviation for ``--foobar``, then ``opt_str`` will be
-   ``"--foobar"``.)
+   là chuỗi tùy chọn xuất hiện trên command line và kích hoạt callback. (Nếu sử dụng một long option viết tắt, ``opt_str`` sẽ là chuỗi tùy chọn đầy đủ, chuẩn tắc---ví dụ: nếu người dùng nhập ``--foo`` trên command line làm dạng viết tắt của ``--foobar``, thì ``opt_str`` sẽ là ``"--foobar"``.)
 
 ``value``
-   is the argument to this option seen on the command-line.  :mod:`!optparse` will
-   only expect an argument if :attr:`~Option.type` is set; the type of ``value`` will be
-   the type implied by the option's type.  If :attr:`~Option.type` for this option is
-   ``None`` (no argument expected), then ``value`` will be ``None``.  If :attr:`~Option.nargs`
-   > 1, ``value`` will be a tuple of values of the appropriate type.
+   là đối số của tùy chọn này xuất hiện trên command line. :mod:`!optparse` sẽ chỉ mong đợi một đối số nếu :attr:`~Option.type` được thiết lập; kiểu của ``value`` sẽ là kiểu được ngụ ý bởi kiểu của tùy chọn. Nếu :attr:`~Option.type` của tùy chọn này là ``None`` (không mong đợi đối số), thì ``value`` sẽ là ``None``. Nếu :attr:`~Option.nargs` > 1, ``value`` sẽ là một tuple gồm các giá trị có kiểu thích hợp.
 
 ``parser``
-   is the OptionParser instance driving the whole thing, mainly useful because
-   you can access some other interesting data through its instance attributes:
+   là instance OptionParser điều khiển toàn bộ quá trình, chủ yếu hữu ích vì bạn có thể truy cập một số dữ liệu thú vị khác thông qua các thuộc tính instance của nó:
 
    ``parser.largs``
-      the current list of leftover arguments, ie. arguments that have been
-      consumed but are neither options nor option arguments. Feel free to modify
-      ``parser.largs``, e.g. by adding more arguments to it.  (This list will
-      become ``args``, the second return value of :meth:`~OptionParser.parse_args`.)
+      danh sách hiện tại gồm các đối số còn lại, tức là những đối số đã được dùng nhưng không phải là tùy chọn cũng không phải là đối số của tùy chọn. Bạn có thể tự do sửa đổi ``parser.largs``, chẳng hạn bằng cách thêm các đối số khác vào đó. (Danh sách này sẽ trở thành ``args``, giá trị trả về thứ hai của :meth:`~OptionParser.parse_args`.)
 
    ``parser.rargs``
-      the current list of remaining arguments, ie. with ``opt_str`` and
-      ``value`` (if applicable) removed, and only the arguments following them
-      still there.  Feel free to modify ``parser.rargs``, e.g. by consuming more
-      arguments.
+      danh sách hiện tại gồm các đối số còn lại, tức là sau khi ``opt_str`` và ``value`` (nếu áp dụng) đã được loại bỏ, và chỉ còn các đối số đứng sau chúng. Bạn có thể tự do sửa đổi ``parser.rargs``, chẳng hạn bằng cách sử dụng thêm các đối số.
 
    ``parser.values``
-      the object where option values are by default stored (an instance of
-      optparse.OptionValues).  This lets callbacks use the same mechanism as the
-      rest of :mod:`!optparse` for storing option values; you don't need to mess
-      around with globals or closures.  You can also access or modify the
-      value(s) of any options already encountered on the command-line.
+      đối tượng mà theo mặc định các giá trị tùy chọn được lưu vào (một instance của optparse.OptionValues). Điều này cho phép callback sử dụng cùng cơ chế như phần còn lại của :mod:`!optparse` để lưu các giá trị tùy chọn; bạn không cần phải dùng biến toàn cục hoặc closure. Bạn cũng có thể truy cập hoặc sửa đổi giá trị của bất kỳ tùy chọn nào đã xuất hiện trên command line.
 
 ``args``
-   is a tuple of arbitrary positional arguments supplied via the
-   :attr:`~Option.callback_args` option attribute.
+   là một tuple gồm các đối số vị trí tùy ý được cung cấp thông qua tùy chọn
+   :attr:`~Option.callback_args`.
 
 ``kwargs``
-   is a dictionary of arbitrary keyword arguments supplied via
+   là một dictionary gồm các đối số từ khóa tùy ý được cung cấp thông qua
    :attr:`~Option.callback_kwargs`.
 
 
 .. _optparse-raising-errors-in-callback:
 
-Raising errors in a callback
+Phát sinh lỗi trong callback
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The callback function should raise :exc:`OptionValueError` if there are any
-problems with the option or its argument(s).  :mod:`!optparse` catches this and
-terminates the program, printing the error message you supply to stderr.  Your
-message should be clear, concise, accurate, and mention the option at fault.
-Otherwise, the user will have a hard time figuring out what they did wrong.
+Hàm callback nên phát sinh :exc:`OptionValueError` nếu có bất kỳ vấn đề nào với tùy chọn hoặc (các) đối số của tùy chọn đó. :mod:`!optparse` bắt lỗi này và kết thúc chương trình, đồng thời in thông báo lỗi bạn cung cấp ra stderr. Thông báo của bạn nên rõ ràng, ngắn gọn, chính xác và nêu tùy chọn gây lỗi. Nếu không, người dùng sẽ khó xác định họ đã làm sai điều gì.
 
 
 .. _optparse-callback-example-1:
 
-Callback example 1: trivial callback
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Ví dụ callback 1: callback đơn giản
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Here's an example of a callback option that takes no arguments, and simply
-records that the option was seen::
+Sau đây là một ví dụ về tùy chọn callback không nhận đối số nào và chỉ ghi lại rằng tùy chọn đó đã được nhìn thấy::
 
    def record_foo_seen(option, opt_str, value, parser):
        parser.values.saw_foo = True
 
    parser.add_option("--foo", action="callback", callback=record_foo_seen)
 
-Of course, you could do that with the ``"store_true"`` action.
+Tất nhiên, bạn có thể thực hiện việc đó bằng action ``"store_true"``.
 
 
 .. _optparse-callback-example-2:
 
-Callback example 2: check option order
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Ví dụ callback 2: kiểm tra thứ tự tùy chọn
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Here's a slightly more interesting example: record the fact that ``-a`` is
-seen, but blow up if it comes after ``-b`` in the command-line.  ::
+Sau đây là một ví dụ thú vị hơn một chút: ghi lại việc ``-a`` được nhìn thấy, nhưng báo lỗi nếu nó xuất hiện sau ``-b`` trên dòng lệnh.::
 
    def check_order(option, opt_str, value, parser):
        if parser.values.b:
@@ -1844,12 +1400,10 @@ seen, but blow up if it comes after ``-b`` in the command-line.  ::
 
 .. _optparse-callback-example-3:
 
-Callback example 3: check option order (generalized)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Ví dụ callback 3: kiểm tra thứ tự tùy chọn (tổng quát hóa)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you want to reuse this callback for several similar options (set a flag, but
-blow up if ``-b`` has already been seen), it needs a bit of work: the error
-message and the flag that it sets must be generalized.  ::
+Nếu muốn sử dụng lại callback này cho một số tùy chọn tương tự (đặt một cờ, nhưng báo lỗi nếu ``-b`` đã được nhìn thấy), bạn cần chỉnh sửa một chút: thông báo lỗi và cờ mà callback đặt phải được tổng quát hóa.::
 
    def check_order(option, opt_str, value, parser):
        if parser.values.b:
@@ -1863,12 +1417,10 @@ message and the flag that it sets must be generalized.  ::
 
 .. _optparse-callback-example-4:
 
-Callback example 4: check arbitrary condition
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Ví dụ callback 4: kiểm tra điều kiện tùy ý
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Of course, you could put any condition in there---you're not limited to checking
-the values of already-defined options.  For example, if you have options that
-should not be called when the moon is full, all you have to do is this::
+Tất nhiên, bạn có thể đặt bất kỳ điều kiện nào vào đó---bạn không bị giới hạn trong việc kiểm tra giá trị của các option đã được định nghĩa. Ví dụ, nếu bạn có các option không nên được gọi khi trăng tròn, tất cả những gì bạn cần làm là như sau::
 
    def check_moon(option, opt_str, value, parser):
        if is_moon_full():
@@ -1879,22 +1431,18 @@ should not be called when the moon is full, all you have to do is this::
    parser.add_option("--foo",
                      action="callback", callback=check_moon, dest="foo")
 
-(The definition of ``is_moon_full()`` is left as an exercise for the reader.)
+(Phần định nghĩa ``is_moon_full()`` được để cho người đọc tự thực hiện.)
 
 
 .. _optparse-callback-example-5:
 
-Callback example 5: fixed arguments
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Ví dụ callback 5: các đối số cố định
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Things get slightly more interesting when you define callback options that take
-a fixed number of arguments.  Specifying that a callback option takes arguments
-is similar to defining a ``"store"`` or ``"append"`` option: if you define
-:attr:`~Option.type`, then the option takes one argument that must be
-convertible to that type; if you further define :attr:`~Option.nargs`, then the
-option takes :attr:`~Option.nargs` arguments.
+Mọi thứ trở nên thú vị hơn một chút khi bạn định nghĩa các option callback nhận số lượng đối số cố định. Việc chỉ định rằng một option callback nhận các đối số tương tự như định nghĩa option ``"store"`` hoặc ``"append"``: nếu bạn định nghĩa
+:attr:`~Option.type`, thì option này nhận một đối số phải có thể chuyển đổi thành kiểu đó; nếu bạn định nghĩa thêm :attr:`~Option.nargs`, thì option này nhận :attr:`~Option.nargs` đối số.
 
-Here's an example that just emulates the standard ``"store"`` action::
+Dưới đây là một ví dụ chỉ mô phỏng action ``"store"`` tiêu chuẩn::
 
    def store_value(option, opt_str, value, parser):
        setattr(parser.values, option.dest, value)
@@ -1903,39 +1451,25 @@ Here's an example that just emulates the standard ``"store"`` action::
                      action="callback", callback=store_value,
                      type="int", nargs=3, dest="foo")
 
-Note that :mod:`!optparse` takes care of consuming 3 arguments and converting
-them to integers for you; all you have to do is store them.  (Or whatever;
-obviously you don't need a callback for this example.)
+Lưu ý rằng :mod:`!optparse` đảm nhiệm việc nhận 3 đối số và chuyển chúng thành số nguyên; tất cả những gì bạn cần làm là lưu trữ chúng. (Hoặc tùy bạn; rõ ràng là bạn không cần callback cho ví dụ này.)
 
 
 .. _optparse-callback-example-6:
 
-Callback example 6: variable arguments
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Ví dụ callback 6: đối số biến đổi
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Things get hairy when you want an option to take a variable number of arguments.
-For this case, you must write a callback, as :mod:`!optparse` doesn't provide any
-built-in capabilities for it.  And you have to deal with certain intricacies of
-conventional Unix command-line parsing that :mod:`!optparse` normally handles for
-you.  In particular, callbacks should implement the conventional rules for bare
-``--`` and ``-`` arguments:
+Mọi chuyện trở nên phức tạp khi bạn muốn một tùy chọn nhận số lượng đối số biến đổi. Trong trường hợp này, bạn phải viết một callback, vì :mod:`!optparse` không cung cấp sẵn khả năng này. Và bạn phải xử lý một số chi tiết phức tạp trong việc phân tích cú pháp dòng lệnh Unix thông thường mà :mod:`!optparse` thường đảm nhiệm thay bạn. Cụ thể, callback nên triển khai các quy tắc thông thường cho các đối số ``--`` và ``-`` đứng riêng như sau:
 
-* either ``--`` or ``-`` can be option arguments
+* ``--`` hoặc ``-`` đều có thể là đối số của tùy chọn
 
-* bare ``--`` (if not the argument to some option): halt command-line
-  processing and discard the ``--``
+* ``--`` đứng riêng (nếu không phải là đối số của một tùy chọn nào đó): dừng xử lý dòng lệnh và loại bỏ ``--``
 
-* bare ``-`` (if not the argument to some option): halt command-line
-  processing but keep the ``-`` (append it to ``parser.largs``)
+* ``-`` đứng riêng (nếu không phải là đối số của một tùy chọn nào đó): dừng xử lý dòng lệnh nhưng giữ lại ``-`` (nối nó vào ``parser.largs``)
 
-If you want an option that takes a variable number of arguments, there are
-several subtle, tricky issues to worry about.  The exact implementation you
-choose will be based on which trade-offs you're willing to make for your
-application (which is why :mod:`!optparse` doesn't support this sort of thing
-directly).
+Nếu bạn muốn một tùy chọn nhận số lượng đối số biến đổi, có một số vấn đề tinh tế và phức tạp cần lưu ý. Cách triển khai chính xác mà bạn chọn sẽ dựa trên những đánh đổi mà bạn sẵn sàng chấp nhận cho ứng dụng của mình (đó là lý do :mod:`!optparse` không hỗ trợ trực tiếp kiểu này).
 
-Nevertheless, here's a stab at a callback for an option with variable
-arguments::
+Tuy vậy, dưới đây là một thử nghiệm về callback cho một tùy chọn có số lượng đối số thay đổi::
 
     def vararg_callback(option, opt_str, value, parser):
         assert value is None
@@ -1949,10 +1483,10 @@ arguments::
                 return False
 
         for arg in parser.rargs:
-            # stop on --foo like options
+            # dừng với các tùy chọn như --foo
             if arg[:2] == "--" and len(arg) > 2:
                 break
-            # stop on -a, but not on -3 or -3.0
+            # dừng với -a, nhưng không dừng với -3 hoặc -3.0
             if arg[:1] == "-" and len(arg) > 1 and not floatable(arg):
                 break
             value.append(arg)
@@ -1967,61 +1501,45 @@ arguments::
 
 .. _optparse-extending-optparse:
 
-Extending :mod:`!optparse`
---------------------------
+Mở rộng :mod:`!optparse`
+------------------------
 
-Since the two major controlling factors in how :mod:`!optparse` interprets
-command-line options are the action and type of each option, the most likely
-direction of extension is to add new actions and new types.
+Vì hai yếu tố chính chi phối cách :mod:`!optparse` diễn giải các tùy chọn dòng lệnh là action và type của từng tùy chọn, hướng mở rộng nhiều khả năng nhất là thêm các action mới và type mới.
 
 
 .. _optparse-adding-new-types:
 
-Adding new types
-^^^^^^^^^^^^^^^^
+Thêm type mới
+^^^^^^^^^^^^^
 
-To add new types, you need to define your own subclass of :mod:`!optparse`'s
-:class:`Option` class.  This class has a couple of attributes that define
-:mod:`!optparse`'s types: :attr:`~Option.TYPES` and :attr:`~Option.TYPE_CHECKER`.
+Để thêm type mới, bạn cần định nghĩa một lớp con của :mod:`!optparse`
+:class:`Option` lớp. Lớp này có một vài thuộc tính xác định
+các kiểu của :mod:`!optparse`: :attr:`~Option.TYPES` và :attr:`~Option.TYPE_CHECKER`.
 
 .. attribute:: Option.TYPES
 
-   A tuple of type names; in your subclass, simply define a new tuple
-   :attr:`TYPES` that builds on the standard one.
+   Một tuple gồm các tên kiểu; trong lớp con của bạn, chỉ cần định nghĩa một tuple mới
+   :attr:`TYPES` được xây dựng dựa trên tuple chuẩn.
 
 .. attribute:: Option.TYPE_CHECKER
 
-   A dictionary mapping type names to type-checking functions.  A type-checking
-   function has the following signature::
+   Một dictionary ánh xạ tên kiểu tới các hàm kiểm tra kiểu. Một hàm kiểm tra kiểu có signature sau::
 
       def check_mytype(option, opt, value)
 
-   where ``option`` is an :class:`Option` instance, ``opt`` is an option string
-   (e.g., ``-f``), and ``value`` is the string from the command line that must
-   be checked and converted to your desired type.  ``check_mytype()`` should
-   return an object of the hypothetical type ``mytype``.  The value returned by
-   a type-checking function will wind up in the OptionValues instance returned
-   by :meth:`OptionParser.parse_args`, or be passed to a callback as the
-   ``value`` parameter.
+   trong đó ``option`` là một instance của :class:`Option`, ``opt`` là một option string (ví dụ: ``-f``), và ``value`` là chuỗi từ command line cần được kiểm tra và chuyển đổi thành kiểu mong muốn. ``check_mytype()`` phải trả về một object thuộc kiểu giả định ``mytype``. Giá trị do một hàm kiểm tra kiểu trả về cuối cùng sẽ nằm trong instance OptionValues được :meth:`OptionParser.parse_args` trả về, hoặc được truyền tới callback dưới dạng tham số ``value``.
 
-   Your type-checking function should raise :exc:`OptionValueError` if it
-   encounters any problems.  :exc:`OptionValueError` takes a single string
-   argument, which is passed as-is to :class:`OptionParser`'s :meth:`error`
-   method, which in turn prepends the program name and the string ``"error:"``
-   and prints everything to stderr before terminating the process.
+   Hàm kiểm tra kiểu của bạn phải raise :exc:`OptionValueError` nếu gặp bất kỳ vấn đề nào. :exc:`OptionValueError` nhận một đối số chuỗi duy nhất, được truyền nguyên trạng tới method :meth:`error` của :class:`OptionParser`, method này lần lượt thêm tên chương trình và chuỗi ``"error:"`` vào đầu, rồi in mọi thứ ra stderr trước khi kết thúc process.
 
-Here's a silly example that demonstrates adding a ``"complex"`` option type to
-parse Python-style complex numbers on the command line.  (This is even sillier
-than it used to be, because :mod:`!optparse` 1.3 added built-in support for
-complex numbers, but never mind.)
+Đây là một ví dụ ngớ ngẩn minh họa cách thêm một kiểu tùy chọn ``"complex"`` để phân tích các số phức theo kiểu Python trên dòng lệnh. (Điều này thậm chí còn ngớ ngẩn hơn trước, vì :mod:`!optparse` 1.3 đã tích hợp sẵn hỗ trợ cho số phức, nhưng thôi không bàn.)
 
-First, the necessary imports::
+Trước tiên, các import cần thiết::
 
    from copy import copy
    from optparse import Option, OptionValueError
 
-You need to define your type-checker first, since it's referred to later (in the
-:attr:`~Option.TYPE_CHECKER` class attribute of your Option subclass)::
+Trước hết, bạn cần định nghĩa bộ kiểm tra kiểu, vì nó được tham chiếu sau đó (trong
+thuộc tính lớp :attr:`~Option.TYPE_CHECKER` của lớp con Option của bạn)::
 
    def check_complex(option, opt, value):
        try:
@@ -2030,28 +1548,21 @@ You need to define your type-checker first, since it's referred to later (in the
            raise OptionValueError(
                "option %s: invalid complex value: %r" % (opt, value))
 
-Finally, the Option subclass::
+Cuối cùng, lớp con Option::
 
    class MyOption (Option):
        TYPES = Option.TYPES + ("complex",)
        TYPE_CHECKER = copy(Option.TYPE_CHECKER)
        TYPE_CHECKER["complex"] = check_complex
 
-(If we didn't make a :func:`copy` of :attr:`Option.TYPE_CHECKER`, we would end
-up modifying the :attr:`~Option.TYPE_CHECKER` attribute of :mod:`!optparse`'s
-Option class.  This being Python, nothing stops you from doing that except good
-manners and common sense.)
+(Nếu chúng ta không tạo một :func:`copy` của :attr:`Option.TYPE_CHECKER`, cuối cùng chúng ta sẽ sửa đổi thuộc tính :attr:`~Option.TYPE_CHECKER` của lớp Option của :mod:`!optparse`. Vì đây là Python, không có gì ngăn bạn làm vậy ngoài phép lịch sự và lẽ thường.)
 
-That's it!  Now you can write a script that uses the new option type just like
-any other :mod:`!optparse`\ -based script, except you have to instruct your
-OptionParser to use MyOption instead of Option::
+Vậy là xong! Giờ bạn có thể viết một script sử dụng kiểu tùy chọn mới giống như bất kỳ script nào khác dựa trên :mod:`!optparse`\ , ngoại trừ việc bạn phải chỉ dẫn OptionParser sử dụng MyOption thay vì Option::
 
    parser = OptionParser(option_class=MyOption)
    parser.add_option("-c", type="complex")
 
-Alternately, you can build your own option list and pass it to OptionParser; if
-you don't use :meth:`add_option` in the above way, you don't need to tell
-OptionParser which option class to use::
+Ngoài ra, bạn có thể tự xây dựng danh sách tùy chọn và truyền danh sách đó cho OptionParser; nếu bạn không sử dụng :meth:`add_option` theo cách trên, bạn không cần cho OptionParser biết nên sử dụng lớp tùy chọn nào::
 
    option_list = [MyOption("-c", action="store", type="complex", dest="c")]
    parser = OptionParser(option_list=option_list)
@@ -2059,66 +1570,50 @@ OptionParser which option class to use::
 
 .. _optparse-adding-new-actions:
 
-Adding new actions
-^^^^^^^^^^^^^^^^^^
+Thêm action mới
+^^^^^^^^^^^^^^^
 
-Adding new actions is a bit trickier, because you have to understand that
-:mod:`!optparse` has a couple of classifications for actions:
+Việc thêm action mới phức tạp hơn một chút, vì bạn phải hiểu rằng
+:mod:`!optparse` phân loại action thành một vài nhóm:
 
-"store" actions
-   actions that result in :mod:`!optparse` storing a value to an attribute of the
-   current OptionValues instance; these options require a :attr:`~Option.dest`
-   attribute to be supplied to the Option constructor.
+action "store"
+   các action khiến :mod:`!optparse` lưu một giá trị vào thuộc tính của thực thể OptionValues hiện tại; các tùy chọn này yêu cầu cung cấp thuộc tính :attr:`~Option.dest` cho hàm khởi tạo Option.
 
-"typed" actions
-   actions that take a value from the command line and expect it to be of a
-   certain type; or rather, a string that can be converted to a certain type.
-   These options require a :attr:`~Option.type` attribute to the Option
-   constructor.
+action "typed"
+   các action nhận một giá trị từ command line và yêu cầu giá trị đó thuộc một kiểu nhất định; hay chính xác hơn là một chuỗi có thể được chuyển đổi sang một kiểu nhất định. Các tùy chọn này yêu cầu một thuộc tính :attr:`~Option.type` trong hàm khởi tạo Option.
 
-These are overlapping sets: some default "store" actions are ``"store"``,
-``"store_const"``, ``"append"``, and ``"count"``, while the default "typed"
-actions are ``"store"``, ``"append"``, and ``"callback"``.
+Đây là các tập hợp chồng lấp nhau: một số action "store" mặc định là ``"store"``, ``"store_const"``, ``"append"`` và ``"count"``, trong khi các action "typed" mặc định là ``"store"``, ``"append"`` và ``"callback"``.
 
-When you add an action, you need to categorize it by listing it in at least one
-of the following class attributes of Option (all are lists of strings):
+Khi thêm một action, bạn cần phân loại action đó bằng cách liệt kê nó trong ít nhất một trong các thuộc tính lớp sau của Option (tất cả đều là danh sách các chuỗi):
 
 .. attribute:: Option.ACTIONS
 
-   All actions must be listed in ACTIONS.
+   Tất cả action phải được liệt kê trong ACTIONS.
 
 .. attribute:: Option.STORE_ACTIONS
 
-   "store" actions are additionally listed here.
+   Các action "store" cũng được liệt kê tại đây.
 
 .. attribute:: Option.TYPED_ACTIONS
 
-   "typed" actions are additionally listed here.
+   Các action "typed" cũng được liệt kê tại đây.
 
 .. attribute:: Option.ALWAYS_TYPED_ACTIONS
 
-   Actions that always take a type (i.e. whose options always take a value) are
-   additionally listed here.  The only effect of this is that :mod:`!optparse`
-   assigns the default type, ``"string"``, to options with no explicit type
-   whose action is listed in :attr:`ALWAYS_TYPED_ACTIONS`.
+   Các action luôn nhận một kiểu (tức là các tùy chọn của chúng luôn nhận một giá trị) cũng được liệt kê tại đây. Tác dụng duy nhất của việc này là :mod:`!optparse` gán kiểu mặc định, ``"string"``, cho các tùy chọn không có kiểu được chỉ định rõ ràng mà action của chúng được liệt kê trong :attr:`ALWAYS_TYPED_ACTIONS`.
 
-In order to actually implement your new action, you must override Option's
-:meth:`take_action` method and add a case that recognizes your action.
+Để thực sự triển khai action mới, bạn phải ghi đè
+:meth:`take_action` method của Option và thêm một case nhận diện action của bạn.
 
-For example, let's add an ``"extend"`` action.  This is similar to the standard
-``"append"`` action, but instead of taking a single value from the command-line
-and appending it to an existing list, ``"extend"`` will take multiple values in
-a single comma-delimited string, and extend an existing list with them.  That
-is, if ``--names`` is an ``"extend"`` option of type ``"string"``, the command
-line ::
+Ví dụ, hãy thêm một action ``"extend"``. Action này tương tự như action ``"append"`` tiêu chuẩn, nhưng thay vì nhận một giá trị duy nhất từ command-line rồi nối giá trị đó vào một list hiện có, ``"extend"`` sẽ nhận nhiều giá trị trong một chuỗi được phân tách bằng dấu phẩy và mở rộng list hiện có bằng các giá trị đó. Nghĩa là, nếu ``--names`` là một option ``"extend"`` thuộc kiểu ``"string"``, command line::
 
    --names=foo,bar --names blah --names ding,dong
 
-would result in a list  ::
+sẽ tạo ra một list::
 
    ["foo", "bar", "blah", "ding", "dong"]
 
-Again we define a subclass of Option::
+Một lần nữa, chúng ta định nghĩa một subclass của Option::
 
    class MyOption(Option):
 
@@ -2135,56 +1630,42 @@ Again we define a subclass of Option::
                Option.take_action(
                    self, action, dest, opt, value, values, parser)
 
-Features of note:
+Các tính năng đáng chú ý:
 
-* ``"extend"`` both expects a value on the command-line and stores that value
-  somewhere, so it goes in both :attr:`~Option.STORE_ACTIONS` and
+* ``"extend"`` vừa yêu cầu một giá trị trên command-line vừa lưu giá trị đó ở đâu đó, vì vậy nó nằm trong cả :attr:`~Option.STORE_ACTIONS` và
   :attr:`~Option.TYPED_ACTIONS`.
 
-* to ensure that :mod:`!optparse` assigns the default type of ``"string"`` to
-  ``"extend"`` actions, we put the ``"extend"`` action in
-  :attr:`~Option.ALWAYS_TYPED_ACTIONS` as well.
+* để đảm bảo rằng :mod:`!optparse` gán kiểu mặc định là ``"string"`` cho các action ``"extend"``, chúng ta đưa action ``"extend"`` vào
+  :attr:`~Option.ALWAYS_TYPED_ACTIONS` nữa.
 
-* :meth:`MyOption.take_action` implements just this one new action, and passes
-  control back to :meth:`Option.take_action` for the standard :mod:`!optparse`
-  actions.
+* :meth:`MyOption.take_action` chỉ triển khai action mới này, rồi chuyển quyền điều khiển lại cho :meth:`Option.take_action` để xử lý các action :mod:`!optparse` tiêu chuẩn.
 
-* ``values`` is an instance of the optparse_parser.Values class, which provides
-  the very useful :meth:`ensure_value` method. :meth:`ensure_value` is
-  essentially :func:`getattr` with a safety valve; it is called as ::
+* ``values`` là một instance của lớp optparse_parser.Values, lớp này cung cấp method :meth:`ensure_value` rất hữu ích. Về cơ bản, :meth:`ensure_value` là :func:`getattr` có thêm cơ chế an toàn; nó được gọi như sau::
 
      values.ensure_value(attr, value)
 
-  If the ``attr`` attribute of ``values`` doesn't exist or is ``None``, then
-  ensure_value() first sets it to ``value``, and then returns ``value``. This is
-  very handy for actions like ``"extend"``, ``"append"``, and ``"count"``, all
-  of which accumulate data in a variable and expect that variable to be of a
-  certain type (a list for the first two, an integer for the latter).  Using
-  :meth:`ensure_value` means that scripts using your action don't have to worry
-  about setting a default value for the option destinations in question; they
-  can just leave the default as ``None`` and :meth:`ensure_value` will take care of
-  getting it right when it's needed.
+  Nếu thuộc tính ``attr`` của ``values`` không tồn tại hoặc là ``None``, thì ensure_value() trước tiên đặt nó thành ``value``, rồi trả về ``value``. Điều này rất hữu ích cho các action như ``"extend"``, ``"append"`` và ``"count"``, tất cả đều tích lũy dữ liệu vào một biến và yêu cầu biến đó có một kiểu nhất định (list đối với hai action đầu, integer đối với action cuối). Sử dụng
+  :meth:`ensure_value` có nghĩa là các script sử dụng action của bạn không phải lo việc đặt giá trị mặc định cho các option destination tương ứng; chúng chỉ cần để giá trị mặc định là ``None`` và :meth:`ensure_value` sẽ đảm nhiệm việc lấy đúng giá trị khi cần.
 
-Exceptions
-----------
+Ngoại lệ
+--------
 
 .. exception:: OptionError
 
-   Raised if an :class:`Option` instance is created with invalid or
-   inconsistent arguments.
+   Được phát sinh nếu một instance :class:`Option` được tạo với các đối số không hợp lệ hoặc không nhất quán.
 
 .. exception:: OptionConflictError
 
-   Raised if conflicting options are added to an :class:`OptionParser`.
+   Được phát sinh nếu các tùy chọn xung đột được thêm vào :class:`OptionParser`.
 
 .. exception:: OptionValueError
 
-   Raised if an invalid option value is encountered on the command line.
+   Được phát sinh nếu gặp giá trị tùy chọn không hợp lệ trên dòng lệnh.
 
 .. exception:: BadOptionError
 
-   Raised if an invalid option is passed on the command line.
+   Được phát sinh nếu một tùy chọn không hợp lệ được truyền trên dòng lệnh.
 
 .. exception:: AmbiguousOptionError
 
-   Raised if an ambiguous option is passed on the command line.
+   Được phát sinh nếu một tùy chọn mơ hồ được truyền trên dòng lệnh.

@@ -1,87 +1,53 @@
-:mod:`!pprint` --- Data pretty printer
-======================================
+:mod:`!pprint` --- Bộ in dữ liệu đẹp
+====================================
 
 .. module:: pprint
-   :synopsis: Data pretty printer.
+   :synopsis: Bộ in dữ liệu đẹp.
 
 .. moduleauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 
-**Source code:** :source:`Lib/pprint.py`
+**Mã nguồn:** :source:`Lib/pprint.py`
 
 --------------
 
-The :mod:`!pprint` module provides a capability to "pretty-print" arbitrary
-Python data structures in a form which can be used as input to the interpreter.
-If the formatted structures include objects which are not fundamental Python
-types, the representation may not be loadable.  This may be the case if objects
-such as files, sockets or classes are included, as well as many other
-objects which are not representable as Python literals.
+Mô-đun :mod:`!pprint` cung cấp khả năng "in đẹp" các cấu trúc dữ liệu Python tùy ý theo định dạng có thể dùng làm đầu vào cho trình thông dịch. Nếu các cấu trúc được định dạng bao gồm những đối tượng không phải là kiểu Python cơ bản, biểu diễn đó có thể không nạp được. Điều này có thể xảy ra nếu bao gồm các đối tượng như tệp, socket hoặc lớp, cũng như nhiều đối tượng khác không thể biểu diễn dưới dạng literal Python.
 
-The formatted representation keeps objects on a single line if it can, and
-breaks them onto multiple lines if they don't fit within the allowed width,
-adjustable by the *width* parameter defaulting to 80 characters.
+Biểu diễn đã định dạng giữ các đối tượng trên một dòng nếu có thể, và ngắt chúng thành nhiều dòng nếu không vừa với độ rộng cho phép. Độ rộng này có thể điều chỉnh bằng tham số *width*, mặc định là 80 ký tự.
 
 .. versionchanged:: 3.9
-   Added support for pretty-printing :class:`types.SimpleNamespace`.
+   Đã bổ sung hỗ trợ in đẹp :class:`types.SimpleNamespace`.
 
 .. versionchanged:: 3.10
-   Added support for pretty-printing :class:`dataclasses.dataclass`.
+   Đã bổ sung hỗ trợ in đẹp :class:`dataclasses.dataclass`.
 
 .. _pprint-functions:
 
-Functions
----------
+Hàm
+---
 
 .. function:: pp(object, stream=None, indent=1, width=80, depth=None, *, \
                      compact=False, sort_dicts=False, underscore_numbers=False)
 
-   Prints the formatted representation of *object*, followed by a newline.
-   This function may be used in the interactive interpreter
-   instead of the :func:`print` function for inspecting values.
-   Tip: you can reassign ``print = pprint.pp`` for use within a scope.
+   In ra biểu diễn đã được định dạng của *object*, theo sau là một ký tự xuống dòng. Có thể sử dụng hàm này trong trình thông dịch tương tác thay cho hàm :func:`print` để kiểm tra các giá trị. Mẹo: bạn có thể gán lại ``print = pprint.pp`` để sử dụng trong một phạm vi.
 
-   :param object:
-      The object to be printed.
+   :param object:Đối tượng cần in.
 
-   :param stream:
-      A file-like object to which the output will be written
-      by calling its :meth:`!write` method.
-      If ``None`` (the default), :data:`sys.stdout` is used.
+   :param stream:Một đối tượng giống tệp mà đầu ra sẽ được ghi vào bằng cách gọi phương thức :meth:`!write`. Nếu là ``None`` (mặc định), :data:`sys.stdout` sẽ được sử dụng.
    :type stream: :term:`file-like object` | None
 
-   :param int indent:
-      The amount of indentation added for each nesting level.
+   :param int indent:Mức thụt lề được thêm vào cho mỗi cấp độ lồng nhau.
 
-   :param int width:
-      The desired maximum number of characters per line in the output.
-      If a structure cannot be formatted within the width constraint,
-      a best effort will be made.
+   :param int width:Số ký tự tối đa mong muốn trên mỗi dòng trong đầu ra. Nếu không thể định dạng một cấu trúc trong giới hạn độ rộng, hệ thống sẽ cố gắng hết sức.
 
-   :param depth:
-      The number of nesting levels which may be printed.
-      If the data structure being printed is too deep,
-      the next contained level is replaced by ``...``.
-      If ``None`` (the default), there is no constraint
-      on the depth of the objects being formatted.
+   :param depth:Số cấp độ lồng nhau có thể được in. Nếu cấu trúc dữ liệu đang được in quá sâu, cấp độ tiếp theo bên trong sẽ được thay thế bằng ``...``. Nếu ``None`` (mặc định), độ sâu của các đối tượng được định dạng không bị giới hạn.
    :type depth: int | None
 
-   :param bool compact:
-      Control the way long :term:`sequences <sequence>` are formatted.
-      If ``False`` (the default),
-      each item of a sequence will be formatted on a separate line,
-      otherwise as many items as will fit within the *width*
-      will be formatted on each output line.
+   :param bool compact:Kiểm soát cách định dạng các :term:`chuỗi <sequence>` dài. Nếu ``False`` (mặc định), mỗi mục trong một chuỗi sẽ được định dạng trên một dòng riêng; nếu không, mỗi dòng đầu ra sẽ định dạng nhiều mục nhất có thể vừa trong *độ rộng*.
 
-   :param bool sort_dicts:
-      If ``True``, dictionaries will be formatted with
-      their keys sorted, otherwise
-      they will be displayed in insertion order (the default).
+   :param bool sort_dicts:Nếu ``True``, các dictionary sẽ được định dạng với các khóa đã sắp xếp; nếu không, chúng sẽ được hiển thị theo thứ tự chèn (mặc định).
 
-   :param bool underscore_numbers:
-      If ``True``,
-      integers will be formatted with the ``_`` character for a thousands separator,
-      otherwise underscores are not displayed (the default).
+   :param bool underscore_numbers:Nếu ``True``, các số nguyên sẽ được định dạng với ký tự ``_`` làm dấu phân cách hàng nghìn; nếu không, dấu gạch dưới sẽ không được hiển thị (mặc định).
 
    >>> import pprint
    >>> stuff = ['spam', 'eggs', 'lumberjack', 'knights', 'ni']
@@ -100,27 +66,20 @@ Functions
 .. function:: pprint(object, stream=None, indent=1, width=80, depth=None, *, \
                      compact=False, sort_dicts=True, underscore_numbers=False)
 
-   Alias for :func:`~pprint.pp` with *sort_dicts* set to ``True`` by default,
-   which would automatically sort the dictionaries' keys,
-   you might want to use :func:`~pprint.pp` instead where it is ``False`` by default.
+   Bí danh cho :func:`~pprint.pp` với *sort_dicts* được đặt thành ``True`` theo mặc định, tùy chọn này sẽ tự động sắp xếp các khóa của dictionary; bạn có thể muốn sử dụng :func:`~pprint.pp` thay vào đó, trong đó tùy chọn này là ``False`` theo mặc định.
 
 
 .. function:: pformat(object, indent=1, width=80, depth=None, *, \
                       compact=False, sort_dicts=True, underscore_numbers=False)
 
-   Return the formatted representation of *object* as a string.  *indent*,
-   *width*, *depth*, *compact*, *sort_dicts* and *underscore_numbers* are
-   passed to the :class:`PrettyPrinter` constructor as formatting parameters
-   and their meanings are as described in the documentation above.
+   Trả về biểu diễn đã được định dạng của *object* dưới dạng chuỗi. *indent*, *width*, *depth*, *compact*, *sort_dicts* và *underscore_numbers* được truyền cho hàm khởi tạo :class:`PrettyPrinter` dưới dạng các tham số định dạng; ý nghĩa của chúng được mô tả trong tài liệu ở trên.
 
 
 .. function:: isreadable(object)
 
    .. index:: pair: built-in function; eval
 
-   Determine if the formatted representation of *object* is "readable", or can be
-   used to reconstruct the value using :func:`eval`.  This always returns ``False``
-   for recursive objects.
+   Xác định xem biểu diễn đã được định dạng của *object* có "dễ đọc" hay không, hoặc có thể được dùng để tái tạo giá trị bằng :func:`eval`. Hàm này luôn trả về ``False`` đối với các object đệ quy.
 
       >>> pprint.isreadable(stuff)
       False
@@ -128,37 +87,30 @@ Functions
 
 .. function:: isrecursive(object)
 
-   Determine if *object* requires a recursive representation.  This function is
-   subject to the same limitations as noted in :func:`saferepr` below and may raise an
-   :exc:`RecursionError` if it fails to detect a recursive object.
+   Xác định xem *object* có yêu cầu biểu diễn đệ quy hay không. Hàm này chịu cùng các giới hạn như được nêu trong :func:`saferepr` bên dưới và có thể phát sinh một
+   :exc:`RecursionError` nếu không phát hiện được object đệ quy.
 
 
 .. function:: saferepr(object)
 
-   Return a string representation of *object*, protected against recursion in
-   some common data structures, namely instances of :class:`dict`, :class:`list`
-   and :class:`tuple` or subclasses whose ``__repr__`` has not been overridden.  If the
-   representation of object exposes a recursive entry, the recursive reference
-   will be represented as ``<Recursion on typename with id=number>``.  The
-   representation is not otherwise formatted.
+   Trả về biểu diễn chuỗi của *object*, được bảo vệ khỏi đệ quy trong một số cấu trúc dữ liệu phổ biến, cụ thể là các instance của :class:`dict`, :class:`list` và :class:`tuple` hoặc các lớp con mà ``__repr__`` của chúng chưa được ghi đè. Nếu biểu diễn của object hiển thị một mục nhập đệ quy, tham chiếu đệ quy sẽ được biểu diễn dưới dạng ``<Recursion on typename with id=number>``. Biểu diễn này không được định dạng theo cách nào khác.
 
    >>> pprint.saferepr(stuff)
    "[<Recursion on list with id=...>, 'spam', 'eggs', 'lumberjack', 'knights', 'ni']"
 
 .. _prettyprinter-objects:
 
-PrettyPrinter Objects
----------------------
+Các đối tượng PrettyPrinter
+---------------------------
 
 .. index:: single: ...; placeholder
 
 .. class:: PrettyPrinter(indent=1, width=80, depth=None, stream=None, *, \
                          compact=False, sort_dicts=True, underscore_numbers=False)
 
-   Construct a :class:`PrettyPrinter` instance.
+   Tạo một thực thể :class:`PrettyPrinter`.
 
-   Arguments have the same meaning as for :func:`~pprint.pp`.
-   Note that they are in a different order, and that *sort_dicts* defaults to ``True``.
+   Các đối số có cùng ý nghĩa như đối với :func:`~pprint.pp`. Lưu ý rằng chúng có thứ tự khác nhau và *sort_dicts* mặc định là ``True``.
 
    >>> import pprint
    >>> stuff = ['spam', 'eggs', 'lumberjack', 'knights', 'ni']
@@ -185,82 +137,60 @@ PrettyPrinter Objects
 
 
    .. versionchanged:: 3.4
-      Added the *compact* parameter.
+      Đã thêm tham số *compact*.
 
    .. versionchanged:: 3.8
-      Added the *sort_dicts* parameter.
+      Đã thêm tham số *sort_dicts*.
 
    .. versionchanged:: 3.10
-      Added the *underscore_numbers* parameter.
+      Đã thêm tham số *underscore_numbers*.
 
    .. versionchanged:: 3.11
-      No longer attempts to write to :data:`!sys.stdout` if it is ``None``.
+      Không còn cố gắng ghi vào :data:`!sys.stdout` nếu nó là ``None``.
 
 
-:class:`PrettyPrinter` instances have the following methods:
+Các instance của :class:`PrettyPrinter` có các phương thức sau:
 
 
 .. method:: PrettyPrinter.pformat(object)
 
-   Return the formatted representation of *object*.  This takes into account the
-   options passed to the :class:`PrettyPrinter` constructor.
+   Trả về biểu diễn đã được định dạng của *object*. Phương thức này tính đến các tùy chọn được truyền cho hàm khởi tạo :class:`PrettyPrinter`.
 
 
 .. method:: PrettyPrinter.pprint(object)
 
-   Print the formatted representation of *object* on the configured stream,
-   followed by a newline.
+   In biểu diễn đã được định dạng của *object* trên stream đã cấu hình, kèm theo một dòng mới.
 
-The following methods provide the implementations for the corresponding
-functions of the same names.  Using these methods on an instance is slightly
-more efficient since new :class:`PrettyPrinter` objects don't need to be
-created.
+Các phương thức sau cung cấp phần triển khai cho những hàm tương ứng có cùng tên. Việc sử dụng các phương thức này trên một instance hiệu quả hơn một chút vì không cần tạo các đối tượng :class:`PrettyPrinter` mới.
 
 
 .. method:: PrettyPrinter.isreadable(object)
 
    .. index:: pair: built-in function; eval
 
-   Determine if the formatted representation of the object is "readable," or can be
-   used to reconstruct the value using :func:`eval`.  Note that this returns
-   ``False`` for recursive objects.  If the *depth* parameter of the
-   :class:`PrettyPrinter` is set and the object is deeper than allowed, this
-   returns ``False``.
+   Xác định xem biểu diễn đã được định dạng của đối tượng có "thể đọc được" hay không, hoặc có thể được dùng để tái tạo giá trị bằng :func:`eval`. Lưu ý rằng phương thức này trả về ``False`` đối với các đối tượng đệ quy. Nếu tham số *depth* của
+   :class:`PrettyPrinter` được thiết lập và đối tượng sâu hơn mức cho phép, phương thức này trả về ``False``.
 
 
 .. method:: PrettyPrinter.isrecursive(object)
 
-   Determine if the object requires a recursive representation.
+   Xác định xem đối tượng có cần biểu diễn đệ quy hay không.
 
-This method is provided as a hook to allow subclasses to modify the way objects
-are converted to strings.  The default implementation uses the internals of the
+Phương thức này được cung cấp dưới dạng một hook để cho phép các lớp con sửa đổi cách đối tượng được chuyển đổi thành chuỗi. Cài đặt mặc định sử dụng phần nội bộ của
 :func:`saferepr` implementation.
 
 
 .. method:: PrettyPrinter.format(object, context, maxlevels, level)
 
-   Returns three values: the formatted version of *object* as a string, a flag
-   indicating whether the result is readable, and a flag indicating whether
-   recursion was detected.  The first argument is the object to be presented.  The
-   second is a dictionary which contains the :func:`id` of objects that are part of
-   the current presentation context (direct and indirect containers for *object*
-   that are affecting the presentation) as the keys; if an object needs to be
-   presented which is already represented in *context*, the third return value
-   should be ``True``.  Recursive calls to the :meth:`.format` method should add
-   additional entries for containers to this dictionary.  The third argument,
-   *maxlevels*, gives the requested limit to recursion; this will be ``0`` if there
-   is no requested limit.  This argument should be passed unmodified to recursive
-   calls. The fourth argument, *level*, gives the current level; recursive calls
-   should be passed a value less than that of the current call.
+   Trả về ba giá trị: phiên bản được định dạng của *object* dưới dạng chuỗi, một cờ cho biết kết quả có dễ đọc hay không và một cờ cho biết có phát hiện đệ quy hay không. Đối số thứ nhất là đối tượng cần trình bày. Đối số thứ hai là một từ điển chứa :func:`id` của các đối tượng nằm trong ngữ cảnh trình bày hiện tại (các container trực tiếp và gián tiếp của *object* đang ảnh hưởng đến việc trình bày) làm các khóa; nếu cần trình bày một đối tượng đã được biểu diễn trong *context*, giá trị trả về thứ ba phải là ``True``. Các lời gọi đệ quy đến phương thức :meth:`.format` phải thêm các mục bổ sung cho các container vào từ điển này. Đối số thứ ba, *maxlevels*, chỉ định giới hạn đệ quy được yêu cầu; giá trị này sẽ là ``0`` nếu không có giới hạn nào được yêu cầu. Đối số này phải được truyền nguyên vẹn cho các lời gọi đệ quy. Đối số thứ tư, *level*, chỉ định cấp hiện tại; các lời gọi đệ quy phải được truyền một giá trị nhỏ hơn cấp của lời gọi hiện tại.
 
 
 .. _pprint-example:
 
-Example
--------
+Ví dụ
+-----
 
-To demonstrate several uses of the :func:`~pprint.pp` function and its parameters,
-let's fetch information about a project from `PyPI <https://pypi.org>`_::
+Để minh họa một số cách sử dụng hàm :func:`~pprint.pp` và các tham số của hàm, hãy lấy thông tin về một project từ `PyPI <https://pypi.org>`_::
 
    >>> import json
    >>> import pprint
@@ -268,7 +198,7 @@ let's fetch information about a project from `PyPI <https://pypi.org>`_::
    >>> with urlopen('https://pypi.org/pypi/sampleproject/1.2.0/json') as resp:
    ...     project_info = json.load(resp)['info']
 
-In its basic form, :func:`~pprint.pp` shows the whole object::
+Ở dạng cơ bản, :func:`~pprint.pp` hiển thị toàn bộ đối tượng::
 
    >>> pprint.pp(project_info)
    {'author': 'The Python Packaging Authority',
@@ -324,8 +254,7 @@ In its basic form, :func:`~pprint.pp` shows the whole object::
     'summary': 'A sample Python project',
     'version': '1.2.0'}
 
-The result can be limited to a certain *depth* (ellipsis is used for deeper
-contents)::
+Kết quả có thể được giới hạn ở một *độ sâu* nhất định (dấu ba chấm được dùng cho nội dung ở các cấp sâu hơn)::
 
    >>> pprint.pp(project_info, depth=1)
    {'author': 'The Python Packaging Authority',
@@ -370,8 +299,7 @@ contents)::
     'summary': 'A sample Python project',
     'version': '1.2.0'}
 
-Additionally, maximum character *width* can be suggested. If a long object
-cannot be split, the specified width will be exceeded::
+Ngoài ra, có thể đề xuất *chiều rộng* tối đa tính theo số ký tự. Nếu không thể tách một đối tượng dài, chiều rộng được chỉ định sẽ bị vượt quá::
 
    >>> pprint.pp(project_info, depth=1, width=60)
    {'author': 'The Python Packaging Authority',
@@ -418,3 +346,5 @@ cannot be split, the specified width will be exceeded::
     'requires_python': None,
     'summary': 'A sample Python project',
     'version': '1.2.0'}
+
+.. _`PyPI`: https://pypi.org

@@ -2,9 +2,9 @@
 ============================================
 
 .. module:: http.client
-   :synopsis: HTTP and HTTPS protocol client (requires sockets).
+   :synopsis: Ứng dụng khách cho giao thức HTTP và HTTPS (yêu cầu sockets).
 
-**Source code:** :source:`Lib/http/client.py`
+**Mã nguồn:** :source:`Lib/http/client.py`
 
 .. index::
    pair: HTTP; protocol
@@ -14,42 +14,28 @@
 
 --------------
 
-This module defines classes that implement the client side of the HTTP and
-HTTPS protocols.  It is normally not used directly --- the module
-:mod:`urllib.request` uses it to handle URLs that use HTTP and HTTPS.
+Mô-đun này định nghĩa các lớp triển khai phía ứng dụng khách của các giao thức HTTP và HTTPS. Thông thường, mô-đun này không được sử dụng trực tiếp --- mô-đun
+:mod:`urllib.request` sử dụng nó để xử lý các URL sử dụng HTTP và HTTPS.
 
 .. seealso::
 
-    The `Requests package <https://requests.readthedocs.io/en/latest/>`_
-    is recommended for a higher-level HTTP client interface.
+    Gói `Requests package <https://requests.readthedocs.io/en/latest/>`_ được khuyến nghị để cung cấp giao diện ứng dụng khách HTTP ở cấp cao hơn.
 
 .. note::
 
-   HTTPS support is only available if Python was compiled with SSL support
-   (through the :mod:`ssl` module).
+   Chỉ có thể hỗ trợ HTTPS nếu Python được biên dịch với hỗ trợ SSL (thông qua mô-đun :mod:`ssl`).
 
 .. include:: ../includes/wasm-notavail.rst
 
-The module provides the following classes:
+Mô-đun cung cấp các lớp sau:
 
 
 .. class:: HTTPConnection(host, port=None[, timeout], source_address=None, \
                           blocksize=8192)
 
-   An :class:`HTTPConnection` instance represents one transaction with an HTTP
-   server.  It should be instantiated by passing it a host and optional port
-   number.  If no port number is passed, the port is extracted from the host
-   string if it has the form ``host:port``, else the default HTTP port (80) is
-   used.  If the optional *timeout* parameter is given, blocking
-   operations (like connection attempts) will timeout after that many seconds
-   (if it is not given, the global default timeout setting is used).
-   The optional *source_address* parameter may be a tuple of a (host, port)
-   to use as the source address the HTTP connection is made from.
-   The optional *blocksize* parameter sets the buffer size in bytes for
-   sending a file-like message body.
+   Một đối tượng :class:`HTTPConnection` đại diện cho một giao dịch với máy chủ HTTP. Đối tượng này nên được khởi tạo bằng cách truyền vào một host và số cổng tùy chọn. Nếu không truyền số cổng, cổng sẽ được trích xuất từ chuỗi host nếu chuỗi có dạng ``host:port``; nếu không, cổng HTTP mặc định (80) sẽ được sử dụng. Nếu truyền tham số *timeout* tùy chọn, các thao tác blocking (chẳng hạn như việc cố gắng kết nối) sẽ hết thời gian chờ sau số giây tương ứng (nếu không truyền, thiết lập timeout mặc định toàn cục sẽ được sử dụng). Tham số *source_address* tùy chọn có thể là một tuple gồm (host, port) để sử dụng làm địa chỉ nguồn nơi kết nối HTTP được thiết lập. Tham số *blocksize* tùy chọn đặt kích thước bộ đệm tính bằng byte để gửi phần thân thông điệp dạng file-like.
 
-   For example, the following calls all create instances that connect to the server
-   at the same host and port::
+   Ví dụ, tất cả các lệnh gọi sau đều tạo ra các đối tượng kết nối đến máy chủ có cùng host và port::
 
       >>> h1 = http.client.HTTPConnection('www.python.org')
       >>> h2 = http.client.HTTPConnection('www.python.org:80')
@@ -57,244 +43,184 @@ The module provides the following classes:
       >>> h4 = http.client.HTTPConnection('www.python.org', 80, timeout=10)
 
    .. versionchanged:: 3.2
-      *source_address* was added.
+      Đã thêm *source_address*.
 
    .. versionchanged:: 3.4
-      The  *strict* parameter was removed. HTTP 0.9-style "Simple Responses" are
-      no longer supported.
+      Tham số *strict* đã bị xóa. Các "Simple Responses" theo kiểu HTTP 0.9 không còn được hỗ trợ.
 
    .. versionchanged:: 3.7
-      *blocksize* parameter was added.
+      Đã thêm tham số *blocksize*.
 
 
 .. class:: HTTPSConnection(host, port=None, *[, timeout], \
-                           source_address=None, context=None, \
-                           blocksize=8192)
+                           source_address=None, context=None, \ blocksize=8192)
 
-   A subclass of :class:`HTTPConnection` that uses SSL for communication with
-   secure servers.  Default port is ``443``.  If *context* is specified, it
-   must be a :class:`ssl.SSLContext` instance describing the various SSL
-   options.
+   Một lớp con của :class:`HTTPConnection` sử dụng SSL để giao tiếp với các máy chủ bảo mật. Cổng mặc định là ``443``. Nếu chỉ định *context*, thì giá trị này phải là một thực thể :class:`ssl.SSLContext` mô tả các tùy chọn SSL khác nhau.
 
-   Please read :ref:`ssl-security` for more information on best practices.
+   Vui lòng đọc :ref:`ssl-security` để biết thêm thông tin về các phương pháp hay nhất.
 
    .. versionchanged:: 3.2
-      *source_address*, *context* and *check_hostname* were added.
+      *source_address*, *context* và *check_hostname* đã được bổ sung.
 
    .. versionchanged:: 3.2
-      This class now supports HTTPS virtual hosts if possible (that is,
-      if :const:`ssl.HAS_SNI` is true).
+      Lớp này hiện hỗ trợ các virtual host HTTPS nếu có thể (nghĩa là nếu :const:`ssl.HAS_SNI` là true).
 
    .. versionchanged:: 3.4
-      The *strict* parameter was removed. HTTP 0.9-style "Simple Responses" are
-      no longer supported.
+      Tham số *strict* đã bị loại bỏ. Các "Phản hồi đơn giản" theo kiểu HTTP 0.9 không còn được hỗ trợ.
 
    .. versionchanged:: 3.4.3
-      This class now performs all the necessary certificate and hostname checks
-      by default. To revert to the previous, unverified, behavior
-      :func:`!ssl._create_unverified_context` can be passed to the *context*
-      parameter.
+      Lớp này hiện thực hiện tất cả các bước kiểm tra chứng chỉ và hostname cần thiết theo mặc định. Để khôi phục hành vi trước đây, không thực hiện xác minh
+      :func:`!ssl._create_unverified_context` có thể được truyền vào tham số *context*.
 
    .. versionchanged:: 3.8
-      This class now enables TLS 1.3
-      :attr:`ssl.SSLContext.post_handshake_auth` for the default *context* or
-      when *cert_file* is passed with a custom *context*.
+      Lớp này hiện cho phép TLS 1.3
+      :attr:`ssl.SSLContext.post_handshake_auth` cho *context* mặc định hoặc khi *cert_file* được truyền cùng với *context* tùy chỉnh.
 
    .. versionchanged:: 3.10
-      This class now sends an ALPN extension with protocol indicator
-      ``http/1.1`` when no *context* is given. Custom *context* should set
-      ALPN protocols with :meth:`~ssl.SSLContext.set_alpn_protocols`.
+      Khi không cung cấp *context*, lớp này hiện gửi một phần mở rộng ALPN với chỉ báo giao thức ``http/1.1``. *context* tùy chỉnh nên thiết lập các giao thức ALPN bằng :meth:`~ssl.SSLContext.set_alpn_protocols`.
 
    .. versionchanged:: 3.12
-      The deprecated *key_file*, *cert_file* and *check_hostname* parameters
-      have been removed.
+      Các tham số không còn được khuyến nghị *key_file*, *cert_file* và *check_hostname* đã bị loại bỏ.
 
 
 .. class:: HTTPResponse(sock, debuglevel=0, method=None, url=None)
 
-   Class whose instances are returned upon successful connection.  Not
-   instantiated directly by user.
+   Lớp có các thể hiện được trả về khi kết nối thành công. Người dùng không khởi tạo lớp này trực tiếp.
 
    .. versionchanged:: 3.4
-      The *strict* parameter was removed. HTTP 0.9 style "Simple Responses" are
-      no longer supported.
+      Tham số *strict* đã bị loại bỏ. Các "Simple Responses" theo kiểu HTTP 0.9 không còn được hỗ trợ.
 
-This module provides the following function:
+Mô-đun này cung cấp hàm sau:
 
 .. function:: parse_headers(fp)
 
-   Parse the headers from a file pointer *fp* representing a HTTP
-   request/response. The file has to be a :class:`~io.BufferedIOBase` reader
-   (i.e. not text) and must provide a valid :rfc:`5322` style header.
+   Phân tích các header từ con trỏ tệp *fp* đại diện cho một yêu cầu/phản hồi HTTP. Tệp phải là một reader :class:`~io.BufferedIOBase` (tức là không phải văn bản) và phải cung cấp header kiểu :rfc:`5322` hợp lệ.
 
-   This function returns an instance of :class:`http.client.HTTPMessage`
-   that holds the header fields, but no payload
-   (the same as :attr:`HTTPResponse.msg`
-   and :attr:`http.server.BaseHTTPRequestHandler.headers`).
-   After returning, the file pointer *fp* is ready to read the HTTP body.
+   Hàm này trả về một thực thể của :class:`http.client.HTTPMessage` chứa các trường header nhưng không có payload (giống như :attr:`HTTPResponse.msg` và :attr:`http.server.BaseHTTPRequestHandler.headers`). Sau khi hàm trả về, con trỏ tệp *fp* đã sẵn sàng để đọc phần nội dung HTTP.
 
    .. note::
       :meth:`parse_headers` does not parse the start-line of a HTTP message;
-      it only parses the ``Name: value`` lines. The file has to be ready to
-      read these field lines, so the first line should already be consumed
-      before calling the function.
+      hàm này chỉ phân tích các dòng ``Name: value``. Tệp phải sẵn sàng để đọc các dòng trường này, vì vậy dòng đầu tiên phải được đọc trước khi gọi hàm.
 
-The following exceptions are raised as appropriate:
+Các ngoại lệ sau sẽ được phát sinh khi thích hợp:
 
 
 .. exception:: HTTPException
 
-   The base class of the other exceptions in this module.  It is a subclass of
+   Lớp cơ sở của các ngoại lệ khác trong mô-đun này. Đây là lớp con của
    :exc:`Exception`.
 
 
 .. exception:: NotConnected
 
-   A subclass of :exc:`HTTPException`.
+   Một lớp con của :exc:`HTTPException`.
 
 
 .. exception:: InvalidURL
 
-   A subclass of :exc:`HTTPException`, raised if a port is given and is either
-   non-numeric or empty.
+   Một lớp con của :exc:`HTTPException`, được phát sinh khi một cổng được cung cấp nhưng không phải là số hoặc bị để trống.
 
 
 .. exception:: UnknownProtocol
 
-   A subclass of :exc:`HTTPException`.
+   Một lớp con của :exc:`HTTPException`.
 
 
 .. exception:: UnknownTransferEncoding
 
-   A subclass of :exc:`HTTPException`.
+   Một lớp con của :exc:`HTTPException`.
 
 
 .. exception:: UnimplementedFileMode
 
-   A subclass of :exc:`HTTPException`.
+   Một lớp con của :exc:`HTTPException`.
 
 
 .. exception:: IncompleteRead
 
-   A subclass of :exc:`HTTPException`.
+   Một lớp con của :exc:`HTTPException`.
 
 
 .. exception:: ImproperConnectionState
 
-   A subclass of :exc:`HTTPException`.
+   Một lớp con của :exc:`HTTPException`.
 
 
 .. exception:: CannotSendRequest
 
-   A subclass of :exc:`ImproperConnectionState`.
+   Một lớp con của :exc:`ImproperConnectionState`.
 
 
 .. exception:: CannotSendHeader
 
-   A subclass of :exc:`ImproperConnectionState`.
+   Một lớp con của :exc:`ImproperConnectionState`.
 
 
 .. exception:: ResponseNotReady
 
-   A subclass of :exc:`ImproperConnectionState`.
+   Một lớp con của :exc:`ImproperConnectionState`.
 
 
 .. exception:: BadStatusLine
 
-   A subclass of :exc:`HTTPException`.  Raised if a server responds with a HTTP
-   status code that we don't understand.
+   Một lớp con của :exc:`HTTPException`. Được phát sinh nếu máy chủ phản hồi bằng mã trạng thái HTTP mà chúng ta không hiểu.
 
 
 .. exception:: LineTooLong
 
-   A subclass of :exc:`HTTPException`.  Raised if an excessively long line
-   is received in the HTTP protocol from the server.
+   Một lớp con của :exc:`HTTPException`. Được phát sinh nếu nhận được một dòng quá dài trong giao thức HTTP từ máy chủ.
 
 
 .. exception:: RemoteDisconnected
 
-   A subclass of :exc:`ConnectionResetError` and :exc:`BadStatusLine`.  Raised
-   by :meth:`HTTPConnection.getresponse` when the attempt to read the response
-   results in no data read from the connection, indicating that the remote end
-   has closed the connection.
+   Một lớp con của :exc:`ConnectionResetError` và :exc:`BadStatusLine`. Được :meth:`HTTPConnection.getresponse` phát sinh khi nỗ lực đọc phản hồi không đọc được dữ liệu nào từ kết nối, cho biết đầu bên kia đã đóng kết nối.
 
    .. versionadded:: 3.5
-      Previously, :exc:`BadStatusLine`\ ``('')`` was raised.
+      Trước đây, :exc:`BadStatusLine`\ ``('')`` đã được phát sinh.
 
 
-The constants defined in this module are:
+Các hằng số được định nghĩa trong module này là:
 
 .. data:: HTTP_PORT
 
-   The default port for the HTTP protocol (always ``80``).
+   Cổng mặc định cho giao thức HTTP (luôn là ``80``).
 
 .. data:: HTTPS_PORT
 
-   The default port for the HTTPS protocol (always ``443``).
+   Cổng mặc định cho giao thức HTTPS (luôn là ``443``).
 
 .. data:: responses
 
-   This dictionary maps the HTTP 1.1 status codes to the W3C names.
+   Từ điển này ánh xạ các mã trạng thái HTTP 1.1 với tên W3C.
 
-   Example: ``http.client.responses[http.client.NOT_FOUND]`` is ``'Not Found'``.
+   Ví dụ: ``http.client.responses[http.client.NOT_FOUND]`` là ``'Not Found'``.
 
-See :ref:`http-status-codes` for a list of HTTP status codes that are
-available in this module as constants.
+Xem :ref:`http-status-codes` để biết danh sách các mã trạng thái HTTP có sẵn trong mô-đun này dưới dạng hằng số.
 
 
 .. _httpconnection-objects:
 
-HTTPConnection Objects
-----------------------
+Đối tượng HTTPConnection
+------------------------
 
-:class:`HTTPConnection` instances have the following methods:
+Các instance của :class:`HTTPConnection` có những phương thức sau:
 
 
 .. method:: HTTPConnection.request(method, url, body=None, headers={}, *, \
             encode_chunked=False)
 
-   This will send a request to the server using the HTTP request
-   method *method* and the request URI *url*. The provided *url* must be
-   an absolute path to conform with :rfc:`RFC 2616 §5.1.2 <2616#section-5.1.2>`
-   (unless connecting to an HTTP proxy server or using the ``OPTIONS`` or
-   ``CONNECT`` methods).
+   Thao tác này sẽ gửi một request đến máy chủ bằng HTTP request method *method* và request URI *url*. *url* được cung cấp phải là một đường dẫn tuyệt đối để tuân thủ :rfc:`RFC 2616 §5.1.2 <2616#section-5.1.2>` (trừ khi kết nối đến HTTP proxy server hoặc sử dụng các method ``OPTIONS`` hoặc ``CONNECT``).
 
-   If *body* is specified, the specified data is sent after the headers are
-   finished.  It may be a :class:`str`, a :term:`bytes-like object`, an
-   open :term:`file object`, or an iterable of :class:`bytes`.  If *body*
-   is a string, it is encoded as ISO-8859-1, the default for HTTP.  If it
-   is a bytes-like object, the bytes are sent as is.  If it is a :term:`file
-   object`, the contents of the file is sent; this file object should
-   support at least the ``read()`` method.  If the file object is an
-   instance of :class:`io.TextIOBase`, the data returned by the ``read()``
-   method will be encoded as ISO-8859-1, otherwise the data returned by
-   ``read()`` is sent as is.  If *body* is an iterable, the elements of the
-   iterable are sent as is until the iterable is :term:`exhausted`.
+   Nếu *body* được chỉ định, dữ liệu đã chỉ định sẽ được gửi sau khi hoàn tất các headers. Dữ liệu này có thể là một :class:`str`, một :term:`bytes-like object`, một :term:`file object` đang mở hoặc một iterable của :class:`bytes`. Nếu *body* là một chuỗi, chuỗi đó được mã hóa bằng ISO-8859-1, là mã hóa mặc định cho HTTP. Nếu đó là một đối tượng dạng bytes, các byte sẽ được gửi nguyên trạng. Nếu đó là một :term:`file object`, nội dung của tệp sẽ được gửi; đối tượng tệp này ít nhất phải hỗ trợ phương thức ``read()`` Nếu đối tượng tệp là một instance của :class:`io.TextIOBase`, dữ liệu do phương thức ``read()`` trả về sẽ được mã hóa bằng ISO-8859-1; nếu không, dữ liệu do ``read()`` trả về sẽ được gửi nguyên trạng. Nếu *body* là một iterable, các phần tử của iterable sẽ được gửi nguyên trạng cho đến khi iterable được :term:`exhausted`.
 
-   The *headers* argument should be a mapping of extra HTTP headers to send
-   with the request. A :rfc:`Host header <2616#section-14.23>`
-   must be provided to conform with :rfc:`RFC 2616 §5.1.2 <2616#section-5.1.2>`
-   (unless connecting to an HTTP proxy server or using the ``OPTIONS`` or
-   ``CONNECT`` methods).
+   Đối số *headers* phải là một mapping chứa các HTTP header bổ sung cần gửi cùng request. Phải cung cấp một :rfc:`Host header <2616#section-14.23>` để tuân thủ :rfc:`RFC 2616 §5.1.2 <2616#section-5.1.2>` (trừ khi kết nối đến HTTP proxy server hoặc sử dụng các method ``OPTIONS`` hoặc ``CONNECT``).
 
-   If *headers* contains neither Content-Length nor Transfer-Encoding,
-   but there is a request body, one of those
-   header fields will be added automatically.  If
-   *body* is ``None``, the Content-Length header is set to ``0`` for
-   methods that expect a body (``PUT``, ``POST``, and ``PATCH``).  If
-   *body* is a string or a bytes-like object that is not also a
-   :term:`file <file object>`, the Content-Length header is
-   set to its length.  Any other type of *body* (files
-   and iterables in general) will be chunk-encoded, and the
-   Transfer-Encoding header will automatically be set instead of
-   Content-Length.
+   Nếu *headers* không chứa Content-Length cũng như Transfer-Encoding, nhưng có request body, một trong các trường header đó sẽ được tự động thêm vào. Nếu *body* là ``None``, header Content-Length được đặt thành ``0`` cho các method yêu cầu body (``PUT``, ``POST`` và ``PATCH``). Nếu *body* là một string hoặc một đối tượng giống bytes nhưng không đồng thời là một
+   :term:`file <file object>`, header Content-Length được đặt bằng độ dài của nó. Mọi kiểu *body* khác (file và iterable nói chung) sẽ được mã hóa theo chunk, còn header Transfer-Encoding sẽ tự động được đặt thay cho Content-Length.
 
-   The *encode_chunked* argument is only relevant if Transfer-Encoding is
-   specified in *headers*.  If *encode_chunked* is ``False``, the
-   HTTPConnection object assumes that all encoding is handled by the
-   calling code.  If it is ``True``, the body will be chunk-encoded.
+   Đối số *encode_chunked* chỉ có ý nghĩa khi Transfer-Encoding được chỉ định trong *headers*. Nếu *encode_chunked* là ``False``, đối tượng HTTPConnection giả định rằng toàn bộ việc encoding được xử lý bởi code gọi nó. Nếu là ``True``, body sẽ được mã hóa theo chunk.
 
-   For example, to perform a ``GET`` request to ``https://docs.python.org/3/``::
+   Ví dụ, để thực hiện một yêu cầu ``GET`` tới ``https://docs.python.org/3/``::
 
       >>> import http.client
       >>> host = "docs.python.org"
@@ -305,76 +231,48 @@ HTTPConnection Objects
       200 OK
 
    .. note::
-      Chunked transfer encoding has been added to the HTTP protocol
-      version 1.1.  Unless the HTTP server is known to handle HTTP 1.1,
-      the caller must either specify the Content-Length, or must pass a
-      :class:`str` or bytes-like object that is not also a file as the
-      body representation.
+      Mã hóa truyền theo chunk đã được bổ sung vào phiên bản 1.1 của giao thức HTTP. Trừ khi biết chắc máy chủ HTTP xử lý HTTP 1.1, bên gọi phải chỉ định Content-Length hoặc phải truyền một
+      :class:`str` hoặc đối tượng tương tự bytes không đồng thời là tệp làm phần biểu diễn body.
 
    .. note::
 
-      Note that you must have read the whole response or call :meth:`close`
-      if :meth:`getresponse` raised an non-:exc:`ConnectionError` exception
-      before you can send a new request to the server.
+      Lưu ý rằng bạn phải đọc toàn bộ response hoặc gọi :meth:`close` nếu :meth:`getresponse` đã phát sinh một ngoại lệ không phải :exc:`ConnectionError` trước khi có thể gửi yêu cầu mới đến máy chủ.
 
    .. versionchanged:: 3.2
-      *body* can now be an iterable.
+      *body* giờ đây có thể là một iterable.
 
    .. versionchanged:: 3.6
-      If neither Content-Length nor Transfer-Encoding are set in
-      *headers*, file and iterable *body* objects are now chunk-encoded.
-      The *encode_chunked* argument was added.
-      No attempt is made to determine the Content-Length for file
-      objects.
+      Nếu cả Content-Length lẫn Transfer-Encoding đều không được đặt trong *headers*, các đối tượng *body* dạng tệp và iterable hiện được mã hóa theo chunk. Đã bổ sung đối số *encode_chunked*. Không có nỗ lực nào được thực hiện để xác định Content-Length cho các đối tượng tệp.
 
 .. method:: HTTPConnection.getresponse()
 
-   Should be called after a request is sent to get the response from the server.
-   Returns an :class:`HTTPResponse` instance.
+   Nên được gọi sau khi gửi một request để nhận response từ máy chủ. Trả về một instance :class:`HTTPResponse`.
 
    .. versionchanged:: 3.5
-      If a :exc:`ConnectionError` or subclass is raised, the
-      :class:`HTTPConnection` object will be ready to reconnect when
-      a new request is sent.
+      Nếu một :exc:`ConnectionError` hoặc lớp con được phát sinh, đối tượng
+      :class:`HTTPConnection` sẽ sẵn sàng kết nối lại khi một request mới được gửi.
 
-      Note that this does not apply to :exc:`OSError`\s raised by the underlying
-      socket. Instead the caller is responsible to call :meth:`close` on the
-      existing connection.
+      Lưu ý rằng điều này không áp dụng cho :exc:`OSError`\s được phát sinh bởi socket bên dưới. Thay vào đó, caller chịu trách nhiệm gọi :meth:`close` trên connection hiện có.
 
 
 .. method:: HTTPConnection.set_debuglevel(level)
 
-   Set the debugging level.  The default debug level is ``0``, meaning no
-   debugging output is printed.  Any value greater than ``0`` will cause all
-   currently defined debug output to be printed to stdout.  The ``debuglevel``
-   is passed to any new :class:`HTTPResponse` objects that are created.
+   Đặt mức debugging. Mức debug mặc định là ``0``, nghĩa là không in output debugging nào. Bất kỳ giá trị nào lớn hơn ``0`` sẽ khiến tất cả output debugging hiện được định nghĩa được in ra stdout. ``debuglevel`` được truyền cho mọi đối tượng :class:`HTTPResponse` mới được tạo.
 
    .. versionadded:: 3.1
 
 
 .. method:: HTTPConnection.set_tunnel(host, port=None, headers=None)
 
-   Set the host and the port for HTTP Connect Tunnelling. This allows running
-   the connection through a proxy server.
+   Đặt host và port cho HTTP Connect Tunnelling. Điều này cho phép chạy connection thông qua proxy server.
 
-   The *host* and *port* arguments specify the endpoint of the tunneled connection
-   (i.e. the address included in the CONNECT request, *not* the address of the
-   proxy server).
+   Các đối số *host* và *port* chỉ định endpoint của connection được tunnel (tức là địa chỉ được đưa vào request CONNECT, *không phải* địa chỉ của proxy server).
 
-   The *headers* argument should be a mapping of extra HTTP headers to send with
-   the CONNECT request.
+   Đối số *headers* phải là một mapping gồm các HTTP header bổ sung cần gửi cùng request CONNECT.
 
-   As HTTP/1.1 is used for HTTP CONNECT tunnelling request, `as per the RFC
-   <https://datatracker.ietf.org/doc/html/rfc7231#section-4.3.6>`_, a HTTP ``Host:``
-   header must be provided, matching the authority-form of the request target
-   provided as the destination for the CONNECT request. If a HTTP ``Host:``
-   header is not provided via the headers argument, one is generated and
-   transmitted automatically.
+   Vì HTTP/1.1 được sử dụng cho yêu cầu tunnelling HTTP CONNECT, `theo RFC <https://datatracker.ietf.org/doc/html/rfc7231#section-4.3.6>`_, một HTTP ``Host:`` header phải được cung cấp, khớp với dạng authority-form của request target được cung cấp làm đích cho yêu cầu CONNECT. Nếu không cung cấp HTTP ``Host:`` header thông qua đối số headers, một header sẽ được tự động tạo và truyền đi.
 
-   For example, to tunnel through a HTTPS proxy server running locally on port
-   8080, we would pass the address of the proxy to the :class:`HTTPSConnection`
-   constructor, and the address of the host that we eventually want to reach to
-   the :meth:`~HTTPConnection.set_tunnel` method::
+   Ví dụ, để tunnelling qua một HTTPS proxy server đang chạy cục bộ trên cổng 8080, chúng ta sẽ truyền địa chỉ của proxy cho constructor :class:`HTTPSConnection`, và địa chỉ của host mà cuối cùng chúng ta muốn truy cập cho method :meth:`~HTTPConnection.set_tunnel`::
 
       >>> import http.client
       >>> conn = http.client.HTTPSConnection("localhost", 8080)
@@ -384,97 +282,68 @@ HTTPConnection Objects
    .. versionadded:: 3.2
 
    .. versionchanged:: 3.12
-      HTTP CONNECT tunnelling requests use protocol HTTP/1.1, upgraded from
-      protocol HTTP/1.0. ``Host:`` HTTP headers are mandatory for HTTP/1.1, so
-      one will be automatically generated and transmitted if not provided in
-      the headers argument.
+      Các yêu cầu HTTP CONNECT tunnelling sử dụng protocol HTTP/1.1, được nâng cấp từ protocol HTTP/1.0. ``Host:`` HTTP headers là bắt buộc đối với HTTP/1.1, vì vậy một header sẽ được tự động tạo và truyền đi nếu không được cung cấp trong đối số headers.
 
 
 .. method:: HTTPConnection.get_proxy_response_headers()
 
-   Returns a dictionary with the headers of the response received from
-   the proxy server to the CONNECT request.
+   Trả về một dictionary chứa các headers của response nhận được từ proxy server cho yêu cầu CONNECT.
 
-   If the CONNECT request was not sent, the method returns ``None``.
+   Nếu yêu cầu CONNECT chưa được gửi, method sẽ trả về ``None``.
 
    .. versionadded:: 3.12
 
 
 .. method:: HTTPConnection.connect()
 
-   Connect to the server specified when the object was created.  By default,
-   this is called automatically when making a request if the client does not
-   already have a connection.
+   Kết nối đến server được chỉ định khi object được tạo. Theo mặc định, thao tác này được tự động gọi khi thực hiện request nếu client chưa có kết nối.
 
    .. audit-event:: http.client.connect self,host,port http.client.HTTPConnection.connect
 
 
 .. method:: HTTPConnection.close()
 
-   Close the connection to the server.
+   Đóng kết nối đến server.
 
 
 .. attribute:: HTTPConnection.blocksize
 
-   Buffer size in bytes for sending a file-like message body.
+   Kích thước bộ đệm tính bằng byte để gửi phần thân thông báo dạng tệp.
 
    .. versionadded:: 3.7
 
 
-As an alternative to using the :meth:`~HTTPConnection.request` method described above, you can
-also send your request step by step, by using the four functions below.
+Ngoài việc sử dụng phương thức :meth:`~HTTPConnection.request` được mô tả ở trên, bạn cũng có thể gửi yêu cầu từng bước bằng cách sử dụng bốn hàm dưới đây.
 
 
 .. method:: HTTPConnection.putrequest(method, url, skip_host=False, \
                                       skip_accept_encoding=False)
 
-   This should be the first call after the connection to the server has been
-   made. It sends a line to the server consisting of the *method* string,
-   the *url* string, and the HTTP version (``HTTP/1.1``).  To disable automatic
-   sending of ``Host:`` or ``Accept-Encoding:`` headers (for example to accept
-   additional content encodings), specify *skip_host* or *skip_accept_encoding*
-   with non-False values.
+   Đây phải là lời gọi đầu tiên sau khi đã thiết lập kết nối với máy chủ. Lời gọi này gửi một dòng đến máy chủ, bao gồm chuỗi *method*, chuỗi *url* và phiên bản HTTP (``HTTP/1.1``). Để tắt việc tự động gửi các header ``Host:`` hoặc ``Accept-Encoding:`` (ví dụ: để chấp nhận các content encoding bổ sung), hãy chỉ định *skip_host* hoặc *skip_accept_encoding* với các giá trị khác False.
 
 
 .. method:: HTTPConnection.putheader(header, argument[, ...])
 
-   Send an :rfc:`822`\ -style header to the server.  It sends a line to the server
-   consisting of the header, a colon and a space, and the first argument.  If more
-   arguments are given, continuation lines are sent, each consisting of a tab and
-   an argument.
+   Gửi một header kiểu :rfc:`822`\  đến máy chủ. Lời gọi này gửi một dòng đến máy chủ, bao gồm header, dấu hai chấm và một khoảng trắng, rồi đến đối số đầu tiên. Nếu có thêm đối số, các dòng tiếp nối sẽ được gửi, mỗi dòng bao gồm một tab và một đối số.
 
 
 .. method:: HTTPConnection.endheaders(message_body=None, *, encode_chunked=False)
 
-   Send a blank line to the server, signalling the end of the headers. The
-   optional *message_body* argument can be used to pass a message body
-   associated with the request.
+   Gửi một dòng trống đến máy chủ để báo hiệu kết thúc các header. Có thể sử dụng đối số tùy chọn *message_body* để truyền phần thân thông báo gắn với yêu cầu.
 
-   If *encode_chunked* is ``True``, the result of each iteration of
-   *message_body* will be chunk-encoded as specified in :rfc:`7230`,
-   Section 3.3.1.  How the data is encoded is dependent on the type of
-   *message_body*.  If *message_body* implements the :ref:`buffer interface
-   <bufferobjects>` the encoding will result in a single chunk.
-   If *message_body* is a :class:`collections.abc.Iterable`, each iteration
-   of *message_body* will result in a chunk.  If *message_body* is a
-   :term:`file object`, each call to ``.read()`` will result in a chunk.
-   The method automatically signals the end of the chunk-encoded data
-   immediately after *message_body*.
+   Nếu *encode_chunked* là ``True``, kết quả của mỗi lần lặp qua *message_body* sẽ được mã hóa theo từng chunk như quy định trong :rfc:`7230`, Mục 3.3.1. Cách mã hóa dữ liệu phụ thuộc vào kiểu của *message_body*. Nếu *message_body* triển khai :ref:`buffer interface <bufferobjects>` thì việc mã hóa sẽ tạo ra một chunk duy nhất. Nếu *message_body* là một :class:`collections.abc.Iterable`, mỗi lần lặp qua *message_body* sẽ tạo ra một chunk. Nếu *message_body* là một
+   :term:`file object`, mỗi lần gọi ``.read()`` sẽ tạo ra một chunk. Phương thức này tự động báo hiệu kết thúc dữ liệu được mã hóa theo chunk ngay sau *message_body*.
 
-   .. note:: Due to the chunked encoding specification, empty chunks
-      yielded by an iterator body will be ignored by the chunk-encoder.
-      This is to avoid premature termination of the read of the request by
-      the target server due to malformed encoding.
+   .. note:: Theo đặc tả mã hóa theo chunk, các chunk rỗng do một iterator body tạo ra sẽ bị chunk-encoder bỏ qua. Điều này nhằm tránh việc máy chủ đích kết thúc sớm quá trình đọc request do mã hóa không đúng định dạng.
 
    .. versionchanged:: 3.6
-      Added chunked encoding support and the *encode_chunked* parameter.
+      Đã bổ sung hỗ trợ mã hóa theo chunk và tham số *encode_chunked*.
 
 
 .. method:: HTTPConnection.send(data)
 
-   Send data to the server.  This should be used directly only after the
-   :meth:`endheaders` method has been called and before :meth:`getresponse` is
-   called.
+   Gửi dữ liệu đến máy chủ. Chỉ nên sử dụng trực tiếp thao tác này sau khi
+   phương thức :meth:`endheaders` đã được gọi và trước khi gọi :meth:`getresponse`.
 
    .. audit-event:: http.client.send self,data http.client.HTTPConnection.send
 
@@ -484,96 +353,86 @@ also send your request step by step, by using the four functions below.
 HTTPResponse Objects
 --------------------
 
-An :class:`HTTPResponse` instance wraps the HTTP response from the
-server.  It provides access to the request headers and the entity
-body.  The response is an iterable object and can be used in a with
-statement.
+Một instance :class:`HTTPResponse` bọc response HTTP từ máy chủ. Nó cung cấp quyền truy cập vào các request header và entity body. Response là một iterable object và có thể được sử dụng trong câu lệnh with.
 
 .. versionchanged:: 3.5
-   The :class:`io.BufferedIOBase` interface is now implemented and
-   all of its reader operations are supported.
+   Giao diện :class:`io.BufferedIOBase` hiện đã được triển khai và tất cả thao tác đọc của giao diện đều được hỗ trợ.
 
 
 .. method:: HTTPResponse.read([amt])
 
-   Reads and returns the response body, or up to the next *amt* bytes.
+   Đọc và trả về phần thân phản hồi, hoặc tối đa *amt* byte tiếp theo.
 
 .. method:: HTTPResponse.readinto(b)
 
-   Reads up to the next len(b) bytes of the response body into the buffer *b*.
-   Returns the number of bytes read.
+   Đọc tối đa len(b) byte tiếp theo của phần thân phản hồi vào bộ đệm *b*. Trả về số byte đã đọc.
 
    .. versionadded:: 3.3
 
 .. method:: HTTPResponse.getheader(name, default=None)
 
-   Return the value of the header *name*, or *default* if there is no header
-   matching *name*.  If there is more than one  header with the name *name*,
-   return all of the values joined by ', '.  If *default* is any iterable other
-   than a single string, its elements are similarly returned joined by commas.
+   Trả về giá trị của header *name*, hoặc *default* nếu không có header nào khớp với *name*. Nếu có nhiều header có tên *name*, trả về tất cả các giá trị, được nối bằng ', '. Nếu *default* là bất kỳ iterable nào không phải một chuỗi đơn, các phần tử của nó cũng được trả về bằng cách nối chúng bằng dấu phẩy.
 
 .. method:: HTTPResponse.getheaders()
 
-   Return a list of (header, value) tuples.
+   Trả về danh sách các tuple (header, value).
 
 .. method:: HTTPResponse.fileno()
 
-   Return the ``fileno`` of the underlying socket.
+   Trả về ``fileno`` của socket bên dưới.
 
 .. attribute:: HTTPResponse.msg
 
-   A :class:`http.client.HTTPMessage` instance containing the response
-   headers.  :class:`http.client.HTTPMessage` is a subclass of
+   Một instance :class:`http.client.HTTPMessage` chứa các header của phản hồi. :class:`http.client.HTTPMessage` là một lớp con của
    :class:`email.message.Message`.
 
 .. attribute:: HTTPResponse.version
 
-   HTTP protocol version used by server.  10 for HTTP/1.0, 11 for HTTP/1.1.
+   Phiên bản giao thức HTTP được máy chủ sử dụng.  10 cho HTTP/1.0, 11 cho HTTP/1.1.
 
 .. attribute:: HTTPResponse.url
 
-   URL of the resource retrieved, commonly used to determine if a redirect was followed.
+   URL của tài nguyên đã truy xuất, thường được dùng để xác định xem có chuyển hướng hay không.
 
 .. attribute:: HTTPResponse.headers
 
-   Headers of the response in the form of an :class:`email.message.EmailMessage` instance.
+   Các header của response dưới dạng một instance :class:`email.message.EmailMessage`.
 
 .. attribute:: HTTPResponse.status
 
-   Status code returned by server.
+   Mã trạng thái do máy chủ trả về.
 
 .. attribute:: HTTPResponse.reason
 
-   Reason phrase returned by server.
+   Cụm từ lý do do máy chủ trả về.
 
 .. attribute:: HTTPResponse.debuglevel
 
-   A debugging hook.  If :attr:`debuglevel` is greater than zero, messages
-   will be printed to stdout as the response is read and parsed.
+   Một hook dùng để debug.  Nếu :attr:`debuglevel` lớn hơn 0, các thông báo sẽ được in ra stdout khi response được đọc và phân tích cú pháp.
 
 .. attribute:: HTTPResponse.closed
 
-   Is ``True`` if the stream is closed.
+   Là ``True`` nếu stream đã đóng.
 
 .. method:: HTTPResponse.geturl()
 
    .. deprecated:: 3.9
-      Deprecated in favor of :attr:`~HTTPResponse.url`.
+      Không dùng nữa, thay vào đó sử dụng :attr:`~HTTPResponse.url`.
 
 .. method:: HTTPResponse.info()
 
    .. deprecated:: 3.9
-      Deprecated in favor of :attr:`~HTTPResponse.headers`.
+      Không dùng nữa, thay vào đó sử dụng :attr:`~HTTPResponse.headers`.
 
 .. method:: HTTPResponse.getcode()
 
    .. deprecated:: 3.9
-      Deprecated in favor of :attr:`~HTTPResponse.status`.
+      Không dùng nữa, thay vào đó sử dụng :attr:`~HTTPResponse.status`.
 
-Examples
---------
+Ví dụ
+-----
 
-Here is an example session that uses the ``GET`` method::
+Sau đây là một phiên làm việc ví dụ sử dụng phương thức ``GET``::
 
    >>> import http.client
    >>> conn = http.client.HTTPSConnection("www.python.org")
@@ -581,15 +440,15 @@ Here is an example session that uses the ``GET`` method::
    >>> r1 = conn.getresponse()
    >>> print(r1.status, r1.reason)
    200 OK
-   >>> data1 = r1.read()  # This will return entire content.
-   >>> # The following example demonstrates reading data in chunks.
+   >>> data1 = r1.read()  # Lệnh này sẽ trả về toàn bộ nội dung.
+   >>> # Ví dụ sau minh họa cách đọc dữ liệu theo từng phần.
    >>> conn.request("GET", "/")
    >>> r1 = conn.getresponse()
    >>> while chunk := r1.read(200):
    ...     print(repr(chunk))
    b'<!doctype html>\n<!--[if"...
    ...
-   >>> # Example of an invalid request
+   >>> # Ví dụ về một yêu cầu không hợp lệ
    >>> conn = http.client.HTTPSConnection("docs.python.org")
    >>> conn.request("GET", "/parrot.spam")
    >>> r2 = conn.getresponse()
@@ -598,8 +457,7 @@ Here is an example session that uses the ``GET`` method::
    >>> data2 = r2.read()
    >>> conn.close()
 
-Here is an example session that uses the ``HEAD`` method.  Note that the
-``HEAD`` method never returns any data. ::
+Sau đây là một phiên làm việc mẫu sử dụng phương thức ``HEAD``. Lưu ý rằng phương thức ``HEAD`` không bao giờ trả về dữ liệu nào.::
 
    >>> import http.client
    >>> conn = http.client.HTTPSConnection("www.python.org")
@@ -613,7 +471,7 @@ Here is an example session that uses the ``HEAD`` method.  Note that the
    >>> data == b''
    True
 
-Here is an example session that uses the ``POST`` method::
+Sau đây là một phiên làm việc mẫu sử dụng phương thức ``POST``::
 
    >>> import http.client, urllib.parse
    >>> params = urllib.parse.urlencode({'@number': 12524, '@type': 'issue', '@action': 'show'})
@@ -629,15 +487,11 @@ Here is an example session that uses the ``POST`` method::
    b'Redirecting to <a href="https://bugs.python.org/issue12524">https://bugs.python.org/issue12524</a>'
    >>> conn.close()
 
-Client side HTTP ``PUT`` requests are very similar to ``POST`` requests. The
-difference lies only on the server side where HTTP servers will allow resources to
-be created via ``PUT`` requests. It should be noted that custom HTTP methods
-are also handled in :class:`urllib.request.Request` by setting the appropriate
-method attribute. Here is an example session that uses the ``PUT`` method::
+Các yêu cầu HTTP ``PUT`` phía máy khách rất giống với các yêu cầu ``POST``. Điểm khác biệt chỉ nằm ở phía máy chủ, nơi các máy chủ HTTP cho phép tạo tài nguyên thông qua các yêu cầu ``PUT``. Cần lưu ý rằng các phương thức HTTP tùy chỉnh cũng được xử lý trong :class:`urllib.request.Request` bằng cách đặt thuộc tính method thích hợp. Sau đây là một phiên làm việc mẫu sử dụng phương thức ``PUT``::
 
-    >>> # This creates an HTTP request
-    >>> # with the content of BODY as the enclosed representation
-    >>> # for the resource http://localhost:8080/file
+    >>> # Điều này tạo một yêu cầu HTTP
+    >>> # với nội dung của BODY làm biểu diễn được đính kèm
+    >>> # cho tài nguyên http://localhost:8080/file
     ...
     >>> import http.client
     >>> BODY = "***filecontents***"
@@ -649,12 +503,14 @@ method attribute. Here is an example session that uses the ``PUT`` method::
 
 .. _httpmessage-objects:
 
-HTTPMessage Objects
--------------------
+Đối tượng HTTPMessage
+---------------------
 
 .. class:: HTTPMessage(email.message.Message)
 
-An :class:`http.client.HTTPMessage` instance holds the headers from an HTTP
-response.  It is implemented using the :class:`email.message.Message` class.
+Một thực thể :class:`http.client.HTTPMessage` chứa các header từ một phản hồi HTTP. Nó được triển khai bằng lớp :class:`email.message.Message`.
 
 .. XXX Define the methods that clients can depend upon between versions.
+
+.. _`Requests package`: https://requests.readthedocs.io/en/latest/
+.. _`as per the RFC`: https://datatracker.ietf.org/doc/html/rfc7231#section-4.3.6

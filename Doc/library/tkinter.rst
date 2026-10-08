@@ -1,219 +1,157 @@
-:mod:`!tkinter` --- Python interface to Tcl/Tk
-==============================================
+:mod:`!tkinter` --- Giao diện Python cho Tcl/Tk
+===============================================
 
 .. module:: tkinter
-   :synopsis: Interface to Tcl/Tk for graphical user interfaces
+   :synopsis: Giao diện cho Tcl/Tk dùng để tạo giao diện người dùng đồ họa
 
 .. moduleauthor:: Guido van Rossum <guido@Python.org>
 
-**Source code:** :source:`Lib/tkinter/__init__.py`
+**Mã nguồn:** :source:`Lib/tkinter/__init__.py`
 
 --------------
 
-The :mod:`!tkinter` package ("Tk interface") is the standard Python interface to
-the Tcl/Tk GUI toolkit.  Both Tk and :mod:`!tkinter` are available on most Unix
-platforms, including macOS, as well as on Windows systems.
+Gói :mod:`!tkinter` ("giao diện Tk") là giao diện Python tiêu chuẩn cho bộ công cụ GUI Tcl/Tk. Cả Tk và :mod:`!tkinter` đều có trên hầu hết các nền tảng Unix, bao gồm macOS, cũng như trên các hệ thống Windows.
 
-Running ``python -m tkinter`` from the command line should open a window
-demonstrating a simple Tk interface, letting you know that :mod:`!tkinter` is
-properly installed on your system, and also showing what version of Tcl/Tk is
-installed, so you can read the Tcl/Tk documentation specific to that version.
+Chạy ``python -m tkinter`` từ dòng lệnh sẽ mở một cửa sổ minh họa giao diện Tk đơn giản, cho bạn biết rằng :mod:`!tkinter` đã được cài đặt đúng cách trên hệ thống, đồng thời hiển thị phiên bản Tcl/Tk đã cài đặt, để bạn có thể đọc tài liệu Tcl/Tk dành riêng cho phiên bản đó.
 
-Tkinter supports a range of Tcl/Tk versions, built either with or without
-thread support.
-Tcl/Tk 8.5.12 is the minimum supported version; the official Python binary
-release bundles Tcl/Tk 8.6.
-See the source code for the :mod:`_tkinter` module for more information about
-supported versions.
+Tkinter hỗ trợ nhiều phiên bản Tcl/Tk, được xây dựng có hoặc không có hỗ trợ thread. Tcl/Tk 8.5.12 là phiên bản tối thiểu được hỗ trợ; bản phát hành binary chính thức của Python đi kèm Tcl/Tk 8.6. Xem mã nguồn của module :mod:`_tkinter` để biết thêm thông tin về các phiên bản được hỗ trợ.
 
 .. versionchanged:: 3.11
-   Support for Tcl/Tk versions older than 8.5.12 was removed.
+   Đã loại bỏ hỗ trợ cho các phiên bản Tcl/Tk cũ hơn 8.5.12.
 
-Tkinter is not a thin wrapper, but adds a fair amount of its own logic to
-make the experience more pythonic. This documentation will concentrate on these
-additions and changes, and refer to the official Tcl/Tk documentation for
-details that are unchanged.
+Tkinter không phải là một lớp bao bọc mỏng mà bổ sung khá nhiều logic riêng để mang lại trải nghiệm mang tính Python hơn. Tài liệu này sẽ tập trung vào những phần bổ sung và thay đổi đó, đồng thời tham chiếu tài liệu Tcl/Tk chính thức để biết chi tiết về những phần không thay đổi.
 
 .. note::
 
-   Tcl/Tk 8.5 (2007) introduced a modern set of themed user interface components
-   along with a new API to use them (see :mod:`tkinter.ttk`).
-   Both old and new APIs are still available.
-   Most documentation you will find online still uses the old API and
-   can be woefully outdated.
+   Tcl/Tk 8.5 (2007) giới thiệu một bộ thành phần giao diện người dùng theo chủ đề hiện đại cùng với API mới để sử dụng chúng (xem :mod:`tkinter.ttk`). Cả API cũ và mới vẫn đều khả dụng. Phần lớn tài liệu bạn tìm thấy trên mạng vẫn sử dụng API cũ và có thể đã lỗi thời nghiêm trọng.
 
 .. include:: ../includes/optional-module.rst
 
 .. seealso::
 
    * `TkDocs <https://tkdocs.com/>`_
-      Extensive tutorial on creating user interfaces with Tkinter.  Explains key concepts,
-      and illustrates recommended approaches using the modern API.
+      Hướng dẫn chuyên sâu về cách tạo giao diện người dùng bằng Tkinter. Giải thích các khái niệm chính và minh họa những cách tiếp cận được khuyến nghị bằng API hiện đại.
 
-   * `Tkinter 8.5 reference: a GUI for Python <https://www.tkdocs.com/shipman/>`_
-      Reference documentation for Tkinter 8.5 detailing available classes, methods, and options.
+   * `Tài liệu tham khảo Tkinter 8.5: GUI cho Python <https://www.tkdocs.com/shipman/>`_
+      Tài liệu tham khảo cho Tkinter 8.5, trình bày chi tiết các lớp, phương thức và tùy chọn hiện có.
 
-   Tcl/Tk Resources:
+   Tài nguyên Tcl/Tk:
 
-   * `Tk commands <https://www.tcl-lang.org/man/tcl9.0/TkCmd/index.html>`_
-      Comprehensive reference to each of the underlying Tcl/Tk commands used by Tkinter.
+   * `Các lệnh Tk <https://www.tcl-lang.org/man/tcl9.0/TkCmd/index.html>`_
+      Tài liệu tham khảo đầy đủ về từng lệnh Tcl/Tk nền tảng được Tkinter sử dụng.
 
-   * `Tcl/Tk Home Page <https://www.tcl.tk>`_
-      Additional documentation, and links to Tcl/Tk core development.
+   * `Trang chủ Tcl/Tk <https://www.tcl.tk>`_
+      Tài liệu bổ sung và các liên kết đến hoạt động phát triển Tcl/Tk core.
 
-   Books:
+   Sách:
 
-   * `Modern Tkinter for Busy Python Developers <https://tkdocs.com/book.html>`_
-      By Mark Roseman. (ISBN 978-1999149567)
+   * `Tkinter hiện đại dành cho các nhà phát triển Python bận rộn <https://tkdocs.com/book.html>`_
+      Tác giả Mark Roseman. (ISBN 978-1999149567)
 
-   * `Python GUI programming with Tkinter <https://www.packtpub.com/en-us/product/python-gui-programming-with-tkinter-9781788835886>`_
-      By Alan D. Moore. (ISBN 978-1788835886)
+   * `Lập trình GUI bằng Python với Tkinter <https://www.packtpub.com/en-us/product/python-gui-programming-with-tkinter-9781788835886>`_
+      Của Alan D. Moore. (ISBN 978-1788835886)
 
-   * `Programming Python <https://learning-python.com/about-pp4e.html>`_
-      By Mark Lutz; has excellent coverage of Tkinter. (ISBN 978-0596158101)
+   * `Lập trình Python <https://learning-python.com/about-pp4e.html>`_
+      Của Mark Lutz; trình bày rất đầy đủ về Tkinter. (ISBN 978-0596158101)
 
-   * `Tcl and the Tk Toolkit (2nd edition)  <https://www.amazon.com/exec/obidos/ASIN/032133633X>`_
-      By John Ousterhout, inventor of Tcl/Tk, and Ken Jones; does not cover Tkinter. (ISBN 978-0321336330)
+   * `Tcl và bộ công cụ Tk (ấn bản thứ 2) <https://www.amazon.com/exec/obidos/ASIN/032133633X>`_
+      Của John Ousterhout, người phát minh ra Tcl/Tk, và Ken Jones; không đề cập đến Tkinter. (ISBN 978-0321336330)
 
 
-Architecture
-------------
+Kiến trúc
+---------
 
-Tcl/Tk is not a single library but rather consists of a few distinct
-modules, each with separate functionality and its own official
-documentation. Python's binary releases also ship an add-on module
-together with it.
+Tcl/Tk không phải là một thư viện đơn lẻ mà gồm một vài mô-đun riêng biệt, mỗi mô-đun có chức năng riêng và tài liệu chính thức riêng. Các bản phát hành binary của Python cũng đi kèm một mô-đun bổ sung.
 
 Tcl
-   Tcl is a dynamic interpreted programming language, just like Python. Though
-   it can be used on its own as a general-purpose programming language, it is
-   most commonly embedded into C applications as a scripting engine or an
-   interface to the Tk toolkit. The Tcl library has a C interface to
-   create and manage one or more instances of a Tcl interpreter, run Tcl
-   commands and scripts in those instances, and add custom commands
-   implemented in either Tcl or C. Each interpreter has an event queue,
-   and there are facilities to send events to it and process them.
-   Unlike Python, Tcl's execution model is designed around cooperative
-   multitasking, and Tkinter bridges this difference
-   (see `Threading model`_ for details).
+   Tcl là một ngôn ngữ lập trình thông dịch động, tương tự Python. Mặc dù có thể được sử dụng độc lập như một ngôn ngữ lập trình đa dụng, Tcl thường được nhúng vào các ứng dụng C nhất dưới dạng một scripting engine hoặc giao diện cho bộ công cụ Tk. Thư viện Tcl có một giao diện C để tạo và quản lý một hoặc nhiều phiên bản của trình thông dịch Tcl, chạy các lệnh và tập lệnh Tcl trong những phiên bản đó, cũng như thêm các lệnh tùy chỉnh được triển khai bằng Tcl hoặc C. Mỗi trình thông dịch có một hàng đợi sự kiện, cùng các cơ chế để gửi sự kiện đến đó và xử lý chúng. Không giống Python, mô hình thực thi của Tcl được thiết kế xoay quanh cơ chế đa nhiệm hợp tác, và Tkinter là cầu nối cho sự khác biệt này (xem `mô hình threading <Threading model_>`_ để biết chi tiết).
 
 Tk
-   Tk is a `Tcl package <https://wiki.tcl-lang.org/37432>`_ implemented in C
-   that adds custom commands to create and manipulate GUI widgets. Each
-   :class:`Tk` object embeds its own Tcl interpreter instance with Tk loaded into
-   it. Tk's widgets are very customizable, though at the cost of a dated appearance.
-   Tk uses Tcl's event queue to generate and process GUI events.
+   Tk là một `gói Tcl <https://wiki.tcl-lang.org/37432>`_ được triển khai bằng C, bổ sung các lệnh tùy chỉnh để tạo và thao tác với các widget GUI. Mỗi
+   :class:`Tk` đối tượng nhúng một phiên bản trình thông dịch Tcl riêng, trong đó Tk đã được nạp. Các widget của Tk có khả năng tùy biến rất cao, nhưng phải đánh đổi bằng diện mạo lỗi thời. Tk sử dụng hàng đợi sự kiện của Tcl để tạo và xử lý các sự kiện GUI.
 
 Ttk
-   Themed Tk (Ttk) is a newer family of Tk widgets that provide a much better
-   appearance on different platforms than many of the classic Tk widgets.
-   Ttk is distributed as part of Tk, starting with Tk version 8.5. Python
-   bindings are provided in a separate module, :mod:`tkinter.ttk`.
+   Tk có giao diện theo chủ đề (Ttk) là một nhóm widget Tk mới hơn, cung cấp giao diện đẹp hơn nhiều trên các nền tảng khác nhau so với nhiều widget Tk kinh điển. Ttk được phân phối như một phần của Tk, bắt đầu từ phiên bản Tk 8.5. Python binding được cung cấp trong một module riêng biệt, :mod:`tkinter.ttk`.
 
-Internally, Tk and Ttk use facilities of the underlying operating system,
-that is, Xlib on Unix/X11, Cocoa on macOS, GDI on Windows.
+Bên trong, Tk và Ttk sử dụng các tiện ích của hệ điều hành nền tảng, cụ thể là Xlib trên Unix/X11, Cocoa trên macOS và GDI trên Windows.
 
-When your Python application uses a class in Tkinter, for example, to create a widget,
-the :mod:`!tkinter` module first assembles a Tcl/Tk command string. It passes that
-Tcl command string to an internal :mod:`_tkinter` binary module, which then
-calls the Tcl interpreter to evaluate it. The Tcl interpreter will then call into the
-Tk and/or Ttk packages, which will in turn make calls to Xlib, Cocoa, or GDI.
+Khi ứng dụng Python của bạn sử dụng một class trong Tkinter, chẳng hạn để tạo một widget, module :mod:`!tkinter` trước tiên sẽ tạo một chuỗi lệnh Tcl/Tk. Module này truyền chuỗi lệnh Tcl đó cho một module nhị phân :mod:`_tkinter` nội bộ, sau đó module này gọi trình thông dịch Tcl để đánh giá chuỗi lệnh. Trình thông dịch Tcl sau đó sẽ gọi các package Tk và/hoặc Ttk, những package này lần lượt thực hiện các lệnh gọi đến Xlib, Cocoa hoặc GDI.
 
 
-Tkinter modules
----------------
+Các module Tkinter
+------------------
 
-Support for Tkinter is spread across several modules. Most applications will need the
-main :mod:`!tkinter` module, as well as the :mod:`tkinter.ttk` module, which provides
-the modern themed widget set and API::
+Hỗ trợ cho Tkinter được phân bổ trên một số module. Hầu hết ứng dụng sẽ cần module :mod:`!tkinter` chính, cũng như module :mod:`tkinter.ttk`, cung cấp bộ widget theo chủ đề và API hiện đại::
 
 
    from tkinter import *
    from tkinter import ttk
 
 
-The modules that provide Tk support include:
+Các module cung cấp hỗ trợ cho Tk bao gồm:
 
 :mod:`!tkinter`
-   Main Tkinter module.
+   Module Tkinter chính.
 
 :mod:`tkinter.colorchooser`
-   Dialog to let the user choose a color.
+   Hộp thoại cho phép người dùng chọn một màu.
 
 :mod:`tkinter.commondialog`
-   Base class for the dialogs defined in the other modules listed here.
+   Lớp cơ sở cho các hộp thoại được định nghĩa trong những mô-đun khác được liệt kê ở đây.
 
 :mod:`tkinter.filedialog`
-   Common dialogs to allow the user to specify a file to open or save.
+   Các hộp thoại thông dụng cho phép người dùng chỉ định tệp để mở hoặc lưu.
 
 :mod:`tkinter.font`
-   Utilities to help work with fonts.
+   Các tiện ích hỗ trợ làm việc với phông chữ.
 
 :mod:`tkinter.messagebox`
-   Access to standard Tk dialog boxes.
+   Truy cập vào các hộp thoại Tk tiêu chuẩn.
 
 :mod:`tkinter.scrolledtext`
-   Text widget with a vertical scroll bar built in.
+   Tiện ích văn bản tích hợp thanh cuộn dọc.
 
 :mod:`tkinter.simpledialog`
-   Basic dialogs and convenience functions.
+   Các hộp thoại cơ bản và các hàm tiện lợi.
 
 :mod:`tkinter.ttk`
-   Themed widget set introduced in Tk 8.5, providing modern alternatives
-   for many of the classic widgets in the main :mod:`!tkinter` module.
+   Bộ widget có giao diện theo chủ đề được giới thiệu trong Tk 8.5, cung cấp các lựa chọn hiện đại thay thế cho nhiều widget cổ điển trong module :mod:`!tkinter` chính.
 
-Additional modules:
+Các module bổ sung:
 
 .. module:: _tkinter
-   :synopsis: A binary module that contains the low-level interface to Tcl/Tk.
+   :synopsis: Một module nhị phân chứa giao diện cấp thấp với Tcl/Tk.
 
 :mod:`_tkinter`
-   A binary module that contains the low-level interface to Tcl/Tk.
-   It is automatically imported by the main :mod:`!tkinter` module,
-   and should never be used directly by application programmers.
-   It is usually a shared library (or DLL), but might in some cases be
-   statically linked with the Python interpreter.
+   Một module nhị phân chứa giao diện cấp thấp với Tcl/Tk. Module này được module :mod:`!tkinter` chính tự động import và lập trình viên ứng dụng không bao giờ nên sử dụng trực tiếp. Thông thường, đây là một thư viện dùng chung (hoặc DLL), nhưng trong một số trường hợp có thể được liên kết tĩnh với trình thông dịch Python.
 
 :mod:`idlelib`
-   Python's Integrated Development and Learning Environment (IDLE). Based
-   on :mod:`!tkinter`.
+   Môi trường Phát triển Tích hợp và Học tập (Integrated Development and Learning Environment - IDLE) của Python. Dựa trên :mod:`!tkinter`.
 
 :mod:`!tkinter.constants`
-   Symbolic constants that can be used in place of strings when passing
-   various parameters to Tkinter calls. Automatically imported by the
-   main :mod:`!tkinter` module.
+   Các hằng số ký hiệu có thể được sử dụng thay cho chuỗi khi truyền nhiều tham số khác nhau cho các lệnh gọi Tkinter. Được module :mod:`!tkinter` chính tự động import.
 
 :mod:`tkinter.dnd`
-   (experimental) Drag-and-drop support for :mod:`!tkinter`. This will
-   become deprecated when it is replaced with the Tk DND.
+   (thử nghiệm) Hỗ trợ kéo và thả cho :mod:`!tkinter`. Tính năng này sẽ trở nên lỗi thời khi được thay thế bằng Tk DND.
 
 :mod:`turtle`
-   Turtle graphics in a Tk window.
+   Đồ họa Turtle trong cửa sổ Tk.
 
 .. currentmodule:: tkinter
 
 
-Tkinter life preserver
-----------------------
+Phao cứu sinh Tkinter
+---------------------
 
-This section is not designed to be an exhaustive tutorial on either Tk or
-Tkinter.  For that, refer to one of the external resources noted earlier.
-Instead, this section provides a very quick orientation to what a Tkinter
-application looks like, identifies foundational Tk concepts, and
-explains how the Tkinter wrapper is structured.
+Phần này không nhằm cung cấp một hướng dẫn toàn diện về Tk hay Tkinter. Để tìm hiểu nội dung đó, hãy tham khảo một trong các tài nguyên bên ngoài được đề cập trước đó. Thay vào đó, phần này cung cấp một định hướng rất nhanh về diện mạo của một ứng dụng Tkinter, xác định các khái niệm nền tảng của Tk và giải thích cấu trúc của lớp bao bọc Tkinter.
 
-The remainder of this section will help you to identify the classes,
-methods, and options you'll need in your Tkinter application, and where to
-find more detailed documentation on them, including in the official Tcl/Tk
-reference manual.
+Phần còn lại sẽ giúp bạn xác định các lớp, phương thức và tùy chọn cần dùng trong ứng dụng Tkinter, cũng như nơi tìm tài liệu chi tiết hơn về chúng, bao gồm cả tài liệu tham khảo Tcl/Tk chính thức.
 
 
-A Hello World program
-^^^^^^^^^^^^^^^^^^^^^
+Chương trình Hello World
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-We'll start by walking through a "Hello World" application in Tkinter. This
-isn't the smallest one we could write, but has enough to illustrate some
-key concepts you'll need to know.
+Chúng ta sẽ bắt đầu bằng cách xem qua một ứng dụng "Hello World" trong Tkinter. Đây không phải là chương trình nhỏ nhất có thể viết, nhưng có đủ nội dung để minh họa một số khái niệm quan trọng mà bạn cần biết.
 
 ::
 
@@ -227,75 +165,48 @@ key concepts you'll need to know.
     root.mainloop()
 
 
-After the imports, the next line creates an instance of the :class:`Tk` class,
-which initializes Tk and creates its associated Tcl interpreter. It also
-creates a toplevel window, known as the root window, which serves as the main
-window of the application.
+Sau các câu lệnh import, dòng tiếp theo tạo một thể hiện của lớp :class:`Tk`, lớp này khởi tạo Tk và tạo trình thông dịch Tcl liên kết với nó. Dòng này cũng tạo một cửa sổ toplevel, được gọi là cửa sổ gốc, đóng vai trò là cửa sổ chính của ứng dụng.
 
-The following line creates a frame widget, which in this case will contain
-a label and a button we'll create next. The frame is fit inside the root
-window.
+Dòng sau đây tạo một frame widget, trong trường hợp này sẽ chứa một label và một button mà chúng ta sẽ tạo tiếp theo. Frame nằm gọn bên trong cửa sổ gốc.
 
-The next line creates a label widget holding a static text string.
-The :meth:`~Grid.grid` method is used to specify the relative layout (position)
-of the label within its containing frame widget, similar to how tables in HTML
-work.
+Dòng tiếp theo tạo một label widget chứa một chuỗi văn bản tĩnh. Phương thức :meth:`~Grid.grid` được dùng để chỉ định bố cục tương đối (vị trí) của label bên trong frame widget chứa nó, tương tự như cách các bảng trong HTML hoạt động.
 
-A button widget is then created, and placed to the right of the label.
-When pressed, it will call the :meth:`~Misc.destroy` method of the root window.
+Sau đó, một button widget được tạo và đặt bên phải label. Khi được nhấn, nó sẽ gọi phương thức :meth:`~Misc.destroy` của cửa sổ gốc.
 
-Finally, the :meth:`mainloop` method puts everything on the display, and
-responds to user input until the program terminates.
+Cuối cùng, phương thức :meth:`mainloop` hiển thị mọi thứ và phản hồi dữ liệu đầu vào của người dùng cho đến khi chương trình kết thúc.
 
 
 
-Important Tk concepts
-^^^^^^^^^^^^^^^^^^^^^
+Các khái niệm Tk quan trọng
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Even this simple program illustrates the following key Tk concepts:
+Ngay cả chương trình đơn giản này cũng minh họa các khái niệm Tk chính sau đây:
 
 widgets
-  A Tkinter user interface is made up of individual *widgets*. Each widget is
-  represented as a Python object, instantiated from classes like
-  :class:`ttk.Frame`, :class:`ttk.Label`, and :class:`ttk.Button`.
+  Giao diện người dùng Tkinter được tạo thành từ các *widget* riêng lẻ. Mỗi widget được biểu diễn bằng một đối tượng Python, được khởi tạo từ các lớp như
+  :class:`ttk.Frame`, :class:`ttk.Label`, và :class:`ttk.Button`.
 
-widget hierarchy
-  Widgets are arranged in a *hierarchy*. The label and button were contained
-  within a frame, which in turn was contained within the root window. When
-  creating each *child* widget, its *parent* widget is passed as the first
-  argument to the widget constructor.
+phân cấp widget
+  Các widget được sắp xếp theo một *cấu trúc phân cấp*. Nhãn và nút nằm trong một frame, và frame này lại nằm trong cửa sổ gốc. Khi tạo mỗi widget *con*, widget *cha* của nó được truyền làm đối số đầu tiên cho constructor của widget.
 
-configuration options
-  Widgets have *configuration options*, which modify their appearance and
-  behavior, such as the text to display in a label or button. Different
-  classes of widgets will have different sets of options.
+các tùy chọn cấu hình
+  Widget có *các tùy chọn cấu hình*, dùng để thay đổi giao diện và hành vi của chúng, chẳng hạn như văn bản hiển thị trong nhãn hoặc nút. Các lớp widget khác nhau sẽ có những tập tùy chọn khác nhau.
 
-geometry management
-  Widgets aren't automatically added to the user interface when they are
-  created. A *geometry manager* like ``grid`` controls where in the
-  user interface they are placed.
+quản lý bố cục
+  Các widget không được tự động thêm vào giao diện người dùng khi chúng được tạo. Một *geometry manager* như ``grid`` sẽ kiểm soát vị trí đặt chúng trong giao diện người dùng.
 
-event loop
-  Tkinter reacts to user input, changes from your program, and even refreshes
-  the display only when actively running an *event loop*. If your program
-  isn't running the event loop, your user interface won't update.
+vòng lặp sự kiện
+  Tkinter chỉ phản hồi dữ liệu đầu vào của người dùng, các thay đổi từ chương trình của bạn và thậm chí cập nhật màn hình khi đang tích cực chạy một *vòng lặp sự kiện*. Nếu chương trình của bạn không chạy vòng lặp sự kiện, giao diện người dùng sẽ không được cập nhật.
 
 
-Understanding how Tkinter wraps Tcl/Tk
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Tìm hiểu cách Tkinter đóng gói Tcl/Tk
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When your application uses Tkinter's classes and methods, internally Tkinter
-is assembling strings representing Tcl/Tk commands, and executing those
-commands in the Tcl interpreter attached to your application's :class:`Tk`
-instance.
+Khi ứng dụng sử dụng các lớp và phương thức của Tkinter, về bản chất Tkinter đang ghép các chuỗi biểu diễn các lệnh Tcl/Tk rồi thực thi những lệnh đó trong trình thông dịch Tcl gắn với :class:`Tk` instance của ứng dụng.
 
-Whether it's trying to navigate reference documentation, trying to find
-the right method or option, adapting some existing code, or debugging your
-Tkinter application, there are times that it will be useful to understand
-what those underlying Tcl/Tk commands look like.
+Cho dù bạn đang cố gắng tra cứu tài liệu tham khảo, tìm phương thức hoặc tùy chọn phù hợp, điều chỉnh một đoạn mã hiện có hay gỡ lỗi ứng dụng Tkinter, sẽ có lúc việc hiểu những lệnh Tcl/Tk nền tảng đó trông như thế nào rất hữu ích.
 
-To illustrate, here is the Tcl/Tk equivalent of the main part of the Tkinter
-script above.
+Để minh họa, dưới đây là phần tương đương trong Tcl/Tk của phần chính trong tập lệnh Tkinter ở trên.
 
 ::
 
@@ -305,72 +216,43 @@ script above.
     grid [ttk::button .frm.btn -text "Quit" -command "destroy ."] -column 1 -row 0
 
 
-Tcl's syntax is similar to many shell languages, where the first word is the
-command to be executed, with arguments to that command following it, separated
-by spaces. Without getting into too many details, notice the following:
+Cú pháp của Tcl tương tự nhiều ngôn ngữ shell, trong đó từ đầu tiên là lệnh sẽ được thực thi, tiếp theo là các đối số của lệnh đó, được phân tách bằng dấu cách. Không đi quá sâu vào chi tiết, hãy lưu ý những điều sau:
 
-* The commands used to create widgets (like ``ttk::frame``) correspond to
-  widget classes in Tkinter.
+* Các lệnh dùng để tạo widget (như ``ttk::frame``) tương ứng với các lớp widget trong Tkinter.
 
-* Tcl widget options (like ``-text``) correspond to keyword arguments in
-  Tkinter.
+* Các tùy chọn widget của Tcl (như ``-text``) tương ứng với các đối số từ khóa trong Tkinter.
 
-* Widgets are referred to by a *pathname* in Tcl (like ``.frm.btn``),
-  whereas Tkinter doesn't use names but object references.
+* Trong Tcl, các widget được tham chiếu bằng *pathname* (như ``.frm.btn``), trong khi Tkinter không sử dụng tên mà sử dụng các tham chiếu đối tượng.
 
-* A widget's place in the widget hierarchy is encoded in its (hierarchical)
-  pathname, which uses a ``.`` (dot) as a path separator. The pathname for
-  the root window is just ``.`` (dot). In Tkinter, the hierarchy is defined
-  not by pathname but by specifying the parent widget when creating each
-  child widget.
+* Vị trí của một widget trong hệ thống phân cấp widget được mã hóa trong pathname (phân cấp) của nó, sử dụng ``.`` (dấu chấm) làm dấu phân cách đường dẫn. Pathname của cửa sổ gốc chỉ là ``.`` (dấu chấm). Trong Tkinter, hệ thống phân cấp được xác định không phải bằng pathname mà bằng cách chỉ định widget cha khi tạo từng widget con.
 
-* Operations which are implemented as separate *commands* in Tcl (like
-  ``grid`` or ``destroy``) are represented as *methods* on Tkinter widget
-  objects. As you'll see shortly, at other times Tcl uses what appear to be
-  method calls on widget objects, which more closely mirror what is
-  used in Tkinter.
+* Các thao tác được triển khai dưới dạng các *commands* riêng biệt trong Tcl (như ``grid`` hoặc ``destroy``) được biểu diễn dưới dạng *methods* trên các đối tượng widget của Tkinter. Như bạn sẽ thấy ngay sau đây, đôi khi Tcl sử dụng những gì có vẻ như các lệnh gọi phương thức trên đối tượng widget, gần giống hơn với cách được sử dụng trong Tkinter.
 
 
-How do I...? What option does...?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Làm thế nào để...? Tùy chọn nào thực hiện...?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you're not sure how to do something in Tkinter, and you can't immediately
-find it in the tutorial or reference documentation you're using, there are a
-few strategies that can be helpful.
+Nếu bạn không chắc cách thực hiện một việc nào đó trong Tkinter và không thể tìm thấy ngay thông tin đó trong tài liệu hướng dẫn hoặc tài liệu tham khảo đang sử dụng, có một vài chiến lược có thể hữu ích.
 
-First, remember that the details of how individual widgets work may vary
-across different versions of both Tkinter and Tcl/Tk. If you're searching
-documentation, make sure it corresponds to the Python and Tcl/Tk versions
-installed on your system.
+Trước hết, hãy nhớ rằng chi tiết về cách hoạt động của từng widget có thể khác nhau giữa các phiên bản khác nhau của cả Tkinter và Tcl/Tk. Khi tìm kiếm tài liệu, hãy đảm bảo tài liệu đó tương ứng với các phiên bản Python và Tcl/Tk được cài đặt trên hệ thống của bạn.
 
-When searching for how to use an API, it helps to know the exact name of the
-class, option, or method that you're using. Introspection, either in an
-interactive Python shell or with :func:`print`, can help you identify what
-you need.
+Khi tìm cách sử dụng một API, việc biết chính xác tên của class, option hoặc method mà bạn đang dùng sẽ rất hữu ích. Introspection, είτε trong Python shell tương tác hoặc với :func:`print`, có thể giúp bạn xác định những gì mình cần.
 
-To find out what configuration options are available on any widget, call its
-:meth:`~Misc.configure` method, which returns a dictionary containing a variety
-of information about each object, including its default and current values.
-Use :meth:`~Misc.keys` to get just the names of each option.
+Để biết những tùy chọn cấu hình nào có sẵn trên bất kỳ widget nào, hãy gọi
+method :meth:`~Misc.configure` của nó; method này trả về một dictionary chứa nhiều thông tin về từng đối tượng, bao gồm các giá trị mặc định và hiện tại. Dùng :meth:`~Misc.keys` để chỉ lấy tên của từng tùy chọn.
 
 ::
 
     btn = ttk.Button(frm, ...)
     print(btn.configure().keys())
 
-As most widgets have many configuration options in common, it can be useful
-to find out which are specific to a particular widget class. Comparing the
-list of options to that of a simpler widget, like a frame, is one way to
-do that.
+Vì hầu hết widget đều có nhiều tùy chọn cấu hình dùng chung, việc tìm hiểu tùy chọn nào là riêng của một class widget cụ thể có thể hữu ích. So sánh danh sách tùy chọn với danh sách của một widget đơn giản hơn, chẳng hạn như frame, là một cách để thực hiện việc đó.
 
 ::
 
     print(set(btn.configure().keys()) - set(frm.configure().keys()))
 
-Similarly, you can find the available methods for a widget object using the
-standard :func:`dir` function. If you try it, you'll see there are over 200
-common widget methods, so again identifying those specific to a widget class
-is helpful.
+Tương tự, bạn có thể tìm các method có sẵn cho một đối tượng widget bằng hàm :func:`dir` tiêu chuẩn. Nếu thử, bạn sẽ thấy có hơn 200 method widget phổ biến, vì vậy việc xác định những method riêng của một class widget cũng rất hữu ích.
 
 ::
 
@@ -378,30 +260,19 @@ is helpful.
     print(set(dir(btn)) - set(dir(frm)))
 
 
-Navigating the Tcl/Tk reference manual
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Tra cứu sổ tay tham khảo Tcl/Tk
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-As noted, the official
-`Tk commands <https://www.tcl-lang.org/man/tcl9.0/TkCmd/index.html>`_ reference
-manual (man pages) is often the most accurate description of what specific
-operations on widgets do.
-Even when you know the name of the option or method that you need, you may
-still have a few places to look.
+Như đã đề cập, sổ tay tham khảo chính thức về các `lệnh Tk <https://www.tcl-lang.org/man/tcl9.0/TkCmd/index.html>`_ (các trang hướng dẫn) thường là mô tả chính xác nhất về tác dụng của từng thao tác cụ thể trên widget. Ngay cả khi đã biết tên của tùy chọn hoặc phương thức cần dùng, bạn vẫn có thể phải tra cứu ở một vài nơi.
 
-While all operations in Tkinter are implemented as method calls on widget
-objects, you've seen that many Tcl/Tk operations appear as commands that
-take a widget pathname as its first parameter, followed by optional
-parameters, for example
+Mặc dù mọi thao tác trong Tkinter đều được triển khai dưới dạng các lời gọi phương thức trên đối tượng widget, bạn đã thấy rằng nhiều thao tác Tcl/Tk xuất hiện dưới dạng các lệnh nhận đường dẫn widget làm tham số đầu tiên, theo sau là các tham số tùy chọn, chẳng hạn như
 
 ::
 
     destroy .
     grid .frm.btn -column 0 -row 0
 
-Others, however, look more like methods called on a widget object (in fact,
-when you create a widget in Tcl/Tk, it creates a Tcl command with the name
-of the widget pathname, with the first parameter to that command being the
-name of a method to call).
+Tuy nhiên, một số thao tác khác trông giống các phương thức được gọi trên một đối tượng widget hơn (trên thực tế, khi bạn tạo một widget trong Tcl/Tk, nó tạo một lệnh Tcl có tên là đường dẫn widget, trong đó tham số đầu tiên của lệnh đó là tên của phương thức cần gọi).
 
 ::
 
@@ -409,175 +280,108 @@ name of a method to call).
     .frm.lbl configure -text "Goodbye"
 
 
-In the official Tcl/Tk reference documentation, you'll find most operations
-that look like method calls on the man page for a specific widget (for example,
-you'll find the :meth:`~tkinter.ttk.Button.invoke` method on the
-`ttk::button <https://www.tcl-lang.org/man/tcl9.0/TkCmd/ttk_button.html>`_
-man page), while functions that take a widget as a parameter often have
-their own man page (for example,
-`grid <https://www.tcl-lang.org/man/tcl9.0/TkCmd/grid.html>`_).
+Trong tài liệu tham khảo Tcl/Tk chính thức, bạn sẽ tìm thấy hầu hết các thao tác trông giống như lời gọi phương thức trên trang hướng dẫn của một widget cụ thể (ví dụ: bạn sẽ tìm thấy phương thức :meth:`~tkinter.ttk.Button.invoke` trên trang hướng dẫn của `ttk::button <https://www.tcl-lang.org/man/tcl9.0/TkCmd/ttk_button.html>`_), trong khi các hàm nhận một widget làm tham số thường có trang hướng dẫn riêng (ví dụ: `grid <https://www.tcl-lang.org/man/tcl9.0/TkCmd/grid.html>`_).
 
-You'll find many common options and methods in the
-`options <https://www.tcl-lang.org/man/tcl9.0/TkCmd/options.html>`_ or
-`ttk::widget <https://www.tcl-lang.org/man/tcl9.0/TkCmd/ttk_widget.html>`_ man
-pages, while others are found in the man page for a specific widget class.
+Bạn sẽ tìm thấy nhiều tùy chọn và phương thức phổ biến trong các trang hướng dẫn `tùy chọn <https://www.tcl-lang.org/man/tcl9.0/TkCmd/options.html>`_ hoặc `ttk::widget <https://www.tcl-lang.org/man/tcl9.0/TkCmd/ttk_widget.html>`_, trong khi những tùy chọn và phương thức khác nằm trên trang hướng dẫn của một lớp widget cụ thể.
 
-You'll also find that many Tkinter methods have compound names, for example,
+Bạn cũng sẽ thấy rằng nhiều phương thức Tkinter có tên ghép, chẳng hạn như
 :meth:`~Misc.winfo_x`, :meth:`~Misc.winfo_height`,
-:meth:`~Misc.winfo_viewable`.
-You'd find documentation for all of these in the
-`winfo <https://www.tcl-lang.org/man/tcl9.0/TkCmd/winfo.html>`_ man page.
+:meth:`~Misc.winfo_viewable`. Bạn có thể tìm tài liệu về tất cả những nội dung này trong trang hướng dẫn `winfo <https://www.tcl-lang.org/man/tcl9.0/TkCmd/winfo.html>`_.
 
 .. note::
-   Somewhat confusingly, there are also methods on all Tkinter widgets
-   that don't actually operate on the widget, but operate at a global
-   scope, independent of any widget. Examples are methods for accessing
-   the clipboard or the system bell. (They happen to be implemented as
-   methods in the base :class:`Widget` class that all Tkinter widgets
-   inherit from).
+   Hơi khó hiểu là tất cả widget Tkinter cũng có các phương thức không thực sự thao tác trên widget mà hoạt động ở phạm vi toàn cục, độc lập với mọi widget. Ví dụ gồm các phương thức truy cập clipboard hoặc chuông hệ thống. (Chúng được triển khai dưới dạng phương thức trong lớp cơ sở :class:`Widget` mà tất cả widget Tkinter đều kế thừa).
 
 
-Threading model
----------------
+.. _`Threading model`:
 
-Python and Tcl/Tk have very different threading models, which :mod:`!tkinter`
-tries to bridge. If you use threads, you may need to be aware of this.
+Mô hình luồng
+-------------
 
-A Python interpreter may have many threads associated with it. In Tcl, multiple
-threads can be created, but each thread has a separate Tcl interpreter instance
-associated with it. Threads can also create more than one interpreter instance,
-though each interpreter instance can be used only by the one thread that created it.
+Python và Tcl/Tk có các mô hình luồng rất khác nhau, và :mod:`!tkinter` cố gắng kết nối hai mô hình này. Nếu sử dụng các luồng, bạn có thể cần lưu ý điều này.
 
-Each :class:`Tk` object created by :mod:`!tkinter` contains a Tcl interpreter.
-It also keeps track of which thread created that interpreter. Calls to
-:mod:`!tkinter` can be made from any Python thread. Internally, if a call comes
-from a thread other than the one that created the :class:`Tk` object, an event
-is posted to the interpreter's event queue, and when executed, the result is
-returned to the calling Python thread.
+Một trình thông dịch Python có thể có nhiều luồng liên kết với nó. Trong Tcl, có thể tạo nhiều luồng, nhưng mỗi luồng có một thực thể trình thông dịch Tcl riêng liên kết với nó. Các luồng cũng có thể tạo nhiều hơn một thực thể trình thông dịch, mặc dù mỗi thực thể trình thông dịch chỉ có thể được sử dụng bởi luồng đã tạo ra nó.
 
-Tcl/Tk applications are normally event-driven, meaning that after
-initialization, the interpreter runs an event loop (that is,
-:meth:`Tk.mainloop <Misc.mainloop>`) and responds to events.
-Because it is single-threaded, event handlers must respond quickly, otherwise
-they will block other events from being processed.
-To avoid this, any long-running computations should not run in an event
-handler, but are either broken into smaller pieces using timers, or run in
-another thread.
-This is different from many GUI toolkits where the GUI runs in a completely
-separate thread from all application code including event handlers.
+Mỗi đối tượng :class:`Tk` được tạo bởi :mod:`!tkinter` đều chứa một trình thông dịch Tcl. Đối tượng này cũng theo dõi luồng đã tạo ra trình thông dịch đó. Các lệnh gọi đến
+:mod:`!tkinter` có thể được thực hiện từ bất kỳ luồng Python nào. Về nội bộ, nếu một lệnh gọi đến từ một luồng khác với luồng đã tạo đối tượng :class:`Tk`, một sự kiện sẽ được đăng vào hàng đợi sự kiện của trình thông dịch; khi được thực thi, kết quả sẽ được trả về cho luồng Python đã gọi.
 
-If the Tcl interpreter is not running the event loop and processing events, any
-:mod:`!tkinter` calls made from threads other than the one running the Tcl
-interpreter will fail.
+Các ứng dụng Tcl/Tk thường được điều khiển bởi sự kiện, nghĩa là sau khi khởi tạo, interpreter chạy một vòng lặp sự kiện (tức là
+:meth:`Tk.mainloop <Misc.mainloop>`) và phản hồi các sự kiện. Vì chỉ chạy trên một thread, các trình xử lý sự kiện phải phản hồi nhanh; nếu không, chúng sẽ chặn các sự kiện khác được xử lý. Để tránh điều này, mọi phép tính chạy lâu không nên chạy trong trình xử lý sự kiện, mà nên được chia thành các phần nhỏ hơn bằng timer hoặc chạy trong một thread khác. Điều này khác với nhiều GUI toolkit, trong đó GUI chạy trên một thread hoàn toàn tách biệt với toàn bộ mã ứng dụng, bao gồm cả các trình xử lý sự kiện.
 
-A number of special cases exist:
+Nếu Tcl interpreter không chạy vòng lặp sự kiện và xử lý các sự kiện, mọi
+:mod:`!tkinter` được gọi từ các thread khác với thread đang chạy Tcl interpreter sẽ thất bại.
 
-* Tcl/Tk libraries built without thread support are now rare: the bundled
-  Tcl/Tk 8.6 is built with thread support, so this case only arises with some
-  older non-threaded builds. When the library is not thread-aware,
-  :mod:`!tkinter` calls the library from the originating Python thread, even
-  if this is different than the thread that created the Tcl interpreter. A global
-  lock ensures only one call occurs at a time.
+Có một số trường hợp đặc biệt:
 
-* While :mod:`!tkinter` allows you to create more than one instance of a :class:`Tk`
-  object (with its own interpreter), all interpreters that are part of the same
-  thread share a common event queue, which gets ugly fast. In practice, don't create
-  more than one instance of :class:`Tk` at a time. Otherwise, it's best to create
-  them in separate threads and ensure you're running a thread-aware Tcl/Tk build.
+* Các thư viện Tcl/Tk được xây dựng mà không hỗ trợ thread hiện nay rất hiếm: Tcl/Tk 8.6 đi kèm được xây dựng với hỗ trợ thread, vì vậy trường hợp này chỉ xảy ra với một số bản dựng cũ không hỗ trợ thread. Khi thư viện không nhận biết thread,
+  :mod:`!tkinter` gọi thư viện từ thread Python khởi tạo, ngay cả khi thread này khác với thread đã tạo Tcl interpreter. Một global lock đảm bảo mỗi lần chỉ có một lệnh gọi được thực hiện.
 
-* Blocking event handlers are not the only way to prevent the Tcl interpreter from
-  reentering the event loop. It is even possible to run multiple nested event loops
-  or abandon the event loop entirely. If you're doing anything tricky when it comes
-  to events or threads, be aware of these possibilities.
+* Mặc dù :mod:`!tkinter` cho phép bạn tạo nhiều hơn một instance của đối tượng :class:`Tk` (với interpreter riêng), tất cả các interpreter thuộc cùng một thread đều dùng chung một hàng đợi sự kiện, và điều này nhanh chóng trở nên rắc rối. Trên thực tế, đừng tạo nhiều hơn một instance của :class:`Tk` tại một thời điểm. Nếu không, tốt nhất là tạo chúng trong các thread riêng biệt và đảm bảo bạn đang chạy bản dựng Tcl/Tk hỗ trợ thread.
 
-* There are a few select :mod:`!tkinter` functions that presently work only when
-  called from the thread that created the Tcl interpreter.
+* Các trình xử lý sự kiện blocking không phải là cách duy nhất để ngăn Tcl interpreter chạy lại event loop. Thậm chí bạn có thể chạy nhiều event loop lồng nhau hoặc từ bỏ event loop hoàn toàn. Nếu bạn đang thực hiện bất kỳ thao tác phức tạp nào liên quan đến sự kiện hoặc thread, hãy lưu ý những khả năng này.
+
+* Hiện tại có một vài hàm :mod:`!tkinter` được chọn chỉ hoạt động khi được gọi từ thread đã tạo Tcl interpreter.
 
 
-Handy reference
----------------
+Tài liệu tham khảo hữu ích
+--------------------------
 
 
 .. _tkinter-setting-options:
 
-Setting options
-^^^^^^^^^^^^^^^
+Thiết lập các tùy chọn
+^^^^^^^^^^^^^^^^^^^^^^
 
-Options control things like the color and border width of a widget. Options can
-be set in three ways:
+Các tùy chọn kiểm soát những yếu tố như màu sắc và độ rộng đường viền của widget. Có thể thiết lập các tùy chọn theo ba cách:
 
-At object creation time, using keyword arguments
-   ::
+Tại thời điểm tạo đối tượng, bằng cách sử dụng keyword arguments
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       fred = Button(self, fg="red", bg="blue")
 
-After object creation, treating the option name like a dictionary index
-   ::
+Sau khi tạo đối tượng, xử lý tên tùy chọn như một chỉ mục từ điển
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-      fred["fg"] = "red"
-      fred["bg"] = "blue"
+      fred["fg"] = "red" fred["bg"] = "blue"
 
-Use the config() method to update multiple attrs subsequent to object creation
-   ::
+Sử dụng phương thức config() để cập nhật nhiều thuộc tính sau khi tạo đối tượng
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       fred.config(fg="red", bg="blue")
 
 .. note::
 
-   The ``fg`` and ``bg`` options used here,
-   and other options that control a widget's appearance,
-   belong to the classic :mod:`!tkinter` widgets.
-   The themed :mod:`tkinter.ttk` widgets recommended in the introduction
-   do not accept them;
-   style a themed widget through the :class:`ttk.Style <tkinter.ttk.Style>`
-   class instead.
-   The three ways of setting an option shown above apply to both widget sets.
+   Các tùy chọn ``fg`` và ``bg`` được sử dụng ở đây, cùng với các tùy chọn khác điều khiển giao diện của widget, thuộc về các widget :mod:`!tkinter` cổ điển. Các widget :mod:`tkinter.ttk` theo chủ đề được khuyến nghị trong phần giới thiệu không chấp nhận chúng; hãy tạo kiểu cho widget theo chủ đề thông qua lớp :class:`ttk.Style <tkinter.ttk.Style>`. Ba cách thiết lập tùy chọn được trình bày ở trên áp dụng cho cả hai bộ widget.
 
-For a complete explanation of a given option and its behavior, see the Tk man
-pages for the widget in question.
+Để xem giải thích đầy đủ về một tùy chọn cụ thể và cách hoạt động của tùy chọn đó, hãy tham khảo các trang hướng dẫn Tk dành cho widget tương ứng.
 
-Note that the man pages list "STANDARD OPTIONS" and "WIDGET SPECIFIC OPTIONS"
-for each widget.  The former is a list of options that are common to many
-widgets, the latter are the options that are idiosyncratic to that particular
-widget.  The Standard Options are documented on the :manpage:`options(3)` man
-page.
+Lưu ý rằng các trang man liệt kê "STANDARD OPTIONS" và "WIDGET SPECIFIC OPTIONS" cho từng widget. Mục đầu tiên là danh sách các tùy chọn dùng chung cho nhiều widget, còn mục sau là các tùy chọn riêng của widget cụ thể đó. Standard Options được mô tả trong trang man :manpage:`options(3)`.
 
-No distinction between standard and widget-specific options is made in this
-document.  Some options don't apply to some kinds of widgets. Whether a given
-widget responds to a particular option depends on the class of the widget;
-buttons have a ``command`` option, labels do not.
+Tài liệu này không phân biệt giữa các tùy chọn tiêu chuẩn và tùy chọn riêng của widget. Một số tùy chọn không áp dụng cho một số loại widget. Việc một widget có phản hồi với một tùy chọn cụ thể hay không phụ thuộc vào class của widget; button có tùy chọn ``command``, còn label thì không.
 
-The options supported by a given widget are listed in that widget's man page,
-or can be queried at runtime by calling the :meth:`~Misc.config` method without
-arguments, or by calling the :meth:`~Misc.keys` method on that widget.
-The return value of these calls is a dictionary whose key is the name of the
-option as a string (for example, ``'relief'``) and whose values are 5-tuples.
+Các tùy chọn được một widget hỗ trợ được liệt kê trong trang man của widget đó hoặc có thể được truy vấn tại runtime bằng cách gọi method :meth:`~Misc.config` không có đối số, hoặc gọi method :meth:`~Misc.keys` trên widget đó. Giá trị trả về của các lệnh gọi này là một dictionary, trong đó key là tên của tùy chọn dưới dạng chuỗi (ví dụ: ``'relief'``) và value là các tuple gồm 5 phần tử.
 
-Some options, like ``bg``, are synonyms for common options with long names
-(``bg`` is shorthand for "background").
+Một số tùy chọn, chẳng hạn như ``bg``, là từ đồng nghĩa của các tùy chọn thông dụng có tên dài (``bg`` là dạng viết tắt của "background").
 
-+-------+---------------------------------+--------------+
-| Index | Meaning                         | Example      |
-+=======+=================================+==============+
-| 0     | option name                     | ``'relief'`` |
-+-------+---------------------------------+--------------+
-| 1     | option name for database lookup | ``'relief'`` |
-+-------+---------------------------------+--------------+
-| 2     | option class for database       | ``'Relief'`` |
-|       | lookup                          |              |
-+-------+---------------------------------+--------------+
-| 3     | default value                   | ``'raised'`` |
-+-------+---------------------------------+--------------+
-| 4     | current value                   | ``'groove'`` |
-+-------+---------------------------------+--------------+
++---------+--------------------------------------------+--------------+
+| Chỉ mục | Ý nghĩa                                    | Ví dụ        |
++=========+============================================+==============+
+| 0       | tên tùy chọn                               | ``'relief'`` |
++---------+--------------------------------------------+--------------+
+| 1       | tên tùy chọn dùng để tra cứu cơ sở dữ liệu | ``'relief'`` |
++---------+--------------------------------------------+--------------+
+| 2       | lớp tùy chọn dùng để tra cứu cơ sở dữ liệu | ``'Relief'`` |
++---------+--------------------------------------------+--------------+
+| 3       | giá trị mặc định                           | ``'raised'`` |
++---------+--------------------------------------------+--------------+
+| 4       | giá trị hiện tại                           | ``'groove'`` |
++---------+--------------------------------------------+--------------+
 
-Example::
+Ví dụ::
 
    >>> print(fred.config())
    {'relief': ('relief', 'relief', 'Relief', 'raised', 'groove')}
 
-Of course, the dictionary printed will include all the options available and
-their values.  This is meant only as an example.
+Tất nhiên, từ điển được in ra sẽ bao gồm tất cả các tùy chọn hiện có và giá trị của chúng. Đây chỉ là một ví dụ.
 
 
 .. _pack-the-packer:
@@ -585,31 +389,19 @@ their values.  This is meant only as an example.
 .. _the-packer:
 .. _packer-options:
 
-Geometry management
-^^^^^^^^^^^^^^^^^^^
+Quản lý bố cục
+^^^^^^^^^^^^^^
 
 .. index::
    single: geometry management (widgets)
    single: packing (widgets)
 
-Creating a widget does not display it.
-A widget appears only after it has been handed to a *geometry manager*,
-which works out its size and position inside its container
-and keeps the layout up to date as the container is resized or its content changes.
-Forgetting to call a geometry manager is a common early mistake:
-the widget is created, but nothing shows up.
+Việc tạo một widget không khiến widget đó hiển thị. Widget chỉ xuất hiện sau khi được chuyển cho *trình quản lý hình học*, thành phần xác định kích thước và vị trí của widget bên trong vùng chứa, đồng thời giữ cho bố cục được cập nhật khi vùng chứa được thay đổi kích thước hoặc nội dung của nó thay đổi. Quên gọi trình quản lý hình học là một lỗi phổ biến ở giai đoạn đầu: widget đã được tạo nhưng không có gì xuất hiện.
 
-Tk provides three geometry managers.
-Each is inherited by every widget, so any widget can be managed by any of them
-(but see the warning below about the incompatibility of grid and pack).
-The choice depends on the kind of layout you want.
+Tk cung cấp ba trình quản lý hình học. Mỗi trình quản lý đều được mọi widget kế thừa, vì vậy bất kỳ widget nào cũng có thể được quản lý bằng bất kỳ trình quản lý nào (nhưng hãy xem cảnh báo bên dưới về sự không tương thích giữa grid và pack). Lựa chọn phụ thuộc vào loại bố cục bạn muốn.
 
 :meth:`grid <Grid.grid_configure>`
-   Arranges widgets in a two-dimensional table of rows and columns.
-   It is the most flexible manager and the one to reach for by default:
-   layouts that would otherwise need several nested frames can often be
-   expressed as a single grid,
-   and rows and columns can be told how to absorb extra space.
+   Sắp xếp các widget trong một bảng hai chiều gồm các hàng và cột. Đây là trình quản lý linh hoạt nhất và là lựa chọn mặc định: những bố cục nếu không sẽ cần nhiều frame lồng nhau thường có thể được biểu diễn bằng một grid duy nhất, đồng thời có thể chỉ định cách các hàng và cột hấp thụ phần không gian thừa.
 
    ::
 
@@ -618,12 +410,7 @@ The choice depends on the kind of layout you want.
       ttk.Button(frm, text="OK").grid(column=1, row=1, sticky="e")
 
 :meth:`pack <Pack.pack_configure>`
-   Stacks widgets against one side of their container
-   -- ``"top"`` (the default), ``"bottom"``, ``"left"`` or ``"right"`` --
-   and can make them fill or expand into the space that is left.
-   It is convenient for simple arrangements,
-   such as a single row or column of widgets
-   or a content area framed by a toolbar and a status bar.
+   Xếp chồng các widget về một phía của vùng chứa -- ``"top"`` (mặc định), ``"bottom"``, ``"left"`` hoặc ``"right"`` -- và có thể khiến chúng lấp đầy hoặc mở rộng vào phần không gian còn lại. Cách này thuận tiện cho các sắp xếp đơn giản, chẳng hạn như một hàng hoặc cột widget duy nhất, hoặc một vùng nội dung được bao quanh bởi thanh công cụ và thanh trạng thái.
 
    ::
 
@@ -632,89 +419,58 @@ The choice depends on the kind of layout you want.
       body.pack(side="left", expand=True, fill="both")
 
 :meth:`place <Place.place_configure>`
-   Positions each widget at an explicit spot,
-   given either as absolute screen distances or as a fraction of the container's size.
-   It offers the most control but the least automatic behavior, and is used the least;
-   it suits special cases such as overlapping widgets or precise custom layouts.
+   Đặt từng widget tại một vị trí cụ thể, được xác định bằng khoảng cách tuyệt đối trên màn hình hoặc bằng một phần kích thước của vùng chứa. Cách này cung cấp khả năng kiểm soát cao nhất nhưng ít hành vi tự động nhất, và được sử dụng ít nhất; nó phù hợp với các trường hợp đặc biệt như những widget chồng lấp hoặc các bố cục tùy chỉnh chính xác.
 
    ::
 
       background.place(x=0, y=0, relwidth=1.0, relheight=1.0)
       badge.place(relx=1.0, rely=0.0, anchor="ne")
 
-Layouts are built up by nesting:
-grid or pack widgets, including frames, inside a frame or toplevel.
-Toplevels are managed by the OS window manager.
-Classic and themed :mod:`tkinter.ttk` widgets can be managed interchangeably.
+Các widget Classic và themed :mod:`tkinter.ttk` có thể được quản lý thay thế cho nhau.
 
 .. warning::
 
-   Do not apply :meth:`!pack` and :meth:`!grid` to two widgets that share the same container.
-   The two managers negotiate sizes in incompatible ways,
-   and the application can hang as they repeatedly resize the container against each other.
-   To combine them, keep each manager's widgets in a separate frame.
+   Không áp dụng :meth:`!pack` và :meth:`!grid` cho hai widget dùng chung một container. Hai trình quản lý thương lượng kích thước theo những cách không tương thích, và ứng dụng có thể bị treo khi chúng liên tục thay đổi kích thước container theo hướng đối nghịch nhau. Để kết hợp chúng, hãy đặt các widget của mỗi trình quản lý trong một frame riêng.
 
-The full set of options accepted by each manager, with their values and defaults,
-is documented under :meth:`Grid.grid_configure`, :meth:`Pack.pack_configure`
-and :meth:`Place.place_configure`;
-see also the :manpage:`grid(3tk)`, :manpage:`pack(3tk)` and :manpage:`place(3tk)`
-man pages.
+Toàn bộ các tùy chọn mà mỗi trình quản lý chấp nhận, cùng với giá trị và giá trị mặc định của chúng, được ghi trong :meth:`Grid.grid_configure`, :meth:`Pack.pack_configure` và :meth:`Place.place_configure`; xem thêm các trang man :manpage:`grid(3tk)`, :manpage:`pack(3tk)` và :manpage:`place(3tk)`.
 
 
 .. _coupling-widget-variables:
 
-Coupling widget variables
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Liên kết biến widget
+^^^^^^^^^^^^^^^^^^^^
 
-Some widgets can tie their current value directly to a program variable,
-so that the two stay in sync.
-Options such as ``variable``, ``textvariable``, ``value``, ``onvalue`` and
-``offvalue`` set up this connection:
-when the user changes the widget the variable is updated,
-and when the variable is set the widget redraws to match.
+Một số widget có thể liên kết trực tiếp giá trị hiện tại của chúng với một biến chương trình, để hai bên luôn đồng bộ. Các tùy chọn như ``variable``, ``textvariable``, ``value``, ``onvalue`` và ``offvalue`` thiết lập kết nối này: khi người dùng thay đổi widget, biến sẽ được cập nhật; và khi biến được gán giá trị, widget sẽ vẽ lại để khớp với biến.
 
-A widget can be linked only to a :class:`Variable` object,
-not to an ordinary Python variable.
-This is not a limitation of :mod:`!tkinter`
-but a consequence of how the two languages differ:
-the link relies on Tcl being notified every time the value changes,
-and Python offers no way to react when a plain variable is reassigned.
-A :class:`Variable` sidesteps this by keeping its value inside the Tcl interpreter
-and exposing it through explicit :meth:`~Variable.get` and :meth:`~Variable.set` methods.
+Một widget chỉ có thể được liên kết với một đối tượng :class:`Variable`, không phải một biến Python thông thường. Đây không phải là hạn chế của :mod:`!tkinter` mà là hệ quả của sự khác biệt giữa hai ngôn ngữ: liên kết này dựa vào việc Tcl được thông báo mỗi khi giá trị thay đổi, còn Python không có cách nào phản ứng khi một biến thông thường được gán lại. Một :class:`Variable` giải quyết vấn đề này bằng cách lưu giá trị bên trong trình thông dịch Tcl và cung cấp giá trị đó thông qua các phương thức :meth:`~Variable.get` và :meth:`~Variable.set` tường minh.
 
-Ready-made subclasses cover the common types:
-:class:`StringVar`, :class:`IntVar`, :class:`DoubleVar` and :class:`BooleanVar`.
-Pass one as a widget's ``textvariable`` (or ``variable``) option,
-then read and update it with :meth:`~Variable.get` and :meth:`~Variable.set`;
-the widget tracks it with no further work on your part.
+Các lớp con có sẵn bao quát những kiểu thường gặp:
+:class:`StringVar`, :class:`IntVar`, :class:`DoubleVar` và :class:`BooleanVar`. Truyền một đối tượng trong số đó vào tùy chọn ``textvariable`` (hoặc ``variable``) của widget, sau đó đọc và cập nhật nó bằng :meth:`~Variable.get` và :meth:`~Variable.set`; widget sẽ tự theo dõi đối tượng đó mà bạn không cần làm thêm gì.
 
-Keep a reference to the variable for as long as the widget uses it
--- for example by storing it as an attribute.
-A :class:`Variable` that is garbage collected removes its underlying Tcl variable,
-breaking the connection to the widget (see :class:`Variable`).
+Giữ tham chiếu đến biến chừng nào widget còn sử dụng biến đó -- chẳng hạn bằng cách lưu biến dưới dạng thuộc tính. Một :class:`Variable` bị thu gom rác sẽ xóa biến Tcl bên dưới, làm mất kết nối với widget (xem :class:`Variable`).
 
-For example::
+Ví dụ::
 
    import tkinter as tk
    from tkinter import ttk
 
    root = tk.Tk()
 
-   # Create the application variable and give it an initial value.
+   # Tạo biến của ứng dụng và gán giá trị ban đầu cho biến.
    contents = tk.StringVar(value="this is a variable")
 
-   # Tell the entry widget to track the variable.
+   # Yêu cầu widget entry theo dõi biến.
    entry = ttk.Entry(root, textvariable=contents)
    entry.pack()
 
-   # Print the current value whenever the user presses Return.
+   # In giá trị hiện tại mỗi khi người dùng nhấn Return.
    def print_contents(event):
        print("The current entry content is:", contents.get())
 
    entry.bind("<Return>", print_contents)
 
-   # Setting the variable from the program updates the entry through the
-   # same link.
+   # Việc đặt giá trị cho biến từ chương trình sẽ cập nhật entry thông qua
+   # cùng một liên kết.
    def clear():
        contents.set("")
 
@@ -724,26 +480,16 @@ For example::
 
 .. _tkinter-window-manager:
 
-The window manager
-^^^^^^^^^^^^^^^^^^
+Trình quản lý cửa sổ
+^^^^^^^^^^^^^^^^^^^^
 
 .. index:: single: window manager (widgets)
 
-The *window manager* is the part of the desktop responsible for the title bar,
-border and controls drawn around each top-level window,
-and for such things as its title, position, size and icon.
-Tk gives access to these through the :class:`Wm` mixin,
-which is inherited by the :class:`Tk` root window and by every :class:`Toplevel`.
-You therefore call the window-manager methods directly on a top-level window.
-Each has a short name and an equivalent ``wm_``-prefixed name,
-for example :meth:`~Wm.title` and :meth:`~Wm.wm_title`.
+*Trình quản lý cửa sổ* là bộ phận của desktop chịu trách nhiệm hiển thị thanh tiêu đề, đường viền và các điều khiển xung quanh mỗi cửa sổ cấp cao nhất, cũng như các thuộc tính như tiêu đề, vị trí, kích thước và biểu tượng của cửa sổ. Tk cung cấp quyền truy cập vào các thuộc tính này thông qua :class:`Wm` mixin, được kế thừa bởi cửa sổ gốc :class:`Tk` và mọi :class:`Toplevel`. Vì vậy, bạn gọi trực tiếp các phương thức của trình quản lý cửa sổ trên một cửa sổ cấp cao nhất. Mỗi phương thức có một tên ngắn và một tên tương đương có tiền tố ``wm_``, chẳng hạn như :meth:`~Wm.title` và :meth:`~Wm.wm_title`.
 
-These methods act on the top-level window
-whether its content is built from the classic widgets or the themed :mod:`tkinter.ttk` widgets.
-To reach the top-level window containing an arbitrary widget,
-call its :meth:`~Misc.winfo_toplevel` method.
+Các phương thức này tác động lên cửa sổ cấp cao nhất, bất kể nội dung của cửa sổ được xây dựng từ các widget cổ điển hay các widget :mod:`tkinter.ttk` theo chủ đề. Để truy cập cửa sổ cấp cao nhất chứa một widget bất kỳ, hãy gọi phương thức :meth:`~Misc.winfo_toplevel` của widget đó.
 
-For example::
+Ví dụ::
 
    import tkinter as tk
    from tkinter import ttk
@@ -757,144 +503,98 @@ For example::
 
    root.mainloop()
 
-See :class:`Wm` for the full set of window-manager methods.
+Xem :class:`Wm` để biết đầy đủ các phương thức của trình quản lý cửa sổ.
 
 
 .. _Tk-option-data-types:
 
-Tk option data types
-^^^^^^^^^^^^^^^^^^^^
+Các kiểu dữ liệu tùy chọn của Tk
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. index:: single: Tk Option Data Types
 
-Many widget options documented in the reference
-accept values of a small number of common types, described here.
+Nhiều tùy chọn widget được mô tả trong tài liệu tham khảo chấp nhận các giá trị thuộc một số ít kiểu dữ liệu phổ biến, được mô tả ở đây.
 
 anchor
-   Legal values are points of the compass: ``"n"``, ``"ne"``, ``"e"``, ``"se"``,
-   ``"s"``, ``"sw"``, ``"w"``, ``"nw"``, and also ``"center"``.
+   Các giá trị hợp lệ là các hướng trên la bàn: ``"n"``, ``"ne"``, ``"e"``, ``"se"``, ``"s"``, ``"sw"``, ``"w"``, ``"nw"``, và ``"center"``.
 
 bitmap
-   There are ten built-in, named bitmaps: ``'error'``, ``'gray12'``,
-   ``'gray25'``, ``'gray50'``, ``'gray75'``, ``'hourglass'``, ``'info'``,
-   ``'questhead'``, ``'question'``, ``'warning'``.  To specify an X bitmap
-   filename, give the full path to the file, preceded with an ``@``, as in
-   ``"@/usr/contrib/bitmap/gumby.bit"``.
+   Có mười bitmap được tích hợp sẵn và có tên: ``'error'``, ``'gray12'``, ``'gray25'``, ``'gray50'``, ``'gray75'``, ``'hourglass'``, ``'info'``, ``'questhead'``, ``'question'``, ``'warning'``. Để chỉ định tên tệp X bitmap, hãy cung cấp đường dẫn đầy đủ đến tệp, đặt trước bằng ``@``, như trong ``"@/usr/contrib/bitmap/gumby.bit"``.
 
 boolean
-   You can pass integers 0 or 1 or the strings ``"yes"`` or ``"no"``.
+   Bạn có thể truyền các số nguyên 0 hoặc 1, hoặc các chuỗi ``"yes"`` hoặc ``"no"``.
 
 callback
-   This is any Python function that takes no arguments.  For example::
+   Đây là bất kỳ hàm Python nào không nhận đối số. Ví dụ::
 
       def print_it():
           print("hi there")
       fred["command"] = print_it
 
-color
-   Colors can be given as the names of X colors in the rgb.txt file, or as strings
-   representing RGB values in 4 bit: ``"#RGB"``, 8 bit: ``"#RRGGBB"``, 12 bit:
-   ``"#RRRGGGBBB"``, or 16 bit: ``"#RRRRGGGGBBBB"`` ranges, where R,G,B here
-   represent any legal hex digit.  See the :manpage:`colors(3tk)` man page for
-   the list of named colors.
+màu sắc
+   Màu sắc có thể được cung cấp dưới dạng tên của các màu X trong tệp rgb.txt hoặc dưới dạng chuỗi biểu diễn các giá trị RGB trong phạm vi 4 bit: ``"#RGB"``, 8 bit: ``"#RRGGBB"``, 12 bit: ``"#RRRGGGBBB"`` hoặc 16 bit: ``"#RRRRGGGGBBBB"``, trong đó R,G,B ở đây đại diện cho bất kỳ chữ số thập lục phân hợp lệ nào. Xem trang hướng dẫn :manpage:`colors(3tk)` để biết danh sách các màu có tên.
 
-cursor
-   The name of the mouse cursor to display while the pointer is over the widget.
-   Tk provides a portable set of cursor names available on all platforms
-   (for example ``"arrow"``, ``"watch"``, ``"cross"``, or ``"hand2"``);
-   the standard X cursor names from :file:`cursorfont.h` may also be used,
-   without the ``XC_`` prefix (so ``XC_hand2`` becomes ``"hand2"``).
-   The full list of names, including the platform-specific ones,
-   is given in the :manpage:`cursors(3tk)` manual page.
-   You can also specify a bitmap and mask file of your own.
-   On Windows a cursor file (:file:`.cur` or :file:`.ani`) may be used directly,
-   giving its path preceded with an ``@``, as in ``"@C:/cursors/bart.ani"``.
+con trỏ
+   Tên của con trỏ chuột sẽ hiển thị khi con trỏ nằm trên widget. Tk cung cấp một tập hợp tên con trỏ có tính di động, khả dụng trên mọi nền tảng (ví dụ ``"arrow"``, ``"watch"``, ``"cross"`` hoặc ``"hand2"``); cũng có thể sử dụng các tên con trỏ X tiêu chuẩn từ :file:`cursorfont.h` mà không cần tiền tố ``XC_`` (do đó ``XC_hand2`` trở thành ``"hand2"``). Danh sách đầy đủ các tên, bao gồm cả những tên dành riêng cho từng nền tảng, được cung cấp trong trang hướng dẫn :manpage:`cursors(3tk)`. Bạn cũng có thể chỉ định tệp bitmap và tệp mask của riêng mình. Trên Windows, có thể sử dụng trực tiếp tệp con trỏ (:file:`.cur` hoặc :file:`.ani`) bằng cách cung cấp đường dẫn của tệp với tiền tố ``@``, như trong ``"@C:/cursors/bart.ani"``.
 
-distance
-   Screen distances can be specified in either pixels or absolute distances.
-   Pixels are given as numbers and absolute distances as strings, with the trailing
-   character denoting units: ``c`` for centimetres, ``i`` for inches, ``m`` for
-   millimetres, ``p`` for printer's points.  For example, 3.5 inches is expressed
-   as ``"3.5i"``.
+khoảng cách
+   Khoảng cách trên màn hình có thể được chỉ định bằng pixel hoặc theo khoảng cách tuyệt đối. Pixel được biểu diễn bằng các số, còn khoảng cách tuyệt đối được biểu diễn bằng chuỗi, trong đó ký tự ở cuối biểu thị đơn vị: ``c`` cho centimet, ``i`` cho inch, ``m`` cho milimet, ``p`` cho point của máy in. Ví dụ, 3.5 inch được biểu diễn là ``"3.5i"``.
 
-font
-   Tk uses a font description such as ``{courier 10 bold}``; in
-   :mod:`!tkinter` this is most naturally passed as a tuple of
-   ``(family, size, *styles)`` (or as the equivalent string
-   ``"Courier 10 bold"``).  Font sizes with positive numbers are measured in
-   points; sizes with negative numbers are measured in pixels.
+phông chữ
+   Tk sử dụng một mô tả phông chữ như ``{courier 10 bold}``; trong
+   :mod:`!tkinter` trường hợp này được truyền tự nhiên nhất dưới dạng một tuple gồm ``(family, size, *styles)`` (hoặc dưới dạng chuỗi tương đương ``"Courier 10 bold"``). Kích thước phông chữ với số dương được đo bằng point; kích thước với số âm được đo bằng pixel.
 
-geometry
-   This is a string of the form ``widthxheight``, where width and height are
-   measured in pixels for most widgets (in characters for widgets displaying text).
-   For example: ``fred["geometry"] = "200x100"``.
+hình học
+   Đây là một chuỗi có dạng ``widthxheight``, trong đó chiều rộng và chiều cao được đo bằng pixel đối với hầu hết widget (bằng số ký tự đối với các widget hiển thị văn bản). Ví dụ: ``fred["geometry"] = "200x100"``.
 
-justify
-   Legal values are the strings: ``"left"``, ``"center"``, and ``"right"``.
+căn chỉnh
+   Các giá trị hợp lệ là các chuỗi: ``"left"``, ``"center"`` và ``"right"``.
 
 region
-   This is a string with four space-delimited elements, each of which is a legal
-   distance (see above).  For example: ``"2 3 4 5"`` and ``"3i 2i 4.5i 2i"`` and
-   ``"3c 2c 4c 10.43c"``  are all legal regions.
+   Đây là một chuỗi gồm bốn phần tử được phân cách bằng dấu cách, mỗi phần tử đều là một khoảng cách hợp lệ (xem ở trên). Ví dụ: ``"2 3 4 5"`` và ``"3i 2i 4.5i 2i"`` và ``"3c 2c 4c 10.43c"`` đều là các region hợp lệ.
 
 relief
-   Determines what the border style of a widget will be.  Legal values are:
-   ``"raised"``, ``"sunken"``, ``"flat"``, ``"groove"``, ``"ridge"``, and
-   ``"solid"``.
+   Xác định kiểu đường viền của widget. Các giá trị hợp lệ là: ``"raised"``, ``"sunken"``, ``"flat"``, ``"groove"``, ``"ridge"`` và ``"solid"``.
 
 scrollcommand
-   This is almost always the :meth:`!set` method of some scrollbar widget, but can
-   be any widget method that takes a single argument.
+   Đây hầu như luôn là phương thức :meth:`!set` của một widget scrollbar nào đó, nhưng cũng có thể là bất kỳ phương thức widget nào nhận một đối số duy nhất.
 
 wrap
-   Must be one of: ``"none"``, ``"char"``, or ``"word"``.
+   Phải là một trong các giá trị sau: ``"none"``, ``"char"`` hoặc ``"word"``.
 
 .. _Bindings-and-Events:
 
-Bindings and events
+Bindings và sự kiện
 ^^^^^^^^^^^^^^^^^^^
 
 .. index::
    single: bind (widgets)
    single: events (widgets)
 
-The bind method from the widget command allows you to watch for certain events
-and to have a callback function trigger when that event type occurs.  The form
-of the bind method is::
+Phương thức bind từ lệnh widget cho phép bạn theo dõi một số sự kiện nhất định và gọi một hàm callback khi loại sự kiện đó xảy ra. Dạng của phương thức bind là::
 
    def bind(self, sequence, func, add=''):
 
-where:
+trong đó:
 
 sequence
-   is a string that denotes the target kind of event.  Physical events use the
-   ``<modifier-modifier-type-detail>`` form (for example ``"<Enter>"`` or
-   ``"<Control-Button-1>"``); application-defined virtual events use double angle
-   brackets, as in ``"<<Paste>>"``.  (See the
-   :manpage:`bind(3tk)` man page for details.)
+   là một chuỗi biểu thị loại sự kiện đích. Các sự kiện vật lý sử dụng dạng ``<modifier-modifier-type-detail>`` (ví dụ ``"<Enter>"`` hoặc ``"<Control-Button-1>"``); các sự kiện ảo do ứng dụng định nghĩa sử dụng cặp dấu ngoặc nhọn, như trong ``"<<Paste>>"``. (Xem
+   trang hướng dẫn :manpage:`bind(3tk)` để biết chi tiết.)
 
 func
-   is a Python function, taking one argument, to be invoked when the event occurs.
-   An Event instance will be passed as the argument. (Functions deployed this way
-   are commonly known as *callbacks*.)
+   là một hàm Python, nhận một đối số và được gọi khi sự kiện xảy ra. Một instance Event sẽ được truyền vào làm đối số. (Các hàm được triển khai theo cách này thường được gọi là *callbacks*.)
 
 add
-   is optional, either ``''`` or ``'+'``.  Passing an empty string denotes that
-   this binding is to replace any other bindings that this event is associated
-   with.  Passing a ``'+'`` means that this function is to be added to the list
-   of functions bound to this event type.
+   là tùy chọn, có thể là ``''`` hoặc ``'+'``. Truyền một chuỗi rỗng cho biết binding này sẽ thay thế mọi binding khác được liên kết với sự kiện này. Truyền một ``'+'`` có nghĩa là hàm này sẽ được thêm vào danh sách các hàm được liên kết với loại sự kiện này.
 
-For example::
+Ví dụ::
 
    def turn_red(self, event):
        event.widget["activeforeground"] = "red"
 
    self.button.bind("<Enter>", self.turn_red)
 
-Notice how the widget field of the event is being accessed in the
-``turn_red()`` callback.  This field contains the widget that caught the X
-event.  The following table lists the other event fields you can access, and how
-they are denoted in Tk, which can be useful when referring to the Tk man pages.
+Lưu ý cách trường widget của sự kiện được truy cập trong callback ``turn_red()``. Trường này chứa widget đã bắt sự kiện X. Bảng sau liệt kê các trường sự kiện khác mà bạn có thể truy cập và cách chúng được ký hiệu trong Tk; điều này có thể hữu ích khi tham khảo các trang hướng dẫn của Tk.
 
 +----+---------------------+----+---------------------+
 | Tk | Tkinter Event Field | Tk | Tkinter Event Field |
@@ -920,298 +620,196 @@ they are denoted in Tk, which can be useful when referring to the Tk man pages.
 | %d | detail              | %D | delta               |
 +----+---------------------+----+---------------------+
 
-The ``add`` parameter above only affects the bindings you make yourself.
-Every widget also inherits *class bindings*
-that implement its standard behavior --
-for example a :class:`Text` widget binds :kbd:`Control-t`
-to transpose two characters.
-These are described in the bindings section of the widget's Tk man page
-(such as :manpage:`text(3tk)` or :manpage:`entry(3tk)`).
+Tham số ``add`` ở trên chỉ ảnh hưởng đến các binding mà bạn tự tạo. Mỗi widget cũng kế thừa *các binding của lớp* để triển khai hành vi tiêu chuẩn của nó -- ví dụ: một :class:`Text` widget liên kết :kbd:`Control-t` để hoán đổi hai ký tự. Các binding này được mô tả trong phần bindings của trang hướng dẫn Tk của widget (chẳng hạn như :manpage:`text(3tk)` hoặc :manpage:`entry(3tk)`).
 
-Class bindings are processed separately from your own,
-so binding an event yourself does not replace the default; both run.
-To suppress an unwanted default binding,
-bind the event on the widget
-and return the string ``"break"`` from your callback.
+Các binding của lớp được xử lý riêng với binding của bạn, vì vậy việc tự binding một event không thay thế binding mặc định; cả hai đều chạy. Để ngăn một binding mặc định không mong muốn, hãy binding event trên widget và trả về chuỗi ``"break"`` từ callback của bạn.
 
 
-The index parameter
-^^^^^^^^^^^^^^^^^^^
+Tham số index
+^^^^^^^^^^^^^
 
-A number of widgets require "index" parameters to be passed.  These are used to
-point at a specific place in a Text widget, or to particular characters in an
-Entry widget, or to particular menu items in a Menu widget.
+Một số widget yêu cầu truyền các tham số "index". Các tham số này được dùng để trỏ đến một vị trí cụ thể trong widget Text, đến các ký tự cụ thể trong widget Entry hoặc đến các mục menu cụ thể trong widget Menu.
 
-Entry widget indexes (index, view index, etc.)
-   Entry widgets have methods and options that refer to character positions
-   in the text being displayed.
-   Anytime an index is needed, you may pass in:
+Các index của widget Entry (index, view index, v.v.)
+   Widget Entry có các phương thức và tùy chọn tham chiếu đến vị trí ký tự trong văn bản đang hiển thị. Bất cứ khi nào cần một index, bạn có thể truyền vào:
 
-   * an integer which refers to the numeric position of a character,
-     counted from the beginning of the text, starting with 0;
+   * một số nguyên biểu thị vị trí số của một ký tự, được đếm từ đầu văn bản, bắt đầu từ 0;
 
-   * the string ``"anchor"``,
-     which refers to the anchor point of the selection,
-     set with the widget's selection methods;
+   * chuỗi ``"anchor"``, tham chiếu đến điểm neo của vùng chọn, được thiết lập bằng các phương thức selection của widget;
 
-   * the string ``"end"``,
-     which refers to the position just after the last character;
+   * chuỗi ``"end"``, tham chiếu đến vị trí ngay sau ký tự cuối cùng;
 
-   * the string ``"insert"``,
-     which refers to the character just after the insertion cursor;
+   * chuỗi ``"insert"``, tham chiếu đến ký tự ngay sau con trỏ chèn;
 
-   * the strings ``"sel.first"`` and ``"sel.last"``,
-     which refer to the first character in the selection
-     and the position just after the last
-     (it is an error to use these if there is no selection);
+   * các chuỗi ``"sel.first"`` và ``"sel.last"``, tham chiếu đến ký tự đầu tiên trong vùng chọn và vị trí ngay sau ký tự cuối cùng (sẽ xảy ra lỗi nếu sử dụng các chuỗi này khi không có vùng chọn nào);
 
-   * a string consisting of ``@`` followed by an integer, as in ``"@6"``,
-     where the integer is interpreted as an x pixel coordinate
-     in the entry's coordinate system,
-     selecting the character spanning that point.
+   * một chuỗi gồm ``@`` theo sau là một số nguyên, như trong ``"@6"``, trong đó số nguyên được hiểu là tọa độ pixel x trong hệ tọa độ của entry, dùng để chọn ký tự bao quanh điểm đó.
 
-Text widget indexes
-   The index notation for Text widgets is very rich and is best described in the Tk
-   man pages.
+Các chỉ mục của Text widget
+   Ký hiệu chỉ mục cho Text widget rất phong phú và được mô tả rõ nhất trong các trang hướng dẫn của Tk.
 
-Menu indexes (menu.invoke(), menu.entryconfig(), etc.)
-   Some options and methods for menus manipulate specific menu entries. Anytime a
-   menu index is needed for an option or a parameter, you may pass in:
+Các chỉ mục menu (menu.invoke(), menu.entryconfig(), v.v.)
+   Một số tùy chọn và phương thức dành cho menu thao tác với các mục menu cụ thể. Bất cứ khi nào cần một chỉ mục menu cho một tùy chọn hoặc tham số, bạn có thể truyền vào:
 
-   * an integer which refers to the numeric position of the entry in the widget,
-     counted from the top, starting with 0;
+   * một số nguyên chỉ vị trí số của mục trong widget, được đếm từ trên xuống, bắt đầu từ 0;
 
-   * the string ``"active"``, which refers to the menu position that is currently
-     under the cursor;
+   * chuỗi ``"active"``, chỉ vị trí menu hiện đang nằm dưới con trỏ;
 
-   * the string ``"last"`` which refers to the last menu item;
+   * chuỗi ``"last"`` chỉ mục menu cuối cùng;
 
-   * a string consisting of ``@`` followed by an integer, as in ``"@6"``, where
-     the integer is interpreted as a y pixel coordinate in the menu's coordinate
-     system;
+   * một chuỗi gồm ``@`` theo sau là một số nguyên, như trong ``"@6"``, trong đó số nguyên được hiểu là tọa độ pixel y trong hệ tọa độ của menu;
 
-   * the string ``"none"``, which indicates no menu entry at all, most often used
-     with menu.activate() to deactivate all entries, and finally,
+   * chuỗi ``"none"``, cho biết hoàn toàn không có mục menu nào, thường được dùng với menu.activate() để hủy kích hoạt tất cả các mục, và cuối cùng,
 
-   * a text string that is pattern matched against the label of the menu entry, as
-     scanned from the top of the menu to the bottom.  Note that this index type is
-     considered after all the others, which means that matches for menu items
-     labelled ``last``, ``active``, or ``none`` may be interpreted as the above
-     literals, instead.
+   * một chuỗi văn bản được so khớp theo mẫu với nhãn của mục menu, được quét từ đầu menu đến cuối menu. Lưu ý rằng kiểu chỉ mục này được xét sau tất cả các kiểu khác, nghĩa là các kết quả khớp với các mục menu có nhãn ``last``, ``active`` hoặc ``none`` thay vào đó có thể được diễn giải là các literal nêu trên.
 
 
-Images
-^^^^^^
+Hình ảnh
+^^^^^^^^
 
-Images of different formats can be created through the corresponding subclass
-of :class:`tkinter.Image`:
+Có thể tạo hình ảnh ở các định dạng khác nhau thông qua lớp con tương ứng của :class:`tkinter.Image`:
 
-* :class:`BitmapImage` for images in XBM format.
+* :class:`BitmapImage` dành cho hình ảnh ở định dạng XBM.
 
-* :class:`PhotoImage` for images in PGM, PPM, GIF and PNG formats. The latter
-  is supported starting with Tk 8.6.
+* :class:`PhotoImage` dành cho hình ảnh ở các định dạng PGM, PPM, GIF và PNG. Định dạng sau được hỗ trợ kể từ Tk 8.6.
 
-Either type of image is created through either the ``file`` or the ``data``
-option (other options are available as well).
+Mỗi loại hình ảnh đều được tạo thông qua tùy chọn ``file`` hoặc ``data`` (cũng có các tùy chọn khác).
 
 .. versionchanged:: 3.13
-   Added the :class:`!PhotoImage` method :meth:`!copy_replace` to copy a region
-   from one image to other image, possibly with pixel zooming and/or
-   subsampling.
-   Add *from_coords* parameter to :class:`!PhotoImage` methods :meth:`!copy`,
-   :meth:`!zoom` and :meth:`!subsample`.
-   Add *zoom* and *subsample* parameters to :class:`!PhotoImage` method
+   Đã thêm phương thức :class:`!PhotoImage` :meth:`!copy_replace` để sao chép một vùng từ hình ảnh này sang hình ảnh khác, có thể kèm theo phóng to pixel và/hoặc lấy mẫu con. Thêm tham số *from_coords* vào các phương thức :class:`!PhotoImage` :meth:`!copy`,
+   :meth:`!zoom` và :meth:`!subsample`. Thêm các tham số *zoom* và *subsample* vào phương thức :class:`!PhotoImage`
    :meth:`!copy`.
 
-The image object can then be used wherever an ``image`` option is supported by
-some widget (for example, labels, buttons, menus). In these cases, Tk will not keep a
-reference to the image. When the last Python reference to the image object is
-deleted, the image data is deleted as well, and Tk will display an empty box
-wherever the image was used.
+Sau đó, đối tượng hình ảnh có thể được sử dụng ở bất kỳ nơi nào một widget hỗ trợ tùy chọn ``image`` (ví dụ: nhãn, nút, menu). Trong những trường hợp này, Tk sẽ không giữ tham chiếu đến hình ảnh. Khi tham chiếu Python cuối cùng đến đối tượng hình ảnh bị xóa, dữ liệu hình ảnh cũng bị xóa, và Tk sẽ hiển thị một ô trống ở mọi nơi hình ảnh từng được sử dụng.
 
 .. seealso::
 
-    The `Pillow <https://python-pillow.org/>`_ package adds support for
-    formats such as BMP, JPEG, TIFF, and WebP, among others.
+    Gói `Pillow <https://python-pillow.org/>`_ bổ sung hỗ trợ cho các định dạng như BMP, JPEG, TIFF và WebP, cùng nhiều định dạng khác.
 
 
-Reference
+Tham khảo
 ---------
 
 .. currentmodule:: tkinter
 
-This section documents the classes, methods, functions and constants of the
-:mod:`!tkinter` module.
-Most of them wrap Tcl/Tk commands; consult the official Tcl/Tk manual pages for
-the full list of widget options and further details.
+Phần này mô tả các lớp, phương thức, hàm và hằng số của
+:mod:`!tkinter` mô-đun. Hầu hết chúng bao bọc các lệnh Tcl/Tk; hãy tham khảo các trang hướng dẫn chính thức của Tcl/Tk để xem danh sách đầy đủ các tùy chọn của widget và biết thêm chi tiết.
 
 .. exception:: TclError
 
-   The exception raised when a call into the Tcl interpreter fails, for example
-   when a widget is given an unknown option or an invalid value.
+   Ngoại lệ được phát sinh khi một lệnh gọi vào trình thông dịch Tcl thất bại, chẳng hạn khi một widget được cung cấp một tùy chọn không xác định hoặc một giá trị không hợp lệ.
 
-Base and mixin classes
+Các lớp cơ sở và mixin
 ^^^^^^^^^^^^^^^^^^^^^^
 
 .. class:: Misc()
 
-   The :class:`!Misc` class is a mix-in inherited by :class:`Tk` and, through
-   :class:`BaseWidget`, by every widget.
-   It provides the large set of methods common to all Tk objects: querying
-   window information, managing event bindings and the event loop, controlling
-   the keyboard focus and pointer grabs, accessing the selection, clipboard and
-   option database, and assorted utility and introspection services.
-   Because they are inherited, these methods are available on every widget and
-   on the :class:`Tk` application object, and are documented here once rather
-   than repeated for each widget.
+   Lớp :class:`!Misc` là một mixin được :class:`Tk` kế thừa và, thông qua
+   :class:`BaseWidget`, bởi mọi widget. Lớp này cung cấp tập hợp lớn các phương thức dùng chung cho tất cả đối tượng Tk: truy vấn thông tin cửa sổ, quản lý các liên kết sự kiện và event loop, điều khiển keyboard focus và pointer grab, truy cập selection, clipboard và option database, cùng nhiều dịch vụ tiện ích và introspection khác. Vì được kế thừa, các phương thức này khả dụng trên mọi widget và trên đối tượng ứng dụng :class:`Tk`, đồng thời được ghi lại một lần ở đây thay vì lặp lại cho từng widget.
 
    .. method:: cget(key)
 
-      Return the current value of the configuration option named *key* for this
-      widget, as a string.
-      The expression ``widget[key]`` is equivalent and may be used instead.
+      Trả về giá trị hiện tại của tùy chọn cấu hình có tên *key* cho widget này dưới dạng chuỗi. Biểu thức ``widget[key]`` tương đương và cũng có thể được sử dụng.
 
    .. method:: config(cnf=None, **kw)
       :no-typesetting:
 
    .. method:: configure(cnf=None, **kw)
 
-      Query or modify the configuration options of the widget.
-      With no arguments, return a dictionary mapping every available option
-      name to a tuple describing it (its name, X resource name, X resource
-      class, default value and current value).
-      If a single option name is given as a string, return the tuple for just
-      that option.
-      If one or more keyword arguments are given, or a dictionary is passed as
-      *cnf*, set each named option to the corresponding value; the expression
-      ``widget[key] = value`` sets a single option in the same way.
+      Truy vấn hoặc sửa đổi các tùy chọn cấu hình của widget. Khi không có đối số, trả về một dictionary ánh xạ mọi tên tùy chọn khả dụng tới một tuple mô tả tùy chọn đó (tên, tên tài nguyên X, lớp tài nguyên X, giá trị mặc định và giá trị hiện tại). Nếu cung cấp một tên tùy chọn duy nhất dưới dạng chuỗi, trả về tuple chỉ dành cho tùy chọn đó. Nếu cung cấp một hoặc nhiều keyword argument, hoặc truyền một dictionary dưới dạng *cnf*, đặt mỗi tùy chọn có tên thành giá trị tương ứng; biểu thức ``widget[key] = value`` đặt một tùy chọn duy nhất theo cách tương tự.
 
-      :meth:`config` is an alias of :meth:`!configure`.
+      :meth:`config` là bí danh của :meth:`!configure`.
 
    .. method:: keys()
 
-      Return a list of the names of all configuration options of this widget.
+      Trả về danh sách tên của tất cả tùy chọn cấu hình của widget này.
 
    .. method:: getboolean(s)
 
-      Interpret the string *s* as a Tcl boolean and return the corresponding
-      :class:`bool`.
-      Tcl accepts values such as ``'1'``, ``'0'``, ``'yes'``, ``'no'``,
-      ``'true'`` and ``'false'``.
-      Raise :exc:`ValueError` if *s* is not a valid boolean.
+      Diễn giải chuỗi *s* dưới dạng một giá trị boolean của Tcl và trả về giá trị tương ứng
+      :class:`bool`. Tcl chấp nhận các giá trị như ``'1'``, ``'0'``, ``'yes'``, ``'no'``, ``'true'`` và ``'false'``. Phát sinh :exc:`ValueError` nếu *s* không phải là một giá trị boolean hợp lệ.
 
    .. method:: getdouble(s)
 
-      Interpret the string *s* as a Tcl floating-point number and return it as
-      a :class:`float`.
-      Raise :exc:`ValueError` if *s* is not a valid number.
+      Diễn giải chuỗi *s* dưới dạng một số dấu phẩy động của Tcl và trả về dưới dạng một :class:`float`. Phát sinh :exc:`ValueError` nếu *s* không phải là một số hợp lệ.
 
       .. versionadded:: 3.5
 
 
    .. method:: getint(s)
 
-      Interpret the string *s* as a Tcl integer and return it as an
-      :class:`int`.
-      Raise :exc:`ValueError` if *s* is not a valid integer.
+      Diễn giải chuỗi *s* dưới dạng một số nguyên Tcl và trả về dưới dạng một
+      :class:`int`. Phát sinh :exc:`ValueError` nếu *s* không phải là một số nguyên hợp lệ.
 
    .. method:: getvar(name)
 
-      Return the value of the Tcl global variable named *name*.
+      Trả về giá trị của biến toàn cục Tcl có tên *name*.
 
    .. method:: setvar(name, value)
 
-      Set the Tcl global variable named *name* to *value*.
+      Đặt biến toàn cục Tcl có tên *name* thành *value*.
 
-      The :meth:`!getvar` and :meth:`!setvar` methods give direct access to Tcl
-      variables.
-      In most code you will instead use a :class:`Variable` subclass such as
-      :class:`StringVar` or :class:`IntVar`, which wraps a Tcl variable and
-      converts its value to and from a Python type.
+      Các phương thức :meth:`!getvar` và :meth:`!setvar` cho phép truy cập trực tiếp vào các biến Tcl. Trong hầu hết mã, thay vào đó bạn sẽ sử dụng một lớp con của :class:`Variable` chẳng hạn như
+      :class:`StringVar` hoặc :class:`IntVar`, lớp này bao bọc một biến Tcl và chuyển đổi giá trị của biến này từ và sang một kiểu Python.
 
    .. method:: register(func, subst=None, needcleanup=1)
 
-      Register the Python callable *func* as a Tcl command and return the name
-      of the new command as a string.
-      Whenever Tcl invokes that command, *func* is called; if *subst* is given,
-      it is applied to the command's arguments first.
-      This is the mechanism used internally to turn Python callbacks into the
-      command names passed to Tk options such as *command*.
-      Unless *needcleanup* is false, the command is deleted automatically when
-      the widget is destroyed.
+      Đăng ký callable Python *func* làm một lệnh Tcl và trả về tên của lệnh mới dưới dạng chuỗi. Mỗi khi Tcl gọi lệnh đó, *func* sẽ được gọi; nếu cung cấp *subst*, nó sẽ được áp dụng trước tiên cho các đối số của lệnh. Đây là cơ chế được sử dụng nội bộ để chuyển các callback Python thành tên lệnh được truyền cho các tùy chọn Tk như *command*. Trừ khi *needcleanup* là false, lệnh sẽ tự động bị xóa khi widget bị hủy.
 
       .. versionchanged:: 3.13
-         The arguments passed to *func* are no longer converted to strings.
+         Các đối số được truyền cho *func* không còn được chuyển đổi thành chuỗi.
 
    .. method:: deletecommand(name)
 
-      Delete the Tcl command named *name*, such as one previously returned by
+      Xóa lệnh Tcl có tên *name*, chẳng hạn như lệnh trước đó được trả về bởi
       :meth:`register`.
 
    .. method:: nametowidget(name)
 
-      Return the widget instance corresponding to the Tk pathname *name*.
+      Trả về instance widget tương ứng với Tk pathname *name*.
 
    .. method:: send(interp, cmd, *args)
 
-      Send the Tcl command *cmd*, with the given *args*, to the Tcl interpreter
-      registered under the name *interp*, and return its result.
-      This is not available on all platforms.
+      Gửi lệnh Tcl *cmd*, cùng với *args* đã cho, đến trình thông dịch Tcl được đăng ký dưới tên *interp*, rồi trả về kết quả của lệnh. Tính năng này không khả dụng trên mọi nền tảng.
 
    .. method:: destroy()
 
-      Destroy this widget and all of its descendant widgets, and delete the Tcl
-      commands associated with them.
+      Hủy widget này cùng tất cả widget hậu duệ của nó, đồng thời xóa các lệnh Tcl liên kết với chúng.
 
    .. method:: lift(aboveThis=None)
       :no-typesetting:
 
    .. method:: tkraise(aboveThis=None)
 
-      Raise this widget in the stacking order so that it is drawn on top of its
-      siblings.
-      If *aboveThis* is given, the widget is moved to be just above it in the
-      stacking order instead.
+      Đưa widget này lên trong thứ tự xếp chồng để nó được vẽ bên trên các widget cùng cấp. Nếu chỉ định *aboveThis*, widget sẽ được di chuyển đến ngay phía trên nó trong thứ tự xếp chồng.
 
-      :meth:`lift` is an alias of :meth:`!tkraise`.
+      :meth:`lift` là bí danh của :meth:`!tkraise`.
 
    .. method:: lower(belowThis=None)
 
-      Lower this widget in the stacking order so that it is drawn beneath its
-      siblings.
-      If *belowThis* is given, the widget is moved to be just below it in the
-      stacking order instead.
+      Đưa widget này xuống trong thứ tự xếp chồng để nó được vẽ bên dưới các widget cùng cấp. Nếu chỉ định *belowThis*, widget sẽ được di chuyển đến ngay phía dưới nó trong thứ tự xếp chồng.
 
-      :meth:`tkraise`/:meth:`lift` and :meth:`lower` are overridden by the
-      :class:`Canvas` widget,
-      where they restack canvas items instead.
+      :meth:`tkraise`/:meth:`lift` và :meth:`lower` bị ghi đè bởi
+      widget :class:`Canvas`, trong đó chúng sẽ sắp xếp lại các mục canvas thay thế.
 
    .. method:: image_names()
 
-      Return the names of all images that currently exist in the Tcl
-      interpreter.
+      Trả về tên của tất cả hình ảnh hiện đang tồn tại trong trình thông dịch Tcl.
 
-      This is overridden by the :class:`Text` widget,
-      where :meth:`!image_names` returns the names of its embedded images
-      instead.
+      Điều này bị widget :class:`Text` ghi đè, trong đó :meth:`!image_names` thay vào đó trả về tên của các hình ảnh được nhúng trong widget.
 
    .. method:: image_types()
 
-      Return the available image types, such as ``'photo'`` and ``'bitmap'``.
+      Trả về các loại hình ảnh hiện có, chẳng hạn như ``'photo'`` và ``'bitmap'``.
 
    .. method:: anchor(anchor=None)
       :no-typesetting:
 
    .. method:: grid_anchor(anchor=None)
 
-      Set the anchor that controls where the grid is placed inside this
-      container when the container is larger than the grid and no row or column
-      has a non-zero weight.
-      *anchor* is one of the usual anchor strings, such as ``'nw'`` (the
-      default) or ``'center'``.
-      Called with no argument, this method has no effect.
+      Đặt anchor kiểm soát vị trí đặt grid bên trong container này khi container lớn hơn grid và không có hàng hoặc cột nào có weight khác không. *anchor* là một trong các chuỗi anchor thông dụng, chẳng hạn như ``'nw'`` (mặc định) hoặc ``'center'``. Khi được gọi mà không có đối số, phương thức này không có tác dụng.
 
-      :meth:`anchor` is an alias of :meth:`!grid_anchor`.
+      :meth:`anchor` là bí danh của :meth:`!grid_anchor`.
 
       .. versionadded:: 3.3
 
@@ -1220,102 +818,65 @@ Base and mixin classes
 
    .. method:: grid_bbox(column=None, row=None, col2=None, row2=None)
 
-      Return the bounding box, in pixels, of a region of the grid laid out in
-      this container, as a 4-tuple ``(xoffset, yoffset, width, height)``.
-      With no arguments the bounding box of the whole grid is returned.
-      If *column* and *row* are given, the box spans from the cell at row and
-      column 0 to that cell; if *col2* and *row2* are also given, it spans from
-      the cell (*column*, *row*) to the cell (*col2*, *row2*).
+      Trả về bounding box, tính bằng pixel, của một vùng trong grid được bố trí trong container này, dưới dạng bộ 4 giá trị ``(xoffset, yoffset, width, height)``. Nếu không có đối số, bounding box của toàn bộ grid sẽ được trả về. Nếu *column* và *row* được cung cấp, hộp sẽ trải từ ô ở hàng và cột 0 đến ô đó; nếu *col2* và *row2* cũng được cung cấp, hộp sẽ trải từ ô (*column*, *row*) đến ô (*col2*, *row2*).
 
-      :meth:`bbox` is an alias of :meth:`!grid_bbox`,
-      except on :class:`Canvas`, :class:`Listbox`, :class:`Spinbox`,
-      :class:`Text`, :class:`ttk.Entry <tkinter.ttk.Entry>` and
-      :class:`ttk.Treeview <tkinter.ttk.Treeview>`,
-      which provide their own :meth:`!bbox` method.
+      :meth:`bbox` là bí danh của :meth:`!grid_bbox`, ngoại trừ trên :class:`Canvas`, :class:`Listbox`, :class:`Spinbox`,
+      :class:`Text`, :class:`ttk.Entry <tkinter.ttk.Entry>` và
+      :class:`ttk.Treeview <tkinter.ttk.Treeview>`, vốn cung cấp phương thức :meth:`!bbox` của riêng mình.
 
    .. method:: columnconfigure(index, cnf={}, **kw)
       :no-typesetting:
 
    .. method:: grid_columnconfigure(index, cnf={}, **kw)
 
-      Query or set the properties of the column (or columns) *index* of the
-      grid managed by this container.
-      *index* may be a column number; when setting options it may also be a
-      list of column numbers, the string ``'all'`` to affect every column, or
-      a child widget whose occupied columns are affected.
-      The supported options are:
+      Truy vấn hoặc thiết lập các thuộc tính của cột (hoặc các cột) *index* trong lưới do container này quản lý. *index* có thể là số thứ tự của một cột; khi thiết lập các tùy chọn, giá trị này cũng có thể là danh sách số thứ tự cột, chuỗi ``'all'`` để áp dụng cho mọi cột hoặc một widget con có các cột mà nó chiếm giữ sẽ bị ảnh hưởng. Các tùy chọn được hỗ trợ là:
 
       *minsize*
-         The column's minimum size, in pixels.
+         Kích thước tối thiểu của cột, tính bằng pixel.
 
       *weight*
-         An integer setting how much of any extra space is apportioned to the
-         column.
-         A weight of ``0`` keeps the column at its requested size, and a column
-         of weight two grows twice as fast as a column of weight one.
+         Một thiết lập số nguyên xác định phần không gian thừa được phân bổ cho cột là bao nhiêu. Trọng số ``0`` giữ cột ở kích thước được yêu cầu, còn cột có trọng số hai sẽ tăng nhanh gấp đôi cột có trọng số một.
 
       *uniform*
-         The name of a uniform group.
-         Columns sharing a non-empty group name are kept in sizes that are
-         strictly proportional to their weights.
+         Tên của một nhóm đồng nhất. Các cột có cùng tên nhóm không rỗng được giữ ở kích thước hoàn toàn tỷ lệ với trọng số của chúng.
 
       *pad*
-         Extra space, in pixels, added to the largest widget in the column when
-         computing the column's size.
+         Khoảng trống bổ sung, tính bằng pixel, được thêm vào widget lớn nhất trong cột khi tính kích thước của cột.
 
-      With a single option name, return that option's value; with no options,
-      return a dictionary of all of them.
+      Với một tên tùy chọn duy nhất, trả về giá trị của tùy chọn đó; khi không có tùy chọn nào, trả về một dictionary chứa tất cả các tùy chọn.
 
-      :meth:`columnconfigure` is an alias of :meth:`!grid_columnconfigure`.
+      :meth:`columnconfigure` là bí danh của :meth:`!grid_columnconfigure`.
 
    .. method:: rowconfigure(index, cnf={}, **kw)
       :no-typesetting:
 
    .. method:: grid_rowconfigure(index, cnf={}, **kw)
 
-      Query or set the properties of the row (or rows) *index* of the grid
-      managed by this container.
-      *index* is interpreted as for :meth:`grid_columnconfigure`, and the
-      supported options (*minsize*, *weight*, *uniform* and *pad*) are the
-      same, applied to a row instead of a column.
+      Truy vấn hoặc thiết lập các thuộc tính của hàng (hoặc các hàng) *index* trong grid do container này quản lý. *index* được diễn giải giống như đối với :meth:`grid_columnconfigure`, và các tùy chọn được hỗ trợ (*minsize*, *weight*, *uniform* và *pad*) cũng giống nhau, nhưng được áp dụng cho hàng thay vì cột.
 
-      :meth:`rowconfigure` is an alias of :meth:`!grid_rowconfigure`.
+      :meth:`rowconfigure` là bí danh của :meth:`!grid_rowconfigure`.
 
    .. method:: grid_location(x, y)
 
-      Return the ``(column, row)`` of the grid cell that contains the pixel at
-      position (*x*, *y*), given in pixels relative to this container.
-      For locations above or to the left of the grid, ``-1`` is returned for
-      the corresponding coordinate.
+      Trả về ``(column, row)`` của ô lưới chứa pixel tại vị trí (*x*, *y*), được tính bằng pixel so với container này. Với các vị trí nằm phía trên hoặc bên trái lưới, ``-1`` được trả về cho tọa độ tương ứng.
 
    .. method:: grid_propagate()
                grid_propagate(flag)
 
-      Enable or disable geometry propagation for this container when it manages
-      its children with the grid geometry manager.
-      When *flag* is true, the container resizes itself to fit the requested
-      sizes of its children; when it is false, its size is left under your
-      control.
-      Called with no argument, return the current setting as a boolean.
+      Bật hoặc tắt việc lan truyền hình học cho container này khi nó quản lý các widget con bằng grid geometry manager. Khi *flag* là true, container sẽ tự điều chỉnh kích thước để vừa với kích thước được yêu cầu của các widget con; khi là false, kích thước của nó do bạn kiểm soát. Khi được gọi mà không có đối số, trả về thiết lập hiện tại dưới dạng boolean.
 
    .. method:: size()
       :no-typesetting:
 
    .. method:: grid_size()
 
-      Return the size of the grid managed by this container as a
-      ``(columns, rows)`` tuple.
+      Trả về kích thước của grid được container này quản lý dưới dạng một tuple ``(columns, rows)``.
 
-      :meth:`size` is an alias of :meth:`!grid_size`,
-      except on the :class:`Listbox` widget,
-      which provides its own :meth:`!size` method.
+      :meth:`size` là bí danh của :meth:`!grid_size`, ngoại trừ trên widget :class:`Listbox`, widget này cung cấp phương thức :meth:`!size` riêng.
 
    .. method:: grid_slaves(row=None, column=None)
 
-      Return a list of the child widgets managed in this container's grid, most
-      recently managed first.
-      If *row* or *column* is given, only the children in that row or column
-      are returned.
+      Trả về danh sách các widget con được quản lý trong grid của container này, theo thứ tự widget được quản lý gần đây nhất trước. Nếu cung cấp *row* hoặc *column*, chỉ trả về các widget con trong hàng hoặc cột đó.
 
    .. method:: propagate()
                propagate(flag)
@@ -1324,546 +885,305 @@ Base and mixin classes
    .. method:: pack_propagate()
                pack_propagate(flag)
 
-      Enable or disable geometry propagation for this container when it manages
-      its children with the pack geometry manager.
-      When *flag* is true, the container resizes itself to fit the requested
-      sizes of its children; when it is false, its size is left under your
-      control.
-      Called with no argument, return the current setting as a boolean.
+      Bật hoặc tắt việc truyền kích thước cho vùng chứa này khi nó quản lý các widget con bằng trình quản lý hình học pack. Khi *flag* là true, vùng chứa sẽ tự thay đổi kích thước để vừa với kích thước được yêu cầu của các widget con; khi là false, kích thước của vùng chứa nằm dưới quyền kiểm soát của bạn. Khi được gọi không có đối số, trả về thiết lập hiện tại dưới dạng boolean.
 
-      :meth:`propagate` is an alias of :meth:`!pack_propagate`.
+      :meth:`propagate` là bí danh của :meth:`!pack_propagate`.
 
    .. method:: slaves()
       :no-typesetting:
 
    .. method:: pack_slaves()
 
-      Return a list of the child widgets managed by this container with the
-      pack geometry manager, in packing order.
+      Trả về danh sách các widget con được vùng chứa này quản lý bằng trình quản lý hình học pack, theo thứ tự đóng gói.
 
-      :meth:`slaves` is an alias of :meth:`!pack_slaves`.
+      :meth:`slaves` là bí danh của :meth:`!pack_slaves`.
 
    .. method:: place_slaves()
 
-      Return a list of the child widgets managed by this container with the
-      place geometry manager.
+      Trả về danh sách các widget con được vùng chứa này quản lý bằng trình quản lý hình học place.
 
    .. method:: bind(sequence=None, func=None, add=None)
 
-      Bind the event pattern *sequence* on this widget to the callable *func*.
+      Liên kết mẫu sự kiện *sequence* trên widget này với hàm có thể gọi *func*.
 
-      *sequence* is an event pattern, such as ``'<Button-1>'`` (a mouse click)
-      or ``'<KeyPress-a>'``, optionally a concatenation of several such
-      patterns that must occur shortly after one another.
-      When the event occurs, *func* is called with an :class:`Event` instance
-      describing it as its only argument; if *func* returns the string
-      ``'break'``, no further bindings for the event are invoked.
+      *sequence* là một mẫu sự kiện, chẳng hạn như ``'<Button-1>'`` (một lần nhấp chuột) hoặc ``'<KeyPress-a>'``, tùy chọn là phép nối của một số mẫu như vậy phải xảy ra liên tiếp trong thời gian ngắn. Khi sự kiện xảy ra, *func* được gọi với một thực thể :class:`Event` mô tả sự kiện đó làm đối số duy nhất; nếu *func* trả về chuỗi ``'break'``, không có binding nào khác cho sự kiện này được gọi.
 
-      If *add* is true, *func* is added to any functions already bound to
-      *sequence*; otherwise it replaces them.
-      The binding applies only to this widget.
+      Nếu *add* là true, *func* sẽ được thêm vào các hàm đã liên kết với *sequence*; nếu không, nó sẽ thay thế các hàm đó. Binding này chỉ áp dụng cho widget này.
 
-      :meth:`!bind` returns a string identifier (a *funcid*) that can later be
-      passed to :meth:`unbind` to remove the binding without leaking the
-      associated Tcl command.
+      :meth:`!bind` trả về một mã định danh dạng chuỗi (một *funcid*) mà sau đó có thể truyền vào :meth:`unbind` để xóa binding mà không làm rò rỉ lệnh Tcl liên quan.
 
-      If *func* is omitted, return the binding currently associated with
-      *sequence*; if *sequence* is also omitted, return a list of all the
-      sequences for which bindings exist on this widget.
+      Nếu bỏ qua *func*, hãy trả về binding hiện được liên kết với *sequence*; nếu cũng bỏ qua *sequence*, hãy trả về danh sách tất cả các sequence có binding trên widget này.
 
    .. method:: bind_class(className, sequence=None, func=None, add=None)
 
-      Like :meth:`bind`, but bind *func* to the binding tag *className* rather
-      than to a single widget, so that the binding applies to every widget
-      having that tag.
-      *className* is usually the name of a widget class, such as ``'Button'``,
-      in which case the binding affects all widgets of that class.
-      The set of binding tags for a widget can be inspected and changed with
+      Tương tự :meth:`bind`, nhưng liên kết *func* với thẻ binding *className* thay vì với một widget duy nhất, để binding áp dụng cho mọi widget có thẻ đó. *className* thường là tên của một lớp widget, chẳng hạn như ``'Button'``, trong trường hợp đó binding ảnh hưởng đến mọi widget thuộc lớp đó. Có thể kiểm tra và thay đổi tập hợp các thẻ binding của một widget bằng
       :meth:`bindtags`.
 
-      The remaining arguments and the return value are as for :meth:`bind`.
+      Các đối số còn lại và giá trị trả về giống như :meth:`bind`.
 
    .. method:: bind_all(sequence=None, func=None, add=None)
 
-      Like :meth:`bind`, but bind *func* to the special binding tag ``'all'``,
-      so that the binding applies to every widget in the application.
+      Tương tự :meth:`bind`, nhưng liên kết *func* với thẻ binding đặc biệt ``'all'``, để binding áp dụng cho mọi widget trong ứng dụng.
 
-      The remaining arguments and the return value are as for :meth:`bind`.
+      Các đối số còn lại và giá trị trả về giống như :meth:`bind`.
 
    .. method:: unbind(sequence, funcid=None)
 
-      Remove bindings for the event pattern *sequence* on this widget.
+      Xóa các binding cho mẫu sự kiện *sequence* trên widget này.
 
-      If *funcid* is given, only the function identified by it (a value
-      returned from a previous call to :meth:`bind`) is removed, and its
-      associated Tcl command is deleted.
-      Otherwise all bindings for *sequence* are destroyed, leaving it unbound.
+      Nếu *funcid* được cung cấp, chỉ hàm được xác định bởi nó (giá trị được trả về từ một lần gọi trước đó đến :meth:`bind`) bị xóa và lệnh Tcl liên kết với hàm đó cũng bị xóa. Nếu không, tất cả binding cho *sequence* sẽ bị hủy, khiến nó không còn binding.
 
       .. versionchanged:: 3.13
-         If *funcid* is given, only that callback is unbound; other callbacks
-         bound to *sequence* are kept.
+         Nếu *funcid* được cung cấp, chỉ callback đó bị hủy liên kết; các callback khác được liên kết với *sequence* vẫn được giữ lại.
 
 
    .. method:: unbind_class(className, sequence)
 
-      Remove all bindings for the event pattern *sequence* from the binding tag
-      *className*.
-      See :meth:`bind_class`.
+      Xóa tất cả binding cho mẫu sự kiện *sequence* khỏi thẻ binding *className*. Xem :meth:`bind_class`.
 
    .. method:: unbind_all(sequence)
 
-      Remove all bindings for the event pattern *sequence* from the special
-      binding tag ``'all'``.
-      See :meth:`bind_all`.
+      Xóa tất cả binding cho mẫu sự kiện *sequence* khỏi thẻ binding đặc biệt ``'all'``. Xem :meth:`bind_all`.
 
    .. method:: bindtags(tagList=None)
 
-      If *tagList* is omitted, return a tuple of the binding tags associated
-      with this widget.
-      When an event occurs in a widget, it is applied to each of the widget's
-      binding tags in order, and for each tag the most specific matching
-      binding is executed.
-      By default a widget has four binding tags: its own pathname, its widget
-      class, the pathname of its nearest toplevel ancestor, and ``'all'``, in
-      that order.
+      Nếu *tagList* bị bỏ qua, trả về một tuple gồm các thẻ binding được liên kết với widget này. Khi một sự kiện xảy ra trong widget, sự kiện đó được áp dụng lần lượt cho từng thẻ binding của widget, và với mỗi thẻ, binding khớp cụ thể nhất sẽ được thực thi. Theo mặc định, một widget có bốn thẻ binding: pathname của chính nó, lớp widget, pathname của tổ tiên toplevel gần nhất và ``'all'``, theo thứ tự đó.
 
-      If *tagList* is given, it must be a sequence of strings; the widget's
-      binding tags are set to its elements, which determines the order in which
-      bindings are evaluated.
+      Nếu *tagList* được cung cấp, nó phải là một chuỗi các string; các binding tag của widget được đặt thành các phần tử của chuỗi này, từ đó xác định thứ tự đánh giá các binding.
 
-   The methods with the ``event_`` prefix define virtual events and generate
-   events programmatically.
+   Các phương thức có tiền tố ``event_`` xác định các sự kiện ảo và tạo sự kiện theo cách lập trình.
 
    .. method:: event_add(virtual, *sequences)
 
-      Associate the virtual event *virtual*, whose name has the form
-      ``'<<Paste>>'``, with each of the physical event patterns given by
-      *sequences*, so that the virtual event triggers whenever any of them
-      occurs.
-      If *virtual* is already defined, the new sequences are added to its
-      existing ones.
+      Liên kết sự kiện ảo *virtual*, có tên theo dạng ``'<<Paste>>'``, với từng mẫu sự kiện vật lý được cung cấp bởi *sequences*, để sự kiện ảo được kích hoạt bất cứ khi nào một trong các mẫu đó xảy ra. Nếu *virtual* đã được định nghĩa, các sequence mới sẽ được thêm vào những sequence hiện có của nó.
 
    .. method:: event_delete(virtual, *sequences)
 
-      Remove each of *sequences* from those associated with the virtual event
-      *virtual*.
-      Sequences that are not currently associated with *virtual* are ignored.
-      If no *sequences* are given, all physical event sequences are removed, so
-      that *virtual* no longer triggers.
+      Xóa từng *sequences* khỏi các sequence được liên kết với sự kiện ảo *virtual*. Các sequence hiện không được liên kết với *virtual* sẽ bị bỏ qua. Nếu không cung cấp *sequences*, tất cả sequence sự kiện vật lý sẽ bị xóa, khiến *virtual* không còn được kích hoạt.
 
    .. method:: event_generate(sequence, **kw)
 
-      Generate the event *sequence* on this widget and arrange for it to be
-      processed just as if it had come from the window system.
-      *sequence* must be a single event pattern, such as ``'<Button-1>'`` or
-      ``'<<Paste>>'``, not a concatenation of several.
-      Keyword arguments specify additional fields of the event, for example *x*
-      and *y* for the pointer position, or *when* to control when the event is
-      processed; refer to the Tk ``event`` manual page for the full list.
+      Tạo sự kiện *sequence* trên widget này và sắp xếp để sự kiện được xử lý giống như thể nó đến từ hệ thống cửa sổ. *sequence* phải là một mẫu sự kiện đơn, chẳng hạn như ``'<Button-1>'`` hoặc ``'<<Paste>>'``, không phải sự ghép nối của nhiều mẫu. Các đối số keyword chỉ định những trường bổ sung của sự kiện, chẳng hạn như *x* và *y* cho vị trí con trỏ, hoặc *when* để kiểm soát thời điểm xử lý sự kiện; hãy tham khảo trang hướng dẫn Tk ``event`` để biết danh sách đầy đủ.
 
    .. method:: event_info(virtual=None)
 
-      If *virtual* is omitted, return a tuple of all the virtual events that
-      are currently defined.
-      If *virtual* is given, return a tuple of the physical event sequences
-      currently associated with it, or an empty tuple if it is not defined.
+      Nếu bỏ qua *virtual*, trả về một tuple gồm tất cả sự kiện ảo hiện được định nghĩa. Nếu cung cấp *virtual*, trả về một tuple gồm các sequence sự kiện vật lý hiện được liên kết với nó, hoặc một tuple rỗng nếu nó chưa được định nghĩa.
 
-   The methods with the ``after`` prefix schedule callbacks to run after a
-   delay or when the application is idle.
+   Các phương thức có tiền tố ``after`` lên lịch cho các callback chạy sau một khoảng trễ hoặc khi ứng dụng ở trạng thái idle.
 
    .. method:: after(ms, func=None, *args, **kw)
 
-      Schedule the callable *func* to be called after *ms* milliseconds, with
-      *args* and *kw* passed to it as positional and keyword arguments.
-      Return an identifier that can be passed to :meth:`after_cancel` to cancel
-      the call.
+      Lên lịch để callable *func* được gọi sau *ms* mili giây, với *args* và *kw* được truyền cho nó dưới dạng đối số vị trí và đối số từ khóa. Trả về một định danh có thể được truyền cho :meth:`after_cancel` để hủy lần gọi này.
 
-      If *func* is omitted, sleep for *ms* milliseconds instead, processing no
-      events during that time, and return ``None``.
+      Nếu bỏ qua *func*, thay vào đó sẽ tạm dừng trong *ms* mili giây, không xử lý sự kiện nào trong thời gian đó, và trả về ``None``.
 
       .. versionchanged:: 3.10
-         *func* can now be any callable object, not only a function.
+         Giờ đây, *func* có thể là bất kỳ đối tượng callable nào, không chỉ là một hàm.
 
       .. versionchanged:: 3.14
-         Keyword arguments are now passed to *func*.
+         Các đối số từ khóa giờ đây được truyền cho *func*.
 
 
    .. method:: after_cancel(id)
 
-      Cancel a callback previously scheduled with :meth:`after` or
-      :meth:`after_idle`.
-      *id* must be an identifier returned by one of those methods; passing a
-      value that is not such an identifier raises :exc:`ValueError`.
-      If the callback has already run or been cancelled, this has no effect.
+      Hủy một callback đã được lên lịch trước đó bằng :meth:`after` hoặc
+      :meth:`after_idle`. *id* phải là một định danh được một trong các phương thức đó trả về; truyền một giá trị không phải là định danh như vậy sẽ gây ra :exc:`ValueError`. Nếu callback đã chạy hoặc đã bị hủy, thao tác này không có hiệu lực.
 
       .. versionchanged:: 3.7
-         Passing ``None`` (or any false value) as *id* now raises
+         Việc truyền ``None`` (hoặc bất kỳ giá trị false nào) làm *id* giờ đây sẽ gây ra
          :exc:`ValueError`.
 
 
    .. method:: after_idle(func, *args, **kw)
 
-      Schedule the callable *func* to be called, with *args* and *kw* passed to
-      it, when the Tk main loop next becomes idle, that is, when it has no
-      other events to process.
-      Return an identifier that can be passed to :meth:`after_cancel` to cancel
-      the call.
+      Lập lịch để callable *func* được gọi, với *args* và *kw* được truyền cho nó, khi vòng lặp chính của Tk chuyển sang trạng thái nhàn rỗi lần tiếp theo, tức là khi không còn sự kiện nào khác cần xử lý. Trả về một mã định danh có thể truyền cho :meth:`after_cancel` để hủy lệnh gọi này.
 
       .. versionchanged:: 3.14
-         Keyword arguments are now passed to *func*.
+         Các đối số từ khóa giờ đây được truyền cho *func*.
 
 
    .. method:: after_info(id=None)
 
-      If *id* is omitted, return a tuple of the identifiers of all callbacks
-      currently scheduled with :meth:`after` and :meth:`after_idle` for this
-      interpreter.
+      Nếu bỏ qua *id*, trả về một tuple chứa mã định danh của tất cả callback hiện đang được lập lịch bằng :meth:`after` và :meth:`after_idle` cho trình thông dịch này.
 
-      If *id* is given, it must identify a callback that has not yet run or
-      been cancelled, and the return value is a tuple ``(script, type)``, where
-      *script* refers to the function to be called and *type* is either
-      ``'idle'`` or ``'timer'``.
-      A :exc:`TclError` is raised if *id* does not exist.
+      Nếu cung cấp *id*, mã này phải xác định một callback chưa được chạy hoặc hủy, và giá trị trả về là một tuple ``(script, type)``, trong đó *script* tham chiếu đến hàm sẽ được gọi còn *type* là ``'idle'`` hoặc ``'timer'``. Một :exc:`TclError` sẽ được phát sinh nếu *id* không tồn tại.
 
       .. versionadded:: 3.13
 
 
    .. method:: mainloop(n=0)
 
-      Enter the Tk event loop, which processes events until all windows are
-      destroyed.
-      This is normally called once, on the root window, to run the application.
+      Đi vào vòng lặp sự kiện Tk, vòng lặp này xử lý các sự kiện cho đến khi tất cả cửa sổ bị hủy. Thông thường, thao tác này được gọi một lần trên cửa sổ gốc để chạy ứng dụng.
 
    .. method:: quit()
 
-      Quit the Tcl interpreter, causing :meth:`mainloop` to return.
+      Thoát khỏi trình thông dịch Tcl, khiến :meth:`mainloop` trả về.
 
    .. method:: update()
 
-      Enter the event loop until all pending events, including idle callbacks,
-      have been processed.
-      This brings the display up to date and handles any events that are
-      already queued, then returns.
+      Đi vào vòng lặp sự kiện cho đến khi tất cả sự kiện đang chờ, bao gồm cả idle callback, được xử lý. Thao tác này cập nhật màn hình và xử lý mọi sự kiện đã được xếp hàng, sau đó trả về.
 
    .. method:: update_idletasks()
 
-      Enter the event loop until all pending idle callbacks have been called.
-      This updates the display of windows, for example after geometry changes,
-      but does not process events caused by the user.
+      Đi vào event loop cho đến khi tất cả các idle callback đang chờ được gọi. Thao tác này cập nhật hiển thị của các cửa sổ, chẳng hạn sau khi thay đổi hình học, nhưng không xử lý các sự kiện do người dùng gây ra.
 
    .. method:: waitvar(name)
       :no-typesetting:
 
    .. method:: wait_variable(name)
 
-      Wait until the Tcl variable *name* is modified, continuing to process
-      events in the meantime so that the application stays responsive.
-      *name* is usually a :class:`Variable` instance, such as an
-      :class:`IntVar` or :class:`StringVar`.
+      Chờ cho đến khi biến Tcl *name* được sửa đổi, đồng thời tiếp tục xử lý các sự kiện để ứng dụng vẫn phản hồi. *name* thường là một :class:`Variable` instance, chẳng hạn như một
+      :class:`IntVar` hoặc :class:`StringVar`.
 
-      :meth:`waitvar` is an alias of :meth:`!wait_variable`.
+      :meth:`waitvar` là bí danh của :meth:`!wait_variable`.
 
    .. method:: wait_window(window=None)
 
-      Wait until *window* is destroyed, continuing to process events in the
-      meantime.
-      If *window* is omitted, this widget is used.
-      This is typically used to wait for the user to finish interacting with a
-      dialog box.
+      Chờ cho đến khi *window* bị hủy, đồng thời tiếp tục xử lý các sự kiện. Nếu bỏ qua *window*, widget này sẽ được sử dụng. Cách này thường được dùng để chờ người dùng hoàn tất thao tác với một hộp thoại.
 
    .. method:: wait_visibility(window=None)
 
-      Wait until the visibility state of *window* changes, for example when it
-      first appears on the screen, continuing to process events in the
-      meantime.
-      If *window* is omitted, this widget is used.
-      This is typically used to wait for a newly created window to become
-      visible before acting on it.
+      Chờ cho đến khi trạng thái hiển thị của *window* thay đổi, chẳng hạn khi cửa sổ xuất hiện lần đầu trên màn hình, đồng thời tiếp tục xử lý các sự kiện. Nếu bỏ qua *window*, widget này sẽ được sử dụng. Cách này thường được dùng để chờ một cửa sổ mới tạo trở nên hiển thị trước khi thao tác với cửa sổ đó.
 
-   The methods with the ``focus_`` prefix manage the keyboard focus.
+   Các phương thức có tiền tố ``focus_`` quản lý keyboard focus.
 
    .. method:: focus_set()
       :no-typesetting:
 
    .. method:: focus()
 
-      Direct the keyboard input focus for this widget's display to this widget.
-      If the application does not currently have the input focus on this
-      widget's display, the widget is remembered as the focus window for its
-      top level, and the focus will be redirected to it the next time the
-      window manager gives the focus to the top level.
-      :meth:`focus` is an alias of :meth:`!focus_set`,
-      except on the :class:`Canvas` and
-      :class:`ttk.Treeview <tkinter.ttk.Treeview>` widgets,
-      which provide their own :meth:`!focus` method.
+      Chuyển tiêu điểm nhập liệu bàn phím cho phần hiển thị của widget này sang widget này. Nếu ứng dụng hiện không có tiêu điểm nhập liệu trên phần hiển thị của widget này, widget sẽ được ghi nhớ là cửa sổ tiêu điểm cho top level của nó, và tiêu điểm sẽ được chuyển hướng đến widget đó vào lần tiếp theo trình quản lý cửa sổ cấp tiêu điểm cho top level.
+      :meth:`focus` là bí danh của :meth:`!focus_set`, ngoại trừ trên :class:`Canvas` và
+      các widget :class:`ttk.Treeview <tkinter.ttk.Treeview>`, vốn cung cấp phương thức :meth:`!focus` riêng.
 
    .. method:: focus_force()
 
-      Direct the keyboard input focus to this widget even if the application
-      does not currently have the input focus for the widget's display.
-      This method should be used sparingly, if at all; normally an application
-      should wait for the window manager to give it the focus rather than
-      claiming it.
+      Chuyển tiêu điểm nhập liệu bàn phím đến widget này ngay cả khi ứng dụng hiện không có tiêu điểm nhập liệu trên phần hiển thị của widget. Nên hạn chế sử dụng phương thức này, nếu có thể thì không sử dụng; thông thường, ứng dụng nên chờ trình quản lý cửa sổ cấp tiêu điểm cho mình thay vì tự giành tiêu điểm.
 
    .. method:: focus_get()
 
-      Return the widget that currently has the keyboard focus in the
-      application, or ``None`` if no widget in the application has the focus.
-      Use :meth:`focus_displayof` to work correctly with several displays.
+      Trả về widget hiện đang có tiêu điểm bàn phím trong ứng dụng, hoặc ``None`` nếu không có widget nào trong ứng dụng có tiêu điểm. Sử dụng :meth:`focus_displayof` để hoạt động chính xác với nhiều phần hiển thị.
 
    .. method:: focus_displayof()
 
-      Return the widget that currently has the keyboard focus on the display
-      where this widget is located, or ``None`` if no widget in the application
-      has the focus on that display.
+      Trả về widget hiện đang có tiêu điểm bàn phím trên phần hiển thị nơi widget này nằm, hoặc ``None`` nếu không có widget nào trong ứng dụng có tiêu điểm trên phần hiển thị đó.
 
    .. method:: focus_lastfor()
 
-      Return the most recent widget to have had the keyboard focus among all
-      the widgets in the same top level as this widget; this is the widget that
-      will receive the focus the next time the window manager gives the focus
-      to the top level.
-      If no widget in that top level has ever had the focus, or if the most
-      recent focus widget has been deleted, the top level itself is returned.
+      Trả về widget gần đây nhất từng có tiêu điểm bàn phím trong số tất cả widget thuộc cùng top level với widget này; đây là widget sẽ nhận tiêu điểm vào lần tiếp theo trình quản lý cửa sổ cấp tiêu điểm cho top level. Nếu chưa từng có widget nào trong top level đó có tiêu điểm, hoặc widget có tiêu điểm gần đây nhất đã bị xóa, thì chính top level được trả về.
 
    .. method:: tk_focusFollowsMouse()
 
-      Reconfigure Tk to use an implicit focus model in which the focus is set
-      to a widget whenever the mouse pointer enters it.
-      This cannot easily be disabled once enabled.
+      Cấu hình lại Tk để sử dụng mô hình focus ngầm, trong đó focus được đặt vào một widget mỗi khi con trỏ chuột đi vào widget đó. Không dễ tắt tính năng này sau khi đã bật.
 
    .. method:: tk_focusNext()
 
-      Return the next widget after this one in the keyboard traversal order, or
-      ``None`` if there is none.
-      The traversal order goes first to the next child, then recursively to the
-      children of that child, and then to the next sibling higher in the
-      stacking order.
-      A widget is skipped if its ``takefocus`` option is set to ``0``.
-      This method is used in the default bindings for the :kbd:`Tab` key.
+      Trả về widget tiếp theo sau widget này trong thứ tự duyệt bằng bàn phím, hoặc ``None`` nếu không có. Thứ tự duyệt trước tiên đi đến widget con tiếp theo, sau đó đệ quy qua các widget con của widget đó, rồi đến widget anh em tiếp theo ở vị trí cao hơn trong thứ tự xếp chồng. Một widget sẽ bị bỏ qua nếu tùy chọn ``takefocus`` của nó được đặt thành ``0``. Phương thức này được sử dụng trong các binding mặc định cho phím :kbd:`Tab`.
 
    .. method:: tk_focusPrev()
 
-      Return the previous widget before this one in the keyboard traversal
-      order, or ``None`` if there is none.
-      See :meth:`tk_focusNext` for how the order is defined.
-      This method is used in the default bindings for the :kbd:`Shift-Tab` key.
+      Trả về widget trước widget này trong thứ tự duyệt bằng bàn phím, hoặc ``None`` nếu không có. Xem :meth:`tk_focusNext` để biết cách xác định thứ tự. Phương thức này được sử dụng trong các binding mặc định cho phím :kbd:`Shift-Tab`.
 
-   The methods with the ``grab_`` prefix set and query the input grab, which
-   directs all input events to a single widget.
+   Các phương thức có tiền tố ``grab_`` thiết lập và truy vấn input grab, chức năng chuyển hướng tất cả sự kiện đầu vào đến một widget duy nhất.
 
    .. method:: grab_set()
 
-      Set a local grab on this widget.
-      A grab confines pointer events to this widget and its descendants: while
-      the pointer is outside the widget's subtree, button presses and releases
-      and pointer motion are reported to the grab widget, and windows outside
-      the subtree become insensitive until the grab is released.
-      A local grab affects only the grabbing application.
-      Any grab previously set by this application on the widget's display is
-      automatically released.
-      Setting a grab is the usual way to make a dialog modal: while the grab is
-      in effect the user cannot interact with the other windows of the
-      application.
+      Thiết lập local grab trên widget này. Grab giới hạn các sự kiện con trỏ trong widget này và các widget con của nó: khi con trỏ nằm ngoài cây con của widget, các thao tác nhấn và nhả nút cùng chuyển động của con trỏ sẽ được báo cáo cho grab widget, còn các cửa sổ bên ngoài cây con sẽ trở nên không tương tác cho đến khi grab được giải phóng. Local grab chỉ ảnh hưởng đến ứng dụng đang grab. Mọi grab trước đó do ứng dụng này thiết lập trên display của widget sẽ tự động được giải phóng. Thiết lập grab là cách thông thường để biến một hộp thoại thành modal: trong khi grab có hiệu lực, người dùng không thể tương tác với các cửa sổ khác của ứng dụng.
 
    .. method:: grab_set_global()
 
-      Set a global grab on this widget.
-      A global grab is like the local grab set by :meth:`grab_set`, but it
-      locks out all other applications on the screen, so that only this
-      widget's subtree is sensitive to pointer events, and it also grabs the
-      keyboard.
-      Use with caution: it is easy to render a display unusable with a global
-      grab, since other applications stop receiving events until it is
-      released.
+      Thiết lập global grab trên widget này. Global grab tương tự local grab được thiết lập bởi :meth:`grab_set`, nhưng khóa tất cả ứng dụng khác trên màn hình, כך chỉ cây con của widget này mới nhận được sự kiện con trỏ, đồng thời nó cũng grab bàn phím. Hãy thận trọng khi sử dụng: global grab có thể dễ dàng khiến display không thể sử dụng được, vì các ứng dụng khác sẽ ngừng nhận sự kiện cho đến khi grab được giải phóng.
 
    .. method:: grab_release()
 
-      Release the grab on this widget if there is one; otherwise do nothing.
+      Giải phóng grab trên widget này nếu có; nếu không thì không thực hiện gì.
 
    .. method:: grab_current()
 
-      Return the widget that currently holds the grab in this application for
-      this widget's display, or ``None`` if there is no such widget.
+      Trả về widget hiện đang giữ grab trong ứng dụng này trên display của widget này, hoặc ``None`` nếu không có widget nào như vậy.
 
    .. method:: grab_status()
 
-      Return ``None`` if no grab is currently set on this widget, ``"local"``
-      if a local grab is set, or ``"global"`` if a global grab is set.
+      Trả về ``None`` nếu hiện không đặt grab nào trên widget này, ``"local"`` nếu đặt grab cục bộ, hoặc ``"global"`` nếu đặt grab toàn cục.
 
-   The methods with the ``selection_`` prefix retrieve and manage the X
-   selection.
+   Các phương thức có tiền tố ``selection_`` dùng để truy xuất và quản lý X selection.
 
    .. method:: selection_clear(**kw)
 
-      Clear the X selection, so that no window owns it anymore.
-      The selection to clear is given by the keyword argument *selection*, an
-      atom name such as ``'PRIMARY'`` or ``'CLIPBOARD'``; it defaults to
-      ``PRIMARY``.
-      The *displayof* keyword argument names a widget that determines the
-      display on which to operate, and defaults to this widget.
+      Xóa X selection để không còn cửa sổ nào sở hữu nó. Selection cần xóa được chỉ định bằng đối số từ khóa *selection*, là một tên atom chẳng hạn như ``'PRIMARY'`` hoặc ``'CLIPBOARD'``; mặc định là ``PRIMARY``. Đối số từ khóa *displayof* chỉ định một widget dùng để xác định display cần thao tác, và mặc định là widget này.
 
-      This is overridden by the :class:`Entry`, :class:`Listbox` and
-      :class:`Spinbox` widgets,
-      where :meth:`!selection_clear` clears the widget's own selection instead.
+      Điều này được ghi đè bởi các widget :class:`Entry`, :class:`Listbox` và
+      :class:`Spinbox`, trong đó :meth:`!selection_clear` thay vào đó sẽ xóa selection riêng của widget.
 
    .. method:: selection_get(**kw)
 
-      Return the contents of the current X selection.
-      The keyword argument *selection* names the selection and defaults to
-      ``PRIMARY``.
-      The keyword argument *type* specifies the form in which the data is to be
-      returned (the desired conversion target), an atom name such as
-      ``'STRING'`` or ``'FILE_NAME'``; it defaults to ``STRING``, except on
-      X11, where ``UTF8_STRING`` is tried first and ``STRING`` is used as a
-      fallback.
-      The *displayof* keyword argument names a widget that determines the
-      display from which to retrieve the selection, and defaults to this
-      widget.
+      Trả về nội dung của X selection hiện tại. Đối số từ khóa *selection* chỉ định selection và mặc định là ``PRIMARY``. Đối số từ khóa *type* chỉ định dạng mà dữ liệu sẽ được trả về (đích chuyển đổi mong muốn), là một tên atom chẳng hạn như ``'STRING'`` hoặc ``'FILE_NAME'``; mặc định là ``STRING``, ngoại trừ trên X11, nơi ``UTF8_STRING`` được thử trước và ``STRING`` được dùng làm phương án dự phòng. Đối số từ khóa *displayof* chỉ định một widget dùng để xác định display cần truy xuất selection, và mặc định là widget này.
 
    .. method:: selection_handle(command, **kw)
 
-      Register *command* as a handler to supply the X selection owned by this
-      widget when another application requests it.
-      When the selection is retrieved, *command* is called with two arguments,
-      the starting character offset and the maximum number of characters to
-      return, and must return at most that many characters of the selection
-      starting at that offset; for very long selections it is called repeatedly
-      with increasing offsets.
-      The keyword argument *selection* names the selection (default
-      ``PRIMARY``) and the keyword argument *type* gives the form of the
-      selection that the handler supplies (such as ``'STRING'`` or
-      ``'FILE_NAME'``, default ``STRING``).
+      Đăng ký *command* làm handler để cung cấp vùng chọn X do widget này sở hữu khi một ứng dụng khác yêu cầu. Khi vùng chọn được truy xuất, *command* được gọi với hai đối số: offset ký tự bắt đầu và số ký tự tối đa cần trả về; hàm này phải trả về nhiều nhất số ký tự đó của vùng chọn, bắt đầu từ offset đó. Với các vùng chọn rất dài, hàm sẽ được gọi lặp lại với các offset tăng dần. Đối số từ khóa *selection* chỉ định vùng chọn (mặc định là ``PRIMARY``), còn đối số từ khóa *type* chỉ định dạng vùng chọn mà handler cung cấp (chẳng hạn như ``'STRING'`` hoặc ``'FILE_NAME'``, mặc định là ``STRING``).
 
    .. method:: selection_own(**kw)
 
-      Make this widget the owner of the X selection on its display.
-      The previous owner, if any, is notified that it has lost the selection.
-      The keyword argument *selection* names the selection and defaults to
-      ``PRIMARY``.
+      Đặt widget này làm chủ sở hữu vùng chọn X trên display của nó. Chủ sở hữu trước đó, nếu có, sẽ được thông báo rằng vùng chọn đã bị mất. Đối số từ khóa *selection* chỉ định vùng chọn và mặc định là ``PRIMARY``.
 
    .. method:: selection_own_get(**kw)
 
-      Return the widget in this application that owns the X selection on the
-      display containing this widget, or ``None`` if no widget in this
-      application owns the selection.
-      The keyword argument *selection* names the selection and defaults to
-      ``PRIMARY``.
-      The *displayof* keyword argument names a widget that determines the
-      display to query, and defaults to this widget.
+      Trả về widget trong ứng dụng này đang sở hữu vùng chọn X trên display chứa widget này, hoặc ``None`` nếu không có widget nào trong ứng dụng này sở hữu vùng chọn. Đối số từ khóa *selection* chỉ định vùng chọn và mặc định là ``PRIMARY``. Đối số từ khóa *displayof* chỉ định một widget dùng để xác định display cần truy vấn và mặc định là widget này.
 
-   The methods with the ``clipboard_`` prefix manage the clipboard.
+   Các phương thức có tiền tố ``clipboard_`` dùng để quản lý clipboard.
 
    .. method:: clipboard_append(string, **kw)
 
-      Append *string* to the Tk clipboard and claim ownership of the clipboard
-      on this widget's display.
-      Before appending, the clipboard should be emptied with
-      :meth:`clipboard_clear`; all appends should be completed before returning
-      to the event loop so that the clipboard is updated atomically.
-      The keyword argument *type* specifies the form of the data, an atom name
-      such as ``'STRING'`` or ``'FILE_NAME'`` (default ``STRING``), and the
-      keyword argument *format* specifies the representation used to transmit
-      it (default ``STRING``).
-      The *displayof* keyword argument names a widget that determines the
-      target display, and defaults to this widget.
-      The contents can be retrieved with :meth:`clipboard_get` or
+      Nối *string* vào clipboard Tk và giành quyền sở hữu clipboard trên display của widget này. Trước khi nối, cần làm trống clipboard bằng
+      :meth:`clipboard_clear`; mọi thao tác nối phải được hoàn tất trước khi quay lại event loop để clipboard được cập nhật nguyên tử. Đối số từ khóa *type* chỉ định dạng dữ liệu, là một tên atom như ``'STRING'`` hoặc ``'FILE_NAME'`` (mặc định là ``STRING``), còn đối số từ khóa *format* chỉ định cách biểu diễn dùng để truyền dữ liệu (mặc định là ``STRING``). Đối số từ khóa *displayof* chỉ định một widget dùng để xác định display đích và mặc định là widget này. Có thể truy xuất nội dung bằng :meth:`clipboard_get` hoặc
       :meth:`selection_get`.
 
    .. method:: clipboard_clear(**kw)
 
-      Claim ownership of the clipboard on this widget's display and remove any
-      previous contents.
-      The *displayof* keyword argument names a widget that determines the
-      target display, and defaults to this widget.
+      Giành quyền sở hữu clipboard trên display của widget này và xóa mọi nội dung trước đó. Đối số từ khóa *displayof* chỉ định một widget dùng để xác định display đích và mặc định là widget này.
 
    .. method:: clipboard_get(**kw)
 
-      Retrieve data from the clipboard on this widget's display.
-      The keyword argument *type* specifies the form in which the data is to be
-      returned, an atom name such as ``'STRING'`` or ``'FILE_NAME'``; it
-      defaults to ``STRING``, except on X11, where ``UTF8_STRING`` is tried
-      first and ``STRING`` is used as a fallback.
-      The *displayof* keyword argument names a widget that determines the
-      display, and defaults to the root window of the application.
-      This is equivalent to ``selection_get(selection='CLIPBOARD')``.
+      Lấy dữ liệu từ clipboard trên display của widget này. Đối số từ khóa *type* chỉ định dạng mà dữ liệu sẽ được trả về, một tên atom chẳng hạn như ``'STRING'`` hoặc ``'FILE_NAME'``; mặc định là ``STRING``, ngoại trừ trên X11, nơi ``UTF8_STRING`` được thử trước và ``STRING`` được dùng làm phương án dự phòng. Đối số từ khóa *displayof* chỉ định tên một widget xác định display và mặc định là cửa sổ gốc của ứng dụng. Tương đương với ``selection_get(selection='CLIPBOARD')``.
 
-   The methods with the ``option_`` prefix query and modify the Tk option
-   database.
+   Các phương thức có tiền tố ``option_`` sẽ truy vấn và sửa đổi cơ sở dữ liệu tùy chọn Tk.
 
    .. method:: option_add(pattern, value, priority=None)
 
-      Add an option to the Tk option database that associates *value* with
-      *pattern*.
-      *pattern* consists of names and/or classes separated by asterisks or
-      dots, in the usual X format.
-      *priority* is an integer between 0 and 100, or one of the symbolic names
-      ``'widgetDefault'`` (20), ``'startupFile'`` (40), ``'userDefault'`` (60),
-      or ``'interactive'`` (80); it defaults to ``interactive``.
+      Thêm một tùy chọn vào cơ sở dữ liệu tùy chọn Tk, liên kết *value* với *pattern*. *pattern* bao gồm các tên và/hoặc lớp được phân tách bằng dấu hoa thị hoặc dấu chấm, theo định dạng X thông thường. *priority* là một số nguyên từ 0 đến 100 hoặc một trong các tên ký hiệu ``'widgetDefault'`` (20), ``'startupFile'`` (40), ``'userDefault'`` (60) hoặc ``'interactive'`` (80); mặc định là ``interactive``.
 
    .. method:: option_clear()
 
-      Clear the Tk option database.
-      Default options from the :envvar:`!RESOURCE_MANAGER` property or the
-      :file:`.Xdefaults` file are reloaded automatically the next time an
-      option is added to or removed from the database.
+      Xóa cơ sở dữ liệu tùy chọn Tk. Các tùy chọn mặc định từ thuộc tính :envvar:`!RESOURCE_MANAGER` hoặc
+      tệp :file:`.Xdefaults` sẽ được tự động tải lại vào lần tiếp theo một tùy chọn được thêm vào hoặc xóa khỏi cơ sở dữ liệu.
 
    .. method:: option_get(name, className)
 
-      Return the value of the option matching this widget under *name* and
-      *className* from the Tk option database, or an empty string if there is
-      no matching entry.
-      When several entries match, the one with the highest priority is
-      returned, and among entries of equal priority the most recently added
-      one.
+      Trả về giá trị của tùy chọn khớp với widget này theo *name* và *className* từ cơ sở dữ liệu tùy chọn Tk, hoặc một chuỗi rỗng nếu không có mục nhập nào khớp. Khi có nhiều mục nhập khớp, mục có độ ưu tiên cao nhất sẽ được trả về; trong số các mục nhập có cùng độ ưu tiên, mục được thêm gần đây nhất sẽ được trả về.
 
    .. method:: option_readfile(fileName, priority=None)
 
-      Read the file named *fileName*, which should have the standard format for
-      an X resource database such as :file:`.Xdefaults`, and add all the
-      options it specifies to the Tk option database.
-      *priority* is interpreted as for :meth:`option_add` and defaults to
-      ``interactive``.
+      Đọc tệp có tên *fileName*, tệp này phải có định dạng chuẩn của cơ sở dữ liệu tài nguyên X chẳng hạn như :file:`.Xdefaults`, rồi thêm tất cả các tùy chọn mà tệp chỉ định vào cơ sở dữ liệu tùy chọn Tk. *priority* được diễn giải giống như đối với :meth:`option_add` và mặc định là ``interactive``.
 
    .. method:: bell(displayof=0)
 
-      Ring the bell on the display for this widget, using the display's current
-      bell-related settings, and reset the screen saver for the screen.
-      If *displayof* is given as a widget, the bell is rung on that widget's
-      display instead.
+      Rung chuông trên màn hình hiển thị của widget này bằng các thiết lập liên quan đến chuông hiện tại của màn hình, đồng thời đặt lại trình bảo vệ màn hình. Nếu *displayof* được cung cấp dưới dạng một widget, chuông sẽ được rung trên màn hình hiển thị của widget đó.
 
    .. method:: tk_setPalette(background, /)
                tk_setPalette(*args, **kw)
 
-      Set a new color scheme for all Tk widget elements.
-      Existing widgets are updated and the option database is changed so that
-      future widgets use the new colors.
-      A single color argument is taken as the normal background color, from
-      which a complete palette is computed.
-      Alternatively, the arguments may be given as keyword *name*/*value* pairs
-      naming individual options in the option database.
-      The recognized option names are ``activeBackground``,
-      ``activeForeground``, ``background``, ``disabledForeground``,
-      ``foreground``, ``highlightBackground``, ``highlightColor``,
-      ``insertBackground``, ``selectColor``, ``selectBackground``,
-      ``selectForeground``, and ``troughColor``; reasonable defaults are
-      computed for any that are not specified.
+      Đặt một bảng màu mới cho tất cả phần tử widget Tk. Các widget hiện có được cập nhật và option database được thay đổi để các widget tạo sau này sử dụng màu mới. Nếu chỉ cung cấp một đối số màu, màu đó được dùng làm màu nền thông thường, từ đó tính toán một bảng màu hoàn chỉnh. Ngoài ra, có thể cung cấp các đối số dưới dạng các cặp từ khóa *name*/*value*, trong đó chỉ định tên của từng tùy chọn trong option database. Các tên tùy chọn được nhận dạng là ``activeBackground``, ``activeForeground``, ``background``, ``disabledForeground``, ``foreground``, ``highlightBackground``, ``highlightColor``, ``insertBackground``, ``selectColor``, ``selectBackground``, ``selectForeground`` và ``troughColor``; các giá trị mặc định hợp lý sẽ được tính cho những tùy chọn chưa được chỉ định.
 
    .. method:: tk_bisque()
 
-      Restore the application's colors to the light brown (bisque) color scheme
-      used in Tk 3.6 and earlier versions.
-      Provided for backward compatibility.
+      Khôi phục màu của ứng dụng về bảng màu nâu nhạt (bisque) được sử dụng trong Tk 3.6 và các phiên bản trước đó. Được cung cấp để đảm bảo khả năng tương thích ngược.
 
    .. method:: tk_strictMotif(boolean=None)
 
-      Query or set whether Tk's look and feel should strictly adhere to Motif.
-      A true *boolean* value enables strict Motif compliance (for example, no
-      color change when the mouse passes over a slider).
-      Return the resulting setting.
+      Truy vấn hoặc đặt tùy chọn giao diện của Tk có phải tuân thủ nghiêm ngặt Motif hay không. Giá trị *boolean* true bật chế độ tuân thủ Motif nghiêm ngặt (ví dụ: không đổi màu khi chuột di chuyển qua thanh trượt). Trả về thiết lập kết quả.
 
-   The methods with the ``busy_`` prefix manage the busy state of a window,
-   which shows a busy cursor and ignores user input.
+   Các phương thức có tiền tố ``busy_`` quản lý trạng thái bận của một cửa sổ; trạng thái này hiển thị con trỏ bận và bỏ qua dữ liệu nhập của người dùng.
 
    .. method:: busy(**kw)
       :no-typesetting:
@@ -1876,19 +1196,11 @@ Base and mixin classes
 
    .. method:: tk_busy_hold(**kw)
 
-      Make this widget appear busy.
-      A transparent window is placed in front of the widget, so that it and all
-      of its descendants in the widget hierarchy are blocked from pointer
-      events and display a busy cursor.
-      Normally :meth:`update` should be called immediately afterwards to ensure
-      that the hold operation is in effect before the application starts its
-      processing.
+      Làm cho widget này hiển thị trạng thái bận. Một cửa sổ trong suốt được đặt phía trước widget, khiến widget đó và tất cả hậu duệ của nó trong hệ thống phân cấp widget bị chặn các sự kiện con trỏ và hiển thị con trỏ bận. Thông thường, cần gọi :meth:`update` ngay sau đó để đảm bảo thao tác giữ có hiệu lực trước khi ứng dụng bắt đầu xử lý.
 
-      The only supported configuration option is *cursor*, the cursor to be
-      displayed while the widget is busy; it may have any of the values
-      accepted by :meth:`!configure`.
+      Tùy chọn cấu hình duy nhất được hỗ trợ là *cursor*, con trỏ sẽ được hiển thị khi widget đang bận; tùy chọn này có thể nhận bất kỳ giá trị nào được :meth:`!configure` chấp nhận.
 
-      :meth:`busy_hold`, :meth:`busy` and :meth:`tk_busy` are aliases of
+      :meth:`busy_hold`, :meth:`busy` và :meth:`tk_busy` là bí danh của
       :meth:`!tk_busy_hold`.
 
       .. versionadded:: 3.13
@@ -1905,23 +1217,14 @@ Base and mixin classes
 
    .. method:: tk_busy_configure(cnf=None, **kw)
 
-      Query or modify the configuration options of the busy window.
-      The widget must have been previously made busy by :meth:`tk_busy_hold`.
-      With no arguments, return a dictionary describing all of the available
-      options; if *cnf* is the name of an option, return a tuple describing
-      that one option.
-      Otherwise set the given options to the given values.
-      Options may have any of the values accepted by :meth:`tk_busy_hold`.
+      Truy vấn hoặc sửa đổi các tùy chọn cấu hình của cửa sổ bận. Widget phải trước đó đã được chuyển sang trạng thái bận bằng :meth:`tk_busy_hold`. Khi không có đối số, trả về một dictionary mô tả tất cả các tùy chọn hiện có; nếu *cnf* là tên của một tùy chọn, trả về một tuple mô tả tùy chọn đó. Nếu không, đặt các tùy chọn đã cho thành các giá trị đã cho. Các tùy chọn có thể nhận bất kỳ giá trị nào được :meth:`tk_busy_hold` chấp nhận.
 
-      The option database is referenced through the widget name or class.
-      For example, if a :class:`Frame` widget named ``frame`` is to be made
-      busy, the busy cursor can be specified for it by either of the calls::
+      Cơ sở dữ liệu tùy chọn được tham chiếu thông qua tên hoặc class của widget. Ví dụ: nếu một widget :class:`Frame` có tên là ``frame`` cần được chuyển sang trạng thái bận, con trỏ bận có thể được chỉ định cho widget đó bằng một trong hai lệnh gọi sau::
 
          w.option_add('*frame.busyCursor', 'gumby')
          w.option_add('*Frame.BusyCursor', 'gumby')
 
-      :meth:`busy_configure`, :meth:`busy_config` and :meth:`tk_busy_config`
-      are aliases of :meth:`!tk_busy_configure`.
+      :meth:`busy_configure`, :meth:`busy_config` và :meth:`tk_busy_config` là bí danh của :meth:`!tk_busy_configure`.
 
       .. versionadded:: 3.13
 
@@ -1931,11 +1234,9 @@ Base and mixin classes
 
    .. method:: tk_busy_cget(option)
 
-      Return the current value of the busy configuration *option*.
-      The widget must have been previously made busy by :meth:`tk_busy_hold`,
-      and *option* may have any of the values accepted by that method.
+      Trả về giá trị hiện tại của tùy chọn cấu hình bận *option*. Widget phải trước đó đã được chuyển sang trạng thái bận bằng :meth:`tk_busy_hold`, và *option* có thể nhận bất kỳ giá trị nào được phương thức đó chấp nhận.
 
-      :meth:`busy_cget` is an alias of :meth:`!tk_busy_cget`.
+      :meth:`busy_cget` là bí danh của :meth:`!tk_busy_cget`.
 
       .. versionadded:: 3.13
 
@@ -1945,12 +1246,9 @@ Base and mixin classes
 
    .. method:: tk_busy_forget()
 
-      Make this widget no longer busy, releasing the resources (including the
-      transparent window) allocated when it was made busy.
-      User events will again be received by the widget.
-      These resources are also released when the widget is destroyed.
+      Đặt widget về trạng thái không còn bận, giải phóng các tài nguyên (bao gồm cả cửa sổ trong suốt) được cấp phát khi widget được đặt ở trạng thái bận. Widget sẽ lại nhận được các sự kiện của người dùng. Các tài nguyên này cũng được giải phóng khi widget bị hủy.
 
-      :meth:`busy_forget` is an alias of :meth:`!tk_busy_forget`.
+      :meth:`busy_forget` là bí danh của :meth:`!tk_busy_forget`.
 
       .. versionadded:: 3.13
 
@@ -1960,9 +1258,9 @@ Base and mixin classes
 
    .. method:: tk_busy_status()
 
-      Return ``True`` if the widget is currently busy, ``False`` otherwise.
+      Trả về ``True`` nếu widget hiện đang bận, nếu không thì trả về ``False``.
 
-      :meth:`busy_status` is an alias of :meth:`!tk_busy_status`.
+      :meth:`busy_status` là bí danh của :meth:`!tk_busy_status`.
 
       .. versionadded:: 3.13
 
@@ -1972,311 +1270,215 @@ Base and mixin classes
 
    .. method:: tk_busy_current(pattern=None)
 
-      Return a list of widgets that are currently busy.
-      If *pattern* is given, only busy widgets whose path names match the
-      pattern are returned.
+      Trả về danh sách các widget hiện đang bận. Nếu cung cấp *pattern*, chỉ các widget bận có tên đường dẫn khớp với mẫu mới được trả về.
 
-      :meth:`busy_current` is an alias of :meth:`!tk_busy_current`.
+      :meth:`busy_current` là bí danh của :meth:`!tk_busy_current`.
 
       .. versionadded:: 3.13
 
-   The methods with the ``winfo_`` prefix retrieve information about windows
-   managed by Tk.
+   Các phương thức có tiền tố ``winfo_`` dùng để truy xuất thông tin về các cửa sổ do Tk quản lý.
 
    .. method:: winfo_atom(name, displayof=0)
 
-      Return the integer identifier for the atom whose name is *name*, creating
-      a new atom if none exists.
-      If *displayof* is given, the atom is looked up on the display of that
-      window; otherwise it is looked up on the display of the application's
-      main window.
+      Trả về mã định danh số nguyên của atom có tên là *name*, đồng thời tạo atom mới nếu chưa tồn tại. Nếu được cung cấp *displayof*, atom sẽ được tra cứu trên display của cửa sổ đó; nếu không, nó sẽ được tra cứu trên display của cửa sổ chính của ứng dụng.
 
    .. method:: winfo_atomname(id, displayof=0)
 
-      Return the textual name for the atom whose integer identifier is *id*.
-      This is the inverse of :meth:`winfo_atom`.
-      If *displayof* is given, the identifier is looked up on the display of
-      that window; otherwise it is looked up on the display of the
-      application's main window.
+      Trả về tên dạng văn bản của atom có mã định danh số nguyên là *id*. Đây là phép đảo của :meth:`winfo_atom`. Nếu được cung cấp *displayof*, mã định danh sẽ được tra cứu trên display của cửa sổ đó; nếu không, nó sẽ được tra cứu trên display của cửa sổ chính của ứng dụng.
 
    .. method:: winfo_cells()
 
-      Return the number of cells in the colormap for the widget.
+      Trả về số ô trong colormap của widget.
 
    .. method:: winfo_children()
 
-      Return a list containing the widgets that are children of the widget, in
-      stacking order from lowest to highest.
-      Toplevel windows are returned as children of their logical parents.
+      Trả về danh sách chứa các widget là con của widget này, theo thứ tự xếp chồng từ thấp đến cao. Các cửa sổ Toplevel được trả về dưới dạng con của các phần tử cha logic của chúng.
 
    .. method:: winfo_class()
 
-      Return the class name of the widget.
+      Trả về tên lớp của widget.
 
    .. method:: winfo_colormapfull()
 
-      Return ``True`` if the colormap for the widget is known to be full,
-      ``False`` otherwise.
+      Trả về ``True`` nếu colormap của widget được biết là đã đầy, nếu không thì trả về ``False``.
 
    .. method:: winfo_containing(rootX, rootY, displayof=0)
 
-      Return the widget containing the point given by *rootX* and *rootY*, or
-      ``None`` if no window in this application contains the point.
-      The coordinates are in screen units in the coordinate system of the root
-      window.
-      If *displayof* is given, the coordinates refer to the screen containing
-      that window; otherwise they refer to the screen of the application's main
-      window.
+      Trả về widget chứa điểm được xác định bởi *rootX* và *rootY*, hoặc ``None`` nếu không có cửa sổ nào trong ứng dụng này chứa điểm đó. Tọa độ được tính theo đơn vị màn hình trong hệ tọa độ của cửa sổ gốc. Nếu được cung cấp *displayof*, tọa độ tham chiếu đến màn hình chứa cửa sổ đó; nếu không, chúng tham chiếu đến màn hình của cửa sổ chính của ứng dụng.
 
    .. method:: winfo_depth()
 
-      Return the depth of the widget, that is, the number of bits per pixel.
+      Trả về độ sâu của widget, tức là số bit trên mỗi pixel.
 
    .. method:: winfo_exists()
 
-      Return true if the widget exists, false otherwise.
+      Trả về true nếu widget tồn tại, false nếu không.
 
    .. method:: winfo_fpixels(number)
 
-      Return a floating-point value giving the number of pixels in the widget
-      corresponding to the screen distance *number* (for example,
-      ``"2.0c"`` or ``"1i"``).
-      The result may be fractional; for a rounded integer value use
+      Trả về một giá trị dấu phẩy động cho biết số pixel trong widget tương ứng với khoảng cách màn hình *number* (ví dụ: ``"2.0c"`` hoặc ``"1i"``). Kết quả có thể là số lẻ; để lấy giá trị số nguyên đã làm tròn, hãy sử dụng
       :meth:`winfo_pixels`.
 
    .. method:: winfo_geometry()
 
-      Return the geometry of the widget, in the form ``widthxheight+x+y``.
-      All dimensions are in pixels.
-      An offset can be negative; see :meth:`~Wm.geometry`.
+      Trả về hình học của widget dưới dạng ``widthxheight+x+y``. Tất cả các kích thước đều tính bằng pixel. Một độ lệch có thể là số âm; xem :meth:`~Wm.geometry`.
 
    .. method:: winfo_height()
 
-      Return the height of the widget in pixels.
-      When a window is first created its height is 1 pixel; it is eventually
-      changed by a geometry manager.
-      See also :meth:`winfo_reqheight`.
+      Trả về chiều cao của widget tính bằng pixel. Khi một cửa sổ được tạo lần đầu, chiều cao của nó là 1 pixel; sau đó sẽ được trình quản lý hình học thay đổi. Xem thêm :meth:`winfo_reqheight`.
 
    .. method:: winfo_id()
 
-      Return a low-level platform-specific identifier for the widget.
-      On Unix this is the X window identifier, and on Windows it is the window
-      handle.
+      Trả về mã định danh cấp thấp, đặc thù cho nền tảng của widget. Trên Unix, đây là mã định danh cửa sổ X; còn trên Windows, đây là window handle.
 
    .. method:: winfo_interps(displayof=0)
 
-      Return a tuple of the names of all Tcl interpreters currently registered
-      for a particular display.
-      If *displayof* is given, the return value refers to the display of that
-      window; otherwise it refers to the display of the application's main
-      window.
+      Trả về một tuple chứa tên của tất cả các trình thông dịch Tcl hiện đang được đăng ký cho một display cụ thể. Nếu cung cấp *displayof*, giá trị trả về tham chiếu đến display của cửa sổ đó; nếu không, nó tham chiếu đến display của cửa sổ chính của ứng dụng.
 
    .. method:: winfo_ismapped()
 
-      Return true if the widget is currently mapped, false otherwise.
+      Trả về true nếu widget hiện đang được ánh xạ, nếu không thì trả về false.
 
    .. method:: winfo_manager()
 
-      Return the name of the geometry manager currently responsible for the
-      widget, or an empty string if it is not managed by any geometry manager.
+      Trả về tên của geometry manager hiện chịu trách nhiệm cho widget, hoặc một chuỗi rỗng nếu widget không được geometry manager nào quản lý.
 
    .. method:: winfo_name()
 
-      Return the widget's name within its parent, as opposed to its full path
-      name.
+      Trả về tên của widget trong parent của nó, thay vì tên đường dẫn đầy đủ của widget.
 
    .. method:: winfo_parent()
 
-      Return the path name of the widget's parent, or an empty string if the
-      widget is the main window of the application.
+      Trả về tên đường dẫn của parent của widget, hoặc một chuỗi rỗng nếu widget là cửa sổ chính của ứng dụng.
 
    .. method:: winfo_pathname(id, displayof=0)
 
-      Return the path name of the window whose identifier is *id*.
-      If *displayof* is given, the identifier is looked up on the display of
-      that window; otherwise it is looked up on the display of the
-      application's main window.
+      Trả về tên đường dẫn của cửa sổ có mã định danh là *id*. Nếu *displayof* được chỉ định, mã định danh sẽ được tra cứu trên display của cửa sổ đó; nếu không, mã định danh sẽ được tra cứu trên display của cửa sổ chính của ứng dụng.
 
    .. method:: winfo_pixels(number)
 
-      Return the number of pixels in the widget corresponding to the screen
-      distance *number* (for example, ``"2.0c"`` or ``"1i"``).
-      The result is rounded to the nearest integer; for a fractional result use
+      Trả về số pixel trong widget tương ứng với khoảng cách trên màn hình *number* (ví dụ: ``"2.0c"`` hoặc ``"1i"``). Kết quả được làm tròn đến số nguyên gần nhất; để sử dụng kết quả dạng phân số, hãy dùng
       :meth:`winfo_fpixels`.
 
    .. method:: winfo_pointerx()
 
-      Return the pointer's *x* coordinate, in pixels, relative to the screen's
-      root window (or virtual root, if one is in use).
-      Return ``-1`` if the pointer is not on the same screen as the widget.
+      Trả về tọa độ *x* của con trỏ, tính bằng pixel và tương đối so với cửa sổ gốc của màn hình (hoặc root ảo, nếu đang được sử dụng). Trả về ``-1`` nếu con trỏ không nằm trên cùng màn hình với widget.
 
    .. method:: winfo_pointerxy()
 
-      Return the pointer's coordinates as an ``(x, y)`` tuple, in pixels,
-      relative to the screen's root window (or virtual root, if one is in use).
-      Both coordinates are ``-1`` if the pointer is not on the same screen as
-      the widget.
+      Trả về tọa độ của con trỏ dưới dạng một ``(x, y)`` tuple, tính bằng pixel, tương đối so với cửa sổ gốc của màn hình (hoặc cửa sổ gốc ảo nếu đang được sử dụng). Cả hai tọa độ đều là ``-1`` nếu con trỏ không nằm trên cùng màn hình với widget.
 
    .. method:: winfo_pointery()
 
-      Return the pointer's *y* coordinate, in pixels, relative to the screen's
-      root window (or virtual root, if one is in use).
-      Return ``-1`` if the pointer is not on the same screen as the widget.
+      Trả về tọa độ *y* của con trỏ, tính bằng pixel, tương đối so với cửa sổ gốc của màn hình (hoặc cửa sổ gốc ảo nếu đang được sử dụng). Trả về ``-1`` nếu con trỏ không nằm trên cùng màn hình với widget.
 
    .. method:: winfo_reqheight()
 
-      Return the widget's requested height in pixels.
-      This is the value used by the widget's geometry manager to compute its
-      geometry.
+      Trả về chiều cao được yêu cầu của widget, tính bằng pixel. Đây là giá trị được geometry manager của widget sử dụng để tính toán geometry của nó.
 
    .. method:: winfo_reqwidth()
 
-      Return the widget's requested width in pixels.
-      This is the value used by the widget's geometry manager to compute its
-      geometry.
+      Trả về chiều rộng được yêu cầu của widget, tính bằng pixel. Đây là giá trị được geometry manager của widget sử dụng để tính toán geometry của nó.
 
    .. method:: winfo_rgb(color)
 
-      Return an ``(r, g, b)`` tuple of the red, green, and blue intensities, in
-      the range 0 to 65535, that correspond to *color* in the widget.
-      *color* may be specified in any of the forms acceptable for a color
-      option.
+      Trả về một tuple ``(r, g, b)`` gồm cường độ màu đỏ, xanh lá và xanh dương, trong phạm vi từ 0 đến 65535, tương ứng với *color* trong widget. *color* có thể được chỉ định dưới bất kỳ dạng nào được chấp nhận cho một tùy chọn màu.
 
    .. method:: winfo_rootx()
 
-      Return the *x* coordinate, in the root window of the screen, of the
-      upper-left corner of the widget's border (or of the widget itself if it
-      has no border).
+      Trả về tọa độ *x*, trong cửa sổ gốc của màn hình, của góc trên bên trái của đường viền widget (hoặc của chính widget nếu widget không có đường viền).
 
    .. method:: winfo_rooty()
 
-      Return the *y* coordinate, in the root window of the screen, of the
-      upper-left corner of the widget's border (or of the widget itself if it
-      has no border).
+      Trả về tọa độ *y*, trong cửa sổ gốc của màn hình, của góc trên bên trái của đường viền widget (hoặc của chính widget nếu widget không có đường viền).
 
    .. method:: winfo_screen()
 
-      Return the name of the screen associated with the widget, in the form
-      ``displayName.screenIndex``.
+      Trả về tên của màn hình được liên kết với widget, theo dạng ``displayName.screenIndex``.
 
    .. method:: winfo_screencells()
 
-      Return the number of cells in the default colormap for the widget's
-      screen.
+      Trả về số ô trong colormap mặc định của màn hình của widget.
 
    .. method:: winfo_screendepth()
 
-      Return the depth of the root window of the widget's screen, that is, the
-      number of bits per pixel.
+      Trả về độ sâu của cửa sổ gốc của màn hình của widget, tức là số bit trên mỗi pixel.
 
    .. method:: winfo_screenheight()
 
-      Return the height of the widget's screen in pixels.
+      Trả về chiều cao tính bằng pixel của màn hình của widget.
 
    .. method:: winfo_screenmmheight()
 
-      Return the height of the widget's screen in millimeters.
+      Trả về chiều cao tính bằng milimét của màn hình của widget.
 
    .. method:: winfo_screenmmwidth()
 
-      Return the width of the widget's screen in millimeters.
+      Trả về chiều rộng tính bằng milimét của màn hình của widget.
 
    .. method:: winfo_screenvisual()
 
-      Return the default visual class for the widget's screen, one of
-      ``"directcolor"``, ``"grayscale"``, ``"pseudocolor"``, ``"staticcolor"``,
-      ``"staticgray"``, or ``"truecolor"``.
+      Trả về lớp visual mặc định của màn hình của widget, một trong các lớp ``"directcolor"``, ``"grayscale"``, ``"pseudocolor"``, ``"staticcolor"``, ``"staticgray"`` hoặc ``"truecolor"``.
 
    .. method:: winfo_screenwidth()
 
-      Return the width of the widget's screen in pixels.
+      Trả về chiều rộng của màn hình của widget tính bằng pixel.
 
    .. method:: winfo_server()
 
-      Return a string containing information about the server for the widget's
-      display.
-      The exact format of this string may vary from platform to platform.
+      Trả về một chuỗi chứa thông tin về máy chủ cho phần hiển thị của widget. Định dạng chính xác của chuỗi này có thể khác nhau tùy theo nền tảng.
 
    .. method:: winfo_toplevel()
 
-      Return the top-of-hierarchy window containing the widget.
-      In standard Tk this is always a :class:`Toplevel` widget.
+      Trả về cửa sổ ở cấp cao nhất trong hệ thống phân cấp chứa widget. Trong Tk chuẩn, đây luôn là một widget :class:`Toplevel`.
 
    .. method:: winfo_viewable()
 
-      Return true if the widget and all of its ancestors up through the
-      nearest toplevel window are mapped, false otherwise.
+      Trả về true nếu widget và tất cả các ancestor của nó cho đến cửa sổ toplevel gần nhất đều được ánh xạ, ngược lại trả về false.
 
    .. method:: winfo_visual()
 
-      Return the visual class for the widget, one of ``"directcolor"``,
-      ``"grayscale"``, ``"pseudocolor"``, ``"staticcolor"``, ``"staticgray"``,
-      or ``"truecolor"``.
+      Trả về visual class của widget, là một trong ``"directcolor"``, ``"grayscale"``, ``"pseudocolor"``, ``"staticcolor"``, ``"staticgray"`` hoặc ``"truecolor"``.
 
    .. method:: winfo_visualid()
 
-      Return the X identifier for the visual for the widget.
+      Trả về mã định danh X cho visual của widget.
 
    .. method:: winfo_visualsavailable(includeids=False)
 
-      Return a list describing the visuals available for the widget's screen.
-      Each item consists of a visual class (see :meth:`winfo_visual`) followed
-      by an integer depth.
-      If *includeids* is true, the X identifier for the visual is also
-      included.
+      Trả về danh sách mô tả các visual khả dụng cho màn hình của widget. Mỗi mục bao gồm một visual class (xem :meth:`winfo_visual`) theo sau là một độ sâu dạng số nguyên. Nếu *includeids* là true, mã định danh X của visual cũng được bao gồm.
 
    .. method:: winfo_vrootheight()
 
-      Return the height of the virtual root window associated with the widget
-      if there is one; otherwise return the height of the widget's screen.
+      Trả về chiều cao của cửa sổ gốc ảo được liên kết với widget nếu có; nếu không, trả về chiều cao màn hình của widget.
 
    .. method:: winfo_vrootwidth()
 
-      Return the width of the virtual root window associated with the widget if
-      there is one; otherwise return the width of the widget's screen.
+      Trả về chiều rộng của cửa sổ gốc ảo được liên kết với widget nếu có; nếu không, trả về chiều rộng màn hình của widget.
 
    .. method:: winfo_vrootx()
 
-      Return the *x* offset of the virtual root window associated with the
-      widget, relative to the root window of its screen.
-      This is normally zero or negative, and is ``0`` if there is no virtual
-      root window.
+      Trả về độ lệch *x* của cửa sổ gốc ảo được liên kết với widget, tính tương đối so với cửa sổ gốc của màn hình chứa nó. Giá trị này thường bằng không hoặc âm, và bằng ``0`` nếu không có cửa sổ gốc ảo.
 
    .. method:: winfo_vrooty()
 
-      Return the *y* offset of the virtual root window associated with the
-      widget, relative to the root window of its screen.
-      This is normally zero or negative, and is ``0`` if there is no virtual
-      root window.
+      Trả về độ lệch *y* của cửa sổ gốc ảo được liên kết với widget, tính tương đối so với cửa sổ gốc của màn hình chứa nó. Giá trị này thường bằng không hoặc âm, và bằng ``0`` nếu không có cửa sổ gốc ảo.
 
    .. method:: winfo_width()
 
-      Return the width of the widget in pixels.
-      When a window is first created its width is 1 pixel; it is eventually
-      changed by a geometry manager.
-      See also :meth:`winfo_reqwidth`.
+      Trả về chiều rộng của widget tính bằng pixel. Khi một cửa sổ được tạo lần đầu, chiều rộng của nó là 1 pixel; sau đó chiều rộng này sẽ được geometry manager thay đổi. Xem thêm :meth:`winfo_reqwidth`.
 
    .. method:: winfo_x()
 
-      Return the *x* coordinate, in the widget's parent, of the upper-left
-      corner of the widget's border (or of the widget itself if it has no
-      border).
+      Trả về tọa độ *x*, trong widget cha của widget, của góc trên bên trái đường viền widget (hoặc của chính widget nếu nó không có đường viền).
 
    .. method:: winfo_y()
 
-      Return the *y* coordinate, in the widget's parent, of the upper-left
-      corner of the widget's border (or of the widget itself if it has no
-      border).
+      Trả về tọa độ *y*, trong widget cha của widget, của góc trên bên trái đường viền widget (hoặc của chính widget nếu nó không có đường viền).
 
    .. method:: info_patchlevel()
 
-      Return the Tcl/Tk patch level as a named tuple with the same five fields
-      as :data:`sys.version_info`: *major*, *minor*, *micro*, *releaselevel*
-      and *serial*.
-      *releaselevel* is ``'alpha'``, ``'beta'`` or ``'final'``.
-      Converting it to a string gives the version in the usual Tcl/Tk notation,
-      for example ``'9.0.3'`` for a final release or ``'9.1b2'`` for a
-      pre-release.
+      Trả về cấp bản vá Tcl/Tk dưới dạng một named tuple với cùng năm trường như :data:`sys.version_info`: *major*, *minor*, *micro*, *releaselevel* và *serial*. *releaselevel* là ``'alpha'``, ``'beta'`` hoặc ``'final'``. Chuyển nó thành chuỗi sẽ cho phiên bản theo ký hiệu Tcl/Tk thông thường, chẳng hạn như ``'9.0.3'`` đối với bản phát hành chính thức hoặc ``'9.1b2'`` đối với bản phát hành thử nghiệm.
 
       .. versionadded:: 3.11
 
@@ -2284,129 +1486,94 @@ Base and mixin classes
 
 .. class:: Wm()
 
-   The :class:`!Wm` mixin provides access to the window manager, allowing an
-   application to control such things as the title, geometry and icon of a
-   top-level window, the way it is resized, and how it responds to window
-   manager protocols.
-   It is mixed into :class:`Tk` and :class:`Toplevel`, so its methods are
-   available on every top-level window.
-   Each method has two equivalent spellings: a short name and a
-   ``wm_``-prefixed name (for example, :meth:`title` and :meth:`wm_title`).
-   See also :ref:`tkinter-window-manager`.
+   Mixin :class:`!Wm` cung cấp quyền truy cập vào trình quản lý cửa sổ, cho phép ứng dụng kiểm soát các yếu tố như tiêu đề, hình học và biểu tượng của cửa sổ cấp cao nhất, cách cửa sổ được thay đổi kích thước và cách cửa sổ phản hồi với các giao thức của trình quản lý cửa sổ. Mixin này được trộn vào :class:`Tk` và :class:`Toplevel`, vì vậy các phương thức của nó khả dụng trên mọi cửa sổ cấp cao nhất. Mỗi phương thức có hai cách viết tương đương: tên ngắn và tên có tiền tố ``wm_`` (ví dụ: :meth:`title` và :meth:`wm_title`). Xem thêm :ref:`tkinter-window-manager`.
 
    .. method:: wm_aspect(minNumer=None, minDenom=None, maxNumer=None, maxDenom=None)
       :no-typesetting:
 
    .. method:: aspect(minNumer=None, minDenom=None, maxNumer=None, maxDenom=None)
 
-      Constrain the aspect ratio (the ratio of width to height) of the window.
-      If all four arguments are given, the window manager keeps the ratio
-      between ``minNumer/minDenom`` and ``maxNumer/maxDenom``; passing empty
-      strings removes any existing restriction.
-      With no arguments, return a tuple of the four current values, or ``None``
-      if no aspect restriction is in effect.
-      :meth:`wm_aspect` is an alias of :meth:`!aspect`.
+      Giới hạn tỷ lệ khung hình (tỷ lệ giữa chiều rộng và chiều cao) của cửa sổ. Nếu cung cấp đủ cả bốn đối số, trình quản lý cửa sổ sẽ giữ tỷ lệ trong khoảng từ ``minNumer/minDenom`` đến ``maxNumer/maxDenom``; truyền các chuỗi rỗng sẽ xóa mọi giới hạn hiện có. Không có đối số, trả về một tuple gồm bốn giá trị hiện tại hoặc ``None`` nếu không có giới hạn tỷ lệ nào đang được áp dụng.
+      :meth:`wm_aspect` là bí danh của :meth:`!aspect`.
 
    .. method:: wm_attributes(*args, return_python_dict=False, **kwargs)
       :no-typesetting:
 
    .. method:: attributes(*args, return_python_dict=False, **kwargs)
 
-      Query or set platform-specific attributes of the window.
-      With no arguments, return the platform-specific flags and their values;
-      pass *return_python_dict* as true to get them as a dictionary.
-      A single option name such as ``'alpha'`` returns the value of that
-      option, and options are set using keyword arguments (``alpha=0.5``).
+      Truy vấn hoặc thiết lập các thuộc tính dành riêng cho nền tảng của cửa sổ. Không có đối số, trả về các cờ dành riêng cho nền tảng cùng với giá trị của chúng; truyền *return_python_dict* là true để nhận chúng dưới dạng một dictionary. Một tên tùy chọn đơn lẻ như ``'alpha'`` sẽ trả về giá trị của tùy chọn đó, còn các tùy chọn được thiết lập bằng các đối số từ khóa (``alpha=0.5``).
 
-      The available attributes differ by platform.
-      All platforms support:
+      Các thuộc tính khả dụng khác nhau tùy theo nền tảng. Tất cả các nền tảng đều hỗ trợ:
 
       *alpha*
-         The window's opacity, from ``0.0`` (fully transparent) to ``1.0``
-         (opaque).
-         Where transparency is unsupported the value stays at ``1.0``.
+         Độ mờ của cửa sổ, từ ``0.0`` (hoàn toàn trong suốt) đến ``1.0`` (đục). Khi không hỗ trợ độ trong suốt, giá trị vẫn là ``1.0``.
 
       *appearance*
-         Whether the window is rendered in dark mode on Windows and macOS:
-         ``'auto'``, ``'light'`` or ``'dark'`` (this has no effect on X11).
+         Cho biết cửa sổ có được hiển thị ở chế độ tối trên Windows và macOS hay không: ``'auto'``, ``'light'`` hoặc ``'dark'`` (điều này không có tác dụng trên X11).
 
       *fullscreen*
-         Whether the window takes up the entire screen and has no borders.
+         Cho biết cửa sổ có chiếm toàn bộ màn hình và không có đường viền hay không.
 
       *topmost*
-         Whether the window is displayed above all other windows.
+         Cho biết cửa sổ có được hiển thị bên trên tất cả các cửa sổ khác hay không.
 
-      Windows additionally supports:
+      Windows cũng hỗ trợ thêm:
 
       *disabled*
-         Whether the window is in a disabled state.
+         Cho biết cửa sổ có đang ở trạng thái bị vô hiệu hóa hay không.
 
       *toolwindow*
-         Whether the window uses the tool window style.
+         Cho biết cửa sổ có sử dụng kiểu cửa sổ công cụ hay không.
 
       *transparentcolor*
-         The color that is made fully transparent, or an empty string for none.
+         Màu được đặt hoàn toàn trong suốt hoặc chuỗi rỗng nếu không có.
 
-      macOS additionally supports:
+      macOS cũng hỗ trợ:
 
       *class*
-         Whether the underlying Aqua window is an ``nswindow`` or an
-         ``nspanel``; this can only be set before the window is created.
+         Liệu cửa sổ Aqua bên dưới là một ``nswindow`` hay một ``nspanel``; điều này chỉ có thể được thiết lập trước khi cửa sổ được tạo.
 
       *modified*
-         The modification state shown by the window's close button and proxy
-         icon.
+         Trạng thái sửa đổi được hiển thị bởi nút đóng và biểu tượng proxy của cửa sổ.
 
       *notify*
-         Whether the application's dock icon bounces to request attention.
+         Liệu biểu tượng dock của ứng dụng có nảy lên để yêu cầu chú ý hay không.
 
       *stylemask*
-         The style mask of the underlying Aqua window, given as a list of bit
-         names such as ``titled`` or ``resizable``.
+         Mặt nạ kiểu dáng của cửa sổ Aqua bên dưới, được cung cấp dưới dạng danh sách các tên bit chẳng hạn như ``titled`` hoặc ``resizable``.
 
       *tabbingid*
-         The identifier of the tab group that the window belongs to.
+         Mã định danh của nhóm tab mà cửa sổ thuộc về.
 
       *tabbingmode*
-         Whether the window may be opened as a tab: ``'auto'``, ``'preferred'``
-         or ``'disallowed'``.
+         Cửa sổ có thể được mở dưới dạng tab hay không: ``'auto'``, ``'preferred'`` hoặc ``'disallowed'``.
 
       *titlepath*
-         The path of the file represented by the window's proxy icon.
+         Đường dẫn của tệp được biểu thị bằng biểu tượng proxy của cửa sổ.
 
       *transparent*
-         Whether the content area is transparent and the window shadow is
-         turned off.
+         Xác định liệu vùng nội dung có trong suốt và bóng cửa sổ có được tắt hay không.
 
-      X11 additionally supports:
+      X11 còn hỗ trợ:
 
       *type*
-         The window type, or a list of types in order of preference, that the
-         window manager should use to interpret the window, such as
-         ``'dialog'`` or ``'splash'``.
+         Loại cửa sổ hoặc danh sách các loại theo thứ tự ưu tiên mà trình quản lý cửa sổ nên dùng để diễn giải cửa sổ, chẳng hạn như ``'dialog'`` hoặc ``'splash'``.
 
       *zoomed*
-         Whether the window is maximized.
+         Cho biết cửa sổ có đang được phóng to tối đa hay không.
 
       .. note::
 
-         Tk 8.6 added the *type* attribute, and Tk 9.0 added the *appearance*,
-         *class*, *stylemask*, *tabbingid* and *tabbingmode* attributes.
+         Tk 8.6 đã thêm thuộc tính *type*, còn Tk 9.0 đã thêm các thuộc tính *appearance*, *class*, *stylemask*, *tabbingid* và *tabbingmode*.
 
-      On X11 changes are applied asynchronously, so a queried value may not yet
-      reflect the most recent request.
-      :meth:`wm_attributes` is an alias of :meth:`!attributes`.
+      Trên X11, các thay đổi được áp dụng không đồng bộ, vì vậy giá trị được truy vấn có thể chưa phản ánh yêu cầu gần đây nhất.
+      :meth:`wm_attributes` là bí danh của :meth:`!attributes`.
 
       .. versionchanged:: 3.13
-         A single attribute may now be queried by name without the leading
-         ``-``, and attributes may be set using keyword arguments.
-         The *return_python_dict* parameter was added.
+         Giờ đây, có thể truy vấn một thuộc tính riêng lẻ theo tên mà không cần ``-``, và có thể thiết lập các thuộc tính bằng keyword arguments. Tham số *return_python_dict* đã được thêm.
 
       .. deprecated:: 3.13
-         Setting an attribute by passing the option name (with a leading
-         ``-``) and its value as two positional arguments, as in
-         ``w.attributes('-alpha', 0.5)``, is deprecated; use keyword arguments
-         instead.
+         Việc thiết lập một thuộc tính bằng cách truyền tên tùy chọn (có ``-`` ở đầu) và giá trị của nó dưới dạng hai đối số vị trí, như trong ``w.attributes('-alpha', 0.5)``, đã không còn được khuyến nghị; thay vào đó, hãy sử dụng keyword arguments.
 
 
    .. method:: wm_client(name=None)
@@ -2414,77 +1581,50 @@ Base and mixin classes
 
    .. method:: client(name=None)
 
-      Store *name*, which should be the name of the host on which the
-      application is running, in the window's ``WM_CLIENT_MACHINE`` property
-      for use by the window or session manager.
-      An empty string deletes the property.
-      With no argument, return the last name set, or an empty string.
-      :meth:`wm_client` is an alias of :meth:`!client`.
+      Lưu *name*, vốn phải là tên của máy chủ nơi ứng dụng đang chạy, vào thuộc tính ``WM_CLIENT_MACHINE`` của cửa sổ để cửa sổ hoặc trình quản lý phiên sử dụng. Chuỗi rỗng sẽ xóa thuộc tính này. Nếu không có đối số, trả về tên được đặt gần đây nhất hoặc một chuỗi rỗng.
+      :meth:`wm_client` là bí danh của :meth:`!client`.
 
    .. method:: wm_colormapwindows(*wlist)
       :no-typesetting:
 
    .. method:: colormapwindows(*wlist)
 
-      Manipulate the ``WM_COLORMAP_WINDOWS`` property, which tells the window
-      manager about windows that have private colormaps.
-      If *wlist* is given, overwrite the property with those windows (their
-      order is a priority order for installing colormaps).
-      With no arguments, return the list of windows currently named in the
-      property.
-      :meth:`wm_colormapwindows` is an alias of :meth:`!colormapwindows`.
+      Thao tác với thuộc tính ``WM_COLORMAP_WINDOWS``, thuộc tính này cho trình quản lý cửa sổ biết về những cửa sổ có colormap riêng. Nếu cung cấp *wlist*, hãy ghi đè thuộc tính bằng các cửa sổ đó (thứ tự của chúng là thứ tự ưu tiên khi cài đặt colormap). Nếu không có đối số, trả về danh sách các cửa sổ hiện được đặt tên trong thuộc tính.
+      :meth:`wm_colormapwindows` là bí danh của :meth:`!colormapwindows`.
 
    .. method:: wm_command(value=None)
       :no-typesetting:
 
    .. method:: command(value=None)
 
-      Store *value* in the window's ``WM_COMMAND`` property for use by the
-      window or session manager; it should be a list giving the words of the
-      command used to invoke the application.
-      An empty string deletes the property.
-      With no argument, return the last value set, or an empty string.
-      :meth:`wm_command` is an alias of :meth:`!command`.
+      Lưu *value* vào thuộc tính ``WM_COMMAND`` của cửa sổ để cửa sổ hoặc trình quản lý phiên sử dụng; giá trị này phải là một danh sách chứa các từ trong lệnh dùng để gọi ứng dụng. Một chuỗi rỗng sẽ xóa thuộc tính. Nếu không có đối số, trả về giá trị được đặt gần đây nhất hoặc một chuỗi rỗng.
+      :meth:`wm_command` là bí danh của :meth:`!command`.
 
    .. method:: wm_deiconify()
       :no-typesetting:
 
    .. method:: deiconify()
 
-      Display the window in normal (non-iconified) form by mapping it.
-      If the window has never been mapped, this ensures it appears de-iconified
-      when it is first mapped.
-      On Windows the window is also raised and given the focus.
-      :meth:`wm_deiconify` is an alias of :meth:`!deiconify`.
+      Hiển thị cửa sổ ở dạng bình thường (không được biểu tượng hóa) bằng cách map cửa sổ. Nếu cửa sổ chưa từng được map, thao tác này đảm bảo cửa sổ sẽ xuất hiện ở trạng thái khôi phục khỏi biểu tượng khi được map lần đầu. Trên Windows, cửa sổ cũng được đưa lên trước và nhận focus.
+      :meth:`wm_deiconify` là bí danh của :meth:`!deiconify`.
 
    .. method:: wm_focusmodel(model=None)
       :no-typesetting:
 
    .. method:: focusmodel(model=None)
 
-      Set or query the focus model for the window.
-      *model* is either ``'active'`` (the window claims the input focus for
-      itself or its descendants, even when the focus is in another application)
-      or ``'passive'`` (the window relies on the window manager to give it the
-      focus).
-      With no argument, return the current model.
-      The default is ``'passive'``, which is what the :meth:`!focus` command
-      assumes.
-      :meth:`wm_focusmodel` is an alias of :meth:`!focusmodel`.
+      Đặt hoặc truy vấn mô hình focus cho cửa sổ. *model* là ``'active'`` (cửa sổ tự nhận focus đầu vào cho chính nó hoặc các cửa sổ con, ngay cả khi focus đang ở ứng dụng khác) hoặc ``'passive'`` (cửa sổ dựa vào trình quản lý cửa sổ để cấp focus cho nó). Nếu không có đối số, trả về mô hình hiện tại. Mặc định là ``'passive'``, đây cũng là giá trị mà lệnh :meth:`!focus` giả định.
+      :meth:`wm_focusmodel` là bí danh của :meth:`!focusmodel`.
 
    .. method:: wm_forget(window)
       :no-typesetting:
 
    .. method:: forget(window)
 
-      Unmap *window* from the screen so that it is no longer managed by the
-      window manager.
-      A :class:`Toplevel` is then treated like a :class:`Frame`, although its
-      ``-menu`` configuration is remembered and the menu reappears if the
-      widget is managed again.
-      :meth:`wm_forget` is an alias of :meth:`!forget`.
+      Bỏ ánh xạ *window* khỏi màn hình để trình quản lý cửa sổ không còn quản lý nó. Khi đó, :class:`Toplevel` được xử lý như :class:`Frame`, mặc dù cấu hình ``-menu`` của nó vẫn được ghi nhớ và menu sẽ xuất hiện lại nếu widget được quản lý trở lại.
+      :meth:`wm_forget` là bí danh của :meth:`!forget`.
 
-      Not to be confused with :meth:`Pack.forget`.
+      Không được nhầm với :meth:`Pack.forget`.
 
       .. versionadded:: 3.3
 
@@ -2493,127 +1633,75 @@ Base and mixin classes
 
    .. method:: frame()
 
-      Return the platform-specific window identifier for the outermost
-      decorative frame containing the window, if the window manager has
-      reparented it into such a frame; otherwise return the identifier of the
-      window itself.
-      :meth:`wm_frame` is an alias of :meth:`!frame`.
+      Trả về mã định danh cửa sổ dành riêng cho nền tảng của khung trang trí ngoài cùng chứa cửa sổ, nếu trình quản lý cửa sổ đã tái gán cửa sổ đó vào một khung như vậy; nếu không, trả về mã định danh của chính cửa sổ.
+      :meth:`wm_frame` là bí danh của :meth:`!frame`.
 
    .. method:: wm_geometry(newGeometry=None)
       :no-typesetting:
 
    .. method:: geometry(newGeometry=None)
 
-      Set or query the geometry of the window.
-      *newGeometry* has the form ``=widthxheight+x+y``, where any of ``=``,
-      ``widthxheight`` and the ``+x+y`` position may be omitted.
-      *width* and *height* are in pixels (or grid units for a gridded window);
-      a position preceded by ``+`` is measured from the left or top edge of the
-      screen and one preceded by ``-`` from the right or bottom edge.
-      An offset can be negative, as in ``'200x100+-9+-8'``, when the window
-      edge is positioned beyond the corresponding screen edge.
-      An empty string cancels any user-specified geometry, letting the window
-      revert to its natural size.
-      With no argument, return the current geometry as a string of the form
-      ``'200x200+10+10'``.
-      :meth:`wm_geometry` is an alias of :meth:`!geometry`.
+      Đặt hoặc truy vấn hình học của cửa sổ. *newGeometry* có dạng ``=widthxheight+x+y``, trong đó có thể bỏ qua bất kỳ thành phần nào trong ``=``, ``widthxheight`` và vị trí ``+x+y``. *width* và *height* được tính bằng pixel (hoặc đơn vị lưới đối với cửa sổ dạng lưới); vị trí có tiền tố ``+`` được đo từ cạnh trái hoặc cạnh trên của màn hình, còn vị trí có tiền tố ``-`` được đo từ cạnh phải hoặc cạnh dưới. Độ lệch có thể là số âm, như trong ``'200x100+-9+-8'``, khi cạnh cửa sổ được đặt vượt ra ngoài cạnh tương ứng của màn hình. Chuỗi rỗng sẽ hủy hình học do người dùng chỉ định, cho phép cửa sổ trở về kích thước tự nhiên. Khi không có đối số, trả về hình học hiện tại dưới dạng chuỗi có dạng ``'200x200+10+10'``.
+      :meth:`wm_geometry` là bí danh của :meth:`!geometry`.
 
    .. method:: wm_grid(baseWidth=None, baseHeight=None, widthInc=None, heightInc=None)
       :no-typesetting:
 
    .. method:: grid(baseWidth=None, baseHeight=None, widthInc=None, heightInc=None)
 
-      Manage the window as a gridded window and define the relationship between
-      grid units and pixels.
-      *baseWidth* and *baseHeight* are the numbers of grid units for the
-      window's internally requested size, and *widthInc* and *heightInc* are
-      the pixel sizes of a horizontal and vertical grid unit.
-      Empty strings turn off gridded management.
-      With no arguments, return a tuple of the four current values, or ``None``
-      if the window is not gridded.
-      :meth:`wm_grid` is an alias of :meth:`!grid`.
+      Quản lý cửa sổ dưới dạng cửa sổ lưới và xác định mối quan hệ giữa các đơn vị lưới với pixel. *baseWidth* và *baseHeight* là số đơn vị lưới trong kích thước được yêu cầu nội bộ của cửa sổ, còn *widthInc* và *heightInc* là kích thước pixel của một đơn vị lưới ngang và dọc. Chuỗi rỗng sẽ tắt chế độ quản lý dạng lưới. Khi không có đối số, trả về một tuple gồm bốn giá trị hiện tại hoặc ``None`` nếu cửa sổ không ở dạng lưới.
+      :meth:`wm_grid` là bí danh của :meth:`!grid`.
 
-      Not to be confused with the grid geometry manager :meth:`Grid.grid`.
+      Không nên nhầm lẫn với trình quản lý hình học dạng lưới :meth:`Grid.grid`.
 
    .. method:: wm_group(pathName=None)
       :no-typesetting:
 
    .. method:: group(pathName=None)
 
-      Set or query the leader of a group of related windows.
-      *pathName* gives the path name of the group leader; the window manager
-      may, for example, unmap all windows in the group when the leader is
-      iconified.
-      An empty string removes the window from any group.
-      With no argument, return the path name of the current group leader, or an
-      empty string.
-      :meth:`wm_group` is an alias of :meth:`!group`.
+      Đặt hoặc truy vấn leader của một nhóm cửa sổ liên quan. *pathName* cung cấp tên đường dẫn của group leader; chẳng hạn, trình quản lý cửa sổ có thể bỏ ánh xạ tất cả cửa sổ trong nhóm khi leader được thu nhỏ thành biểu tượng. Chuỗi rỗng sẽ xóa cửa sổ khỏi mọi nhóm. Khi không có đối số, trả về tên đường dẫn của group leader hiện tại hoặc một chuỗi rỗng.
+      :meth:`wm_group` là bí danh của :meth:`!group`.
 
    .. method:: wm_iconbitmap(bitmap=None, default=None)
       :no-typesetting:
 
    .. method:: iconbitmap(bitmap=None, default=None)
 
-      Set or query the bitmap used by the window manager for the window's icon.
-      *bitmap* names a bitmap in one of the standard forms accepted by Tk; an
-      empty string cancels the current icon bitmap.
-      With no argument, return the name of the current icon bitmap, or an empty
-      string.
-      On Windows the *default* argument names an icon (for example an ``.ico``
-      file) applied to all top-level windows that have no icon of their own.
-      :meth:`wm_iconbitmap` is an alias of :meth:`!iconbitmap`.
+      Đặt hoặc truy vấn bitmap được window manager sử dụng cho biểu tượng của cửa sổ. *bitmap* chỉ định tên một bitmap ở một trong các dạng chuẩn được Tk chấp nhận; chuỗi rỗng hủy bitmap biểu tượng hiện tại. Khi không có đối số, trả về tên bitmap biểu tượng hiện tại hoặc một chuỗi rỗng. Trên Windows, đối số *default* chỉ định một biểu tượng (ví dụ: một ``.ico`` file) được áp dụng cho tất cả cửa sổ cấp cao nhất không có biểu tượng riêng.
+      :meth:`wm_iconbitmap` là bí danh của :meth:`!iconbitmap`.
 
    .. method:: wm_iconify()
       :no-typesetting:
 
    .. method:: iconify()
 
-      Iconify the window.
-      If the window has not yet been mapped for the first time, arrange for it
-      to appear in the iconified state when it is eventually mapped.
-      :meth:`wm_iconify` is an alias of :meth:`!iconify`.
+      Thu nhỏ cửa sổ thành biểu tượng. Nếu cửa sổ chưa được ánh xạ lần đầu, sắp xếp để cửa sổ xuất hiện ở trạng thái thu nhỏ thành biểu tượng khi được ánh xạ sau đó.
+      :meth:`wm_iconify` là bí danh của :meth:`!iconify`.
 
    .. method:: wm_iconmask(bitmap=None)
       :no-typesetting:
 
    .. method:: iconmask(bitmap=None)
 
-      Set or query the bitmap used as a mask for the icon (see
-      :meth:`iconbitmap`).
-      Where the mask is zero no icon is displayed; where it is one, the
-      corresponding bits of the icon bitmap are shown.
-      An empty string cancels the current mask.
-      With no argument, return the name of the current icon mask, or an empty
-      string.
-      :meth:`wm_iconmask` is an alias of :meth:`!iconmask`.
+      Đặt hoặc truy vấn bitmap được sử dụng làm mặt nạ cho biểu tượng (xem
+      :meth:`iconbitmap`). Khi mặt nạ là 0, không biểu tượng nào được hiển thị; khi là 1, các bit tương ứng của bitmap biểu tượng được hiển thị. Chuỗi rỗng hủy mặt nạ hiện tại. Khi không có đối số, trả về tên mặt nạ biểu tượng hiện tại hoặc một chuỗi rỗng.
+      :meth:`wm_iconmask` là bí danh của :meth:`!iconmask`.
 
    .. method:: wm_iconname(newName=None)
       :no-typesetting:
 
    .. method:: iconname(newName=None)
 
-      Set or query the name displayed by the window manager inside the window's
-      icon.
-      With no argument, return the current icon name, or an empty string if
-      none has been set (in which case the window manager normally displays the
-      window's title).
-      :meth:`wm_iconname` is an alias of :meth:`!iconname`.
+      Đặt hoặc truy vấn tên được trình quản lý cửa sổ hiển thị bên trong biểu tượng của cửa sổ. Khi không có đối số, trả về tên biểu tượng hiện tại hoặc chuỗi rỗng nếu chưa đặt tên nào (trong trường hợp đó, trình quản lý cửa sổ thường hiển thị tiêu đề của cửa sổ).
+      :meth:`wm_iconname` là bí danh của :meth:`!iconname`.
 
    .. method:: wm_iconphoto(default=False, *images)
       :no-typesetting:
 
    .. method:: iconphoto(default=False, *images)
 
-      Set the titlebar icon for the window from one or more :class:`PhotoImage`
-      objects given in *images*.
-      Several images of different sizes (for example 16x16 and 32x32) may be
-      supplied so that the window manager can choose an appropriate one.
-      The image data is taken as a snapshot at the time of the call; later
-      changes to the images are not reflected.
-      If *default* is true, the icon is also applied to all top-level windows
-      created in the future.
-      On macOS only the first image is used.
-      :meth:`wm_iconphoto` is an alias of :meth:`!iconphoto`.
+      Đặt biểu tượng thanh tiêu đề cho cửa sổ từ một hoặc nhiều đối tượng :class:`PhotoImage` được truyền trong *images*. Có thể cung cấp nhiều hình ảnh với các kích thước khác nhau (ví dụ 16x16 và 32x32) để trình quản lý cửa sổ có thể chọn hình ảnh phù hợp. Dữ liệu hình ảnh được chụp nhanh tại thời điểm gọi; các thay đổi về sau đối với hình ảnh sẽ không được phản ánh. Nếu *default* là true, biểu tượng cũng được áp dụng cho tất cả cửa sổ cấp cao nhất được tạo về sau. Trên macOS, chỉ hình ảnh đầu tiên được sử dụng.
+      :meth:`wm_iconphoto` là bí danh của :meth:`!iconphoto`.
 
       .. versionadded:: 3.3
 
@@ -2622,39 +1710,24 @@ Base and mixin classes
 
    .. method:: iconposition(x=None, y=None)
 
-      Set or query a hint to the window manager about where the window's icon
-      should be positioned.
-      Empty strings cancel an existing hint.
-      With no arguments, return a tuple of the two current values, or ``None``
-      if no hint is in effect.
-      :meth:`wm_iconposition` is an alias of :meth:`!iconposition`.
+      Đặt hoặc truy vấn gợi ý cho trình quản lý cửa sổ về vị trí đặt biểu tượng của cửa sổ. Chuỗi rỗng sẽ hủy gợi ý hiện có. Khi không có đối số, trả về tuple gồm hai giá trị hiện tại hoặc ``None`` nếu không có gợi ý nào đang có hiệu lực.
+      :meth:`wm_iconposition` là bí danh của :meth:`!iconposition`.
 
    .. method:: wm_iconwindow(pathName=None)
       :no-typesetting:
 
    .. method:: iconwindow(pathName=None)
 
-      Set or query the window used as the icon for the window.
-      When the window is iconified, *pathName* is mapped to serve as its icon
-      and unmapped again when it is de-iconified.
-      An empty string cancels the association.
-      With no argument, return the path name of the current icon window, or an
-      empty string.
-      Not all window managers support icon windows, and the concept is
-      meaningless on non-X11 platforms.
-      :meth:`wm_iconwindow` is an alias of :meth:`!iconwindow`.
+      Đặt hoặc truy vấn cửa sổ được sử dụng làm biểu tượng cho cửa sổ. Khi cửa sổ được thu nhỏ thành biểu tượng, *pathName* được ánh xạ để làm biểu tượng của cửa sổ đó và được hủy ánh xạ khi cửa sổ được khôi phục. Chuỗi rỗng sẽ hủy liên kết. Khi không có đối số, trả về tên đường dẫn của cửa sổ biểu tượng hiện tại hoặc chuỗi rỗng. Không phải mọi trình quản lý cửa sổ đều hỗ trợ cửa sổ biểu tượng, và khái niệm này không có ý nghĩa trên các nền tảng không phải X11.
+      :meth:`wm_iconwindow` là bí danh của :meth:`!iconwindow`.
 
    .. method:: wm_manage(widget)
       :no-typesetting:
 
    .. method:: manage(widget)
 
-      Make *widget* a stand-alone top-level window, decorated by the window
-      manager with a title bar and so on.
-      Only :class:`Frame`, :class:`LabelFrame` and :class:`Toplevel` widgets
-      may be used (the :mod:`tkinter.ttk` versions are **not** accepted);
-      passing any other widget type raises an error.
-      :meth:`wm_manage` is an alias of :meth:`!manage`.
+      Biến *widget* thành một cửa sổ cấp cao nhất độc lập, được window manager trang trí bằng thanh tiêu đề, v.v. Chỉ các widget :class:`Frame`, :class:`LabelFrame` và :class:`Toplevel` mới được sử dụng (các phiên bản :mod:`tkinter.ttk` thì **not** được chấp nhận); truyền vào bất kỳ loại widget nào khác sẽ gây ra lỗi.
+      :meth:`wm_manage` là bí danh của :meth:`!manage`.
 
       .. versionadded:: 3.3
 
@@ -2663,185 +1736,103 @@ Base and mixin classes
 
    .. method:: maxsize(width=None, height=None)
 
-      Set or query the maximum permissible dimensions of the window, in pixels
-      (or grid units for a gridded window).
-      The window manager restricts the window to be no larger than *width* and
-      *height*.
-      With no arguments, return a tuple of the current maximum width and
-      height.
-      The maximum size defaults to the size of the screen.
-      :meth:`wm_maxsize` is an alias of :meth:`!maxsize`.
+      Đặt hoặc truy vấn các kích thước tối đa được phép của cửa sổ, tính bằng pixel (hoặc đơn vị lưới đối với cửa sổ dạng lưới). Window manager giới hạn cửa sổ không được lớn hơn *width* và *height*. Khi không có đối số, trả về một tuple gồm chiều rộng và chiều cao tối đa hiện tại. Kích thước tối đa mặc định bằng kích thước màn hình.
+      :meth:`wm_maxsize` là bí danh của :meth:`!maxsize`.
 
    .. method:: wm_minsize(width=None, height=None)
       :no-typesetting:
 
    .. method:: minsize(width=None, height=None)
 
-      Set or query the minimum permissible dimensions of the window, in pixels
-      (or grid units for a gridded window).
-      The window manager restricts the window to be no smaller than *width* and
-      *height*.
-      With no arguments, return a tuple of the current minimum width and
-      height.
-      The minimum size defaults to one pixel in each dimension.
-      :meth:`wm_minsize` is an alias of :meth:`!minsize`.
+      Đặt hoặc truy vấn các kích thước tối thiểu được phép của cửa sổ, tính bằng pixel (hoặc đơn vị lưới đối với cửa sổ dạng lưới). Window manager giới hạn cửa sổ không được nhỏ hơn *width* và *height*. Khi không có đối số, trả về một tuple gồm chiều rộng và chiều cao tối thiểu hiện tại. Kích thước tối thiểu mặc định là một pixel theo mỗi chiều.
+      :meth:`wm_minsize` là bí danh của :meth:`!minsize`.
 
    .. method:: wm_overrideredirect(boolean=None)
       :no-typesetting:
 
    .. method:: overrideredirect(boolean=None)
 
-      Set or query the override-redirect flag for the window.
-      When this flag is set, the window is ignored by the window manager: it is
-      not reparented into a decorative frame and the user cannot manipulate it
-      through the usual window manager controls.
-      With no argument, return a boolean indicating whether the flag is set,
-      or ``None`` if it has not been set.
-      The flag is reliably honored only when the window is first mapped or
-      remapped from the withdrawn state.
-      :meth:`wm_overrideredirect` is an alias of :meth:`!overrideredirect`.
+      Đặt hoặc truy vấn cờ override-redirect cho cửa sổ. Khi cờ này được đặt, cửa sổ sẽ bị trình quản lý cửa sổ bỏ qua: cửa sổ không được đặt lại vào một khung trang trí và người dùng không thể thao tác với cửa sổ bằng các điều khiển trình quản lý cửa sổ thông thường. Khi không có đối số, trả về một giá trị boolean cho biết cờ có được đặt hay không, hoặc ``None`` nếu cờ chưa được đặt. Cờ này chỉ được tuân thủ đáng tin cậy khi cửa sổ được ánh xạ lần đầu hoặc được ánh xạ lại từ trạng thái withdrawn.
+      :meth:`wm_overrideredirect` là bí danh của :meth:`!overrideredirect`.
 
    .. method:: wm_positionfrom(who=None)
       :no-typesetting:
 
    .. method:: positionfrom(who=None)
 
-      Set or query the source of the window's current position.
-      *who* is either ``'program'`` or ``'user'`` and indicates whether the
-      position was requested by the program or by the user; an empty string
-      cancels the current source.
-      With no argument, return the current source, or an empty string if none
-      has been set.
-      Tk automatically sets the source to ``'user'`` when :meth:`geometry` is
-      called, unless it has been set explicitly to ``'program'``.
-      :meth:`wm_positionfrom` is an alias of :meth:`!positionfrom`.
+      Đặt hoặc truy vấn nguồn của vị trí hiện tại của cửa sổ. *who* có thể là ``'program'`` hoặc ``'user'``, cho biết vị trí được yêu cầu bởi chương trình hay người dùng; một chuỗi rỗng sẽ hủy nguồn hiện tại. Khi không có đối số, trả về nguồn hiện tại hoặc một chuỗi rỗng nếu chưa có nguồn nào được đặt. Tk tự động đặt nguồn thành ``'user'`` khi :meth:`geometry` được gọi, trừ khi nguồn đã được đặt rõ ràng thành ``'program'``.
+      :meth:`wm_positionfrom` là bí danh của :meth:`!positionfrom`.
 
    .. method:: wm_protocol(name=None, func=None)
       :no-typesetting:
 
    .. method:: protocol(name=None, func=None)
 
-      Register *func* as the handler for the window manager protocol *name*, an
-      atom such as ``'WM_DELETE_WINDOW'``, ``'WM_SAVE_YOURSELF'`` or
-      ``'WM_TAKE_FOCUS'``; *func* is then called whenever the window manager
-      sends a message of that protocol.
-      Tk installs a default ``WM_DELETE_WINDOW`` handler that destroys the
-      window, which this method can replace.
-      If *func* is an empty string, the handler is removed.
-      With only *name*, return the name of its registered handler command, or
-      an empty string if none is set (the default ``WM_DELETE_WINDOW`` handler
-      is not reported); with no arguments, return a tuple of the protocols that
-      currently have handlers.
-      :meth:`wm_protocol` is an alias of :meth:`!protocol`.
+      Đăng ký *func* làm trình xử lý cho giao thức của trình quản lý cửa sổ *name*, một atom chẳng hạn như ``'WM_DELETE_WINDOW'``, ``'WM_SAVE_YOURSELF'`` hoặc ``'WM_TAKE_FOCUS'``; sau đó *func* được gọi bất cứ khi nào trình quản lý cửa sổ gửi một thông báo của giao thức đó. Tk cài đặt một trình xử lý ``WM_DELETE_WINDOW`` mặc định để hủy cửa sổ; phương thức này có thể thay thế trình xử lý đó. Nếu *func* là một chuỗi rỗng, trình xử lý sẽ bị xóa. Khi chỉ có *name*, trả về tên của lệnh trình xử lý đã đăng ký cho lệnh đó hoặc một chuỗi rỗng nếu chưa đặt lệnh nào (trình xử lý ``WM_DELETE_WINDOW`` mặc định không được báo cáo); khi không có đối số, trả về một tuple gồm các giao thức hiện có trình xử lý.
+      :meth:`wm_protocol` là bí danh của :meth:`!protocol`.
 
    .. method:: wm_resizable(width=None, height=None)
       :no-typesetting:
 
    .. method:: resizable(width=None, height=None)
 
-      Control whether the user may interactively resize the window.
-      *width* and *height* are boolean values that determine whether the
-      window's width and height may be changed.
-      With no arguments, return a tuple of two ``0``/``1`` values indicating
-      whether each dimension is currently resizable.
-      By default a window is resizable in both dimensions.
-      :meth:`wm_resizable` is an alias of :meth:`!resizable`.
+      Kiểm soát việc người dùng có thể thay đổi kích thước cửa sổ một cách tương tác hay không. *width* và *height* là các giá trị boolean xác định chiều rộng và chiều cao của cửa sổ có thể được thay đổi hay không. Khi không có đối số, trả về một tuple gồm hai giá trị ``0``/``1`` cho biết mỗi chiều hiện có thể thay đổi kích thước hay không. Theo mặc định, cửa sổ có thể thay đổi kích thước theo cả hai chiều.
+      :meth:`wm_resizable` là bí danh của :meth:`!resizable`.
 
    .. method:: wm_sizefrom(who=None)
       :no-typesetting:
 
    .. method:: sizefrom(who=None)
 
-      Set or query the source of the window's current size.
-      *who* is either ``'program'`` or ``'user'`` and indicates whether the
-      size was requested by the program or by the user; an empty string cancels
-      the current source.
-      With no argument, return the current source, or an empty string if none
-      has been set.
-      :meth:`wm_sizefrom` is an alias of :meth:`!sizefrom`.
+      Đặt hoặc truy vấn nguồn gốc của kích thước hiện tại của cửa sổ. *who* là ``'program'`` hoặc ``'user'``, cho biết kích thước được yêu cầu bởi chương trình hay người dùng; chuỗi rỗng sẽ hủy nguồn hiện tại. Nếu không có đối số, trả về nguồn hiện tại hoặc chuỗi rỗng nếu chưa có nguồn nào được đặt.
+      :meth:`wm_sizefrom` là bí danh của :meth:`!sizefrom`.
 
    .. method:: wm_state(newstate=None)
       :no-typesetting:
 
    .. method:: state(newstate=None)
 
-      Set or query the state of the window.
-      With no argument, return the current state: one of ``'normal'``,
-      ``'iconic'``, ``'withdrawn'``, ``'icon'`` or, on Windows and macOS only,
-      ``'zoomed'``.
-      ``'iconic'`` refers to a window that has been iconified, while ``'icon'``
-      refers to a window serving as the icon for another window (see
-      :meth:`iconwindow`); the ``'icon'`` state cannot be set.
-      :meth:`wm_state` is an alias of :meth:`!state`.
+      Đặt hoặc truy vấn trạng thái của cửa sổ. Nếu không có đối số, trả về trạng thái hiện tại: một trong các giá trị ``'normal'``, ``'iconic'``, ``'withdrawn'``, ``'icon'`` hoặc, chỉ trên Windows và macOS, ``'zoomed'``. ``'iconic'`` chỉ cửa sổ đã được thu nhỏ thành biểu tượng, còn ``'icon'`` chỉ cửa sổ đóng vai trò là biểu tượng cho một cửa sổ khác (xem
+      :meth:`iconwindow`); không thể đặt trạng thái ``'icon'``.
+      :meth:`wm_state` là bí danh của :meth:`!state`.
 
-      Not to be confused with :meth:`ttk.Widget.state
-      <tkinter.ttk.Widget.state>`.
+      Không được nhầm lẫn với :meth:`ttk.Widget.state <tkinter.ttk.Widget.state>`.
 
    .. method:: wm_title(string=None)
       :no-typesetting:
 
    .. method:: title(string=None)
 
-      Set or query the title for the window, which the window manager should
-      display in the window's title bar.
-      With no argument, return the current title.
-      The title defaults to the window's name.
-      :meth:`wm_title` is an alias of :meth:`!title`.
+      Đặt hoặc truy vấn tiêu đề của cửa sổ, tiêu đề mà window manager sẽ hiển thị trên thanh tiêu đề của cửa sổ. Nếu không có đối số, trả về tiêu đề hiện tại. Tiêu đề mặc định là tên của cửa sổ.
+      :meth:`wm_title` là bí danh của :meth:`!title`.
 
    .. method:: wm_transient(master=None)
       :no-typesetting:
 
    .. method:: transient(master=None)
 
-      Mark the window as a transient window (such as a pull-down menu or
-      dialog) working on behalf of *master*, the path name of another top-level
-      window.
-      An empty string clears the transient status.
-      With no argument, return the path name of the current master, or an empty
-      string.
-      A transient window mirrors state changes in its master and may be
-      decorated differently by the window manager; it is an error to make a
-      window a transient of itself.
-      :meth:`wm_transient` is an alias of :meth:`!transient`.
+      Đánh dấu cửa sổ là cửa sổ tạm thời (chẳng hạn như menu xổ xuống hoặc hộp thoại) hoạt động thay mặt cho *master*, là tên đường dẫn của một cửa sổ cấp cao nhất khác. Chuỗi rỗng sẽ xóa trạng thái tạm thời. Nếu không có đối số, trả về tên đường dẫn của master hiện tại hoặc một chuỗi rỗng. Cửa sổ tạm thời phản ánh các thay đổi trạng thái trong master của nó và có thể được window manager trang trí theo cách khác; việc đặt một cửa sổ làm cửa sổ tạm thời của chính nó là lỗi.
+      :meth:`wm_transient` là bí danh của :meth:`!transient`.
 
    .. method:: wm_withdraw()
       :no-typesetting:
 
    .. method:: withdraw()
 
-      Withdraw the window from the screen, unmapping it and causing the window
-      manager to forget about it.
-      If the window has never been mapped, it is instead mapped in the
-      withdrawn state.
-      It is sometimes necessary to withdraw a window and then re-map it (for
-      example with :meth:`deiconify`) to make some window managers notice
-      changes to window attributes.
-      :meth:`wm_withdraw` is an alias of :meth:`!withdraw`.
+      Rút cửa sổ khỏi màn hình, bỏ ánh xạ cửa sổ và khiến window manager quên cửa sổ đó. Nếu cửa sổ chưa từng được ánh xạ, thay vào đó cửa sổ sẽ được ánh xạ ở trạng thái đã rút. Đôi khi cần rút cửa sổ rồi ánh xạ lại cửa sổ đó (chẳng hạn bằng :meth:`deiconify`) để một số window manager nhận biết các thay đổi đối với thuộc tính cửa sổ.
+      :meth:`wm_withdraw` là bí danh của :meth:`!withdraw`.
 
 
 .. class:: Pack()
 
-   Geometry manager that arranges widgets by packing them against the sides of
-   their container.
-   The :class:`!Pack` mix-in is inherited by all widgets (through
-   :class:`Widget`) and provides the methods for managing a widget with the
-   *pack* geometry manager.
-   See also :ref:`tkinter-geometry-management`.
+   Trình quản lý hình học sắp xếp các widget bằng cách đóng gói chúng sát vào các cạnh của vùng chứa. Mixin :class:`!Pack` được tất cả widget kế thừa (thông qua
+   :class:`Widget`) và cung cấp các phương thức để quản lý một widget bằng geometry manager *pack*. Xem thêm :ref:`tkinter-geometry-management`.
 
    .. note::
 
-      :class:`Pack`, :class:`Place` and :class:`Grid` all define the short
-      method names :meth:`!forget`, :meth:`!info`, :meth:`!slaves`,
-      :meth:`!content` and :meth:`!propagate`.
-      On a widget the bare names resolve to the *pack* manager's versions,
-      since :class:`Pack` and :class:`Misc` precede :class:`Place` and
-      :class:`Grid` in the method resolution order,
-      whatever manager actually manages the widget;
-      and :meth:`!configure`/:meth:`!config` configure the widget's options,
-      not its geometry.
-      Use the explicit ``pack_*``, ``grid_*`` and ``place_*`` methods
-      (and ``pack``, ``grid``, ``place`` for geometry configuration)
-      to act on a specific geometry manager.
+      :class:`Pack`, :class:`Place` và :class:`Grid` đều định nghĩa các tên phương thức ngắn :meth:`!forget`, :meth:`!info`, :meth:`!slaves`,
+      :meth:`!content` và :meth:`!propagate`. Trên một widget, các tên không có tiền tố sẽ trỏ đến các phiên bản của geometry manager *pack*, vì :class:`Pack` và :class:`Misc` đứng trước :class:`Place` và
+      :class:`Grid` trong thứ tự phân giải phương thức, bất kể manager nào thực sự quản lý widget; còn :meth:`!configure`/:meth:`!config` cấu hình các tùy chọn của widget, không phải geometry của nó. Sử dụng các phương thức tường minh ``pack_*``, ``grid_*`` và ``place_*`` (và ``pack``, ``grid``, ``place`` để cấu hình geometry) để thao tác với một geometry manager cụ thể.
 
    .. method:: configure(cnf={}, **kw)
       :no-typesetting:
@@ -2850,51 +1841,38 @@ Base and mixin classes
       :no-typesetting:
 
    .. method:: pack_configure(cnf={}, **kw)
-               pack(cnf={}, **kw)
+               pack(cnf={}, ****kw)
 
-      Pack the widget inside its container, positioning it relative to the
-      siblings already packed there.
-      The supported options are:
+      Đóng gói widget bên trong container của nó, đặt vị trí tương đối so với các widget cùng cấp đã được đóng gói ở đó. Các tùy chọn được hỗ trợ là:
 
       *side*
-         Which side of the container to pack the widget against: ``'top'`` (the
-         default), ``'bottom'``, ``'left'`` or ``'right'``.
+         Cạnh nào của vùng chứa để đặt widget sát vào: ``'top'`` (mặc định), ``'bottom'``, ``'left'`` hoặc ``'right'``.
 
       *fill*
-         Whether to stretch the widget to fill its parcel: ``'none'`` (the
-         default), ``'x'``, ``'y'`` or ``'both'``.
+         Có kéo giãn widget để lấp đầy phần được phân bổ cho nó hay không: ``'none'`` (mặc định), ``'x'``, ``'y'`` hoặc ``'both'``.
 
       *expand*
-         Whether the widget should expand to consume any extra space in its
-         container (a boolean, default false).
+         Widget có nên mở rộng để sử dụng phần không gian dư thừa trong vùng chứa hay không (giá trị boolean, mặc định là false).
 
       *anchor*
-         Where to position the widget in its parcel when the parcel is larger
-         than the widget: an anchor such as ``'n'`` or ``'sw'`` (default
-         ``'center'``).
+         Đặt widget ở đâu trong phần được phân bổ cho nó khi phần này lớn hơn widget: một anchor như ``'n'`` hoặc ``'sw'`` (mặc định là ``'center'``).
 
       *ipadx*, *ipady*
-         Internal padding added on the left and right (*ipadx*) or top and
-         bottom (*ipady*) of the widget, as a screen distance (default ``0``).
+         Khoảng đệm bên trong được thêm vào bên trái và bên phải (*ipadx*) hoặc bên trên và bên dưới (*ipady*) của widget, tính theo khoảng cách trên màn hình (mặc định là ``0``).
 
       *padx*, *pady*
-         External padding left on the left and right (*padx*) or top and bottom
-         (*pady*) of the widget, as a screen distance or a pair of two
-         distances for the two sides (default ``0``).
+         Khoảng đệm bên ngoài ở bên trái và bên phải (*padx*) hoặc bên trên và bên dưới (*pady*) của widget, tính theo khoảng cách trên màn hình hoặc một cặp gồm hai khoảng cách cho hai phía (mặc định là ``0``).
 
       *after*
-         Pack the widget after the given widget in the packing order, using the
-         same container.
+         Đóng gói widget sau widget đã cho trong thứ tự đóng gói, sử dụng cùng một container.
 
       *before*
-         Pack the widget before the given widget in the packing order, using
-         the same container.
+         Đóng gói widget trước widget đã cho trong thứ tự đóng gói, bằng cách sử dụng cùng một container.
 
       *in_*
-         The container in which to pack the widget; it defaults to the parent
-         widget.
+         Container mà widget được đóng gói vào; mặc định là widget cha.
 
-      :meth:`pack`, :meth:`configure` and :meth:`config` are aliases of
+      :meth:`pack`, :meth:`configure` và :meth:`config` là các bí danh của
       :meth:`!pack_configure`.
 
    .. method:: forget()
@@ -2902,24 +1880,20 @@ Base and mixin classes
 
    .. method:: pack_forget()
 
-      Unmap the widget and remove it from the packing order, forgetting its
-      packing options.
-      It can be packed again later with :meth:`pack_configure`.
-      :meth:`forget` is an alias of :meth:`!pack_forget`,
-      except on :class:`PanedWindow`,
-      :class:`ttk.Notebook <tkinter.ttk.Notebook>` and
-      :class:`ttk.PanedWindow <tkinter.ttk.PanedWindow>`,
-      which provide their own :meth:`!forget` method.
+      Bỏ ánh xạ widget và xóa widget khỏi thứ tự đóng gói, đồng thời loại bỏ các tùy chọn đóng gói của nó. Sau đó, widget có thể được đóng gói lại bằng :meth:`pack_configure`.
+      :meth:`forget` là bí danh của :meth:`!pack_forget`, ngoại trừ trên :class:`PanedWindow`,
+      :class:`ttk.Notebook <tkinter.ttk.Notebook>` và
+      :class:`ttk.PanedWindow <tkinter.ttk.PanedWindow>`, các lớp này cung cấp phương thức :meth:`!forget` riêng.
 
-      Not to be confused with :meth:`Wm.forget`.
+      Không nên nhầm lẫn với :meth:`Wm.forget`.
 
    .. method:: info()
       :no-typesetting:
 
    .. method:: pack_info()
 
-      Return a dictionary of the widget's current packing options.
-      :meth:`info` is an alias of :meth:`!pack_info`.
+      Trả về một dictionary chứa các tùy chọn packing hiện tại của widget.
+      :meth:`info` là bí danh của :meth:`!pack_info`.
 
    .. method:: propagate()
                propagate(flag)
@@ -2928,27 +1902,22 @@ Base and mixin classes
    .. method:: pack_propagate()
                pack_propagate(flag)
 
-      Same as :meth:`Misc.pack_propagate`, treating this widget as a container:
-      enable or disable geometry propagation.
-      :meth:`propagate` is an alias of :meth:`!pack_propagate`.
+      Giống như :meth:`Misc.pack_propagate`, xem widget này như một container: bật hoặc tắt việc truyền hình học.
+      :meth:`propagate` là bí danh của :meth:`!pack_propagate`.
 
    .. method:: slaves()
       :no-typesetting:
 
    .. method:: pack_slaves()
 
-      Same as :meth:`Misc.pack_slaves`: return the list of widgets packed in
-      this widget.
-      :meth:`slaves` is an alias of :meth:`!pack_slaves`.
+      Giống như :meth:`Misc.pack_slaves`: trả về danh sách các widget được pack trong widget này.
+      :meth:`slaves` là bí danh của :meth:`!pack_slaves`.
 
 
 .. class:: Place()
 
-   Geometry manager that places widgets at explicit positions and sizes within
-   their container.
-   The :class:`!Place` mix-in is inherited by all widgets (through
-   :class:`Widget`).
-   See also :ref:`tkinter-geometry-management`.
+   Trình quản lý hình học đặt các widget tại những vị trí và kích thước cụ thể bên trong vùng chứa của chúng. Mix-in :class:`!Place` được tất cả các widget kế thừa (thông qua
+   :class:`Widget`). Xem thêm :ref:`tkinter-geometry-management`.
 
    .. method:: configure(cnf={}, **kw)
       :no-typesetting:
@@ -2957,49 +1926,32 @@ Base and mixin classes
       :no-typesetting:
 
    .. method:: place_configure(cnf={}, **kw)
-               place(cnf={}, **kw)
+               place(cnf={}, ****kw)
 
-      Place the widget inside its container at an absolute or relative
-      position.
-      The supported options are:
+      Đặt widget bên trong vùng chứa của nó tại một vị trí tuyệt đối hoặc tương đối. Các tùy chọn được hỗ trợ là:
 
       *x*, *y*
-         The absolute horizontal and vertical position of the widget's anchor
-         point, as a screen distance (default ``0``).
+         Vị trí ngang và dọc tuyệt đối của điểm neo của widget, dưới dạng khoảng cách trên màn hình (mặc định ``0``).
 
       *relx*, *rely*
-         The horizontal and vertical position of the widget's anchor point as a
-         fraction of the container's width and height, where ``0.0`` is the
-         left or top edge and ``1.0`` is the right or bottom edge.
-         If both the absolute and the relative option are given, their values
-         are summed.
+         Vị trí ngang và dọc của điểm neo của widget dưới dạng phân số của chiều rộng và chiều cao của container, trong đó ``0.0`` là cạnh trái hoặc cạnh trên, còn ``1.0`` là cạnh phải hoặc cạnh dưới. Nếu cung cấp cả tùy chọn tuyệt đối và tương đối, các giá trị của chúng sẽ được cộng lại.
 
       *anchor*
-         Which point of the widget is placed at the given position: an anchor
-         such as ``'n'`` or ``'se'`` (default ``'nw'``).
+         Điểm nào của widget được đặt tại vị trí đã cho: một điểm neo như ``'n'`` hoặc ``'se'`` (mặc định ``'nw'``).
 
       *width*, *height*
-         The absolute width and height of the widget, as a screen distance.
-         By default the widget's requested size is used.
+         Chiều rộng và chiều cao tuyệt đối của widget, dưới dạng khoảng cách trên màn hình. Theo mặc định, kích thước được yêu cầu của widget sẽ được sử dụng.
 
       *relwidth*, *relheight*
-         The width and height of the widget as a fraction of the container's
-         width and height.
-         If both the absolute and the relative option are given, their values
-         are summed.
+         Chiều rộng và chiều cao của widget dưới dạng phần của chiều rộng và chiều cao của container. Nếu cung cấp cả tùy chọn tuyệt đối và tương đối, các giá trị của chúng sẽ được cộng lại.
 
       *bordermode*
-         How the container's border affects placement: ``'inside'`` (the
-         default) measures the area inside the border, ``'outside'`` measures
-         the area including the border, and ``'ignore'`` uses the official X
-         area.
+         Cách đường viền của container ảnh hưởng đến việc định vị: ``'inside'`` (mặc định) đo vùng bên trong đường viền, ``'outside'`` đo vùng bao gồm cả đường viền, và ``'ignore'`` sử dụng vùng X chính thức.
 
       *in_*
-         The container relative to which the widget is placed; it must be the
-         widget's parent or a descendant of the parent, and defaults to the
-         parent.
+         Container mà widget được đặt tương đối theo đó; nó phải là widget cha của widget hoặc một hậu duệ của widget cha, và mặc định là widget cha.
 
-      :meth:`place`, :meth:`configure` and :meth:`config` are aliases of
+      :meth:`place`, :meth:`configure` và :meth:`config` là bí danh của
       :meth:`!place_configure`.
 
    .. method:: forget()
@@ -3007,32 +1959,27 @@ Base and mixin classes
 
    .. method:: place_forget()
 
-      Unmap the widget and remove it from the placement, forgetting its place
-      options.
+      Hủy ánh xạ widget và loại bỏ nó khỏi bố trí, đồng thời quên các tùy chọn vị trí của nó.
 
    .. method:: info()
       :no-typesetting:
 
    .. method:: place_info()
 
-      Return a dictionary of the widget's current place options.
+      Trả về một dictionary chứa các tùy chọn bố trí hiện tại của widget.
 
    .. method:: slaves()
       :no-typesetting:
 
    .. method:: place_slaves()
 
-      Same as :meth:`Misc.place_slaves`: return the list of widgets placed in
-      this widget.
+      Giống như :meth:`Misc.place_slaves`: trả về danh sách các widget được đặt trong widget này.
 
 
 .. class:: Grid()
 
-   Geometry manager that arranges widgets in a two-dimensional grid of rows and
-   columns within their container.
-   The :class:`!Grid` mix-in is inherited by all widgets (through
-   :class:`Widget`).
-   See also :ref:`tkinter-geometry-management`.
+   Geometry manager sắp xếp các widget trong một lưới hai chiều gồm các hàng và cột bên trong container của chúng. Mix-in :class:`!Grid` được kế thừa bởi tất cả các widget (thông qua
+   :class:`Widget`). Xem thêm :ref:`tkinter-geometry-management`.
 
    .. method:: configure(cnf={}, **kw)
       :no-typesetting:
@@ -3041,47 +1988,33 @@ Base and mixin classes
       :no-typesetting:
 
    .. method:: grid_configure(cnf={}, **kw)
-               grid(cnf={}, **kw)
+               grid(cnf={}, ****kw)
 
-      Position the widget in a cell of its container's grid.
+      Đặt widget vào một ô trong lưới của container.
 
-      Not to be confused with :meth:`Wm.grid`.
+      Không được nhầm lẫn với :meth:`Wm.grid`.
 
-      The supported options are:
+      Các tùy chọn được hỗ trợ là:
 
       *row*, *column*
-         The row and column of the cell to place the widget in, counting from
-         ``0``.
-         *column* defaults to the column after the previous widget placed in
-         the same :meth:`!grid_configure` call (or ``0``), and *row* defaults
-         to the next empty row.
+         Hàng và cột của ô nơi đặt widget, được tính từ ``0``. *column* mặc định là cột ngay sau widget trước đó được đặt trong cùng một lệnh gọi :meth:`!grid_configure` (hoặc ``0``), còn *row* mặc định là hàng trống tiếp theo.
 
       *rowspan*, *columnspan*
-         The number of rows and columns the widget should span (default ``1``).
+         Số hàng và cột mà widget sẽ trải rộng (mặc định là ``1``).
 
       *sticky*
-         How to position or stretch the widget when its cell is larger than the
-         widget: a string containing zero or more of the characters ``'n'``,
-         ``'s'``, ``'e'`` and ``'w'``, naming the cell sides the widget sticks
-         to.
-         Specifying both ``'n'`` and ``'s'`` (or ``'e'`` and ``'w'``) stretches
-         the widget to fill the height (or width) of the cell.
-         The default is ``''``, which centers the widget at its requested size.
+         Cách định vị hoặc kéo giãn widget khi ô của nó lớn hơn widget: một chuỗi chứa không hoặc nhiều ký tự ``'n'``, ``'s'``, ``'e'`` và ``'w'``, chỉ định các cạnh của ô mà widget bám vào. Việc chỉ định cả ``'n'`` và ``'s'`` (hoặc ``'e'`` và ``'w'``) sẽ kéo giãn widget để lấp đầy chiều cao (hoặc chiều rộng) của ô. Mặc định là ``''``, căn giữa widget ở kích thước được yêu cầu.
 
       *ipadx*, *ipady*
-         Internal padding added on the left and right (*ipadx*) or top and
-         bottom (*ipady*) of the widget, as a screen distance (default ``0``).
+         Khoảng đệm bên trong được thêm vào bên trái và bên phải (*ipadx*) hoặc bên trên và bên dưới (*ipady*) của widget, tính theo khoảng cách trên màn hình (mặc định là ``0``).
 
       *padx*, *pady*
-         External padding left on the left and right (*padx*) or top and bottom
-         (*pady*) of the widget, as a screen distance or a pair of two
-         distances for the two sides (default ``0``).
+         Khoảng đệm bên ngoài ở bên trái và bên phải (*padx*) hoặc bên trên và bên dưới (*pady*) của widget, tính theo khoảng cách trên màn hình hoặc một cặp gồm hai khoảng cách cho hai phía (mặc định là ``0``).
 
       *in_*
-         The container in whose grid to place the widget; it defaults to the
-         parent widget.
+         Container có grid mà widget sẽ được đặt vào; mặc định là widget cha.
 
-      :meth:`grid`, :meth:`configure` and :meth:`config` are aliases of
+      :meth:`grid`, :meth:`configure` và :meth:`config` là các bí danh của
       :meth:`!grid_configure`.
 
    .. method:: forget()
@@ -3089,70 +2022,60 @@ Base and mixin classes
 
    .. method:: grid_forget()
 
-      Unmap the widget and remove it from the grid, forgetting its grid
-      options.
+      Bỏ ánh xạ widget và xóa widget khỏi grid, đồng thời quên các tùy chọn grid của widget.
 
    .. method:: grid_remove()
 
-      Unmap the widget and remove it from the grid, but remember its grid
-      options so that it is restored to the same cell if it is gridded again.
+      Gỡ widget khỏi grid và xóa nó khỏi grid, nhưng hãy nhớ các tùy chọn grid để widget được khôi phục vào cùng một ô nếu được thêm lại vào grid.
 
    .. method:: info()
       :no-typesetting:
 
    .. method:: grid_info()
 
-      Return a dictionary of the widget's current grid options.
+      Trả về một dictionary chứa các tùy chọn grid hiện tại của widget.
 
    .. method:: bbox(column=None, row=None, col2=None, row2=None)
       :no-typesetting:
 
    .. method:: grid_bbox(column=None, row=None, col2=None, row2=None)
 
-      Same as :meth:`Misc.grid_bbox`.
-      :meth:`bbox` is an alias of :meth:`!grid_bbox`,
-      except on :class:`Canvas`, :class:`Listbox`, :class:`Spinbox`,
-      :class:`Text`, :class:`ttk.Entry <tkinter.ttk.Entry>` and
-      :class:`ttk.Treeview <tkinter.ttk.Treeview>`,
-      which provide their own :meth:`!bbox` method.
+      Giống như :meth:`Misc.grid_bbox`.
+      :meth:`bbox` là bí danh của :meth:`!grid_bbox`, ngoại trừ trên :class:`Canvas`, :class:`Listbox`, :class:`Spinbox`,
+      :class:`Text`, :class:`ttk.Entry <tkinter.ttk.Entry>` và
+      :class:`ttk.Treeview <tkinter.ttk.Treeview>`, vốn cung cấp phương thức :meth:`!bbox` của riêng mình.
 
    .. method:: columnconfigure(index, cnf={}, **kw)
       :no-typesetting:
 
    .. method:: grid_columnconfigure(index, cnf={}, **kw)
 
-      Same as :meth:`Misc.grid_columnconfigure`: query or set the options (such
-      as *weight*, *minsize*, *pad* and *uniform*) of a grid column.
-      :meth:`columnconfigure` is an alias of :meth:`!grid_columnconfigure`.
+      Giống như :meth:`Misc.grid_columnconfigure`: truy vấn hoặc thiết lập các tùy chọn (chẳng hạn như *weight*, *minsize*, *pad* và *uniform*) của một cột grid.
+      :meth:`columnconfigure` là bí danh của :meth:`!grid_columnconfigure`.
 
    .. method:: rowconfigure(index, cnf={}, **kw)
       :no-typesetting:
 
    .. method:: grid_rowconfigure(index, cnf={}, **kw)
 
-      Same as :meth:`Misc.grid_rowconfigure`: query or set the options of a
-      grid row.
-      :meth:`rowconfigure` is an alias of :meth:`!grid_rowconfigure`.
+      Giống như :meth:`Misc.grid_rowconfigure`: truy vấn hoặc thiết lập các tùy chọn của một hàng grid.
+      :meth:`rowconfigure` là bí danh của :meth:`!grid_rowconfigure`.
 
    .. method:: location(x, y)
       :no-typesetting:
 
    .. method:: grid_location(x, y)
 
-      Same as :meth:`Misc.grid_location`: return the ``(column, row)`` of the
-      cell that covers the pixel at *x*, *y*.
-      :meth:`location` is an alias of :meth:`!grid_location`.
+      Giống như :meth:`Misc.grid_location`: trả về ``(column, row)`` của ô bao phủ pixel tại *x*, *y*.
+      :meth:`location` là bí danh của :meth:`!grid_location`.
 
    .. method:: size()
       :no-typesetting:
 
    .. method:: grid_size()
 
-      Same as :meth:`Misc.grid_size`: return a ``(columns, rows)`` tuple giving
-      the size of the grid.
-      :meth:`size` is an alias of :meth:`!grid_size`,
-      except on the :class:`Listbox` widget,
-      which provides its own :meth:`!size` method.
+      Giống như :meth:`Misc.grid_size`: trả về một tuple ``(columns, rows)`` cho biết kích thước của grid.
+      :meth:`size` là bí danh của :meth:`!grid_size`, ngoại trừ trên widget :class:`Listbox`, widget này cung cấp phương thức :meth:`!size` riêng.
 
    .. method:: propagate()
                propagate(flag)
@@ -3161,697 +2084,436 @@ Base and mixin classes
    .. method:: grid_propagate()
                grid_propagate(flag)
 
-      Same as :meth:`Misc.grid_propagate`.
+      Tương tự như :meth:`Misc.grid_propagate`.
 
    .. method:: slaves(row=None, column=None)
       :no-typesetting:
 
    .. method:: grid_slaves(row=None, column=None)
 
-      Same as :meth:`Misc.grid_slaves`: return the widgets managed in the grid,
-      optionally restricted to a *row* and/or *column*.
+      Tương tự như :meth:`Misc.grid_slaves`: trả về các widget được quản lý trong lưới, tùy chọn giới hạn ở một *hàng* và/hoặc *cột*.
 
 
 .. class:: XView()
 
-   Mix-in providing the horizontal-scrolling interface shared by widgets such
-   as :class:`Entry`, :class:`Canvas`, :class:`Listbox`, :class:`Text` and
-   :class:`Spinbox`.
-   A widget's :meth:`xview` method is registered as the *command* of a
-   horizontal :class:`Scrollbar`.
+   Mixin cung cấp giao diện cuộn ngang được dùng chung bởi các widget như :class:`Entry`, :class:`Canvas`, :class:`Listbox`, :class:`Text` và
+   :class:`Spinbox`. Phương thức :meth:`xview` của một widget được đăng ký làm *lệnh* của một :class:`Scrollbar` ngang.
 
    .. method:: xview(*args)
 
-      Query or change the horizontal position of the view.
-      With no arguments, return a tuple ``(first, last)`` of two fractions
-      between 0 and 1 giving the portion of the document that is currently
-      visible.
-      Otherwise the arguments are passed to the Tk ``xview`` widget command and
-      are usually generated by a scrollbar; :meth:`xview_moveto` and
-      :meth:`xview_scroll` provide a more convenient interface.
+      Truy vấn hoặc thay đổi vị trí ngang của chế độ xem. Khi không có đối số, trả về một tuple ``(first, last)`` gồm hai phân số từ 0 đến 1, cho biết phần tài liệu hiện đang hiển thị. Nếu không, các đối số sẽ được truyền cho lệnh widget Tk ``xview`` và thường được tạo bởi một thanh cuộn; :meth:`xview_moveto` và
+      :meth:`xview_scroll` cung cấp một giao diện thuận tiện hơn.
 
    .. method:: xview_moveto(fraction)
 
-      Adjust the view so that *fraction* of the total width of the document is
-      off-screen to the left.
-      *fraction* is a number between 0 and 1.
+      Điều chỉnh chế độ xem để *fraction* của tổng chiều rộng tài liệu nằm ngoài màn hình về bên trái. *fraction* là một số nằm trong khoảng từ 0 đến 1.
 
    .. method:: xview_scroll(number, what)
 
-      Shift the view left or right by *number* units.
-      *what* is either ``'units'`` or ``'pages'``; a negative *number* scrolls
-      left and a positive one scrolls right.
+      Dịch chế độ xem sang trái hoặc phải *number* đơn vị. *what* là ``'units'`` hoặc ``'pages'``; *number* âm sẽ cuộn sang trái, còn số dương sẽ cuộn sang phải.
 
 
 .. class:: YView()
 
-   Mix-in providing the vertical-scrolling interface shared by widgets such as
-   :class:`Canvas`, :class:`Listbox` and :class:`Text`.
-   A widget's :meth:`yview` method is registered as the *command* of a vertical
+   Mixin cung cấp giao diện cuộn dọc được dùng chung bởi các widget như
+   :class:`Canvas`, :class:`Listbox` và :class:`Text`. Phương thức :meth:`yview` của widget được đăng ký làm *command* của một cuộn dọc
    :class:`Scrollbar`.
 
    .. method:: yview(*args)
 
-      Query or change the vertical position of the view.
-      With no arguments, return a tuple ``(first, last)`` of two fractions
-      between 0 and 1 giving the portion of the document that is currently
-      visible.
-      Otherwise the arguments are passed to the Tk ``yview`` widget command,
-      usually generated by a scrollbar; :meth:`yview_moveto` and
-      :meth:`yview_scroll` provide a more convenient interface.
+      Truy vấn hoặc thay đổi vị trí dọc của chế độ xem. Khi không có đối số, trả về một tuple ``(first, last)`` gồm hai phân số từ 0 đến 1 biểu thị phần tài liệu hiện đang hiển thị. Nếu không, các đối số được truyền cho lệnh widget Tk ``yview``, thường được tạo bởi một thanh cuộn; :meth:`yview_moveto` và
+      :meth:`yview_scroll` cung cấp một giao diện thuận tiện hơn.
 
    .. method:: yview_moveto(fraction)
 
-      Adjust the view so that *fraction* of the total height of the document is
-      off-screen above the top.
-      *fraction* is a number between 0 and 1.
+      Điều chỉnh chế độ xem sao cho *fraction* tổng chiều cao của tài liệu nằm ngoài màn hình, phía trên cạnh trên. *fraction* là một số nằm trong khoảng từ 0 đến 1.
 
    .. method:: yview_scroll(number, what)
 
-      Shift the view up or down by *number* units.
-      *what* is either ``'units'`` or ``'pages'``; a negative *number* scrolls
-      up and a positive one scrolls down.
+      Dịch chế độ xem lên hoặc xuống *number* đơn vị. *what* là ``'units'`` hoặc ``'pages'``; *number* âm sẽ cuộn lên, còn số dương sẽ cuộn xuống.
 
 
 .. class:: BaseWidget(master, widgetName, cnf={}, kw={}, extra=())
 
-   Internal base class for all widgets.
-   It inherits from :class:`Misc` and adds the machinery that creates the
-   underlying Tk widget; application code normally uses :class:`Widget` or a
-   concrete widget class rather than instantiating :class:`!BaseWidget`
-   directly.
+   Lớp cơ sở nội bộ cho tất cả widget. Lớp này kế thừa từ :class:`Misc` và bổ sung cơ chế tạo widget Tk bên dưới; mã ứng dụng thường sử dụng :class:`Widget` hoặc một lớp widget cụ thể thay vì khởi tạo trực tiếp :class:`!BaseWidget`.
 
    .. method:: destroy()
 
-      Destroy this widget and all of its children, removing the corresponding
-      Tk widgets and deleting the associated Tcl commands.
+      Hủy widget này và tất cả các widget con của nó, xóa các widget Tk tương ứng và xóa các lệnh Tcl liên quan.
 
 
 .. class:: Widget(master, widgetName, cnf={}, kw={}, extra=())
 
-   Internal base class for the standard widgets.
-   It combines :class:`BaseWidget` with the geometry-manager mix-ins
-   :class:`Pack`, :class:`Place` and :class:`Grid`, so that every widget can be
-   managed by any of the three geometry managers.
-   The concrete widget classes (:class:`Button`, :class:`Label`, and so on)
-   derive from :class:`!Widget`.
+   Lớp cơ sở nội bộ cho các widget tiêu chuẩn. Lớp này kết hợp :class:`BaseWidget` với các mix-in của trình quản lý hình học
+   :class:`Pack`, :class:`Place` và :class:`Grid`, để mọi widget đều có thể được quản lý bởi bất kỳ trình quản lý hình học nào trong ba trình quản lý. Các lớp widget cụ thể (:class:`Button`, :class:`Label`, v.v.) kế thừa từ :class:`!Widget`.
 
 
-Toplevel widgets
-^^^^^^^^^^^^^^^^
+Widget cấp cao nhất
+^^^^^^^^^^^^^^^^^^^
 
 .. class:: Tk(screenName=None, baseName=None, className='Tk', useTk=True, sync=False, use=None)
 
-   Construct a toplevel Tk widget, which is usually the main window of an
-   application, and initialize a Tcl interpreter for this widget.  Each
-   instance has its own associated Tcl interpreter.
-   Inherits from :class:`Misc` and :class:`Wm`.
+   Tạo một widget Tk toplevel, thường là cửa sổ chính của một ứng dụng, và khởi tạo một trình thông dịch Tcl cho widget này. Mỗi instance có một trình thông dịch Tcl liên kết riêng. Kế thừa từ :class:`Misc` và :class:`Wm`.
 
-   To create a Tcl interpreter without initializing the Tk subsystem, use the
-   :func:`Tcl` factory function instead.
+   Để tạo một trình thông dịch Tcl mà không khởi tạo hệ thống con Tk, hãy sử dụng
+   hàm factory :func:`Tcl` thay thế.
 
-   The :class:`Tk` class is typically instantiated using all default values.
-   However, the following keyword arguments are currently recognized:
+   Lớp :class:`Tk` thường được khởi tạo bằng tất cả các giá trị mặc định. Tuy nhiên, các đối số keyword sau hiện được nhận diện:
 
    *screenName*
-      When given (as a string), sets the :envvar:`DISPLAY` environment
-      variable. (X11 only)
+      Khi được cung cấp (dưới dạng chuỗi), đối số này sẽ đặt biến môi trường :envvar:`DISPLAY`. (Chỉ X11)
    *baseName*
-      Name of the profile file.  By default, *baseName* is derived from the
-      program name (``sys.argv[0]``).
+      Tên của tệp profile. Theo mặc định, *baseName* được suy ra từ tên chương trình (``sys.argv[0]``).
    *className*
-      Name of the widget class.  Used as a profile file and also as the name
-      with which Tcl is invoked (*argv0* in *interp*).
+      Tên của lớp widget. Được dùng làm tệp profile và cũng làm tên mà Tcl được gọi bằng tên đó (*argv0* trong *interp*).
    *useTk*
-      If ``True``, initialize the Tk subsystem.  The :func:`tkinter.Tcl() <Tcl>`
-      function sets this to ``False``.
+      Nếu ``True``, khởi tạo hệ thống Tk. Hàm :func:`tkinter.Tcl() <Tcl>` đặt giá trị này thành ``False``.
    *sync*
-      If ``True``, execute all X server commands synchronously, so that errors
-      are reported immediately.  Can be used for debugging. (X11 only)
+      Nếu ``True``, thực thi đồng bộ tất cả lệnh của X server để các lỗi được báo cáo ngay lập tức. Có thể dùng để debug. (Chỉ X11)
    *use*
-      Specifies the *id* of the window in which to embed the application,
-      instead of it being created as an independent toplevel window. *id* must
-      be specified in the same way as the value for the -use option for
-      toplevel widgets (that is, it has a form like that returned by
+      Chỉ định *id* của cửa sổ mà ứng dụng sẽ được nhúng vào, thay vì được tạo dưới dạng cửa sổ toplevel độc lập. *id* phải được chỉ định theo cùng cách với giá trị cho tùy chọn -use đối với các widget toplevel (nghĩa là có dạng giống như giá trị được trả về bởi
       :meth:`~Misc.winfo_id`).
 
-      Note that on some platforms this will only work correctly if *id* refers
-      to a Tk frame or toplevel that has its -container option enabled.
+      Lưu ý rằng trên một số nền tảng, tùy chọn này chỉ hoạt động chính xác nếu *id* tham chiếu đến một frame hoặc toplevel của Tk đã bật tùy chọn -container.
 
-   :class:`Tk` reads and interprets profile files, named
-   :file:`.{className}.tcl` and :file:`.{baseName}.tcl`, into the Tcl
-   interpreter and calls :func:`exec` on the contents of
-   :file:`.{className}.py` and :file:`.{baseName}.py`.  The path for the
-   profile files is the :envvar:`HOME` environment variable or, if that
-   isn't defined, then :data:`os.curdir`.
+   :class:`Tk` đọc và diễn giải các tệp profile, có tên là
+   :file:`.{className}.tcl` và :file:`.{baseName}.tcl`, vào trình thông dịch Tcl rồi gọi :func:`exec` trên nội dung của
+   :file:`.{className}.py` và :file:`.{baseName}.py`. Đường dẫn đến các tệp profile là biến môi trường :envvar:`HOME` hoặc, nếu biến đó chưa được định nghĩa, thì là :data:`os.curdir`.
 
    .. note::
 
-      On Windows, creating a Tcl interpreter (by instantiating :class:`Tk` or
-      calling :func:`Tcl`) sets the :envvar:`HOME` environment variable for
-      the process, if it is not already set, to ``%HOMEDRIVE%%HOMEPATH%`` (or
-      :envvar:`USERPROFILE`, or ``c:\``).  This is done by Tcl and can affect
-      other code that reads :envvar:`HOME`.
+      Trên Windows, việc tạo một trình thông dịch Tcl (bằng cách khởi tạo :class:`Tk` hoặc gọi :func:`Tcl`) sẽ đặt biến môi trường :envvar:`HOME` cho tiến trình, nếu biến này chưa được đặt, thành ``%HOMEDRIVE%%HOMEPATH%`` (hoặc
+      :envvar:`USERPROFILE`, hoặc ``c:\``). Việc này được Tcl thực hiện và có thể ảnh hưởng đến mã khác đọc :envvar:`HOME`.
 
    .. attribute:: tk
 
-      The Tk application object created by instantiating :class:`Tk`.  This
-      provides access to the Tcl interpreter.  Each widget that is attached
-      the same instance of :class:`Tk` has the same value for its :attr:`tk`
-      attribute.
+      Đối tượng ứng dụng Tk được tạo bằng cách khởi tạo :class:`Tk`. Đối tượng này cung cấp quyền truy cập vào trình thông dịch Tcl. Mỗi widget được gắn vào cùng một thực thể :class:`Tk` sẽ có cùng giá trị cho thuộc tính :attr:`tk` của nó.
 
    .. attribute:: master
 
-      The widget object that contains this widget.
-      For :class:`Tk`, the :attr:`!master` is :const:`None` because it is the
-      main window.
-      The terms *master* and *parent* are similar and sometimes used
-      interchangeably as argument names; however, calling
-      :meth:`~Misc.winfo_parent` returns a string of the widget name whereas
-      :attr:`!master` returns the object.
-      *parent*/*child* reflects the tree-like relationship while *master* (or
-      *container*)/*content* reflects the container structure.
+      Đối tượng widget chứa widget này. Đối với :class:`Tk`, :attr:`!master` là :const:`None` vì đây là cửa sổ chính. Các thuật ngữ *master* và *parent* tương tự nhau và đôi khi được dùng thay thế cho nhau làm tên đối số; tuy nhiên, việc gọi
+      :meth:`~Misc.winfo_parent` trả về một chuỗi chứa tên widget, còn
+      :attr:`!master` trả về đối tượng. *parent*/*child* thể hiện mối quan hệ dạng cây, trong khi *master* (hoặc *container*)/*content* thể hiện cấu trúc container.
 
    .. attribute:: children
 
-      The immediate descendants of this widget as a :class:`dict` with the
-      child widget names as the keys and the child instance objects as the
-      values.
+      Các widget con trực tiếp của widget này dưới dạng một :class:`dict`, trong đó tên widget con là các khóa và các đối tượng instance của widget con là các giá trị.
 
    .. method:: destroy()
 
-      Destroy this and all descendant widgets and, for the main window, end the
-      connection to the underlying Tcl interpreter.
+      Hủy widget này cùng tất cả widget con cháu và, đối với cửa sổ chính, kết thúc kết nối với trình thông dịch Tcl bên dưới.
 
    .. method:: loadtk()
 
-      Finish loading and initializing the Tk subsystem.
-      This is needed only when the interpreter was created without Tk (for
-      example through :func:`Tcl`); it is called automatically when *useTk* is
-      true.
+      Hoàn tất việc tải và khởi tạo hệ thống con Tk. Điều này chỉ cần thiết khi interpreter được tạo mà không có Tk (ví dụ thông qua :func:`Tcl`); nó được gọi tự động khi *useTk* là true.
 
    .. method:: readprofile(baseName, className)
 
-      Read and source the user's profile files :file:`.{className}.tcl` and
-      :file:`.{baseName}.tcl` into the Tcl interpreter, and execute the
-      corresponding :file:`.{className}.py` and :file:`.{baseName}.py` files.
-      This is called during initialization; see the description of the
-      constructor above.
+      Đọc và nạp các tệp profile của người dùng :file:`.{className}.tcl` và
+      :file:`.{baseName}.tcl` vào Tcl interpreter, đồng thời thực thi các tệp :file:`.{className}.py` và :file:`.{baseName}.py` tương ứng. Việc này được thực hiện trong quá trình khởi tạo; xem phần mô tả về constructor ở trên.
 
    .. method:: report_callback_exception(exc, val, tb)
 
-      Report a callback exception.
-      This is called when an exception propagates out of a Tkinter callback;
-      *exc*, *val* and *tb* are the exception type, value and traceback as
-      returned by :func:`sys.exc_info`.
-      The default implementation prints a traceback to :data:`sys.stderr`.
-      It can be overridden to customize error handling, for example to display
-      the traceback in a dialog.
+      Báo cáo ngoại lệ callback. Phương thức này được gọi khi một ngoại lệ thoát ra khỏi callback Tkinter; *exc*, *val* và *tb* lần lượt là kiểu, giá trị và traceback của ngoại lệ do :func:`sys.exc_info` trả về. Cách triển khai mặc định sẽ in traceback vào :data:`sys.stderr`. Có thể ghi đè phương thức này để tùy chỉnh việc xử lý lỗi, chẳng hạn như hiển thị traceback trong một hộp thoại.
 
 
 .. class:: Toplevel(master=None, cnf={}, **kw)
 
-   A :class:`!Toplevel` widget is a top-level window, similar to a
-   :class:`Frame` except that its X parent is the root window of a screen
-   rather than its logical parent.
-   Its primary purpose is to serve as a container for dialog boxes and other
-   collections of widgets; its only visible features are its background and an
-   optional 3-D border.
-   Notable options include *menu*, which installs a :class:`Menu` as the
-   window's menubar.
-   Inherits from :class:`BaseWidget` and :class:`Wm`, so a toplevel is managed
-   by the window manager.
-   Refer to the Tk ``toplevel`` manual page for the full list of options.
+   Một widget :class:`!Toplevel` là một cửa sổ cấp cao nhất, tương tự như một
+   :class:`Frame`, ngoại trừ việc X parent của nó là cửa sổ gốc của một màn hình thay vì logical parent của nó. Mục đích chính của nó là làm vùng chứa cho các hộp thoại và những tập hợp widget khác; các đặc điểm duy nhất có thể nhìn thấy là nền và một đường viền 3-D tùy chọn. Các tùy chọn đáng chú ý gồm *menu*, tùy chọn này cài đặt một :class:`Menu` làm menubar của cửa sổ. Nó kế thừa từ :class:`BaseWidget` và :class:`Wm`, vì vậy một toplevel được window manager quản lý. Hãy tham khảo trang hướng dẫn Tk ``toplevel`` để xem danh sách đầy đủ các tùy chọn.
 
 
-Widget classes
+Các lớp widget
 ^^^^^^^^^^^^^^
 
 .. class:: Button(master=None, cnf={}, **kw)
 
-   A :class:`!Button` widget displays a textual string, bitmap or image and
-   invokes a command when the user presses it (by clicking mouse button 1 over
-   the button or, when the button has focus, by pressing the space key).
-   Inherits from :class:`Widget`.
-   In addition to the standard widget options, a button accepts the options
-   documented in the Tk ``button`` manual page, such as *command* (the callback
-   invoked when the button is pressed), *textvariable*, *state* and *default*.
+   Một widget :class:`!Button` hiển thị chuỗi văn bản, bitmap hoặc hình ảnh và gọi một command khi người dùng nhấn vào nó (bằng cách nhấp nút chuột 1 trên nút hoặc, khi nút được focus, bằng cách nhấn phím cách). Kế thừa từ :class:`Widget`. Ngoài các tùy chọn widget tiêu chuẩn, một button chấp nhận các tùy chọn được mô tả trong trang hướng dẫn Tk ``button``, chẳng hạn như *command* (callback được gọi khi button được nhấn), *textvariable*, *state* và *default*.
 
    .. method:: invoke()
 
-      Invoke the command associated with the button, if there is one, and
-      return its result, or an empty string if no command is associated with
-      the button.
-      This is ignored if the button's state is ``disabled``.
+      Gọi command liên kết với button, nếu có, và trả về kết quả của command đó hoặc một chuỗi rỗng nếu button không có command liên kết. Thao tác này bị bỏ qua nếu trạng thái của button là ``disabled``.
 
    .. method:: flash()
 
-      Flash the button by redisplaying it several times, alternating between
-      the active and normal colors.
-      At the end of the flash the button is left in the same normal or active
-      state as when the method was called.
-      This is ignored if the button's state is ``disabled``.
+      Làm button nhấp nháy bằng cách hiển thị lại nó nhiều lần, xen kẽ giữa các màu active và normal. Khi kết thúc hiệu ứng nhấp nháy, button được giữ ở cùng trạng thái normal hoặc active như khi phương thức được gọi. Thao tác này bị bỏ qua nếu trạng thái của button là ``disabled``.
 
 
 .. class:: Canvas(master=None, cnf={}, **kw)
 
-   A :class:`!Canvas` widget implements structured graphics.
-   It displays any number of *items*, such as arcs, lines, ovals, polygons,
-   rectangles, text, bitmaps, images and embedded windows, which may be drawn,
-   moved, re-colored and bound to events.
-   Inherits from :class:`Widget`, :class:`XView` and :class:`YView`, so the
-   view can be scrolled horizontally and vertically with :meth:`~XView.xview`
-   and :meth:`~YView.yview`.
-   Refer to the Tk ``canvas`` manual page for the full list of widget and item
-   options.
+   Một widget :class:`!Canvas` triển khai đồ họa có cấu trúc. Widget này hiển thị任 ý số lượng *items*, chẳng hạn như cung tròn, đường thẳng, hình oval, đa giác, hình chữ nhật, văn bản, bitmap, hình ảnh và cửa sổ được nhúng; các item này có thể được vẽ, di chuyển, đổi màu và liên kết với các event. Kế thừa từ :class:`Widget`, :class:`XView` và :class:`YView`, vì vậy chế độ xem có thể được cuộn theo chiều ngang và chiều dọc bằng :meth:`~XView.xview` và :meth:`~YView.yview`. Tham khảo trang hướng dẫn Tk ``canvas`` để xem danh sách đầy đủ các tùy chọn của widget và item.
 
-   Each item has a unique integer *id*, assigned when it is created, and zero
-   or more string *tags*.
-   A tag is an arbitrary string that does not have the form of an integer; the
-   same tag may be shared by many items, which makes tags convenient for
-   grouping items.
-   The special tag ``'all'`` matches every item in the canvas, and
-   ``'current'`` matches the topmost item under the mouse pointer.
-   Most methods take a *tagOrId* argument that may be an integer id naming a
-   single item, or a tag naming zero or more items; as described in the Tk
-   ``canvas`` manual page, a tag may also be a logical expression of tags
-   combined with the operators ``&&``, ``||``, ``^``, ``!`` and parentheses.
-   When a method that operates on a single item is given a *tagOrId* matching
-   several items, it normally uses the lowest matching item in the display
-   list.
+   Mỗi item có một *id* số nguyên duy nhất, được gán khi item được tạo, và không hoặc nhiều *tags* dạng chuỗi. Tag là một chuỗi tùy ý không có dạng số nguyên; cùng một tag có thể được nhiều item dùng chung, nhờ đó tag thuận tiện cho việc nhóm các item. Tag đặc biệt ``'all'`` khớp với mọi item trên canvas, còn ``'current'`` khớp với item ở trên cùng bên dưới con trỏ chuột. Hầu hết các phương thức nhận một đối số *tagOrId*, có thể là id số nguyên chỉ định một item duy nhất hoặc tag chỉ định không hoặc nhiều item; như được mô tả trong trang hướng dẫn Tk ``canvas``, tag cũng có thể là một biểu thức logic gồm các tag kết hợp bằng các toán tử ``&&``, ``||``, ``^``, ``!`` và dấu ngoặc đơn. Khi một phương thức hoạt động trên một item duy nhất nhận *tagOrId* khớp với nhiều item, phương thức thường sử dụng item khớp có vị trí thấp nhất trong danh sách hiển thị.
 
-   The items are kept in a *display list* that determines drawing order: items
-   later in the list are drawn on top of earlier ones.
-   A newly created item is placed at the top of the list; the order can be
-   changed with :meth:`tag_raise` and :meth:`tag_lower`.
+   Các item được lưu trong một *display list* xác định thứ tự vẽ: các item xuất hiện sau trong danh sách được vẽ chồng lên các item xuất hiện trước. Item mới được tạo sẽ được đặt ở đầu danh sách; thứ tự có thể được thay đổi bằng :meth:`tag_raise` và :meth:`tag_lower`.
 
    .. method:: create_arc(*args, **kw)
-               create_bitmap(*args, **kw)
-               create_image(*args, **kw)
-               create_line(*args, **kw)
-               create_oval(*args, **kw)
-               create_polygon(*args, **kw)
-               create_rectangle(*args, **kw)
-               create_text(*args, **kw)
-               create_window(*args, **kw)
+               create_bitmap(*args, **kw) create_image(*args, ****kw) create_line(*args, **kw) create_oval(*args, ****kw) create_polygon(*args, **kw) create_rectangle(*args, ****kw) create_text(*args, **kw) create_window(*args, ****kw)
 
-      Create a new item of the corresponding type and return its integer id.
-      Each method is called as ``create_TYPE(coord..., **options)``: the
-      leading positional arguments give the coordinates that define the item
-      (as separate numbers, as a single sequence of numbers, or as coordinate
-      pairs), and the keyword arguments set item-specific options.
-      Coordinates and screen distances may be given as numbers (interpreted as
-      pixels) or as strings with a unit suffix (``'m'``, ``'c'``, ``'i'`` or
-      ``'p'`` for millimetres, centimetres, inches or printer's points), but
-      are always stored and returned in pixels.
+      Tạo một item mới thuộc kiểu tương ứng và trả về id dạng số nguyên của item đó. Mỗi phương thức được gọi như ``create_TYPE(coord..., **options)``: các đối số vị trí đứng đầu cung cấp tọa độ xác định item (dưới dạng các số riêng biệt, một chuỗi số duy nhất hoặc các cặp tọa độ), còn các đối số keyword thiết lập những tùy chọn riêng của item. Tọa độ và khoảng cách trên màn hình có thể được cung cấp dưới dạng số (được hiểu là pixel) hoặc chuỗi có hậu tố đơn vị (``'m'``, ``'c'``, ``'i'`` hoặc ``'p'`` tương ứng với millimet, centimet, inch hoặc point của máy in), nhưng luôn được lưu trữ và trả về theo pixel.
 
-      The item types are: ``arc`` (an arc-shaped region that is a section of an
-      oval, defined by two diagonally opposite corners ``x1, y1, x2, y2`` of
-      the enclosing rectangle); ``bitmap`` (a two-color bitmap positioned at a
-      point ``x, y``); ``image`` (a Tk image positioned at a point ``x, y``);
-      ``line`` (a line or curve through the points ``x1, y1, ..., xn, yn``);
-      ``oval`` (a circle or ellipse inscribed in the rectangle
-      ``x1, y1, x2, y2``); ``polygon`` (a closed polygon through the points
-      ``x1, y1, ..., xn, yn``); ``rectangle`` (a rectangle with corners
-      ``x1, y1, x2, y2``); ``text`` (a string of text positioned at a point
-      ``x, y``); and ``window`` (a child widget embedded in the canvas at a
-      point ``x, y``, specified with the *window* option).
+      Các kiểu item gồm: ``arc`` (một vùng hình cung là một phần của hình oval, được xác định bởi hai góc đối diện theo đường chéo ``x1, y1, x2, y2`` của hình chữ nhật bao quanh); ``bitmap`` (một bitmap hai màu được đặt tại một điểm ``x, y``); ``image`` (một ảnh Tk được đặt tại một điểm ``x, y``); ``line`` (một đường thẳng hoặc đường cong đi qua các điểm ``x1, y1, ..., xn, yn``); ``oval`` (một hình tròn hoặc hình ellipse nội tiếp trong hình chữ nhật ``x1, y1, x2, y2``); ``polygon`` (một đa giác đóng đi qua các điểm ``x1, y1, ..., xn, yn``); ``rectangle`` (một hình chữ nhật có các góc ``x1, y1, x2, y2``); ``text`` (một chuỗi văn bản được đặt tại một điểm ``x, y``); và ``window`` (một widget con được nhúng vào canvas tại một điểm ``x, y``, được chỉ định bằng tùy chọn *window*).
 
-      Most item types accept a common set of *standard item options*, plus a
-      few options specific to each type.
-      Option names are passed as keyword arguments, without the leading
-      hyphen.
+      Hầu hết các kiểu item đều chấp nhận một tập hợp *standard item options* dùng chung, cùng với một vài tùy chọn riêng cho từng kiểu. Tên tùy chọn được truyền dưới dạng các đối số keyword, không có dấu gạch nối ở đầu.
 
-      The standard item options are:
+      Các tùy chọn item tiêu chuẩn gồm:
 
       *fill*
-         The color used to fill the item's interior, or to draw a *line*
-         item or the characters of a *text* item.
-         An empty string (the default for all types except *line* and *text*)
-         leaves the item unfilled.
+         Màu dùng để tô phần bên trong của item hoặc để vẽ item *line* hay các ký tự của item *text*. Chuỗi rỗng (mặc định cho mọi kiểu, ngoại trừ *line* và *text*) khiến item không được tô.
 
       *outline*
-         The color used to draw the item's outline.
-         An empty string draws no outline.
+         Màu được sử dụng để vẽ đường viền của mục. Chuỗi rỗng sẽ không vẽ đường viền.
 
       *width*
-         The width of the outline, defaulting to ``1.0``.
-         Has no effect if *outline* is empty.
+         Độ rộng của đường viền, mặc định là ``1.0``. Không có tác dụng nếu *outline* là chuỗi rỗng.
 
       *dash*
-         A dash pattern for the outline, given either as a sequence of
-         segment lengths in pixels or as a string of the characters
-         ``'.'``, ``','``, ``'-'``, ``'_'`` and space.
-         An empty pattern (the default) draws a solid outline.
+         Mẫu nét đứt cho đường viền, được cung cấp dưới dạng một chuỗi độ dài các đoạn tính bằng pixel hoặc một chuỗi gồm các ký tự ``'.'``, ``','``, ``'-'``, ``'_'`` và dấu cách. Mẫu rỗng (mặc định) sẽ vẽ đường viền liền.
 
       *dashoffset*
-         The starting offset in pixels into the *dash* pattern.
-         Ignored if there is no *dash* pattern.
+         Độ lệch ban đầu tính bằng pixel trong mẫu *dash*. Bị bỏ qua nếu không có mẫu *dash*.
 
       *stipple*
-         A bitmap used as a stipple pattern when filling the item.
-         Only well supported on X11.
+         Một bitmap được dùng làm mẫu stipple khi tô mục. Chỉ được hỗ trợ tốt trên X11.
 
       *outlinestipple*
-         A bitmap used as a stipple pattern when drawing the outline.
-         Has no effect if *outline* is empty.
+         Một bitmap được dùng làm mẫu stipple khi vẽ đường viền. Không có tác dụng nếu *outline* trống.
 
       *offset*, *outlineoffset*
-         The offset of the fill and outline stipple patterns, given as
-         ``'x,y'`` or as a side such as ``'n'``, ``'se'`` or ``'center'``.
-         Stipple offsets are only supported on X11.
+         Độ lệch của các mẫu stipple tô và đường viền, được chỉ định dưới dạng ``'x,y'`` hoặc một cạnh như ``'n'``, ``'se'`` hoặc ``'center'``. Độ lệch stipple chỉ được hỗ trợ trên X11.
 
       *state*
-         Overrides the canvas state for this item; one of ``'normal'``,
-         ``'disabled'`` or ``'hidden'``.
+         Ghi đè trạng thái canvas cho mục này; một trong ``'normal'``, ``'disabled'`` hoặc ``'hidden'``.
 
       *tags*
-         A single tag or a sequence of tags to associate with the item,
-         replacing any existing tags.
+         Một tag hoặc một chuỗi tag để liên kết với mục này, thay thế mọi tag hiện có.
 
-      Many of these options have *active...* and *disabled...* variants
-      (such as *activefill*, *disabledfill*, *activewidth*, *disableddash*,
-      *activeoutline*, *disabledstipple*) that override the base option when
-      the item is the active item (under the mouse pointer) or is in the
-      disabled state.
+      Nhiều tùy chọn trong số này có các biến thể *active...* và *disabled...* (chẳng hạn như *activefill*, *disabledfill*, *activewidth*, *disableddash*, *activeoutline*, *disabledstipple*) để ghi đè tùy chọn cơ sở khi mục là mục đang hoạt động (bên dưới con trỏ chuột) hoặc ở trạng thái bị vô hiệu hóa.
 
-      The following item types support additional options.
+      Các loại mục sau hỗ trợ những tùy chọn bổ sung.
 
-      For ``arc`` items:
+      Đối với các mục ``arc``:
 
       *start*
-         The start of the arc's angular range, in degrees measured
-         counter-clockwise from the 3-o'clock position.
+         Điểm bắt đầu của phạm vi góc của cung, tính bằng độ theo hướng ngược chiều kim đồng hồ từ vị trí 3 giờ.
 
       *extent*
-         The size of the angular range, in degrees counter-clockwise from
-         *start*.
+         Kích thước của phạm vi góc, tính bằng độ ngược chiều kim đồng hồ từ *start*.
 
       *style*
-         How the arc is drawn: ``'pieslice'`` (the default), ``'chord'`` or
-         ``'arc'``.
+         Cách vẽ cung: ``'pieslice'`` (mặc định), ``'chord'`` hoặc ``'arc'``.
 
-      For ``line`` items:
+      Đối với các mục ``line``:
 
       *arrow*
-         Where to draw arrowheads: ``'none'`` (the default), ``'first'``,
-         ``'last'`` or ``'both'``.
+         Vị trí vẽ đầu mũi tên: ``'none'`` (mặc định), ``'first'``, ``'last'`` hoặc ``'both'``.
 
       *arrowshape*
-         A sequence of three distances describing the shape of the
-         arrowheads.
+         Một chuỗi gồm ba khoảng cách mô tả hình dạng của các đầu mũi tên.
 
       *capstyle*
-         How line ends are drawn: ``'butt'`` (the default), ``'projecting'``
-         or ``'round'``.
+         Cách vẽ các đầu đường: ``'butt'`` (mặc định), ``'projecting'`` hoặc ``'round'``.
 
       *joinstyle*
-         How line vertices are drawn: ``'round'`` (the default), ``'bevel'``
-         or ``'miter'``.
+         Cách vẽ các đỉnh đường: ``'round'`` (mặc định), ``'bevel'`` hoặc ``'miter'``.
 
       *smooth*
-         The smoothing method: a false value (the default) for no smoothing,
-         or ``'true'``/``'bezier'`` or ``'raw'`` to draw the line as a curve.
+         Phương thức làm mượt: giá trị false (mặc định) để không làm mượt, hoặc ``'true'``/``'bezier'`` hay ``'raw'`` để vẽ đường dưới dạng đường cong.
 
       *splinesteps*
-         The number of line segments approximating each spline when
-         *smooth* is enabled.
+         Số lượng đoạn thẳng xấp xỉ mỗi spline khi *smooth* được bật.
 
-      For ``polygon`` items:
+      Đối với ``polygon`` mục:
 
       *joinstyle*, *smooth*, *splinesteps*
-         As for ``line`` items, applied to the polygon's outline.
+         Tương tự như với các mục ``line``, áp dụng cho đường viền của đa giác.
 
-      For ``text`` items:
+      Đối với các mục ``text``:
 
       *text*
-         The string to display; newline characters start new lines.
+         Chuỗi cần hiển thị; các ký tự dòng mới sẽ bắt đầu dòng mới.
 
       *font*
-         The font used for the text.
+         Phông chữ được sử dụng cho văn bản.
 
       *justify*
-         How lines are justified: ``'left'`` (the default), ``'right'`` or
-         ``'center'``.
+         Cách căn chỉnh các dòng: ``'left'`` (mặc định), ``'right'`` hoặc ``'center'``.
 
       *anchor*
-         How the text is positioned relative to its point, defaulting to
-         ``'center'``.
+         Văn bản được định vị như thế nào so với điểm của nó, mặc định là ``'center'``.
 
       *width*
-         The maximum line length; if non-zero, lines are wrapped at spaces.
+         Độ dài dòng tối đa; nếu khác không, các dòng sẽ được ngắt tại khoảng trắng.
 
       *angle*
-         How many degrees to rotate the text counter-clockwise about its
-         positioning point, from ``0.0`` to ``360.0`` (default ``0.0``).
+         Số độ xoay văn bản ngược chiều kim đồng hồ quanh điểm định vị, từ ``0.0`` đến ``360.0`` (mặc định là ``0.0``).
 
       *underline*
-         The index of a character to underline, or ``-1`` for none.
+         Chỉ mục của ký tự cần gạch chân, hoặc ``-1`` nếu không có.
 
-      For ``bitmap`` items:
+      Đối với các mục ``bitmap``:
 
       *bitmap*
-         The bitmap to display.
+         Bitmap cần hiển thị.
 
       *anchor*
-         How the bitmap is positioned relative to its point.
+         Cách bitmap được định vị tương đối so với điểm của nó.
 
       *background*, *foreground*
-         The colors used for the bitmap's ``0`` and ``1`` pixels; an empty
-         *background* makes the ``0`` pixels transparent.
-         Both have *active...* and *disabled...* variants, and *bitmap* has
-         *activebitmap* and *disabledbitmap* variants.
+         Các màu được dùng cho các pixel ``0`` và ``1`` của bitmap; *background* trống khiến các pixel ``0`` trở nên trong suốt. Cả hai đều có các biến thể *active...* và *disabled...*, còn *bitmap* có các biến thể *activebitmap* và *disabledbitmap*.
 
-      For ``image`` items:
+      Đối với các mục ``image``:
 
       *image*
-         The Tk image to display, previously created with the image
-         protocols.
+         Tk image cần hiển thị, được tạo trước đó bằng các image protocol.
 
       *anchor*
-         How the image is positioned relative to its point.
+         Cách image được định vị so với điểm của nó.
 
-      Both options have *active...* and *disabled...* variants
-      (*activeimage*, *disabledimage*) used in the active and disabled
-      states.
+      Cả hai tùy chọn đều có các biến thể *active...* và *disabled...* (*activeimage*, *disabledimage*) được dùng ở các trạng thái active và disabled.
 
-      For ``window`` items:
+      Đối với các mục ``window``:
 
       *window*
-         The widget to embed; it must be a child of the canvas or of one of
-         its ancestors, and may not be a top-level window.
+         Widget cần nhúng; widget này phải là phần tử con của canvas hoặc một trong các phần tử tổ tiên của canvas, và không được là cửa sổ cấp cao nhất.
 
       *anchor*
-         How the window is positioned relative to its point.
+         Cách cửa sổ được định vị tương đối so với điểm của nó.
 
       *width*, *height*
-         The size to assign to the window; if zero (the default), the window
-         is given its requested size.
+         Kích thước được gán cho cửa sổ; nếu bằng 0 (mặc định), cửa sổ sẽ được cấp kích thước mà nó yêu cầu.
 
-      ``oval`` and ``rectangle`` items have no type-specific options; they
-      use only the standard item options.
+      Các mục ``oval`` và ``rectangle`` không có tùy chọn dành riêng cho từng kiểu; chúng chỉ sử dụng các tùy chọn mục tiêu chuẩn.
 
       .. note::
 
-         Tk 8.6 added the *angle* option and Tk 9.0 added the *underline*
-         option for ``text`` items.
+         Tk 8.6 đã thêm tùy chọn *angle* và Tk 9.0 đã thêm tùy chọn *underline* cho các mục ``text``.
 
    .. method:: coords(tagOrId)
-               coords(tagOrId, coordList, /)
-               coords(tagOrId, /, *coordList)
+               coords(tagOrId, coordList, /) coords(tagOrId, /, *coordList)
 
-      Query or modify the coordinates of an item.
-      With only *tagOrId*, return a list of the floating-point coordinates of
-      the item given by *tagOrId* (the first matching item if it matches
-      several).
-      Given new coordinates, replace the coordinates of that item with them;
-      like the ``create_*`` methods, the coordinates may be given as separate
-      numbers, as a single sequence, or as coordinate pairs.
-      The returned coordinates are always in pixels, regardless of the units
-      used to specify them; for rectangles, ovals and arcs they are ordered
-      left, top, right, bottom.
+      Truy vấn hoặc sửa đổi tọa độ của một mục. Khi chỉ cung cấp *tagOrId*, trả về danh sách các tọa độ số thực của mục được xác định bởi *tagOrId* (mục đầu tiên khớp nếu có nhiều mục khớp). Khi cung cấp tọa độ mới, thay thế tọa độ của mục đó bằng các tọa độ mới; giống như các phương thức ``create_*``, tọa độ có thể được cung cấp dưới dạng các số riêng biệt, một chuỗi đơn hoặc các cặp tọa độ. Tọa độ được trả về luôn tính bằng pixel, bất kể đơn vị được dùng để chỉ định chúng; đối với hình chữ nhật, hình oval và cung, chúng được sắp xếp theo thứ tự trái, trên, phải, dưới.
 
       .. versionchanged:: 3.12
-         The arguments are now flattened: the coordinates may be given as
-         separate arguments, as a single sequence, or grouped in pairs, like
-         the ``create_*`` methods.
+         Các đối số hiện được làm phẳng: tọa độ có thể được cung cấp dưới dạng các đối số riêng biệt, một chuỗi đơn hoặc được nhóm thành từng cặp, giống như các phương thức ``create_*``.
 
 
    .. method:: move(tagOrId, xAmount, yAmount, /)
 
-      Move each of the items given by *tagOrId* in the canvas coordinate space
-      by adding *xAmount* to every x-coordinate and *yAmount* to every
-      y-coordinate of the item.
+      Di chuyển từng mục được xác định bởi *tagOrId* trong không gian tọa độ canvas bằng cách cộng *xAmount* vào mọi tọa độ x và *yAmount* vào mọi tọa độ y của mục đó.
 
    .. method:: moveto(tagOrId, x='', y='')
 
-      Move the items given by *tagOrId* so that the first coordinate pair (the
-      upper-left corner of the bounding box) of the lowest matching item is at
-      position (*x*, *y*).
-      *x* or *y* may be an empty string, in which case the corresponding
-      coordinate is unchanged.
-      All matching items keep their positions relative to each other.
+      Di chuyển các mục được xác định bởi *tagOrId* sao cho cặp tọa độ đầu tiên (góc trên bên trái của hộp bao) của mục khớp thấp nhất nằm tại vị trí (*x*, *y*). *x* hoặc *y* có thể là chuỗi rỗng; khi đó, tọa độ tương ứng không thay đổi. Tất cả các mục khớp vẫn giữ nguyên vị trí tương đối so với nhau.
 
       .. versionadded:: 3.8
 
 
    .. method:: scale(tagOrId, xOrigin, yOrigin, xScale, yScale, /)
 
-      Rescale the coordinates of all items given by *tagOrId* in canvas
-      coordinate space.
-      Each x-coordinate is adjusted so that its distance from *xOrigin* changes
-      by a factor of *xScale*, and each y-coordinate so that its distance from
-      *yOrigin* changes by a factor of *yScale* (a factor of ``1.0`` leaves the
-      coordinate unchanged).
+      Điều chỉnh tỷ lệ tọa độ của tất cả các mục được chỉ định bởi *tagOrId* trong hệ tọa độ canvas. Mỗi tọa độ x được điều chỉnh sao cho khoảng cách từ *xOrigin* thay đổi theo hệ số *xScale*, và mỗi tọa độ y được điều chỉnh sao cho khoảng cách từ *yOrigin* thay đổi theo hệ số *yScale* (hệ số ``1.0`` giữ nguyên tọa độ).
 
    .. method:: delete(*tagOrIds)
 
-      Delete each of the items given by the *tagOrIds* arguments.
+      Xóa từng mục được chỉ định bởi các đối số *tagOrIds*.
 
    .. method:: dchars(tagOrId, first, /)
                dchars(tagOrId, first, last, /)
 
-      Delete from each of the items given by *tagOrId* the characters (for text
-      items) or coordinates (for line and polygon items) in the range from
-      *first* to *last* inclusive; *last* defaults to *first*.
-      Items that do not support indexing ignore this operation.
+      Xóa khỏi từng mục được chỉ định bởi *tagOrId* các ký tự (đối với mục văn bản) hoặc tọa độ (đối với mục đường thẳng và đa giác) trong phạm vi từ *first* đến *last*, bao gồm cả hai đầu mút; *last* mặc định là *first*. Các mục không hỗ trợ lập chỉ mục sẽ bỏ qua thao tác này.
 
    .. method:: insert(tagOrId, beforeThis, string, /)
 
-      Insert *string* into each of the items given by *tagOrId* just before the
-      character or coordinate whose index is *beforeThis*.
-      For line and polygon items *string* must be a valid sequence of
-      coordinates.
+      Chèn *string* vào từng mục được chỉ định bởi *tagOrId*, ngay trước ký tự hoặc tọa độ có chỉ mục là *beforeThis*. Đối với các mục đường thẳng và đa giác, *string* phải là một chuỗi tọa độ hợp lệ.
 
    .. method:: itemcget(tagOrId, option)
 
-      Return the current value of the configuration option *option* for the
-      item given by *tagOrId* (the lowest matching item if it matches several).
-      This is like :meth:`~Misc.cget` but applies to an individual item.
+      Trả về giá trị hiện tại của tùy chọn cấu hình *option* cho mục được chỉ định bởi *tagOrId* (mục khớp đầu tiên nếu có nhiều mục khớp). Phương thức này tương tự :meth:`~Misc.cget`, nhưng áp dụng cho một mục riêng lẻ.
 
    .. method:: itemconfig(tagOrId, cnf=None, **kw)
       :no-typesetting:
 
    .. method:: itemconfigure(tagOrId, cnf=None, **kw)
 
-      Query or modify the configuration options of the items given by
-      *tagOrId*.
-      This mirrors :meth:`~Misc.configure`, except that it applies to
-      individual items rather than to the canvas as a whole.
-      With no options, it returns a dictionary describing the current options
-      of the first matching item; otherwise it sets the given options on every
-      matching item.
-      The legal options are those accepted by the corresponding ``create_*``
-      method.
-      :meth:`itemconfig` is an alias of :meth:`!itemconfigure`.
+      Truy vấn hoặc sửa đổi các tùy chọn cấu hình của các mục được chỉ định bởi *tagOrId*. Phương thức này tương tự :meth:`~Misc.configure`, ngoại trừ việc áp dụng cho từng mục riêng lẻ thay vì toàn bộ canvas. Khi không có tùy chọn nào, phương thức trả về một dictionary mô tả các tùy chọn hiện tại của mục khớp đầu tiên; nếu không, phương thức đặt các tùy chọn đã cho trên mọi mục khớp. Các tùy chọn hợp lệ là những tùy chọn được phương thức ``create_*`` tương ứng chấp nhận.
+      :meth:`itemconfig` là bí danh của :meth:`!itemconfigure`.
 
    .. method:: type(tagOrId)
 
-      Return the type of the item given by *tagOrId* (the first matching item
-      if it matches several), such as ``'rectangle'`` or ``'text'``, or
-      ``None`` if *tagOrId* does not match any item.
+      Trả về kiểu của mục được chỉ định bởi *tagOrId* (mục đầu tiên khớp nếu nó khớp với nhiều mục), chẳng hạn như ``'rectangle'`` hoặc ``'text'``, hoặc ``None`` nếu *tagOrId* không khớp với mục nào.
 
    .. method:: gettags(tagOrId, /)
 
-      Return a tuple of the tags associated with the item given by *tagOrId*
-      (the first matching item in display-list order if it matches several).
-      Return an empty tuple if no item matches or the item has no tags.
+      Trả về một tuple gồm các thẻ liên kết với mục được chỉ định bởi *tagOrId* (mục đầu tiên khớp theo thứ tự display-list nếu nó khớp với nhiều mục). Trả về một tuple rỗng nếu không có mục nào khớp hoặc mục đó không có thẻ.
 
    .. method:: dtag(tagOrId, /)
                dtag(tagOrId, tagToDelete, /)
 
-      Remove the tag *tagToDelete* (which defaults to *tagOrId*) from each of
-      the items given by *tagOrId*.
-      Items that do not have that tag are unaffected.
+      Xóa thẻ *tagToDelete* (mặc định là *tagOrId*) khỏi từng mục được chỉ định bởi *tagOrId*. Các mục không có thẻ đó sẽ không bị ảnh hưởng.
 
    .. method:: addtag(newtag, searchSpec, /, *args)
 
-      Add the tag *newtag* to each item selected by the search specification
-      *searchSpec* (and any further *args*).
-      *searchSpec* is one of ``'above'``, ``'all'``, ``'below'``,
-      ``'closest'``, ``'enclosed'``, ``'overlapping'`` or ``'withtag'``; the
-      ``addtag_*`` methods below are convenient wrappers that supply each of
-      these forms.
+      Thêm thẻ *newtag* vào từng mục được chọn bởi đặc tả tìm kiếm *searchSpec* (và mọi *args* bổ sung). *searchSpec* là một trong các giá trị ``'above'``, ``'all'``, ``'below'``, ``'closest'``, ``'enclosed'``, ``'overlapping'`` hoặc ``'withtag'``; các phương thức ``addtag_*`` bên dưới là các wrapper tiện lợi, cung cấp từng dạng này.
 
    .. method:: addtag_above(newtag, tagOrId)
 
-      Add the tag *newtag* to the item just above (after) *tagOrId* in the
-      display list.
+      Thêm thẻ *newtag* vào mục ngay phía trên (sau) *tagOrId* trong display list.
 
    .. method:: addtag_all(newtag)
 
-      Add the tag *newtag* to all items in the canvas.
+      Thêm tag *newtag* vào tất cả item trên canvas.
 
    .. method:: addtag_below(newtag, tagOrId)
 
-      Add the tag *newtag* to the item just below (before) *tagOrId* in the
-      display list.
+      Thêm tag *newtag* vào item ngay bên dưới (trước) *tagOrId* trong danh sách hiển thị.
 
    .. method:: addtag_closest(newtag, x, y, halo=None, start=None)
 
-      Add the tag *newtag* to the item closest to the point (*x*, *y*).
-      If *halo* is given, any item within that distance of the point is treated
-      as overlapping it.
-      If *start* is given (a tag or id), select the topmost closest item that
-      lies below *start* in the display list, which can be used to step through
-      all the closest items.
+      Thêm tag *newtag* vào item gần điểm (*x*, *y*) nhất. Nếu cung cấp *halo*, mọi item nằm trong khoảng cách đó tính từ điểm sẽ được xem là chồng lấn với điểm. Nếu cung cấp *start* (một tag hoặc id), chọn item gần nhất ở trên cùng nằm bên dưới *start* trong danh sách hiển thị; tùy chọn này có thể được dùng để duyệt qua tất cả các item gần nhất.
 
    .. method:: addtag_enclosed(newtag, x1, y1, x2, y2)
 
-      Add the tag *newtag* to every item completely enclosed within the
-      rectangle (*x1*, *y1*, *x2*, *y2*), where *x1* <= *x2* and *y1* <= *y2*.
+      Thêm tag *newtag* vào mọi item được bao hoàn toàn trong hình chữ nhật (*x1*, *y1*, *x2*, *y2*), trong đó *x1* <= *x2* và *y1* <= *y2*.
 
    .. method:: addtag_overlapping(newtag, x1, y1, x2, y2)
 
-      Add the tag *newtag* to every item that overlaps or is enclosed within
-      the rectangle (*x1*, *y1*, *x2*, *y2*), where *x1* <= *x2* and *y1* <=
-      *y2*.
+      Thêm tag *newtag* vào mọi item chồng lấn hoặc nằm trong hình chữ nhật (*x1*, *y1*, *x2*, *y2*), trong đó *x1* <= *x2* và *y1* <= *y2*.
 
    .. method:: addtag_withtag(newtag, tagOrId)
 
-      Add the tag *newtag* to every item given by *tagOrId*.
+      Thêm tag *newtag* vào mọi item được chỉ định bởi *tagOrId*.
 
    .. method:: find(searchSpec, /, *args)
 
-      Return a tuple of the ids of all items selected by the search
-      specification *searchSpec* (and any further *args*), in stacking order
-      with the lowest item first.
-      The search specification has any of the forms accepted by :meth:`addtag`.
-      The ``find_*`` methods below are more convenient wrappers around it.
+      Trả về một tuple chứa id của tất cả item được chọn bởi đặc tả tìm kiếm *searchSpec* (và mọi *args* bổ sung), theo thứ tự xếp chồng với item thấp nhất ở trước. Đặc tả tìm kiếm có một trong các dạng được :meth:`addtag` chấp nhận. Các phương thức ``find_*`` bên dưới là các wrapper thuận tiện hơn cho đặc tả này.
 
    .. method:: find_above(tagOrId)
 
-      Return a tuple containing the id of the item just above *tagOrId* in the
-      display list.
+      Trả về một tuple chứa id của item ngay phía trên *tagOrId* trong danh sách hiển thị.
 
    .. method:: find_all()
 
-      Return a tuple of the ids of all items in the canvas, in stacking order.
+      Trả về một tuple gồm id của tất cả item trên canvas, theo thứ tự xếp chồng.
 
    .. method:: find_below(tagOrId)
 
-      Return a tuple containing the id of the item just below *tagOrId* in the
-      display list.
+      Trả về một tuple chứa id của item ngay phía dưới *tagOrId* trong danh sách hiển thị.
 
    .. method:: find_closest(x, y, halo=None, start=None)
 
-      Return a tuple containing the id of the item closest to the point (*x*,
-      *y*).
-      *halo* and *start* are interpreted as for :meth:`addtag_closest`.
+      Trả về một tuple chứa id của item gần điểm (*x*, *y*) nhất. *halo* và *start* được diễn giải như đối với :meth:`addtag_closest`.
 
    .. method:: find_enclosed(x1, y1, x2, y2)
 
-      Return a tuple of the ids of all items completely enclosed within the
-      rectangle (*x1*, *y1*, *x2*, *y2*).
+      Trả về một tuple gồm id của tất cả item nằm hoàn toàn trong hình chữ nhật (*x1*, *y1*, *x2*, *y2*).
 
    .. method:: find_overlapping(x1, y1, x2, y2)
 
-      Return a tuple of the ids of all items that overlap or are enclosed
-      within the rectangle (*x1*, *y1*, *x2*, *y2*).
+      Trả về một tuple gồm id của tất cả item chồng lấn hoặc nằm trong hình chữ nhật (*x1*, *y1*, *x2*, *y2*).
 
    .. method:: find_withtag(tagOrId)
 
-      Return a tuple of the ids of all items given by *tagOrId*.
+      Trả về một tuple gồm id của tất cả item được chỉ định bởi *tagOrId*.
 
    .. method:: lift(tagOrId, aboveThis=None, /)
       :no-typesetting:
@@ -3861,1317 +2523,799 @@ Widget classes
 
    .. method:: tag_raise(tagOrId, aboveThis=None, /)
 
-      Move all items given by *tagOrId* to a new position in the display list
-      just above the item given by *aboveThis*, or to the top of the display
-      list if *aboveThis* is omitted.
-      When several items are moved their relative order is preserved.
-      This has no effect on embedded window items, whose stacking order is
-      controlled by :meth:`Misc.tkraise` and :meth:`Misc.lower` instead.
-      :meth:`lift` and :meth:`tkraise` are aliases of :meth:`!tag_raise`.
+      Di chuyển tất cả các mục được chỉ định bởi *tagOrId* đến một vị trí mới trong danh sách hiển thị, ngay phía trên mục được chỉ định bởi *aboveThis*, hoặc lên đầu danh sách hiển thị nếu *aboveThis* bị bỏ qua. Khi di chuyển nhiều mục, thứ tự tương đối của chúng được giữ nguyên. Điều này không ảnh hưởng đến các mục cửa sổ được nhúng, vì thứ tự xếp chồng của chúng được điều khiển bởi :meth:`Misc.tkraise` và :meth:`Misc.lower`.
+      :meth:`lift` và :meth:`tkraise` là các bí danh của :meth:`!tag_raise`.
 
    .. method:: lower(tagOrId, belowThis=None, /)
       :no-typesetting:
 
    .. method:: tag_lower(tagOrId, belowThis=None, /)
 
-      Move all items given by *tagOrId* to a new position in the display list
-      just below the item given by *belowThis*, or to the bottom of the display
-      list if *belowThis* is omitted.
-      When several items are moved their relative order is preserved.
-      This has no effect on embedded window items.
-      :meth:`lower` is an alias of :meth:`!tag_lower`.
+      Di chuyển tất cả các mục được chỉ định bởi *tagOrId* đến một vị trí mới trong danh sách hiển thị, ngay phía dưới mục được chỉ định bởi *belowThis*, hoặc xuống cuối danh sách hiển thị nếu *belowThis* bị bỏ qua. Khi di chuyển nhiều mục, thứ tự tương đối của chúng được giữ nguyên. Điều này không ảnh hưởng đến các mục cửa sổ được nhúng.
+      :meth:`lower` là bí danh của :meth:`!tag_lower`.
 
       .. note::
 
-         On a :class:`Canvas`, :meth:`tkraise`/:meth:`lift` and :meth:`lower`
-         restack canvas items,
-         shadowing the inherited :meth:`Misc.tkraise`/:meth:`Misc.lift` and
-         :meth:`Misc.lower` methods that restack the widget itself,
-         which are therefore not available.
+         Trên một :class:`Canvas`, :meth:`tkraise`/:meth:`lift` và :meth:`lower` sắp xếp lại các mục canvas, che khuất :meth:`Misc.tkraise`/:meth:`Misc.lift` được kế thừa và
+         các phương thức :meth:`Misc.lower` sắp xếp lại chính widget, vì vậy các phương thức này không khả dụng.
 
    .. method:: tag_bind(tagOrId, sequence=None, func=None, add=None)
 
-      Bind the callback *func* to the event *sequence* for all items given by
-      *tagOrId*, so that *func* is invoked whenever that event occurs for one
-      of the items.
-      This is like :meth:`Widget.bind <Misc.bind>` but operates on canvas items
-      rather than on whole widgets; only mouse, keyboard and virtual events may
-      be bound.
-      Mouse events are directed to the current item and keyboard events to the
-      focus item (see :meth:`focus`).
-      If *add* is true the new binding is added to any existing bindings for
-      the same sequence, rather than replacing them.
-      Return the identifier of the bound function, which can be passed to
+      Liên kết callback *func* với sự kiện *sequence* cho tất cả các mục được chỉ định bởi *tagOrId*, để *func* được gọi bất cứ khi nào sự kiện đó xảy ra đối với một trong các mục. Điều này tương tự như :meth:`Widget.bind <Misc.bind>` nhưng hoạt động trên các mục canvas thay vì toàn bộ widget; chỉ có thể liên kết các sự kiện chuột, bàn phím và sự kiện ảo. Các sự kiện chuột được chuyển đến mục hiện tại còn các sự kiện bàn phím được chuyển đến mục đang được focus (xem :meth:`focus`). Nếu *add* là true, liên kết mới sẽ được thêm vào các liên kết hiện có cho cùng một sequence thay vì thay thế chúng. Trả về mã định danh của hàm đã liên kết, mã này có thể được truyền cho
       :meth:`tag_unbind`.
 
    .. method:: tag_unbind(tagOrId, sequence, funcid=None)
 
-      Remove for all items given by *tagOrId* the binding for the event
-      *sequence*.
-      If *funcid* is given, only that callback (as returned by
-      :meth:`tag_bind`) is unbound and deregistered.
+      Xóa liên kết của sự kiện *sequence* khỏi tất cả các mục được chỉ định bởi *tagOrId*. Nếu cung cấp *funcid*, chỉ callback đó (như được trả về bởi
+      :meth:`tag_bind`) được hủy liên kết và hủy đăng ký.
 
       .. versionchanged:: 3.13
-         If *funcid* is given, only that callback is unbound.
+         Nếu cung cấp *funcid*, chỉ callback đó được hủy liên kết.
 
 
    .. method:: bbox(tagOrId, /, *tagOrIds)
 
-      Return a 4-tuple ``(x1, y1, x2, y2)`` giving an approximate bounding box,
-      in pixels, that encloses all the items given by *tagOrId* and any further
-      *tagOrIds*.
-      The result may overestimate the true bounding box by a few pixels.
-      Return ``None`` if no item matches or the matching items have nothing to
-      display.
+      Trả về một bộ 4 phần tử ``(x1, y1, x2, y2)``, biểu thị hộp giới hạn gần đúng theo pixel, bao quanh tất cả các mục được chỉ định bởi *tagOrId* và mọi *tagOrIds* bổ sung. Kết quả có thể lớn hơn hộp giới hạn thực vài pixel. Trả về ``None`` nếu không có mục nào khớp hoặc các mục khớp không có gì để hiển thị.
 
-      This shadows the inherited :meth:`!Misc.bbox`;
-      use :meth:`~Misc.grid_bbox` for the grid bounding box.
+      Phương thức này che khuất :meth:`!Misc.bbox` được kế thừa; hãy sử dụng :meth:`~Misc.grid_bbox` cho hộp giới hạn của grid.
 
    .. method:: canvasx(screenx, gridspacing=None)
 
-      Given a window x-coordinate *screenx*, return the canvas x-coordinate
-      displayed at that location.
-      If *gridspacing* is given, the result is rounded to the nearest multiple
-      of *gridspacing* units.
+      Với tọa độ x của cửa sổ *screenx*, trả về tọa độ x của canvas được hiển thị tại vị trí đó. Nếu cung cấp *gridspacing*, kết quả được làm tròn đến bội số gần nhất của *gridspacing* đơn vị.
 
    .. method:: canvasy(screeny, gridspacing=None)
 
-      Given a window y-coordinate *screeny*, return the canvas y-coordinate
-      displayed at that location.
-      If *gridspacing* is given, the result is rounded to the nearest multiple
-      of *gridspacing* units.
+      Với tọa độ y của cửa sổ *screeny*, trả về tọa độ y của canvas được hiển thị tại vị trí đó. Nếu cung cấp *gridspacing*, kết quả được làm tròn đến bội số gần nhất của *gridspacing* đơn vị.
 
    .. method:: focus()
                focus(tagOrId, /)
 
-      With *tagOrId*, set the keyboard focus for the canvas to the first item
-      given by *tagOrId* that supports the insertion cursor; the focus is left
-      unchanged if no such item exists.
-      If *tagOrId* is an empty string, reset the focus so that no item has it.
-      With no argument, return the id of the item that currently has the focus,
-      or an empty string if none does.
-      An item only displays the insertion cursor when both it is the focus item
-      and its canvas has the input focus.
+      Với *tagOrId*, đặt focus bàn phím của canvas vào mục đầu tiên được chỉ định bởi *tagOrId* có hỗ trợ con trỏ chèn; focus được giữ nguyên nếu không có mục nào như vậy. Nếu *tagOrId* là một chuỗi rỗng, đặt lại focus để không có mục nào có focus. Khi không có đối số, trả về id của mục hiện đang có focus hoặc một chuỗi rỗng nếu không có mục nào.
 
-      This shadows the inherited :meth:`!Misc.focus`;
-      use :meth:`~Misc.focus_set` to focus the widget itself.
+      Điều này che khuất :meth:`!Misc.focus` được kế thừa; hãy dùng :meth:`~Misc.focus_set` để đặt focus cho chính widget.
 
    .. method:: icursor(tagOrId, index, /)
 
-      Set the insertion cursor of the items given by *tagOrId* to just before
-      the character given by *index*.
-      Items that do not support an insertion cursor are unaffected.
-      The cursor is only displayed when the item has the focus, but its
-      position may be set at any time.
+      Đặt con trỏ chèn của các mục được chỉ định bởi *tagOrId* ngay trước ký tự được chỉ định bởi *index*. Các mục không hỗ trợ con trỏ chèn sẽ không bị ảnh hưởng. Con trỏ chỉ được hiển thị khi mục có focus, nhưng vị trí của nó có thể được đặt bất kỳ lúc nào.
 
    .. method:: index(tagOrId, index, /)
 
-      Return as an integer the numerical index within *tagOrId* corresponding
-      to *index*, which is a textual description of a position (for text items
-      an index into the characters, for line and polygon items an index into
-      the coordinates).
-      If *tagOrId* matches several items, the first one that supports indexing
-      is used.
+      Trả về dưới dạng số nguyên chỉ mục số trong *tagOrId* tương ứng với *index*, vốn là mô tả dạng văn bản của một vị trí (đối với các mục văn bản, là chỉ mục trong các ký tự; đối với các mục đường và đa giác, là chỉ mục trong các tọa độ). Nếu *tagOrId* khớp với nhiều mục, mục đầu tiên hỗ trợ lập chỉ mục sẽ được sử dụng.
 
    .. method:: select_adjust(tagOrId, index)
 
-      Adjust the end of the selection in *tagOrId* nearest to *index* so that
-      it is at *index*, and make the other end the anchor point for future
-      :meth:`select_to` calls.
-      If the selection is not currently in *tagOrId*, this behaves like
+      Điều chỉnh đầu cuối của vùng chọn trong *tagOrId* gần với *index* nhất để nó nằm tại *index*, đồng thời đặt đầu còn lại làm điểm neo cho các
+      :meth:`select_to` lệnh tiếp theo. Nếu vùng chọn hiện không nằm trong *tagOrId*, thao tác này sẽ hoạt động như
       :meth:`select_to`.
 
    .. method:: select_clear()
 
-      Clear the selection if it is in this canvas; otherwise do nothing.
+      Xóa vùng chọn nếu nó nằm trong canvas này; nếu không thì không làm gì.
 
    .. method:: select_from(tagOrId, index)
 
-      Set the selection anchor point to just before the character given by
-      *index* in the item given by *tagOrId*.
-      This does not change the selection itself; it sets the fixed end for
-      future :meth:`select_to` calls.
+      Đặt điểm neo của vùng chọn ngay trước ký tự được chỉ định bởi *index* trong mục được chỉ định bởi *tagOrId*. Thao tác này không thay đổi vùng chọn; nó đặt điểm cuối cố định cho các lệnh gọi :meth:`select_to` trong tương lai.
 
    .. method:: select_item()
 
-      Return the id of the item that holds the selection, or ``None`` if the
-      selection is not in this canvas.
-      Unlike :meth:`find` and the ``find_*`` methods, this returns the id as a
-      string rather than an integer.
+      Trả về id của mục chứa vùng chọn hoặc ``None`` nếu vùng chọn không nằm trong canvas này. Không giống :meth:`find` và các phương thức ``find_*``, phương thức này trả về id dưới dạng chuỗi thay vì số nguyên.
 
    .. method:: select_to(tagOrId, index)
 
-      Set the selection to the characters of *tagOrId* between the selection
-      anchor point and *index*, inclusive of *index*.
-      The anchor point is the one set by the most recent :meth:`select_adjust`
-      or :meth:`select_from` call.
+      Đặt vùng chọn thành các ký tự của *tagOrId* nằm giữa điểm neo của vùng chọn và *index*, bao gồm cả *index*. Điểm neo là điểm được đặt bởi lệnh gọi :meth:`select_adjust` hoặc :meth:`select_from` gần đây nhất.
 
    .. method:: scan_mark(x, y)
 
-      Record *x*, *y* and the current view, for use with later
-      :meth:`scan_dragto` calls.
-      This is typically bound to a mouse button press in the widget.
+      Ghi lại *x*, *y* và chế độ xem hiện tại để sử dụng với các lệnh gọi sau này
+      :meth:`scan_dragto`. Thông thường, lệnh này được liên kết với thao tác nhấn nút chuột trong widget.
 
    .. method:: scan_dragto(x, y, gain=10)
 
-      Scroll the canvas by *gain* times the difference between *x*, *y* and the
-      coordinates passed to the last :meth:`scan_mark` call.
-      This is typically bound to mouse motion events in the widget, producing
-      the effect of dragging the canvas at high speed through its window.
+      Cuộn canvas theo *gain* lần hiệu giữa *x*, *y* và các tọa độ được truyền cho lệnh gọi :meth:`scan_mark` gần đây nhất. Thông thường, lệnh này được liên kết với các sự kiện di chuyển chuột trong widget, tạo ra hiệu ứng kéo canvas ở tốc độ cao qua cửa sổ của nó.
 
    .. method:: postscript(cnf={}, **kw)
 
-      Generate a PostScript (Encapsulated PostScript, version 3.0)
-      representation of part or all of the canvas.
-      If the *file* or *channel* option is given, the PostScript is written
-      there and an empty string is returned; otherwise it is returned as a
-      string.
-      By default only the area currently visible in the window is generated, so
-      it is usually necessary either to call :meth:`~Misc.update` first or to
-      use the *width* and *height* options.
-      Supported options include *colormap*, *colormode*, *file*, *fontmap*,
-      *height*, *pageanchor*, *pageheight*, *pagewidth*, *pagex*, *pagey*,
-      *rotate*, *width*, *x* and *y*.
+      Tạo biểu diễn PostScript (Encapsulated PostScript, phiên bản 3.0) của một phần hoặc toàn bộ canvas. Nếu cung cấp tùy chọn *file* hoặc *channel*, PostScript sẽ được ghi vào đó và một chuỗi rỗng được trả về; nếu không, nó sẽ được trả về dưới dạng chuỗi. Theo mặc định, chỉ vùng hiện đang hiển thị trong cửa sổ được tạo, vì vậy thường cần gọi :meth:`~Misc.update` trước hoặc sử dụng các tùy chọn *width* và *height*. Các tùy chọn được hỗ trợ bao gồm *colormap*, *colormode*, *file*, *fontmap*, *height*, *pageanchor*, *pageheight*, *pagewidth*, *pagex*, *pagey*, *rotate*, *width*, *x* và *y*.
 
 
 .. class:: Checkbutton(master=None, cnf={}, **kw)
 
-   A :class:`!Checkbutton` widget displays a textual string, bitmap or image
-   together with a square indicator, and toggles a boolean selection when
-   pressed.
-   It has all the behavior of a simple button and, in addition, can be
-   selected: when selected the indicator is drawn with a check mark and the
-   associated variable is set to the ``onvalue``, and when deselected the
-   indicator is drawn empty and the variable is set to the ``offvalue``.
-   Inherits from :class:`Widget`.
-   In addition to the standard widget options, a checkbutton accepts the
-   options documented in the Tk ``checkbutton`` manual page, such as
-   *variable*, *onvalue*, *offvalue* and *command*.
+   Một :class:`!Checkbutton` widget hiển thị một chuỗi văn bản, bitmap hoặc hình ảnh cùng với một ô chỉ báo hình vuông, và chuyển đổi một lựa chọn Boolean khi được nhấn. Nó có toàn bộ hành vi của một nút đơn giản và ngoài ra còn có thể được chọn: khi được chọn, ô chỉ báo được vẽ với dấu kiểm và biến liên kết được đặt thành ``onvalue``, còn khi bỏ chọn, ô chỉ báo được vẽ trống và biến được đặt thành ``offvalue``. Kế thừa từ :class:`Widget`. Ngoài các tùy chọn widget tiêu chuẩn, một checkbutton chấp nhận các tùy chọn được ghi trong trang hướng dẫn Tk ``checkbutton``, chẳng hạn như *variable*, *onvalue*, *offvalue* và *command*.
 
    .. method:: invoke()
 
-      Do just what would happen if the user pressed the checkbutton with the
-      mouse: toggle the selection state of the button and invoke the associated
-      command, if there is one.
-      Return the result of the command, or an empty string if no command is
-      associated with the checkbutton.
-      This is ignored if the checkbutton's state is ``disabled``.
+      Thực hiện đúng những gì sẽ xảy ra nếu người dùng nhấn checkbutton bằng chuột: chuyển đổi trạng thái lựa chọn của nút và gọi command liên kết, nếu có. Trả về kết quả của command hoặc một chuỗi rỗng nếu checkbutton không có command liên kết. Tùy chọn này bị bỏ qua nếu trạng thái của checkbutton là ``disabled``.
 
    .. method:: select()
 
-      Select the checkbutton and set the associated variable to its
-      ``onvalue``.
+      Chọn checkbutton và đặt biến liên kết thành ``onvalue`` của nó.
 
    .. method:: deselect()
 
-      Deselect the checkbutton and set the associated variable to its
-      ``offvalue``.
+      Bỏ chọn checkbutton và đặt biến liên kết thành ``offvalue`` của nó.
 
    .. method:: toggle()
 
-      Toggle the selection state of the button, redisplaying it and modifying
-      its associated variable to reflect the new state.
+      Chuyển đổi trạng thái lựa chọn của nút, hiển thị lại nút và sửa đổi biến liên kết để phản ánh trạng thái mới.
 
    .. method:: flash()
 
-      Flash the checkbutton by redisplaying it several times, alternating
-      between the active and normal colors.
-      At the end of the flash the checkbutton is left in the same normal or
-      active state as when the method was called.
-      This is ignored if the checkbutton's state is ``disabled``.
+      Làm nhấp nháy checkbutton bằng cách hiển thị lại nó nhiều lần, xen kẽ giữa màu active và màu normal. Khi kết thúc, checkbutton được giữ ở cùng trạng thái normal hoặc active như khi phương thức được gọi. Tùy chọn này bị bỏ qua nếu trạng thái của checkbutton là ``disabled``.
 
 
 .. class:: Entry(master=None, cnf={}, **kw)
 
-   An :class:`!Entry` widget displays a single line of text and lets the user
-   edit it.
-   Inherits from :class:`Widget` and :class:`XView`; since entries can hold
-   strings too long to fit in the window, they support horizontal scrolling
-   through :meth:`~XView.xview`.
+   Một widget :class:`!Entry` hiển thị một dòng văn bản và cho phép người dùng chỉnh sửa dòng đó. Widget này kế thừa từ :class:`Widget` và :class:`XView`; vì các entry có thể chứa những chuỗi quá dài không vừa trong cửa sổ, chúng hỗ trợ cuộn ngang thông qua :meth:`~XView.xview`.
 
-   In addition to the standard widget options, an entry accepts the options
-   documented in the Tk ``entry`` manual page.
-   Notable ones are *textvariable* (the name of a variable kept in sync with
-   the entry's contents), *show* (if set, each character is displayed as the
-   given character rather than its true value, useful for password entry),
-   *validate* and *validatecommand* (which together let a callback accept or
-   reject edits), and *state* (one of ``'normal'``, ``'disabled'`` or
-   ``'readonly'``).
+   Ngoài các tùy chọn widget tiêu chuẩn, một entry chấp nhận các tùy chọn được ghi lại trong trang hướng dẫn Tk ``entry``. Các tùy chọn đáng chú ý gồm *textvariable* (tên của một biến được giữ đồng bộ với nội dung của entry), *show* (nếu được đặt, mỗi ký tự sẽ được hiển thị bằng ký tự đã cho thay vì giá trị thực của nó, hữu ích khi nhập mật khẩu), *validate* và *validatecommand* (kết hợp với nhau cho phép một callback chấp nhận hoặc từ chối các chỉnh sửa), và *state* (một trong ``'normal'``, ``'disabled'`` hoặc ``'readonly'``).
 
-   Many of the methods below take an *index* argument that selects a character
-   in the entry's string.
-   As described in the Tk ``entry`` manual page, *index* may be a number
-   (counting from 0), ``'insert'`` (the character just after the insertion
-   cursor), ``'end'`` (just after the last character), ``'anchor'`` (the
-   selection anchor point), ``'sel.first'`` and ``'sel.last'`` (the ends of the
-   selection), or ``@x`` (the character covering pixel x-coordinate *x* in the
-   window).
-   Out-of-range indices are rounded to the nearest legal value.
+   Nhiều phương thức dưới đây nhận một đối số *index* để chọn một ký tự trong chuỗi của entry. Như được mô tả trong trang hướng dẫn Tk ``entry``, *index* có thể là một số (đếm từ 0), ``'insert'`` (ký tự ngay sau con trỏ chèn), ``'end'`` (ngay sau ký tự cuối cùng), ``'anchor'`` (điểm neo của vùng chọn), ``'sel.first'`` và ``'sel.last'`` (hai đầu của vùng chọn), hoặc ``@x`` (ký tự bao phủ tọa độ pixel x *x* trong cửa sổ). Các chỉ mục nằm ngoài phạm vi sẽ được làm tròn về giá trị hợp lệ gần nhất.
 
    .. method:: delete(first, last=None)
 
-      Delete the characters from index *first* up to but not including index
-      *last*.
-      If *last* is omitted, only the single character at *first* is deleted.
+      Xóa các ký tự từ chỉ mục *first* đến trước chỉ mục *last*. Nếu bỏ qua *last*, chỉ ký tự tại *first* sẽ bị xóa.
 
    .. method:: get()
 
-      Return the entry's current string.
+      Trả về chuỗi hiện tại của entry.
 
    .. method:: insert(index, string)
 
-      Insert *string* just before the character given by *index*.
+      Chèn *string* ngay trước ký tự được chỉ định bởi *index*.
 
    .. method:: icursor(index)
 
-      Arrange for the insertion cursor to be displayed just before the
-      character given by *index*.
+      Đặt con trỏ chèn hiển thị ngay trước ký tự được chỉ định bởi *index*.
 
    .. method:: index(index)
 
-      Return the numerical index corresponding to *index*.
+      Trả về chỉ số dạng số tương ứng với *index*.
 
    .. method:: select_adjust(index)
       :no-typesetting:
 
    .. method:: selection_adjust(index)
 
-      Locate the end of the selection nearest to the character given by
-      *index*, and adjust that end to be at *index* (including but not going
-      beyond it); the other end becomes the anchor point for future
-      :meth:`selection_to` calls.
-      If there is no selection in the entry, a new one is created between
-      *index* and the most recent anchor point, inclusive.
-      :meth:`select_adjust` is an alias of :meth:`!selection_adjust`.
+      Xác định đầu cuối của vùng chọn gần nhất với ký tự được xác định bởi *index*, rồi điều chỉnh đầu cuối đó về *index* (bao gồm vị trí này nhưng không vượt quá nó); đầu còn lại trở thành điểm neo cho các lần gọi
+      :meth:`selection_to` trong tương lai. Nếu không có vùng chọn nào trong entry, một vùng chọn mới sẽ được tạo giữa *index* và điểm neo gần nhất, bao gồm cả hai đầu.
+      :meth:`select_adjust` là bí danh của :meth:`!selection_adjust`.
 
    .. method:: select_clear()
       :no-typesetting:
 
    .. method:: selection_clear()
 
-      Clear the selection if it is currently in this widget.
-      If the selection is not in this widget the method has no effect.
-      :meth:`select_clear` is an alias of :meth:`!selection_clear`.
+      Xóa vùng chọn nếu hiện tại vùng chọn nằm trong widget này. Nếu vùng chọn không nằm trong widget này, phương thức sẽ không có tác dụng.
+      :meth:`select_clear` là bí danh của :meth:`!selection_clear`.
 
       .. note::
 
-         This shadows the inherited :meth:`Misc.selection_clear`,
-         which clears the X selection;
-         that method is not available on an :class:`Entry`.
+         Điều này che khuất :meth:`Misc.selection_clear` được kế thừa, vốn xóa vùng chọn X; phương thức đó không khả dụng trên một :class:`Entry`.
 
    .. method:: select_from(index)
       :no-typesetting:
 
    .. method:: selection_from(index)
 
-      Set the selection anchor point to just before the character given by
-      *index*, without changing the selection.
-      :meth:`select_from` is an alias of :meth:`!selection_from`.
+      Đặt điểm neo của vùng chọn ngay trước ký tự được chỉ định bởi *index*, mà không thay đổi vùng chọn.
+      :meth:`select_from` là bí danh của :meth:`!selection_from`.
 
    .. method:: select_present()
       :no-typesetting:
 
    .. method:: selection_present()
 
-      Return ``True`` if there are characters selected in the entry, ``False``
-      otherwise.
-      :meth:`select_present` is an alias of :meth:`!selection_present`.
+      Trả về ``True`` nếu có các ký tự được chọn trong entry, nếu không thì trả về ``False``.
+      :meth:`select_present` là bí danh của :meth:`!selection_present`.
 
    .. method:: select_range(start, end)
       :no-typesetting:
 
    .. method:: selection_range(start, end)
 
-      Set the selection to include the characters starting with the one indexed
-      by *start* and ending with the one just before *end*.
-      If *end* refers to the same character as *start* or an earlier one, the
-      selection is cleared.
-      :meth:`select_range` is an alias of :meth:`!selection_range`.
+      Đặt vùng chọn bao gồm các ký tự bắt đầu từ ký tự có chỉ mục *start* và kết thúc bằng ký tự ngay trước *end*. Nếu *end* trỏ đến cùng ký tự với *start* hoặc một ký tự đứng trước đó, vùng chọn sẽ bị xóa.
+      :meth:`select_range` là bí danh của :meth:`!selection_range`.
 
    .. method:: select_to(index)
       :no-typesetting:
 
    .. method:: selection_to(index)
 
-      Set the selection between the anchor point and *index*: if *index* is
-      before the anchor point, the selection runs from *index* up to but not
-      including the anchor; if *index* is after it, from the anchor up to but
-      not including *index*; if they coincide, nothing happens.
-      The anchor point is the one set by the most recent :meth:`selection_from`
-      or :meth:`selection_adjust` call.
-      If there is no selection in the entry, a new one is created using the
-      most recent anchor point.
-      :meth:`select_to` is an alias of :meth:`!selection_to`.
+      Đặt vùng chọn giữa điểm neo và *index*: nếu *index* nằm trước điểm neo, vùng chọn sẽ chạy từ *index* đến ngay trước điểm neo; nếu *index* nằm sau điểm neo, vùng chọn sẽ chạy từ điểm neo đến ngay trước *index*; nếu chúng trùng nhau thì không có gì xảy ra. Điểm neo là điểm được thiết lập bởi lệnh gọi :meth:`selection_from` hoặc :meth:`selection_adjust` gần đây nhất. Nếu không có vùng chọn trong entry, một vùng chọn mới sẽ được tạo bằng điểm neo gần đây nhất.
+      :meth:`select_to` là bí danh của :meth:`!selection_to`.
 
    .. method:: scan_mark(x)
 
-      Record *x* and the current view in the entry window, for use with later
-      :meth:`scan_dragto` calls.
-      Typically associated with a mouse button press in the widget.
+      Ghi lại *x* và chế độ xem hiện tại trong cửa sổ nhập liệu để sử dụng cho các
+      lệnh gọi :meth:`scan_dragto`. Thông thường được liên kết với thao tác nhấn nút chuột trong widget.
 
    .. method:: scan_dragto(x)
 
-      Compute the difference between *x* and the *x* given to the last
-      :meth:`scan_mark` call, and adjust the view left or right by 10 times
-      that difference.
-      Typically associated with mouse motion events, to produce the effect of
-      dragging the entry at high speed through the window.
+      Tính hiệu giữa *x* và *x* được truyền cho lần
+      gọi :meth:`scan_mark` gần nhất, rồi điều chỉnh chế độ xem sang trái hoặc phải một khoảng bằng 10 lần hiệu đó. Thông thường được liên kết với các sự kiện chuyển động của chuột để tạo hiệu ứng kéo mục nhập qua cửa sổ với tốc độ cao.
 
 
 .. class:: Frame(master=None, cnf={}, **kw)
 
-   A :class:`!Frame` widget is a simple container.
-   Its primary purpose is to act as a spacer or container for complex window
-   layouts; its only features are its background and an optional 3-D border to
-   make the frame appear raised or sunken.
-   Inherits from :class:`Widget`.
-   Refer to the Tk ``frame`` manual page for the full list of options.
+   Một widget :class:`!Frame` là một vùng chứa đơn giản. Mục đích chính của nó là làm khoảng đệm hoặc vùng chứa cho các bố cục cửa sổ phức tạp; các tính năng duy nhất của nó là nền và đường viền 3-D tùy chọn để làm cho khung có vẻ nổi lên hoặc lõm xuống. Kế thừa từ :class:`Widget`. Tham khảo trang hướng dẫn Tk ``frame`` để xem danh sách đầy đủ các tùy chọn.
 
 
 .. class:: Label(master=None, cnf={}, **kw)
 
-   A :class:`!Label` widget displays a non-interactive textual string, bitmap
-   or image.
-   The displayed text is set with the *text* option or linked to a variable
-   through *textvariable*, and an image can be shown using the *image* option.
-   Text must all be in a single font but may occupy multiple lines, and one
-   character may be underlined with the *underline* option.
-   Inherits from :class:`Widget`.
-   Refer to the Tk ``label`` manual page for the full list of options.
+   Một widget :class:`!Label` hiển thị một chuỗi văn bản, bitmap hoặc hình ảnh không tương tác. Văn bản hiển thị được thiết lập bằng tùy chọn *text* hoặc liên kết với một biến thông qua *textvariable*, và có thể hiển thị hình ảnh bằng tùy chọn *image*. Văn bản phải sử dụng cùng một font nhưng có thể trải dài trên nhiều dòng, và một ký tự có thể được gạch chân bằng tùy chọn *underline*. Kế thừa từ :class:`Widget`. Tham khảo trang hướng dẫn Tk ``label`` để xem danh sách đầy đủ các tùy chọn.
 
 
 .. class:: LabelFrame(master=None, cnf={}, **kw)
 
-   A :class:`!LabelFrame` widget is a container that has the features of a
-   :class:`Frame` plus the ability to display a label.
-   The label text is set with the *text* option and positioned with
-   *labelanchor*, or an arbitrary widget may be used as the label by giving it
-   as the *labelwidget* option.
-   Inherits from :class:`Widget`.
-   Refer to the Tk ``labelframe`` manual page for the full list of options.
+   Widget :class:`!LabelFrame` là một vùng chứa có các tính năng của một
+   :class:`Frame` cùng với khả năng hiển thị nhãn. Văn bản nhãn được đặt bằng tùy chọn *text* và định vị bằng *labelanchor*, hoặc có thể dùng một widget bất kỳ làm nhãn bằng cách cung cấp widget đó dưới dạng tùy chọn *labelwidget*. Kế thừa từ :class:`Widget`. Tham khảo trang hướng dẫn Tk ``labelframe`` để xem danh sách đầy đủ các tùy chọn.
 
 
 .. class:: Listbox(master=None, cnf={}, **kw)
 
-   A :class:`!Listbox` widget displays a list of single-line text items, one
-   per line, of which the user can select one or more.
-   The way the selection behaves is governed by the *selectmode* option, which
-   is one of ``browse`` (the default; at most one item, which may be dragged
-   with the mouse), ``single`` (at most one item), ``multiple`` (any number of
-   items, toggled individually), or ``extended`` (any number of items,
-   including discontiguous ranges, selected by clicking and dragging).
-   Inherits from :class:`Widget`, :class:`XView` and :class:`YView`, so the
-   view can be scrolled horizontally and vertically with :meth:`~XView.xview`
-   and :meth:`~YView.yview`.
-   Refer to the Tk ``listbox`` manual page for the full list of options.
+   Widget :class:`!Listbox` hiển thị danh sách các mục văn bản một dòng, mỗi mục trên một dòng, trong đó người dùng có thể chọn một hoặc nhiều mục. Cách thức hoạt động của việc chọn được điều khiển bởi tùy chọn *selectmode*, có thể là ``browse`` (mặc định; tối đa một mục, có thể được kéo bằng chuột), ``single`` (tối đa một mục), ``multiple`` (bất kỳ số lượng mục nào, được bật hoặc tắt riêng lẻ), hoặc ``extended`` (bất kỳ số lượng mục nào, bao gồm các phạm vi không liền nhau, được chọn bằng cách nhấp và kéo). Kế thừa từ :class:`Widget`, :class:`XView` và :class:`YView`, nên chế độ xem có thể được cuộn theo chiều ngang và chiều dọc bằng :meth:`~XView.xview` và :meth:`~YView.yview`. Tham khảo trang hướng dẫn Tk ``listbox`` để xem danh sách đầy đủ các tùy chọn.
 
-   Many of the methods take an *index* argument identifying a particular item.
-   As described in the Tk ``listbox`` manual page, *index* may be a numeric
-   index (counting from 0 at the top), ``'active'`` (the item with the location
-   cursor, set with :meth:`activate`), ``'anchor'`` (the selection anchor, set
-   with :meth:`selection_anchor`), ``'end'`` (the last item, or for
-   :meth:`index` and :meth:`insert` the position just after it), or ``@x,y``
-   (the item covering pixel coordinates *x*, *y* in the listbox window).
-   Arguments named *first* and *last* are indices of the same forms.
+   Nhiều phương thức nhận đối số *index* xác định một mục cụ thể. Như được mô tả trong trang hướng dẫn Tk ``listbox``, *index* có thể là một chỉ mục dạng số (đếm từ 0 ở đầu), ``'active'`` (mục có con trỏ vị trí, được đặt bằng :meth:`activate`), ``'anchor'`` (anchor của vùng chọn, được đặt bằng :meth:`selection_anchor`), ``'end'`` (mục cuối cùng, hoặc đối với
+   :meth:`index` và :meth:`insert` là vị trí ngay sau mục đó), hoặc ``@x,y`` (mục bao phủ các tọa độ pixel *x*, *y* trong cửa sổ listbox). Các đối số có tên *first* và *last* là các chỉ mục thuộc những dạng tương tự.
 
    .. method:: insert(index, *elements)
 
-      Insert the given *elements* as new items just before the item given by
-      *index*.
-      If *index* is ``'end'``, the new items are appended to the end of the
-      list.
+      Chèn các *elements* đã cho thành các mục mới ngay trước mục được chỉ định bởi *index*. Nếu *index* là ``'end'``, các mục mới sẽ được thêm vào cuối danh sách.
 
    .. method:: delete(first, last=None)
 
-      Delete the items in the range from *first* to *last* inclusive.
-      If *last* is omitted, it defaults to *first*, so that a single item is
-      deleted.
+      Xóa các mục trong phạm vi từ *first* đến *last*, bao gồm cả hai đầu. Nếu bỏ qua *last*, giá trị mặc định là *first*, do đó chỉ một mục sẽ bị xóa.
 
    .. method:: get(first, last=None)
 
-      If *last* is omitted, return the contents of the item given by *first*,
-      or an empty string if *first* refers to a non-existent item.
-      If *last* is given, return a tuple of all the items in the range from
-      *first* to *last* inclusive.
+      Nếu bỏ qua *last*, trả về nội dung của mục được chỉ định bởi *first*, hoặc một chuỗi rỗng nếu *first* trỏ đến một mục không tồn tại. Nếu cung cấp *last*, trả về một tuple gồm tất cả các mục trong phạm vi từ *first* đến *last*, bao gồm cả hai đầu mút.
 
    .. method:: size()
 
-      Return the total number of items in the listbox.
+      Trả về tổng số mục trong hộp danh sách.
 
-      This shadows the inherited :meth:`!Misc.size`;
-      use :meth:`~Misc.grid_size` for the grid size.
+      Giá trị này che khuất :meth:`!Misc.size` được kế thừa; hãy sử dụng :meth:`~Misc.grid_size` để lấy kích thước grid.
 
    .. method:: index(index)
 
-      Return the integer index value corresponding to *index*, or ``None`` if
-      *index* is out of range.
-      If *index* is ``'end'``, the result is a count of the number of items in
-      the listbox (not the index of the last item).
+      Trả về giá trị chỉ mục số nguyên tương ứng với *index*, hoặc ``None`` nếu *index* nằm ngoài phạm vi. Nếu *index* là ``'end'``, kết quả là số lượng mục trong hộp danh sách (không phải chỉ mục của mục cuối cùng).
 
    .. method:: bbox(index)
 
-      Return a tuple ``(x, y, width, height)`` describing the bounding box, in
-      pixels relative to the widget, of the text of the item given by *index*.
-      Return ``None`` if no part of that item is visible on the screen, or if
-      *index* refers to a non-existent item; if the item is only partly
-      visible, the result still gives the full area of the item, including the
-      parts that are not visible.
+      Trả về một tuple ``(x, y, width, height)`` mô tả bounding box, tính bằng pixel và tương đối so với widget, của văn bản thuộc mục được chỉ định bởi *index*. Trả về ``None`` nếu không có phần nào của mục đó hiển thị trên màn hình, hoặc nếu *index* trỏ đến một mục không tồn tại; nếu mục chỉ hiển thị một phần, kết quả vẫn cung cấp toàn bộ vùng của mục, bao gồm cả những phần không hiển thị.
 
-      This shadows the inherited :meth:`!Misc.bbox`;
-      use :meth:`~Misc.grid_bbox` for the grid bounding box.
+      Phương thức này che khuất :meth:`!Misc.bbox` được kế thừa; hãy sử dụng :meth:`~Misc.grid_bbox` cho hộp giới hạn của grid.
 
    .. method:: nearest(y)
 
-      Given a y-coordinate within the listbox window, return the index of the
-      visible item nearest to that y-coordinate.
+      Với một tọa độ y nằm trong cửa sổ hộp danh sách, trả về chỉ mục của mục đang hiển thị gần tọa độ y đó nhất.
 
    .. method:: see(index)
 
-      Adjust the view so that the item given by *index* is visible.
-      If the item is already visible the method has no effect; if it is near an
-      edge of the window the listbox scrolls just enough to bring it into view
-      at that edge, otherwise the listbox scrolls to center the item.
+      Điều chỉnh chế độ xem để mục được chỉ định bởi *index* hiển thị. Nếu mục đó đã hiển thị, phương thức không có tác dụng; nếu mục ở gần mép cửa sổ, listbox chỉ cuộn vừa đủ để đưa mục đó vào chế độ xem tại mép ấy; nếu không, listbox cuộn để đưa mục vào giữa.
 
    .. method:: activate(index)
 
-      Set the active item to the one given by *index*.
-      If *index* is outside the range of items, the closest item is activated
-      instead.
-      The active item is drawn as specified by the *activestyle* option when
-      the widget has the input focus, and its index may be retrieved with the
-      ``'active'`` index.
+      Đặt mục đang hoạt động thành mục được chỉ định bởi *index*. Nếu *index* nằm ngoài phạm vi các mục, mục gần nhất sẽ được kích hoạt thay thế. Mục đang hoạt động được vẽ theo quy định của tùy chọn *activestyle* khi widget nhận input focus, và có thể lấy chỉ số của mục này bằng ``'active'`` index.
 
    .. method:: curselection()
 
-      Return a tuple containing the numerical indices of all of the items that
-      are currently selected, or an empty tuple if no items are selected.
+      Trả về một tuple chứa các chỉ số dạng số của tất cả mục hiện đang được chọn, hoặc một tuple rỗng nếu không có mục nào được chọn.
 
    .. method:: select_anchor(index)
       :no-typesetting:
 
    .. method:: selection_anchor(index)
 
-      Set the selection anchor to the item given by *index*.
-      If *index* refers to a non-existent item, the closest item is used.
-      The selection anchor is the end of the selection that is fixed while
-      dragging out a selection with the mouse, and may afterwards be referred
-      to with the ``'anchor'`` index.
-      :meth:`select_anchor` is an alias of :meth:`!selection_anchor`.
+      Đặt selection anchor thành mục được chỉ định bởi *index*. Nếu *index* tham chiếu đến một mục không tồn tại, mục gần nhất sẽ được sử dụng. Selection anchor là đầu cuối của vùng chọn được cố định khi kéo để mở rộng vùng chọn bằng chuột, và sau đó có thể được tham chiếu bằng ``'anchor'`` index.
+      :meth:`select_anchor` là bí danh của :meth:`!selection_anchor`.
 
    .. method:: select_clear(first, last=None)
       :no-typesetting:
 
    .. method:: selection_clear(first, last=None)
 
-      Deselect any of the items in the range from *first* to *last* inclusive
-      that are selected.
-      The selection state of items outside this range is not changed.
-      :meth:`select_clear` is an alias of :meth:`!selection_clear`.
+      Bỏ chọn mọi mục đang được chọn trong phạm vi từ *first* đến *last*, bao gồm cả hai đầu. Trạng thái chọn của các mục nằm ngoài phạm vi này không thay đổi.
+      :meth:`select_clear` là bí danh của :meth:`!selection_clear`.
 
       .. note::
 
-         This shadows the inherited :meth:`Misc.selection_clear`,
-         which clears the X selection;
-         that method is not available on a :class:`Listbox`.
+         Điều này che khuất :meth:`Misc.selection_clear` được kế thừa, vốn xóa vùng chọn X; phương thức đó không khả dụng trên một :class:`Listbox`.
 
    .. method:: select_includes(index)
       :no-typesetting:
 
    .. method:: selection_includes(index)
 
-      Return ``True`` if the item given by *index* is currently selected,
-      ``False`` otherwise.
-      :meth:`select_includes` is an alias of :meth:`!selection_includes`.
+      Trả về ``True`` nếu mục được chỉ định bởi *index* hiện đang được chọn, ``False`` nếu không.
+      :meth:`select_includes` là bí danh của :meth:`!selection_includes`.
 
    .. method:: select_set(first, last=None)
       :no-typesetting:
 
    .. method:: selection_set(first, last=None)
 
-      Select all of the items in the range from *first* to *last* inclusive,
-      without affecting the selection state of items outside that range.
-      :meth:`select_set` is an alias of :meth:`!selection_set`.
+      Chọn tất cả các mục trong phạm vi từ *first* đến *last*, bao gồm cả hai đầu, mà không ảnh hưởng đến trạng thái chọn của các mục nằm ngoài phạm vi đó.
+      :meth:`select_set` là bí danh của :meth:`!selection_set`.
 
    .. method:: itemcget(index, option)
 
-      Return the current value of the configuration option *option* for the
-      item given by *index*.
+      Trả về giá trị hiện tại của tùy chọn cấu hình *option* cho mục được chỉ định bởi *index*.
 
    .. method:: itemconfig(index, cnf=None, **kw)
       :no-typesetting:
 
    .. method:: itemconfigure(index, cnf=None, **kw)
 
-      Query or modify the configuration options of the item given by *index*.
-      This mirrors :meth:`~Misc.configure`, except that it applies to an
-      individual item rather than to the listbox as a whole.
-      With no options, it returns a dictionary describing the current options
-      of the item; otherwise it sets the given options.
-      The supported item options are *background*, *foreground*,
-      *selectbackground* and *selectforeground*.
-      :meth:`itemconfig` is an alias of :meth:`!itemconfigure`.
+      Truy vấn hoặc sửa đổi các tùy chọn cấu hình của mục được chỉ định bởi *index*. Điều này phản ánh :meth:`~Misc.configure`, ngoại trừ việc nó áp dụng cho từng mục riêng lẻ thay vì toàn bộ listbox. Khi không có tùy chọn nào, nó trả về một từ điển mô tả các tùy chọn hiện tại của mục; nếu không, nó đặt các tùy chọn được cung cấp. Các tùy chọn mục được hỗ trợ là *background*, *foreground*, *selectbackground* và *selectforeground*.
+      :meth:`itemconfig` là bí danh của :meth:`!itemconfigure`.
 
    .. method:: scan_mark(x, y)
 
-      Record *x*, *y* and the current view, for use with later
-      :meth:`scan_dragto` calls.
-      This is typically bound to a mouse button press in the widget.
+      Ghi lại *x*, *y* và chế độ xem hiện tại để sử dụng với các lệnh gọi sau này
+      :meth:`scan_dragto`. Thông thường, lệnh này được liên kết với thao tác nhấn nút chuột trong widget.
 
    .. method:: scan_dragto(x, y)
 
-      Scroll the listbox by 10 times the difference between *x*, *y* and the
-      coordinates passed to the last :meth:`scan_mark` call.
-      This is typically bound to mouse motion events in the widget, producing
-      the effect of dragging the list at high speed through the window.
+      Cuộn listbox một khoảng bằng 10 lần chênh lệch giữa *x*, *y* và các tọa độ được truyền vào lần gọi :meth:`scan_mark` gần nhất. Thao tác này thường được liên kết với các sự kiện chuyển động chuột trong widget, tạo ra hiệu ứng kéo danh sách qua cửa sổ với tốc độ cao.
 
 
 .. class:: Menu(master=None, cnf={}, **kw)
 
-   A :class:`!Menu` widget displays a column of entries, each of which may be a
-   command, a checkbutton, a radiobutton, a cascade (which posts an associated
-   submenu) or a separator.
-   Menus are used as the menubar of a toplevel window, as pulldown menus posted
-   from a cascade entry or menubutton, and as popup menus.
-   Inherits from :class:`Widget`.
+   Một widget :class:`!Menu` hiển thị một cột các mục, mỗi mục có thể là một command, checkbutton, radiobutton, cascade (hiển thị một submenu liên kết) hoặc separator. Menu được dùng làm menubar của cửa sổ toplevel, làm pulldown menu được hiển thị từ một mục cascade hoặc menubutton, và làm popup menu. Kế thừa từ :class:`Widget`.
 
-   Many of the entry methods take an *index* argument that selects which entry
-   to operate on.
-   As described in the Tk ``menu`` manual page, *index* may be a numeric index
-   (counting from 0 at the top), ``'active'`` (the currently active entry),
-   ``'end'`` or ``'last'`` (the bottommost entry), ``'none'`` (no entry at all,
-   written ``{}`` in Tcl), ``@y`` (the entry covering pixel y-coordinate *y* in
-   the menu window), or a pattern matched against the labels of the entries
-   from the top down.
+   Nhiều phương thức của entry nhận một đối số *index* để chọn entry cần thao tác. Như được mô tả trong trang hướng dẫn Tk ``menu``, *index* có thể là một chỉ mục số (đếm từ 0 ở trên cùng), ``'active'`` (entry hiện đang active), ``'end'`` hoặc ``'last'`` (entry ở dưới cùng), ``'none'`` (không có entry nào, được viết là ``{}`` trong Tcl), ``@y`` (entry bao phủ tọa độ pixel y *y* trong cửa sổ menu), hoặc một mẫu được đối chiếu với nhãn của các entry từ trên xuống.
 
    .. method:: add(itemType, cnf={}, **kw)
 
-      Add a new entry to the bottom of the menu.
-      *itemType* is one of ``'command'``, ``'cascade'``, ``'checkbutton'``,
-      ``'radiobutton'`` or ``'separator'`` and determines the type of the new
-      entry; the remaining options configure it.
-      The :meth:`!add_command`, :meth:`!add_cascade`, :meth:`!add_checkbutton`,
-      :meth:`!add_radiobutton` and :meth:`!add_separator` convenience methods
-      call this method with the corresponding *itemType*.
+      Thêm một entry mới vào cuối menu. *itemType* là một trong ``'command'``, ``'cascade'``, ``'checkbutton'``, ``'radiobutton'`` hoặc ``'separator'`` và xác định loại entry mới; các tùy chọn còn lại sẽ cấu hình entry đó. :meth:`!add_command`, :meth:`!add_cascade`, :meth:`!add_checkbutton`,
+      Các phương thức tiện ích :meth:`!add_radiobutton` và :meth:`!add_separator` gọi phương thức này với *itemType* tương ứng.
 
-      The entry is configured by the following options, although not every
-      option applies to every entry type (a separator accepts none of them):
+      Mục nhập được cấu hình bằng các tùy chọn sau, mặc dù không phải tùy chọn nào cũng áp dụng cho mọi loại mục nhập (separator không chấp nhận tùy chọn nào trong số đó):
 
       *label*
-         The text to display in the entry.
+         Văn bản sẽ hiển thị trong mục nhập.
 
       *command*
-         The function to call when the entry is invoked (command, checkbutton
-         and radiobutton entries).
+         Hàm sẽ được gọi khi mục nhập được kích hoạt (các mục nhập command, checkbutton và radiobutton).
 
       *accelerator*
-         A string displayed at the right of the entry to advertise an
-         accelerator keystroke; it does not itself create the binding.
+         Một chuỗi được hiển thị ở bên phải mục nhập để quảng bá một phím tắt; bản thân chuỗi này không tạo liên kết phím.
 
       *underline*
-         The index of a character in the label to underline for keyboard
-         traversal.
+         Chỉ mục của một ký tự trong nhãn cần gạch dưới để duyệt bằng bàn phím.
 
       *state*
-         One of ``'normal'``, ``'active'`` or ``'disabled'``.
+         Một trong ``'normal'``, ``'active'`` hoặc ``'disabled'``.
 
       *image*
-         An image to display instead of, or together with, the text label.
+         Một hình ảnh được hiển thị thay cho hoặc cùng với nhãn văn bản.
 
       *compound*
-         Where to show the image relative to the text: ``'none'`` (the
-         default), ``'text'``, ``'image'``, ``'top'``, ``'bottom'``, ``'left'``
-         or ``'right'``.
+         Vị trí hiển thị hình ảnh so với văn bản: ``'none'`` (mặc định), ``'text'``, ``'image'``, ``'top'``, ``'bottom'``, ``'left'`` hoặc ``'right'``.
 
       *bitmap*
-         A bitmap to display instead of the text label.
+         Một bitmap để hiển thị thay cho nhãn văn bản.
 
       *font*
-         The font to use for the text.
+         Phông chữ dùng cho văn bản.
 
       *background*, *foreground*
-         The entry's background and foreground colors in its normal state
-         (ignored on macOS).
+         Màu nền và màu chữ của entry ở trạng thái bình thường (bị bỏ qua trên macOS).
 
       *activebackground*, *activeforeground*
-         The background and foreground colors used when the entry is active
-         (ignored on macOS).
+         Màu nền và màu chữ được sử dụng khi entry đang hoạt động (bị bỏ qua trên macOS).
 
       *columnbreak*
-         If true, the entry starts a new column instead of being placed below
-         the previous entry.
+         Nếu là true, entry sẽ bắt đầu một cột mới thay vì được đặt bên dưới entry trước đó.
 
       *hidemargin*
-         If true, the standard margin around the entry is omitted, which is
-         useful when a menu is used as a palette.
+         Nếu là true, phần lề tiêu chuẩn xung quanh entry sẽ bị bỏ qua, điều này hữu ích khi menu được dùng làm palette.
 
       *menu*
-         The submenu posted by a cascade entry; it must be a child of this
-         menu.
+         Menu con do một mục cascade đăng lên; nó phải là con của menu này.
 
       *variable*
-         The variable associated with a checkbutton or radiobutton entry.
+         Biến được liên kết với một mục checkbutton hoặc radiobutton.
 
       *onvalue*, *offvalue*
-         The values stored in *variable* when a checkbutton entry is selected
-         or cleared.
+         Các giá trị được lưu trong *variable* khi một mục checkbutton được chọn hoặc bỏ chọn.
 
       *value*
-         The value stored in *variable* when a radiobutton entry is selected.
+         Giá trị được lưu trong *variable* khi một mục radiobutton được chọn.
 
       *indicatoron*
-         Whether to display the indicator of a checkbutton or radiobutton
-         entry.
+         Có hiển thị indicator của mục checkbutton hoặc radiobutton hay không.
 
       *selectcolor*
-         The color of the indicator of a checkbutton or radiobutton entry when
-         it is selected.
+         Màu của indicator của mục checkbutton hoặc radiobutton khi mục đó được chọn.
 
       *selectimage*
-         The image displayed when a checkbutton or radiobutton entry is
-         selected and *image* is also given.
+         Ảnh được hiển thị khi một mục checkbutton hoặc radiobutton được chọn và *image* cũng được cung cấp.
 
    .. method:: add_cascade(cnf={}, **kw)
 
-      Add a new cascade entry to the bottom of the menu.
-      A cascade entry has an associated submenu, given by its *menu* option,
-      which must be a child of this menu; posting the entry posts the submenu
-      next to it.
+      Thêm một mục cascade mới vào cuối menu. Một mục cascade có submenu liên kết, được chỉ định bởi tùy chọn *menu* của mục đó; tùy chọn này phải là một mục con của menu hiện tại. Khi đăng mục, submenu sẽ được đăng bên cạnh mục đó.
 
    .. method:: add_checkbutton(cnf={}, **kw)
 
-      Add a new checkbutton entry to the bottom of the menu.
-      When invoked, a checkbutton entry toggles between its *onvalue* and
-      *offvalue*, storing the result in its associated *variable*, and displays
-      an indicator showing whether it is selected.
+      Thêm một mục checkbutton mới vào cuối menu. Khi được gọi, mục checkbutton chuyển đổi giữa *onvalue* và *offvalue*, lưu kết quả vào *variable* liên kết với nó, đồng thời hiển thị một chỉ báo cho biết mục đó có được chọn hay không.
 
    .. method:: add_command(cnf={}, **kw)
 
-      Add a new command entry to the bottom of the menu.
-      A command entry behaves much like a button: when it is invoked, the
-      callback given by its *command* option is called.
+      Thêm một mục command mới vào cuối menu. Mục command hoạt động gần giống một button: khi được gọi, callback được chỉ định bởi tùy chọn *command* của mục đó sẽ được gọi.
 
    .. method:: add_radiobutton(cnf={}, **kw)
 
-      Add a new radiobutton entry to the bottom of the menu.
-      Radiobutton entries sharing the same *variable* form a group of which
-      only one may be selected at a time; selecting an entry stores its *value*
-      in the variable.
+      Thêm một mục radiobutton mới vào cuối menu. Các mục radiobutton dùng chung *variable* sẽ tạo thành một nhóm mà tại mỗi thời điểm chỉ có một mục được chọn; khi chọn một mục, *value* của mục đó sẽ được lưu vào biến.
 
    .. method:: add_separator(cnf={}, **kw)
 
-      Add a separator to the bottom of the menu.
-      A separator is displayed as a horizontal dividing line and cannot be
-      activated or invoked.
+      Thêm một dấu phân cách vào cuối menu. Dấu phân cách được hiển thị dưới dạng một đường ngang và không thể được kích hoạt hoặc gọi.
 
    .. method:: insert(index, itemType, cnf={}, **kw)
 
-      Same as :meth:`add`, except that the new entry is inserted just before
-      the entry given by *index* instead of being appended to the end of the
-      menu.
-      *itemType* is one of ``'command'``, ``'cascade'``, ``'checkbutton'``,
-      ``'radiobutton'`` or ``'separator'``.
-      The :meth:`!insert_command`, :meth:`!insert_cascade`,
-      :meth:`!insert_checkbutton`, :meth:`!insert_radiobutton` and
-      :meth:`!insert_separator` convenience methods call this method with the
-      corresponding *itemType*.
+      Giống :meth:`add`, ngoại trừ mục mới được chèn ngay trước mục được chỉ định bởi *index* thay vì được thêm vào cuối menu. *itemType* là một trong các giá trị ``'command'``, ``'cascade'``, ``'checkbutton'``, ``'radiobutton'`` hoặc ``'separator'``. :meth:`!insert_command`, :meth:`!insert_cascade`,
+      :meth:`!insert_checkbutton`, :meth:`!insert_radiobutton` và
+      Các phương thức tiện ích :meth:`!insert_separator` gọi phương thức này với *itemType* tương ứng.
 
    .. method:: insert_cascade(index, cnf={}, **kw)
 
-      Insert a new cascade entry before the entry given by *index* (see
+      Chèn một mục cascade mới trước mục được chỉ định bởi *index* (xem
       :meth:`add_cascade`).
 
    .. method:: insert_checkbutton(index, cnf={}, **kw)
 
-      Insert a new checkbutton entry before the entry given by *index* (see
+      Chèn một mục checkbutton mới trước mục được chỉ định bởi *index* (xem
       :meth:`add_checkbutton`).
 
    .. method:: insert_command(index, cnf={}, **kw)
 
-      Insert a new command entry before the entry given by *index* (see
+      Chèn một mục command mới trước mục được chỉ định bởi *index* (xem
       :meth:`add_command`).
 
    .. method:: insert_radiobutton(index, cnf={}, **kw)
 
-      Insert a new radiobutton entry before the entry given by *index* (see
+      Chèn một mục radiobutton mới trước mục được chỉ định bởi *index* (xem
       :meth:`add_radiobutton`).
 
    .. method:: insert_separator(index, cnf={}, **kw)
 
-      Insert a separator before the entry given by *index* (see
+      Chèn một dấu phân cách trước mục được chỉ định bởi *index* (xem
       :meth:`add_separator`).
 
    .. method:: delete(index1, index2=None)
 
-      Delete all of the menu entries between *index1* and *index2* inclusive.
-      If *index2* is omitted, it defaults to *index1*, so that a single entry
-      is deleted.
-      Attempts to delete a tear-off entry are ignored; remove it by changing
-      the *tearoff* option instead.
+      Xóa tất cả các mục menu giữa *index1* và *index2*, bao gồm cả hai mục này. Nếu *index2* bị bỏ qua, giá trị mặc định là *index1*, do đó một mục duy nhất sẽ bị xóa. Các nỗ lực xóa mục tear-off sẽ bị bỏ qua; hãy xóa mục đó bằng cách thay đổi tùy chọn *tearoff*.
 
    .. method:: entrycget(index, option)
 
-      Return the current value of the configuration option *option* for the
-      entry given by *index*.
+      Trả về giá trị hiện tại của tùy chọn cấu hình *option* cho mục nhập được chỉ định bởi *index*.
 
    .. method:: entryconfig(index, cnf=None, **kw)
       :no-typesetting:
 
    .. method:: entryconfigure(index, cnf=None, **kw)
 
-      Query or modify the configuration options of the entry given by *index*.
-      This mirrors :meth:`~Misc.configure`, except that it applies to an
-      individual entry rather than to the menu as a whole.
-      With no options, it returns a dictionary describing the current options
-      of the entry; otherwise it sets the given options.
-      The supported options are those accepted by :meth:`add` for the entry's
-      type.
-      :meth:`entryconfig` is an alias of :meth:`!entryconfigure`.
+      Truy vấn hoặc sửa đổi các tùy chọn cấu hình của mục nhập được chỉ định bởi *index*. Điều này phản chiếu :meth:`~Misc.configure`, ngoại trừ việc nó áp dụng cho một mục nhập riêng lẻ thay vì toàn bộ menu. Khi không có tùy chọn nào, hàm trả về một từ điển mô tả các tùy chọn hiện tại của mục nhập; nếu không, hàm sẽ đặt các tùy chọn đã cho. Các tùy chọn được hỗ trợ là những tùy chọn được :meth:`add` chấp nhận cho loại mục nhập đó.
+      :meth:`entryconfig` là bí danh của :meth:`!entryconfigure`.
 
    .. method:: index(index)
 
-      Return the numerical index corresponding to *index*, or ``None`` if
-      *index* selects no entry.
+      Trả về chỉ mục số tương ứng với *index*, hoặc ``None`` nếu *index* không chọn mục nhập nào.
 
    .. method:: type(index)
 
-      Return the type of the entry given by *index*: one of ``'command'``,
-      ``'cascade'``, ``'checkbutton'``, ``'radiobutton'``, ``'separator'`` or
-      ``'tearoff'`` (for the tear-off entry).
+      Trả về loại của mục nhập được chỉ định bởi *index*: một trong các loại ``'command'``, ``'cascade'``, ``'checkbutton'``, ``'radiobutton'``, ``'separator'`` hoặc ``'tearoff'`` (đối với mục nhập tear-off).
 
    .. method:: activate(index)
 
-      Make the entry given by *index* the active entry, redisplaying it with
-      its active colors, and deactivate any previously active entry.
-      If *index* selects no entry, or the selected entry is disabled, the menu
-      ends up with no active entry.
+      Đặt mục nhập được chỉ định bởi *index* làm mục nhập hiện hoạt, hiển thị lại mục nhập đó bằng các màu hiện hoạt và hủy kích hoạt mọi mục nhập hiện hoạt trước đó. Nếu *index* không chọn mục nhập nào hoặc mục nhập được chọn bị vô hiệu hóa, menu sẽ không còn mục nhập hiện hoạt nào.
 
    .. method:: invoke(index)
 
-      Invoke the action of the entry given by *index*, as if it had been
-      clicked.
-      Nothing happens if the entry is disabled.
-      If the entry has a *command* associated with it, the result of that
-      command is returned; otherwise the result is an empty string.
+      Gọi hành động của mục nhập được chỉ định bởi *index*, như thể mục nhập đó đã được nhấp. Sẽ không có gì xảy ra nếu mục nhập bị vô hiệu hóa. Nếu mục nhập có *command* liên kết với nó, kết quả của command đó sẽ được trả về; nếu không, kết quả là một chuỗi rỗng.
 
    .. method:: post(x, y)
 
-      Display the menu on the screen at the root-window coordinates *x* and
-      *y*, adjusting them if necessary so that the whole menu is visible.
-      If the *postcommand* option has been specified, it is evaluated before
-      the menu is posted.
+      Hiển thị menu trên màn hình tại các tọa độ của cửa sổ gốc *x* và *y*, điều chỉnh các tọa độ này nếu cần để toàn bộ menu hiển thị được. Nếu tùy chọn *postcommand* được chỉ định, tùy chọn này sẽ được đánh giá trước khi menu được hiển thị.
 
    .. method:: tk_popup(x, y, entry='')
 
-      Post the menu as a popup at the root-window coordinates *x* and *y*.
-      If *entry* is given, the menu is positioned so that this entry is
-      displayed under the pointer.
+      Hiển thị menu dưới dạng popup tại các tọa độ của cửa sổ gốc *x* và *y*. Nếu chỉ định *entry*, menu sẽ được định vị sao cho mục này hiển thị bên dưới con trỏ.
 
    .. method:: unpost()
 
-      Unmap the menu so that it is no longer displayed, also unposting any
-      posted lower-level cascaded submenu.
-      This has no effect on Windows and macOS, which manage the unposting of
-      menus themselves.
+      Bỏ ánh xạ menu để menu không còn được hiển thị, đồng thời bỏ hiển thị mọi menu con dạng cascade cấp thấp hơn đang được hiển thị. Việc này không ảnh hưởng đến Windows và macOS, vì các hệ điều hành này tự quản lý việc bỏ hiển thị menu.
 
    .. method:: xposition(index)
 
-      Return the x-coordinate, within the menu window, of the leftmost pixel of
-      the entry given by *index*.
+      Trả về tọa độ x, trong cửa sổ menu, của pixel ngoài cùng bên trái của mục được chỉ định bởi *index*.
 
       .. versionadded:: 3.3
 
    .. method:: yposition(index)
 
-      Return the y-coordinate, within the menu window, of the topmost pixel of
-      the entry given by *index*.
+      Trả về tọa độ y, trong cửa sổ menu, của pixel trên cùng của mục được chỉ định bởi *index*.
 
 
 .. class:: Menubutton(master=None, cnf={}, **kw)
 
-   A :class:`!Menubutton` widget displays a textual string, bitmap or image and
-   posts an associated :class:`Menu`, given by its *menu* option, when the user
-   presses it.
-   Like a :class:`Label` it can show *text*, a *textvariable*, or an *image*,
-   and the *direction* option controls where the menu appears relative to the
-   button.
-   Inherits from :class:`Widget`.
-   Refer to the Tk ``menubutton`` manual page for the full list of options.
+   Một widget :class:`!Menubutton` hiển thị một chuỗi văn bản, bitmap hoặc hình ảnh, đồng thời hiển thị :class:`Menu` liên kết với nó, được chỉ định bởi tùy chọn *menu*, khi người dùng nhấn vào widget. Giống như :class:`Label`, widget này có thể hiển thị *text*, *textvariable* hoặc *image*, và tùy chọn *direction* kiểm soát vị trí menu so với nút. Kế thừa từ :class:`Widget`. Tham khảo trang hướng dẫn Tk ``menubutton`` để xem danh sách đầy đủ các tùy chọn.
 
 
 .. class:: Message(master=None, cnf={}, **kw)
 
-   A :class:`!Message` widget displays a non-interactive textual string, given
-   by the *text* option or linked to a variable through *textvariable*.
-   Unlike a :class:`Label`, it breaks the string into multiple lines in order
-   to produce a given aspect ratio, choosing line breaks at word boundaries,
-   and it can justify the text left, centered or right.
-   Inherits from :class:`Widget`.
-   Refer to the Tk ``message`` manual page for the full list of options.
+   Một widget :class:`!Message` hiển thị một chuỗi văn bản không tương tác, được chỉ định bởi tùy chọn *text* hoặc liên kết với một biến thông qua *textvariable*. Không giống :class:`Label`, widget này ngắt chuỗi thành nhiều dòng để tạo ra một tỷ lệ khung hình nhất định, chọn vị trí ngắt dòng tại ranh giới giữa các từ, đồng thời có thể căn văn bản sang trái, giữa hoặc phải. Kế thừa từ :class:`Widget`. Tham khảo trang hướng dẫn Tk ``message`` để xem danh sách đầy đủ các tùy chọn.
 
 
 .. class:: OptionMenu(master, variable, value, *values, **kwargs)
 
-   A helper subclass of :class:`Menubutton` that displays a pop-up menu of
-   mutually exclusive choices.
-   *variable* is a :class:`Variable` kept in sync with the selection, *value*
-   is the initial choice, and *values* are the remaining menu entries.
-   The keyword argument *command* may be given a callback that is invoked with
-   the selected value, and the keyword argument *name* sets the Tk widget name.
+   Một lớp con trợ giúp của :class:`Menubutton`, dùng để hiển thị menu bật lên gồm các lựa chọn loại trừ lẫn nhau. *variable* là một :class:`Variable` được giữ đồng bộ với lựa chọn, *value* là lựa chọn ban đầu, còn *values* là các mục còn lại trong menu. Đối số từ khóa *command* có thể nhận một callback được gọi với giá trị đã chọn, còn đối số từ khóa *name* thiết lập tên widget Tk.
 
    .. method:: destroy()
 
-      Destroy the widget, also cleaning up the associated pop-up menu.
+      Hủy widget, đồng thời dọn dẹp menu bật lên liên kết với widget.
 
    .. versionchanged:: 3.14
-      Added support for the *name* keyword argument.
+      Đã bổ sung hỗ trợ cho đối số từ khóa *name*.
 
 
 
 .. class:: PanedWindow(master=None, cnf={}, **kw)
 
-   A :class:`!PanedWindow` is a geometry-manager widget that arranges any
-   number of child *panes* in a row (when *orient* is ``'horizontal'``) or a
-   column (when *orient* is ``'vertical'``).
-   Each pane holds one widget, and each pair of adjacent panes is separated by
-   a movable *sash* that the user can drag with the mouse to resize the widgets
-   on either side of it.
-   Inherits from :class:`Widget`.
+   :class:`!PanedWindow` là một widget geometry-manager sắp xếp bất kỳ số lượng *panes* con nào thành một hàng (khi *orient* là ``'horizontal'``) hoặc một cột (khi *orient* là ``'vertical'``). Mỗi pane chứa một widget, và mỗi cặp pane liền kề được ngăn cách bởi một *sash* có thể di chuyển; người dùng có thể kéo sash bằng chuột để thay đổi kích thước các widget ở hai bên. Kế thừa từ :class:`Widget`.
 
-   The *orient* option selects the layout direction, *sashwidth* sets the width
-   of each sash and *sashrelief* its relief.
-   When *showhandle* is true a small handle is drawn on each sash that the user
-   can grab to drag it.
-   Refer to the Tk ``panedwindow`` manual page for the full list of options.
+   Tùy chọn *orient* chọn hướng bố cục, *sashwidth* đặt chiều rộng của mỗi sash, còn *sashrelief* đặt kiểu nổi của sash. Khi *showhandle* là true, một tay nắm nhỏ được vẽ trên mỗi sash để người dùng có thể nắm và kéo sash. Tham khảo trang hướng dẫn Tk ``panedwindow`` để xem danh sách đầy đủ các tùy chọn.
 
    .. method:: add(child, **kw)
 
-      Add *child* to the panedwindow as a new pane, placed after any existing
-      panes.
-      The keyword arguments specify per-pane management options for *child*;
-      they may be any of the options accepted by :meth:`paneconfigure`.
+      Thêm *child* vào panedwindow dưới dạng pane mới, đặt sau tất cả các pane hiện có. Các đối số từ khóa chỉ định các tùy chọn quản lý riêng cho từng pane của *child*; chúng có thể là bất kỳ tùy chọn nào được :meth:`paneconfigure` chấp nhận.
 
    .. method:: forget(child)
       :no-typesetting:
 
    .. method:: remove(child)
 
-      Remove the pane containing *child* from the panedwindow.
-      All geometry management options for *child* are forgotten.
-      :meth:`forget` is an alias of :meth:`!remove`.
-      This shadows the inherited geometry-manager :meth:`!forget`;
-      use :meth:`~Pack.pack_forget`, :meth:`~Grid.grid_forget` or
-      :meth:`~Place.place_forget` to remove the widget itself from its manager.
+      Xóa pane chứa *child* khỏi panedwindow. Tất cả tùy chọn quản lý hình học cho *child* sẽ bị quên.
+      :meth:`forget` là bí danh của :meth:`!remove`. Nó che khuất geometry-manager được kế thừa :meth:`!forget`; hãy sử dụng :meth:`~Pack.pack_forget`, :meth:`~Grid.grid_forget` hoặc
+      :meth:`~Place.place_forget` để xóa chính widget khỏi trình quản lý của nó.
 
    .. method:: panes()
 
-      Return a tuple of the widgets managed by the panedwindow, one per pane,
-      in order.
+      Trả về một tuple gồm các widget do panedwindow quản lý, mỗi pane một widget, theo đúng thứ tự.
 
    .. method:: panecget(child, option)
 
-      Return the current value of the management option *option* for the pane
-      containing *child*.
-      *option* may be any value allowed by :meth:`paneconfigure`.
+      Trả về giá trị hiện tại của tùy chọn quản lý *option* cho pane chứa *child*. *option* có thể là bất kỳ giá trị nào được :meth:`paneconfigure` cho phép.
 
    .. method:: paneconfig(tagOrId, cnf=None, **kw)
       :no-typesetting:
 
    .. method:: paneconfigure(tagOrId, cnf=None, **kw)
 
-      Query or modify the management options of the pane containing the widget
-      *tagOrId*.
-      With no options, it returns a dictionary describing all of the available
-      options for the pane; given a single option name as a string, it returns
-      a description of that one option; otherwise it sets the given options.
-      The supported options include *after* and *before* (insert the pane after
-      or before another managed window), *height* and *width* (the outer
-      dimensions of the window, including any border), *minsize* (the minimum
-      size in the paned dimension), *padx* and *pady* (extra space to leave on
-      each side of the window), *sticky* (position or stretch the window within
-      an oversized pane, using a string of the characters ``n``, ``s``, ``e``
-      and ``w``), *hide* (hide the pane while keeping it in the list of panes)
-      and *stretch* (how extra space is allocated to the pane: one of
-      ``'always'``, ``'first'``, ``'last'``, ``'middle'`` or ``'never'``).
-      :meth:`paneconfig` is an alias of :meth:`!paneconfigure`.
+      Truy vấn hoặc sửa đổi các tùy chọn quản lý của pane chứa widget *tagOrId*. Khi không có tùy chọn nào, trả về một dictionary mô tả tất cả tùy chọn hiện có của pane; khi được cung cấp một tên tùy chọn duy nhất dưới dạng chuỗi, trả về mô tả của tùy chọn đó; nếu không, đặt các tùy chọn đã cho. Các tùy chọn được hỗ trợ bao gồm *after* và *before* (chèn pane sau hoặc trước một cửa sổ khác đang được quản lý), *height* và *width* (kích thước bên ngoài của cửa sổ, bao gồm cả đường viền), *minsize* (kích thước tối thiểu theo chiều paned), *padx* và *pady* (khoảng trống bổ sung để chừa ở mỗi bên của cửa sổ), *sticky* (định vị hoặc kéo giãn cửa sổ trong một pane lớn hơn kích thước cần thiết, bằng chuỗi gồm các ký tự ``n``, ``s``, ``e`` và ``w``), *hide* (ẩn pane nhưng vẫn giữ pane trong danh sách các pane) và *stretch* (cách phân bổ khoảng trống bổ sung cho pane: một trong ``'always'``, ``'first'``, ``'last'``, ``'middle'`` hoặc ``'never'``).
+      :meth:`paneconfig` là bí danh của :meth:`!paneconfigure`.
 
    .. method:: identify(x, y)
 
-      Identify the panedwindow component underneath the point given by *x* and
-      *y*, in window coordinates.
-      If the point is over a sash or a sash handle, the result is a two-element
-      tuple containing the index of the sash or handle and a word indicating
-      whether it is over a sash or a handle, such as ``(0, 'sash')`` or
-      ``(2, 'handle')``.
-      If the point is over any other part of the panedwindow, the result is an
-      empty string.
+      Xác định thành phần panedwindow nằm bên dưới điểm được cho bởi *x* và *y*, trong tọa độ cửa sổ. Nếu điểm nằm trên một sash hoặc tay cầm sash, kết quả là một tuple gồm hai phần tử chứa chỉ mục của sash hoặc tay cầm và một từ cho biết điểm nằm trên sash hay tay cầm, chẳng hạn như ``(0, 'sash')`` hoặc ``(2, 'handle')``. Nếu điểm nằm trên bất kỳ phần nào khác của panedwindow, kết quả là một chuỗi rỗng.
 
    .. method:: sash(*args)
 
-      Query or change the position of the sashes in the panedwindow.
-      This is a thin wrapper around the Tk ``sash`` subcommand; the convenience
-      methods :meth:`sash_coord`, :meth:`sash_mark` and :meth:`sash_place`
-      should normally be used instead.
+      Truy vấn hoặc thay đổi vị trí của các sash trong panedwindow. Đây là một lớp bao bọc mỏng quanh subcommand ``sash`` của Tk; thông thường nên sử dụng các phương thức tiện ích :meth:`sash_coord`, :meth:`sash_mark` và :meth:`sash_place` thay thế.
 
    .. method:: sash_coord(index)
 
-      Return the current x and y coordinate pair for the sash given by *index*,
-      which must be an integer between 0 and one less than the number of panes
-      in the panedwindow.
-      The coordinates returned are those of the top left corner of the region
-      containing the sash.
+      Trả về cặp tọa độ x và y hiện tại của sash được chỉ định bởi *index*, phải là một số nguyên từ 0 đến nhỏ hơn một đơn vị so với số ngăn trong panedwindow. Các tọa độ được trả về là tọa độ góc trên bên trái của vùng chứa sash.
 
    .. method:: sash_mark(index)
 
-      Record the current mouse position for the sash given by *index*, for use
-      together with later sash-drag operations to move the sash.
+      Ghi lại vị trí chuột hiện tại của sash được chỉ định bởi *index*, để sử dụng cùng với các thao tác kéo sash về sau nhằm di chuyển sash.
 
    .. method:: sash_place(index, x, y)
 
-      Place the sash given by *index* at the coordinates *x* and *y*.
+      Đặt sash được chỉ định bởi *index* tại các tọa độ *x* và *y*.
 
    .. method:: proxy(*args)
 
-      Query or change the position of the sash proxy, the "ghost" sash shown
-      while a sash is being dragged with non-opaque resizing.
-      This is a thin wrapper around the Tk ``proxy`` subcommand; the
-      convenience methods :meth:`proxy_coord`, :meth:`proxy_forget` and
-      :meth:`proxy_place` should normally be used instead.
+      Truy vấn hoặc thay đổi vị trí của proxy sash, tức sash "bóng ma" được hiển thị khi sash đang được kéo với thao tác thay đổi kích thước không đục. Đây là một lớp bao bọc mỏng quanh subcommand ``proxy`` của Tk; thông thường nên sử dụng các phương thức tiện ích :meth:`proxy_coord`, :meth:`proxy_forget` và
+      :meth:`proxy_place` thay thế.
 
    .. method:: proxy_coord()
 
-      Return a tuple containing the x and y coordinates of the most recent
-      proxy location.
+      Trả về một tuple chứa tọa độ x và y của vị trí proxy gần đây nhất.
 
    .. method:: proxy_forget()
 
-      Remove the proxy from the display.
+      Xóa proxy khỏi phần hiển thị.
 
    .. method:: proxy_place(x, y)
 
-      Place the proxy at the coordinates *x* and *y*.
+      Đặt proxy tại tọa độ *x* và *y*.
 
 
 .. class:: Radiobutton(master=None, cnf={}, **kw)
 
-   A :class:`!Radiobutton` widget displays a textual string, bitmap or image
-   together with a diamond or circular indicator, and selects one choice out of
-   several.
-   It has all the behavior of a simple button and, in addition, can be
-   selected: typically several radiobuttons share a single *variable*, and
-   selecting one sets that variable to the radiobutton's *value*; each
-   radiobutton also monitors the variable and automatically selects or
-   deselects itself when the variable changes.
-   Inherits from :class:`Widget`.
-   In addition to the standard widget options, a radiobutton accepts the
-   options documented in the Tk ``radiobutton`` manual page, such as
-   *variable*, *value* and *command*.
+   Một widget :class:`!Radiobutton` hiển thị một chuỗi văn bản, bitmap hoặc hình ảnh cùng với một chỉ báo hình thoi hoặc hình tròn, đồng thời chọn một lựa chọn trong số nhiều lựa chọn. Widget này có toàn bộ hành vi của một nút đơn giản và ngoài ra còn có thể được chọn: thông thường, một số radiobutton dùng chung một *variable*, và việc chọn một radiobutton sẽ đặt biến đó thành *value* của radiobutton; mỗi radiobutton cũng theo dõi biến này và tự động chọn hoặc bỏ chọn chính nó khi biến thay đổi. Kế thừa từ :class:`Widget`. Ngoài các tùy chọn widget tiêu chuẩn, radiobutton chấp nhận các tùy chọn được mô tả trong trang hướng dẫn Tk ``radiobutton``, chẳng hạn như *variable*, *value* và *command*.
 
    .. method:: invoke()
 
-      Do just what would happen if the user pressed the radiobutton with the
-      mouse: select the button and invoke the associated command, if there is
-      one.
-      Return the result of the command, or an empty string if no command is
-      associated with the radiobutton.
-      This is ignored if the radiobutton's state is ``disabled``.
+      Thực hiện chính xác những gì sẽ xảy ra nếu người dùng nhấn radiobutton bằng chuột: chọn nút và gọi command liên kết, nếu có. Trả về kết quả của command hoặc một chuỗi rỗng nếu radiobutton không liên kết với command nào. Tùy chọn này bị bỏ qua nếu trạng thái của radiobutton là ``disabled``.
 
    .. method:: select()
 
-      Select the radiobutton and set the associated variable to the value
-      corresponding to this widget.
+      Chọn radiobutton và đặt biến liên kết thành giá trị tương ứng với widget này.
 
    .. method:: deselect()
 
-      Deselect the radiobutton and set the associated variable to an empty
-      string.
-      If this radiobutton was not currently selected, this has no effect.
+      Bỏ chọn radiobutton và đặt biến liên kết thành một chuỗi rỗng. Nếu radiobutton này hiện không được chọn, thao tác này không có tác dụng.
 
    .. method:: flash()
 
-      Flash the radiobutton by redisplaying it several times, alternating
-      between the active and normal colors.
-      At the end of the flash the radiobutton is left in the same normal or
-      active state as when the method was called.
-      This is ignored if the radiobutton's state is ``disabled``.
+      Làm nhấp nháy radiobutton bằng cách hiển thị lại nó nhiều lần, xen kẽ giữa các màu active và normal. Khi kết thúc, radiobutton được giữ ở cùng trạng thái normal hoặc active như lúc phương thức được gọi. Tùy chọn này bị bỏ qua nếu trạng thái của radiobutton là ``disabled``.
 
 
 .. class:: Scale(master=None, cnf={}, **kw)
 
-   A :class:`!Scale` widget lets the user select a numerical value by moving a
-   slider along a trough.
-   It can be oriented vertically or horizontally and can optionally display a
-   label and the current value.
-   Inherits from :class:`Widget`.
+   Một widget :class:`!Scale` cho phép người dùng chọn một giá trị số bằng cách di chuyển thanh trượt dọc theo rãnh. Widget này có thể được định hướng theo chiều dọc hoặc chiều ngang, đồng thời có thể tùy chọn hiển thị nhãn và giá trị hiện tại. Kế thừa từ :class:`Widget`.
 
-   In addition to the standard widget options, a scale accepts the options
-   documented in the Tk ``scale`` manual page, such as *from_*, *to*,
-   *resolution*, *orient*, *tickinterval*, *variable* and *command*.
-   As elsewhere in :mod:`!tkinter`, the leading ``-`` of the Tk option name is
-   dropped; *from* is spelled ``from_`` because :keyword:`from` is a Python
-   keyword.
+   Ngoài các tùy chọn widget tiêu chuẩn, scale chấp nhận các tùy chọn được mô tả trong trang hướng dẫn Tk ``scale``, chẳng hạn như *from_*, *to*, *resolution*, *orient*, *tickinterval*, *variable* và *command*. Cũng như ở những nơi khác trong :mod:`!tkinter`, ký tự đầu ``-`` của tên tùy chọn Tk được lược bỏ; *from* được viết thành ``from_`` vì :keyword:`from` là một từ khóa Python.
 
-   With a non-integer *resolution*, see :ref:`numeric values and the locale
-   <tkinter-numeric-locale>`.
+   Với *resolution* không phải số nguyên, hãy xem :ref:`giá trị số và locale <tkinter-numeric-locale>`.
 
    .. method:: get()
 
-      Return the current value of the scale.
-      The result is an integer if the scale's *resolution* yields whole
-      numbers, and a float otherwise.
+      Trả về giá trị hiện tại của scale. Kết quả là một số nguyên nếu *resolution* của scale tạo ra các số nguyên, và là một số thực trong trường hợp ngược lại.
 
    .. method:: set(value)
 
-      Set the scale to *value*, moving the slider accordingly.
-      This has no effect if the scale is disabled.
+      Đặt scale thành *value*, đồng thời di chuyển thanh trượt tương ứng. Việc này không có tác dụng nếu scale bị vô hiệu hóa.
 
    .. method:: coords(value=None)
 
-      Return a tuple ``(x, y)`` giving the pixel coordinates, relative to the
-      widget, of the point on the centerline of the trough that corresponds to
-      *value*.
-      If *value* is omitted, the scale's current value is used.
+      Trả về một tuple ``(x, y)`` chứa tọa độ pixel, tương đối so với widget, của điểm trên đường trung tâm của rãnh tương ứng với *value*. Nếu bỏ qua *value*, giá trị hiện tại của scale sẽ được sử dụng.
 
    .. method:: identify(x, y)
 
-      Return a string describing the part of the scale at the pixel coordinates
-      *x*, *y*: ``'slider'``, ``'trough1'`` (the part of the trough above or to
-      the left of the slider), ``'trough2'`` (below or to the right of the
-      slider), or an empty string if the point is not over any of these
-      elements.
+      Trả về một chuỗi mô tả phần của scale tại tọa độ pixel *x*, *y*: ``'slider'``, ``'trough1'`` (phần rãnh nằm phía trên hoặc bên trái thanh trượt), ``'trough2'`` (phía dưới hoặc bên phải thanh trượt), hoặc một chuỗi rỗng nếu điểm đó không nằm trên bất kỳ thành phần nào trong số này.
 
 
 .. class:: Scrollbar(master=None, cnf={}, **kw)
 
-   A :class:`!Scrollbar` widget displays a slider and two arrows that let the
-   user scroll an associated widget, such as a :class:`Listbox`, :class:`Text`,
-   :class:`Canvas` or :class:`Entry`.
-   It is connected to the scrolled widget by setting that widget's
-   *xscrollcommand* or *yscrollcommand* option to the scrollbar's :meth:`set`
-   method, and the scrollbar's *command* option to the scrolled widget's
-   :meth:`~XView.xview` or :meth:`~YView.yview` method.
-   Inherits from :class:`Widget`.
+   Một widget :class:`!Scrollbar` hiển thị một thanh trượt và hai mũi tên, cho phép người dùng cuộn một widget liên kết, chẳng hạn như :class:`Listbox`, :class:`Text`,
+   :class:`Canvas` hoặc :class:`Entry`. Widget này được kết nối với widget được cuộn bằng cách đặt tùy chọn *xscrollcommand* hoặc *yscrollcommand* của widget đó thành phương thức :meth:`set` của thanh cuộn, và tùy chọn *command* của thanh cuộn thành phương thức của widget được cuộn
+   :meth:`~XView.xview` hoặc :meth:`~YView.yview`. Kế thừa từ :class:`Widget`.
 
    .. method:: get()
 
-      Return the current scrollbar settings as a tuple ``(first, last)`` of two
-      fractions between 0 and 1, describing the portion of the document that is
-      currently visible, as last passed to :meth:`set`.
+      Trả về các thiết lập hiện tại của thanh cuộn dưới dạng một tuple ``(first, last)`` gồm hai phân số từ 0 đến 1, mô tả phần tài liệu hiện đang hiển thị, như được truyền lần cuối cho :meth:`set`.
 
    .. method:: set(first, last)
 
-      Set the scrollbar.
-      *first* and *last* are fractions between 0 and 1 giving the positions of
-      the start and end of the visible portion of the associated document.
-      This method is normally registered as the scrolled widget's
-      *xscrollcommand* or *yscrollcommand* and called by that widget.
+      Thiết lập thanh cuộn. *first* và *last* là các phân số từ 0 đến 1, biểu thị vị trí bắt đầu và kết thúc của phần tài liệu liên kết đang hiển thị. Phương thức này thường được đăng ký làm *xscrollcommand* hoặc *yscrollcommand* của widget được cuộn và được widget đó gọi.
 
    .. method:: activate(index=None)
 
-      Mark the element *index* (one of ``'arrow1'``, ``'slider'`` or
-      ``'arrow2'``) as active, displaying it according to the
-      *activebackground* and *activerelief* options.
-      If *index* is omitted, return the name of the currently active element,
-      or ``None`` if no element is active.
+      Đánh dấu phần tử *index* (một trong ``'arrow1'``, ``'slider'`` hoặc ``'arrow2'``) là đang hoạt động và hiển thị phần tử đó theo các tùy chọn *activebackground* và *activerelief*. Nếu bỏ qua *index*, trả về tên của phần tử hiện đang hoạt động hoặc ``None`` nếu không có phần tử nào đang hoạt động.
 
       .. versionchanged:: 3.5
-         The *index* argument is now optional.
+         Đối số *index* hiện là tùy chọn.
 
    .. method:: delta(deltax, deltay)
 
-      Return a float indicating the fractional change in the scrollbar setting
-      that corresponds to moving the slider by *deltax* pixels horizontally
-      (for horizontal scrollbars) or *deltay* pixels vertically (for vertical
-      scrollbars).
+      Trả về một số thực biểu thị mức thay đổi phân số trong thiết lập thanh cuộn tương ứng với việc di chuyển thanh trượt theo chiều ngang *deltax* pixel (đối với thanh cuộn ngang) hoặc theo chiều dọc *deltay* pixel (đối với thanh cuộn dọc).
 
    .. method:: fraction(x, y)
 
-      Return a float between 0 and 1 indicating where the point at pixel
-      coordinates *x*, *y* lies in the trough: 0 corresponds to the top or left
-      of the trough and 1 to the bottom or right.
+      Trả về một số thực từ 0 đến 1 cho biết vị trí của điểm tại tọa độ pixel *x*, *y* trong rãnh: 0 tương ứng với đầu trên hoặc bên trái của rãnh, còn 1 tương ứng với đầu dưới hoặc bên phải.
 
    .. method:: identify(x, y)
 
-      Return the name of the element under the pixel coordinates *x*, *y* (such
-      as ``'arrow1'``), or an empty string if the point does not lie in any
-      element of the scrollbar.
+      Trả về tên của phần tử bên dưới tọa độ pixel *x*, *y* (chẳng hạn như ``'arrow1'``), hoặc một chuỗi rỗng nếu điểm đó không nằm trong bất kỳ phần tử nào của thanh cuộn.
 
 
 .. class:: Spinbox(master=None, cnf={}, **kw)
 
-   A :class:`!Spinbox` widget is an :class:`Entry`-like widget with a pair of
-   up/down arrow buttons that let the user step through a range of values in
-   addition to editing the value directly.
-   The set of values may be a numeric range given by the *from_*, *to* and
-   *increment* options, or an explicit list of strings given by the *values*
-   option (which takes precedence over the range).
-   Each time an arrow is invoked the *command* callback, if any, is called; the
-   *wrap* option controls whether stepping past either end of the range wraps
-   around to the other end; the *format* option specifies how numeric values
-   are formatted; and the *validate* option enables validation of the entered
-   text.
-   Inherits from :class:`Widget` and :class:`XView`.
+   Một widget :class:`!Spinbox` là widget tương tự :class:`Entry`, có một cặp nút mũi tên lên/xuống cho phép người dùng duyệt từng bước qua một dải giá trị, bên cạnh việc chỉnh sửa trực tiếp giá trị. Tập giá trị có thể là một dải số được xác định bởi các tùy chọn *from_*, *to* và *increment*, hoặc một danh sách chuỗi rõ ràng được xác định bởi tùy chọn *values* (tùy chọn này được ưu tiên hơn dải giá trị). Mỗi khi một mũi tên được kích hoạt, callback *command*, nếu có, sẽ được gọi; tùy chọn *wrap* kiểm soát việc khi bước qua một đầu của dải thì có quay vòng về đầu kia hay không; tùy chọn *format* chỉ định cách định dạng các giá trị số; và tùy chọn *validate* cho phép xác thực văn bản đã nhập. Kế thừa từ :class:`Widget` và :class:`XView`.
 
-   With a non-integer *increment*, see :ref:`numeric values and the locale
-   <tkinter-numeric-locale>`.
+   Với *increment* không phải số nguyên, hãy xem :ref:`numeric values and the locale <tkinter-numeric-locale>`.
 
-   Many of the methods take an *index* argument identifying a character in the
-   spinbox's string.
-   As described in the Tk ``spinbox`` manual page, *index* may be a numeric
-   index (counting from 0), ``'anchor'`` (the selection anchor point),
-   ``'end'`` (just after the last character), ``'insert'`` (the character just
-   after the insertion cursor), ``'sel.first'`` or ``'sel.last'`` (the ends of
-   the selection), or ``@x`` (the character covering pixel x-coordinate *x* in
-   the window).
+   Nhiều phương thức nhận một đối số *index* xác định một ký tự trong chuỗi của spinbox. Như được mô tả trong trang hướng dẫn Tk ``spinbox``, *index* có thể là một chỉ mục số (đếm từ 0), ``'anchor'`` (điểm neo của vùng chọn), ``'end'`` (ngay sau ký tự cuối cùng), ``'insert'`` (ký tự ngay sau con trỏ chèn), ``'sel.first'`` hoặc ``'sel.last'`` (các đầu của vùng chọn), hoặc ``@x`` (ký tự bao phủ tọa độ pixel x *x* trong cửa sổ).
 
    .. method:: get()
 
-      Return the spinbox's string.
+      Trả về chuỗi của spinbox.
 
    .. method:: insert(index, s)
 
-      Insert the characters of the string *s* just before the character given
-      by *index*.
+      Chèn các ký tự của chuỗi *s* ngay trước ký tự được xác định bởi *index*.
 
    .. method:: delete(first, last=None)
 
-      Delete one or more characters of the spinbox.
-      *first* is the index of the first character to delete, and *last* is the
-      index of the character just after the last one to delete.
-      If *last* is omitted, a single character at *first* is deleted.
+      Xóa một hoặc nhiều ký tự khỏi spinbox. *first* là chỉ mục của ký tự đầu tiên cần xóa, còn *last* là chỉ mục của ký tự ngay sau ký tự cuối cùng cần xóa. Nếu bỏ qua *last*, một ký tự duy nhất tại *first* sẽ bị xóa.
 
    .. method:: icursor(index)
 
-      Arrange for the insertion cursor to be displayed just before the
-      character given by *index*.
+      Đặt con trỏ chèn hiển thị ngay trước ký tự được chỉ định bởi *index*.
 
    .. method:: index(index)
 
-      Return the numerical index corresponding to *index*, as a string.
+      Trả về chỉ mục số tương ứng với *index*, dưới dạng chuỗi.
 
    .. method:: bbox(index)
 
-      Return a tuple of four integers ``(x, y, width, height)`` describing the
-      bounding box of the character given by *index*.
-      *x* and *y* are the pixel coordinates of the upper-left corner of the
-      character relative to the widget, and *width* and *height* are its size
-      in pixels.
-      The bounding box may refer to a region outside the visible area of the
-      window.
+      Trả về một tuple gồm bốn số nguyên ``(x, y, width, height)`` mô tả hộp giới hạn của ký tự được xác định bởi *index*. *x* và *y* là tọa độ pixel của góc trên bên trái của ký tự tính tương đối với widget, còn *width* và *height* là kích thước của ký tự tính bằng pixel. Hộp giới hạn có thể trỏ đến một vùng nằm ngoài khu vực hiển thị của cửa sổ.
 
-      This shadows the inherited :meth:`!Misc.bbox`;
-      use :meth:`~Misc.grid_bbox` for the grid bounding box.
+      Phương thức này che khuất :meth:`!Misc.bbox` được kế thừa; hãy sử dụng :meth:`~Misc.grid_bbox` cho hộp giới hạn của grid.
 
    .. method:: identify(x, y)
 
-      Return the name of the window element at the pixel coordinates *x*, *y*:
-      one of ``'buttondown'``, ``'buttonup'``, ``'entry'`` or ``'none'``.
+      Trả về tên của phần tử cửa sổ tại tọa độ pixel *x*, *y*: một trong ``'buttondown'``, ``'buttonup'``, ``'entry'`` hoặc ``'none'``.
 
    .. method:: invoke(element)
 
-      Invoke the spin button given by *element*, either ``'buttonup'`` or
-      ``'buttondown'``, triggering the action associated with it.
+      Gọi spin button được chỉ định bởi *element*, với ``'buttonup'`` hoặc ``'buttondown'``, để kích hoạt hành động liên kết với nó.
 
    .. method:: scan(*args)
 
-      A thin wrapper around the Tk ``scan`` widget subcommand, used to
-      implement fast dragging of the view: ``scan('mark', x)`` records *x* and
-      the current view, and ``scan('dragto', x)`` adjusts the view relative to
-      that mark.
-      The :meth:`scan_mark` and :meth:`scan_dragto` methods wrap the two forms.
+      Một lớp bao bọc mỏng quanh lệnh con widget Tk ``scan``, được dùng để triển khai thao tác kéo nhanh chế độ xem: ``scan('mark', x)`` ghi lại *x* và chế độ xem hiện tại, còn ``scan('dragto', x)`` điều chỉnh chế độ xem tương đối so với điểm đánh dấu đó. Các phương thức :meth:`scan_mark` và :meth:`scan_dragto` bao bọc hai dạng này.
 
    .. method:: scan_mark(x)
 
-      Record *x* and the current view in the spinbox window, for use with a
-      later :meth:`scan_dragto` call.
-      This is typically associated with a mouse button press in the widget.
+      Ghi lại *x* và chế độ xem hiện tại trong cửa sổ spinbox để sử dụng với lệnh gọi :meth:`scan_dragto` sau đó. Thông thường, thao tác này được liên kết với sự kiện nhấn nút chuột trong widget.
 
    .. method:: scan_dragto(x)
 
-      Adjust the view by 10 times the difference between *x* and the *x* passed
-      to the last :meth:`scan_mark` call.
-      This is typically associated with mouse motion events, producing the
-      effect of dragging the spinbox at high speed through the window.
+      Điều chỉnh chế độ xem bằng 10 lần hiệu giữa *x* và *x* được truyền cho lệnh gọi :meth:`scan_mark` gần nhất. Thông thường, thao tác này được liên kết với các sự kiện chuyển động của chuột, tạo hiệu ứng kéo spinbox qua cửa sổ với tốc độ cao.
 
    .. method:: selection(*args)
 
-      A thin wrapper around the Tk ``selection`` widget subcommand, used to
-      adjust the selection within the spinbox.
-      It has several forms depending on the first argument, such as
-      ``selection('adjust', index)``, ``selection('clear')``,
-      ``selection('element', ?elem?)``, ``selection('from', index)``,
-      ``selection('present')``, ``selection('range', start, end)`` and
-      ``selection('to', index)``.
-      The :meth:`selection_adjust`, :meth:`selection_clear`,
+      Một lớp bao bọc mỏng quanh lệnh con widget Tk ``selection``, được dùng để điều chỉnh vùng chọn trong spinbox. Nó có nhiều dạng tùy thuộc vào đối số đầu tiên, chẳng hạn như ``selection('adjust', index)``, ``selection('clear')``, ``selection('element', ?elem?)``, ``selection('from', index)``, ``selection('present')``, ``selection('range', start, end)`` và ``selection('to', index)``. Các phương thức :meth:`selection_adjust`, :meth:`selection_clear`,
       :meth:`selection_element`, :meth:`selection_from`,
-      :meth:`selection_present`, :meth:`selection_range` and
-      :meth:`selection_to` methods wrap these forms.
+      :meth:`selection_present`, :meth:`selection_range` và
+      các phương thức :meth:`selection_to` bao bọc những dạng này.
 
    .. method:: selection_adjust(index)
 
-      Locate the end of the selection nearest to the character given by *index*
-      and adjust that end of the selection to be at *index* (including but not
-      going beyond *index*).
-      The other end becomes the anchor point for future :meth:`selection_to`
-      calls.
-      If the selection is not currently in the spinbox, a new selection is
-      created to include the characters between *index* and the most recent
-      anchor point, inclusive.
+      Xác định đầu của vùng chọn gần ký tự được chỉ định bởi *index* nhất và điều chỉnh đầu đó của vùng chọn đến *index* (bao gồm nhưng không vượt quá *index*). Đầu còn lại trở thành điểm neo cho các lệnh gọi :meth:`selection_to` trong tương lai. Nếu hiện tại vùng chọn không nằm trong spinbox, một vùng chọn mới sẽ được tạo để bao gồm các ký tự giữa *index* và điểm neo gần nhất, tính cả hai đầu.
 
    .. method:: selection_clear()
 
-      Clear the selection if it is currently in this widget.
-      If the selection is not in this widget, the method has no effect.
+      Xóa vùng chọn nếu hiện tại nó nằm trong widget này. Nếu vùng chọn không nằm trong widget này, phương thức không có tác dụng.
 
       .. note::
 
-         This shadows the inherited :meth:`Misc.selection_clear`,
-         which clears the X selection;
-         that method is not available on a :class:`Spinbox`.
+         Phương thức này che khuất :meth:`Misc.selection_clear` được kế thừa, vốn xóa vùng chọn X; phương thức đó không khả dụng trên :class:`Spinbox`.
 
    .. method:: selection_element(element=None)
 
-      Set or get the currently selected element.
-      If *element* (one of ``'buttonup'``, ``'buttondown'`` or ``'none'``) is
-      given, that spin button is selected and displayed depressed; otherwise
-      the name of the currently selected element is returned.
+      Đặt hoặc lấy phần tử hiện được chọn. Nếu *element* (một trong ``'buttonup'``, ``'buttondown'`` hoặc ``'none'``) được cung cấp, nút spin đó sẽ được chọn và hiển thị ở trạng thái nhấn; nếu không, tên của phần tử hiện được chọn sẽ được trả về.
 
    .. method:: selection_from(index)
 
-      Set the selection anchor point to just before the character given by
-      *index*, without changing the selection itself.
+      Đặt điểm neo của vùng chọn ngay trước ký tự được chỉ định bởi *index*, mà không thay đổi chính vùng chọn.
 
       .. versionadded:: 3.8
 
 
    .. method:: selection_present()
 
-      Return ``True`` if there are characters selected in the spinbox,
-      ``False`` otherwise.
+      Trả về ``True`` nếu có các ký tự được chọn trong spinbox, nếu không thì trả về ``False``.
 
       .. versionadded:: 3.8
 
 
    .. method:: selection_range(start, end)
 
-      Set the selection to include the characters starting with the one indexed
-      by *start* and ending with the one just before *end*.
-      If *end* refers to the same character as *start* or an earlier one, the
-      selection is cleared.
+      Đặt vùng chọn bao gồm các ký tự bắt đầu từ ký tự có chỉ mục *start* và kết thúc bằng ký tự ngay trước *end*. Nếu *end* trỏ đến cùng ký tự với *start* hoặc một ký tự đứng trước đó, vùng chọn sẽ bị xóa.
 
       .. versionadded:: 3.8
 
 
    .. method:: selection_to(index)
 
-      Set the selection between *index* and the anchor point.
-      If *index* is before the anchor point, the selection runs from *index* up
-      to but not including the anchor point; if it is after, the selection runs
-      from the anchor point up to but not including *index*; if it is the same,
-      nothing happens.
-      The anchor point is the one set by the most recent :meth:`selection_from`
-      or :meth:`selection_adjust` call.
-      If the selection is not in this widget, a new selection is created using
-      the most recent anchor point.
+      Đặt vùng chọn giữa *index* và điểm neo. Nếu *index* nằm trước điểm neo, vùng chọn chạy từ *index* đến nhưng không bao gồm điểm neo; nếu nằm sau, vùng chọn chạy từ điểm neo đến nhưng không bao gồm *index*; nếu trùng nhau thì không có gì xảy ra. Điểm neo là điểm được thiết lập bởi lệnh gọi :meth:`selection_from` hoặc :meth:`selection_adjust` gần đây nhất. Nếu vùng chọn không nằm trong widget này, một vùng chọn mới được tạo bằng điểm neo gần đây nhất.
 
       .. versionadded:: 3.8
 
@@ -5179,607 +3323,376 @@ Widget classes
 
 .. class:: Text(master=None, cnf={}, **kw)
 
-   A :class:`!Text` widget displays and edits multi-line text.
-   Portions of the text may be styled with **tags**, particular positions may
-   be annotated with floating **marks**, and arbitrary images and other widgets
-   may be embedded in the text.
-   The widget also provides an unlimited undo/redo mechanism and supports peer
-   widgets that share the same underlying data.
-   Inherits from :class:`Widget`, :class:`XView` and :class:`YView`, so the
-   view can be scrolled horizontally and vertically with :meth:`~XView.xview`
-   and :meth:`~YView.yview`.
-   Refer to the Tk ``text`` manual page for the full list of options.
+   Một widget :class:`!Text` hiển thị và chỉnh sửa văn bản nhiều dòng. Các phần của văn bản có thể được định kiểu bằng **tags**, các vị trí cụ thể có thể được chú thích bằng **marks** nổi, và hình ảnh tùy ý cùng các widget khác có thể được nhúng vào văn bản. Widget này cũng cung cấp cơ chế undo/redo không giới hạn và hỗ trợ các widget peer dùng chung dữ liệu cơ sở. Widget kế thừa từ :class:`Widget`, :class:`XView` và :class:`YView`, vì vậy chế độ xem có thể được cuộn theo chiều ngang và chiều dọc bằng :meth:`~XView.xview` và :meth:`~YView.yview`. Tham khảo trang hướng dẫn Tk ``text`` để xem danh sách đầy đủ các tùy chọn.
 
-   Most of the methods take one or more *index* arguments that identify a
-   position within the text.
-   As described in the Tk ``text`` manual page, an index is a string consisting
-   of a base, optionally followed by one or more modifiers.
-   The base may be ``'line.char'`` (line *line*, character *char*, where lines
-   are counted from 1 and characters within a line from 0; ``'line.end'``
-   refers to the newline ending the line), ``'end'`` (the position just after
-   the last newline), the name of a mark, ``'tag.first'`` or ``'tag.last'``
-   (the first character tagged with *tag*, or the position just after the last
-   such character), the name of an embedded image or window, or ``@x,y`` (the
-   character covering pixel coordinates *x*, *y* in the widget).
-   A modifier such as ``'+5 chars'``, ``'-3 lines'``, ``'linestart'``,
-   ``'lineend'``, ``'wordstart'`` or ``'wordend'`` adjusts the index relative
-   to its base; several modifiers may be combined and are applied from left to
-   right, for example ``'insert wordstart - 1 c'``.
+   Hầu hết các phương thức nhận một hoặc nhiều đối số *index* xác định một vị trí trong văn bản. Như được mô tả trên trang hướng dẫn Tk ``text``, index là một chuỗi gồm một base, có thể theo sau bởi một hoặc nhiều modifier. Base có thể là ``'line.char'`` (dòng *line*, ký tự *char*, trong đó các dòng được đánh số từ 1 và các ký tự trong một dòng được đánh số từ 0; ``'line.end'`` tham chiếu đến ký tự xuống dòng kết thúc dòng), ``'end'`` (vị trí ngay sau ký tự xuống dòng cuối cùng), tên của một mark, ``'tag.first'`` hoặc ``'tag.last'`` (ký tự đầu tiên được gắn *tag*, hoặc vị trí ngay sau ký tự cuối cùng như vậy), tên của một hình ảnh hoặc cửa sổ được nhúng, hoặc ``@x,y`` (ký tự bao phủ các tọa độ pixel *x*, *y* trong widget). Một modifier như ``'+5 chars'``, ``'-3 lines'``, ``'linestart'``, ``'lineend'``, ``'wordstart'`` hoặc ``'wordend'`` điều chỉnh index tương ứng với base của nó; có thể kết hợp nhiều modifier và chúng được áp dụng từ trái sang phải, chẳng hạn như ``'insert wordstart - 1 c'``.
 
    .. method:: insert(index, chars, *args)
 
-      Insert the string *chars* just before the character at *index* (if
-      *index* is ``'end'``, just before the final newline).
-      By default the new text inherits any tags present on both sides of the
-      insertion point.
-      If *args* is given, it consists of alternating *tagList*, *chars* values:
-      the preceding *chars* receives exactly the tags listed (a tag list may be
-      a single tag name or a sequence of names), overriding the surrounding
-      tags.
+      Chèn chuỗi *chars* ngay trước ký tự tại *index* (nếu *index* là ``'end'``, thì chèn ngay trước ký tự xuống dòng cuối cùng). Theo mặc định, văn bản mới kế thừa mọi tag có ở cả hai phía của điểm chèn. Nếu cung cấp *args*, đối số này gồm các giá trị xen kẽ *tagList*, *chars*: *chars* đứng trước sẽ nhận chính xác các tag được liệt kê (một danh sách tag có thể là một tên tag hoặc một chuỗi tên), ghi đè các tag xung quanh.
 
    .. method:: delete(index1, index2=None)
 
-      Delete the range of characters from *index1* up to but not including
-      *index2*.
-      If *index2* is omitted, the single character at *index1* is deleted.
-      The widget always keeps a newline as its last character, so a deletion
-      that would remove it is adjusted accordingly.
+      Xóa phạm vi ký tự từ *index1* đến nhưng không bao gồm *index2*. Nếu bỏ qua *index2*, ký tự đơn tại *index1* sẽ bị xóa. Widget luôn giữ một ký tự xuống dòng ở vị trí cuối cùng, vì vậy thao tác xóa nếu làm mất ký tự này sẽ được điều chỉnh cho phù hợp.
 
    .. method:: replace(index1, index2, chars, *args)
 
-      Replace the range of characters from *index1* up to but not including
-      *index2* with *chars*.
-      This is equivalent to a :meth:`delete` followed by an :meth:`insert` at
-      *index1*; *args* is interpreted as for :meth:`insert`.
+      Thay thế phạm vi ký tự từ *index1* đến nhưng không bao gồm *index2* bằng *chars*. Thao tác này tương đương với một :meth:`delete` theo sau bởi một :meth:`insert` tại *index1*; *args* được diễn giải như đối với :meth:`insert`.
 
       .. versionadded:: 3.3
 
    .. method:: get(index1, index2=None)
 
-      Return the text from *index1* up to but not including *index2* as a
-      string.
-      If *index2* is omitted, return the single character at *index1*.
-      Embedded images and windows are omitted from the result.
+      Trả về văn bản từ *index1* đến nhưng không bao gồm *index2* dưới dạng một chuỗi. Nếu bỏ qua *index2*, trả về ký tự đơn tại *index1*. Hình ảnh và cửa sổ được nhúng sẽ bị loại khỏi kết quả.
 
    .. method:: index(index)
 
-      Return the position corresponding to *index* in the canonical
-      ``'line.char'`` form.
+      Trả về vị trí tương ứng với *index* ở dạng ``'line.char'`` chuẩn.
 
    .. method:: compare(index1, op, index2)
 
-      Compare the positions of *index1* and *index2* using the relational
-      operator *op*, which must be one of ``'<'``, ``'<='``, ``'=='``,
-      ``'>='``, ``'>'`` or ``'!='``, and return the boolean result.
+      So sánh các vị trí của *index1* và *index2* bằng toán tử quan hệ *op*, phải là một trong các toán tử ``'<'``, ``'<='``, ``'=='``, ``'>='``, ``'>'`` hoặc ``'!='``, rồi trả về kết quả boolean.
 
    .. method:: count(index1, index2, *options, return_ints=False)
 
-      Count the number of items of the requested kinds between *index1* and
-      *index2*; the count is negative if *index1* is after *index2*.
-      Each of *options* names a kind of item to count: ``'chars'``,
-      ``'displaychars'``, ``'displayindices'``, ``'displaylines'``,
-      ``'indices'``, ``'lines'``, ``'xpixels'`` or ``'ypixels'`` (the default,
-      used when no option is given, is ``'indices'``).
-      The pseudo-option ``'update'`` forces any out-of-date layout information
-      to be recalculated before the following options are evaluated.
-      When *return_ints* is true and a single counting option is given, return
-      a plain integer; otherwise return a tuple with one integer per counting
-      option (or ``None`` if the result is empty).
+      Đếm số mục thuộc các loại được yêu cầu nằm giữa *index1* và *index2*; số đếm là số âm nếu *index1* đứng sau *index2*. Mỗi tên trong *options* chỉ định một loại mục cần đếm: ``'chars'``, ``'displaychars'``, ``'displayindices'``, ``'displaylines'``, ``'indices'``, ``'lines'``, ``'xpixels'`` hoặc ``'ypixels'`` (mặc định, được dùng khi không cung cấp tùy chọn, là ``'indices'``). Pseudo-option ``'update'`` buộc mọi thông tin bố cục đã lỗi thời phải được tính toán lại trước khi đánh giá các tùy chọn tiếp theo. Khi *return_ints* là true và chỉ cung cấp một tùy chọn đếm, trả về một số nguyên thuần; nếu không, trả về một tuple có một số nguyên cho mỗi tùy chọn đếm (hoặc ``None`` nếu kết quả rỗng).
 
       .. versionadded:: 3.3
 
       .. versionchanged:: 3.13
-         Added the *return_ints* parameter.
+         Đã thêm tham số *return_ints*.
 
 
    .. method:: see(index)
 
-      Adjust the view so that the character given by *index* is visible.
-      If it is already visible the method has no effect; if it is a short
-      distance out of view the widget scrolls just enough to bring it to the
-      nearest edge, otherwise it scrolls to center *index* in the window.
+      Điều chỉnh chế độ xem để ký tự do *index* chỉ định được hiển thị. Nếu ký tự đó đã hiển thị, phương thức không có tác dụng; nếu nó chỉ nằm ngoài chế độ xem một đoạn ngắn, widget chỉ cuộn vừa đủ để đưa ký tự đến cạnh gần nhất, nếu không thì cuộn để căn giữa *index* trong cửa sổ.
 
    .. method:: bbox(index)
 
-      Return a tuple ``(x, y, width, height)`` giving the bounding box, in
-      pixels, of the visible part of the character at *index*, or ``None`` if
-      that character is not visible on the screen.
+      Trả về một tuple ``(x, y, width, height)`` chứa bounding box, tính bằng pixel, của phần hiển thị của ký tự tại *index*, hoặc ``None`` nếu ký tự đó không hiển thị trên màn hình.
 
-      This shadows the inherited :meth:`!Misc.bbox`;
-      use :meth:`~Misc.grid_bbox` for the grid bounding box.
+      Phương thức này che khuất :meth:`!Misc.bbox` được kế thừa; hãy sử dụng :meth:`~Misc.grid_bbox` cho hộp giới hạn của grid.
 
    .. method:: dlineinfo(index)
 
-      Return a tuple ``(x, y, width, height, baseline)`` describing the display
-      line that contains *index*: the first four values give the bounding box
-      of the line in pixels and *baseline* gives the offset of the baseline
-      measured down from the top of the area.
-      Return ``None`` if that display line is not visible on the screen.
+      Trả về một tuple ``(x, y, width, height, baseline)`` mô tả dòng hiển thị chứa *index*: bốn giá trị đầu tiên cung cấp bounding box của dòng theo pixel, còn *baseline* cung cấp độ lệch của baseline, được đo từ phía trên xuống của vùng. Trả về ``None`` nếu dòng hiển thị đó không hiển thị trên màn hình.
 
    .. method:: mark_set(markName, index)
 
-      Set the mark named *markName* to the position just before the character
-      at *index*, creating the mark if it does not already exist.
-      A mark created this way has right gravity by default.
+      Đặt mark có tên *markName* vào vị trí ngay trước ký tự tại *index*, đồng thời tạo mark nếu mark đó chưa tồn tại. Mark được tạo theo cách này mặc định có right gravity.
 
    .. method:: mark_unset(*markNames)
 
-      Remove each of the marks named in *markNames*.
-      The special ``insert`` and ``current`` marks may not be removed.
+      Xóa từng mark có tên được nêu trong *markNames*. Không được xóa các mark đặc biệt ``insert`` và ``current``.
 
    .. method:: mark_names()
 
-      Return a tuple of the names of all marks currently set in the widget.
+      Trả về một tuple chứa tên của tất cả các mark hiện đang được đặt trong widget.
 
    .. method:: mark_gravity(markName, direction=None)
 
-      If *direction* is omitted, return the gravity of mark *markName*, either
-      ``'left'`` or ``'right'``.
-      Otherwise set its gravity to *direction*.
-      The gravity determines on which side of the mark text inserted at the
-      mark's position appears: a mark with right gravity (the default) stays to
-      the right of such text.
+      Nếu bỏ qua *direction*, hãy trả về gravity của mark *markName*, có thể là ``'left'`` hoặc ``'right'``. Nếu không, hãy đặt gravity của mark thành *direction*. Gravity xác định văn bản được chèn tại vị trí của mark sẽ xuất hiện ở phía nào của mark: mark có right gravity (mặc định) sẽ nằm bên phải phần văn bản đó.
 
    .. method:: mark_next(index)
 
-      Return the name of the first mark at or after *index*, or ``None`` if
-      there is none.
-      When *index* is the name of a mark, the search starts just after that
-      mark.
+      Trả về tên của mark đầu tiên tại hoặc sau *index*, hoặc ``None`` nếu không có mark nào. Khi *index* là tên của một mark, việc tìm kiếm bắt đầu ngay sau mark đó.
 
    .. method:: mark_previous(index)
 
-      Return the name of the last mark at or before *index*, or ``None`` if
-      there is none.
-      When *index* is the name of a mark, the search starts just before that
-      mark.
+      Trả về tên của mark cuối cùng tại hoặc trước *index*, hoặc ``None`` nếu không có mark nào. Khi *index* là tên của một mark, việc tìm kiếm bắt đầu ngay trước mark đó.
 
    .. method:: tag_add(tagName, index1, *args)
 
-      Add the tag *tagName* to the range of characters from *index1* up to but
-      not including the next index in *args*.
-      Further pairs of indices may follow in *args* to tag additional ranges; a
-      trailing single index tags just the character at that index.
+      Thêm thẻ *tagName* vào phạm vi ký tự từ *index1* đến trước chỉ mục tiếp theo trong *args*. Các cặp chỉ mục tiếp theo có thể xuất hiện trong *args* để gắn thẻ cho các phạm vi bổ sung; một chỉ mục đơn ở cuối chỉ gắn thẻ cho ký tự tại chỉ mục đó.
 
    .. method:: tag_remove(tagName, index1, index2=None)
 
-      Remove the tag *tagName* from the characters from *index1* up to but not
-      including *index2* (or from the single character at *index1* if *index2*
-      is omitted).
-      The tag itself continues to exist even if no characters carry it.
+      Xóa thẻ *tagName* khỏi các ký tự từ *index1* đến trước *index2* (hoặc khỏi ký tự đơn tại *index1* nếu *index2* bị bỏ qua). Bản thân thẻ vẫn tiếp tục tồn tại ngay cả khi không có ký tự nào mang thẻ đó.
 
    .. method:: tag_delete(*tagNames)
 
-      Delete each of the tags named in *tagNames*, removing them from all
-      characters and discarding their options and bindings.
+      Xóa từng thẻ có tên trong *tagNames*, gỡ chúng khỏi mọi ký tự và loại bỏ các tùy chọn cùng các binding của chúng.
 
    .. method:: tag_config(tagName, cnf=None, **kw)
       :no-typesetting:
 
    .. method:: tag_configure(tagName, cnf=None, **kw)
 
-      Query or modify the configuration options of the tag *tagName*.
-      This mirrors :meth:`~Misc.configure`, except that it applies to a tag
-      rather than to the widget as a whole: with no options it returns a
-      dictionary describing the current options, otherwise it sets the given
-      options.
-      Defining a tag this way also gives it a priority higher than any existing
-      tag.
+      Truy vấn hoặc sửa đổi các tùy chọn cấu hình của thẻ *tagName*. Thao tác này tương tự :meth:`~Misc.configure`, ngoại trừ việc áp dụng cho một thẻ thay vì toàn bộ widget: khi không có tùy chọn, thao tác trả về một dictionary mô tả các tùy chọn hiện tại; nếu không, thao tác sẽ đặt các tùy chọn được cung cấp. Việc định nghĩa thẻ theo cách này cũng khiến thẻ có mức ưu tiên cao hơn mọi thẻ hiện có.
 
-      The supported tag options, all controlling the appearance of the tagged
-      text, are:
+      Các tùy chọn thẻ được hỗ trợ, tất cả đều điều khiển giao diện của văn bản được gắn thẻ, gồm:
 
       *font*
-         The font to use for the text.
+         Phông chữ dùng cho văn bản.
 
       *foreground*
-         The color to use for the text.
+         Màu được sử dụng cho văn bản.
 
       *background*
-         The color to use for the area behind the text.
+         Màu được sử dụng cho khu vực phía sau văn bản.
 
       *fgstipple*, *bgstipple*
-         Bitmaps used to stipple the foreground (text) and the background;
-         only well supported on X11.
+         Các bitmap được sử dụng để tạo mẫu chấm cho tiền cảnh (văn bản) và nền; chỉ được hỗ trợ tốt trên X11.
 
       *borderwidth*
-         The width of the border drawn around the text according to *relief*
-         (default ``0``).
+         Độ rộng của đường viền được vẽ quanh văn bản theo *relief* (mặc định là ``0``).
 
       *relief*
-         The 3-D appearance of the text's border: ``'flat'`` (the default),
-         ``'raised'``, ``'sunken'``, ``'ridge'``, ``'groove'`` or ``'solid'``.
+         Diện mạo 3-D của đường viền văn bản: ``'flat'`` (mặc định), ``'raised'``, ``'sunken'``, ``'ridge'``, ``'groove'`` hoặc ``'solid'``.
 
       *offset*
-         How far the text is raised above (or, if negative, lowered below) the
-         baseline, for superscripts and subscripts.
+         Mức độ văn bản được nâng lên trên đường cơ sở (hoặc, nếu là số âm, hạ xuống dưới đường cơ sở), dùng cho chỉ số trên và chỉ số dưới.
 
       *underline*
-         Whether to underline the text.
+         Có gạch chân văn bản hay không.
 
       *underlinefg*
-         The color of the underline; it defaults to the text color.
+         Màu của đường gạch chân; theo mặc định, màu này là màu của văn bản.
 
       *overstrike*
-         Whether to draw a line through the middle of the text.
+         Xác định có vẽ một đường xuyên qua giữa văn bản hay không.
 
       *overstrikefg*
-         The color of the overstrike line; it defaults to the text color.
+         Màu của đường gạch ngang; theo mặc định, màu này là màu của văn bản.
 
       *elide*
-         Whether the text is elided (hidden).
+         Văn bản có bị rút gọn (ẩn) hay không.
 
       *justify*
-         How to justify the first character of a display line: ``'left'`` (the
-         default), ``'right'`` or ``'center'``.
+         Cách căn chỉnh ký tự đầu tiên của một dòng hiển thị: ``'left'`` (mặc định), ``'right'`` hoặc ``'center'``.
 
       *wrap*
-         How to wrap lines that are too long: ``'char'``, ``'word'`` or
-         ``'none'``.
+         Cách ngắt các dòng quá dài: ``'char'``, ``'word'`` hoặc ``'none'``.
 
       *lmargin1*, *lmargin2*
-         The indentation, in pixels, of the first display line of a logical
-         line and of the remaining display lines.
+         Độ thụt lề, tính bằng pixel, của dòng hiển thị đầu tiên của một dòng logic và của các dòng hiển thị còn lại.
 
       *lmargincolor*
-         The color of the left margin area.
+         Màu của vùng lề bên trái.
 
       *rmargin*
-         The right-hand margin, in pixels.
+         Lề bên phải, tính bằng pixel.
 
       *rmargincolor*
-         The color of the right margin area.
+         Màu của vùng lề bên phải.
 
       *spacing1*, *spacing2*, *spacing3*
-         Extra space, in pixels, above the first display line of a logical
-         line, between its display lines, and below its last display line.
+         Khoảng trống bổ sung, tính bằng pixel, phía trên dòng hiển thị đầu tiên của một dòng logic, giữa các dòng hiển thị của nó và phía dưới dòng hiển thị cuối cùng của nó.
 
       *tabs*
-         The set of tab stops, in the same form as the widget's *tabs* option.
+         Tập hợp các điểm dừng tab, có cùng định dạng với tùy chọn *tabs* của widget.
 
       *tabstyle*
-         How tab stops are interpreted: ``'tabular'`` or ``'wordprocessor'``.
+         Cách diễn giải các điểm dừng tab: ``'tabular'`` hoặc ``'wordprocessor'``.
 
       *selectbackground*, *selectforeground*
-         The background and foreground colors used for the text while it is
-         selected.
+         Màu nền và màu chữ được sử dụng cho văn bản khi văn bản được chọn.
 
       .. note::
 
-         Tk 8.6 added the *lmargincolor*, *overstrikefg*, *rmargincolor*,
-         *selectbackground*, *selectforeground* and *underlinefg* options.
+         Tk 8.6 đã bổ sung các tùy chọn *lmargincolor*, *overstrikefg*, *rmargincolor*, *selectbackground*, *selectforeground* và *underlinefg*.
 
-      :meth:`tag_config` is an alias of :meth:`!tag_configure`.
+      :meth:`tag_config` là bí danh của :meth:`!tag_configure`.
 
    .. method:: tag_cget(tagName, option)
 
-      Return the current value of the configuration option *option* for the tag
-      *tagName*.
+      Trả về giá trị hiện tại của tùy chọn cấu hình *option* cho tag *tagName*.
 
    .. method:: tag_names(index=None)
 
-      If *index* is omitted, return a tuple of the names of all tags defined in
-      the widget; otherwise return only the names of the tags applied to the
-      character at *index*.
-      The names are ordered from lowest to highest priority.
+      Nếu bỏ qua *index*, trả về một tuple chứa tên của tất cả các tag được định nghĩa trong widget; nếu không, chỉ trả về tên của các tag được áp dụng cho ký tự tại *index*. Các tên được sắp xếp từ mức ưu tiên thấp nhất đến cao nhất.
 
    .. method:: tag_ranges(tagName)
 
-      Return a tuple of indices describing all ranges of text tagged with
-      *tagName*.
-      The result alternates start and end indices, so that elements ``2*i`` and
-      ``2*i+1`` bound the *i*-th range.
+      Trả về một tuple gồm các chỉ số mô tả tất cả các phạm vi văn bản được gắn tag *tagName*. Kết quả xen kẽ các chỉ số bắt đầu và kết thúc, nên các phần tử ``2*i`` và ``2*i+1`` bao quanh phạm vi thứ *i*.
 
    .. method:: tag_nextrange(tagName, index1, index2=None)
 
-      Search forward from *index1* (up to *index2* if given) for the first
-      range of characters tagged with *tagName*, and return a two-element tuple
-      of its start and end indices, or an empty tuple if there is no such
-      range.
+      Tìm kiếm về phía trước từ *index1* (tối đa đến *index2* nếu được cung cấp) để tìm phạm vi đầu tiên gồm các ký tự được gắn tag *tagName*, rồi trả về tuple gồm hai phần tử là chỉ số bắt đầu và kết thúc của phạm vi đó, hoặc một tuple rỗng nếu không có phạm vi như vậy.
 
    .. method:: tag_prevrange(tagName, index1, index2=None)
 
-      Search backward from *index1* (down to *index2* if given) for the nearest
-      preceding range of characters tagged with *tagName*, and return a
-      two-element tuple of its start and end indices, or an empty tuple if
-      there is no such range.
+      Tìm kiếm ngược từ *index1* (lùi đến *index2* nếu được cung cấp) để tìm phạm vi liền trước gần nhất gồm các ký tự được gắn tag *tagName*, rồi trả về tuple gồm hai phần tử là chỉ số bắt đầu và kết thúc của phạm vi đó, hoặc một tuple rỗng nếu không có phạm vi như vậy.
 
    .. method:: tag_raise(tagName, aboveThis=None)
 
-      Raise the priority of tag *tagName* so that it is just above the priority
-      of *aboveThis*, or to the highest priority of all tags if *aboveThis* is
-      omitted.
-      When the display options of overlapping tags conflict, the
-      higher-priority tag wins.
+      Nâng mức ưu tiên của thẻ *tagName* lên ngay trên mức ưu tiên của *aboveThis*, hoặc lên mức ưu tiên cao nhất của tất cả các thẻ nếu bỏ qua *aboveThis*. Khi các tùy chọn hiển thị của những thẻ chồng lấp xung đột, thẻ có mức ưu tiên cao hơn sẽ được ưu tiên.
 
    .. method:: tag_lower(tagName, belowThis=None)
 
-      Lower the priority of tag *tagName* so that it is just below the priority
-      of *belowThis*, or to the lowest priority of all tags if *belowThis* is
-      omitted.
+      Hạ mức ưu tiên của thẻ *tagName* xuống ngay dưới mức ưu tiên của *belowThis*, hoặc xuống mức ưu tiên thấp nhất của tất cả các thẻ nếu bỏ qua *belowThis*.
 
    .. method:: tag_bind(tagName, sequence, func, add=None)
 
-      Bind the event *sequence* on characters tagged with *tagName* to the
-      callback *func*, so that *func* is invoked when that event occurs over
-      such a character.
-      If *add* is true the binding is added alongside any existing bindings for
-      *sequence*, otherwise it replaces them.
-      Works like :meth:`~Misc.bind` and returns the identifier of the new
-      binding.
+      Liên kết sự kiện *sequence* trên các ký tự được gắn thẻ *tagName* với callback *func*, để *func* được gọi khi sự kiện đó xảy ra trên một ký tự như vậy. Nếu *add* là true, liên kết sẽ được thêm cùng với mọi liên kết hiện có cho *sequence*; nếu không, chúng sẽ được thay thế. Hoạt động giống như :meth:`~Misc.bind` và trả về mã định danh của liên kết mới.
 
    .. method:: tag_unbind(tagName, sequence, funcid=None)
 
-      Remove the bindings of the event *sequence* on characters tagged with
-      *tagName*.
-      If *funcid* is given, only that binding (as returned by :meth:`tag_bind`)
-      is removed and its callback is unregistered.
+      Xóa các liên kết của sự kiện *sequence* trên các ký tự được gắn thẻ *tagName*. Nếu cung cấp *funcid*, chỉ liên kết đó (do :meth:`tag_bind` trả về) sẽ bị xóa và callback của nó sẽ được hủy đăng ký.
 
       .. versionchanged:: 3.13
-         If *funcid* is given, only that callback is unbound.
+         Nếu cung cấp *funcid*, chỉ callback đó được hủy liên kết.
 
 
    .. method:: image_create(index, cnf={}, **kw)
 
-      Embed an image at *index* and return the name assigned to this image
-      instance, which may then be used as an index or passed to the other
-      ``image_*`` methods.
-      The options, given in *cnf* and *kw*, include *image* (the Tk image to
-      display), *name* (a base name for the instance), *align*, *padx* and
-      *pady*.
+      Nhúng một hình ảnh tại *index* và trả về tên được gán cho phiên bản hình ảnh này; tên đó sau đó có thể được dùng làm chỉ mục hoặc truyền cho các phương thức ``image_*`` khác. Các tùy chọn được cung cấp trong *cnf* và *kw* bao gồm *image* (hình ảnh Tk cần hiển thị), *name* (tên cơ sở cho phiên bản), *align*, *padx* và *pady*.
 
    .. method:: image_cget(index, option)
 
-      Return the current value of the configuration option *option* for the
-      embedded image at *index*.
+      Trả về giá trị hiện tại của tùy chọn cấu hình *option* cho hình ảnh được nhúng tại *index*.
 
    .. method:: image_configure(index, cnf=None, **kw)
 
-      Query or modify the configuration options of the embedded image at
-      *index*, like :meth:`~Misc.configure` but applied to that image.
+      Truy vấn hoặc sửa đổi các tùy chọn cấu hình của ảnh được nhúng tại *index*, tương tự :meth:`~Misc.configure` nhưng áp dụng cho ảnh đó.
 
    .. method:: image_names()
 
-      Return a tuple of the names of all images embedded in the widget.
+      Trả về một tuple chứa tên của tất cả ảnh được nhúng trong widget.
 
       .. note::
 
-         This shadows the inherited :meth:`Misc.image_names`,
-         which returns the names of all images in the Tcl interpreter;
-         that method is not available on a :class:`Text`.
+         Phương thức này che khuất :meth:`Misc.image_names` được kế thừa, vốn trả về tên của tất cả ảnh trong trình thông dịch Tcl; phương thức đó không khả dụng trên một :class:`Text`.
 
    .. method:: window_create(index, cnf={}, **kw)
 
-      Embed a window (any widget) at *index*.
-      The options, given in *cnf* and *kw*, include *window* (the widget to
-      embed), *create* (a callback that creates the widget on demand), *align*,
-      *stretch*, *padx* and *pady*.
-      The embedded widget must be a descendant of the text widget's parent.
+      Nhúng một cửa sổ (bất kỳ widget nào) tại *index*. Các tùy chọn, được cung cấp trong *cnf* và *kw*, bao gồm *window* (widget cần nhúng), *create* (callback tạo widget theo yêu cầu), *align*, *stretch*, *padx* và *pady*. Widget được nhúng phải là một hậu duệ của phần tử cha của text widget.
 
    .. method:: window_cget(index, option)
 
-      Return the current value of the configuration option *option* for the
-      embedded window at *index*.
+      Trả về giá trị hiện tại của tùy chọn cấu hình *option* cho cửa sổ được nhúng tại *index*.
 
    .. method:: window_config(index, cnf=None, **kw)
       :no-typesetting:
 
    .. method:: window_configure(index, cnf=None, **kw)
 
-      Query or modify the configuration options of the embedded window at
-      *index*, like :meth:`~Misc.configure` but applied to that window.
+      Truy vấn hoặc sửa đổi các tùy chọn cấu hình của cửa sổ được nhúng tại *index*, tương tự :meth:`~Misc.configure` nhưng áp dụng cho cửa sổ đó.
 
-      :meth:`window_config` is an alias of :meth:`!window_configure`.
+      :meth:`window_config` là bí danh của :meth:`!window_configure`.
 
    .. method:: window_names()
 
-      Return a tuple of the names of all windows embedded in the widget.
+      Trả về một tuple chứa tên của tất cả cửa sổ được nhúng trong widget.
 
    .. method:: edit(*args)
 
-      Low-level wrapper around the Tk ``edit`` widget command that controls the
-      undo/redo mechanism and the modified flag; *args* is the ``edit``
-      subcommand and its arguments.
-      The :meth:`!edit_\*` methods below are thin wrappers around it and are
-      usually more convenient.
+      Wrapper cấp thấp quanh lệnh widget Tk ``edit`` để điều khiển cơ chế undo/redo và cờ modified; *args* là subcommand ``edit`` cùng các đối số của nó. Các phương thức :meth:`!edit_\*` bên dưới là những wrapper mỏng quanh lệnh này và thường thuận tiện hơn khi sử dụng.
 
    .. method:: edit_modified(arg=None)
 
-      If *arg* is omitted, return the current state of the modified flag as
-      true or false; the flag is set automatically whenever the text is
-      inserted or deleted.
-      Otherwise set the flag to the boolean *arg*.
+      Nếu bỏ qua *arg*, trả về trạng thái hiện tại của cờ modified dưới dạng true hoặc false; cờ này được tự động đặt mỗi khi văn bản được chèn hoặc xóa. Nếu không, đặt cờ thành giá trị boolean *arg*.
 
    .. method:: edit_undo()
 
-      Undo the most recent edit action, that is, all the inserts and deletes
-      recorded on the undo stack since the previous separator, and move it to
-      the redo stack.
-      Raises :exc:`TclError` if the undo stack is empty.
-      Has no effect unless the *undo* option is true.
-      Since Tk 9.0, returns a tuple of indices delimiting the ranges of text
-      that were changed.
+      Hoàn tác hành động chỉnh sửa gần đây nhất, tức là tất cả thao tác chèn và xóa được ghi vào undo stack kể từ separator trước đó, rồi chuyển hành động này vào redo stack. Phát sinh :exc:`TclError` nếu undo stack trống. Không có tác dụng trừ khi tùy chọn *undo* là true. Kể từ Tk 9.0, trả về một tuple gồm các chỉ mục phân định những phạm vi văn bản đã thay đổi.
 
    .. method:: edit_redo()
 
-      Reapply the most recently undone edit action, provided no further edits
-      have been made since, and move it back to the undo stack.
-      Raises :exc:`TclError` if the redo stack is empty.
-      Has no effect unless the *undo* option is true.
-      Since Tk 9.0, returns a tuple of indices delimiting the ranges of text
-      that were changed.
+      Thực hiện lại hành động chỉnh sửa vừa được hoàn tác gần đây nhất, với điều kiện chưa có chỉnh sửa nào khác được thực hiện kể từ đó, rồi chuyển hành động này trở lại undo stack. Phát sinh :exc:`TclError` nếu redo stack trống. Không có tác dụng trừ khi tùy chọn *undo* là true. Kể từ Tk 9.0, trả về một tuple gồm các chỉ mục phân định những phạm vi văn bản đã thay đổi.
 
    .. method:: edit_reset()
 
-      Clear the undo and redo stacks.
+      Xóa undo stack và redo stack.
 
    .. method:: edit_separator()
 
-      Push a separator onto the undo stack, marking a boundary between edit
-      actions for undo and redo.
-      Has no effect unless the *undo* option is true.
-      Separators are inserted automatically when the *autoseparators* option is
-      true.
+      Đẩy một separator vào undo stack, đánh dấu ranh giới giữa các hành động chỉnh sửa để undo và redo. Không có tác dụng trừ khi tùy chọn *undo* là true. Các separator được tự động chèn khi tùy chọn *autoseparators* là true.
 
    .. method:: search(pattern, index, stopindex=None, forwards=None, backwards=None, exact=None, regexp=None, nocase=None, count=None, elide=None)
 
-      Search for *pattern* starting at *index* and return the index of the
-      first character of the first match, or an empty string if there is no
-      match.
-      Searching stops at *stopindex* if given; otherwise it wraps around the
-      ends of the text until the starting position is reached again.
-      The following boolean keyword flags control the search: *forwards* or
-      *backwards* select the direction (forward is the default); *exact* (the
-      default) or *regexp* select literal or regular-expression matching;
-      *nocase* makes the match case-insensitive; and *elide* causes hidden text
-      to be searched as well.
-      If *count* is a :class:`Variable`, the number of index positions in the
-      match is stored in it.
+      Tìm kiếm *pattern* bắt đầu từ *index* và trả về chỉ mục của ký tự đầu tiên trong kết quả khớp đầu tiên, hoặc một chuỗi rỗng nếu không có kết quả khớp. Nếu được cung cấp, việc tìm kiếm sẽ dừng tại *stopindex*; nếu không, tìm kiếm sẽ vòng qua hai đầu của văn bản cho đến khi quay lại vị trí bắt đầu. Các cờ keyword dạng boolean sau đây điều khiển việc tìm kiếm: *forwards* hoặc *backwards* chọn hướng tìm kiếm (mặc định là tiến); *exact* (mặc định) hoặc *regexp* chọn kiểu khớp literal hoặc biểu thức chính quy; *nocase* khiến việc khớp không phân biệt chữ hoa chữ thường; và *elide* khiến cả văn bản ẩn cũng được tìm kiếm. Nếu *count* là một :class:`Variable`, số lượng vị trí chỉ mục trong kết quả khớp sẽ được lưu vào đó.
 
 
    .. method:: scan_mark(x, y)
 
-      Record *x*, *y* and the current view, for use with later
-      :meth:`scan_dragto` calls.
-      This is typically bound to a mouse button press in the widget.
+      Ghi lại *x*, *y* và chế độ xem hiện tại để sử dụng với các lệnh gọi sau này
+      :meth:`scan_dragto`. Thông thường, lệnh này được liên kết với thao tác nhấn nút chuột trong widget.
 
    .. method:: scan_dragto(x, y)
 
-      Scroll the widget by 10 times the difference between *x*, *y* and the
-      coordinates passed to the last :meth:`scan_mark` call.
-      This is typically bound to mouse motion events, producing the effect of
-      dragging the text at high speed through the window.
+      Cuộn widget một khoảng bằng 10 lần độ chênh lệch giữa *x*, *y* và tọa độ được truyền đến lời gọi :meth:`scan_mark` gần nhất. Thao tác này thường được liên kết với các sự kiện chuyển động của chuột, tạo hiệu ứng kéo văn bản qua cửa sổ với tốc độ cao.
 
    .. method:: debug(boolean=None)
 
-      If *boolean* is omitted, return whether internal consistency checks of
-      the B-tree data structure are enabled.
-      Otherwise enable or disable them.
-      The setting is shared by all text widgets and may noticeably slow down
-      widgets holding large amounts of text.
+      Nếu bỏ qua *boolean*, trả về việc các kiểm tra tính nhất quán nội bộ của cấu trúc dữ liệu B-tree có được bật hay không. Nếu không, bật hoặc tắt các kiểm tra này. Thiết lập này được dùng chung cho tất cả text widget và có thể làm chậm đáng kể các widget chứa lượng văn bản lớn.
 
    .. method:: dump(index1, index2=None, command=None, **kw)
 
-      Return the contents of the widget from *index1* up to but not including
-      *index2* (or just the segment at *index1* if *index2* is omitted),
-      including text and information about marks, tags, images and windows.
-      The result is a list of ``(key, value, index)`` triples, where *key* is
-      one of ``'text'``, ``'mark'``, ``'tagon'``, ``'tagoff'``, ``'image'`` or
-      ``'window'``.
-      By default all kinds are reported; passing any of the keyword arguments
-      *all*, *text*, *mark*, *tag*, *image* or *window* as true restricts the
-      dump to the selected kinds.
-      If *command* is given, it is called once per triple with the three values
-      as arguments and nothing is returned.
+      Trả về nội dung của widget từ *index1* đến nhưng không bao gồm *index2* (hoặc chỉ trả về đoạn tại *index1* nếu bỏ qua *index2*), bao gồm văn bản và thông tin về mark, tag, image và window. Kết quả là một danh sách các bộ ba ``(key, value, index)``, trong đó *key* là một trong các giá trị ``'text'``, ``'mark'``, ``'tagon'``, ``'tagoff'``, ``'image'`` hoặc ``'window'``. Theo mặc định, tất cả các loại đều được báo cáo; truyền bất kỳ đối số keyword nào sau đây với giá trị true: *all*, *text*, *mark*, *tag*, *image* hoặc *window* sẽ giới hạn kết xuất ở các loại được chọn. Nếu cung cấp *command*, lệnh này được gọi một lần cho mỗi bộ ba với ba giá trị làm đối số và không trả về gì.
 
    .. method:: peer_create(newPathName, cnf={}, **kw)
 
-      Create a peer text widget with the path name *newPathName* that shares
-      this widget's underlying data (text, marks, tags, images and the undo
-      stack).
-      Changes made through any peer are reflected in all of them.
-      By default the peer covers the same lines as this widget; standard text
-      options, including *startline* and *endline*, may be given to override
-      this.
+      Tạo một text widget peer với tên đường dẫn *newPathName*, dùng chung dữ liệu nền tảng của widget này (văn bản, mark, tag, image và ngăn xếp hoàn tác). Các thay đổi được thực hiện thông qua bất kỳ peer nào sẽ được phản ánh trong tất cả các peer. Theo mặc định, peer bao phủ cùng các dòng như widget này; có thể cung cấp các tùy chọn text tiêu chuẩn, bao gồm *startline* và *endline*, để ghi đè thiết lập này.
 
       .. versionadded:: 3.3
 
    .. method:: peer_names()
 
-      Return a tuple of the path names of this widget's peers, not including
-      the widget itself.
+      Trả về một tuple gồm tên đường dẫn của các peer của widget này, không bao gồm chính widget đó.
 
       .. versionadded:: 3.3
 
    .. method:: yview_pickplace(*what)
 
-      Adjust the view so that the location given by *what* is visible.
-      This is an obsolete equivalent of :meth:`see`, which should be used
-      instead.
+      Điều chỉnh view để vị trí được chỉ định bởi *what* hiển thị. Đây là một cách tương đương đã lỗi thời của :meth:`see`, nên sử dụng cách đó thay thế.
 
 
-Variable classes
-^^^^^^^^^^^^^^^^
+Các lớp biến
+^^^^^^^^^^^^
 
 .. class:: Variable(master=None, value=None, name=None)
 
-   The base class for the Tk variable wrappers.
-   A Tk variable is a value stored in the Tcl interpreter that can be linked to
-   widgets through their *variable* or *textvariable* options (see
-   :ref:`coupling-widget-variables`), so that changes propagate both ways:
-   updating the variable updates every widget bound to it, and a user editing
-   such a widget updates the variable.
+   Lớp cơ sở cho các wrapper biến Tk. Một biến Tk là một giá trị được lưu trong trình thông dịch Tcl và có thể liên kết với các widget thông qua các tùy chọn *variable* hoặc *textvariable* của chúng (xem
+   :ref:`coupling-widget-variables`), để các thay đổi được truyền theo cả hai chiều: cập nhật biến sẽ cập nhật mọi widget liên kết với biến đó, và người dùng chỉnh sửa widget như vậy sẽ cập nhật biến.
 
-   *master* is the widget whose Tcl interpreter owns the variable; if omitted,
-   the default root window is used.
-   *value* is the initial value; if omitted, a type-specific default is used.
-   *name* is the name of the variable in the Tcl interpreter; if omitted, a
-   unique name of the form ``'PY_VARnum'`` is generated.
-   If *name* matches an existing variable and *value* is omitted, the existing
-   value is retained.
+   *master* là widget có trình thông dịch Tcl sở hữu biến; nếu bị bỏ qua, cửa sổ gốc mặc định sẽ được sử dụng. *value* là giá trị ban đầu; nếu bị bỏ qua, giá trị mặc định dành riêng cho kiểu sẽ được sử dụng. *name* là tên của biến trong trình thông dịch Tcl; nếu bị bỏ qua, một tên duy nhất có dạng ``'PY_VARnum'`` sẽ được tạo. Nếu *name* khớp với một biến hiện có và *value* bị bỏ qua, giá trị hiện có sẽ được giữ lại.
 
-   In most cases you should use one of the typed subclasses below --
-   :class:`StringVar`, :class:`IntVar`, :class:`DoubleVar` or
-   :class:`BooleanVar` -- rather than :class:`!Variable` directly.
+   Trong hầu hết trường hợp, bạn nên sử dụng một trong các lớp con có kiểu bên dưới --
+   :class:`StringVar`, :class:`IntVar`, :class:`DoubleVar` hoặc
+   :class:`BooleanVar` -- thay vì trực tiếp sử dụng :class:`!Variable`.
 
    .. note::
 
-      When a :class:`!Variable` is garbage collected, its Tcl variable is unset.
-      Keep a reference to it for as long as a widget is linked to it, for example
-      by storing it as an attribute rather than in a local variable.
-      Otherwise Tk recreates the Tcl variable to keep the widget working, but it
-      is never unset again, leaking one Tcl variable per dropped wrapper.
+      Khi một :class:`!Variable` được thu gom rác, biến Tcl của nó sẽ bị hủy đặt. Hãy giữ một tham chiếu đến nó trong suốt thời gian một widget còn liên kết với nó, chẳng hạn bằng cách lưu nó dưới dạng thuộc tính thay vì trong một biến cục bộ. Nếu không, Tk sẽ tạo lại biến Tcl để widget tiếp tục hoạt động, nhưng biến này sẽ không bao giờ bị hủy đặt lại, làm rò rỉ một biến Tcl cho mỗi wrapper bị loại bỏ.
 
    .. versionchanged:: 3.10
-      Two variables now compare equal (``==``) only when they have the same
-      name, are of the same class, and belong to the same Tcl interpreter.
+      Hai biến hiện chỉ so sánh bằng nhau (``==``) khi chúng có cùng tên, thuộc cùng một lớp và thuộc cùng một trình thông dịch Tcl.
 
    .. method:: get()
 
-      Return the current value of the variable.
-      For the base class the value is returned as a string; the typed
-      subclasses convert it to the appropriate Python type.
+      Trả về giá trị hiện tại của biến. Đối với lớp cơ sở, giá trị được trả về dưới dạng chuỗi; các lớp con có kiểu sẽ chuyển đổi giá trị thành kiểu Python thích hợp.
 
    .. method:: initialize(value)
       :no-typesetting:
 
    .. method:: set(value)
 
-      Set the variable to *value*.
-      :meth:`initialize` is an alias of :meth:`!set`.
+      Đặt biến thành *value*.
+      :meth:`initialize` là bí danh của :meth:`!set`.
 
       .. versionadded:: 3.3
-         The *initialize* spelling.
+         Cách viết *initialize*.
 
    .. method:: trace_add(mode, callback)
 
-      Register *callback* to be called when the variable is accessed according
-      to *mode*.
-      *mode* is one of the strings ``'array'``, ``'read'``, ``'write'`` or
-      ``'unset'``, or a list or tuple of such strings.
+      Đăng ký *callback* để được gọi khi biến được truy cập theo *mode*. *mode* là một trong các chuỗi ``'array'``, ``'read'``, ``'write'`` hoặc ``'unset'``, hay một danh sách hoặc tuple chứa các chuỗi như vậy.
 
-      When triggered, *callback* is called with three arguments: the name of
-      the Tcl variable, an index (or an empty string if the variable is not an
-      element of an array), and the *mode* that triggered the call.
+      Khi được kích hoạt, *callback* được gọi với ba đối số: tên của biến Tcl, một chỉ mục (hoặc chuỗi rỗng nếu biến không phải là một phần tử của mảng), và *mode* đã kích hoạt lệnh gọi.
 
-      Return the internal name of the registered callback, which can be passed
-      to :meth:`trace_remove`.
+      Trả về tên nội bộ của callback đã đăng ký, tên này có thể được truyền cho :meth:`trace_remove`.
 
       .. versionadded:: 3.6
 
    .. method:: trace_remove(mode, cbname)
 
-      Remove a trace callback from the variable.
-      *mode* must match the *mode* that was passed to :meth:`trace_add`, and
-      *cbname* is the callback name returned by :meth:`trace_add`.
+      Xóa một trace callback khỏi biến. *mode* phải khớp với *mode* đã được truyền cho :meth:`trace_add`, và *cbname* là tên callback được :meth:`trace_add` trả về.
 
       .. versionadded:: 3.6
 
    .. method:: trace_info()
 
-      Return a list of ``(modes, cbname)`` pairs describing all traces
-      currently set on the variable, where *modes* is a tuple of mode strings
-      and *cbname* is the internal callback name.
+      Trả về danh sách các cặp ``(modes, cbname)`` mô tả tất cả trace hiện đang được đặt trên biến, trong đó *modes* là một tuple gồm các chuỗi mode còn *cbname* là tên callback nội bộ.
 
       .. versionadded:: 3.6
 
@@ -5788,223 +3701,153 @@ Variable classes
 
    .. method:: trace_variable(mode, callback)
 
-      Register *callback* to be called when the variable is accessed according
-      to *mode*.
-      *mode* is one of the strings ``'r'``, ``'w'`` or ``'u'``, for read, write
-      or unset.
-      Return the internal name of the registered callback.
-      :meth:`trace` is an alias of :meth:`!trace_variable`.
+      Đăng ký *callback* để được gọi khi biến được truy cập theo *mode*. *mode* là một trong các chuỗi ``'r'``, ``'w'`` hoặc ``'u'``, tương ứng với đọc, ghi hoặc hủy thiết lập. Trả về tên nội bộ của callback đã đăng ký.
+      :meth:`trace` là bí danh của :meth:`!trace_variable`.
 
       .. deprecated:: 3.6
-         Use :meth:`trace_add` instead.  This method wraps a Tcl feature that
-         was removed in Tcl 9.0.
+         Thay vào đó, hãy sử dụng :meth:`trace_add`. Phương thức này bao bọc một tính năng của Tcl đã bị loại bỏ trong Tcl 9.0.
 
    .. method:: trace_vdelete(mode, cbname)
 
-      Remove the trace callback named *cbname* registered for *mode* with
+      Xóa trace callback có tên *cbname* đã đăng ký cho *mode* với
       :meth:`trace_variable`.
 
       .. deprecated:: 3.6
-         Use :meth:`trace_remove` instead.  This method wraps a Tcl feature
-         that was removed in Tcl 9.0.
+         Thay vào đó, hãy sử dụng :meth:`trace_remove`. Phương thức này bao bọc một tính năng của Tcl đã bị loại bỏ trong Tcl 9.0.
 
    .. method:: trace_vinfo()
 
-      Return a list of ``(mode, cbname)`` pairs for all traces set on the
-      variable with :meth:`trace_variable`.
+      Trả về danh sách các cặp ``(mode, cbname)`` cho tất cả trace được thiết lập trên biến bằng :meth:`trace_variable`.
 
       .. deprecated:: 3.6
-         Use :meth:`trace_info` instead.  This method wraps a Tcl feature that
-         was removed in Tcl 9.0.
+         Thay vào đó, hãy sử dụng :meth:`trace_info`. Phương thức này bao bọc một tính năng của Tcl đã bị loại bỏ trong Tcl 9.0.
 
 
 .. class:: StringVar(master=None, value=None, name=None)
 
-   A :class:`Variable` subclass that holds a string.
-   The default value is ``''``.
+   Một lớp con :class:`Variable` chứa một chuỗi. Giá trị mặc định là ``''``.
 
    .. method:: get()
 
-      Return the value of the variable as a :class:`str`.
+      Trả về giá trị của biến dưới dạng :class:`str`.
 
 
 .. class:: IntVar(master=None, value=None, name=None)
 
-   A :class:`Variable` subclass that holds an integer.
-   The default value is ``0``.
+   Một lớp con :class:`Variable` chứa một số nguyên. Giá trị mặc định là ``0``.
 
    .. method:: get()
 
-      Return the value of the variable as an :class:`int`.
+      Trả về giá trị của biến dưới dạng :class:`int`.
 
 
 .. class:: DoubleVar(master=None, value=None, name=None)
 
-   A :class:`Variable` subclass that holds a float.
-   The default value is ``0.0``.
+   Một lớp con :class:`Variable` chứa một số thực. Giá trị mặc định là ``0.0``.
 
    .. method:: get()
 
-      Return the value of the variable as a :class:`float`.
+      Trả về giá trị của biến dưới dạng :class:`float`.
 
    .. _tkinter-numeric-locale:
 
    .. note::
 
-      A floating-point value is always parsed with a period (``.``) as the
-      decimal separator, but :class:`Spinbox`, :class:`Scale` and
-      :class:`ttk.Spinbox <tkinter.ttk.Spinbox>` format it according to the
-      ``LC_NUMERIC`` locale.  Under a locale that uses a comma they produce a
-      value that :meth:`get` cannot read, raising :exc:`TclError`.  Set
-      ``LC_NUMERIC`` to a locale that uses a period (such as ``'C'``) to avoid
-      this.
+      Giá trị dấu phẩy động luôn được phân tích cú pháp với dấu chấm (``.``) làm dấu phân cách thập phân, nhưng :class:`Spinbox`, :class:`Scale` và
+      :class:`ttk.Spinbox <tkinter.ttk.Spinbox>` định dạng giá trị đó theo locale ``LC_NUMERIC``. Trong locale sử dụng dấu phẩy, chúng tạo ra một giá trị mà :meth:`get` không thể đọc, dẫn đến :exc:`TclError`. Đặt ``LC_NUMERIC`` thành một locale sử dụng dấu chấm (chẳng hạn như ``'C'``) để tránh điều này.
 
 
 .. class:: BooleanVar(master=None, value=None, name=None)
 
-   A :class:`Variable` subclass that holds a boolean.
-   The default value is ``False``.
+   Một lớp con :class:`Variable` lưu một giá trị boolean. Giá trị mặc định là ``False``.
 
    .. method:: get()
 
-      Return the value of the variable as a :class:`bool`.
-      Raise a :exc:`ValueError` if the value cannot be interpreted as a
-      boolean.
+      Trả về giá trị của biến dưới dạng :class:`bool`. Phát sinh :exc:`ValueError` nếu không thể diễn giải giá trị này thành boolean.
 
    .. method:: initialize(value)
       :no-typesetting:
 
    .. method:: set(value)
 
-      Set the variable to *value*, converting it to a boolean.
-      :meth:`initialize` is an alias of :meth:`!set`.
+      Đặt biến thành *value*, chuyển đổi giá trị đó thành boolean.
+      :meth:`initialize` là bí danh của :meth:`!set`.
 
       .. versionadded:: 3.3
-         The *initialize* spelling.
+         Cách viết *initialize*.
 
 
-Image classes
-^^^^^^^^^^^^^
+Các lớp hình ảnh
+^^^^^^^^^^^^^^^^
 
 .. class:: Image(imgtype, name=None, cnf={}, master=None, **kw)
 
-   Base class for Tk images.
-   *imgtype* is the Tk image type, one of ``'photo'`` or ``'bitmap'``.
-   An image is a named object that can be displayed by widgets through their
-   *image* option; deleting all references to the :class:`!Image` object
-   deletes the underlying Tk image.
-   Usually you create a :class:`PhotoImage` or :class:`BitmapImage` rather than
-   an :class:`!Image` directly.
+   Lớp cơ sở cho hình ảnh Tk. *imgtype* là loại hình ảnh Tk, một trong ``'photo'`` hoặc ``'bitmap'``. Hình ảnh là một đối tượng có tên mà các widget có thể hiển thị thông qua tùy chọn *image*; việc xóa mọi tham chiếu đến đối tượng :class:`!Image` sẽ xóa hình ảnh Tk bên dưới. Thông thường, bạn tạo một :class:`PhotoImage` hoặc :class:`BitmapImage` thay vì tạo trực tiếp một :class:`!Image`.
 
-   The image's configuration options are given by *cnf* and *kw* and may be
-   queried and changed later with the mapping protocol (using ``image[key]``)
-   or with the :meth:`configure` method.
+   Các tùy chọn cấu hình của ảnh được cung cấp bởi *cnf* và *kw*, đồng thời có thể được truy vấn và thay đổi sau đó bằng mapping protocol (sử dụng ``image[key]``) hoặc bằng phương thức :meth:`configure`.
 
    .. method:: config(**kw)
       :no-typesetting:
 
    .. method:: configure(**kw)
 
-      Modify one or more configuration options of the image.
-      The valid options depend on the image type; see :class:`PhotoImage` and
+      Sửa đổi một hoặc nhiều tùy chọn cấu hình của ảnh. Các tùy chọn hợp lệ phụ thuộc vào loại ảnh; xem :class:`PhotoImage` và
       :class:`BitmapImage`.
-      :meth:`config` is an alias of :meth:`!configure`.
+      :meth:`config` là bí danh của :meth:`!configure`.
 
    .. method:: height()
 
-      Return the height of the image, in pixels.
+      Trả về chiều cao của ảnh, tính bằng pixel.
 
    .. method:: width()
 
-      Return the width of the image, in pixels.
+      Trả về chiều rộng của ảnh, tính bằng pixel.
 
    .. method:: type()
 
-      Return the type of the image, that is the value of *imgtype* with which
-      it was created (for example ``'photo'`` or ``'bitmap'``).
+      Trả về loại ảnh, tức là giá trị của *imgtype* được dùng khi tạo ảnh (ví dụ ``'photo'`` hoặc ``'bitmap'``).
 
 
 .. class:: PhotoImage(name=None, cnf={}, master=None, **kw)
 
-   A full-color image (the Tk ``photo`` image type), stored internally with a
-   varying degree of transparency per pixel.
-   It can read and write GIF, PPM/PGM and (in Tk 8.6 and later) PNG files, read
-   SVG files (in Tk 9.0 and later), and be drawn in widgets.
-   Inherits from :class:`Image`.
+   Ảnh đầy đủ màu sắc (loại ảnh Tk ``photo``), được lưu trữ nội bộ với mức độ trong suốt khác nhau ở từng pixel. Ảnh có thể đọc và ghi các tệp GIF, PPM/PGM và (trong Tk 8.6 trở lên) PNG, đọc các tệp SVG (trong Tk 9.0 trở lên), cũng như được vẽ trong các widget. Kế thừa từ :class:`Image`.
 
-   The configuration options include *data* (the image contents as a string),
-   *file* (the name of a file to read the contents from), *format* (the name of
-   the file format handler), *width* and *height* (the size of the image, used
-   when building it up piece by piece), *gamma* and *palette*.
+   Các tùy chọn cấu hình bao gồm *data* (nội dung ảnh dưới dạng chuỗi), *file* (tên tệp để đọc nội dung), *format* (tên trình xử lý định dạng tệp), *width* và *height* (kích thước ảnh, được sử dụng khi dựng ảnh từng phần), *gamma* và *palette*.
 
    .. method:: blank()
 
-      Blank the image; that is, set the entire image to have no data, so that
-      it is displayed as transparent and the background of whatever window it
-      is displayed in shows through.
+      Xóa dữ liệu của ảnh; tức là đặt toàn bộ ảnh ở trạng thái không có dữ liệu, để ảnh được hiển thị trong suốt và nền của cửa sổ chứa ảnh sẽ hiển thị xuyên qua.
 
    .. method:: cget(option)
 
-      Return the current value of the configuration option *option*.
+      Trả về giá trị hiện tại của tùy chọn cấu hình *option*.
 
    .. method:: copy(*, from_coords=None, zoom=None, subsample=None)
 
-      Return a new :class:`PhotoImage` with a copy of this image.
+      Trả về một :class:`PhotoImage` mới chứa bản sao của ảnh này.
 
-      *from_coords* specifies a rectangular sub-region of the source image to
-      be copied.
-      It must be a tuple or a list of 1 to 4 integers ``(x1, y1, x2, y2)``.
-      ``(x1, y1)`` and ``(x2, y2)`` specify diagonally opposite corners of the
-      rectangle.
-      If *x2* and *y2* are not specified, they default to the bottom-right
-      corner of the source image.
-      The pixels copied include the left and top edges of the rectangle but not
-      the bottom or right edges.
-      If *from_coords* is not given, the whole source image is copied.
+      *from_coords* chỉ định một vùng con hình chữ nhật của ảnh nguồn cần sao chép. Giá trị này phải là một tuple hoặc danh sách gồm từ 1 đến 4 số nguyên ``(x1, y1, x2, y2)``. ``(x1, y1)`` và ``(x2, y2)`` chỉ định hai góc đối diện theo đường chéo của hình chữ nhật. Nếu không chỉ định *x2* và *y2*, chúng sẽ mặc định là góc dưới bên phải của ảnh nguồn. Các pixel được sao chép bao gồm cạnh trái và cạnh trên của hình chữ nhật, nhưng không bao gồm cạnh dưới hoặc cạnh phải. Nếu không cung cấp *from_coords*, toàn bộ ảnh nguồn sẽ được sao chép.
 
-      If *zoom* or *subsample* are specified, the image is transformed as in
-      the :meth:`zoom` or :meth:`subsample` methods.
-      The value must be a single integer or a pair of integers.
+      Nếu chỉ định *zoom* hoặc *subsample*, ảnh sẽ được biến đổi như trong các phương thức :meth:`zoom` hoặc :meth:`subsample`. Giá trị phải là một số nguyên đơn hoặc một cặp số nguyên.
 
       .. versionchanged:: 3.13
-         Added the *from_coords*, *zoom* and *subsample* parameters.
+         Đã thêm các tham số *from_coords*, *zoom* và *subsample*.
 
 
    .. method:: copy_replace(sourceImage, *, from_coords=None, to=None, \
-                            shrink=False, zoom=None, subsample=None, \
-                            compositingrule=None)
+                            shrink=False, zoom=None, subsample=None, \ compositingrule=None)
 
-      Copy a region from *sourceImage* (which must be a :class:`PhotoImage`)
-      into this image, possibly with pixel zooming and/or subsampling.
-      If no options are specified, the whole of *sourceImage* is copied into
-      this image, starting at coordinates ``(0, 0)``.
+      Sao chép một vùng từ *sourceImage* (phải là một :class:`PhotoImage`) vào hình ảnh này, có thể kèm theo phóng to pixel và/hoặc subsampling. Nếu không chỉ định tùy chọn nào, toàn bộ *sourceImage* sẽ được sao chép vào hình ảnh này, bắt đầu tại tọa độ ``(0, 0)``.
 
-      *from_coords* specifies a rectangular sub-region of the source image to
-      be copied, as in the :meth:`copy` method.
+      *from_coords* chỉ định một vùng con hình chữ nhật của hình ảnh nguồn cần sao chép, như trong phương thức :meth:`copy`.
 
-      *to* specifies a rectangular sub-region of the destination image to be
-      affected.
-      It must be a tuple or a list of 1 to 4 integers ``(x1, y1, x2, y2)``.
-      If *x2* and *y2* are not specified, they default to ``(x1, y1)`` plus the
-      size of the source region (after subsampling and zooming, if specified).
-      If *x2* and *y2* are specified, the source region is replicated if
-      necessary to fill the destination region in a tiled fashion.
+      *to* chỉ định một vùng con hình chữ nhật của hình ảnh đích sẽ bị tác động. Giá trị này phải là một tuple hoặc list gồm từ 1 đến 4 số nguyên ``(x1, y1, x2, y2)``. Nếu không chỉ định *x2* và *y2*, chúng mặc định là ``(x1, y1)`` cộng với kích thước của vùng nguồn (sau khi subsampling và phóng to, nếu được chỉ định). Nếu chỉ định *x2* và *y2*, vùng nguồn sẽ được lặp lại nếu cần để lấp đầy vùng đích theo dạng lát.
 
-      If *shrink* is true, the size of the destination image is reduced, if
-      necessary, so that the region being copied into is at the bottom-right
-      corner of the image.
+      Nếu *shrink* là true, kích thước của hình ảnh đích sẽ được giảm nếu cần, để vùng được sao chép vào nằm ở góc dưới bên phải của hình ảnh.
 
-      If *zoom* or *subsample* are specified, the image is transformed as in
-      the :meth:`zoom` or :meth:`subsample` methods.
-      The value must be a single integer or a pair of integers.
+      Nếu chỉ định *zoom* hoặc *subsample*, ảnh sẽ được biến đổi như trong các phương thức :meth:`zoom` hoặc :meth:`subsample`. Giá trị phải là một số nguyên đơn hoặc một cặp số nguyên.
 
-      *compositingrule* specifies how transparent pixels in the source image
-      are combined with the destination image.
-      With ``'overlay'`` (the default), the old contents of the destination
-      image remain visible, as if the source image were printed on a piece of
-      transparent film and placed over the top of the destination.
-      With ``'set'``, the old contents of the destination image are discarded
-      and the source image is used as-is.
+      *compositingrule* chỉ định cách các pixel trong suốt của hình ảnh nguồn được kết hợp với hình ảnh đích. Với ``'overlay'`` (mặc định), nội dung cũ của hình ảnh đích vẫn hiển thị, như thể hình ảnh nguồn được in trên một tấm phim trong suốt rồi đặt lên trên hình ảnh đích. Với ``'set'``, nội dung cũ của hình ảnh đích bị loại bỏ và hình ảnh nguồn được sử dụng nguyên trạng.
 
       .. versionadded:: 3.13
 
@@ -6012,104 +3855,65 @@ Image classes
    .. method:: data(format=None, *, from_coords=None, background=None, \
                     grayscale=False)
 
-      Return the image data.
+      Trả về dữ liệu hình ảnh.
 
-      *format* specifies the name of the image file format handler to use.
-      If it is not given, the data is returned as a tuple (one element per row)
-      of strings containing space-separated (one element per pixel/column)
-      colors in ``#RRGGBB`` format.
+      *format* chỉ định tên của trình xử lý định dạng tệp hình ảnh cần sử dụng. Nếu không được cung cấp, dữ liệu được trả về dưới dạng một tuple (mỗi phần tử tương ứng với một hàng) gồm các chuỗi chứa các màu được phân tách bằng dấu cách (mỗi phần tử tương ứng với một pixel/cột) ở định dạng ``#RRGGBB``.
 
-      *from_coords* specifies a rectangular region of the image to be returned.
-      It must be a tuple or a list of 1 to 4 integers ``(x1, y1, x2, y2)``.
-      If only *x1* and *y1* are specified, the region extends from ``(x1, y1)``
-      to the bottom-right corner of the image.
-      If all four coordinates are given, they specify diagonally opposite
-      corners of the region, including ``(x1, y1)`` and excluding ``(x2, y2)``.
-      If *from_coords* is not given, the whole image is returned.
+      *from_coords* chỉ định một vùng hình chữ nhật của hình ảnh cần trả về. Nó phải là một tuple hoặc một danh sách gồm từ 1 đến 4 số nguyên ``(x1, y1, x2, y2)``. Nếu chỉ chỉ định *x1* và *y1*, vùng này sẽ mở rộng từ ``(x1, y1)`` đến góc dưới bên phải của hình ảnh. Nếu cung cấp đủ cả bốn tọa độ, chúng chỉ định hai góc đối diện theo đường chéo của vùng, bao gồm ``(x1, y1)`` và không bao gồm ``(x2, y2)``. Nếu không cung cấp *from_coords*, toàn bộ hình ảnh sẽ được trả về.
 
-      If *background* is specified, the data does not contain any transparency
-      information; in all transparent pixels the color is replaced by the
-      specified color.
+      Nếu chỉ định *background*, dữ liệu sẽ không chứa thông tin về độ trong suốt; trong tất cả các pixel trong suốt, màu sẽ được thay thế bằng màu đã chỉ định.
 
-      If *grayscale* is true, the data does not contain color information; all
-      pixel data is transformed into grayscale.
+      Nếu *grayscale* là true, dữ liệu sẽ không chứa thông tin màu; toàn bộ dữ liệu pixel được chuyển thành thang độ xám.
 
       .. versionadded:: 3.13
 
 
    .. method:: get(x, y)
 
-      Return the color of the pixel at coordinates (*x*, *y*) as an
-      ``(r, g, b)`` tuple of three integers between 0 and 255, representing the
-      red, green and blue components respectively.
+      Trả về màu của pixel tại tọa độ (*x*, *y*) dưới dạng một tuple ``(r, g, b)`` gồm ba số nguyên từ 0 đến 255, lần lượt biểu thị các thành phần đỏ, lục và lam.
 
    .. method:: put(data, to=None)
 
-      Set pixels of the image to the colors given in *data*, which must be a
-      string or a nested sequence of horizontal rows of pixel colors (for
-      example ``"{red green} {blue yellow}"``).
+      Đặt các pixel của ảnh thành các màu được chỉ định trong *data*, giá trị này phải là một chuỗi hoặc một chuỗi lồng nhau gồm các hàng pixel theo chiều ngang với các màu pixel (ví dụ ``"{red green} {blue yellow}"``).
 
-      *to* specifies the coordinates of the region of the image into which the
-      data are copied.
-      It must be a tuple or a list of 2 or 4 integers ``(x1, y1)`` or
-      ``(x1, y1, x2, y2)`` giving the top-left corner, and optionally the
-      bottom-right corner, of the region.
-      The default position is ``(0, 0)``.
+      *to* chỉ định tọa độ của vùng ảnh mà dữ liệu được sao chép vào. Giá trị này phải là một tuple hoặc list gồm 2 hoặc 4 số nguyên ``(x1, y1)`` hoặc ``(x1, y1, x2, y2)``, lần lượt chỉ định góc trên bên trái và tùy chọn góc dưới bên phải của vùng. Vị trí mặc định là ``(0, 0)``.
 
    .. method:: read(filename, format=None, *, from_coords=None, to=None, \
                     shrink=False)
 
-      Read image data from the file named *filename* into the image.
+      Đọc dữ liệu ảnh từ tệp có tên *filename* vào ảnh.
 
-      *format* specifies the format of the image data in the file.
+      *format* chỉ định định dạng của dữ liệu ảnh trong tệp.
 
-      *from_coords* specifies a rectangular sub-region of the image file data
-      to be copied to the destination image.
-      It must be a tuple or a list of 1 to 4 integers ``(x1, y1, x2, y2)``.
-      If only *x1* and *y1* are specified, the region extends from ``(x1, y1)``
-      to the bottom-right corner of the image in the file.
-      If all four coordinates are given, they specify diagonally opposite
-      corners of the region.
-      If *from_coords* is not given, the whole of the image in the file is
-      read.
+      *from_coords* chỉ định một vùng con hình chữ nhật của dữ liệu tệp ảnh sẽ được sao chép vào ảnh đích. Giá trị này phải là một tuple hoặc list gồm từ 1 đến 4 số nguyên ``(x1, y1, x2, y2)``. Nếu chỉ chỉ định *x1* và *y1*, vùng sẽ kéo dài từ ``(x1, y1)`` đến góc dưới bên phải của ảnh trong tệp. Nếu cung cấp cả bốn tọa độ, chúng chỉ định các góc đối diện theo đường chéo của vùng. Nếu không cung cấp *from_coords*, toàn bộ ảnh trong tệp sẽ được đọc.
 
-      *to* specifies the coordinates of the top-left corner of the region of
-      the image into which the data are read.
-      The default is ``(0, 0)``.
+      *to* chỉ định tọa độ của góc trên bên trái của vùng ảnh mà dữ liệu được đọc vào. Giá trị mặc định là ``(0, 0)``.
 
-      If *shrink* is true, the size of the image is reduced, if necessary, so
-      that the region into which the file data are read is at the bottom-right
-      corner of the image.
+      Nếu *shrink* là true, kích thước của ảnh sẽ được giảm xuống nếu cần, để vùng mà dữ liệu tệp được đọc nằm ở góc dưới bên phải của ảnh.
 
       .. versionadded:: 3.13
 
 
    .. method:: subsample(x, y='', *, from_coords=None)
 
-      Return a new :class:`PhotoImage` based on this image but using only every
-      *x*-th pixel in the X direction and every *y*-th pixel in the Y
-      direction.
-      If *y* is not given, it defaults to the same value as *x*.
+      Trả về một :class:`PhotoImage` mới dựa trên ảnh này nhưng chỉ sử dụng mỗi pixel thứ *x* theo hướng X và mỗi pixel thứ *y* theo hướng Y. Nếu không cung cấp *y*, giá trị mặc định sẽ giống với *x*.
 
-      *from_coords* specifies a rectangular sub-region of the source image to
-      be copied, as in the :meth:`copy` method.
+      *from_coords* chỉ định một vùng con hình chữ nhật của hình ảnh nguồn cần sao chép, như trong phương thức :meth:`copy`.
 
       .. versionchanged:: 3.13
-         Added the *from_coords* parameter.
+         Đã thêm tham số *from_coords*.
 
 
    .. method:: transparency_get(x, y)
 
-      Return ``True`` if the pixel at coordinates (*x*, *y*) is fully
-      transparent, ``False`` otherwise.
+      Trả về ``True`` nếu pixel tại tọa độ (*x*, *y*) hoàn toàn trong suốt; nếu không thì trả về ``False``.
 
       .. versionadded:: 3.8
 
 
    .. method:: transparency_set(x, y, boolean)
 
-      Make the pixel at coordinates (*x*, *y*) fully transparent if *boolean*
-      is true, fully opaque otherwise.
+      Đặt pixel tại tọa độ (*x*, *y*) thành hoàn toàn trong suốt nếu *boolean* là true, nếu không thì thành hoàn toàn đục.
 
       .. versionadded:: 3.8
 
@@ -6117,157 +3921,120 @@ Image classes
    .. method:: write(filename, format=None, from_coords=None, *, \
                      background=None, grayscale=False)
 
-      Write image data from the image to the file named *filename*.
+      Ghi dữ liệu hình ảnh từ ảnh vào tệp có tên *filename*.
 
-      *format* specifies the name of the image file format handler to use.
-      If it is not given, the format is guessed from the file extension.
+      *format* chỉ định tên của trình xử lý định dạng tệp hình ảnh cần sử dụng. Nếu không được cung cấp, định dạng sẽ được suy đoán từ phần mở rộng tệp.
 
-      *from_coords* specifies a rectangular region of the image to be written.
-      It must be a tuple or a list of 1 to 4 integers ``(x1, y1, x2, y2)``.
-      If only *x1* and *y1* are specified, the region extends from ``(x1, y1)``
-      to the bottom-right corner of the image.
-      If all four coordinates are given, they specify diagonally opposite
-      corners of the region.
-      If *from_coords* is not given, the whole image is written.
+      *from_coords* chỉ định một vùng hình chữ nhật của ảnh cần được ghi. Giá trị này phải là một tuple hoặc một danh sách gồm từ 1 đến 4 số nguyên ``(x1, y1, x2, y2)``. Nếu chỉ chỉ định *x1* và *y1*, vùng sẽ kéo dài từ ``(x1, y1)`` đến góc dưới bên phải của ảnh. Nếu cung cấp đủ bốn tọa độ, chúng chỉ định hai góc đối diện theo đường chéo của vùng. Nếu không cung cấp *from_coords*, toàn bộ ảnh sẽ được ghi.
 
-      If *background* is specified, the data does not contain any transparency
-      information; in all transparent pixels the color is replaced by the
-      specified color.
+      Nếu chỉ định *background*, dữ liệu sẽ không chứa thông tin về độ trong suốt; trong tất cả các pixel trong suốt, màu sẽ được thay thế bằng màu đã chỉ định.
 
-      If *grayscale* is true, the data does not contain color information; all
-      pixel data is transformed into grayscale.
+      Nếu *grayscale* là true, dữ liệu sẽ không chứa thông tin màu; toàn bộ dữ liệu pixel được chuyển thành thang độ xám.
 
       .. versionchanged:: 3.13
-         Added the *background* and *grayscale* parameters.
+         Đã thêm các tham số *background* và *grayscale*.
 
 
    .. method:: zoom(x, y='', *, from_coords=None)
 
-      Return a new :class:`PhotoImage` with this image magnified by a factor of
-      *x* in the X direction and *y* in the Y direction.
-      If *y* is not given, it defaults to the same value as *x*.
+      Trả về một :class:`PhotoImage` mới với ảnh này được phóng đại theo hệ số *x* theo hướng X và *y* theo hướng Y. Nếu không cung cấp *y*, giá trị này mặc định giống với *x*.
 
-      *from_coords* specifies a rectangular sub-region of the source image to
-      be copied, as in the :meth:`copy` method.
+      *from_coords* chỉ định một vùng con hình chữ nhật của hình ảnh nguồn cần sao chép, như trong phương thức :meth:`copy`.
 
       .. versionchanged:: 3.13
-         Added the *from_coords* parameter.
+         Đã thêm tham số *from_coords*.
 
 
 
 .. class:: BitmapImage(name=None, cnf={}, master=None, **kw)
 
-   A two-color image (the Tk ``bitmap`` image type) created from an X11 bitmap.
-   Each pixel displays a foreground color, a background color, or nothing
-   (producing a transparent effect).
-   Inherits from :class:`Image`.
+   Một hình ảnh hai màu (kiểu hình ảnh Tk ``bitmap``) được tạo từ bitmap X11. Mỗi pixel hiển thị màu tiền cảnh, màu nền hoặc không hiển thị gì (tạo hiệu ứng trong suốt). Kế thừa từ :class:`Image`.
 
-   The configuration options are *data* or *file* (the source bitmap, given as
-   a string in X11 bitmap format or as the name of a file in that format),
-   *maskdata* or *maskfile* (the mask bitmap, in the same forms), and
-   *foreground* and *background* (the two colors).
-   For pixels where the mask is zero the image displays nothing; for other
-   pixels it displays the foreground color where the source is one and the
-   background color where the source is zero.
-   If *background* is set to an empty string, the background pixels are
-   transparent.
+   Các tùy chọn cấu hình là *data* hoặc *file* (bitmap nguồn, được cung cấp dưới dạng chuỗi theo định dạng bitmap X11 hoặc tên của một tệp ở định dạng đó), *maskdata* hoặc *maskfile* (bitmap mặt nạ, với cùng các dạng trên), và *foreground* cùng *background* (hai màu). Với các pixel mà mặt nạ bằng không, hình ảnh không hiển thị gì; với các pixel khác, hình ảnh hiển thị màu tiền cảnh tại nơi nguồn bằng một và màu nền tại nơi nguồn bằng không. Nếu *background* được đặt thành chuỗi rỗng, các pixel nền sẽ trong suốt.
 
-   :class:`!BitmapImage` has no methods of its own beyond those inherited from
+   :class:`!BitmapImage` không có phương thức riêng nào ngoài các phương thức được kế thừa từ
    :class:`Image`.
 
 
-Other classes
-^^^^^^^^^^^^^
+Các lớp khác
+^^^^^^^^^^^^
 
 .. class:: Event()
 
-   A container for the attributes of an event passed to a callback bound with
-   :meth:`Misc.bind`.
-   An :class:`!Event` instance has the following attributes, each corresponding
-   to a field of the underlying Tk event; depending on the event type, some
-   attributes may be set to the string ``'??'`` to indicate that they are not
-   meaningful.
-   See :ref:`bindings-and-events`.
+   Một vùng chứa các thuộc tính của một sự kiện được truyền đến một callback được liên kết bằng
+   :meth:`Misc.bind`. Một instance :class:`!Event` có các thuộc tính sau, mỗi thuộc tính tương ứng với một trường của sự kiện Tk bên dưới; tùy thuộc vào loại sự kiện, một số thuộc tính có thể được đặt thành chuỗi ``'??'`` để cho biết chúng không có ý nghĩa. Xem :ref:`bindings-and-events`.
 
    .. attribute:: serial
 
-      The serial number of the event.
+      Số sê-ri của sự kiện.
 
    .. attribute:: num
 
-      The mouse button that was pressed or released (for button events).
+      Nút chuột đã được nhấn hoặc thả (đối với các sự kiện nút).
 
    .. attribute:: focus
 
-      Whether the window has the focus (for ``Enter`` and ``Leave`` events).
+      Cửa sổ có đang được focus hay không (đối với các sự kiện ``Enter`` và ``Leave``).
 
    .. attribute:: height
                   width
 
-      The new height and width of the window (for ``Configure`` and ``Expose``
-      events).
+      Chiều cao và chiều rộng mới của cửa sổ (đối với các sự kiện ``Configure`` và ``Expose``).
 
    .. attribute:: keycode
 
-      The keycode of the key that was pressed or released.
+      keycode của phím đã được nhấn hoặc thả.
 
    .. attribute:: state
 
-      The state of the event, as a number (for most events) or a string (for
-      ``Visibility`` events).
+      Trạng thái của sự kiện, dưới dạng một số (đối với hầu hết các sự kiện) hoặc một chuỗi (đối với các sự kiện ``Visibility``).
 
    .. attribute:: time
 
-      The timestamp of the event, in milliseconds.
+      Dấu thời gian của sự kiện, tính bằng mili giây.
 
    .. attribute:: x
                   y
 
-      The pointer position relative to the widget, in pixels.
+      Vị trí của con trỏ tương đối so với widget, tính bằng pixel.
 
    .. attribute:: x_root
                   y_root
 
-      The pointer position relative to the top-left corner of the screen, in
-      pixels.
+      Vị trí của con trỏ tương đối so với góc trên bên trái của màn hình, tính bằng pixel.
 
    .. attribute:: char
 
-      The character typed, as a string (for key events).
+      Ký tự được nhập, dưới dạng một chuỗi (đối với các sự kiện phím).
 
    .. attribute:: send_event
 
-      ``True`` if the event was sent by another application.
+      ``True`` nếu sự kiện được gửi bởi một ứng dụng khác.
 
    .. attribute:: keysym
 
-      The symbolic name of the key that was pressed or released.
+      Tên ký hiệu của phím đã được nhấn hoặc thả.
 
    .. attribute:: keysym_num
 
-      The numeric value of :attr:`keysym`.
+      Giá trị số của :attr:`keysym`.
 
    .. attribute:: type
 
-      The :class:`EventType` of the event.
+      :class:`EventType` của sự kiện.
 
    .. attribute:: widget
 
-      The widget on which the event occurred.
+      Widget nơi sự kiện xảy ra.
 
    .. attribute:: delta
 
-      The amount the mouse wheel was rotated (for ``MouseWheel`` events).
+      Mức độ xoay của con lăn chuột (đối với các sự kiện ``MouseWheel``).
 
 
 .. class:: EventType(*values)
 
-   An :class:`enum.StrEnum` enumerating the Tk event types, used as the value
-   of :attr:`Event.type`.
-   Its members include, among others, ``KeyPress``, ``KeyRelease``,
-   ``ButtonPress``, ``ButtonRelease``, ``Motion``, ``Enter``, ``Leave``,
-   ``FocusIn``, ``FocusOut``, ``Configure``, ``Map``, ``Unmap``, ``Expose``,
-   ``Destroy`` and ``MouseWheel``.
+   Một :class:`enum.StrEnum` liệt kê các loại sự kiện Tk, được dùng làm giá trị của :attr:`Event.type`. Các thành phần của nó bao gồm, cùng với những thành phần khác, ``KeyPress``, ``KeyRelease``, ``ButtonPress``, ``ButtonRelease``, ``Motion``, ``Enter``, ``Leave``, ``FocusIn``, ``FocusOut``, ``Configure``, ``Map``, ``Unmap``, ``Expose``, ``Destroy`` và ``MouseWheel``.
 
    .. versionadded:: 3.6
 
@@ -6275,79 +4042,52 @@ Other classes
 
 .. class:: CallWrapper(func, subst, widget)
 
-   Internal helper that wraps a Python callback so that it can be invoked from
-   Tcl.
-   *func* is the Python function, *subst* is an optional function that
-   pre-processes the Tcl arguments, and *widget* is the widget used for error
-   reporting.
-   Instances are created automatically by :meth:`Misc.register`; this class is
-   not normally used directly.
+   Trợ giúp nội bộ bao bọc một callback Python để có thể gọi từ Tcl. *func* là hàm Python, *subst* là một hàm tùy chọn để tiền xử lý các đối số Tcl, còn *widget* là widget được dùng để báo lỗi. Các instance được :meth:`Misc.register` tự động tạo; thông thường không sử dụng trực tiếp class này.
 
 
-Module-level functions
-^^^^^^^^^^^^^^^^^^^^^^
+Các hàm cấp mô-đun
+^^^^^^^^^^^^^^^^^^
 
 .. function:: Tcl(screenName=None, baseName=None, className='Tk', useTk=False)
 
-   The :func:`Tcl` function is a factory function which creates an object much
-   like that created by the :class:`Tk` class, except that it does not
-   initialize the Tk subsystem.
-   This is most often useful when driving the Tcl interpreter in an environment
-   where one doesn't want to create extraneous toplevel windows, or where one
-   cannot (such as Unix/Linux systems without an X server).
-   An object created by the :func:`Tcl` object can have a Toplevel window
-   created (and the Tk subsystem initialized) by calling its :meth:`~Tk.loadtk`
-   method.
+   Hàm :func:`Tcl` là một hàm factory tạo ra một đối tượng tương tự đối tượng do class :class:`Tk` tạo ra, ngoại trừ việc nó không khởi tạo hệ thống Tk. Hàm này hữu ích nhất khi điều khiển trình thông dịch Tcl trong môi trường không muốn tạo các cửa sổ toplevel không cần thiết hoặc không thể tạo chúng (chẳng hạn như các hệ thống Unix/Linux không có X server). Một đối tượng được tạo bởi đối tượng :func:`Tcl` có thể tạo một cửa sổ Toplevel (đồng thời khởi tạo hệ thống Tk) bằng cách gọi phương thức :meth:`~Tk.loadtk` của nó.
 
 .. function:: NoDefaultRoot()
 
-   Inhibit the creation of an implicit default root window.
-   Afterwards :mod:`!tkinter` no longer creates a shared default root
-   automatically, and operations that rely on one --- such as constructing a
-   widget without an explicit *master* --- raise a :exc:`RuntimeError`.
-   Call this early in larger applications to make the root window explicit.
+   Ngăn việc tạo cửa sổ root mặc định ngầm. Sau đó, :mod:`!tkinter` không còn tự động tạo một root mặc định dùng chung, và các thao tác phụ thuộc vào root này — chẳng hạn như tạo một widget không chỉ rõ *master* — sẽ phát sinh :exc:`RuntimeError`. Hãy gọi hàm này sớm trong các ứng dụng lớn để chỉ rõ cửa sổ root.
 
 .. function:: mainloop(n=0)
 
-   Run the Tk main event loop on the default root window until all windows are
-   destroyed.
-   Equivalent to calling :meth:`Misc.mainloop` on the default root.
+   Chạy vòng lặp sự kiện chính của Tk trên cửa sổ root mặc định cho đến khi tất cả các cửa sổ bị hủy. Tương đương với việc gọi :meth:`Misc.mainloop` trên root mặc định.
 
 .. function:: getboolean(s)
 
-   Convert the Tcl boolean string *s* (one of ``'1'``, ``'true'``, ``'yes'``,
-   ``'on'`` and similar, or their false counterparts) to a Python
-   :class:`bool`.
-   Raise :exc:`TclError` for an invalid value.
+   Chuyển đổi chuỗi boolean của Tcl *s* (một trong các giá trị ``'1'``, ``'true'``, ``'yes'``, ``'on'`` và các giá trị tương tự, hoặc các giá trị tương ứng với false) thành một giá trị Python
+   :class:`bool`. Phát sinh :exc:`TclError` nếu giá trị không hợp lệ.
 
 .. function:: getdouble(s)
 
-   Convert *s* to a floating-point number.
-   This is the built-in :class:`float`.
+   Chuyển *s* thành một số dấu phẩy động. Đây là :class:`float` tích hợp sẵn.
 
 .. function:: getint(s)
 
-   Convert *s* to an integer.
-   This is the built-in :class:`int`.
+   Chuyển *s* thành một số nguyên. Đây là :class:`int` tích hợp sẵn.
 
 .. function:: image_names()
 
-   Return the names of all existing images in the default root's interpreter.
+   Trả về tên của tất cả image hiện có trong interpreter của root mặc định.
 
 .. function:: image_types()
 
-   Return the available image types (such as ``'photo'`` and ``'bitmap'``) in
-   the default root's interpreter.
+   Trả về các loại image khả dụng (chẳng hạn như ``'photo'`` và ``'bitmap'``) trong interpreter của root mặc định.
 
 
 .. _tkinter-file-handlers:
 
-File handlers
-^^^^^^^^^^^^^
+Bộ xử lý tệp
+^^^^^^^^^^^^
 
-Tk allows you to register and unregister a callback function which will be
-called from the Tk mainloop when I/O is possible on a file descriptor.
-Only one handler may be registered per file descriptor. Example code::
+Tk cho phép bạn đăng ký và hủy đăng ký một hàm callback, hàm này sẽ được gọi từ mainloop của Tk khi có thể thực hiện I/O trên một file descriptor. Mỗi file descriptor chỉ có thể đăng ký một handler. Mã ví dụ::
 
    import tkinter
    widget = tkinter.Tk()
@@ -6356,198 +4096,156 @@ Only one handler may be registered per file descriptor. Example code::
    ...
    widget.tk.deletefilehandler(file)
 
-This feature is not available on Windows.
+Tính năng này không khả dụng trên Windows.
 
-Since you don't know how many bytes are available for reading, you may not
-want to use the :class:`~io.BufferedIOBase` or :class:`~io.TextIOBase`
-:meth:`~io.BufferedIOBase.read` or :meth:`~io.IOBase.readline` methods,
-since these will insist on reading a predefined number of bytes.
-For sockets, the :meth:`~socket.socket.recv` or
-:meth:`~socket.socket.recvfrom` methods will work fine; for other files,
-use raw reads or ``os.read(file.fileno(), maxbytecount)``.
+Vì bạn không biết có bao nhiêu byte sẵn sàng để đọc, bạn có thể không muốn sử dụng :class:`~io.BufferedIOBase` hoặc :class:`~io.TextIOBase`
+Các phương thức :meth:`~io.BufferedIOBase.read` hoặc :meth:`~io.IOBase.readline` sẽ buộc phải đọc một số byte được xác định trước. Đối với socket, :meth:`~socket.socket.recv` hoặc
+các phương thức :meth:`~socket.socket.recvfrom` sẽ hoạt động tốt; đối với các tệp khác, hãy sử dụng thao tác đọc thô hoặc ``os.read(file.fileno(), maxbytecount)``.
 
 
 .. method:: Widget.tk.createfilehandler(file, mask, func)
 
-   Registers the file handler callback function *func*. The *file* argument
-   may either be an object with a :meth:`~io.IOBase.fileno` method (such as
-   a file or socket object), or an integer file descriptor. The *mask*
-   argument is an ORed combination of any of the three constants below.
-   The callback is called as follows::
+   Đăng ký hàm callback của trình xử lý tệp *func*. Đối số *file* có thể là một đối tượng có phương thức :meth:`~io.IOBase.fileno` (chẳng hạn như đối tượng tệp hoặc socket), hoặc một file descriptor dạng số nguyên. Đối số *mask* là sự kết hợp bằng phép OR của bất kỳ hằng số nào trong ba hằng số dưới đây. Callback được gọi như sau::
 
       callback(file, mask)
 
 
 .. method:: Widget.tk.deletefilehandler(file)
 
-   Unregisters a file handler.
+   Hủy đăng ký trình xử lý tệp.
 
 
 .. data:: READABLE
-          WRITABLE
-          EXCEPTION
+          WRITABLE EXCEPTION
 
-   Constants used in the *mask* arguments.
+   Các hằng số được sử dụng trong các đối số *mask*.
 
 
-Constants
-^^^^^^^^^
+Hằng số
+^^^^^^^
 
-The following symbolic constants are available in both the :mod:`!tkinter`
-and :mod:`!tkinter.constants` namespaces.
+Các hằng số ký hiệu sau đây có trong cả hai namespace :mod:`!tkinter` và :mod:`!tkinter.constants`.
 
 .. data:: TRUE
-          YES
-          ON
+          YES ON
 
-   Truthy values, all equal to the integer ``1``.
+   Các giá trị Truthy, tất cả đều bằng số nguyên ``1``.
 
 .. data:: FALSE
-          NO
-          OFF
+          NO OFF
 
-   Falsy values, all equal to the integer ``0``.
+   Các giá trị Falsy, tất cả đều bằng số nguyên ``0``.
 
 .. data:: N
-          S
-          E
-          W
-          NE
-          NW
-          SE
-          SW
-          NS
-          EW
-          NSEW
-          CENTER
+          S E W NE NW SE SW NS EW NSEW CENTER
 
-   Compass directions (``'n'``, ``'s'``, ``'e'``, ``'w'`` and the diagonals and
-   edges) plus ``CENTER`` (``'center'``), used as values for the *anchor* and
-   *sticky* options and by methods such as :meth:`Misc.grid_anchor`.
+   Các hướng la bàn (``'n'``, ``'s'``, ``'e'``, ``'w'`` và các hướng chéo, cạnh) cùng với ``CENTER`` (``'center'``), được dùng làm giá trị cho các tùy chọn *anchor* và *sticky*, cũng như bởi các phương thức như :meth:`Misc.grid_anchor`.
 
 .. data:: LEFT
-          RIGHT
-          TOP
-          BOTTOM
+          RIGHT TOP BOTTOM
 
-   Sides for the *side* option of the packer (see :meth:`Pack.pack_configure`).
+   Các cạnh cho tùy chọn *side* của packer (xem :meth:`Pack.pack_configure`).
 
 .. data:: X
-          Y
-          BOTH
-          NONE
+          Y BOTH NONE
 
-   Values for the *fill* option of the packer: ``'x'``, ``'y'``, ``'both'`` or
-   ``'none'``.
+   Các giá trị cho tùy chọn *fill* của packer: ``'x'``, ``'y'``, ``'both'`` hoặc ``'none'``.
 
 .. data:: RAISED
-          SUNKEN
-          FLAT
-          RIDGE
-          GROOVE
-          SOLID
+          SUNKEN FLAT RIDGE GROOVE SOLID
 
-   Values for the *relief* option, which controls a widget's 3-D border.
+   Các giá trị cho tùy chọn *relief*, tùy chọn kiểm soát đường viền 3-D của widget.
 
 .. data:: HORIZONTAL
           VERTICAL
 
-   Values for the *orient* option of widgets such as :class:`Scale`,
-   :class:`Scrollbar` and :class:`PanedWindow`.
+   Các giá trị cho tùy chọn *orient* của các widget như :class:`Scale`,
+   :class:`Scrollbar` và :class:`PanedWindow`.
 
 .. data:: CHAR
           WORD
 
-   Values for the *wrap* option of the :class:`Text` widget, selecting line
-   wrapping on character or word boundaries.
+   Các giá trị cho tùy chọn *wrap* của widget :class:`Text`, dùng để chọn cách ngắt dòng tại ranh giới ký tự hoặc từ.
 
 .. data:: BASELINE
 
-   The text-alignment value ``'baseline'``.
+   Giá trị căn chỉnh văn bản ``'baseline'``.
 
 .. data:: INSIDE
           OUTSIDE
 
-   Values for the *bordermode* option of the placer (see
+   Các giá trị cho tùy chọn *bordermode* của placer (xem
    :meth:`Place.place_configure`).
 
 .. data:: INSERT
-          CURRENT
-          END
-          ANCHOR
-          SEL
-          SEL_FIRST
-          SEL_LAST
+          CURRENT END ANCHOR SEL SEL_FIRST SEL_LAST
 
-   Symbolic indices used by the :class:`Text`, :class:`Entry`, :class:`Listbox`
-   and :class:`Canvas` widgets, such as ``'insert'`` (the insertion cursor),
-   ``'current'``, ``'end'``, ``'anchor'`` and the bounds of the selection
-   (``'sel.first'`` and ``'sel.last'``).
+   Các chỉ mục ký hiệu được sử dụng bởi các widget :class:`Text`, :class:`Entry`, :class:`Listbox` và :class:`Canvas`, chẳng hạn như ``'insert'`` (con trỏ chèn), ``'current'``, ``'end'``, ``'anchor'`` và các giới hạn của vùng chọn (``'sel.first'`` và ``'sel.last'``).
 
 .. data:: ALL
 
-   The special tag ``'all'``, which matches every item of a :class:`Canvas` or
-   every character of a :class:`Text` (for example ``canvas.delete(ALL)``).
+   Thẻ đặc biệt ``'all'``, khớp với mọi mục của :class:`Canvas` hoặc mọi ký tự của :class:`Text` (ví dụ ``canvas.delete(ALL)``).
 
 .. data:: NORMAL
-          DISABLED
-          ACTIVE
-          HIDDEN
+          DISABLED ACTIVE HIDDEN
 
-   Values for the *state* option of various widgets and items.
+   Các giá trị cho tùy chọn *state* của nhiều widget và mục khác nhau.
 
 .. data:: CASCADE
-          CHECKBUTTON
-          COMMAND
-          RADIOBUTTON
-          SEPARATOR
+          CHECKBUTTON COMMAND RADIOBUTTON SEPARATOR
 
-   Menu entry types, used as the *itemType* argument of :meth:`Menu.add` and
+   Các loại mục menu, được dùng làm đối số *itemType* của :meth:`Menu.add` và
    :meth:`Menu.insert`.
 
 .. data:: SINGLE
-          BROWSE
-          MULTIPLE
-          EXTENDED
+          BROWSE MULTIPLE EXTENDED
 
-   Values for the *selectmode* option of the :class:`Listbox` widget.
+   Các giá trị cho tùy chọn *selectmode* của widget :class:`Listbox`.
 
 .. data:: PIESLICE
-          CHORD
-          ARC
+          CHORD ARC
 
-   Values for the *style* option of :class:`Canvas` arc items.
+   Các giá trị cho tùy chọn *style* của các mục cung :class:`Canvas`.
 
 .. data:: BUTT
-          PROJECTING
-          ROUND
-          BEVEL
-          MITER
+          PROJECTING ROUND BEVEL MITER
 
-   Values for the *capstyle* (``'butt'``, ``'projecting'``, ``'round'``) and
-   *joinstyle* (``'round'``, ``'bevel'``, ``'miter'``) options of
-   :class:`Canvas` line items.
+   Các giá trị cho các tùy chọn *capstyle* (``'butt'``, ``'projecting'``, ``'round'``) và *joinstyle* (``'round'``, ``'bevel'``, ``'miter'``) của
+   :class:`Canvas` các mục trên dòng.
 
 .. data:: FIRST
           LAST
 
-   Values for the *arrow* option of :class:`Canvas` line items, indicating
-   which ends have arrowheads.
+   Các giá trị cho tùy chọn *arrow* của :class:`Canvas` các mục dòng, cho biết đầu nào có đầu mũi tên.
 
 .. data:: MOVETO
           SCROLL
 
-   The first argument passed by a :class:`Scrollbar` to the :meth:`XView.xview`
-   or :meth:`YView.yview` method of the scrolled widget.
+   Đối số đầu tiên được một :class:`Scrollbar` truyền cho phương thức :meth:`XView.xview` hoặc :meth:`YView.yview` của widget được cuộn.
 
 .. data:: UNITS
           PAGES
 
-   Values for the *what* argument of :meth:`XView.xview_scroll` and
+   Các giá trị cho đối số *what* của :meth:`XView.xview_scroll` và
    :meth:`YView.yview_scroll`.
 
 .. data:: UNDERLINE
-          NUMERIC
-          DOTBOX
+          NUMERIC DOTBOX
 
-   Other option values: ``'underline'``, ``'numeric'`` and ``'dotbox'``.
+   Các giá trị tùy chọn khác: ``'underline'``, ``'numeric'`` và ``'dotbox'``.
+
+.. _`TkDocs`: https://tkdocs.com/
+.. _`Tkinter 8.5 reference: a GUI for Python`: https://www.tkdocs.com/shipman/
+.. _`Tk commands`: https://www.tcl-lang.org/man/tcl9.0/TkCmd/index.html
+.. _`Tcl/Tk Home Page`: https://www.tcl.tk
+.. _`Modern Tkinter for Busy Python Developers`: https://tkdocs.com/book.html
+.. _`Python GUI programming with Tkinter`: https://www.packtpub.com/en-us/product/python-gui-programming-with-tkinter-9781788835886
+.. _`Programming Python`: https://learning-python.com/about-pp4e.html
+.. _`Tcl and the Tk Toolkit (2nd edition)`: https://www.amazon.com/exec/obidos/ASIN/032133633X
+.. _`Tcl package`: https://wiki.tcl-lang.org/37432
+.. _`ttk::button`: https://www.tcl-lang.org/man/tcl9.0/TkCmd/ttk_button.html
+.. _`grid`: https://www.tcl-lang.org/man/tcl9.0/TkCmd/grid.html
+.. _`options`: https://www.tcl-lang.org/man/tcl9.0/TkCmd/options.html
+.. _`ttk::widget`: https://www.tcl-lang.org/man/tcl9.0/TkCmd/ttk_widget.html
+.. _`winfo`: https://www.tcl-lang.org/man/tcl9.0/TkCmd/winfo.html
+.. _`Pillow`: https://python-pillow.org/

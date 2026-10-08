@@ -2,11 +2,10 @@
 .. _netdata:
 
 **********************
-Internet Data Handling
+Xử lý dữ liệu Internet
 **********************
 
-This chapter describes modules which support handling data formats commonly used
-on the internet.
+Chương này mô tả các module hỗ trợ xử lý những định dạng dữ liệu thường được sử dụng trên Internet.
 
 
 .. toctree::

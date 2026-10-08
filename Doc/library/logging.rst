@@ -1,36 +1,31 @@
-:mod:`!logging` --- Logging facility for Python
-===============================================
+:mod:`!logging` --- Cơ chế ghi nhật ký cho Python
+=================================================
 
 .. module:: logging
-   :synopsis: Flexible event logging system for applications.
+   :synopsis: Hệ thống ghi nhật ký sự kiện linh hoạt cho các ứng dụng.
 
 .. moduleauthor:: Vinay Sajip <vinay_sajip@red-dove.com>
 .. sectionauthor:: Vinay Sajip <vinay_sajip@red-dove.com>
 
-**Source code:** :source:`Lib/logging/__init__.py`
+**Mã nguồn:** :source:`Lib/logging/__init__.py`
 
 .. index:: pair: Errors; logging
 
-.. sidebar:: Important
+.. sidebar:: Quan trọng
 
-   This page contains the API reference information. For tutorial
-   information and discussion of more advanced topics, see
+   Trang này chứa thông tin tham chiếu API. Để xem hướng dẫn và thảo luận về các chủ đề nâng cao hơn, hãy xem
 
-   * :ref:`Basic Tutorial <logging-basic-tutorial>`
-   * :ref:`Advanced Tutorial <logging-advanced-tutorial>`
-   * :ref:`Logging Cookbook <logging-cookbook>`
+   * :ref:`Hướng dẫn cơ bản <logging-basic-tutorial>`
+   * :ref:`Hướng dẫn nâng cao <logging-advanced-tutorial>`
+   * :ref:`Cẩm nang Logging <logging-cookbook>`
 
 --------------
 
-This module defines functions and classes which implement a flexible event
-logging system for applications and libraries.
+Mô-đun này định nghĩa các hàm và lớp triển khai một hệ thống ghi nhật ký sự kiện linh hoạt cho các ứng dụng và thư viện.
 
-The key benefit of having the logging API provided by a standard library module
-is that all Python modules can participate in logging, so your application log
-can include your own messages integrated with messages from third-party
-modules.
+Lợi ích chính của việc cung cấp API logging thông qua một mô-đun trong thư viện chuẩn là tất cả các mô-đun Python đều có thể tham gia logging, nhờ đó log của ứng dụng có thể bao gồm các thông báo của riêng bạn được tích hợp với thông báo từ các mô-đun bên thứ ba.
 
-Here's a simple example of idiomatic usage: ::
+Sau đây là một ví dụ đơn giản về cách sử dụng đúng quy chuẩn:::
 
    # myapp.py
    import logging
@@ -55,7 +50,7 @@ Here's a simple example of idiomatic usage: ::
    def do_something():
        logger.info('Doing something')
 
-If you run *myapp.py*, you should see this in *myapp.log*:
+Nếu chạy *myapp.py*, bạn sẽ thấy nội dung sau trong *myapp.log*:
 
 .. code-block:: none
 
@@ -63,252 +58,142 @@ If you run *myapp.py*, you should see this in *myapp.log*:
    INFO:mylib:Doing something
    INFO:__main__:Finished
 
-The key feature of this idiomatic usage is that the majority of code is simply
-creating a module level logger with ``getLogger(__name__)``, and using that
-logger to do any needed logging. This is concise, while allowing downstream
-code fine-grained control if needed. Logged messages to the module-level logger
-get forwarded to handlers of loggers in higher-level modules, all the way up to
-the highest-level logger known as the root logger; this approach is known as
-hierarchical logging.
+Tính năng chính của cách sử dụng đúng theo phong cách này là phần lớn mã chỉ đơn giản là tạo một logger cấp mô-đun bằng ``getLogger(__name__)``, rồi sử dụng logger đó để thực hiện mọi hoạt động ghi nhật ký cần thiết. Cách này ngắn gọn, đồng thời vẫn cho phép mã ở phía sau kiểm soát chi tiết khi cần. Các thông báo được ghi vào logger cấp mô-đun sẽ được chuyển tiếp đến các handler của những logger trong các mô-đun cấp cao hơn, cho đến logger cấp cao nhất được gọi là root logger; cách tiếp cận này được gọi là ghi nhật ký phân cấp.
 
-For logging to be useful, it needs to be configured: setting the levels and
-destinations for each logger, potentially changing how specific modules log,
-often based on command-line arguments or application configuration. In most
-cases, like the one above, only the root logger needs to be so configured, since
-all the lower level loggers at module level eventually forward their messages to
-its handlers.  :func:`~logging.basicConfig` provides a quick way to configure
-the root logger that handles many use cases.
+Để việc ghi nhật ký hữu ích, cần cấu hình nó: thiết lập cấp độ và đích đến cho từng logger, có thể thay đổi cách các mô-đun cụ thể ghi nhật ký, thường dựa trên các đối số dòng lệnh hoặc cấu hình ứng dụng. Trong hầu hết trường hợp, như ví dụ trên, chỉ cần cấu hình root logger theo cách này, vì tất cả logger cấp thấp hơn ở cấp mô-đun cuối cùng đều chuyển tiếp thông báo của chúng đến các handler của root logger. :func:`~logging.basicConfig` cung cấp một cách nhanh chóng để cấu hình root logger, đáp ứng nhiều trường hợp sử dụng.
 
-The module provides a lot of functionality and flexibility.  If you are
-unfamiliar with logging, the best way to get to grips with it is to view the
-tutorials (**see the links above and on the right**).
+Mô-đun này cung cấp rất nhiều chức năng và tính linh hoạt. Nếu bạn chưa quen với việc ghi nhật ký, cách tốt nhất để làm quen với nó là xem các hướng dẫn (**xem các liên kết ở trên và bên phải**).
 
-The basic classes defined by the module, together with their attributes and
-methods, are listed in the sections below.
+Các lớp cơ bản được định nghĩa bởi mô-đun, cùng với các thuộc tính và phương thức của chúng, được liệt kê trong các phần bên dưới.
 
-* Loggers expose the interface that application code directly uses.
-* Handlers send the log records (created by loggers) to the appropriate
-  destination.
-* Filters provide a finer grained facility for determining which log records
-  to output.
-* Formatters specify the layout of log records in the final output.
+* Logger cung cấp giao diện mà mã ứng dụng sử dụng trực tiếp.
+* Handler gửi các bản ghi nhật ký (do logger tạo) đến đích thích hợp.
+* Filter cung cấp cơ chế chi tiết hơn để xác định bản ghi nhật ký nào sẽ được xuất.
+* Formatter chỉ định bố cục của các bản ghi log trong đầu ra cuối cùng.
 
 
 .. _logger:
 
-Logger Objects
---------------
+Đối tượng Logger
+----------------
 
-Loggers have the following attributes and methods.  Note that Loggers should
-*NEVER* be instantiated directly, but always through the module-level function
-``logging.getLogger(name)``.  Multiple calls to :func:`getLogger` with the same
-name will always return a reference to the same Logger object.
+Các đối tượng Logger có những thuộc tính và phương thức sau. Lưu ý rằng các Logger *KHÔNG BAO GIỜ* được khởi tạo trực tiếp mà luôn phải thông qua hàm cấp mô-đun ``logging.getLogger(name)``. Nhiều lần gọi :func:`getLogger` với cùng một tên sẽ luôn trả về tham chiếu đến cùng một đối tượng Logger.
 
-The ``name`` is potentially a period-separated hierarchical value, like
-``foo.bar.baz`` (though it could also be just plain ``foo``, for example).
-Loggers that are further down in the hierarchical list are children of loggers
-higher up in the list.  For example, given a logger with a name of ``foo``,
-loggers with names of ``foo.bar``, ``foo.bar.baz``, and ``foo.bam`` are all
-descendants of ``foo``.  In addition, all loggers are descendants of the root
-logger. The logger name hierarchy is analogous to the Python package hierarchy,
-and identical to it if you organise your loggers on a per-module basis using
-the recommended construction ``logging.getLogger(__name__)``.  That's because
-in a module, ``__name__`` is the module's name in the Python package namespace.
+``name`` có thể là một giá trị phân cấp, được ngăn cách bằng dấu chấm, chẳng hạn như ``foo.bar.baz`` (mặc dù cũng có thể chỉ là ``foo`` đơn thuần, chẳng hạn). Các logger nằm thấp hơn trong danh sách phân cấp là các logger con của những logger nằm cao hơn trong danh sách. Ví dụ, với một logger có tên ``foo``, các logger có tên ``foo.bar``, ``foo.bar.baz`` và ``foo.bam`` đều là hậu duệ của ``foo``. Ngoài ra, mọi logger đều là hậu duệ của root logger. Hệ thống phân cấp tên logger tương tự như hệ thống phân cấp package Python, và sẽ giống hệt nếu bạn tổ chức logger theo từng module bằng cách sử dụng cách khởi tạo được khuyến nghị ``logging.getLogger(__name__)``. Đó là vì trong một module, ``__name__`` là tên của module trong không gian tên package Python.
 
 
 .. class:: Logger
 
    .. attribute:: Logger.name
 
-      This is the logger's name, and is the value that was passed to :func:`getLogger`
-      to obtain the logger.
+      Đây là tên của logger và là giá trị được truyền cho :func:`getLogger` để lấy logger.
 
-      .. note:: This attribute should be treated as read-only.
+      .. note:: Nên coi thuộc tính này là chỉ đọc.
 
    .. attribute:: Logger.level
 
-      The threshold of this logger, as set by the :meth:`setLevel` method.
+      Ngưỡng của logger này, được thiết lập bằng phương thức :meth:`setLevel`.
 
-      .. note:: Do not set this attribute directly - always use :meth:`setLevel`,
-         which has checks for the level passed to it.
+      .. note:: Không đặt trực tiếp thuộc tính này - luôn sử dụng :meth:`setLevel`, vì hàm này có các bước kiểm tra đối với cấp độ được truyền vào.
 
    .. attribute:: Logger.parent
 
-      The parent logger of this logger. It may change based on later instantiation
-      of loggers which are higher up in the namespace hierarchy.
+      Logger cha của logger này. Logger này có thể thay đổi dựa trên việc khởi tạo sau đó các logger nằm cao hơn trong hệ thống phân cấp namespace.
 
-      .. note:: This value should be treated as read-only.
+      .. note:: Giá trị này nên được coi là chỉ đọc.
 
    .. attribute:: Logger.propagate
 
-      If this attribute evaluates to true, events logged to this logger will be
-      passed to the handlers of higher level (ancestor) loggers, in addition to
-      any handlers attached to this logger. Messages are passed directly to the
-      ancestor loggers' handlers - neither the level nor filters of the ancestor
-      loggers in question are considered.
+      Nếu thuộc tính này được đánh giá là true, các sự kiện được ghi vào logger này sẽ được chuyển đến các handler của những logger cấp cao hơn (logger tổ tiên), ngoài mọi handler được gắn với logger này. Thông báo được chuyển trực tiếp đến các handler của logger tổ tiên - cả cấp độ lẫn bộ lọc của các logger tổ tiên liên quan đều không được xem xét.
 
-      If this evaluates to false, logging messages are not passed to the handlers
-      of ancestor loggers.
+      Nếu giá trị này được đánh giá là false, các thông báo logging sẽ không được chuyển đến các handler của logger tổ tiên.
 
-      Spelling it out with an example: If the propagate attribute of the logger named
-      ``A.B.C`` evaluates to true, any event logged to ``A.B.C`` via a method call such as
-      ``logging.getLogger('A.B.C').error(...)`` will [subject to passing that logger's
-      level and filter settings] be passed in turn to any handlers attached to loggers
-      named ``A.B``, ``A`` and the root logger, after first being passed to any handlers
-      attached to ``A.B.C``. If any logger in the chain ``A.B.C``, ``A.B``, ``A`` has its
-      ``propagate`` attribute set to false, then that is the last logger whose handlers
-      are offered the event to handle, and propagation stops at that point.
+      Hãy diễn giải bằng một ví dụ: Nếu thuộc tính propagate của logger có tên ``A.B.C`` được đánh giá là true, mọi sự kiện được ghi vào ``A.B.C`` thông qua một lời gọi phương thức như ``logging.getLogger('A.B.C').error(...)`` sẽ [với điều kiện vượt qua các thiết lập cấp độ và bộ lọc của logger đó] lần lượt được chuyển đến mọi handler được gắn với các logger có tên ``A.B``, ``A`` và logger root, sau khi trước đó được chuyển đến mọi handler được gắn với ``A.B.C``. Nếu bất kỳ logger nào trong chuỗi ``A.B.C``, ``A.B``, ``A`` có thuộc tính ``propagate`` được đặt thành false, thì đó là logger cuối cùng mà các handler của nó được cung cấp sự kiện để xử lý, và quá trình lan truyền sẽ dừng tại đó.
 
-      The constructor sets this attribute to ``True``.
+      Hàm khởi tạo đặt thuộc tính này thành ``True``.
 
-      .. note:: If you attach a handler to a logger *and* one or more of its
-         ancestors, it may emit the same record multiple times. In general, you
-         should not need to attach a handler to more than one logger - if you just
-         attach it to the appropriate logger which is highest in the logger
-         hierarchy, then it will see all events logged by all descendant loggers,
-         provided that their propagate setting is left set to ``True``. A common
-         scenario is to attach handlers only to the root logger, and to let
-         propagation take care of the rest.
+      .. note:: Nếu bạn gắn một handler vào một logger *and* hoặc nhiều logger tổ tiên của nó, logger đó có thể phát cùng một bản ghi nhiều lần. Nhìn chung, bạn không cần gắn handler vào nhiều hơn một logger - nếu chỉ gắn nó vào logger phù hợp ở vị trí cao nhất trong hệ thống phân cấp logger, thì nó sẽ nhận được tất cả các sự kiện được ghi bởi mọi logger hậu duệ, với điều kiện cài đặt propagate của chúng vẫn được đặt thành ``True``. Một trường hợp phổ biến là chỉ gắn các handler vào root logger và để cơ chế propagation xử lý phần còn lại.
 
    .. attribute:: Logger.handlers
 
-      The list of handlers directly attached to this logger instance.
+      Danh sách các handler được gắn trực tiếp vào instance logger này.
 
-      .. note:: This attribute should be treated as read-only; it is normally changed via
-         the :meth:`addHandler` and :meth:`removeHandler` methods, which use locks to ensure
-         thread-safe operation.
+      .. note:: Thuộc tính này nên được xem là chỉ-đọc; thông thường, thuộc tính được thay đổi thông qua các phương thức :meth:`addHandler` và :meth:`removeHandler`, vốn sử dụng các khóa để đảm bảo thao tác an toàn trong môi trường đa luồng.
 
    .. attribute:: Logger.disabled
 
-      This attribute disables handling of any events. It is set to ``False`` in the
-      initializer, and only changed by logging configuration code.
+      Thuộc tính này vô hiệu hóa việc xử lý mọi sự kiện. Thuộc tính được đặt thành ``False`` trong hàm khởi tạo và chỉ được thay đổi bởi mã cấu hình logging.
 
-      .. note:: This attribute should be treated as read-only.
+      .. note:: Nên coi thuộc tính này là chỉ đọc.
 
    .. method:: Logger.setLevel(level)
 
-      Sets the threshold for this logger to *level*. Logging messages which are less
-      severe than *level* will be ignored; logging messages which have severity *level*
-      or higher will be emitted by whichever handler or handlers service this logger,
-      unless a handler's level has been set to a higher severity level than *level*.
+      Đặt ngưỡng cho logger này thành *level*. Các thông báo logging có mức độ nghiêm trọng thấp hơn *level* sẽ bị bỏ qua; các thông báo logging có mức độ nghiêm trọng *level* trở lên sẽ được phát bởi handler hoặc các handler phục vụ logger này, trừ khi mức của một handler được đặt thành mức độ nghiêm trọng cao hơn *level*.
 
-      When a logger is created, the level is set to :const:`NOTSET` (which causes
-      all messages to be processed when the logger is the root logger, or delegation
-      to the parent when the logger is a non-root logger). Note that the root logger
-      is created with level :const:`WARNING`.
+      Khi một logger được tạo, level được đặt thành :const:`NOTSET` (khiến mọi thông báo được xử lý nếu logger đó là root logger, hoặc được ủy quyền cho logger cha nếu logger đó không phải root logger). Lưu ý rằng root logger được tạo với level :const:`WARNING`.
 
-      The term 'delegation to the parent' means that if a logger has a level of
-      NOTSET, its chain of ancestor loggers is traversed until either an ancestor with
-      a level other than NOTSET is found, or the root is reached.
+      Thuật ngữ 'ủy quyền cho cấp cha' có nghĩa là nếu một logger có mức là NOTSET, chuỗi các logger tổ tiên của nó sẽ được duyệt cho đến khi tìm thấy một logger tổ tiên có mức khác NOTSET hoặc đạt đến root.
 
-      If an ancestor is found with a level other than NOTSET, then that ancestor's
-      level is treated as the effective level of the logger where the ancestor search
-      began, and is used to determine how a logging event is handled.
+      Nếu tìm thấy một logger tổ tiên có mức khác NOTSET, thì mức của logger tổ tiên đó được coi là mức hiệu lực của logger nơi bắt đầu quá trình tìm kiếm logger tổ tiên, và được dùng để xác định cách một sự kiện logging được xử lý.
 
-      If the root is reached, and it has a level of NOTSET, then all messages will be
-      processed. Otherwise, the root's level will be used as the effective level.
+      Nếu đạt đến root và root có mức NOTSET, thì tất cả thông báo sẽ được xử lý. Nếu không, mức của root sẽ được dùng làm mức hiệu lực.
 
-      See :ref:`levels` for a list of levels.
+      Xem :ref:`levels` để biết danh sách các mức.
 
       .. versionchanged:: 3.2
-         The *level* parameter now accepts a string representation of the
-         level such as 'INFO' as an alternative to the integer constants
-         such as :const:`INFO`. Note, however, that levels are internally stored
-         as integers, and methods such as e.g. :meth:`getEffectiveLevel` and
-         :meth:`isEnabledFor` will return/expect to be passed integers.
+         Tham số *level* hiện chấp nhận biểu diễn dạng chuỗi của mức, chẳng hạn như 'INFO', thay cho các hằng số dạng số nguyên như :const:`INFO`. Tuy nhiên, lưu ý rằng các mức được lưu trữ nội bộ dưới dạng số nguyên, và các phương thức như :meth:`getEffectiveLevel` và
+         :meth:`isEnabledFor` sẽ trả về hoặc yêu cầu được truyền vào các số nguyên.
 
 
    .. method:: Logger.isEnabledFor(level)
 
-      Indicates if a message of severity *level* would be processed by this logger.
-      This method checks first the module-level level set by
-      ``logging.disable(level)`` and then the logger's effective level as determined
-      by :meth:`getEffectiveLevel`.
+      Cho biết liệu một thông báo có mức độ nghiêm trọng *level* có được logger này xử lý hay không. Phương thức này trước tiên kiểm tra mức cấp module được đặt bởi ``logging.disable(level)``, sau đó kiểm tra mức hiệu lực của logger được xác định bởi :meth:`getEffectiveLevel`.
 
 
    .. method:: Logger.getEffectiveLevel()
 
-      Indicates the effective level for this logger. If a value other than
-      :const:`NOTSET` has been set using :meth:`setLevel`, it is returned. Otherwise,
-      the hierarchy is traversed towards the root until a value other than
-      :const:`NOTSET` is found, and that value is returned. The value returned is
-      an integer, typically one of :const:`logging.DEBUG`, :const:`logging.INFO`
-      etc.
+      Cho biết level (mức) hiệu lực của logger này. Nếu một giá trị khác với
+      :const:`NOTSET` đã được đặt bằng :meth:`setLevel`, thì giá trị đó được trả về. Nếu không, hệ thống duyệt qua hệ phân cấp theo hướng về root cho đến khi tìm thấy một giá trị khác với
+      :const:`NOTSET`, rồi trả về giá trị đó. Giá trị được trả về là một số nguyên, thường là một trong các giá trị :const:`logging.DEBUG`, :const:`logging.INFO` v.v.
 
 
    .. method:: Logger.getChild(suffix)
 
-      Returns a logger which is a descendant to this logger, as determined by the suffix.
-      Thus, ``logging.getLogger('abc').getChild('def.ghi')`` would return the same
-      logger as would be returned by ``logging.getLogger('abc.def.ghi')``. This is a
-      convenience method, useful when the parent logger is named using e.g. ``__name__``
-      rather than a literal string.
+      Trả về một logger là hậu duệ của logger này, được xác định theo hậu tố. Vì vậy, ``logging.getLogger('abc').getChild('def.ghi')`` sẽ trả về cùng logger với logger được trả về bởi ``logging.getLogger('abc.def.ghi')``. Đây là một phương thức tiện ích, hữu ích khi logger cha được đặt tên bằng, chẳng hạn, ``__name__`` thay vì một chuỗi ký tự cố định.
 
       .. versionadded:: 3.2
 
 
    .. method:: Logger.getChildren()
 
-      Returns a set of loggers which are immediate children of this logger. So for
-      example ``logging.getLogger().getChildren()`` might return a set containing
-      loggers named ``foo`` and ``bar``, but a logger named ``foo.bar`` wouldn't be
-      included in the set. Likewise, ``logging.getLogger('foo').getChildren()`` might
-      return a set including a logger named ``foo.bar``, but it wouldn't include one
-      named ``foo.bar.baz``.
+      Trả về một tập hợp các logger là con trực tiếp của logger này. Ví dụ, ``logging.getLogger().getChildren()`` có thể trả về một tập hợp chứa các logger có tên ``foo`` và ``bar``, nhưng logger có tên ``foo.bar`` sẽ không được đưa vào tập hợp. Tương tự, ``logging.getLogger('foo').getChildren()`` có thể trả về một tập hợp bao gồm logger có tên ``foo.bar``, nhưng sẽ không bao gồm logger có tên ``foo.bar.baz``.
 
       .. versionadded:: 3.12
 
 
    .. method:: Logger.debug(msg, *args, **kwargs)
 
-      Logs a message with level :const:`DEBUG` on this logger. The *msg* is the
-      message format string, and the *args* are the arguments which are merged into
-      *msg* using the string formatting operator. (Note that this means that you can
-      use keywords in the format string, together with a single dictionary argument.)
-      No % formatting operation is performed on *msg* when no *args* are supplied.
+      Ghi một thông báo với level :const:`DEBUG` trên logger này. *msg* là chuỗi định dạng thông báo, còn *args* là các đối số được hợp nhất vào *msg* bằng toán tử định dạng chuỗi. (Lưu ý rằng điều này có nghĩa là bạn có thể sử dụng các keyword trong chuỗi định dạng cùng với một đối số kiểu dictionary duy nhất.) Không thực hiện thao tác định dạng % trên *msg* khi không cung cấp *args*.
 
-      There are four keyword arguments in *kwargs* which are inspected:
-      *exc_info*, *stack_info*, *stacklevel* and *extra*.
+      Có bốn keyword argument trong *kwargs* được kiểm tra: *exc_info*, *stack_info*, *stacklevel* và *extra*.
 
-      If *exc_info* does not evaluate as false, it causes exception information to be
-      added to the logging message. If an exception tuple (in the format returned by
-      :func:`sys.exc_info`) or an exception instance is provided, it is used;
-      otherwise, :func:`sys.exc_info` is called to get the exception information.
+      Nếu *exc_info* không cho kết quả là false, thông tin ngoại lệ sẽ được thêm vào thông báo ghi nhật ký. Nếu cung cấp một tuple ngoại lệ (theo định dạng được trả về bởi
+      :func:`sys.exc_info`) hoặc một instance ngoại lệ, nó sẽ được sử dụng; nếu không, :func:`sys.exc_info` sẽ được gọi để lấy thông tin ngoại lệ.
 
-      The second optional keyword argument is *stack_info*, which defaults to
-      ``False``. If true, stack information is added to the logging
-      message, including the actual logging call. Note that this is not the same
-      stack information as that displayed through specifying *exc_info*: The
-      former is stack frames from the bottom of the stack up to the logging call
-      in the current thread, whereas the latter is information about stack frames
-      which have been unwound, following an exception, while searching for
-      exception handlers.
+      Đối số từ khóa tùy chọn thứ hai là *stack_info*, mặc định là ``False``. Nếu là true, thông tin stack sẽ được thêm vào thông báo ghi nhật ký, bao gồm cả lệnh gọi ghi nhật ký thực tế. Lưu ý rằng đây không phải là thông tin stack giống với thông tin được hiển thị khi chỉ định *exc_info*: thông tin trước là các stack frame từ đáy stack lên đến lệnh gọi ghi nhật ký trong thread hiện tại, còn thông tin sau là thông tin về các stack frame đã được unwind sau một ngoại lệ trong khi tìm kiếm các trình xử lý ngoại lệ.
 
-      You can specify *stack_info* independently of *exc_info*, e.g. to just show
-      how you got to a certain point in your code, even when no exceptions were
-      raised. The stack frames are printed following a header line which says:
+      Bạn có thể chỉ định *stack_info* độc lập với *exc_info*, chẳng hạn như để chỉ hiển thị cách bạn đã đi đến một điểm nhất định trong mã, ngay cả khi không có ngoại lệ nào được phát sinh. Các stack frame được in sau một dòng tiêu đề có nội dung:
 
       .. code-block:: none
 
           Stack (most recent call last):
 
-      This mimics the ``Traceback (most recent call last):`` which is used when
-      displaying exception frames.
+      Điều này mô phỏng ``Traceback (most recent call last):``, được sử dụng khi hiển thị các frame của ngoại lệ.
 
-      The third optional keyword argument is *stacklevel*, which defaults to ``1``.
-      If greater than 1, the corresponding number of stack frames are skipped
-      when computing the line number and function name set in the :class:`LogRecord`
-      created for the logging event. This can be used in logging helpers so that
-      the function name, filename and line number recorded are not the information
-      for the helper function/method, but rather its caller. The name of this
-      parameter mirrors the equivalent one in the :mod:`warnings` module.
+      Đối số từ khóa tùy chọn thứ ba là *stacklevel*, mặc định là ``1``. Nếu lớn hơn 1, số lượng stack frame tương ứng sẽ được bỏ qua khi tính số dòng và tên hàm được thiết lập trong :class:`LogRecord` được tạo cho sự kiện ghi nhật ký. Bạn có thể sử dụng đối số này trong các helper ghi nhật ký để tên hàm, tên tệp và số dòng được ghi lại không phải là thông tin của hàm/phương thức helper mà là của bên gọi nó. Tên của tham số này tương tự với tên tương đương trong module :mod:`warnings`.
 
-      The fourth keyword argument is *extra* which can be used to pass a
-      dictionary which is used to populate the :attr:`~object.__dict__` of the
-      :class:`LogRecord`
-      created for the logging event with user-defined attributes. These custom
-      attributes can then be used as you like. For example, they could be
-      incorporated into logged messages. For example::
+      Đối số từ khóa thứ tư là *extra*, có thể được sử dụng để truyền một dictionary dùng để điền vào :attr:`~object.__dict__` của
+      :class:`LogRecord` được tạo cho sự kiện ghi nhật ký với các thuộc tính do người dùng định nghĩa. Sau đó, bạn có thể sử dụng các thuộc tính tùy chỉnh này theo ý muốn. Chẳng hạn, bạn có thể đưa chúng vào các thông điệp được ghi nhật ký. Ví dụ::
 
          FORMAT = '%(asctime)s %(clientip)-15s %(user)-8s %(message)s'
          logging.basicConfig(format=FORMAT)
@@ -316,640 +201,406 @@ in a module, ``__name__`` is the module's name in the Python package namespace.
          logger = logging.getLogger('tcpserver')
          logger.warning('Protocol problem: %s', 'connection reset', extra=d)
 
-      would print something like
+      sẽ in ra nội dung tương tự như sau
 
       .. code-block:: none
 
          2006-02-08 22:20:02,165 192.168.0.1 fbloggs  Protocol problem: connection reset
 
-      The keys in the dictionary passed in *extra* should not clash with the keys used
-      by the logging system. (See the section on :ref:`logrecord-attributes` for more
-      information on which keys are used by the logging system.)
+      Các khóa trong từ điển được truyền vào *extra* không được trùng với các khóa mà hệ thống ghi nhật ký sử dụng. (Xem phần về :ref:`logrecord-attributes` để biết thêm thông tin về các khóa được hệ thống ghi nhật ký sử dụng.)
 
-      If you choose to use these attributes in logged messages, you need to exercise
-      some care. In the above example, for instance, the :class:`Formatter` has been
-      set up with a format string which expects 'clientip' and 'user' in the attribute
-      dictionary of the :class:`LogRecord`. If these are missing, the message will
-      not be logged because a string formatting exception will occur. So in this case,
-      you always need to pass the *extra* dictionary with these keys.
+      Nếu chọn sử dụng các thuộc tính này trong các thông điệp được ghi nhật ký, bạn cần thận trọng. Chẳng hạn, trong ví dụ trên, :class:`Formatter` đã được cấu hình với một chuỗi định dạng yêu cầu 'clientip' và 'user' trong từ điển thuộc tính của :class:`LogRecord`. Nếu thiếu các thuộc tính này, thông điệp sẽ không được ghi vì sẽ xảy ra ngoại lệ định dạng chuỗi. Do đó, trong trường hợp này, bạn luôn cần truyền từ điển *extra* với các khóa này.
 
-      While this might be annoying, this feature is intended for use in specialized
-      circumstances, such as multi-threaded servers where the same code executes in
-      many contexts, and interesting conditions which arise are dependent on this
-      context (such as remote client IP address and authenticated user name, in the
-      above example). In such circumstances, it is likely that specialized
-      :class:`Formatter`\ s would be used with particular :class:`Handler`\ s.
+      Mặc dù điều này có thể gây khó chịu, tính năng này được thiết kế để sử dụng trong các trường hợp chuyên biệt, chẳng hạn như các máy chủ đa luồng, nơi cùng một đoạn mã thực thi trong nhiều ngữ cảnh và các điều kiện đáng chú ý phát sinh phụ thuộc vào ngữ cảnh đó (chẳng hạn như địa chỉ IP của máy khách từ xa và tên người dùng đã xác thực trong ví dụ trên). Trong những trường hợp như vậy, có khả năng các
+      :class:`Formatter`\ s sẽ được sử dụng với các :class:`Handler`\ s cụ thể.
 
-      If no handler is attached to this logger (or any of its ancestors,
-      taking into account the relevant :attr:`Logger.propagate` attributes),
-      the message will be sent to the handler set on :data:`lastResort`.
+      Nếu không có handler nào được gắn với logger này (hoặc bất kỳ logger cha nào của nó, có tính đến các thuộc tính :attr:`Logger.propagate` liên quan), thông điệp sẽ được gửi đến handler được đặt trên :data:`lastResort`.
 
       .. versionchanged:: 3.2
-         The *stack_info* parameter was added.
+         Tham số *stack_info* đã được thêm vào.
 
       .. versionchanged:: 3.5
-         The *exc_info* parameter can now accept exception instances.
+         Tham số *exc_info* hiện có thể nhận các instance của exception.
 
       .. versionchanged:: 3.8
-         The *stacklevel* parameter was added.
+         Tham số *stacklevel* đã được thêm vào.
 
 
    .. method:: Logger.info(msg, *args, **kwargs)
 
-      Logs a message with level :const:`INFO` on this logger. The arguments are
-      interpreted as for :meth:`debug`.
+      Ghi một thông báo với cấp độ :const:`INFO` trên logger này. Các đối số được diễn giải như đối với :meth:`debug`.
 
 
    .. method:: Logger.warning(msg, *args, **kwargs)
 
-      Logs a message with level :const:`WARNING` on this logger. The arguments are
-      interpreted as for :meth:`debug`.
+      Ghi một thông báo với cấp độ :const:`WARNING` trên logger này. Các đối số được diễn giải như đối với :meth:`debug`.
 
-      .. note:: There is an obsolete method ``warn`` which is functionally
-         identical to ``warning``. As ``warn`` is deprecated, please do not use
-         it - use ``warning`` instead.
+      .. note:: Có một phương thức lỗi thời ``warn`` có chức năng giống hệt ``warning``. Vì ``warn`` không còn được khuyến nghị sử dụng, vui lòng không dùng nó - hãy sử dụng ``warning`` thay thế.
 
    .. method:: Logger.error(msg, *args, **kwargs)
 
-      Logs a message with level :const:`ERROR` on this logger. The arguments are
-      interpreted as for :meth:`debug`.
+      Ghi một thông báo với cấp độ :const:`ERROR` trên logger này. Các đối số được diễn giải như đối với :meth:`debug`.
 
 
    .. method:: Logger.critical(msg, *args, **kwargs)
 
-      Logs a message with level :const:`CRITICAL` on this logger. The arguments are
-      interpreted as for :meth:`debug`.
+      Ghi một thông báo với mức :const:`CRITICAL` trên logger này. Các đối số được diễn giải như đối với :meth:`debug`.
 
 
    .. method:: Logger.log(level, msg, *args, **kwargs)
 
-      Logs a message with integer level *level* on this logger. The other arguments are
-      interpreted as for :meth:`debug`.
+      Ghi một thông báo với mức nguyên *level* trên logger này. Các đối số khác được diễn giải như đối với :meth:`debug`.
 
 
    .. method:: Logger.exception(msg, *args, **kwargs)
 
-      Logs a message with level :const:`ERROR` on this logger. The arguments are
-      interpreted as for :meth:`debug`. Exception info is added to the logging
-      message. This method should only be called from an exception handler.
+      Ghi một thông báo với mức :const:`ERROR` trên logger này. Các đối số được diễn giải như đối với :meth:`debug`. Thông tin ngoại lệ được thêm vào thông báo logging. Chỉ nên gọi phương thức này từ một exception handler.
 
 
    .. method:: Logger.addFilter(filter)
 
-      Adds the specified filter *filter* to this logger.
+      Thêm filter được chỉ định *filter* vào logger này.
 
 
    .. method:: Logger.removeFilter(filter)
 
-      Removes the specified filter *filter* from this logger.
+      Xóa filter được chỉ định *filter* khỏi logger này.
 
 
    .. method:: Logger.filter(record)
 
-      Apply this logger's filters to the record and return ``True`` if the
-      record is to be processed. The filters are consulted in turn, until one of
-      them returns a false value. If none of them return a false value, the record
-      will be processed (passed to handlers). If one returns a false value, no
-      further processing of the record occurs.
+      Áp dụng các filter của logger này cho record và trả về ``True`` nếu record cần được xử lý. Các filter được kiểm tra lần lượt cho đến khi một trong số chúng trả về giá trị false. Nếu không filter nào trả về giá trị false, record sẽ được xử lý (chuyển đến các handler). Nếu một filter trả về giá trị false, sẽ không thực hiện thêm bước xử lý nào đối với record.
 
 
    .. method:: Logger.addHandler(hdlr)
 
-      Adds the specified handler *hdlr* to this logger.
+      Thêm handler được chỉ định *hdlr* vào logger này.
 
 
    .. method:: Logger.removeHandler(hdlr)
 
-      Removes the specified handler *hdlr* from this logger.
+      Xóa handler được chỉ định *hdlr* khỏi logger này.
 
 
    .. method:: Logger.findCaller(stack_info=False, stacklevel=1)
 
-      Finds the caller's source filename and line number. Returns the filename, line
-      number, function name and stack information as a 4-element tuple. The stack
-      information is returned as ``None`` unless *stack_info* is ``True``.
+      Tìm tên tệp nguồn và số dòng của caller. Trả về tên tệp, số dòng, tên hàm và thông tin stack dưới dạng tuple gồm 4 phần tử. Thông tin stack được trả về dưới dạng ``None`` trừ khi *stack_info* là ``True``.
 
-      The *stacklevel* parameter is passed from code calling the :meth:`debug`
-      and other APIs. If greater than 1, the excess is used to skip stack frames
-      before determining the values to be returned. This will generally be useful
-      when calling logging APIs from helper/wrapper code, so that the information
-      in the event log refers not to the helper/wrapper code, but to the code that
-      calls it.
+      Tham số *stacklevel* được truyền từ mã gọi :meth:`debug` và các API khác. Nếu lớn hơn 1, phần vượt quá được dùng để bỏ qua các stack frame trước khi xác định các giá trị cần trả về. Điều này thường hữu ích khi gọi các logging API từ mã helper/wrapper, để thông tin trong event log tham chiếu đến mã gọi nó thay vì mã helper/wrapper.
 
 
    .. method:: Logger.handle(record)
 
-      Handles a record by passing it to all handlers associated with this logger and
-      its ancestors (until a false value of *propagate* is found). This method is used
-      for unpickled records received from a socket, as well as those created locally.
-      Logger-level filtering is applied using :meth:`~Logger.filter`.
+      Xử lý một record bằng cách truyền nó cho tất cả handler được liên kết với logger này và các logger cấp trên của nó (cho đến khi tìm thấy giá trị false của *propagate*). Phương thức này được dùng cho các record đã được unpickle nhận từ socket, cũng như các record được tạo cục bộ. Bộ lọc ở cấp logger được áp dụng bằng :meth:`~Logger.filter`.
 
 
    .. method:: Logger.makeRecord(name, level, fn, lno, msg, args, exc_info, func=None, extra=None, sinfo=None)
 
-      This is a factory method which can be overridden in subclasses to create
-      specialized :class:`LogRecord` instances.
+      Đây là một factory method có thể được ghi đè trong các subclass để tạo các :class:`LogRecord` chuyên biệt.
 
    .. method:: Logger.hasHandlers()
 
-      Checks to see if this logger has any handlers configured. This is done by
-      looking for handlers in this logger and its parents in the logger hierarchy.
-      Returns ``True`` if a handler was found, else ``False``. The method stops searching
-      up the hierarchy whenever a logger with the 'propagate' attribute set to
-      false is found - that will be the last logger which is checked for the
-      existence of handlers.
+      Kiểm tra xem logger này có handler nào được cấu hình hay không. Việc này được thực hiện bằng cách tìm handler trong logger này và các logger cấp trên của nó trong hệ thống phân cấp logger. Trả về ``True`` nếu tìm thấy handler, nếu không thì trả về ``False``. Phương thức này dừng tìm kiếm lên cấp trên bất cứ khi nào tìm thấy một logger có thuộc tính 'propagate' được đặt thành false - đó sẽ là logger cuối cùng được kiểm tra để xác định sự tồn tại của handler.
 
       .. versionadded:: 3.2
 
    .. versionchanged:: 3.7
-      Loggers can now be pickled and unpickled.
+      Các logger hiện có thể được pickle và unpickle.
 
 .. _levels:
 
-Logging Levels
---------------
+Các cấp độ ghi nhật ký
+----------------------
 
-The numeric values of logging levels are given in the following table. These are
-primarily of interest if you want to define your own levels, and need them to
-have specific values relative to the predefined levels. If you define a level
-with the same numeric value, it overwrites the predefined value; the predefined
-name is lost.
+Các giá trị số của các cấp độ ghi nhật ký được nêu trong bảng sau. Những giá trị này chủ yếu hữu ích nếu bạn muốn định nghĩa các cấp độ riêng và cần chúng có các giá trị cụ thể tương quan với những cấp độ được định nghĩa sẵn. Nếu bạn định nghĩa một cấp độ có cùng giá trị số, cấp độ đó sẽ ghi đè giá trị được định nghĩa sẵn; tên được định nghĩa sẵn sẽ bị mất.
 
-+-----------------------+---------------+-------------------------------------+
-| Level                 | Numeric value | What it means / When to use it      |
-+=======================+===============+=====================================+
-| .. py:data:: NOTSET   | 0             | When set on a logger, indicates that|
-|                       |               | ancestor loggers are to be consulted|
-|                       |               | to determine the effective level.   |
-|                       |               | If that still resolves to           |
-|                       |               | :const:`!NOTSET`, then all events   |
-|                       |               | are logged. When set on a handler,  |
-|                       |               | all events are handled.             |
-+-----------------------+---------------+-------------------------------------+
-| .. py:data:: DEBUG    | 10            | Detailed information, typically only|
-|                       |               | of interest to a developer trying to|
-|                       |               | diagnose a problem.                 |
-+-----------------------+---------------+-------------------------------------+
-| .. py:data:: INFO     | 20            | Confirmation that things are working|
-|                       |               | as expected.                        |
-+-----------------------+---------------+-------------------------------------+
-| .. py:data:: WARNING  | 30            | An indication that something        |
-|                       |               | unexpected happened, or that a      |
-|                       |               | problem might occur in the near     |
-|                       |               | future (e.g. 'disk space low'). The |
-|                       |               | software is still working as        |
-|                       |               | expected.                           |
-+-----------------------+---------------+-------------------------------------+
-| .. py:data:: ERROR    | 40            | Due to a more serious problem, the  |
-|                       |               | software has not been able to       |
-|                       |               | perform some function.              |
-+-----------------------+---------------+-------------------------------------+
-| .. py:data:: CRITICAL | 50            | A serious error, indicating that the|
-|                       |               | program itself may be unable to     |
-|                       |               | continue running.                   |
-+-----------------------+---------------+-------------------------------------+
++-----------------------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Cấp độ                | Giá trị số | Ý nghĩa / Khi sử dụng                                                                                                                                                        |
++=======================+============+==============================================================================================================================================================================+
+| .. py:data:: NOTSET   | 0          | Khi được đặt trên một logger, cho biết rằng cần tham vấn các logger tổ tiên để xác định cấp độ hiệu lực. Nếu kết quả đó vẫn phân giải thành                                  |
+|                       |            | :const:`!NOTSET`, thì tất cả sự kiện đều được ghi nhật ký. Khi được đặt trên một handler, tất cả sự kiện đều được xử lý.                                                     |
++-----------------------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| .. py:data:: DEBUG    | 10         | Thông tin chi tiết, thường chỉ hữu ích với nhà phát triển đang cố gắng chẩn đoán sự cố.                                                                                      |
++-----------------------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| .. py:data:: INFO     | 20         | Xác nhận rằng mọi thứ đang hoạt động như mong đợi.                                                                                                                           |
++-----------------------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| .. py:data:: WARNING  | 30         | Dấu hiệu cho thấy đã xảy ra điều gì đó bất ngờ hoặc một sự cố có thể xảy ra trong tương lai gần (ví dụ: 'sắp hết dung lượng đĩa'). Phần mềm vẫn đang hoạt động như mong đợi. |
++-----------------------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| .. py:data:: ERROR    | 40         | Do một sự cố nghiêm trọng hơn, phần mềm không thể thực hiện một số chức năng.                                                                                                |
++-----------------------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| .. py:data:: CRITICAL | 50         | Một lỗi nghiêm trọng, cho biết bản thân chương trình có thể không thể tiếp tục chạy.                                                                                         |
++-----------------------+------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
 .. _handler:
 
-Handler Objects
----------------
+Đối tượng Handler
+-----------------
 
-Handlers have the following attributes and methods. Note that :class:`Handler`
-is never instantiated directly; this class acts as a base for more useful
-subclasses. However, the :meth:`!__init__` method in subclasses needs to call
+Handler có các thuộc tính và phương thức sau. Lưu ý rằng :class:`Handler` không bao giờ được khởi tạo trực tiếp; lớp này đóng vai trò là lớp cơ sở cho các lớp con hữu ích hơn. Tuy nhiên, phương thức :meth:`!__init__` trong các lớp con cần gọi
 :meth:`Handler.__init__`.
 
 .. class:: Handler
 
    .. method:: Handler.__init__(level=NOTSET)
 
-      Initializes the :class:`Handler` instance by setting its level, setting the list
-      of filters to the empty list and creating a lock (using :meth:`createLock`) for
-      serializing access to an I/O mechanism.
+      Khởi tạo instance :class:`Handler` bằng cách đặt level cho instance, đặt danh sách bộ lọc thành danh sách rỗng và tạo một lock (sử dụng :meth:`createLock`) để tuần tự hóa quyền truy cập vào cơ chế I/O.
 
 
    .. method:: Handler.createLock()
 
-      Initializes a thread lock which can be used to serialize access to underlying
-      I/O functionality which may not be threadsafe.
+      Khởi tạo một thread lock có thể được sử dụng để tuần tự hóa quyền truy cập vào chức năng I/O bên dưới, vốn có thể không threadsafe.
 
 
    .. method:: Handler.acquire()
 
-      Acquires the thread lock created with :meth:`createLock`.
+      Nhận thread lock được tạo bằng :meth:`createLock`.
 
 
    .. method:: Handler.release()
 
-      Releases the thread lock acquired with :meth:`acquire`.
+      Giải phóng thread lock đã nhận bằng :meth:`acquire`.
 
 
    .. method:: Handler.setLevel(level)
 
-      Sets the threshold for this handler to *level*. Logging messages which are
-      less severe than *level* will be ignored. When a handler is created, the
-      level is set to :const:`NOTSET` (which causes all messages to be
-      processed).
+      Đặt ngưỡng cho handler này thành *level*. Các thông báo logging ít nghiêm trọng hơn *level* sẽ bị bỏ qua. Khi một handler được tạo, level được đặt thành :const:`NOTSET` (khiến mọi thông báo được xử lý).
 
-      See :ref:`levels` for a list of levels.
+      Xem :ref:`levels` để biết danh sách các level.
 
       .. versionchanged:: 3.2
-         The *level* parameter now accepts a string representation of the
-         level such as 'INFO' as an alternative to the integer constants
-         such as :const:`INFO`.
+         Tham số *level* hiện chấp nhận biểu diễn dạng chuỗi của level, chẳng hạn như 'INFO', thay cho các hằng số số nguyên như :const:`INFO`.
 
 
    .. method:: Handler.setFormatter(fmt)
 
-      Sets the formatter for this handler to *fmt*.
-      The *fmt* argument must be a :class:`Formatter` instance or ``None``.
+      Đặt formatter cho handler này thành *fmt*. Đối số *fmt* phải là một instance của :class:`Formatter` hoặc ``None``.
 
 
    .. method:: Handler.addFilter(filter)
 
-      Adds the specified filter *filter* to this handler.
+      Thêm filter được chỉ định *filter* vào handler này.
 
 
    .. method:: Handler.removeFilter(filter)
 
-      Removes the specified filter *filter* from this handler.
+      Xóa filter được chỉ định *filter* khỏi handler này.
 
 
    .. method:: Handler.filter(record)
 
-      Apply this handler's filters to the record and return ``True`` if the
-      record is to be processed. The filters are consulted in turn, until one of
-      them returns a false value. If none of them return a false value, the record
-      will be emitted. If one returns a false value, the handler will not emit the
-      record.
+      Áp dụng các filter của handler này cho record và trả về ``True`` nếu record cần được xử lý. Các filter được kiểm tra lần lượt cho đến khi một filter trả về giá trị false. Nếu không có filter nào trả về giá trị false, record sẽ được phát ra. Nếu một filter trả về giá trị false, handler sẽ không phát ra record.
 
 
    .. method:: Handler.flush()
 
-      Ensure all logging output has been flushed. This version does nothing and is
-      intended to be implemented by subclasses.
+      Đảm bảo mọi đầu ra logging đã được flush. Phiên bản này không thực hiện thao tác nào và được thiết kế để các lớp con triển khai.
 
 
    .. method:: Handler.close()
 
-      Tidy up any resources used by the handler. This version does no output
-      but removes the handler from an internal map of handlers, which is used
-      for handler lookup by name.
+      Dọn dẹp mọi tài nguyên được handler sử dụng. Phiên bản này không tạo đầu ra, nhưng xóa handler khỏi một map nội bộ của các handler, được dùng để tra cứu handler theo tên.
 
-      Subclasses should ensure that this gets called from overridden :meth:`close`
-      methods.
+      Các lớp con cần đảm bảo rằng phương thức :meth:`close` được gọi từ các phương thức bị ghi đè.
 
 
    .. method:: Handler.handle(record)
 
-      Conditionally emits the specified logging record, depending on filters which may
-      have been added to the handler. Wraps the actual emission of the record with
-      acquisition/release of the I/O thread lock.
+      Phát ra bản ghi logging được chỉ định tùy theo các bộ lọc có thể đã được thêm vào handler. Bao quanh việc phát ra bản ghi thực tế bằng thao tác lấy/nhả khóa luồng I/O.
 
 
    .. method:: Handler.handleError(record)
 
-      This method should be called from handlers when an exception is encountered
-      during an :meth:`emit` call. If the module-level attribute
-      :data:`raiseExceptions` is ``False``, exceptions get silently ignored. This is
-      what is mostly wanted for a logging system - most users will not care about
-      errors in the logging system, they are more interested in application
-      errors. You could, however, replace this with a custom handler if you wish.
-      The specified record is the one which was being processed when the exception
-      occurred. (The default value of :data:`raiseExceptions` is ``True``, as that is
-      more useful during development).
+      Phương thức này nên được gọi từ các handler khi gặp ngoại lệ trong một lần gọi :meth:`emit`. Nếu thuộc tính cấp mô-đun
+      :data:`raiseExceptions` là ``False``, các ngoại lệ sẽ bị bỏ qua một cách im lặng. Đây là điều thường được mong muốn đối với một hệ thống logging - hầu hết người dùng sẽ không quan tâm đến các lỗi trong hệ thống logging mà quan tâm hơn đến các lỗi của ứng dụng. Tuy nhiên, bạn có thể thay thế hành vi này bằng một handler tùy chỉnh nếu muốn. Bản ghi được chỉ định là bản ghi đang được xử lý khi ngoại lệ xảy ra. (Giá trị mặc định của :data:`raiseExceptions` là ``True``, vì giá trị đó hữu ích hơn trong quá trình phát triển).
 
 
    .. method:: Handler.format(record)
 
-      Do formatting for a record - if a formatter is set, use it. Otherwise, use the
-      default formatter for the module.
+      Định dạng một bản ghi - nếu đã đặt formatter thì sử dụng formatter đó. Nếu không, sử dụng formatter mặc định của mô-đun.
 
 
    .. method:: Handler.emit(record)
 
-      Do whatever it takes to actually log the specified logging record. This version
-      is intended to be implemented by subclasses and so raises a
+      Thực hiện mọi việc cần thiết để thực sự ghi bản ghi logging được chỉ định. Phiên bản này được thiết kế để các lớp con triển khai, vì vậy sẽ phát sinh một
       :exc:`NotImplementedError`.
 
-      .. warning:: This method is called after a handler-level lock is acquired, which
-         is released after this method returns. When you override this method, note
-         that you should be careful when calling anything that invokes other parts of
-         the logging API which might do locking, because that might result in a
-         deadlock. Specifically:
+      .. warning:: Phương thức này được gọi sau khi khóa cấp handler được lấy, và khóa này sẽ được nhả sau khi phương thức trả về. Khi ghi đè phương thức này, hãy lưu ý rằng bạn cần thận trọng khi gọi bất kỳ thứ gì kích hoạt các phần khác của API logging có thể thực hiện thao tác khóa, vì điều đó có thể dẫn đến deadlock. Cụ thể:
 
-         * Logging configuration APIs acquire the module-level lock, and then
-           individual handler-level locks as those handlers are configured.
+         * Các API cấu hình logging lấy khóa cấp mô-đun, sau đó lấy các khóa cấp handler riêng lẻ khi các handler đó được cấu hình.
 
-         * Many logging APIs lock the module-level lock. If such an API is called
-           from this method, it could cause a deadlock if a configuration call is
-           made on another thread, because that thread will try to acquire the
-           module-level lock *before* the handler-level lock, whereas this thread
-           tries to acquire the module-level lock *after* the handler-level lock
-           (because in this method, the handler-level lock has already been acquired).
+         * Nhiều logging API khóa khóa cấp mô-đun. Nếu một API như vậy được gọi từ phương thức này, nó có thể gây deadlock nếu một lời gọi cấu hình được thực hiện trên thread khác, vì thread đó sẽ cố gắng giành khóa cấp mô-đun *trước* khóa cấp handler, trong khi thread này cố gắng giành khóa cấp mô-đun *sau* khóa cấp handler (vì trong phương thức này, khóa cấp handler đã được giành trước).
 
-For a list of handlers included as standard, see :mod:`logging.handlers`.
+Để xem danh sách các handler được cung cấp theo tiêu chuẩn, hãy xem :mod:`logging.handlers`.
 
 .. _formatter-objects:
 
-Formatter Objects
------------------
+Đối tượng Formatter
+-------------------
 
 .. currentmodule:: logging
 
 .. class:: Formatter(fmt=None, datefmt=None, style='%', validate=True, *, defaults=None)
 
-   Responsible for converting a :class:`LogRecord` to an output string
-   to be interpreted by a human or external system.
+   Chịu trách nhiệm chuyển đổi :class:`LogRecord` thành chuỗi đầu ra để con người hoặc hệ thống bên ngoài diễn giải.
 
-   :param fmt: A format string in the given *style* for
-       the logged output as a whole.
-       The possible mapping keys are drawn from the :class:`LogRecord` object's
-       :ref:`logrecord-attributes`.
-       If not specified, ``'%(message)s'`` is used,
-       which is just the logged message.
+   :param fmt: Một chuỗi định dạng theo *style* đã cho cho toàn bộ đầu ra được ghi nhật ký. Các khóa ánh xạ có thể có được lấy từ đối tượng :class:`LogRecord`
+       :ref:`logrecord-attributes`. Nếu không được chỉ định, ``'%(message)s'`` sẽ được sử dụng, tức chỉ là thông báo được ghi nhật ký.
    :type fmt: str
 
-   :param datefmt: A format string for the date/time portion of the logged output.
-       If not specified, the default described in :meth:`formatTime` is used.
+   :param datefmt: Một chuỗi định dạng cho phần ngày/giờ của đầu ra được ghi nhật ký. Nếu không được chỉ định, mặc định được mô tả trong :meth:`formatTime` sẽ được sử dụng.
    :type datefmt: str
 
-   :param style: Can be one of ``'%'``, ``'{'`` or ``'$'`` and determines
-       how the format string will be merged with its data: using one of
-       :ref:`old-string-formatting` (``%``), :meth:`str.format` (``{``)
-       or :class:`string.Template` (``$``). This only applies to
-       *fmt* (e.g. ``'%(message)s'`` versus ``'{message}'``),
-       not to the actual log messages passed to the logging methods.
-       However, there are :ref:`other ways <formatting-styles>`
-       to use ``{``- and ``$``-formatting for log messages.
+   :param style: Có thể là ``'%'``, ``'{'`` hoặc ``'$'`` và xác định cách chuỗi định dạng sẽ được kết hợp với dữ liệu tương ứng: bằng một trong các cách sau
+       :ref:`old-string-formatting` (``%``), :meth:`str.format` (``{``) hoặc :class:`string.Template` (``$``). Điều này chỉ áp dụng cho *fmt* (ví dụ: ``'%(message)s'`` so với ``'{message}'``), không áp dụng cho các thông báo nhật ký thực tế được truyền vào những phương thức logging. Tuy nhiên, còn có :ref:`những cách khác <formatting-styles>` để sử dụng kiểu định dạng ``{``- và ``$``- cho các thông báo nhật ký.
    :type style: str
 
-   :param validate: If ``True`` (the default), incorrect or mismatched
-       *fmt* and *style* will raise a :exc:`ValueError`; for example,
-       ``logging.Formatter('%(asctime)s - %(message)s', style='{')``.
+   :param validate: Nếu là ``True`` (mặc định), *fmt* và *style* không chính xác hoặc không khớp sẽ gây ra :exc:`ValueError`; ví dụ: ``logging.Formatter('%(asctime)s - %(message)s', style='{')``.
    :type validate: bool
 
-   :param defaults: A dictionary with default values to use in custom fields.
-       For example,
-       ``logging.Formatter('%(ip)s %(message)s', defaults={"ip": None})``
+   :param defaults: Một dictionary chứa các giá trị mặc định để sử dụng trong các trường tùy chỉnh. Ví dụ: ``logging.Formatter('%(ip)s %(message)s', defaults={"ip": None})``
    :type defaults: dict[str, Any]
 
    .. versionchanged:: 3.2
-      Added the *style* parameter.
+      Đã thêm tham số *style*.
 
    .. versionchanged:: 3.8
-      Added the *validate* parameter.
+      Đã thêm tham số *validate*.
 
    .. versionchanged:: 3.10
-      Added the *defaults* parameter.
+      Đã thêm tham số *defaults*.
 
 
    .. method:: format(record)
 
-      The record's attribute dictionary is used as the operand to a string
-      formatting operation. Returns the resulting string. Before formatting the
-      dictionary, a couple of preparatory steps are carried out. The *message*
-      attribute of the record is computed using *msg* % *args*. If the
-      formatting string contains ``'(asctime)'``, :meth:`formatTime` is called
-      to format the event time. If there is exception information, it is
-      formatted using :meth:`formatException` and appended to the message. Note
-      that the formatted exception information is cached in attribute
-      *exc_text*. This is useful because the exception information can be
-      pickled and sent across the wire, but you should be careful if you have
-      more than one :class:`Formatter` subclass which customizes the formatting
-      of exception information. In this case, you will have to clear the cached
-      value (by setting the *exc_text* attribute to ``None``) after a formatter
-      has done its formatting, so that the next formatter to handle the event
-      doesn't use the cached value, but recalculates it afresh.
+      Dictionary thuộc tính của bản ghi được sử dụng làm toán hạng cho một thao tác định dạng chuỗi. Trả về chuỗi kết quả. Trước khi định dạng dictionary, một vài bước chuẩn bị sẽ được thực hiện. Thuộc tính *message* của bản ghi được tính bằng *msg* % *args*. Nếu chuỗi định dạng chứa ``'(asctime)'``, :meth:`formatTime` sẽ được gọi để định dạng thời gian của sự kiện. Nếu có thông tin ngoại lệ, thông tin đó sẽ được định dạng bằng :meth:`formatException` và nối vào thông báo. Lưu ý rằng thông tin ngoại lệ đã định dạng được lưu trong bộ nhớ đệm tại thuộc tính *exc_text*. Điều này hữu ích vì thông tin ngoại lệ có thể được pickle và gửi qua mạng, nhưng bạn cần cẩn thận nếu có nhiều hơn một lớp con :class:`Formatter` tùy chỉnh cách định dạng thông tin ngoại lệ. Trong trường hợp này, bạn sẽ phải xóa giá trị được lưu trong bộ nhớ đệm (bằng cách đặt thuộc tính *exc_text* thành ``None``) sau khi một formatter hoàn tất việc định dạng, để formatter tiếp theo xử lý sự kiện không sử dụng giá trị được lưu trong bộ nhớ đệm mà tính toán lại từ đầu.
 
-      If stack information is available, it's appended after the exception
-      information, using :meth:`formatStack` to transform it if necessary.
+      Nếu có thông tin stack, thông tin đó sẽ được nối vào sau thông tin ngoại lệ, sử dụng :meth:`formatStack` để chuyển đổi khi cần.
 
 
    .. method:: formatTime(record, datefmt=None)
 
-      This method should be called from :meth:`format` by a formatter which
-      wants to make use of a formatted time. This method can be overridden in
-      formatters to provide for any specific requirement, but the basic behavior
-      is as follows: if *datefmt* (a string) is specified, it is used with
-      :func:`time.strftime` to format the creation time of the
-      record. Otherwise, the format '%Y-%m-%d %H:%M:%S,uuu' is used, where the
-      uuu part is a millisecond value and the other letters are as per the
-      :func:`time.strftime` documentation.  An example time in this format is
-      ``2003-01-23 00:29:50,411``.  The resulting string is returned.
+      Phương thức này nên được gọi từ :meth:`format` bởi một formatter muốn sử dụng thời gian đã được định dạng. Có thể ghi đè phương thức này trong các formatter để đáp ứng mọi yêu cầu cụ thể, nhưng hành vi cơ bản như sau: nếu *datefmt* (một chuỗi) được chỉ định, nó sẽ được dùng cùng với
+      :func:`time.strftime` để định dạng thời gian tạo bản ghi. Nếu không, định dạng '%Y-%m-%d %H:%M:%S,uuu' sẽ được sử dụng, trong đó phần uuu là giá trị mili giây và các chữ cái còn lại tuân theo
+      :func:`time.strftime` documentation.  An example time in this format is ``2003-01-23 00:29:50,411``.  The resulting string is returned.
 
-      This function uses a user-configurable function to convert the creation
-      time to a tuple. By default, :func:`time.localtime` is used; to change
-      this for a particular formatter instance, set the ``converter`` attribute
-      to a function with the same signature as :func:`time.localtime` or
-      :func:`time.gmtime`. To change it for all formatters, for example if you
-      want all logging times to be shown in GMT, set the ``converter``
-      attribute in the ``Formatter`` class.
+      Hàm này sử dụng một hàm do người dùng cấu hình để chuyển đổi thời gian tạo thành một tuple. Theo mặc định, :func:`time.localtime` được sử dụng; để thay đổi hàm này cho một formatter instance cụ thể, hãy đặt thuộc tính ``converter`` thành một hàm có cùng signature với :func:`time.localtime` hoặc
+      :func:`time.gmtime`. Để thay đổi cho tất cả formatter, chẳng hạn nếu bạn muốn tất cả thời gian ghi log được hiển thị theo GMT, hãy đặt thuộc tính ``converter`` trong class ``Formatter``.
 
       .. versionchanged:: 3.3
-         Previously, the default format was hard-coded as in this example:
-         ``2010-09-06 22:38:15,292`` where the part before the comma is
-         handled by a strptime format string (``'%Y-%m-%d %H:%M:%S'``), and the
-         part after the comma is a millisecond value. Because strptime does not
-         have a format placeholder for milliseconds, the millisecond value is
-         appended using another format string, ``'%s,%03d'`` --- and both of these
-         format strings have been hardcoded into this method. With the change,
-         these strings are defined as class-level attributes which can be
-         overridden at the instance level when desired. The names of the
-         attributes are ``default_time_format`` (for the strptime format string)
-         and ``default_msec_format`` (for appending the millisecond value).
+         Trước đây, định dạng mặc định được hard-code như trong ví dụ này: ``2010-09-06 22:38:15,292``, trong đó phần trước dấu phẩy được xử lý bởi chuỗi định dạng strptime (``'%Y-%m-%d %H:%M:%S'``), còn phần sau dấu phẩy là một giá trị mili giây. Vì strptime không có placeholder định dạng cho mili giây, giá trị mili giây được nối thêm bằng một chuỗi định dạng khác, ``'%s,%03d'`` --- và cả hai chuỗi định dạng này đều được hard-code trong phương thức này. Sau thay đổi này, các chuỗi được định nghĩa dưới dạng thuộc tính cấp class và có thể được ghi đè ở cấp instance khi cần. Tên của các thuộc tính là ``default_time_format`` (dành cho chuỗi định dạng strptime) và ``default_msec_format`` (dành cho việc nối thêm giá trị mili giây).
 
       .. versionchanged:: 3.9
-         The ``default_msec_format`` can be ``None``.
+         ``default_msec_format`` có thể là ``None``.
 
    .. method:: formatException(exc_info)
 
-      Formats the specified exception information (a standard exception tuple as
-      returned by :func:`sys.exc_info`) as a string. This default implementation
-      just uses :func:`traceback.print_exception`. The resulting string is
-      returned.
+      Định dạng thông tin ngoại lệ được chỉ định (một tuple ngoại lệ tiêu chuẩn do :func:`sys.exc_info` trả về) thành một chuỗi. Cách triển khai mặc định này chỉ sử dụng :func:`traceback.print_exception`. Chuỗi kết quả được trả về.
 
    .. method:: formatStack(stack_info)
 
-      Formats the specified stack information (a string as returned by
-      :func:`traceback.print_stack`, but with the last newline removed) as a
-      string. This default implementation just returns the input value.
+      Định dạng thông tin stack được chỉ định (một chuỗi do
+      :func:`traceback.print_stack`, nhưng đã loại bỏ ký tự dòng mới cuối cùng) thành một chuỗi. Cách triển khai mặc định này chỉ trả về giá trị đầu vào.
 
 .. class:: BufferingFormatter(linefmt=None)
 
-   A base formatter class suitable for subclassing when you want to format a
-   number of records. You can pass a :class:`Formatter` instance which you want
-   to use to format each line (that corresponds to a single record). If not
-   specified, the default formatter (which just outputs the event message) is
-   used as the line formatter.
+   Một lớp formatter cơ sở phù hợp để phân lớp con khi bạn muốn định dạng nhiều bản ghi. Bạn có thể truyền một thực thể :class:`Formatter` mà bạn muốn dùng để định dạng từng dòng (tương ứng với một bản ghi). Nếu không chỉ định, formatter mặc định (chỉ xuất thông báo sự kiện) sẽ được dùng làm formatter dòng.
 
    .. method:: formatHeader(records)
 
-      Return a header for a list of *records*. The base implementation just
-      returns the empty string. You will need to override this method if you
-      want specific behaviour, e.g. to show the count of records, a title or a
-      separator line.
+      Trả về phần đầu cho một danh sách *các bản ghi*. Cách triển khai cơ sở chỉ trả về chuỗi rỗng. Bạn cần ghi đè phương thức này nếu muốn có hành vi cụ thể, chẳng hạn như hiển thị số lượng bản ghi, tiêu đề hoặc một dòng phân cách.
 
    .. method:: formatFooter(records)
 
-      Return a footer for a list of *records*. The base implementation just
-      returns the empty string. You will need to override this method if you
-      want specific behaviour, e.g. to show the count of records or a separator
-      line.
+      Trả về phần cuối cho một danh sách *các bản ghi*. Cách triển khai cơ sở chỉ trả về chuỗi rỗng. Bạn cần ghi đè phương thức này nếu muốn có hành vi cụ thể, chẳng hạn như hiển thị số lượng bản ghi hoặc một dòng phân cách.
 
    .. method:: format(records)
 
-      Return formatted text for a list of *records*. The base implementation
-      just returns the empty string if there are no records; otherwise, it
-      returns the concatenation of the header, each record formatted with the
-      line formatter, and the footer.
+      Trả về văn bản đã định dạng cho một danh sách *các bản ghi*. Cách triển khai cơ sở chỉ trả về chuỗi rỗng nếu không có bản ghi; nếu không, nó trả về phép nối của phần đầu, từng bản ghi được định dạng bằng formatter dòng và phần cuối.
 
 .. _filter:
 
-Filter Objects
---------------
+Đối tượng bộ lọc
+----------------
 
-``Filters`` can be used by ``Handlers`` and ``Loggers`` for more sophisticated
-filtering than is provided by levels. The base filter class only allows events
-which are below a certain point in the logger hierarchy. For example, a filter
-initialized with 'A.B' will allow events logged by loggers 'A.B', 'A.B.C',
-'A.B.C.D', 'A.B.D' etc. but not 'A.BB', 'B.A.B' etc. If initialized with the
-empty string, all events are passed.
+``Filters`` có thể được ``Handlers`` và ``Loggers`` sử dụng để thực hiện việc lọc phức tạp hơn so với khả năng lọc theo cấp độ. Lớp bộ lọc cơ sở chỉ cho phép các sự kiện nằm dưới một vị trí nhất định trong hệ thống phân cấp logger. Ví dụ: một bộ lọc được khởi tạo với 'A.B' sẽ cho phép các sự kiện được ghi bởi các logger 'A.B', 'A.B.C', 'A.B.C.D', 'A.B.D', v.v., nhưng không cho phép 'A.BB', 'B.A.B', v.v. Nếu được khởi tạo bằng chuỗi rỗng, mọi sự kiện đều được truyền qua.
 
 
 .. class:: Filter(name='')
 
-   Returns an instance of the :class:`Filter` class. If *name* is specified, it
-   names a logger which, together with its children, will have its events allowed
-   through the filter. If *name* is the empty string, allows every event.
+   Trả về một instance của lớp :class:`Filter`. Nếu *name* được chỉ định, nó sẽ xác định một logger mà logger đó cùng các logger con của nó sẽ được phép truyền sự kiện qua bộ lọc. Nếu *name* là chuỗi rỗng, mọi sự kiện đều được cho phép.
 
 
    .. method:: filter(record)
 
-      Is the specified record to be logged? Returns false for no, true for
-      yes. Filters can either modify log records in-place or return a completely
-      different record instance which will replace the original
-      log record in any future processing of the event.
+      Bản ghi được chỉ định có cần được ghi lại không? Trả về false nếu không, true nếu có. Bộ lọc có thể sửa đổi các bản ghi log trực tiếp hoặc trả về một instance bản ghi hoàn toàn khác để thay thế bản ghi log ban đầu trong mọi bước xử lý tiếp theo của sự kiện.
 
-Note that filters attached to handlers are consulted before an event is
-emitted by the handler, whereas filters attached to loggers are consulted
-whenever an event is logged (using :meth:`debug`, :meth:`info`,
-etc.), before sending an event to handlers. This means that events which have
-been generated by descendant loggers will not be filtered by a logger's filter
-setting, unless the filter has also been applied to those descendant loggers.
+Lưu ý rằng các bộ lọc được gắn vào handler được kiểm tra trước khi sự kiện được handler phát ra, trong khi các bộ lọc được gắn vào logger được kiểm tra mỗi khi một sự kiện được ghi lại (bằng :meth:`debug`, :meth:`info`, v.v.), trước khi gửi sự kiện đến các handler. Điều này có nghĩa là các sự kiện được tạo bởi các logger hậu duệ sẽ không bị lọc theo thiết lập bộ lọc của logger, trừ khi bộ lọc cũng được áp dụng cho các logger hậu duệ đó.
 
-You don't actually need to subclass ``Filter``: you can pass any instance
-which has a ``filter`` method with the same semantics.
+Bạn thực sự không cần phân lớp ``Filter``: bạn có thể truyền vào bất kỳ instance nào có phương thức ``filter`` với cùng ngữ nghĩa.
 
 .. versionchanged:: 3.2
-   You don't need to create specialized ``Filter`` classes, or use other
-   classes with a ``filter`` method: you can use a function (or other
-   callable) as a filter. The filtering logic will check to see if the filter
-   object has a ``filter`` attribute: if it does, it's assumed to be a
-   ``Filter`` and its :meth:`~Filter.filter` method is called. Otherwise, it's
-   assumed to be a callable and called with the record as the single
-   parameter. The returned value should conform to that returned by
+   Bạn không cần tạo các lớp ``Filter`` chuyên biệt hoặc sử dụng các lớp khác có phương thức ``filter``: bạn có thể sử dụng một hàm (hoặc callable khác) làm bộ lọc. Logic lọc sẽ kiểm tra xem đối tượng bộ lọc có thuộc tính ``filter`` hay không: nếu có, đối tượng đó được coi là một ``Filter`` và phương thức :meth:`~Filter.filter` của nó sẽ được gọi. Nếu không, đối tượng đó được coi là một callable và được gọi với bản ghi làm tham số duy nhất. Giá trị được trả về phải phù hợp với giá trị được trả về bởi
    :meth:`~Filter.filter`.
 
 .. versionchanged:: 3.12
-   You can now return a :class:`LogRecord` instance from filters to replace
-   the log record rather than modifying it in place. This allows filters attached to
-   a :class:`Handler` to modify the log record before it is emitted, without
-   having side effects on other handlers.
+   Giờ đây, bạn có thể trả về một thể hiện :class:`LogRecord` từ các filter để thay thế bản ghi log thay vì sửa đổi bản ghi tại chỗ. Điều này cho phép các filter được gắn vào một :class:`Handler` sửa đổi bản ghi log trước khi bản ghi được phát ra, mà không gây ra tác động phụ lên các handler khác.
 
-Although filters are used primarily to filter records based on more
-sophisticated criteria than levels, they get to see every record which is
-processed by the handler or logger they're attached to: this can be useful if
-you want to do things like counting how many records were processed by a
-particular logger or handler, or adding, changing or removing attributes in
-the :class:`LogRecord` being processed. Obviously changing the LogRecord needs
-to be done with some care, but it does allow the injection of contextual
-information into logs (see :ref:`filters-contextual`).
+Mặc dù filter chủ yếu được dùng để lọc các bản ghi dựa trên những tiêu chí phức tạp hơn level, chúng vẫn xem được mọi bản ghi được handler hoặc logger mà chúng được gắn vào xử lý: điều này có thể hữu ích nếu bạn muốn thực hiện những việc như đếm số bản ghi được một logger hoặc handler cụ thể xử lý, hoặc thêm, thay đổi hay xóa các thuộc tính trong :class:`LogRecord` đang được xử lý. Rõ ràng, việc thay đổi LogRecord cần được thực hiện cẩn thận, nhưng điều đó cho phép đưa thông tin ngữ cảnh vào log (xem :ref:`filters-contextual`).
 
 
 .. _log-record:
 
-LogRecord Objects
------------------
+Đối tượng LogRecord
+-------------------
 
-:class:`LogRecord` instances are created automatically by the :class:`Logger`
-every time something is logged, and can be created manually via
-:func:`makeLogRecord` (for example, from a pickled event received over the
-wire).
+Các thể hiện :class:`LogRecord` được :class:`Logger` tự động tạo ra mỗi khi có nội dung được log, và có thể được tạo thủ công thông qua
+:func:`makeLogRecord` (ví dụ: từ một event đã được pickle nhận qua mạng).
 
 
 .. class:: LogRecord(name, level, pathname, lineno, msg, args, exc_info, func=None, sinfo=None)
 
-   Contains all the information pertinent to the event being logged.
+   Chứa mọi thông tin liên quan đến event đang được log.
 
-   The primary information is passed in *msg* and *args*,
-   which are combined using ``msg % args`` to create
-   the :attr:`!message` attribute of the record.
+   Thông tin chính được truyền trong *msg* và *args*, sau đó được kết hợp bằng ``msg % args`` để tạo thuộc tính :attr:`!message` của bản ghi.
 
-   :param name: The name of the logger used to log the event
-      represented by this :class:`!LogRecord`.
-      Note that the logger name in the :class:`!LogRecord`
-      will always have this value,
-      even though it may be emitted by a handler
-      attached to a different (ancestor) logger.
+   :param name: Tên của logger được dùng để ghi lại sự kiện được biểu diễn bởi :class:`!LogRecord`. Lưu ý rằng tên logger trong :class:`!LogRecord` sẽ luôn có giá trị này, ngay cả khi sự kiện có thể được phát ra bởi một handler được gắn với một logger (tổ tiên) khác.
    :type name: str
 
-   :param level: The :ref:`numeric level <levels>` of the logging event
-      (such as ``10`` for ``DEBUG``, ``20`` for ``INFO``, etc).
-      Note that this is converted to *two* attributes of the LogRecord:
-      :attr:`!levelno` for the numeric value
-      and :attr:`!levelname` for the corresponding level name.
+   :param level: :ref:`mức số <levels>` của sự kiện ghi log (chẳng hạn như ``10`` cho ``DEBUG``, ``20`` cho ``INFO``, v.v.). Lưu ý rằng giá trị này được chuyển đổi thành *hai* thuộc tính của LogRecord:
+      :attr:`!levelno` cho giá trị số và :attr:`!levelname` cho tên mức tương ứng.
    :type level: int
 
-   :param pathname: The full string path of the source file
-      where the logging call was made.
+   :param pathname: Đường dẫn chuỗi đầy đủ của tệp nguồn nơi thực hiện lệnh gọi ghi log.
    :type pathname: str
 
-   :param lineno: The line number in the source file
-      where the logging call was made.
+   :param lineno: Số dòng trong tệp nguồn nơi lệnh gọi ghi nhật ký được thực hiện.
    :type lineno: int
 
-   :param msg: The event description message,
-      which can be a %-format string with placeholders for variable data,
-      or an arbitrary object (see :ref:`arbitrary-object-messages`).
+   :param msg: Thông báo mô tả sự kiện, có thể là chuỗi định dạng %-format với các placeholder cho dữ liệu biến đổi hoặc một đối tượng tùy ý (xem :ref:`arbitrary-object-messages`).
    :type msg: typing.Any
 
-   :param args: Variable data to merge into the *msg* argument
-      to obtain the event description.
+   :param args: Dữ liệu biến đổi được hợp nhất vào đối số *msg* để nhận mô tả sự kiện.
    :type args: tuple | dict[str, typing.Any]
 
-   :param exc_info: An exception tuple with the current exception information,
-      as returned by :func:`sys.exc_info`,
-      or ``None`` if no exception information is available.
+   :param exc_info: Một tuple ngoại lệ chứa thông tin về ngoại lệ hiện tại, do :func:`sys.exc_info` trả về hoặc là ``None`` nếu không có thông tin ngoại lệ.
    :type exc_info: tuple[type[BaseException], BaseException, types.TracebackType] | None
 
-   :param func: The name of the function or method
-      from which the logging call was invoked.
+   :param func: Tên của hàm hoặc phương thức nơi lời gọi ghi nhật ký được thực hiện.
    :type func: str | None
 
-   :param sinfo: A text string representing stack information
-      from the base of the stack in the current thread,
-      up to the logging call.
+   :param sinfo: Một chuỗi văn bản biểu thị thông tin ngăn xếp từ đáy ngăn xếp trong luồng hiện tại đến lời gọi ghi nhật ký.
    :type sinfo: str | None
 
    .. method:: getMessage()
 
-      Returns the message for this :class:`LogRecord` instance after merging any
-      user-supplied arguments with the message. If the user-supplied message
-      argument to the logging call is not a string, :func:`str` is called on it to
-      convert it to a string. This allows use of user-defined classes as
-      messages, whose ``__str__`` method can return the actual format string to
-      be used.
+      Trả về thông báo cho thực thể :class:`LogRecord` này sau khi hợp nhất mọi đối số do người dùng cung cấp với thông báo. Nếu đối số thông báo do người dùng cung cấp cho lời gọi ghi nhật ký không phải là chuỗi, :func:`str` sẽ được gọi trên đối số đó để chuyển đổi thành chuỗi. Điều này cho phép sử dụng các lớp do người dùng định nghĩa làm thông báo, trong đó phương thức ``__str__`` có thể trả về chuỗi định dạng thực tế cần sử dụng.
 
    .. versionchanged:: 3.2
-      The creation of a :class:`LogRecord` has been made more configurable by
-      providing a factory which is used to create the record. The factory can be
-      set using :func:`getLogRecordFactory` and :func:`setLogRecordFactory`
-      (see this for the factory's signature).
+      Việc tạo một :class:`LogRecord` đã trở nên linh hoạt hơn bằng cách cung cấp một factory được dùng để tạo record. Có thể thiết lập factory bằng :func:`getLogRecordFactory` và :func:`setLogRecordFactory` (xem tại đây chữ ký của factory).
 
-   This functionality can be used to inject your own values into a
-   :class:`LogRecord` at creation time. You can use the following pattern::
+   Chức năng này có thể được sử dụng để đưa các giá trị của riêng bạn vào một
+   :class:`LogRecord` tại thời điểm tạo. Bạn có thể sử dụng mẫu sau::
 
       old_factory = logging.getLogRecordFactory()
 
@@ -960,36 +611,19 @@ wire).
 
       logging.setLogRecordFactory(record_factory)
 
-   With this pattern, multiple factories could be chained, and as long
-   as they don't overwrite each other's attributes or unintentionally
-   overwrite the standard attributes listed above, there should be no
-   surprises.
+   Với mẫu này, có thể nối chuỗi nhiều factory, và miễn là chúng không ghi đè lên các thuộc tính của nhau hoặc vô tình ghi đè lên các thuộc tính tiêu chuẩn được liệt kê ở trên thì sẽ không có điều gì bất ngờ xảy ra.
 
 
 .. _logrecord-attributes:
 
-LogRecord attributes
---------------------
+Các thuộc tính LogRecord
+------------------------
 
-The LogRecord has a number of attributes, most of which are derived from the
-parameters to the constructor. (Note that the names do not always correspond
-exactly between the LogRecord constructor parameters and the LogRecord
-attributes.) These attributes can be used to merge data from the record into
-the format string. The following table lists (in alphabetical order) the
-attribute names, their meanings and the corresponding placeholder in a %-style
-format string.
+LogRecord có một số thuộc tính, phần lớn trong số đó được lấy từ các tham số của hàm khởi tạo. (Lưu ý rằng tên không phải lúc nào cũng tương ứng chính xác giữa các tham số của hàm khởi tạo LogRecord và các thuộc tính LogRecord.) Bạn có thể sử dụng các thuộc tính này để hợp nhất dữ liệu từ record vào chuỗi định dạng. Bảng sau liệt kê (theo thứ tự bảng chữ cái) tên thuộc tính, ý nghĩa của chúng và placeholder tương ứng trong chuỗi định dạng kiểu %.
 
-If you are using {}-formatting (:func:`str.format`), you can use
-``{attrname}`` as the placeholder in the format string. If you are using
-$-formatting (:class:`string.Template`), use the form ``${attrname}``. In
-both cases, of course, replace ``attrname`` with the actual attribute name
-you want to use.
+Nếu bạn đang sử dụng định dạng {} (:func:`str.format`), bạn có thể dùng ``{attrname}`` làm placeholder trong chuỗi định dạng. Nếu bạn đang sử dụng định dạng $ (:class:`string.Template`), hãy dùng dạng ``${attrname}``. Trong cả hai trường hợp, tất nhiên, hãy thay ``attrname`` bằng tên thuộc tính thực tế mà bạn muốn sử dụng.
 
-In the case of {}-formatting, you can specify formatting flags by placing them
-after the attribute name, separated from it with a colon. For example: a
-placeholder of ``{msecs:03.0f}`` would format a millisecond value of ``4`` as
-``004``. Refer to the :meth:`str.format` documentation for full details on
-the options available to you.
+Trong trường hợp định dạng {}, bạn có thể chỉ định các cờ định dạng bằng cách đặt chúng sau tên thuộc tính và phân tách với tên bằng dấu hai chấm. Ví dụ: placeholder ``{msecs:03.0f}`` sẽ định dạng giá trị mili giây ``4`` thành ``004``. Hãy tham khảo tài liệu :meth:`str.format` để biết đầy đủ chi tiết về các tùy chọn bạn có thể sử dụng.
 
 +----------------+-------------------------+-----------------------------------------------+
 | Attribute name | Format                  | Description                                   |
@@ -1073,301 +707,207 @@ the options available to you.
 +----------------+-------------------------+-----------------------------------------------+
 
 .. versionchanged:: 3.1
-   *processName* was added.
+   *processName* đã được thêm.
 
 .. versionchanged:: 3.12
-   *taskName* was added.
+   *taskName* đã được thêm.
 
 .. _logger-adapter:
 
-LoggerAdapter Objects
----------------------
+Các đối tượng LoggerAdapter
+---------------------------
 
-:class:`LoggerAdapter` instances are used to conveniently pass contextual
-information into logging calls. For a usage example, see the section on
-:ref:`adding contextual information to your logging output <context-info>`.
+Các instance :class:`LoggerAdapter` được dùng để truyền thông tin ngữ cảnh vào các lệnh gọi logging một cách thuận tiện. Để xem ví dụ sử dụng, hãy xem phần
+:ref:`thêm thông tin ngữ cảnh vào đầu ra logging của bạn <context-info>`.
 
 .. class:: LoggerAdapter(logger, extra=None, merge_extra=False)
 
-   Returns an instance of :class:`LoggerAdapter` initialized with an
-   underlying :class:`Logger` instance, an optional dict-like object (*extra*),
-   and an optional boolean (*merge_extra*) indicating whether or not
-   the *extra* argument of individual log calls should be merged with
-   the :class:`LoggerAdapter` extra.
-   The default behavior is to ignore the *extra* argument of individual log
-   calls and only use the one of the :class:`LoggerAdapter` instance
+   Trả về một instance của :class:`LoggerAdapter`, được khởi tạo với một instance :class:`Logger` bên dưới, một đối tượng dạng dict tùy chọn (*extra*), và một boolean tùy chọn (*merge_extra*) cho biết có hợp nhất đối số *extra* của các lệnh gọi log riêng lẻ với :class:`LoggerAdapter` extra hay không. Theo mặc định, đối số *extra* của các lệnh gọi log riêng lẻ sẽ bị bỏ qua và chỉ sử dụng đối số của instance :class:`LoggerAdapter`
 
    .. method:: process(msg, kwargs)
 
-      Modifies the message and/or keyword arguments passed to a logging call in
-      order to insert contextual information. This implementation takes the object
-      passed as *extra* to the constructor and adds it to *kwargs* using key
-      'extra'. The return value is a (*msg*, *kwargs*) tuple which has the
-      (possibly modified) versions of the arguments passed in.
+      Sửa đổi message và/hoặc các đối số keyword được truyền vào một lệnh gọi logging để chèn thông tin ngữ cảnh. Cách triển khai này lấy đối tượng được truyền dưới dạng *extra* cho hàm khởi tạo và thêm đối tượng đó vào *kwargs* bằng khóa 'extra'. Giá trị trả về là một tuple (*msg*, *kwargs*) chứa các phiên bản (có thể đã được sửa đổi) của các đối số được truyền vào.
 
    .. attribute:: manager
 
-      Delegates to the underlying :attr:`!manager` on *logger*.
+      Ủy quyền cho :attr:`!manager` bên dưới trên *logger*.
 
    .. attribute:: _log
 
-      Delegates to the underlying :meth:`!_log` method on *logger*.
+      Ủy quyền cho phương thức :meth:`!_log` bên dưới trên *logger*.
 
-   In addition to the above, :class:`LoggerAdapter` supports the following
-   methods of :class:`Logger`: :meth:`~Logger.debug`, :meth:`~Logger.info`,
+   Ngoài những nội dung trên, :class:`LoggerAdapter` hỗ trợ các phương thức sau của :class:`Logger`: :meth:`~Logger.debug`, :meth:`~Logger.info`,
    :meth:`~Logger.warning`, :meth:`~Logger.error`, :meth:`~Logger.exception`,
    :meth:`~Logger.critical`, :meth:`~Logger.log`, :meth:`~Logger.isEnabledFor`,
-   :meth:`~Logger.getEffectiveLevel`, :meth:`~Logger.setLevel` and
-   :meth:`~Logger.hasHandlers`. These methods have the same signatures as their
-   counterparts in :class:`Logger`, so you can use the two types of instances
-   interchangeably.
+   :meth:`~Logger.getEffectiveLevel`, :meth:`~Logger.setLevel` và
+   :meth:`~Logger.hasHandlers`. Các phương thức này có cùng chữ ký với những phương thức tương ứng trong :class:`Logger`, vì vậy bạn có thể sử dụng thay thế lẫn nhau hai loại instance này.
 
    .. versionchanged:: 3.2
 
-      The :meth:`~Logger.isEnabledFor`, :meth:`~Logger.getEffectiveLevel`,
-      :meth:`~Logger.setLevel` and :meth:`~Logger.hasHandlers` methods were added
-      to :class:`LoggerAdapter`.  These methods delegate to the underlying logger.
+      Các phương thức :meth:`~Logger.isEnabledFor`, :meth:`~Logger.getEffectiveLevel`,
+      :meth:`~Logger.setLevel` và :meth:`~Logger.hasHandlers` đã được thêm vào :class:`LoggerAdapter`. Các phương thức này ủy quyền cho logger bên dưới.
 
    .. versionchanged:: 3.6
 
-      Attribute :attr:`!manager` and method :meth:`!_log` were added, which
-      delegate to the underlying logger and allow adapters to be nested.
+      Thuộc tính :attr:`!manager` và phương thức :meth:`!_log` đã được thêm vào; chúng ủy quyền cho logger bên dưới và cho phép lồng các adapter.
 
    .. versionchanged:: 3.10
 
-      The *extra* argument is now optional.
+      Đối số *extra* hiện là tùy chọn.
 
    .. versionchanged:: 3.13
 
-      The *merge_extra* parameter was added.
+      Tham số *merge_extra* đã được thêm vào.
 
 
-Thread Safety
+An toàn luồng
 -------------
 
-The logging module is intended to be thread-safe without any special work
-needing to be done by its clients. It achieves this through using threading
-locks; there is one lock to serialize access to the module's shared data, and
-each handler also creates a lock to serialize access to its underlying I/O.
+Mô-đun logging được thiết kế để an toàn luồng mà không yêu cầu client thực hiện bất kỳ thao tác đặc biệt nào. Mô-đun này đạt được điều đó bằng cách sử dụng các khóa threading; có một khóa để tuần tự hóa quyền truy cập vào dữ liệu dùng chung của mô-đun, và mỗi handler cũng tạo một khóa để tuần tự hóa quyền truy cập vào I/O bên dưới.
 
-If you are implementing asynchronous signal handlers using the :mod:`signal`
-module, you may not be able to use logging from within such handlers. This is
-because lock implementations in the :mod:`threading` module are not always
-re-entrant, and so cannot be invoked from such signal handlers.
+Nếu bạn triển khai các trình xử lý tín hiệu bất đồng bộ bằng mô-đun :mod:`signal`, bạn có thể không sử dụng được logging bên trong các trình xử lý đó. Nguyên nhân là các cơ chế triển khai khóa trong mô-đun :mod:`threading` không phải lúc nào cũng có thể tái nhập, vì vậy không thể được gọi từ các trình xử lý tín hiệu như vậy.
 
 
-Module-Level Functions
-----------------------
+Các hàm cấp mô-đun
+------------------
 
-In addition to the classes described above, there are a number of module-level
-functions.
+Ngoài các class được mô tả ở trên, còn có một số hàm cấp module.
 
 
 .. function:: getLogger(name=None)
 
-   Return a logger with the specified name or, if name is ``None``, return the
-   root logger of the hierarchy. If specified, the name is typically a
-   dot-separated hierarchical name like *'a'*, *'a.b'* or *'a.b.c.d'*. Choice
-   of these names is entirely up to the developer who is using logging, though
-   it is recommended that ``__name__`` be used unless you have a specific
-   reason for not doing that, as mentioned in :ref:`logger`.
+   Trả về một logger có tên được chỉ định hoặc, nếu name là ``None``, trả về logger gốc của hệ thống phân cấp. Nếu được chỉ định, name thường là một tên phân cấp được phân tách bằng dấu chấm, chẳng hạn như *'a'*, *'a.b'* hoặc *'a.b.c.d'*. Việc chọn các tên này hoàn toàn phụ thuộc vào developer sử dụng logging, mặc dù bạn nên sử dụng ``__name__`` trừ khi có lý do cụ thể để không làm vậy, như đã đề cập trong :ref:`logger`.
 
-   All calls to this function with a given name return the same logger instance.
-   This means that logger instances never need to be passed between different parts
-   of an application.
+   Mọi lần gọi hàm này với cùng một tên đều trả về cùng một instance logger. Điều này có nghĩa là không cần truyền các instance logger giữa những phần khác nhau của ứng dụng.
 
 
 .. function:: getLoggerClass()
 
-   Return either the standard :class:`Logger` class, or the last class passed to
-   :func:`setLoggerClass`. This function may be called from within a new class
-   definition, to ensure that installing a customized :class:`Logger` class will
-   not undo customizations already applied by other code. For example::
+   Trả về class :class:`Logger` tiêu chuẩn hoặc class cuối cùng được truyền cho
+   :func:`setLoggerClass`. Có thể gọi hàm này bên trong định nghĩa một class mới để đảm bảo rằng việc cài đặt một class :class:`Logger` tùy chỉnh không hoàn tác các tùy chỉnh đã được mã khác áp dụng. Ví dụ::
 
       class MyLogger(logging.getLoggerClass()):
-          # ... override behaviour here
+          # ... ghi đè hành vi tại đây
 
 
 .. function:: getLogRecordFactory()
 
-   Return a callable which is used to create a :class:`LogRecord`.
+   Trả về một callable được dùng để tạo :class:`LogRecord`.
 
    .. versionadded:: 3.2
-      This function has been provided, along with :func:`setLogRecordFactory`,
-      to allow developers more control over how the :class:`LogRecord`
-      representing a logging event is constructed.
+      Hàm này được cung cấp cùng với :func:`setLogRecordFactory` để cho phép các developer kiểm soát tốt hơn cách xây dựng :class:`LogRecord` đại diện cho một sự kiện ghi log.
 
-   See :func:`setLogRecordFactory` for more information about the how the
-   factory is called.
+   Xem :func:`setLogRecordFactory` để biết thêm thông tin về cách factory được gọi.
 
 .. function:: debug(msg, *args, **kwargs)
 
-   This is a convenience function that calls :meth:`Logger.debug`, on the root
-   logger. The handling of the arguments is in every way identical
-   to what is described in that method.
+   Đây là một hàm tiện ích gọi :meth:`Logger.debug` trên root logger. Cách xử lý các đối số hoàn toàn giống với mô tả trong phương thức đó.
 
-   The only difference is that if the root logger has no handlers, then
-   :func:`basicConfig` is called, prior to calling ``debug`` on the root logger.
+   Điểm khác biệt duy nhất là nếu root logger không có handler nào thì
+   :func:`basicConfig` được gọi trước khi gọi ``debug`` trên root logger.
 
-   For very short scripts or quick demonstrations of ``logging`` facilities,
-   ``debug`` and the other module-level functions may be convenient. However,
-   most programs will want to carefully and explicitly control the logging
-   configuration, and should therefore prefer creating a module-level logger and
-   calling :meth:`Logger.debug` (or other level-specific methods) on it, as
-   described at the beginning of this documentation.
+   Đối với các script rất ngắn hoặc phần minh họa nhanh về các tiện ích của ``logging``, ``debug`` và các hàm cấp module khác có thể rất tiện lợi. Tuy nhiên, hầu hết chương trình sẽ muốn kiểm soát cấu hình logging một cách cẩn thận và tường minh, vì vậy nên ưu tiên tạo một logger cấp module và gọi :meth:`Logger.debug` (hoặc các phương thức dành riêng cho cấp độ khác) trên logger đó, như được mô tả ở phần đầu tài liệu này.
 
 
 .. function:: info(msg, *args, **kwargs)
 
-   Logs a message with level :const:`INFO` on the root logger. The arguments and behavior
-   are otherwise the same as for :func:`debug`.
+   Ghi một thông báo với cấp độ :const:`INFO` trên root logger. Các đối số và hành vi về những mặt khác giống như :func:`debug`.
 
 
 .. function:: warning(msg, *args, **kwargs)
 
-   Logs a message with level :const:`WARNING` on the root logger. The arguments and behavior
-   are otherwise the same as for :func:`debug`.
+   Ghi nhật ký một thông báo với cấp độ :const:`WARNING` trên root logger. Các đối số và hành vi về cơ bản giống với :func:`debug`.
 
-   .. note:: There is an obsolete function ``warn`` which is functionally
-      identical to ``warning``. As ``warn`` is deprecated, please do not use
-      it - use ``warning`` instead.
+   .. note:: Có một hàm lỗi thời ``warn`` có chức năng giống hệt ``warning``. Vì ``warn`` đã không còn được dùng, vui lòng không sử dụng nó - thay vào đó hãy dùng ``warning``.
 
 
 .. function:: error(msg, *args, **kwargs)
 
-   Logs a message with level :const:`ERROR` on the root logger. The arguments and behavior
-   are otherwise the same as for :func:`debug`.
+   Ghi nhật ký một thông báo với cấp độ :const:`ERROR` trên root logger. Các đối số và hành vi về cơ bản giống với :func:`debug`.
 
 
 .. function:: critical(msg, *args, **kwargs)
 
-   Logs a message with level :const:`CRITICAL` on the root logger. The arguments and behavior
-   are otherwise the same as for :func:`debug`.
+   Ghi nhật ký một thông báo với cấp độ :const:`CRITICAL` trên root logger. Các đối số và hành vi về cơ bản giống với :func:`debug`.
 
 
 .. function:: exception(msg, *args, **kwargs)
 
-   Logs a message with level :const:`ERROR` on the root logger. The arguments and behavior
-   are otherwise the same as for :func:`debug`. Exception info is added to the logging
-   message. This function should only be called from an exception handler.
+   Ghi nhật ký một thông báo với cấp độ :const:`ERROR` trên root logger. Các đối số và hành vi về cơ bản giống với :func:`debug`. Thông tin về ngoại lệ được thêm vào thông báo nhật ký. Chỉ nên gọi hàm này từ trình xử lý ngoại lệ.
 
 .. function:: log(level, msg, *args, **kwargs)
 
-   Logs a message with level *level* on the root logger. The arguments and behavior
-   are otherwise the same as for :func:`debug`.
+   Ghi nhật ký một thông báo với cấp độ *level* trên root logger. Các đối số và hành vi về cơ bản giống với :func:`debug`.
 
 .. function:: disable(level=CRITICAL)
 
-   Provides an overriding level *level* for all loggers which takes precedence over
-   the logger's own level. When the need arises to temporarily throttle logging
-   output down across the whole application, this function can be useful. Its
-   effect is to disable all logging calls of severity *level* and below, so that
-   if you call it with a value of INFO, then all INFO and DEBUG events would be
-   discarded, whereas those of severity WARNING and above would be processed
-   according to the logger's effective level. If
-   ``logging.disable(logging.NOTSET)`` is called, it effectively removes this
-   overriding level, so that logging output again depends on the effective
-   levels of individual loggers.
+   Cung cấp cấp độ ghi đè *level* cho tất cả logger, cấp độ này được ưu tiên hơn cấp độ riêng của logger. Khi cần tạm thời giảm lượng đầu ra nhật ký trên toàn bộ ứng dụng, hàm này có thể hữu ích. Tác dụng của nó là vô hiệu hóa tất cả các lệnh gọi ghi nhật ký có mức độ nghiêm trọng *level* trở xuống, vì vậy nếu gọi hàm này với giá trị INFO thì tất cả sự kiện INFO và DEBUG sẽ bị loại bỏ, trong khi các sự kiện có mức độ nghiêm trọng WARNING trở lên sẽ được xử lý theo cấp độ hiệu lực của logger. Nếu gọi ``logging.disable(logging.NOTSET)``, thao tác này thực tế sẽ xóa cấp độ ghi đè, để đầu ra nhật ký một lần nữa phụ thuộc vào các cấp độ hiệu lực của từng logger.
 
-   Note that if you have defined any custom logging level higher than
-   ``CRITICAL`` (this is not recommended), you won't be able to rely on the
-   default value for the *level* parameter, but will have to explicitly supply a
-   suitable value.
+   Lưu ý rằng nếu bạn đã định nghĩa bất kỳ cấp độ logging tùy chỉnh nào cao hơn ``CRITICAL`` (điều này không được khuyến nghị), bạn sẽ không thể dựa vào giá trị mặc định của tham số *level*, mà sẽ phải cung cấp rõ ràng một giá trị phù hợp.
 
    .. versionchanged:: 3.7
-      The *level* parameter was defaulted to level ``CRITICAL``. See
-      :issue:`28524` for more information about this change.
+      Tham số *level* được mặc định ở cấp độ ``CRITICAL``. Xem
+      :issue:`28524` để biết thêm thông tin về thay đổi này.
 
 .. function:: addLevelName(level, levelName)
 
-   Associates level *level* with text *levelName* in an internal dictionary, which is
-   used to map numeric levels to a textual representation, for example when a
-   :class:`Formatter` formats a message. This function can also be used to define
-   your own levels. The only constraints are that all levels used must be
-   registered using this function, levels should be positive integers and they
-   should increase in increasing order of severity.
+   Liên kết cấp độ *level* với văn bản *levelName* trong một từ điển nội bộ, được dùng để ánh xạ các cấp độ dạng số sang dạng biểu diễn văn bản, chẳng hạn khi một
+   :class:`Formatter` định dạng một thông báo. Hàm này cũng có thể được dùng để định nghĩa các cấp độ của riêng bạn. Điều kiện duy nhất là mọi cấp độ được sử dụng phải được đăng ký bằng hàm này, các cấp độ phải là số nguyên dương và phải tăng theo thứ tự mức độ nghiêm trọng tăng dần.
 
-   .. note:: If you are thinking of defining your own levels, please see the
-      section on :ref:`custom-levels`.
+   .. note:: Nếu bạn đang cân nhắc định nghĩa các cấp độ của riêng mình, hãy xem phần về :ref:`custom-levels`.
 
 .. function:: getLevelNamesMapping()
 
-   Returns a mapping from level names to their corresponding logging levels. For example, the
-   string "CRITICAL" maps to :const:`CRITICAL`. The returned mapping is copied from an internal
-   mapping on each call to this function.
+   Trả về một ánh xạ từ tên cấp độ đến các cấp độ logging tương ứng. Ví dụ, chuỗi "CRITICAL" ánh xạ đến :const:`CRITICAL`. Ánh xạ được trả về là bản sao của một ánh xạ nội bộ trong mỗi lần gọi hàm này.
 
    .. versionadded:: 3.11
 
 .. function:: getLevelName(level)
 
-   Returns the textual or numeric representation of logging level *level*.
+   Trả về biểu diễn dạng văn bản hoặc dạng số của mức độ ghi nhật ký *level*.
 
-   If *level* is one of the predefined levels :const:`CRITICAL`, :const:`ERROR`,
-   :const:`WARNING`, :const:`INFO` or :const:`DEBUG` then you get the
-   corresponding string. If you have associated levels with names using
-   :func:`addLevelName` then the name you have associated with *level* is
-   returned. If a numeric value corresponding to one of the defined levels is
-   passed in, the corresponding string representation is returned.
+   Nếu *level* là một trong các mức được định nghĩa sẵn :const:`CRITICAL`, :const:`ERROR`,
+   :const:`WARNING`, :const:`INFO` hoặc :const:`DEBUG` thì bạn nhận được chuỗi tương ứng. Nếu bạn đã liên kết các mức với tên bằng cách sử dụng
+   :func:`addLevelName` thì tên bạn đã liên kết với *level* sẽ được trả về. Nếu truyền vào một giá trị số tương ứng với một trong các mức đã định nghĩa, biểu diễn chuỗi tương ứng sẽ được trả về.
 
-   The *level* parameter also accepts a string representation of the level such
-   as 'INFO'. In such cases, this functions returns the corresponding numeric
-   value of the level.
+   Tham số *level* cũng chấp nhận biểu diễn dạng chuỗi của mức, chẳng hạn như 'INFO'. Trong những trường hợp đó, hàm này trả về giá trị số tương ứng của mức.
 
-   If no matching numeric or string value is passed in, the string
-   'Level %s' % level is returned.
+   Nếu không truyền vào giá trị số hoặc chuỗi nào khớp, chuỗi 'Level %s' % level sẽ được trả về.
 
-   .. note:: Levels are internally integers (as they need to be compared in the
-      logging logic). This function is used to convert between an integer level
-      and the level name displayed in the formatted log output by means of the
-      ``%(levelname)s`` format specifier (see :ref:`logrecord-attributes`), and
-      vice versa.
+   .. note:: Các mức nội bộ là số nguyên (vì chúng cần được so sánh trong logic ghi nhật ký). Hàm này được dùng để chuyển đổi giữa mức dạng số nguyên và tên mức được hiển thị trong đầu ra nhật ký đã định dạng thông qua bộ chỉ định định dạng ``%(levelname)s`` (xem :ref:`logrecord-attributes`), và ngược lại.
 
    .. versionchanged:: 3.4
-      In Python versions earlier than 3.4, this function could also be passed a
-      text level, and would return the corresponding numeric value of the level.
-      This undocumented behaviour was considered a mistake, and was removed in
-      Python 3.4, but reinstated in 3.4.2 due to retain backward compatibility.
+      Trong các phiên bản Python trước 3.4, hàm này cũng có thể nhận một cấp độ dạng văn bản và trả về giá trị số tương ứng của cấp độ đó. Hành vi không được ghi lại này được xem là một sai sót và đã bị loại bỏ trong Python 3.4, nhưng được khôi phục trong 3.4.2 để duy trì khả năng tương thích ngược.
 
 .. function:: getHandlerByName(name)
 
-   Returns a handler with the specified *name*, or ``None`` if there is no handler
-   with that name.
+   Trả về một handler có *name* được chỉ định, hoặc ``None`` nếu không có handler nào có tên đó.
 
    .. versionadded:: 3.12
 
 .. function:: getHandlerNames()
 
-   Returns an immutable set of all known handler names.
+   Trả về một tập hợp bất biến gồm tất cả tên handler đã biết.
 
    .. versionadded:: 3.12
 
 .. function:: makeLogRecord(attrdict)
 
-   Creates and returns a new :class:`LogRecord` instance whose attributes are
-   defined by *attrdict*. This function is useful for taking a pickled
-   :class:`LogRecord` attribute dictionary, sent over a socket, and reconstituting
-   it as a :class:`LogRecord` instance at the receiving end.
+   Tạo và trả về một instance :class:`LogRecord` mới với các thuộc tính được xác định bởi *attrdict*. Hàm này hữu ích để lấy một
+   :class:`LogRecord` dictionary thuộc tính, gửi qua socket, rồi tái tạo nó thành một instance :class:`LogRecord` ở đầu nhận.
 
 
 .. function:: basicConfig(**kwargs)
 
-   Does basic configuration for the logging system by creating a
-   :class:`StreamHandler` with a default :class:`Formatter` and adding it to the
-   root logger. The functions :func:`debug`, :func:`info`, :func:`warning`,
-   :func:`error` and :func:`critical` will call :func:`basicConfig` automatically
-   if no handlers are defined for the root logger.
+   Thực hiện cấu hình cơ bản cho hệ thống logging bằng cách tạo một
+   :class:`StreamHandler` với một :class:`Formatter` mặc định và thêm nó vào root logger. Các hàm :func:`debug`, :func:`info`, :func:`warning`,
+   :func:`error` và :func:`critical` sẽ tự động gọi :func:`basicConfig` nếu không có handler nào được định nghĩa cho root logger.
 
-   This function does nothing if the root logger already has handlers
-   configured, unless the keyword argument *force* is set to ``True``.
+   Hàm này không thực hiện thao tác nào nếu root logger đã được cấu hình handler, trừ khi đối số từ khóa *force* được đặt thành ``True``.
 
-   .. note:: This function should be called from the main thread
-      before other threads are started. In versions of Python prior to
-      2.7.1 and 3.2, if this function is called from multiple threads,
-      it is possible (in rare circumstances) that a handler will be added
-      to the root logger more than once, leading to unexpected results
-      such as messages being duplicated in the log.
+   .. note:: Hàm này nên được gọi từ main thread trước khi khởi động các thread khác. Trong các phiên bản Python trước 2.7.1 và 3.2, nếu hàm này được gọi từ nhiều thread, trong một số trường hợp hiếm gặp, một handler có thể được thêm vào root logger nhiều hơn một lần, dẫn đến các kết quả không mong muốn, chẳng hạn như thông báo bị lặp lại trong log.
 
-   The following keyword arguments are supported.
+   Các đối số từ khóa sau được hỗ trợ.
 
    .. tabularcolumns:: |l|L|
 
@@ -1439,133 +979,99 @@ functions.
    +--------------+---------------------------------------------+
 
    .. versionchanged:: 3.2
-      The *style* argument was added.
+      Đối số *style* đã được bổ sung.
 
    .. versionchanged:: 3.3
-      The *handlers* argument was added. Additional checks were added to
-      catch situations where incompatible arguments are specified (e.g.
-      *handlers* together with *stream* or *filename*, or *stream*
-      together with *filename*).
+      Đối số *handlers* đã được bổ sung. Các bước kiểm tra bổ sung cũng được thêm vào để phát hiện những trường hợp chỉ định các đối số không tương thích (ví dụ: *handlers* cùng với *stream* hoặc *filename*, hoặc *stream* cùng với *filename*).
 
    .. versionchanged:: 3.8
-      The *force* argument was added.
+      Đối số *force* đã được bổ sung.
 
    .. versionchanged:: 3.9
-      The *encoding* and *errors* arguments were added.
+      Các đối số *encoding* và *errors* đã được thêm vào.
 
 .. function:: shutdown()
 
-   Informs the logging system to perform an orderly shutdown by flushing and
-   closing all handlers. This should be called at application exit and no
-   further use of the logging system should be made after this call.
+   Thông báo cho hệ thống logging thực hiện việc tắt theo đúng thứ tự bằng cách flush và đóng tất cả handler. Hàm này nên được gọi khi ứng dụng thoát và không nên tiếp tục sử dụng hệ thống logging sau lần gọi này.
 
-   When the logging module is imported, it registers this function as an exit
-   handler (see :mod:`atexit`), so normally there's no need to do that
-   manually.
+   Khi module logging được import, module này đăng ký hàm này làm exit handler (xem :mod:`atexit`), vì vậy thông thường bạn không cần thực hiện việc đó theo cách thủ công.
 
 
 .. function:: setLoggerClass(klass)
 
-   Tells the logging system to use the class *klass* when instantiating a logger.
-   The class should define :meth:`!__init__` such that only a name argument is
-   required, and the :meth:`!__init__` should call :meth:`!Logger.__init__`. This
-   function is typically called before any loggers are instantiated by applications
-   which need to use custom logger behavior. After this call, as at any other
-   time, do not instantiate loggers directly using the subclass: continue to use
-   the :func:`logging.getLogger` API to get your loggers.
+   Cho hệ thống logging biết sử dụng lớp *klass* khi khởi tạo logger. Lớp này phải định nghĩa :meth:`!__init__` sao cho chỉ cần một đối số name, và :meth:`!__init__` phải gọi :meth:`!Logger.__init__`. Các ứng dụng cần hành vi logger tùy chỉnh thường gọi hàm này trước khi khởi tạo bất kỳ logger nào. Sau lần gọi này, cũng như ở mọi thời điểm khác, không khởi tạo logger trực tiếp bằng subclass; hãy tiếp tục sử dụng API :func:`logging.getLogger` để lấy logger.
 
 
 .. function:: setLogRecordFactory(factory)
 
-   Set a callable which is used to create a :class:`LogRecord`.
+   Đặt một callable được sử dụng để tạo :class:`LogRecord`.
 
-   :param factory: The factory callable to be used to instantiate a log record.
+   :param factory: Callable factory được sử dụng để khởi tạo một log record.
 
    .. versionadded:: 3.2
-      This function has been provided, along with :func:`getLogRecordFactory`, to
-      allow developers more control over how the :class:`LogRecord` representing
-      a logging event is constructed.
+      Hàm này được cung cấp cùng với :func:`getLogRecordFactory` để cho phép các developer kiểm soát nhiều hơn cách :class:`LogRecord` đại diện cho một sự kiện logging được tạo ra.
 
-   The factory has the following signature:
+   Factory có chữ ký sau:
 
    ``factory(name, level, fn, lno, msg, args, exc_info, func=None, sinfo=None, **kwargs)``
 
-      :name: The logger name.
-      :level: The logging level (numeric).
-      :fn: The full pathname of the file where the logging call was made.
-      :lno: The line number in the file where the logging call was made.
-      :msg: The logging message.
-      :args: The arguments for the logging message.
-      :exc_info: An exception tuple, or ``None``.
-      :func: The name of the function or method which invoked the logging
-             call.
-      :sinfo: A stack traceback such as is provided by
-              :func:`traceback.print_stack`, showing the call hierarchy.
-      :kwargs: Additional keyword arguments.
+      :name: Tên logger.
+      :level: Mức logging (dạng số).
+      :fn: Đường dẫn đầy đủ của tệp nơi lệnh gọi logging được thực hiện.
+      :lno: Số dòng trong tệp nơi lệnh gọi logging được thực hiện.
+      :msg: Thông báo logging.
+      :args: Các đối số của thông báo logging.
+      :exc_info: Một exception tuple, hoặc ``None``.
+      :func: Tên của function hoặc method đã gọi logging call.
+      :sinfo: Một stack traceback như được cung cấp bởi
+              :func:`traceback.print_stack`, hiển thị hệ thống phân cấp lệnh gọi.
+      :kwargs: Các đối số từ khóa bổ sung.
 
 
-Module-Level Attributes
------------------------
+Các thuộc tính cấp module
+-------------------------
 
 .. data:: lastResort
 
-   A "handler of last resort" is available through this attribute. This
-   is a :class:`StreamHandler` writing to ``sys.stderr`` with a level of
-   ``WARNING``, and is used to handle logging events in the absence of any
-   logging configuration. The end result is to just print the message to
-   ``sys.stderr``. This replaces the earlier error message saying that
-   "no handlers could be found for logger XYZ". If you need the earlier
-   behaviour for some reason, ``lastResort`` can be set to ``None``.
+   Một "handler of last resort" được cung cấp thông qua thuộc tính này. Đây là một :class:`StreamHandler` ghi vào ``sys.stderr`` với level là ``WARNING``, và được dùng để xử lý các sự kiện logging khi không có cấu hình logging nào. Kết quả cuối cùng chỉ đơn giản là in thông báo vào ``sys.stderr``. Điều này thay thế thông báo lỗi trước đây cho biết rằng "no handlers could be found for logger XYZ". Nếu vì lý do nào đó bạn cần hành vi trước đây, ``lastResort`` có thể được đặt thành ``None``.
 
    .. versionadded:: 3.2
 
 .. data:: raiseExceptions
 
-   Used to see if exceptions during handling should be propagated.
+   Dùng để xác định liệu các ngoại lệ phát sinh trong quá trình xử lý có nên được truyền tiếp hay không.
 
-   Default: ``True``.
+   Mặc định: ``True``.
 
-   If :data:`raiseExceptions` is ``False``,
-   exceptions get silently ignored. This is what is mostly wanted
-   for a logging system - most users will not care about errors in
-   the logging system, they are more interested in application errors.
+   Nếu :data:`raiseExceptions` là ``False``, các ngoại lệ sẽ bị bỏ qua một cách im lặng. Đây thường là điều mong muốn đối với một hệ thống logging - hầu hết người dùng sẽ không quan tâm đến các lỗi trong hệ thống logging mà quan tâm nhiều hơn đến các lỗi của ứng dụng.
 
 
-Integration with the warnings module
-------------------------------------
+Tích hợp với mô-đun warnings
+----------------------------
 
-The :func:`captureWarnings` function can be used to integrate :mod:`!logging`
-with the :mod:`warnings` module.
+Hàm :func:`captureWarnings` có thể được dùng để tích hợp :mod:`!logging` với mô-đun :mod:`warnings`.
 
 .. function:: captureWarnings(capture)
 
-   This function is used to turn the capture of warnings by logging on and
-   off.
+   Hàm này được dùng để bật và tắt việc ghi log các cảnh báo.
 
-   If *capture* is ``True``, warnings issued by the :mod:`warnings` module will
-   be redirected to the logging system. Specifically, a warning will be
-   formatted using :func:`warnings.formatwarning` and the resulting string
-   logged to a logger named ``'py.warnings'`` with a severity of :const:`WARNING`.
+   Nếu *capture* là ``True``, các cảnh báo do mô-đun :mod:`warnings` phát hành sẽ được chuyển hướng đến hệ thống logging. Cụ thể, một cảnh báo sẽ được định dạng bằng :func:`warnings.formatwarning` và chuỗi kết quả sẽ được ghi vào một logger có tên ``'py.warnings'`` với mức độ nghiêm trọng :const:`WARNING`.
 
-   If *capture* is ``False``, the redirection of warnings to the logging system
-   will stop, and warnings will be redirected to their original destinations
-   (i.e. those in effect before ``captureWarnings(True)`` was called).
+   Nếu *capture* là ``False``, việc chuyển hướng cảnh báo đến hệ thống ghi nhật ký sẽ dừng lại và các cảnh báo sẽ được chuyển hướng đến đích ban đầu của chúng (tức là những đích đang có hiệu lực trước khi gọi ``captureWarnings(True)``).
 
 
 .. seealso::
 
-   Module :mod:`logging.config`
-      Configuration API for the logging module.
+   Mô-đun :mod:`logging.config`
+      API cấu hình cho mô-đun ghi nhật ký.
 
-   Module :mod:`logging.handlers`
-      Useful handlers included with the logging module.
+   Mô-đun :mod:`logging.handlers`
+      Các handler hữu ích đi kèm với mô-đun ghi nhật ký.
 
-   :pep:`282` - A Logging System
-      The proposal which described this feature for inclusion in the Python standard
-      library.
+   :pep:`282` - Một hệ thống ghi nhật ký
+      Đề xuất mô tả tính năng này để đưa vào thư viện chuẩn Python.
 
-   `Original Python logging package <https://old.red-dove.com/python_logging.html>`_
-      This is the original source for the :mod:`!logging` package.  The version of the
-      package available from this site is suitable for use with Python 1.5.2, 2.1.x
-      and 2.2.x, which do not include the :mod:`!logging` package in the standard
-      library.
+   `Gói logging Python nguyên bản <https://old.red-dove.com/python_logging.html>`_
+      Đây là mã nguồn ban đầu của gói :mod:`!logging`. Phiên bản của gói có trên trang này phù hợp để sử dụng với Python 1.5.2, 2.1.x và 2.2.x, những phiên bản không bao gồm gói :mod:`!logging` trong thư viện chuẩn.
+
+.. _`Original Python logging package`: https://old.red-dove.com/python_logging.html

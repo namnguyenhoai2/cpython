@@ -1,24 +1,18 @@
-:mod:`!html` --- HyperText Markup Language support
-==================================================
+:mod:`!html` --- Hỗ trợ HyperText Markup Language
+=================================================
 
 .. module:: html
-   :synopsis: Helpers for manipulating HTML.
+   :synopsis: Các hàm hỗ trợ để thao tác với HTML.
 
-**Source code:** :source:`Lib/html/__init__.py`
+**Mã nguồn:** :source:`Lib/html/__init__.py`
 
 --------------
 
-This module defines utilities to manipulate HTML.
+Mô-đun này định nghĩa các tiện ích để thao tác với HTML.
 
 .. function:: escape(s, quote=True)
 
-   Convert the characters ``&``, ``<`` and ``>`` in string *s* to HTML-safe
-   sequences.  Use this if you need to display text that might contain such
-   characters in HTML.  If the optional flag *quote* is true (the default), the
-   characters (``"``) and (``'``) are also translated; this helps for inclusion
-   in an HTML attribute value delimited by quotes, as in ``<a href="...">``.
-   If *quote* is set to false, the characters (``"``) and (``'``) are not
-   translated.
+   Chuyển đổi các ký tự ``&``, ``<`` và ``>`` trong chuỗi *s* thành các chuỗi an toàn cho HTML. Sử dụng hàm này nếu bạn cần hiển thị văn bản có thể chứa những ký tự đó trong HTML. Nếu cờ tùy chọn *quote* là true (mặc định), các ký tự (``"``) và (``'``) cũng được chuyển đổi; điều này hữu ích khi đưa vào giá trị thuộc tính HTML được bao quanh bằng dấu ngoặc kép, như trong ``<a href="...">``. Nếu *quote* được đặt thành false, các ký tự (``"``) và (``'``) sẽ không được chuyển đổi.
 
 
    .. versionadded:: 3.2
@@ -26,17 +20,13 @@ This module defines utilities to manipulate HTML.
 
 .. function:: unescape(s)
 
-   Convert all named and numeric character references (e.g. ``&gt;``,
-   ``&#62;``, ``&#x3e;``) in the string *s* to the corresponding Unicode
-   characters.  This function uses the rules defined by the HTML 5 standard
-   for both valid and invalid character references, and the :data:`list of
-   HTML 5 named character references <html.entities.html5>`.
+   Chuyển đổi tất cả các tham chiếu ký tự có tên và dạng số (ví dụ: ``&gt;``, ``&#62;``, ``&#x3e;``) trong chuỗi *s* thành các ký tự Unicode tương ứng. Hàm này sử dụng các quy tắc được định nghĩa trong tiêu chuẩn HTML 5 cho cả các tham chiếu ký tự hợp lệ và không hợp lệ, cùng với :data:`list of HTML 5 named character references <html.entities.html5>`.
 
    .. versionadded:: 3.4
 
 --------------
 
-Submodules in the ``html`` package are:
+Các mô-đun con trong gói ``html`` là:
 
-* :mod:`html.parser` -- HTML/XHTML parser with lenient parsing mode
-* :mod:`html.entities` -- HTML entity definitions
+* :mod:`html.parser` -- trình phân tích cú pháp HTML/XHTML với chế độ phân tích cú pháp linh hoạt
+* :mod:`html.entities` -- các định nghĩa thực thể HTML

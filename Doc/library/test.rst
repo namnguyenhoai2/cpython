@@ -1,65 +1,47 @@
-:mod:`!test` --- Regression tests package for Python
-====================================================
+:mod:`!test` --- Gói kiểm thử hồi quy cho Python
+================================================
 
 .. module:: test
-   :synopsis: Regression tests package containing the testing suite for Python.
+   :synopsis: Gói kiểm thử hồi quy chứa bộ kiểm thử cho Python.
 
 .. sectionauthor:: Brett Cannon <brett@python.org>
 
 .. note::
-   The :mod:`!test` package is meant for internal use by Python only. It is
-   documented for the benefit of the core developers of Python. Any use of
-   this package outside of Python's standard library is discouraged as code
-   mentioned here can change or be removed without notice between releases of
-   Python.
+   Gói :mod:`!test` chỉ dành cho Python sử dụng nội bộ. Gói này được lập tài liệu nhằm phục vụ các nhà phát triển cốt lõi của Python. Không khuyến khích sử dụng gói này bên ngoài thư viện chuẩn của Python, vì mã được đề cập ở đây có thể thay đổi hoặc bị xóa mà không thông báo giữa các bản phát hành Python.
 
 --------------
 
-The :mod:`!test` package contains all regression tests for Python as well as the
-modules :mod:`test.support` and :mod:`test.regrtest`.
-:mod:`test.support` is used to enhance your tests while
-:mod:`test.regrtest` drives the testing suite.
+Gói :mod:`!test` chứa tất cả các kiểm thử hồi quy cho Python, cũng như các module :mod:`test.support` và :mod:`test.regrtest`.
+:mod:`test.support` được dùng để nâng cao các kiểm thử của bạn trong khi
+:mod:`test.regrtest` điều khiển bộ kiểm thử.
 
-Each module in the :mod:`!test` package whose name starts with ``test_`` is a
-testing suite for a specific module or feature. All new tests should be written
-using the :mod:`unittest` or :mod:`doctest` module.  Some older tests are
-written using a "traditional" testing style that compares output printed to
-``sys.stdout``; this style of test is considered deprecated.
+Mỗi module trong gói :mod:`!test` có tên bắt đầu bằng ``test_`` là một bộ kiểm thử dành cho một module hoặc tính năng cụ thể. Tất cả kiểm thử mới nên được viết bằng module :mod:`unittest` hoặc :mod:`doctest`. Một số kiểm thử cũ được viết theo kiểu kiểm thử "truyền thống", trong đó so sánh đầu ra được in ra ``sys.stdout``; kiểu kiểm thử này được xem là đã lỗi thời.
 
 
 .. seealso::
 
-   Module :mod:`unittest`
-      Writing PyUnit regression tests.
+   Mô-đun :mod:`unittest`
+      Viết các bài kiểm thử hồi quy PyUnit.
 
-   Module :mod:`doctest`
-      Tests embedded in documentation strings.
+   Mô-đun :mod:`doctest`
+      Các bài kiểm thử được nhúng trong chuỗi tài liệu.
 
 
 .. _writing-tests:
 
-Writing Unit Tests for the :mod:`!test` package
------------------------------------------------
+Viết các bài kiểm thử đơn vị cho gói :mod:`!test`
+-------------------------------------------------
 
-It is preferred that tests that use the :mod:`unittest` module follow a few
-guidelines. One is to name the test module by starting it with ``test_`` and end
-it with the name of the module being tested. The test methods in the test module
-should start with ``test_`` and end with a description of what the method is
-testing. This is needed so that the methods are recognized by the test driver as
-test methods. Also, no documentation string for the method should be included. A
-comment (such as ``# Tests function returns only True or False``) should be used
-to provide documentation for test methods. This is done because documentation
-strings get printed out if they exist and thus what test is being run is not
-stated.
+Các bài kiểm thử sử dụng mô-đun :mod:`unittest` nên tuân theo một số hướng dẫn. Một trong số đó là đặt tên mô-đun kiểm thử bằng cách bắt đầu tên với ``test_`` và kết thúc bằng tên của mô-đun đang được kiểm thử. Các phương thức kiểm thử trong mô-đun kiểm thử nên bắt đầu với ``test_`` và kết thúc bằng phần mô tả nội dung mà phương thức đang kiểm thử. Điều này cần thiết để trình điều khiển kiểm thử nhận diện các phương thức đó là phương thức kiểm thử. Ngoài ra, không nên đưa chuỗi tài liệu vào phương thức. Nên sử dụng một chú thích (chẳng hạn như ``# Tests function returns only True or False``) để cung cấp tài liệu cho các phương thức kiểm thử. Lý do là nếu tồn tại, các chuỗi tài liệu sẽ được in ra, và do đó không cho biết bài kiểm thử nào đang được chạy.
 
-A basic boilerplate is often used::
+Thường sử dụng một phần khung mã cơ bản::
 
    import unittest
    from test import support
 
    class MyTestCase1(unittest.TestCase):
 
-       # Only use setUp() and tearDown() if necessary
+       # Chỉ sử dụng setUp() và tearDown() khi cần thiết
 
        def setUp(self):
            ... code to execute in preparation for tests ...
@@ -68,11 +50,11 @@ A basic boilerplate is often used::
            ... code to execute to clean up after tests ...
 
        def test_feature_one(self):
-           # Test feature one.
+           # Kiểm thử tính năng một.
            ... testing code ...
 
        def test_feature_two(self):
-           # Test feature two.
+           # Kiểm thử tính năng hai.
            ... testing code ...
 
        ... more test methods ...
@@ -85,46 +67,27 @@ A basic boilerplate is often used::
    if __name__ == '__main__':
        unittest.main()
 
-This code pattern allows the testing suite to be run by :mod:`test.regrtest`,
-on its own as a script that supports the :mod:`unittest` CLI, or via the
-``python -m unittest`` CLI.
+Mẫu mã này cho phép chạy bộ kiểm thử bằng :mod:`test.regrtest`, độc lập dưới dạng một script hỗ trợ CLI :mod:`unittest`, hoặc thông qua CLI ``python -m unittest``.
 
-The goal for regression testing is to try to break code. This leads to a few
-guidelines to be followed:
+Mục tiêu của kiểm thử hồi quy là cố gắng làm hỏng mã. Điều này dẫn đến một số hướng dẫn cần tuân theo:
 
-* The testing suite should exercise all classes, functions, and constants. This
-  includes not just the external API that is to be presented to the outside
-  world but also "private" code.
+* Bộ kiểm thử cần kiểm tra tất cả các class, function và constant. Điều này không chỉ bao gồm API bên ngoài được cung cấp cho thế giới bên ngoài mà còn cả mã "private".
 
-* Whitebox testing (examining the code being tested when the tests are being
-  written) is preferred. Blackbox testing (testing only the published user
-  interface) is not complete enough to make sure all boundary and edge cases
-  are tested.
+* Nên ưu tiên kiểm thử hộp trắng (kiểm tra mã đang được kiểm thử khi viết các bài kiểm thử). Kiểm thử hộp đen (chỉ kiểm thử giao diện người dùng đã công bố) chưa đủ để đảm bảo tất cả các trường hợp biên và trường hợp đặc biệt đều được kiểm thử.
 
-* Make sure all possible values are tested including invalid ones. This makes
-  sure that not only all valid values are acceptable but also that improper
-  values are handled correctly.
+* Đảm bảo kiểm thử tất cả các giá trị có thể có, bao gồm cả các giá trị không hợp lệ. Điều này đảm bảo không chỉ mọi giá trị hợp lệ đều được chấp nhận mà các giá trị không phù hợp cũng được xử lý đúng cách.
 
-* Exhaust as many code paths as possible. Test where branching occurs and thus
-  tailor input to make sure as many different paths through the code are taken.
+* Bao phủ càng nhiều đường dẫn mã càng tốt. Hãy kiểm thử tại những nơi xảy ra rẽ nhánh và điều chỉnh dữ liệu đầu vào để đảm bảo mã đi qua càng nhiều đường dẫn khác nhau càng tốt.
 
-* Add an explicit test for any bugs discovered for the tested code. This will
-  make sure that the error does not crop up again if the code is changed in the
-  future.
+* Thêm một kiểm thử rõ ràng cho mọi lỗi được phát hiện trong mã đang kiểm thử. Điều này đảm bảo lỗi đó không xuất hiện trở lại nếu mã được thay đổi trong tương lai.
 
-* Make sure to clean up after your tests (such as close and remove all temporary
-  files).
+* Đảm bảo dọn dẹp sau khi kiểm thử (chẳng hạn như đóng và xóa tất cả các tệp tạm thời).
 
-* If a test is dependent on a specific condition of the operating system then
-  verify the condition already exists before attempting the test.
+* Nếu một kiểm thử phụ thuộc vào một điều kiện cụ thể của hệ điều hành, hãy xác minh rằng điều kiện đó đã tồn tại trước khi thực hiện kiểm thử.
 
-* Import as few modules as possible and do it as soon as possible. This
-  minimizes external dependencies of tests and also minimizes possible anomalous
-  behavior from side-effects of importing a module.
+* Nhập càng ít module càng tốt và thực hiện việc đó càng sớm càng tốt. Điều này giảm thiểu các dependency bên ngoài của kiểm thử, đồng thời giảm thiểu hành vi bất thường có thể xảy ra do các tác dụng phụ khi nhập một module.
 
-* Try to maximize code reuse. On occasion, tests will vary by something as small
-  as what type of input is used. Minimize code duplication by subclassing a
-  basic test class with a class that specifies the input::
+* Cố gắng tối đa hóa việc tái sử dụng mã. Đôi khi, các kiểm thử chỉ khác nhau ở một yếu tố nhỏ, chẳng hạn như kiểu dữ liệu đầu vào được sử dụng. Giảm thiểu việc trùng lặp mã bằng cách tạo lớp con từ một lớp kiểm thử cơ bản, trong đó lớp mới chỉ định dữ liệu đầu vào::
 
      class TestFuncAcceptsSequencesMixin:
 
@@ -142,318 +105,266 @@ guidelines to be followed:
      class AcceptTuples(TestFuncAcceptsSequencesMixin, unittest.TestCase):
          arg = (1, 2, 3)
 
-  When using this pattern, remember that all classes that inherit from
-  :class:`unittest.TestCase` are run as tests.  The :class:`!TestFuncAcceptsSequencesMixin` class in the example above
-  does not have any data and so can't be run by itself, thus it does not
-  inherit from :class:`unittest.TestCase`.
+  Khi sử dụng mẫu này, hãy nhớ rằng mọi lớp kế thừa từ
+  :class:`unittest.TestCase` đều được chạy dưới dạng các bài kiểm thử. Lớp :class:`!TestFuncAcceptsSequencesMixin` trong ví dụ trên không có dữ liệu nên không thể tự chạy, do đó lớp này không kế thừa từ :class:`unittest.TestCase`.
 
 
 .. seealso::
 
-   Test Driven Development
-      A book by Kent Beck on writing tests before code.
+   Phát triển hướng kiểm thử
+      Một cuốn sách của Kent Beck về việc viết test trước code.
 
 
 .. _regrtest:
 
-Running tests using the command-line interface
-----------------------------------------------
+Chạy test bằng giao diện dòng lệnh
+----------------------------------
 
 .. module:: test.regrtest
-   :synopsis: Drives the regression test suite.
+   :synopsis: Điều khiển bộ kiểm thử hồi quy.
 
-The :mod:`!test` package can be run as a script to drive Python's regression
-test suite, thanks to the :option:`-m` option: :program:`python -m test`. Under
-the hood, it uses :mod:`!test.regrtest`; the call :program:`python -m
-test.regrtest` used in previous Python versions still works.  Running the
-script by itself automatically starts running all regression tests in the
-:mod:`!test` package. It does this by finding all modules in the package whose
-name starts with ``test_``, importing them, and executing the function
-:func:`test_main` if present or loading the tests via
-unittest.TestLoader.loadTestsFromModule if ``test_main`` does not exist.  The
-names of tests to execute may also be passed to the script. Specifying a single
-regression test (:program:`python -m test test_spam`) will minimize output and
-only print whether the test passed or failed.
+Gói :mod:`!test` có thể được chạy dưới dạng script để điều khiển bộ kiểm thử hồi quy của Python, nhờ tùy chọn :option:`-m`: :program:`python -m test`. Bên dưới, gói này sử dụng :mod:`!test.regrtest`; lời gọi :program:`python -m test.regrtest` được dùng trong các phiên bản Python trước đây vẫn hoạt động. Khi tự chạy script, tất cả các bài kiểm thử hồi quy trong
+gói :mod:`!test`. Gói này thực hiện việc đó bằng cách tìm tất cả các module trong gói có tên bắt đầu bằng ``test_``, import chúng và thực thi hàm
+:func:`test_main` nếu có, hoặc tải các bài kiểm thử bằng unittest.TestLoader.loadTestsFromModule nếu ``test_main`` không tồn tại. Tên của các bài kiểm thử cần thực thi cũng có thể được truyền vào script. Việc chỉ định một bài kiểm thử hồi quy duy nhất (:program:`python -m test test_spam`) sẽ giảm lượng đầu ra và chỉ in cho biết bài kiểm thử đã đạt hay thất bại.
 
-Running :mod:`!test` directly allows what resources are available for
-tests to use to be set. You do this by using the ``-u`` command-line
-option. Specifying ``all`` as the value for the ``-u`` option enables all
-possible resources: :program:`python -m test -uall`.
-If all but one resource is desired (a more common case), a
-comma-separated list of resources that are not desired may be listed after
-``all``. The command :program:`python -m test -uall,-audio,-largefile`
-will run :mod:`!test` with all resources except the ``audio`` and
-``largefile`` resources. For a list of all resources and more command-line
-options, run :program:`python -m test -h`.
+Việc chạy :mod:`!test` trực tiếp cho phép thiết lập những tài nguyên nào có thể được các bài kiểm thử sử dụng. Bạn thực hiện việc này bằng tùy chọn dòng lệnh ``-u``. Chỉ định ``all`` làm giá trị cho tùy chọn ``-u`` sẽ bật tất cả tài nguyên có thể có: :program:`python -m test -uall`. Nếu muốn sử dụng tất cả trừ một tài nguyên (trường hợp phổ biến hơn), bạn có thể liệt kê các tài nguyên không mong muốn sau ``all``, phân tách bằng dấu phẩy. Lệnh :program:`python -m test -uall,-audio,-largefile` sẽ chạy :mod:`!test` với tất cả tài nguyên ngoại trừ tài nguyên ``audio`` và ``largefile``. Để xem danh sách tất cả tài nguyên và các tùy chọn dòng lệnh khác, hãy chạy :program:`python -m test -h`.
 
-Some other ways to execute the regression tests depend on what platform the
-tests are being executed on. On Unix, you can run :program:`make test` at the
-top-level directory where Python was built. On Windows,
-executing :program:`rt.bat` from your :file:`PCbuild` directory will run all
-regression tests.
+Một số cách khác để thực thi các bài kiểm thử hồi quy phụ thuộc vào nền tảng mà các bài kiểm thử được thực thi. Trên Unix, bạn có thể chạy :program:`make test` trong thư mục cấp cao nhất nơi Python được build. Trên Windows, việc thực thi :program:`rt.bat` từ thư mục :file:`PCbuild` của bạn sẽ chạy tất cả các bài kiểm thử hồi quy.
 
 .. versionadded:: 3.14
-   Output is colorized by default and can be
-   :ref:`controlled using environment variables <using-on-controlling-color>`.
+   Theo mặc định, đầu ra được tô màu và có thể
+   :ref:`được kiểm soát bằng các biến môi trường <using-on-controlling-color>`.
 
 
-:mod:`!test.support` --- Utilities for the Python test suite
+:mod:`!test.support` --- Các tiện ích cho bộ kiểm thử Python
 ============================================================
 
 .. module:: test.support
-   :synopsis: Support for Python's regression test suite.
+   :synopsis: Hỗ trợ cho bộ kiểm thử hồi quy của Python.
 
 
-The :mod:`!test.support` module provides support for Python's regression
-test suite.
+Mô-đun :mod:`!test.support` cung cấp hỗ trợ cho bộ kiểm thử hồi quy của Python.
 
 .. note::
 
-   :mod:`!test.support` is not a public module.  It is documented here to help
-   Python developers write tests.  The API of this module is subject to change
-   without backwards compatibility concerns between releases.
+   :mod:`!test.support` không phải là mô-đun công khai. Mô-đun này được ghi lại ở đây để giúp các nhà phát triển Python viết các bài kiểm thử. API của mô-đun này có thể thay đổi giữa các bản phát hành mà không đảm bảo khả năng tương thích ngược.
 
 
-This module defines the following exceptions:
+Mô-đun này định nghĩa các ngoại lệ sau:
 
 .. exception:: TestFailed
 
-   Exception to be raised when a test fails. This is deprecated in favor of
-   :mod:`unittest`\ -based tests and :class:`unittest.TestCase`'s assertion
-   methods.
+   Ngoại lệ được phát sinh khi một bài kiểm thử thất bại. Ngoại lệ này không còn được khuyến nghị sử dụng, thay vào đó hãy dùng
+   Các bài kiểm thử dựa trên :mod:`unittest`\  và các phương thức assertion của :class:`unittest.TestCase`.
 
 
 .. exception:: ResourceDenied
 
-   Subclass of :exc:`unittest.SkipTest`. Raised when a resource (such as a
-   network connection) is not available. Raised by the :func:`requires`
-   function.
+   Lớp con của :exc:`unittest.SkipTest`. Được phát sinh khi một tài nguyên (chẳng hạn như kết nối mạng) không khả dụng. Được phát sinh bởi hàm :func:`requires`.
 
 
-The :mod:`!test.support` module defines the following constants:
+Mô-đun :mod:`!test.support` định nghĩa các hằng số sau:
 
 .. data:: verbose
 
-   ``True`` when verbose output is enabled. Should be checked when more
-   detailed information is desired about a running test. *verbose* is set by
+   ``True`` khi đầu ra chi tiết được bật. Nên kiểm tra giá trị này khi cần thông tin chi tiết hơn về một kiểm thử đang chạy. *verbose* được thiết lập bởi
    :mod:`test.regrtest`.
 
 
 .. data:: is_jython
 
-   ``True`` if the running interpreter is Jython.
+   ``True`` nếu trình thông dịch đang chạy là Jython.
 
 
 .. data:: is_android
 
-   ``True`` if ``sys.platform`` is ``android``.
+   ``True`` nếu ``sys.platform`` là ``android``.
 
 
 .. data:: is_emscripten
 
-   ``True`` if ``sys.platform`` is ``emscripten``.
+   ``True`` nếu ``sys.platform`` là ``emscripten``.
 
 
 .. data:: is_wasi
 
-   ``True`` if ``sys.platform`` is ``wasi``.
+   ``True`` nếu ``sys.platform`` là ``wasi``.
 
 
 .. data:: is_apple_mobile
 
-   ``True`` if ``sys.platform`` is ``ios``, ``tvos``, or ``watchos``.
+   ``True`` nếu ``sys.platform`` là ``ios``, ``tvos`` hoặc ``watchos``.
 
 
 .. data:: is_apple
 
-   ``True`` if ``sys.platform`` is ``darwin`` or ``is_apple_mobile`` is ``True``.
+   ``True`` nếu ``sys.platform`` là ``darwin`` hoặc ``is_apple_mobile`` là ``True``.
 
 
 .. data:: unix_shell
 
-   Path for shell if not on Windows; otherwise ``None``.
+   Đường dẫn cho shell nếu không chạy trên Windows; nếu không thì ``None``.
 
 
 .. data:: LOOPBACK_TIMEOUT
 
-   Timeout in seconds for tests using a network server listening on the network
-   local loopback interface like ``127.0.0.1``.
+   Thời gian chờ tính bằng giây cho các bài kiểm thử sử dụng máy chủ mạng lắng nghe trên giao diện loopback cục bộ của mạng, chẳng hạn như ``127.0.0.1``.
 
-   The timeout is long enough to prevent test failure: it takes into account
-   that the client and the server can run in different threads or even
-   different processes.
+   Thời gian chờ đủ dài để ngăn bài kiểm thử thất bại: thời gian này tính đến khả năng client và máy chủ chạy trong các thread khác nhau hoặc thậm chí trong các process khác nhau.
 
-   The timeout should be long enough for :meth:`~socket.socket.connect`,
-   :meth:`~socket.socket.recv` and :meth:`~socket.socket.send` methods of
+   Thời gian chờ phải đủ dài cho :meth:`~socket.socket.connect`,
+   các phương thức :meth:`~socket.socket.recv` và :meth:`~socket.socket.send` của
    :class:`socket.socket`.
 
-   Its default value is 10 seconds.
+   Giá trị mặc định của nó là 10 giây.
 
-   See also :data:`INTERNET_TIMEOUT`.
+   Xem thêm :data:`INTERNET_TIMEOUT`.
 
 
 .. data:: INTERNET_TIMEOUT
 
-   Timeout in seconds for network requests going to the internet.
+   Thời gian chờ tính bằng giây cho các yêu cầu mạng đi đến internet.
 
-   The timeout is short enough to prevent a test to wait for too long if the
-   internet request is blocked for whatever reason.
+   Thời gian chờ đủ ngắn để ngăn một kiểm thử phải chờ quá lâu nếu yêu cầu internet bị chặn vì bất kỳ lý do nào.
 
-   Usually, a timeout using :data:`INTERNET_TIMEOUT` should not mark a test as
-   failed, but skip the test instead: see
+   Thông thường, thời gian chờ sử dụng :data:`INTERNET_TIMEOUT` không nên đánh dấu kiểm thử là thất bại mà nên bỏ qua kiểm thử đó: xem
    :func:`~test.support.socket_helper.transient_internet`.
 
-   Its default value is 1 minute.
+   Giá trị mặc định của nó là 1 phút.
 
-   See also :data:`LOOPBACK_TIMEOUT`.
+   Xem thêm :data:`LOOPBACK_TIMEOUT`.
 
 
 .. data:: SHORT_TIMEOUT
 
-   Timeout in seconds to mark a test as failed if the test takes "too long".
+   Thời gian chờ tính bằng giây để đánh dấu kiểm thử là thất bại nếu kiểm thử chạy "quá lâu".
 
-   The timeout value depends on the regrtest ``--timeout`` command line option.
+   Giá trị timeout phụ thuộc vào tùy chọn dòng lệnh ``--timeout`` của regrtest.
 
-   If a test using :data:`SHORT_TIMEOUT` starts to fail randomly on slow
-   buildbots, use :data:`LONG_TIMEOUT` instead.
+   Nếu một test sử dụng :data:`SHORT_TIMEOUT` bắt đầu bị lỗi ngẫu nhiên trên các buildbot chậm, hãy sử dụng :data:`LONG_TIMEOUT` thay thế.
 
-   Its default value is 30 seconds.
+   Giá trị mặc định là 30 giây.
 
 
 .. data:: LONG_TIMEOUT
 
-   Timeout in seconds to detect when a test hangs.
+   Thời gian timeout tính bằng giây để phát hiện khi một test bị treo.
 
-   It is long enough to reduce the risk of test failure on the slowest Python
-   buildbots. It should not be used to mark a test as failed if the test takes
-   "too long".  The timeout value depends on the regrtest ``--timeout`` command
-   line option.
+   Giá trị này đủ dài để giảm nguy cơ test bị lỗi trên các buildbot Python chậm nhất. Không nên sử dụng nó để đánh dấu test là bị lỗi nếu test mất "quá nhiều thời gian". Giá trị timeout phụ thuộc vào tùy chọn dòng lệnh ``--timeout`` của regrtest.
 
-   Its default value is 5 minutes.
+   Giá trị mặc định là 5 phút.
 
-   See also :data:`LOOPBACK_TIMEOUT`, :data:`INTERNET_TIMEOUT` and
+   Xem thêm :data:`LOOPBACK_TIMEOUT`, :data:`INTERNET_TIMEOUT` và
    :data:`SHORT_TIMEOUT`.
 
 
 .. data:: PGO
 
-   Set when tests can be skipped when they are not useful for PGO.
+   Được thiết lập khi có thể bỏ qua các bài kiểm thử vì chúng không hữu ích cho PGO.
 
 
 .. data:: PIPE_MAX_SIZE
 
-   A constant that is likely larger than the underlying OS pipe buffer size,
-   to make writes blocking.
+   Một hằng số có khả năng lớn hơn kích thước bộ đệm pipe của hệ điều hành bên dưới, nhằm khiến việc ghi bị chặn.
 
 
 .. data:: Py_DEBUG
 
-   ``True`` if Python was built with the :c:macro:`Py_DEBUG` macro
-   defined, that is, if
-   Python was :ref:`built in debug mode <debug-build>`.
+   ``True`` nếu Python được xây dựng với macro :c:macro:`Py_DEBUG` được định nghĩa, tức là nếu Python được :ref:`xây dựng ở chế độ debug <debug-build>`.
 
    .. versionadded:: 3.12
 
 
 .. data:: SOCK_MAX_SIZE
 
-   A constant that is likely larger than the underlying OS socket buffer size,
-   to make writes blocking.
+   Một hằng số có khả năng lớn hơn kích thước bộ đệm socket của hệ điều hành bên dưới, nhằm khiến việc ghi bị chặn.
 
 
 .. data:: TEST_SUPPORT_DIR
 
-   Set to the top level directory that contains :mod:`!test.support`.
+   Được thiết lập thành thư mục cấp cao nhất chứa :mod:`!test.support`.
 
 
 .. data:: TEST_HOME_DIR
 
-   Set to the top level directory for the test package.
+   Được thiết lập thành thư mục cấp cao nhất của gói kiểm thử.
 
 
 .. data:: TEST_DATA_DIR
 
-   Set to the ``data`` directory within the test package.
+   Được thiết lập thành thư mục ``data`` bên trong gói kiểm thử.
 
 
 .. data:: MAX_Py_ssize_t
 
-   Set to :data:`sys.maxsize` for big memory tests.
+   Đặt thành :data:`sys.maxsize` cho các bài kiểm tra bộ nhớ lớn.
 
 
 .. data:: max_memuse
 
-   Set by :func:`set_memlimit` as the memory limit for big memory tests.
-   Limited by :data:`MAX_Py_ssize_t`.
+   Được :func:`set_memlimit` đặt làm giới hạn bộ nhớ cho các bài kiểm tra bộ nhớ lớn. Bị giới hạn bởi :data:`MAX_Py_ssize_t`.
 
 
 .. data:: real_max_memuse
 
-   Set by :func:`set_memlimit` as the memory limit for big memory tests.  Not
-   limited by :data:`MAX_Py_ssize_t`.
+   Được :func:`set_memlimit` đặt làm giới hạn bộ nhớ cho các bài kiểm tra bộ nhớ lớn. Không bị giới hạn bởi :data:`MAX_Py_ssize_t`.
 
 
 .. data:: MISSING_C_DOCSTRINGS
 
-   Set to ``True`` if Python is built without docstrings (the
-   :c:macro:`WITH_DOC_STRINGS` macro is not defined).
-   See the :option:`configure --without-doc-strings <--without-doc-strings>` option.
+   Đặt thành ``True`` nếu Python được build mà không có docstring (macro
+   :c:macro:`WITH_DOC_STRINGS` không được định nghĩa). Xem tùy chọn :option:`configure --without-doc-strings <--without-doc-strings>`.
 
-   See also the :data:`HAVE_DOCSTRINGS` variable.
+   Xem thêm biến :data:`HAVE_DOCSTRINGS`.
 
 
 .. data:: HAVE_DOCSTRINGS
 
-   Set to ``True`` if function docstrings are available.
-   See the :option:`python -OO <-O>` option, which strips docstrings of functions implemented in Python.
+   Đặt thành ``True`` nếu docstring của hàm khả dụng. Xem tùy chọn :option:`python -OO <-O>`, tùy chọn này loại bỏ docstring của các hàm được triển khai bằng Python.
 
-   See also the :data:`MISSING_C_DOCSTRINGS` variable.
+   Xem thêm biến :data:`MISSING_C_DOCSTRINGS`.
 
 
 .. data:: TEST_HTTP_URL
 
-   Define the URL of a dedicated HTTP server for the network tests.
+   Xác định URL của một HTTP server chuyên dụng cho các bài kiểm thử mạng.
 
 
 .. data:: ALWAYS_EQ
 
-   Object that is equal to anything.  Used to test mixed type comparison.
+   Đối tượng bằng với mọi thứ. Được dùng để kiểm thử phép so sánh giữa các kiểu khác nhau.
 
 
 .. data:: NEVER_EQ
 
-   Object that is not equal to anything (even to :data:`ALWAYS_EQ`).
-   Used to test mixed type comparison.
+   Đối tượng không bằng bất kỳ thứ gì (kể cả :data:`ALWAYS_EQ`). Được dùng để kiểm thử phép so sánh giữa các kiểu khác nhau.
 
 
 .. data:: LARGEST
 
-   Object that is greater than anything (except itself).
-   Used to test mixed type comparison.
+   Đối tượng lớn hơn mọi thứ (ngoại trừ chính nó). Được dùng để kiểm thử phép so sánh giữa các kiểu khác nhau.
 
 
 .. data:: SMALLEST
 
-   Object that is less than anything (except itself).
-   Used to test mixed type comparison.
+   Đối tượng nhỏ hơn mọi thứ (ngoại trừ chính nó). Được dùng để kiểm thử phép so sánh giữa các kiểu khác nhau.
 
 
-The :mod:`!test.support` module defines the following functions:
+Mô-đun :mod:`!test.support` định nghĩa các hàm sau:
 
 .. function:: busy_retry(timeout, err_msg=None, /, *, error=True)
 
-   Run the loop body until ``break`` stops the loop.
+   Chạy phần thân vòng lặp cho đến khi ``break`` dừng vòng lặp.
 
-   After *timeout* seconds, raise an :exc:`AssertionError` if *error* is true,
-   or just stop the loop if *error* is false.
+   Sau *timeout* giây, phát sinh một :exc:`AssertionError` nếu *error* là true, hoặc chỉ dừng vòng lặp nếu *error* là false.
 
-   Example::
+   Ví dụ::
 
        for _ in support.busy_retry(support.SHORT_TIMEOUT):
            if check():
                break
 
-   Example of error=False usage::
+   Ví dụ sử dụng error=False::
 
        for _ in support.busy_retry(support.SHORT_TIMEOUT, error=False):
            if check():
@@ -463,21 +374,19 @@ The :mod:`!test.support` module defines the following functions:
 
 .. function:: sleeping_retry(timeout, err_msg=None, /, *, init_delay=0.010, max_delay=1.0, error=True)
 
-   Wait strategy that applies exponential backoff.
+   Chiến lược chờ áp dụng exponential backoff.
 
-   Run the loop body until ``break`` stops the loop. Sleep at each loop
-   iteration, but not at the first iteration. The sleep delay is doubled at
-   each iteration (up to *max_delay* seconds).
+   Chạy phần thân vòng lặp cho đến khi ``break`` dừng vòng lặp. Chờ ở mỗi lần lặp, nhưng không chờ ở lần lặp đầu tiên. Thời gian chờ được tăng gấp đôi sau mỗi lần lặp (tối đa *max_delay* giây).
 
-   See :func:`busy_retry` documentation for the parameters usage.
+   Xem tài liệu :func:`busy_retry` để biết cách sử dụng các tham số.
 
-   Example raising an exception after SHORT_TIMEOUT seconds::
+   Ví dụ phát sinh một exception sau SHORT_TIMEOUT giây::
 
        for _ in support.sleeping_retry(support.SHORT_TIMEOUT):
            if check():
                break
 
-   Example of error=False usage::
+   Ví dụ sử dụng error=False::
 
        for _ in support.sleeping_retry(support.SHORT_TIMEOUT, error=False):
            if check():
@@ -487,113 +396,94 @@ The :mod:`!test.support` module defines the following functions:
 
 .. function:: is_resource_enabled(resource)
 
-   Return ``True`` if *resource* is enabled and available. The list of
-   available resources is only set when :mod:`test.regrtest` is executing the
-   tests.
+   Trả về ``True`` nếu tài nguyên *resource* được bật và khả dụng. Danh sách các tài nguyên khả dụng chỉ được thiết lập khi :mod:`test.regrtest` đang thực thi các bài kiểm thử.
 
 
 .. function:: get_resource_value(resource)
 
-   Return the value specified for *resource* (as :samp:`-u {resource}={value}`).
-   Return ``None`` if *resource* is disabled or no value is specified.
+   Trả về giá trị được chỉ định cho tài nguyên *resource* (dưới dạng :samp:`-u {resource}={value}`). Trả về ``None`` nếu tài nguyên *resource* bị tắt hoặc không được chỉ định giá trị.
 
 
 .. function:: python_is_optimized()
 
-   Return ``True`` if Python was not built with ``-O0`` or ``-Og``.
+   Trả về ``True`` nếu Python không được build với ``-O0`` hoặc ``-Og``.
 
 
 .. function:: with_pymalloc()
 
-   Return :const:`_testcapi.WITH_PYMALLOC`.
+   Trả về :const:`_testcapi.WITH_PYMALLOC`.
 
 
 .. function:: requires(resource, msg=None)
 
-   Raise :exc:`ResourceDenied` if *resource* is not available. *msg* is the
-   argument to :exc:`ResourceDenied` if it is raised. Always returns
-   ``True`` if called by a function whose ``__name__`` is ``'__main__'``.
-   Used when tests are executed by :mod:`test.regrtest`.
+   Phát sinh :exc:`ResourceDenied` nếu tài nguyên *resource* không khả dụng. *msg* là đối số của :exc:`ResourceDenied` nếu exception này được phát sinh. Luôn trả về ``True`` nếu được gọi bởi một hàm có ``__name__`` là ``'__main__'``. Được sử dụng khi các bài kiểm thử được thực thi bởi :mod:`test.regrtest`.
 
 
 .. function:: sortdict(dict)
 
-   Return a repr of *dict* with keys sorted.
+   Trả về repr của *dict* với các khóa được sắp xếp.
 
 
 .. function:: findfile(filename, subdir=None)
 
-   Return the path to the file named *filename*. If no match is found
-   *filename* is returned. This does not equal a failure since it could be the
-   path to the file.
+   Trả về đường dẫn đến tệp có tên *filename*. Nếu không tìm thấy kết quả khớp, *filename* sẽ được trả về. Điều này không tương đương với việc xảy ra lỗi, vì đó có thể là đường dẫn đến tệp.
 
-   Setting *subdir* indicates a relative path to use to find the file
-   rather than looking directly in the path directories.
+   Thiết lập *subdir* cho biết đường dẫn tương đối cần dùng để tìm tệp thay vì tìm trực tiếp trong các thư mục đường dẫn.
 
 
 .. function:: get_pagesize()
 
-   Get size of a page in bytes.
+   Lấy kích thước của một trang theo byte.
 
    .. versionadded:: 3.12
 
 
 .. function:: setswitchinterval(interval)
 
-   Set the :func:`sys.setswitchinterval` to the given *interval*.  Defines
-   a minimum interval for Android systems to prevent the system from hanging.
+   Đặt :func:`sys.setswitchinterval` thành *interval* đã cho. Xác định khoảng thời gian tối thiểu cho các hệ thống Android để ngăn hệ thống bị treo.
 
 
 .. function:: check_impl_detail(**guards)
 
-   Use this check to guard CPython's implementation-specific tests or to
-   run them only on the implementations guarded by the arguments.  This
-   function returns ``True`` or ``False`` depending on the host platform.
-   Example usage::
+   Sử dụng bước kiểm tra này để bảo vệ các bài kiểm thử dành riêng cho việc triển khai CPython hoặc chỉ chạy chúng trên các bản triển khai được bảo vệ bởi các đối số. Hàm này trả về ``True`` hoặc ``False`` tùy thuộc vào nền tảng máy chủ. Ví dụ sử dụng::
 
-      check_impl_detail()               # Only on CPython (default).
-      check_impl_detail(jython=True)    # Only on Jython.
-      check_impl_detail(cpython=False)  # Everywhere except CPython.
+      check_impl_detail()               # Chỉ trên CPython (mặc định).
+      check_impl_detail(jython=True)    # Chỉ trên Jython.
+      check_impl_detail(cpython=False)  # Ở mọi nơi ngoại trừ CPython.
 
 
 .. function:: set_memlimit(limit)
 
-   Set the values for :data:`max_memuse` and :data:`real_max_memuse` for big
-   memory tests.
+   Đặt các giá trị cho :data:`max_memuse` và :data:`real_max_memuse` cho các bài kiểm tra bộ nhớ lớn.
 
 
 .. function:: record_original_stdout(stdout)
 
-   Store the value from *stdout*.  It is meant to hold the stdout at the
-   time the regrtest began.
+   Lưu giá trị từ *stdout*. Giá trị này dùng để lưu stdout tại thời điểm regrtest bắt đầu.
 
 
 .. function:: get_original_stdout()
 
-   Return the original stdout set by :func:`record_original_stdout` or
-   ``sys.stdout`` if it's not set.
+   Trả về stdout ban đầu được thiết lập bởi :func:`record_original_stdout` hoặc ``sys.stdout`` nếu nó chưa được thiết lập.
 
 
 .. function:: args_from_interpreter_flags()
 
-   Return a list of command line arguments reproducing the current settings
-   in ``sys.flags`` and ``sys.warnoptions``.
+   Trả về danh sách các đối số dòng lệnh tái tạo các thiết lập hiện tại trong ``sys.flags`` và ``sys.warnoptions``.
 
 
 .. function:: optim_args_from_interpreter_flags()
 
-   Return a list of command line arguments reproducing the current
-   optimization settings in ``sys.flags``.
+   Trả về danh sách các đối số dòng lệnh tái tạo các thiết lập tối ưu hóa hiện tại trong ``sys.flags``.
 
 
 .. function:: captured_stdin()
-              captured_stdout()
-              captured_stderr()
+              captured_stdout() captured_stderr()
 
-   A context managers that temporarily replaces the named stream with
-   :class:`io.StringIO` object.
+   Một context manager tạm thời thay thế stream được chỉ định bằng
+   đối tượng :class:`io.StringIO`.
 
-   Example use with output streams::
+   Ví dụ sử dụng với các output stream::
 
       with captured_stdout() as stdout, captured_stderr() as stderr:
           print("hello")
@@ -601,334 +491,272 @@ The :mod:`!test.support` module defines the following functions:
       assert stdout.getvalue() == "hello\n"
       assert stderr.getvalue() == "error\n"
 
-   Example use with input stream::
+   Ví dụ sử dụng với input stream::
 
       with captured_stdin() as stdin:
           stdin.write('hello\n')
           stdin.seek(0)
-          # call test code that consumes from sys.stdin
+          # gọi mã kiểm thử sử dụng dữ liệu từ sys.stdin
           captured = input()
       self.assertEqual(captured, "hello")
 
 
 .. function:: disable_faulthandler()
 
-   A context manager that temporary disables :mod:`faulthandler`.
+   Một context manager tạm thời vô hiệu hóa :mod:`faulthandler`.
 
 
 .. function:: gc_collect()
 
-   Force as many objects as possible to be collected.  This is needed because
-   timely deallocation is not guaranteed by the garbage collector.  This means
-   that ``__del__`` methods may be called later than expected and weakrefs
-   may remain alive for longer than expected.
+   Buộc thu gom càng nhiều đối tượng càng tốt. Điều này cần thiết vì trình garbage collector không đảm bảo giải phóng kịp thời. Điều đó có nghĩa là các phương thức ``__del__`` có thể được gọi muộn hơn dự kiến và weakref có thể vẫn tồn tại lâu hơn dự kiến.
 
 
 .. function:: disable_gc()
 
-   A context manager that disables the garbage collector on entry. On
-   exit, the garbage collector is restored to its prior state.
+   Một context manager vô hiệu hóa garbage collector khi bắt đầu. Khi kết thúc, garbage collector được khôi phục về trạng thái trước đó.
 
 
 .. function:: swap_attr(obj, attr, new_val)
 
-   Context manager to swap out an attribute with a new object.
+   Context manager để thay thế một thuộc tính bằng một đối tượng mới.
 
-   Usage::
+   Cách sử dụng::
 
       with swap_attr(obj, "attr", 5):
           ...
 
-   This will set ``obj.attr`` to 5 for the duration of the ``with`` block,
-   restoring the old value at the end of the block.  If ``attr`` doesn't
-   exist on ``obj``, it will be created and then deleted at the end of the
-   block.
+   Thao tác này sẽ đặt ``obj.attr`` thành 5 trong khoảng thời gian của khối ``with``, rồi khôi phục giá trị cũ khi kết thúc khối. Nếu ``attr`` không tồn tại trên ``obj``, nó sẽ được tạo rồi bị xóa khi kết thúc khối.
 
-   The old value (or ``None`` if it doesn't exist) will be assigned to the
-   target of the "as" clause, if there is one.
+   Giá trị cũ (hoặc ``None`` nếu giá trị đó không tồn tại) sẽ được gán cho đối tượng đích của mệnh đề "as", nếu có.
 
 
 .. function:: swap_item(obj, attr, new_val)
 
-   Context manager to swap out an item with a new object.
+   Context manager để thay thế một phần tử bằng một đối tượng mới.
 
-   Usage::
+   Cách sử dụng::
 
       with swap_item(obj, "item", 5):
           ...
 
-   This will set ``obj["item"]`` to 5 for the duration of the ``with`` block,
-   restoring the old value at the end of the block. If ``item`` doesn't
-   exist on ``obj``, it will be created and then deleted at the end of the
-   block.
+   Thao tác này sẽ đặt ``obj["item"]`` thành 5 trong suốt thời gian của khối ``with``, rồi khôi phục giá trị cũ khi kết thúc khối. Nếu ``item`` không tồn tại trên ``obj``, nó sẽ được tạo rồi bị xóa khi kết thúc khối.
 
-   The old value (or ``None`` if it doesn't exist) will be assigned to the
-   target of the "as" clause, if there is one.
+   Giá trị cũ (hoặc ``None`` nếu giá trị đó không tồn tại) sẽ được gán cho đối tượng đích của mệnh đề "as", nếu có.
 
 
 .. function:: flush_std_streams()
 
-   Call the ``flush()`` method on :data:`sys.stdout` and then on
-   :data:`sys.stderr`. It can be used to make sure that the logs order is
-   consistent before writing into stderr.
+   Gọi phương thức ``flush()`` trên :data:`sys.stdout` rồi trên
+   :data:`sys.stderr`. Có thể dùng nó để đảm bảo thứ tự của các log nhất quán trước khi ghi vào stderr.
 
    .. versionadded:: 3.11
 
 
 .. function:: print_warning(msg)
 
-   Print a warning into :data:`sys.__stderr__`. Format the message as:
-   ``f"Warning -- {msg}"``. If *msg* is made of multiple lines, add
-   ``"Warning -- "`` prefix to each line.
+   In một cảnh báo vào :data:`sys.__stderr__`. Định dạng thông báo như sau: ``f"Warning -- {msg}"``. Nếu *msg* gồm nhiều dòng, hãy thêm tiền tố ``"Warning -- "`` vào mỗi dòng.
 
    .. versionadded:: 3.9
 
 
 .. function:: wait_process(pid, *, exitcode, timeout=None)
 
-   Wait until process *pid* completes and check that the process exit code is
-   *exitcode*.
+   Chờ tiến trình *pid* hoàn tất và kiểm tra xem mã thoát của tiến trình có phải là *exitcode* hay không.
 
-   Raise an :exc:`AssertionError` if the process exit code is not equal to
-   *exitcode*.
+   Ném một :exc:`AssertionError` nếu mã thoát của tiến trình không bằng *exitcode*.
 
-   If the process runs longer than *timeout* seconds (:data:`SHORT_TIMEOUT` by
-   default), kill the process and raise an :exc:`AssertionError`. The timeout
-   feature is not available on Windows.
+   Nếu tiến trình chạy lâu hơn *timeout* giây (:data:`SHORT_TIMEOUT` theo mặc định), hãy kết thúc tiến trình và ném một :exc:`AssertionError`. Tính năng timeout không khả dụng trên Windows.
 
    .. versionadded:: 3.9
 
 
 .. function:: calcobjsize(fmt)
 
-   Return the size of the :c:type:`PyObject` whose structure members are
-   defined by *fmt*. The returned value includes the size of the Python object header and alignment.
+   Trả về kích thước của :c:type:`PyObject` có các thành viên cấu trúc được định nghĩa bởi *fmt*. Giá trị trả về bao gồm kích thước phần header của đối tượng Python và phần căn chỉnh.
 
 
 .. function:: calcvobjsize(fmt)
 
-   Return the size of the :c:type:`PyVarObject` whose structure members are
-   defined by *fmt*. The returned value includes the size of the Python object header and alignment.
+   Trả về kích thước của :c:type:`PyVarObject` có các thành viên cấu trúc được định nghĩa bởi *fmt*. Giá trị trả về bao gồm kích thước phần header của đối tượng Python và phần căn chỉnh.
 
 
 .. function:: checksizeof(test, o, size)
 
-   For testcase *test*, assert that the ``sys.getsizeof`` for *o* plus the GC
-   header size equals *size*.
+   Đối với testcase *test*, hãy khẳng định rằng ``sys.getsizeof`` của *o* cộng với kích thước header GC bằng *size*.
 
 
 .. decorator:: anticipate_failure(condition)
 
-   A decorator to conditionally mark tests with
-   :deco:`unittest.expectedFailure`. Any use of this decorator should
-   have an associated comment identifying the relevant tracker issue.
+   Một decorator dùng để đánh dấu có điều kiện các kiểm thử bằng
+   :deco:`unittest.expectedFailure`. Mọi cách sử dụng decorator này cần có chú thích đi kèm xác định issue tương ứng trên tracker.
 
 
 .. function:: system_must_validate_cert(f)
 
-   A decorator that skips the decorated test on TLS certification validation failures.
+   Một decorator bỏ qua bài kiểm thử được trang trí khi xảy ra lỗi xác thực chứng chỉ TLS.
 
 
 .. decorator:: run_with_locale(catstr, *locales)
 
-   A decorator for running a function in a different locale, correctly
-   resetting it after it has finished.  *catstr* is the locale category as
-   a string (for example ``"LC_ALL"``).  The *locales* passed will be tried
-   sequentially, and the first valid locale will be used.
+   Một decorator chạy một hàm trong locale khác và đặt lại locale đúng cách sau khi hàm hoàn tất. *catstr* là danh mục locale dưới dạng chuỗi (ví dụ ``"LC_ALL"``). Các *locales* được truyền vào sẽ lần lượt được thử, và locale hợp lệ đầu tiên sẽ được sử dụng.
 
 
 .. decorator:: run_with_tz(tz)
 
-   A decorator for running a function in a specific timezone, correctly
-   resetting it after it has finished.
+   Một decorator chạy một hàm trong một múi giờ cụ thể và đặt lại múi giờ đúng cách sau khi hàm hoàn tất.
 
 
 .. decorator:: requires_freebsd_version(*min_version)
 
-   Decorator for the minimum version when running test on FreeBSD.  If the
-   FreeBSD version is less than the minimum, the test is skipped.
+   Decorator chỉ định phiên bản tối thiểu khi chạy bài kiểm thử trên FreeBSD. Nếu phiên bản FreeBSD thấp hơn mức tối thiểu, bài kiểm thử sẽ bị bỏ qua.
 
 
 .. decorator:: requires_linux_version(*min_version)
 
-   Decorator for the minimum version when running test on Linux.  If the
-   Linux version is less than the minimum, the test is skipped.
+   Decorator chỉ định phiên bản tối thiểu khi chạy bài kiểm thử trên Linux. Nếu phiên bản Linux thấp hơn mức tối thiểu, bài kiểm thử sẽ bị bỏ qua.
 
 
 .. decorator:: requires_mac_version(*min_version)
 
-   Decorator for the minimum version when running test on macOS.  If the
-   macOS version is less than the minimum, the test is skipped.
+   Decorator chỉ định phiên bản tối thiểu khi chạy bài kiểm thử trên macOS. Nếu phiên bản macOS thấp hơn mức tối thiểu, bài kiểm thử sẽ bị bỏ qua.
 
 
 .. decorator:: requires_gil_enabled
 
-   Decorator for skipping tests on the free-threaded build.  If the
-   :term:`GIL` is disabled, the test is skipped.
+   Decorator bỏ qua các bài kiểm thử trên bản build free-threaded. Nếu
+   :term:`GIL` bị tắt, bài kiểm thử được bỏ qua.
 
 
 .. decorator:: requires_IEEE_754
 
-   Decorator for skipping tests on non-IEEE 754 platforms.
+   Trình trang trí để bỏ qua các bài kiểm thử trên những nền tảng không tuân theo IEEE 754.
 
 
 .. decorator:: requires_zlib
 
-   Decorator for skipping tests if :mod:`zlib` doesn't exist.
+   Trình trang trí để bỏ qua các bài kiểm thử nếu :mod:`zlib` không tồn tại.
 
 
 .. decorator:: requires_gzip
 
-   Decorator for skipping tests if :mod:`gzip` doesn't exist.
+   Trình trang trí để bỏ qua các bài kiểm thử nếu :mod:`gzip` không tồn tại.
 
 
 .. decorator:: requires_bz2
 
-   Decorator for skipping tests if :mod:`bz2` doesn't exist.
+   Trình trang trí để bỏ qua các bài kiểm thử nếu :mod:`bz2` không tồn tại.
 
 
 .. decorator:: requires_lzma
 
-   Decorator for skipping tests if :mod:`lzma` doesn't exist.
+   Trình trang trí để bỏ qua các bài kiểm thử nếu :mod:`lzma` không tồn tại.
 
 
 .. decorator:: requires_resource(resource)
 
-   Decorator for skipping tests if *resource* is not available.
+   Trình trang trí để bỏ qua các bài kiểm thử nếu *resource* không khả dụng.
 
 
 .. decorator:: requires_docstrings
 
-   Decorator for only running the test if :data:`HAVE_DOCSTRINGS`.
+   Decorator chỉ chạy bài kiểm thử nếu :data:`HAVE_DOCSTRINGS`.
 
 
 .. decorator:: requires_limited_api
 
-   Decorator for only running the test if :ref:`Limited C API <limited-c-api>`
-   is available.
+   Decorator chỉ chạy bài kiểm thử nếu :ref:`Limited C API <limited-c-api>` khả dụng.
 
 
 .. decorator:: cpython_only
 
-   Decorator for tests only applicable to CPython.
+   Decorator dành cho các bài kiểm thử chỉ áp dụng cho CPython.
 
 
 .. decorator:: impl_detail(msg=None, **guards)
 
-   Decorator for invoking :func:`check_impl_detail` on *guards*.  If that
-   returns ``False``, then uses *msg* as the reason for skipping the test.
+   Decorator gọi :func:`check_impl_detail` trên *các guard*. Nếu kết quả là ``False``, thì sử dụng *msg* làm lý do bỏ qua bài kiểm thử.
 
 .. decorator:: thread_unsafe(reason=None)
 
-   Decorator for marking tests as thread-unsafe.  This test always runs in one
-   thread even when invoked with ``--parallel-threads``.
+   Decorator đánh dấu các bài kiểm thử là không an toàn khi chạy trong thread. Bài kiểm thử này luôn chạy trong một thread ngay cả khi được gọi bằng ``--parallel-threads``.
 
 
 .. decorator:: no_tracing
 
-   Decorator to temporarily turn off tracing for the duration of the test.
+   Decorator tạm thời tắt tracing trong thời gian chạy bài kiểm thử.
 
 
 .. decorator:: refcount_test
 
-   Decorator for tests which involve reference counting.  The decorator does
-   not run the test if it is not run by CPython.  Any trace function is unset
-   for the duration of the test to prevent unexpected refcounts caused by
-   the trace function.
+   Decorator dành cho các bài kiểm thử liên quan đến việc đếm reference. Decorator không chạy bài kiểm thử nếu nó không được chạy bởi CPython. Mọi hàm trace đều bị bỏ thiết lập trong thời gian chạy bài kiểm thử để ngăn refcount không mong muốn do hàm trace gây ra.
 
 
 .. decorator:: bigmemtest(size, memuse, dry_run=True)
 
-   Decorator for bigmem tests.
+   Decorator dành cho các kiểm thử bigmem.
 
-   *size* is a requested size for the test (in arbitrary, test-interpreted
-   units.)  *memuse* is the number of bytes per unit for the test, or a good
-   estimate of it.  For example, a test that needs two byte buffers, of 4 GiB
-   each, could be decorated with ``@bigmemtest(size=_4G, memuse=2)``.
+   *size* là kích thước được yêu cầu cho kiểm thử (theo các đơn vị tùy ý do kiểm thử diễn giải). *memuse* là số byte trên mỗi đơn vị cho kiểm thử hoặc một ước tính phù hợp. Ví dụ: một kiểm thử cần hai bộ đệm byte, mỗi bộ đệm có kích thước 4 GiB, có thể được áp dụng ``@bigmemtest(size=_4G, memuse=2)``.
 
-   The *size* argument is normally passed to the decorated test method as an
-   extra argument.  If *dry_run* is ``True``, the value passed to the test
-   method may be less than the requested value.  If *dry_run* is ``False``, it
-   means the test doesn't support dummy runs when ``-M`` is not specified.
+   Đối số *size* thường được truyền cho phương thức kiểm thử đã được áp dụng decorator dưới dạng một đối số bổ sung. Nếu *dry_run* là ``True``, giá trị được truyền cho phương thức kiểm thử có thể nhỏ hơn giá trị được yêu cầu. Nếu *dry_run* là ``False``, điều đó có nghĩa là kiểm thử không hỗ trợ các lần chạy giả khi ``-M`` không được chỉ định.
 
 
 .. decorator:: bigaddrspacetest
 
-   Decorator for tests that fill the address space.
+   Decorator dành cho các kiểm thử lấp đầy không gian địa chỉ.
 
 
 .. function:: linked_to_musl()
 
-   Return ``False`` if there is no evidence the interpreter was compiled with
-   ``musl``, otherwise return a version triple, either ``(0, 0, 0)`` if the
-   version is unknown, or the actual version if it is known.  Intended for use
-   in ``skip`` decorators.  ``emscripten`` and ``wasi`` are assumed to be
-   compiled with ``musl``; otherwise ``platform.libc_ver`` is checked.
+   Trả về ``False`` nếu không có bằng chứng cho thấy interpreter được biên dịch với ``musl``; nếu không, trả về một bộ ba phiên bản, trong đó ``(0, 0, 0)`` nếu không xác định được phiên bản hoặc phiên bản thực tế nếu xác định được. Dùng cho các decorator ``skip``. Giả định ``emscripten`` và ``wasi`` được biên dịch với ``musl``; nếu không, ``platform.libc_ver`` sẽ được kiểm tra.
 
 
 .. function:: check_syntax_error(testcase, statement, errtext='', *, lineno=None, offset=None)
 
-   Test for syntax errors in *statement* by attempting to compile *statement*.
-   *testcase* is the :mod:`unittest` instance for the test.  *errtext* is the
-   regular expression which should match the string representation of the
-   raised :exc:`SyntaxError`.  If *lineno* is not ``None``, compares to
-   the line of the exception.  If *offset* is not ``None``, compares to
-   the offset of the exception.
+   Kiểm tra lỗi cú pháp trong *statement* bằng cách cố gắng biên dịch *statement*. *testcase* là thực thể :mod:`unittest` cho kiểm thử. *errtext* là biểu thức chính quy phải khớp với biểu diễn chuỗi của :exc:`SyntaxError` được phát sinh. Nếu *lineno* không phải là ``None``, so sánh với dòng xảy ra ngoại lệ. Nếu *offset* không phải là ``None``, so sánh với vị trí lệch của ngoại lệ.
 
 
 .. function:: open_urlresource(url, *args, **kw)
 
-   Open *url*.  If open fails, raises :exc:`TestFailed`.
+   Mở *url*. Nếu mở không thành công, phát sinh :exc:`TestFailed`.
 
 
 .. function:: reap_children()
 
-   Use this at the end of ``test_main`` whenever sub-processes are started.
-   This will help ensure that no extra children (zombies) stick around to
-   hog resources and create problems when looking for refleaks.
+   Sử dụng điều này ở cuối ``test_main`` mỗi khi các quy trình con được khởi chạy. Điều này giúp đảm bảo không có tiến trình con dư thừa nào (zombie) tiếp tục tồn tại, chiếm dụng tài nguyên và gây ra sự cố khi tìm refleak.
 
 
 .. function:: get_attribute(obj, name)
 
-   Get an attribute, raising :exc:`unittest.SkipTest` if :exc:`AttributeError`
-   is raised.
+   Lấy một thuộc tính, đồng thời phát sinh :exc:`unittest.SkipTest` nếu :exc:`AttributeError` được phát sinh.
 
 
 .. function:: catch_unraisable_exception()
 
-   Context manager catching unraisable exception using
+   Trình quản lý ngữ cảnh bắt ngoại lệ không thể xử lý bằng cách sử dụng
    :func:`sys.unraisablehook`.
 
-   Storing the exception value (``cm.unraisable.exc_value``) creates a
-   reference cycle. The reference cycle is broken explicitly when the context
-   manager exits.
+   Việc lưu giá trị ngoại lệ (``cm.unraisable.exc_value``) tạo ra một chu kỳ tham chiếu (reference cycle). Chu kỳ tham chiếu này được phá vỡ một cách rõ ràng khi trình quản lý ngữ cảnh kết thúc.
 
-   Storing the object (``cm.unraisable.object``) can resurrect it if it is set
-   to an object which is being finalized. Exiting the context manager clears
-   the stored object.
+   Việc lưu đối tượng (``cm.unraisable.object``) có thể làm đối tượng hồi sinh nếu đối tượng đó được gán cho một đối tượng đang được hoàn tất. Khi trình quản lý ngữ cảnh kết thúc, đối tượng được lưu sẽ được xóa.
 
-   Usage::
+   Cách sử dụng::
 
        with support.catch_unraisable_exception() as cm:
-           # code creating an "unraisable exception"
+           # đoạn mã tạo ra một "unraisable exception"
            ...
 
-           # check the unraisable exception: use cm.unraisable
+           # kiểm tra ngoại lệ không thể phát sinh: sử dụng cm.unraisable
            ...
 
-       # cm.unraisable attribute no longer exists at this point
-       # (to break a reference cycle)
+       # thuộc tính cm.unraisable không còn tồn tại tại thời điểm này
+       # (để phá vỡ một chu kỳ tham chiếu)
 
    .. versionadded:: 3.8
 
 
 .. function:: load_package_tests(pkg_dir, loader, standard_tests, pattern)
 
-   Generic implementation of the :mod:`unittest` ``load_tests`` protocol for
-   use in test packages.  *pkg_dir* is the root directory of the package;
-   *loader*, *standard_tests*, and *pattern* are the arguments expected by
-   ``load_tests``.  In simple cases, the test package's ``__init__.py``
-   can be the following::
+   Triển khai :mod:`unittest` ``load_tests`` protocol tổng quát để sử dụng trong các gói kiểm thử. *pkg_dir* là thư mục gốc của gói; *loader*, *standard_tests* và *pattern* là các đối số mà ``load_tests`` mong đợi. Trong những trường hợp đơn giản, ``__init__.py`` của gói kiểm thử có thể là đoạn sau::
 
       import os
       from test.support import load_package_tests
@@ -939,91 +767,56 @@ The :mod:`!test.support` module defines the following functions:
 
 .. function:: detect_api_mismatch(ref_api, other_api, *, ignore=())
 
-   Returns the set of attributes, functions or methods of *ref_api* not
-   found on *other_api*, except for a defined list of items to be
-   ignored in this check specified in *ignore*.
+   Trả về tập hợp các thuộc tính, hàm hoặc phương thức của *ref_api* không có trên *other_api*, ngoại trừ danh sách các mục được xác định để bỏ qua trong lần kiểm tra này, được chỉ định trong *ignore*.
 
-   By default this skips private attributes beginning with '_' but
-   includes all magic methods, i.e. those starting and ending in '__'.
+   Theo mặc định, hàm này bỏ qua các thuộc tính private bắt đầu bằng '_' nhưng bao gồm tất cả các phương thức magic, tức là những phương thức bắt đầu và kết thúc bằng '__'.
 
    .. versionadded:: 3.5
 
 
 .. function:: patch(test_instance, object_to_patch, attr_name, new_value)
 
-   Override *object_to_patch.attr_name* with *new_value*.  Also add
-   cleanup procedure to *test_instance* to restore *object_to_patch* for
-   *attr_name*.  The *attr_name* should be a valid attribute for
-   *object_to_patch*.
+   Ghi đè *object_to_patch.attr_name* bằng *new_value*. Đồng thời thêm thủ tục dọn dẹp vào *test_instance* để khôi phục *object_to_patch* cho *attr_name*. *attr_name* phải là một thuộc tính hợp lệ của *object_to_patch*.
 
 
 .. function:: run_in_subinterp(code)
 
-   Run *code* in subinterpreter.  Raise :exc:`unittest.SkipTest` if
-   :mod:`tracemalloc` is enabled.
+   Chạy *code* trong subinterpreter. Tăng :exc:`unittest.SkipTest` nếu
+   :mod:`tracemalloc` được bật.
 
 
 .. currentmodule:: test.support.isolation
 
 .. decorator:: runInSubprocess(*, options=(), env=None, timeout=None)
 
-   Decorator that runs the decorated test in a fresh interpreter subprocess, in
-   isolation, so that it does not share global or interpreter state with the
-   rest of the test run.  It can decorate a test method or a whole
-   :class:`~unittest.TestCase` subclass.  Decorated methods must take no extra
-   arguments.  A failure, error or skip in the subprocess is reported for the
-   corresponding test, and individual :meth:`subtests
-   <unittest.TestCase.subTest>` that fail or are skipped are reported
-   individually.  A reported failure or error shows the original subprocess
-   traceback as the cause of the exception.
+   Decorator này chạy bài kiểm thử được trang trí trong một subprocess interpreter mới, độc lập, để không chia sẻ trạng thái toàn cục hoặc trạng thái interpreter với phần còn lại của lượt chạy kiểm thử. Decorator này có thể được áp dụng cho một phương thức kiểm thử hoặc toàn bộ
+   :class:`~unittest.TestCase` subclass. Các phương thức được trang trí không được nhận thêm đối số. Một lỗi, ngoại lệ hoặc lần bỏ qua trong subprocess sẽ được báo cáo cho bài kiểm thử tương ứng, còn từng :meth:`subtests <unittest.TestCase.subTest>` bị lỗi hoặc bị bỏ qua sẽ được báo cáo riêng. Một lỗi hoặc ngoại lệ được báo cáo sẽ hiển thị traceback gốc của subprocess làm nguyên nhân của exception.
 
-   When a **method** is decorated, only that method runs in a subprocess; all
-   fixtures (:meth:`~unittest.TestCase.setUp` / :meth:`~unittest.TestCase.tearDown`,
-   :meth:`~unittest.TestCase.setUpClass` / :meth:`~unittest.TestCase.tearDownClass`
-   and ``setUpModule()`` / ``tearDownModule()``) run both in the parent process
-   (as usual) and in the subprocess around the method.
+   Khi một **method** được trang trí, chỉ phương thức đó chạy trong subprocess; tất cả fixture (:meth:`~unittest.TestCase.setUp` / :meth:`~unittest.TestCase.tearDown`,
+   :meth:`~unittest.TestCase.setUpClass` / :meth:`~unittest.TestCase.tearDownClass` và ``setUpModule()`` / ``tearDownModule()``) đều chạy trong process cha (như thường lệ) và trong subprocess quanh phương thức đó.
 
-   When a **class** is decorated, the whole class runs in a single subprocess,
-   and :meth:`~unittest.TestCase.setUpClass`,
-   :meth:`~unittest.TestCase.tearDownClass`, :meth:`~unittest.TestCase.setUp`
-   and :meth:`~unittest.TestCase.tearDown` run once each in the subprocess and
-   are skipped in the parent process.  A failure or skip of
-   :meth:`~unittest.TestCase.setUpClass` in the subprocess is reported for the
-   whole class.  ``setUpModule()`` cannot be controlled by a class decorator,
-   so it still runs in the parent process too; test it with
-   :data:`runningInSubprocess` if needed.
+   Khi một **class** được trang trí, toàn bộ lớp chạy trong một subprocess duy nhất, còn :meth:`~unittest.TestCase.setUpClass`,
+   :meth:`~unittest.TestCase.tearDownClass`, :meth:`~unittest.TestCase.setUp` và :meth:`~unittest.TestCase.tearDown` mỗi cái chạy một lần trong subprocess và bị bỏ qua trong parent process. Việc :meth:`~unittest.TestCase.tearDownClass` bị lỗi hoặc bị bỏ qua
+   :meth:`~unittest.TestCase.setUpClass` trong subprocess được báo cáo cho toàn bộ lớp.  ``setUpModule()`` không thể được kiểm soát bằng class decorator, vì vậy nó vẫn chạy trong tiến trình cha; hãy kiểm thử bằng
+   :data:`runningInSubprocess` nếu cần.
 
-   The subprocess inherits the enabled resources (``-u``), memory limit
-   (``-M``) and verbosity (``-v``) of the parent test run, so that
+   Subprocess kế thừa các resource được bật (``-u``), giới hạn bộ nhớ (``-M``) và verbosity (``-v``) của lần chạy kiểm thử trong parent, để
    :func:`~test.support.requires_resource`, :func:`~test.support.requires`,
-   :func:`~test.support.bigmemtest` and the like behave consistently in both
-   processes.
+   :func:`~test.support.bigmemtest` và các tùy chọn tương tự hoạt động nhất quán trong cả hai process.
 
-   *options* is a sequence of interpreter command line options
-   to run the subprocess with,
-   and *env* is a mapping of environment variables to set in it,
-   on top of the inherited environment.
-   A value of ``None`` in *env* unsets the variable.
-   Note that :option:`-E` and :option:`-I` make the subprocess ignore
-   the ``PYTHON*`` environment variables, including :envvar:`PYTHONPATH`.
+   *options* là một chuỗi các tùy chọn dòng lệnh của interpreter để chạy subprocess, còn *env* là một mapping các biến môi trường cần đặt trong đó, ngoài môi trường được kế thừa. Giá trị ``None`` trong *env* sẽ hủy đặt biến đó. Lưu ý rằng :option:`-E` và :option:`-I` khiến subprocess bỏ qua các biến môi trường ``PYTHON*``, bao gồm cả :envvar:`PYTHONPATH`.
 
-   *timeout* is the number of seconds to wait for the subprocess;
-   the test is reported as an error if it does not complete in time.
-   By default there is no timeout,
-   and a hung test is left to the timeout of the test runner.
+   *timeout* là số giây cần chờ subprocess; bài kiểm thử được báo cáo là lỗi nếu không hoàn tất trong thời gian đó. Theo mặc định, không có thời gian chờ và một bài kiểm thử bị treo sẽ chờ đến thời hạn của test runner.
 
-   The test is skipped on platforms without subprocess support.
+   Bài kiểm thử được bỏ qua trên các nền tảng không hỗ trợ subprocess.
 
 
 .. data:: runningInSubprocess
 
-   ``True`` while the code runs in the isolated subprocess spawned by
-   :func:`runInSubprocess`, and ``False`` otherwise (including in the parent
-   process and in a normal, non-isolated test run).  Fixtures such as
+   ``True`` trong khi mã chạy trong subprocess cô lập được tạo bởi
+   :func:`runInSubprocess`, và ``False`` trong các trường hợp khác (bao gồm trong tiến trình cha và trong một lần chạy kiểm thử thông thường, không cô lập). Các fixture như
    :meth:`~unittest.TestCase.setUp`, :meth:`~unittest.TestCase.tearDown`,
-   :meth:`~unittest.TestCase.setUpClass`, :meth:`~unittest.TestCase.tearDownClass`,
-   ``setUpModule()`` and ``tearDownModule()`` can test it to choose which code
-   to run in the subprocess.
+   :meth:`~unittest.TestCase.setUpClass`, :meth:`~unittest.TestCase.tearDownClass`, ``setUpModule()`` và ``tearDownModule()`` có thể kiểm tra điều này để chọn mã cần chạy trong subprocess.
 
 
 .. currentmodule:: test.support
@@ -1031,38 +824,27 @@ The :mod:`!test.support` module defines the following functions:
 
 .. function:: check_free_after_iterating(test, iter, cls, args=())
 
-   Assert instances of *cls* are deallocated after iterating.
+   Xác nhận rằng các thực thể của *cls* được giải phóng sau khi lặp.
 
 
 .. function:: missing_compiler_executable(cmd_names=[])
 
-   Check for the existence of the compiler executables whose names are listed
-   in *cmd_names* or all the compiler executables when *cmd_names* is empty
-   and return the first missing executable or ``None`` when none is found
-   missing.
+   Kiểm tra sự tồn tại của các tệp thực thi của compiler có tên được liệt kê trong *cmd_names* hoặc tất cả các tệp thực thi của compiler khi *cmd_names* trống, rồi trả về tệp thực thi đầu tiên bị thiếu hoặc ``None`` nếu không tìm thấy tệp nào bị thiếu.
 
 
 .. function:: check__all__(test_case, module, name_of_module=None, extra=(), not_exported=())
 
-   Assert that the ``__all__`` variable of *module* contains all public names.
+   Xác nhận rằng biến ``__all__`` của *module* chứa tất cả các tên công khai.
 
-   The module's public names (its API) are detected automatically
-   based on whether they match the public name convention and were defined in
-   *module*.
+   Các tên public của module (API của module) được tự động phát hiện dựa trên việc chúng có khớp với quy ước tên public và được định nghĩa trong *module* hay không.
 
-   The *name_of_module* argument can specify (as a string or tuple thereof) what
-   module(s) an API could be defined in order to be detected as a public
-   API. One case for this is when *module* imports part of its public API from
-   other modules, possibly a C backend (like ``csv`` and its ``_csv``).
+   Đối số *name_of_module* có thể chỉ định (dưới dạng một chuỗi hoặc tuple các chuỗi) module nào có thể định nghĩa API để API đó được phát hiện là public API. Một trường hợp sử dụng là khi *module* import một phần public API của nó từ các module khác, có thể là một C backend (như ``csv`` và ``_csv`` của nó).
 
-   The *extra* argument can be a set of names that wouldn't otherwise be automatically
-   detected as "public", like objects without a proper :attr:`~definition.__module__`
-   attribute. If provided, it will be added to the automatically detected ones.
+   Đối số *extra* có thể là một tập hợp các tên mà nếu không thì sẽ không được tự động phát hiện là "public", chẳng hạn như các đối tượng không có thuộc tính :attr:`~definition.__module__` phù hợp. Nếu được cung cấp, tập hợp này sẽ được thêm vào các tên được tự động phát hiện.
 
-   The *not_exported* argument can be a set of names that must not be treated
-   as part of the public API even though their names indicate otherwise.
+   Đối số *not_exported* có thể là một tập hợp các tên không được xem là một phần của public API, ngay cả khi tên của chúng cho thấy điều ngược lại.
 
-   Example use::
+   Ví dụ sử dụng::
 
       import bar
       import foo
@@ -1076,8 +858,8 @@ The :mod:`!test.support` module defines the following functions:
       class OtherTestCase(unittest.TestCase):
           def test__all__(self):
               extra = {'BAR_CONST', 'FOO_CONST'}
-              not_exported = {'baz'}  # Undocumented name.
-              # bar imports part of its API from _bar.
+              not_exported = {'baz'}  # Tên không được ghi tài liệu.
+              # bar import một phần API của nó từ _bar.
               support.check__all__(self, bar, ('bar', '_bar'),
                                    extra=extra, not_exported=not_exported)
 
@@ -1085,625 +867,504 @@ The :mod:`!test.support` module defines the following functions:
 
 .. function:: skip_if_broken_multiprocessing_synchronize()
 
-   Skip tests if the :mod:`multiprocessing.synchronize` module is missing, if
-   there is no available semaphore implementation, or if creating a lock raises
-   an :exc:`OSError`.
+   Bỏ qua các kiểm thử nếu thiếu module :mod:`multiprocessing.synchronize`, nếu không có implementation semaphore khả dụng hoặc nếu việc tạo lock phát sinh :exc:`OSError`.
 
    .. versionadded:: 3.10
 
 
 .. function:: check_disallow_instantiation(test_case, tp, *args, **kwds)
 
-   Assert that type *tp* cannot be instantiated using *args* and *kwds*.
+   Khẳng định rằng không thể khởi tạo type *tp* bằng *args* và *kwds*.
 
    .. versionadded:: 3.10
 
 
 .. function:: adjust_int_max_str_digits(max_digits)
 
-   This function returns a context manager that will change the global
-   :func:`sys.set_int_max_str_digits` setting for the duration of the
-   context to allow execution of test code that needs a different limit
-   on the number of digits when converting between an integer and string.
+   Hàm này trả về một context manager sẽ thay đổi giá trị global
+   :func:`sys.set_int_max_str_digits` trong thời gian context tồn tại, cho phép thực thi mã kiểm thử cần một giới hạn khác về số chữ số khi chuyển đổi giữa integer và string.
 
    .. versionadded:: 3.11
 
 
-The :mod:`!test.support` module defines the following classes:
+Module :mod:`!test.support` định nghĩa các class sau:
 
 
 .. class:: SuppressCrashReport()
 
-   A context manager used to try to prevent crash dialog popups on tests that
-   are expected to crash a subprocess.
+   Một context manager được dùng để cố gắng ngăn các hộp thoại crash bật lên trong những kiểm thử dự kiến làm crash một subprocess.
 
-   On Windows, it disables Windows Error Reporting dialogs using
-   `SetErrorMode <https://msdn.microsoft.com/en-us/library/windows/desktop/ms680621.aspx>`_.
+   Trên Windows, nó vô hiệu hóa các hộp thoại Windows Error Reporting bằng `SetErrorMode <https://msdn.microsoft.com/en-us/library/windows/desktop/ms680621.aspx>`_.
 
-   On UNIX, :func:`resource.setrlimit` is used to set
-   :const:`resource.RLIMIT_CORE`'s soft limit to 0 to prevent coredump file
-   creation.
+   Trên UNIX, :func:`resource.setrlimit` được dùng để đặt
+   giới hạn mềm của :const:`resource.RLIMIT_CORE` về 0 nhằm ngăn việc tạo tệp coredump.
 
-   On both platforms, the old value is restored by :meth:`~object.__exit__`.
+   Trên cả hai nền tảng, giá trị cũ được khôi phục bằng :meth:`~object.__exit__`.
 
 
 .. class:: SaveSignals()
 
-   Class to save and restore signal handlers registered by the Python signal
-   handler.
+   Lớp dùng để lưu và khôi phục các trình xử lý tín hiệu được đăng ký bởi trình xử lý tín hiệu Python.
 
    .. method:: save(self)
 
-      Save the signal handlers to a dictionary mapping signal numbers to the
-      current signal handler.
+      Lưu các trình xử lý tín hiệu vào một từ điển ánh xạ số hiệu tín hiệu với trình xử lý tín hiệu hiện tại.
 
    .. method:: restore(self)
 
-      Set the signal numbers from the :meth:`save` dictionary to the saved
-      handler.
+      Đặt các số hiệu tín hiệu từ từ điển :meth:`save` thành trình xử lý đã lưu.
 
 
 .. class:: Matcher()
 
    .. method:: matches(self, d, **kwargs)
 
-      Try to match a single dict with the supplied arguments.
+      Thử khớp một dict duy nhất với các đối số được cung cấp.
 
 
    .. method:: match_value(self, k, dv, v)
 
-      Try to match a single stored value (*dv*) with a supplied value (*v*).
+      Cố gắng khớp một giá trị được lưu trữ duy nhất (*dv*) với một giá trị được cung cấp (*v*).
 
 
-:mod:`!test.support.socket_helper` --- Utilities for socket tests
-=================================================================
+:mod:`!test.support.socket_helper` --- Tiện ích cho các bài kiểm thử socket
+===========================================================================
 
 .. module:: test.support.socket_helper
-   :synopsis: Support for socket tests.
+   :synopsis: Hỗ trợ cho các bài kiểm thử socket.
 
 
-The :mod:`!test.support.socket_helper` module provides support for socket tests.
+Mô-đun :mod:`!test.support.socket_helper` cung cấp hỗ trợ cho các bài kiểm thử socket.
 
 .. versionadded:: 3.9
 
 
 .. data:: IPV6_ENABLED
 
-    Set to ``True`` if IPv6 is enabled on this host, ``False`` otherwise.
+    Được đặt thành ``True`` nếu IPv6 được bật trên máy chủ này, nếu không thì là ``False``.
 
 
 .. function:: find_unused_port(family=socket.AF_INET, socktype=socket.SOCK_STREAM)
 
-   Returns an unused port that should be suitable for binding.  This is
-   achieved by creating a temporary socket with the same family and type as
-   the ``sock`` parameter (default is :const:`~socket.AF_INET`,
-   :const:`~socket.SOCK_STREAM`),
-   and binding it to the specified host address (defaults to ``0.0.0.0``)
-   with the port set to 0, eliciting an unused ephemeral port from the OS.
-   The temporary socket is then closed and deleted, and the ephemeral port is
-   returned.
+   Trả về một cổng chưa được sử dụng, phù hợp để liên kết. Việc này được thực hiện bằng cách tạo một socket tạm thời có cùng family và type với tham số ``sock`` (mặc định là :const:`~socket.AF_INET`,
+   :const:`~socket.SOCK_STREAM`), rồi liên kết socket đó với địa chỉ host được chỉ định (mặc định là ``0.0.0.0``) và đặt cổng thành 0, yêu cầu hệ điều hành cấp một cổng tạm thời chưa được sử dụng. Sau đó, socket tạm thời được đóng và xóa, rồi cổng tạm thời được trả về.
 
-   Either this method or :func:`bind_port` should be used for any tests
-   where a server socket needs to be bound to a particular port for the
-   duration of the test.
-   Which one to use depends on whether the calling code is creating a Python
-   socket, or if an unused port needs to be provided in a constructor
-   or passed to an external program (i.e. the ``-accept`` argument to
-   openssl's s_server mode).  Always prefer :func:`bind_port` over
-   :func:`find_unused_port` where possible.  Using a hard coded port is
-   discouraged since it can make multiple instances of the test impossible to
-   run simultaneously, which is a problem for buildbots.
+   Nên sử dụng phương thức này hoặc :func:`bind_port` cho mọi kiểm thử cần liên kết một server socket với một cổng cụ thể trong suốt thời gian kiểm thử. Việc chọn phương thức nào phụ thuộc vào việc code gọi đang tạo một Python socket hay cần cung cấp một cổng chưa được sử dụng trong constructor hoặc truyền cổng đó cho một chương trình bên ngoài (ví dụ: đối số ``-accept`` trong chế độ s_server của openssl). Luôn ưu tiên :func:`bind_port` hơn
+   :func:`find_unused_port` khi có thể. Không khuyến khích sử dụng cổng được ghi cố định vì điều này có thể khiến nhiều instance của kiểm thử không thể chạy đồng thời, gây ra vấn đề cho buildbot.
 
 
 .. function:: bind_port(sock, host=HOST)
 
-   Bind the socket to a free port and return the port number.  Relies on
-   ephemeral ports in order to ensure we are using an unbound port.  This is
-   important as many tests may be running simultaneously, especially in a
-   buildbot environment.  This method raises an exception if the
-   ``sock.family`` is :const:`~socket.AF_INET` and ``sock.type`` is
-   :const:`~socket.SOCK_STREAM`, and the socket has
-   :const:`~socket.SO_REUSEADDR` or :const:`~socket.SO_REUSEPORT` set on it.
-   Tests should never set these socket options for TCP/IP sockets.
-   The only case for setting these options is testing multicasting via
-   multiple UDP sockets.
+   Liên kết socket với một cổng trống và trả về số cổng. Phương thức này dựa vào các cổng ephemeral để đảm bảo chúng ta đang sử dụng một cổng chưa được liên kết. Điều này rất quan trọng vì nhiều kiểm thử có thể chạy đồng thời, đặc biệt trong môi trường buildbot. Phương thức này sẽ raise một exception nếu ``sock.family`` là :const:`~socket.AF_INET` và ``sock.type`` là
+   :const:`~socket.SOCK_STREAM`, và socket đã có
+   :const:`~socket.SO_REUSEADDR` hoặc :const:`~socket.SO_REUSEPORT` được thiết lập trên đó. Kiểm thử không bao giờ được thiết lập các socket option này cho socket TCP/IP. Trường hợp duy nhất cần thiết lập các option này là kiểm thử multicast thông qua nhiều UDP socket.
 
-   Additionally, if the :const:`~socket.SO_EXCLUSIVEADDRUSE` socket option is
-   available (i.e. on Windows), it will be set on the socket.  This will
-   prevent anyone else from binding to our host/port for the duration of the
-   test.
+   Ngoài ra, nếu socket option :const:`~socket.SO_EXCLUSIVEADDRUSE` khả dụng (tức là trên Windows), option này sẽ được thiết lập trên socket. Điều này sẽ ngăn bất kỳ tiến trình nào khác liên kết với host/port của chúng ta trong suốt thời gian kiểm thử.
 
 
 .. function:: bind_unix_socket(sock, addr)
 
-   Bind a Unix socket, raising :exc:`unittest.SkipTest` if
-   :exc:`PermissionError` is raised.
+   Liên kết một Unix socket, và raise :exc:`unittest.SkipTest` nếu
+   :exc:`PermissionError` được phát sinh.
 
 
 .. decorator:: skip_unless_bind_unix_socket
 
-   A decorator for running tests that require a functional ``bind()`` for Unix
-   sockets.
+   Một decorator để chạy các bài kiểm thử yêu cầu ``bind()`` hoạt động bình thường cho các socket Unix.
 
 
 .. function:: transient_internet(resource_name, *, timeout=30.0, errnos=())
 
-   A context manager that raises :exc:`~test.support.ResourceDenied` when
-   various issues with the internet connection manifest themselves as
-   exceptions.
+   Một context manager sẽ phát sinh :exc:`~test.support.ResourceDenied` khi nhiều vấn đề khác nhau với kết nối internet biểu hiện dưới dạng các exception.
 
 
-:mod:`!test.support.script_helper` --- Utilities for the Python execution tests
-===============================================================================
+:mod:`!test.support.script_helper` --- Các tiện ích cho các bài kiểm thử thực thi Python
+========================================================================================
 
 .. module:: test.support.script_helper
-   :synopsis: Support for Python's script execution tests.
+   :synopsis: Hỗ trợ cho các bài kiểm thử thực thi script của Python.
 
 
-The :mod:`!test.support.script_helper` module provides support for Python's
-script execution tests.
+Module :mod:`!test.support.script_helper` cung cấp hỗ trợ cho các bài kiểm thử thực thi script của Python.
 
 .. function:: interpreter_requires_environment()
 
-   Return ``True`` if ``sys.executable interpreter`` requires environment
-   variables in order to be able to run at all.
+   Trả về ``True`` nếu ``sys.executable interpreter`` yêu cầu các biến môi trường để có thể chạy được.
 
-   This is designed to be used with ``@unittest.skipIf()`` to annotate tests
-   that need to use an ``assert_python*()`` function to launch an isolated
-   mode (``-I``) or no environment mode (``-E``) sub-interpreter process.
+   Điều này được thiết kế để dùng với ``@unittest.skipIf()`` nhằm chú thích các bài kiểm thử cần sử dụng hàm ``assert_python*()`` để khởi chạy một quy trình con ở chế độ cô lập (``-I``) hoặc chế độ không có môi trường (``-E``).
 
-   A normal build & test does not run into this situation but it can happen
-   when trying to run the standard library test suite from an interpreter that
-   doesn't have an obvious home with Python's current home finding logic.
+   Một lần build và test thông thường không gặp tình huống này, nhưng tình huống này có thể xảy ra khi cố chạy bộ kiểm thử thư viện chuẩn từ một interpreter không có thư mục home rõ ràng theo logic tìm home hiện tại của Python.
 
-   Setting :envvar:`PYTHONHOME` is one way to get most of the testsuite to run
-   in that situation.  :envvar:`PYTHONPATH` or :envvar:`PYTHONUSERSITE` are
-   other common environment variables that might impact whether or not the
-   interpreter can start.
+   Thiết lập :envvar:`PYTHONHOME` là một cách để chạy hầu hết testsuite trong tình huống đó. :envvar:`PYTHONPATH` hoặc :envvar:`PYTHONUSERSITE` là những biến môi trường phổ biến khác có thể ảnh hưởng đến việc interpreter có thể khởi động hay không.
 
 
 .. function:: run_python_until_end(*args, **env_vars)
 
-   Set up the environment based on *env_vars* for running the interpreter
-   in a subprocess.  The values can include ``__isolated``, ``__cleanenv``,
-   ``__cwd``, and ``TERM``.
+   Thiết lập môi trường dựa trên *env_vars* để chạy interpreter trong một subprocess. Các giá trị có thể bao gồm ``__isolated``, ``__cleanenv``, ``__cwd`` và ``TERM``.
 
    .. versionchanged:: 3.9
-      The function no longer strips whitespaces from *stderr*.
+      Hàm này không còn loại bỏ khoảng trắng khỏi *stderr*.
 
 
 .. function:: assert_python_ok(*args, **env_vars)
 
-   Assert that running the interpreter with *args* and optional environment
-   variables *env_vars* succeeds (``rc == 0``) and return a ``(return code,
-   stdout, stderr)`` tuple.
+   Xác nhận rằng việc chạy interpreter với *args* và các biến môi trường tùy chọn *env_vars* thành công (``rc == 0``) và trả về một tuple ``(return code, stdout, stderr)``.
 
-   If the *__cleanenv* keyword-only parameter is set, *env_vars* is used as a fresh
-   environment.
+   Nếu tham số chỉ dùng theo keyword *__cleanenv* được thiết lập, *env_vars* sẽ được sử dụng làm môi trường mới.
 
-   Python is started in isolated mode (command line option ``-I``),
-   except if the *__isolated* keyword-only parameter is set to ``False``.
+   Python được khởi chạy ở chế độ isolated (tùy chọn dòng lệnh ``-I``), trừ khi tham số chỉ nhận đối số từ khóa *__isolated* được đặt thành ``False``.
 
    .. versionchanged:: 3.9
-      The function no longer strips whitespaces from *stderr*.
+      Hàm này không còn loại bỏ khoảng trắng khỏi *stderr*.
 
 
 .. function:: assert_python_failure(*args, **env_vars)
 
-   Assert that running the interpreter with *args* and optional environment
-   variables *env_vars* fails (``rc != 0``) and return a ``(return code,
-   stdout, stderr)`` tuple.
+   Khẳng định rằng việc chạy trình thông dịch với *args* và các biến môi trường tùy chọn *env_vars* sẽ không thành công (``rc != 0``) và trả về một tuple ``(return code, stdout, stderr)``.
 
-   See :func:`assert_python_ok` for more options.
+   Xem :func:`assert_python_ok` để biết thêm tùy chọn.
 
    .. versionchanged:: 3.9
-      The function no longer strips whitespaces from *stderr*.
+      Hàm này không còn loại bỏ khoảng trắng khỏi *stderr*.
 
 
 .. function:: spawn_python(*args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **kw)
 
-   Run a Python subprocess with the given arguments.
+   Chạy một Python subprocess với các đối số đã cho.
 
-   *kw* is extra keyword args to pass to :func:`subprocess.Popen`. Returns a
-   :class:`subprocess.Popen` object.
+   *kw* là các đối số từ khóa bổ sung cần truyền cho :func:`subprocess.Popen`. Trả về một
+   đối tượng :class:`subprocess.Popen`.
 
 
 .. function:: kill_python(p)
 
-   Run the given :class:`subprocess.Popen` process until completion and return
-   stdout.
+   Chạy quy trình :class:`subprocess.Popen` đã cho đến khi hoàn tất và trả về stdout.
 
 
 .. function:: make_script(script_dir, script_basename, source, omit_suffix=False)
 
-   Create script containing *source* in path *script_dir* and *script_basename*.
-   If *omit_suffix* is ``False``, append ``.py`` to the name.  Return the full
-   script path.
+   Tạo tập lệnh chứa *source* tại đường dẫn *script_dir* và *script_basename*. Nếu *omit_suffix* là ``False``, hãy nối thêm ``.py`` vào tên. Trả về đường dẫn đầy đủ của tập lệnh.
 
 
 .. function:: make_zip_script(zip_dir, zip_basename, script_name, name_in_zip=None)
 
-   Create zip file at *zip_dir* and *zip_basename* with extension ``zip`` which
-   contains the files in *script_name*. *name_in_zip* is the archive name.
-   Return a tuple containing ``(full path, full path of archive name)``.
+   Tạo tệp zip tại *zip_dir* và *zip_basename* với phần mở rộng ``zip``, trong đó chứa các tệp trong *script_name*. *name_in_zip* là tên của kho lưu trữ. Trả về một tuple chứa ``(full path, full path of archive name)``.
 
 
 .. function:: make_pkg(pkg_dir, init_source='')
 
-   Create a directory named *pkg_dir* containing an ``__init__`` file with
-   *init_source* as its contents.
+   Tạo một thư mục có tên *pkg_dir*, chứa một tệp ``__init__`` với nội dung là *init_source*.
 
 
 .. function:: make_zip_pkg(zip_dir, zip_basename, pkg_name, script_basename, \
                            source, depth=1, compiled=False)
 
-   Create a zip package directory with a path of *zip_dir* and *zip_basename*
-   containing an empty ``__init__`` file and a file *script_basename*
-   containing the *source*.  If *compiled* is ``True``, both source files will
-   be compiled and added to the zip package.  Return a tuple of the full zip
-   path and the archive name for the zip file.
+   Tạo một thư mục gói zip với đường dẫn *zip_dir* và *zip_basename*, chứa một tệp ``__init__`` rỗng và một tệp *script_basename* chứa *source*. Nếu *compiled* là ``True``, cả hai tệp nguồn sẽ được biên dịch và thêm vào gói zip. Trả về một tuple gồm đường dẫn zip đầy đủ và tên kho lưu trữ của tệp zip.
 
 
-:mod:`!test.support.bytecode_helper` --- Support tools for testing correct bytecode generation
-==============================================================================================
+:mod:`!test.support.bytecode_helper` --- Công cụ hỗ trợ kiểm thử việc tạo bytecode chính xác
+============================================================================================
 
 .. module:: test.support.bytecode_helper
-   :synopsis: Support tools for testing correct bytecode generation.
+   :synopsis: Công cụ hỗ trợ kiểm thử việc tạo bytecode chính xác.
 
-The :mod:`!test.support.bytecode_helper` module provides support for testing
-and inspecting bytecode generation.
+Mô-đun :mod:`!test.support.bytecode_helper` cung cấp các tính năng hỗ trợ cho việc kiểm thử và kiểm tra quá trình tạo bytecode.
 
 .. versionadded:: 3.9
 
-The module defines the following class:
+Mô-đun này định nghĩa lớp sau:
 
 .. class:: BytecodeTestCase(unittest.TestCase)
 
-   This class has custom assertion methods for inspecting bytecode.
+   Lớp này có các phương thức assertion tùy chỉnh để kiểm tra bytecode.
 
 .. method:: BytecodeTestCase.get_disassembly_as_string(co)
 
-   Return the disassembly of *co* as string.
+   Trả về mã disassembly của *co* dưới dạng chuỗi.
 
 
 .. method:: BytecodeTestCase.assertInBytecode(x, opname, argval=_UNSPECIFIED)
 
-   Return instr if *opname* is found, otherwise throws :exc:`AssertionError`.
+   Trả về instr nếu tìm thấy *opname*, nếu không sẽ ném :exc:`AssertionError`.
 
 
 .. method:: BytecodeTestCase.assertNotInBytecode(x, opname, argval=_UNSPECIFIED)
 
-   Throws :exc:`AssertionError` if *opname* is found.
+   Phát sinh :exc:`AssertionError` nếu tìm thấy *opname*.
 
 
-:mod:`!test.support.threading_helper` --- Utilities for threading tests
-=======================================================================
+:mod:`!test.support.threading_helper` --- Tiện ích cho việc kiểm thử threading
+==============================================================================
 
 .. module:: test.support.threading_helper
-   :synopsis: Support for threading tests.
+   :synopsis: Hỗ trợ cho việc kiểm thử threading.
 
-The :mod:`!test.support.threading_helper` module provides support for threading tests.
+Mô-đun :mod:`!test.support.threading_helper` cung cấp các công cụ hỗ trợ cho việc kiểm thử threading.
 
 .. versionadded:: 3.10
 
 
 .. function:: join_thread(thread, timeout=None)
 
-   Join a *thread* within *timeout*.  Raise an :exc:`AssertionError` if thread
-   is still alive after *timeout* seconds.
+   Thực hiện join một *thread* trong *timeout*. Phát sinh một :exc:`AssertionError` nếu thread vẫn đang hoạt động sau *timeout* giây.
 
 
 .. decorator:: reap_threads
 
-   Decorator to ensure the threads are cleaned up even if the test fails.
+   Decorator bảo đảm các thread được dọn dẹp ngay cả khi bài kiểm thử thất bại.
 
 
 .. function:: start_threads(threads, unlock=None)
 
-   Context manager to start *threads*, which is a sequence of threads.
-   *unlock* is a function called after the threads are started, even if an
-   exception was raised; an example would be :meth:`threading.Event.set`.
-   ``start_threads`` will attempt to join the started threads upon exit.
+   Context manager để khởi động *threads*, tức là một chuỗi các thread. *unlock* là một hàm được gọi sau khi các thread được khởi động, ngay cả khi đã xảy ra ngoại lệ; một ví dụ có thể là :meth:`threading.Event.set`. ``start_threads`` sẽ cố gắng join các thread đã khởi động khi thoát.
 
 
 .. function:: threading_cleanup(*original_values)
 
-   Cleanup up threads not specified in *original_values*.  Designed to emit
-   a warning if a test leaves running threads in the background.
+   Dọn dẹp các thread không được chỉ định trong *original_values*. Được thiết kế để phát cảnh báo nếu một test để lại các thread đang chạy trong nền.
 
 
 .. function:: threading_setup()
 
-   Return current thread count and copy of dangling threads.
+   Trả về số lượng thread hiện tại và bản sao của các thread còn tồn tại.
 
 
 .. function:: wait_threads_exit(timeout=None)
 
-   Context manager to wait until all threads created in the ``with`` statement
-   exit.
+   Context manager chờ cho đến khi tất cả các thread được tạo trong câu lệnh ``with`` thoát.
 
 
 .. function:: catch_threading_exception()
 
-   Context manager catching :class:`threading.Thread` exception using
+   Context manager bắt ngoại lệ :class:`threading.Thread` bằng cách sử dụng
    :func:`threading.excepthook`.
 
-   Attributes set when an exception is caught:
+   Các thuộc tính được thiết lập khi bắt được một ngoại lệ:
 
    * ``exc_type``
    * ``exc_value``
    * ``exc_traceback``
    * ``thread``
 
-   See :func:`threading.excepthook` documentation.
+   Xem tài liệu :func:`threading.excepthook`.
 
-   These attributes are deleted at the context manager exit.
+   Các thuộc tính này sẽ bị xóa khi context manager thoát.
 
-   Usage::
+   Cách sử dụng::
 
        with threading_helper.catch_threading_exception() as cm:
-           # code spawning a thread which raises an exception
+           # mã tạo một thread phát sinh exception
            ...
 
-           # check the thread exception, use cm attributes:
-           # exc_type, exc_value, exc_traceback, thread
+           # kiểm tra exception của thread, sử dụng các thuộc tính của cm:
+           # các thuộc tính exc_type, exc_value, exc_traceback, thread
            ...
 
-       # exc_type, exc_value, exc_traceback, thread attributes of cm no longer
-       # exists at this point
-       # (to avoid reference cycles)
+       # các thuộc tính exc_type, exc_value, exc_traceback, thread của cm không còn
+       # tồn tại tại thời điểm này
+       # (để tránh vòng lặp tham chiếu)
 
    .. versionadded:: 3.8
 
 
 .. function:: run_concurrently(worker_func, nthreads, args=(), kwargs={})
 
-    Run the worker function concurrently in multiple threads.
-    Re-raises an exception if any thread raises one, after all threads have
-    finished.
+    Chạy đồng thời hàm worker trong nhiều thread. Ném lại một exception nếu bất kỳ thread nào phát sinh exception, sau khi tất cả thread đã hoàn tất.
 
 
-:mod:`!test.support.os_helper` --- Utilities for os tests
-=========================================================
+:mod:`!test.support.os_helper` --- Các tiện ích cho việc kiểm thử os
+====================================================================
 
 .. module:: test.support.os_helper
-   :synopsis: Support for os tests.
+   :synopsis: Hỗ trợ cho việc kiểm thử os.
 
-The :mod:`!test.support.os_helper` module provides support for os tests.
+Module :mod:`!test.support.os_helper` cung cấp hỗ trợ cho việc kiểm thử os.
 
 .. versionadded:: 3.10
 
 
 .. data:: FS_NONASCII
 
-   A non-ASCII character encodable by :func:`os.fsencode`.
+   Một ký tự không phải ASCII có thể được mã hóa bằng :func:`os.fsencode`.
 
 
 .. data:: SAVEDCWD
 
-   Set to :func:`os.getcwd`.
+   Được đặt thành :func:`os.getcwd`.
 
 
 .. data:: TESTFN
 
-   Set to a name that is safe to use as the name of a temporary file.  Any
-   temporary file that is created should be closed and unlinked (removed).
+   Được đặt thành một tên an toàn để sử dụng làm tên tệp tạm thời. Mọi tệp tạm thời được tạo ra cần được đóng và unlink (xóa).
 
 
 .. data:: TESTFN_NONASCII
 
-   Set to a filename containing the :data:`FS_NONASCII` character, if it exists.
-   This guarantees that if the filename exists, it can be encoded and decoded
-   with the default filesystem encoding. This allows tests that require a
-   non-ASCII filename to be easily skipped on platforms where they can't work.
+   Đặt thành một tên tệp chứa ký tự :data:`FS_NONASCII`, nếu có thể. Điều này đảm bảo rằng nếu tên tệp tồn tại, nó có thể được mã hóa và giải mã bằng encoding mặc định của hệ thống tệp. Nhờ đó, các kiểm thử yêu cầu tên tệp không phải ASCII có thể dễ dàng được bỏ qua trên những nền tảng không hỗ trợ chúng.
 
 
 .. data:: TESTFN_UNENCODABLE
 
-   Set to a filename (str type) that should not be able to be encoded by file
-   system encoding in strict mode.  It may be ``None`` if it's not possible to
-   generate such a filename.
+   Đặt thành một tên tệp (kiểu str) không thể được mã hóa bằng encoding của hệ thống tệp ở chế độ strict. Nó có thể là ``None`` nếu không thể tạo tên tệp như vậy.
 
 
 .. data:: TESTFN_UNDECODABLE
 
-   Set to a filename (bytes type) that should not be able to be decoded by
-   file system encoding in strict mode.  It may be ``None`` if it's not
-   possible to generate such a filename.
+   Đặt thành một tên tệp (kiểu bytes) không thể được giải mã bằng encoding của hệ thống tệp ở chế độ strict. Nó có thể là ``None`` nếu không thể tạo tên tệp như vậy.
 
 
 .. data:: TESTFN_UNICODE
 
-    Set to a non-ASCII name for a temporary file.
+    Đặt thành một tên không phải ASCII cho một tệp tạm thời.
 
 
 .. class:: EnvironmentVarGuard()
 
-   Class used to temporarily set or unset environment variables.  Instances can
-   be used as a context manager and have a complete dictionary interface for
-   querying/modifying the underlying ``os.environ``. After exit from the
-   context manager all changes to environment variables done through this
-   instance will be rolled back.
+   Lớp dùng để tạm thời đặt hoặc hủy đặt các biến môi trường. Các instance có thể được dùng như một context manager và có đầy đủ giao diện từ điển để truy vấn/sửa đổi ``os.environ`` bên dưới. Sau khi thoát khỏi context manager, mọi thay đổi đối với các biến môi trường được thực hiện thông qua instance này sẽ được hoàn tác.
 
    .. versionchanged:: 3.1
-      Added dictionary interface.
+      Đã thêm giao diện từ điển.
 
 
 .. class:: FakePath(path)
 
-   Simple :term:`path-like object`.  It implements the
-   :meth:`~os.PathLike.__fspath__`
-   method which just returns the *path* argument.  If *path* is an exception,
-   it will be raised in :meth:`!__fspath__`.
+   :term:`path-like object` đơn giản. Nó triển khai
+   Phương thức :meth:`~os.PathLike.__fspath__` chỉ trả về đối số *path*. Nếu *path* là một exception, nó sẽ được raise trong :meth:`!__fspath__`.
 
 
 .. method:: EnvironmentVarGuard.set(envvar, value)
 
-   Temporarily set the environment variable ``envvar`` to the value of
-   ``value``.
+   Tạm thời đặt biến môi trường ``envvar`` thành giá trị ``value``.
 
 
 .. method:: EnvironmentVarGuard.unset(envvar, *others)
 
-   Temporarily unset one or more environment variables.
+   Tạm thời bỏ đặt một hoặc nhiều biến môi trường.
 
    .. versionchanged:: 3.14
-      More than one environment variable can be unset.
+      Có thể bỏ đặt nhiều biến môi trường.
 
 
 .. function:: can_symlink()
 
-   Return ``True`` if the OS supports symbolic links, ``False``
-   otherwise.
+   Trả về ``True`` nếu hệ điều hành hỗ trợ symbolic links, nếu không thì trả về ``False``.
 
 
 .. function:: can_xattr()
 
-   Return ``True`` if the OS supports xattr, ``False``
-   otherwise.
+   Trả về ``True`` nếu hệ điều hành hỗ trợ xattr, nếu không thì trả về ``False``.
 
 
 .. function:: change_cwd(path, quiet=False)
 
-   A context manager that temporarily changes the current working
-   directory to *path* and yields the directory.
+   Một context manager tạm thời thay đổi thư mục làm việc hiện tại thành *path* và yield thư mục đó.
 
-   If *quiet* is ``False``, the context manager raises an exception
-   on error.  Otherwise, it issues only a warning and keeps the current
-   working directory the same.
+   Nếu *quiet* là ``False``, context manager sẽ phát sinh ngoại lệ khi có lỗi. Nếu không, nó chỉ đưa ra cảnh báo và giữ nguyên thư mục làm việc hiện tại.
 
 
 .. function:: create_empty_file(filename)
 
-   Create an empty file with *filename*.  If it already exists, truncate it.
+   Tạo một tệp trống với *filename*. Nếu tệp đã tồn tại, cắt ngắn tệp đó.
 
 
 .. function:: fd_count()
 
-   Count the number of open file descriptors.
+   Đếm số lượng file descriptor đang mở.
 
 
 .. function:: fs_is_case_insensitive(directory)
 
-   Return ``True`` if the file system for *directory* is case-insensitive.
+   Trả về ``True`` nếu hệ thống tệp cho *directory* không phân biệt chữ hoa chữ thường.
 
 
 .. function:: make_bad_fd()
 
-   Create an invalid file descriptor by opening and closing a temporary file,
-   and returning its descriptor.
+   Tạo một file descriptor không hợp lệ bằng cách mở rồi đóng một tệp tạm thời, sau đó trả về descriptor của tệp đó.
 
 
 .. function:: rmdir(filename)
 
-   Call :func:`os.rmdir` on *filename*.  On Windows platforms, this is
-   wrapped with a wait loop that checks for the existence of the file,
-   which is needed due to antivirus programs that can hold files open and prevent
-   deletion.
+   Gọi :func:`os.rmdir` trên *filename*. Trên các nền tảng Windows, thao tác này được bọc trong một vòng lặp chờ để kiểm tra sự tồn tại của tệp; điều này cần thiết vì các chương trình chống virus có thể giữ tệp ở trạng thái mở và ngăn việc xóa tệp.
 
 
 .. function:: rmtree(path)
 
-   Call :func:`shutil.rmtree` on *path* or call :func:`os.lstat` and
-   :func:`os.rmdir` to remove a path and its contents.  As with :func:`rmdir`,
-   on Windows platforms
-   this is wrapped with a wait loop that checks for the existence of the files.
+   Gọi :func:`shutil.rmtree` trên *path* hoặc gọi :func:`os.lstat` và
+   :func:`os.rmdir` để xóa một đường dẫn và nội dung của đường dẫn đó. Cũng như :func:`rmdir`, trên các nền tảng Windows, thao tác này được bao bọc bằng một vòng lặp chờ để kiểm tra sự tồn tại của các tệp.
 
 
 .. decorator:: skip_unless_symlink
 
-   A decorator for running tests that require support for symbolic links.
+   Một decorator dùng để chạy các bài kiểm thử yêu cầu hỗ trợ symbolic link.
 
 
 .. decorator:: skip_unless_xattr
 
-   A decorator for running tests that require support for xattr.
+   Một decorator dùng để chạy các bài kiểm thử yêu cầu hỗ trợ xattr.
 
 
 .. function:: temp_cwd(name='tempcwd', quiet=False)
 
-   A context manager that temporarily creates a new directory and
-   changes the current working directory (CWD).
+   Một context manager tạm thời tạo một thư mục mới và thay đổi thư mục làm việc hiện tại (CWD).
 
-   The context manager creates a temporary directory in the current
-   directory with name *name* before temporarily changing the current
-   working directory.  If *name* is ``None``, the temporary directory is
-   created using :func:`tempfile.mkdtemp`.
+   Context manager này tạo một thư mục tạm thời trong thư mục hiện tại với tên *name* trước khi tạm thời thay đổi thư mục làm việc hiện tại. Nếu *name* là ``None``, thư mục tạm thời được tạo bằng :func:`tempfile.mkdtemp`.
 
-   If *quiet* is ``False`` and it is not possible to create or change
-   the CWD, an error is raised.  Otherwise, only a warning is raised
-   and the original CWD is used.
+   Nếu *quiet* là ``False`` và không thể tạo hoặc thay đổi CWD, một lỗi sẽ được phát sinh. Nếu không, chỉ một cảnh báo được phát ra và CWD ban đầu được sử dụng.
 
 
 .. function:: temp_dir(path=None, quiet=False)
 
-   A context manager that creates a temporary directory at *path* and
-   yields the directory.
+   Một context manager tạo một thư mục tạm thời tại *path* và trả về thư mục đó.
 
-   If *path* is ``None``, the temporary directory is created using
-   :func:`tempfile.mkdtemp`.  If *quiet* is ``False``, the context manager
-   raises an exception on error.  Otherwise, if *path* is specified and
-   cannot be created, only a warning is issued.
+   Nếu *path* là ``None``, thư mục tạm thời được tạo bằng
+   :func:`tempfile.mkdtemp`.  Nếu *quiet* là ``False``, context manager sẽ phát sinh ngoại lệ khi có lỗi.  Nếu không, khi *path* được chỉ định nhưng không thể tạo, chỉ một cảnh báo được đưa ra.
 
 
 .. function:: temp_umask(umask)
 
-   A context manager that temporarily sets the process umask.
+   Một context manager tạm thời đặt umask của process.
 
 
 .. function:: unlink(filename)
 
-   Call :func:`os.unlink` on *filename*.  As with :func:`rmdir`,
-   on Windows platforms, this is
-   wrapped with a wait loop that checks for the existence of the file.
+   Gọi :func:`os.unlink` trên *filename*.  Tương tự như :func:`rmdir`, trên các nền tảng Windows, thao tác này được bọc trong một vòng lặp chờ để kiểm tra sự tồn tại của tệp.
 
 
-:mod:`!test.support.import_helper` --- Utilities for import tests
-=================================================================
+:mod:`!test.support.import_helper` --- Tiện ích cho các bài kiểm thử import
+===========================================================================
 
 .. module:: test.support.import_helper
-   :synopsis: Support for import tests.
+   :synopsis: Hỗ trợ cho các bài kiểm thử import.
 
-The :mod:`!test.support.import_helper` module provides support for import tests.
+Module :mod:`!test.support.import_helper` cung cấp hỗ trợ cho các bài kiểm thử import.
 
 .. versionadded:: 3.10
 
 
 .. function:: forget(module_name)
 
-   Remove the module named *module_name* from ``sys.modules`` and delete any
-   byte-compiled files of the module.
+   Xóa module có tên *module_name* khỏi ``sys.modules`` và xóa mọi tệp đã biên dịch thành byte của module đó.
 
 
 .. function:: import_fresh_module(name, fresh=(), blocked=(), deprecated=False)
 
-   This function imports and returns a fresh copy of the named Python module
-   by removing the named module from ``sys.modules`` before doing the import.
-   Note that unlike :func:`reload`, the original module is not affected by
-   this operation.
+   Hàm này nhập và trả về một bản sao mới của module Python có tên bằng cách xóa module đó khỏi ``sys.modules`` trước khi thực hiện thao tác nhập. Lưu ý rằng, không giống như :func:`reload`, module gốc không bị ảnh hưởng bởi thao tác này.
 
-   *fresh* is an iterable of additional module names that are also removed
-   from the ``sys.modules`` cache before doing the import.
+   *fresh* là một iterable chứa các tên module bổ sung cũng được xóa khỏi bộ nhớ đệm ``sys.modules`` trước khi thực hiện thao tác nhập.
 
-   *blocked* is an iterable of module names that are replaced with ``None``
-   in the module cache during the import to ensure that attempts to import
-   them raise :exc:`ImportError`.
+   *blocked* là một iterable chứa các tên module được thay thế bằng ``None`` trong bộ nhớ đệm module trong quá trình nhập, nhằm đảm bảo rằng các nỗ lực nhập chúng sẽ gây ra :exc:`ImportError`.
 
-   The named module and any modules named in the *fresh* and *blocked*
-   parameters are saved before starting the import and then reinserted into
-   ``sys.modules`` when the fresh import is complete.
+   Module được chỉ định cùng mọi module có tên trong các tham số *fresh* và *blocked* sẽ được lưu lại trước khi bắt đầu thao tác nhập, sau đó được chèn trở lại vào ``sys.modules`` khi quá trình nhập mới hoàn tất.
 
-   Module and package deprecation messages are suppressed during this import
-   if *deprecated* is ``True``.
+   Các thông báo không còn được khuyến nghị của module và package sẽ bị bỏ qua trong quá trình nhập này nếu *deprecated* là ``True``.
 
-   This function will raise :exc:`ImportError` if the named module cannot be
-   imported.
+   Hàm này sẽ phát sinh :exc:`ImportError` nếu không thể nhập module được chỉ định.
 
-   Example use::
+   Ví dụ sử dụng::
 
-      # Get copies of the warnings module for testing without affecting the
-      # version being used by the rest of the test suite. One copy uses the
-      # C implementation, the other is forced to use the pure Python fallback
+      # Lấy các bản sao của module warnings để kiểm thử mà không ảnh hưởng đến
+      # phiên bản đang được phần còn lại của bộ kiểm thử sử dụng. Một bản sao sử dụng
+      # implementation C, bản còn lại bị buộc sử dụng implementation Python thuần túy dự phòng
       # implementation
       py_warnings = import_fresh_module('warnings', blocked=['_warnings'])
       c_warnings = import_fresh_module('warnings', fresh=['_warnings'])
@@ -1713,159 +1374,114 @@ The :mod:`!test.support.import_helper` module provides support for import tests.
 
 .. function:: import_module(name, deprecated=False, *, required_on=())
 
-   This function imports and returns the named module. Unlike a normal
-   import, this function raises :exc:`unittest.SkipTest` if the module
-   cannot be imported.
+   Hàm này import và trả về module có tên được chỉ định. Không giống như import thông thường, hàm này phát sinh :exc:`unittest.SkipTest` nếu không thể import module.
 
-   Module and package deprecation messages are suppressed during this import
-   if *deprecated* is ``True``.  If a module is required on a platform but
-   optional for others, set *required_on* to an iterable of platform prefixes
-   which will be compared against :data:`sys.platform`.
+   Các thông báo deprecated của module và package sẽ bị ẩn trong quá trình import này nếu *deprecated* là ``True``. Nếu một module bắt buộc phải có trên một nền tảng nhưng là tùy chọn trên các nền tảng khác, hãy đặt *required_on* thành một iterable gồm các tiền tố nền tảng để so sánh với :data:`sys.platform`.
 
    .. versionadded:: 3.1
 
 
 .. function:: modules_setup()
 
-   Return a copy of :data:`sys.modules`.
+   Trả về một bản sao của :data:`sys.modules`.
 
 
 .. function:: modules_cleanup(oldmodules)
 
-   Remove modules except for *oldmodules* and ``encodings`` in order to
-   preserve internal cache.
+   Xóa các module ngoại trừ *oldmodules* và ``encodings`` để bảo toàn bộ nhớ đệm nội bộ.
 
 
 .. function:: unload(name)
 
-   Delete *name* from ``sys.modules``.
+   Xóa *name* khỏi ``sys.modules``.
 
 
 .. function:: make_legacy_pyc(source)
 
-   Move a :pep:`3147`/:pep:`488` pyc file to its legacy pyc location and return the file
-   system path to the legacy pyc file.  The *source* value is the file system
-   path to the source file.  It does not need to exist, however the PEP
-   3147/488 pyc file must exist.
+   Di chuyển một tệp pyc :pep:`3147`/:pep:`488` đến vị trí pyc cũ của nó và trả về đường dẫn hệ thống tệp đến tệp pyc cũ. Giá trị *source* là đường dẫn hệ thống tệp đến tệp nguồn. Tệp này không cần phải tồn tại, tuy nhiên tệp pyc PEP 3147/488 phải tồn tại.
 
 
 .. class:: CleanImport(*module_names)
 
-   A context manager to force import to return a new module reference.  This
-   is useful for testing module-level behaviors, such as the emission of a
-   :exc:`DeprecationWarning` on import.  Example usage::
+   Một context manager dùng để buộc import trả về một tham chiếu module mới. Điều này hữu ích khi kiểm thử các hành vi cấp module, chẳng hạn như việc phát ra một
+   :exc:`DeprecationWarning` khi import. Ví dụ sử dụng::
 
       with CleanImport('foo'):
-          importlib.import_module('foo')  # New reference.
+          importlib.import_module('foo')  # Tham chiếu mới.
 
 
 .. class:: DirsOnSysPath(*paths)
 
-   A context manager to temporarily add directories to :data:`sys.path`.
+   Một context manager để tạm thời thêm các thư mục vào :data:`sys.path`.
 
-   This makes a copy of :data:`sys.path`, appends any directories given
-   as positional arguments, then reverts :data:`sys.path` to the copied
-   settings when the context ends.
+   Context manager này tạo một bản sao của :data:`sys.path`, nối thêm mọi thư mục được cung cấp dưới dạng đối số vị trí, rồi khôi phục :data:`sys.path` về các thiết lập đã sao chép khi context kết thúc.
 
-   Note that *all* :data:`sys.path` modifications in the body of the
-   context manager, including replacement of the object,
-   will be reverted at the end of the block.
+   Lưu ý rằng *all* :data:`sys.path` sửa đổi nào trong phần thân của context manager, kể cả việc thay thế đối tượng, cũng sẽ được khôi phục khi kết thúc khối.
 
 
-:mod:`!test.support.warnings_helper` --- Utilities for warnings tests
-=====================================================================
+:mod:`!test.support.warnings_helper` --- Tiện ích cho các kiểm thử cảnh báo
+===========================================================================
 
 .. module:: test.support.warnings_helper
-   :synopsis: Support for warnings tests.
+   :synopsis: Hỗ trợ cho các kiểm thử cảnh báo.
 
-The :mod:`!test.support.warnings_helper` module provides support for warnings tests.
+Mô-đun :mod:`!test.support.warnings_helper` cung cấp tính năng hỗ trợ cho các kiểm thử cảnh báo.
 
 .. versionadded:: 3.10
 
 
 .. function:: ignore_warnings(*, category)
 
-   Suppress warnings that are instances of *category*,
-   which must be :exc:`Warning` or a subclass.
-   Roughly equivalent to :func:`warnings.catch_warnings`
-   with :meth:`warnings.simplefilter('ignore', category=category) <warnings.simplefilter>`.
-   For example::
+   Bỏ qua các cảnh báo là các thể hiện của *category*, đối tượng này phải là :exc:`Warning` hoặc một lớp con. Về cơ bản tương đương với :func:`warnings.catch_warnings` cùng với :meth:`warnings.simplefilter('ignore', category=category) <warnings.simplefilter>`. Ví dụ::
 
       @warning_helper.ignore_warnings(category=DeprecationWarning)
       def test_suppress_warning():
-          # do something
+          # thực hiện một thao tác
 
    .. versionadded:: 3.8
 
 
 .. function:: check_no_resource_warning(testcase)
 
-   Context manager to check that no :exc:`ResourceWarning` was raised.  You
-   must remove the object which may emit :exc:`ResourceWarning` before the
-   end of the context manager.
+   Context manager để kiểm tra rằng không có :exc:`ResourceWarning` nào được phát ra. Bạn phải xóa đối tượng có thể phát ra :exc:`ResourceWarning` trước khi kết thúc context manager.
 
 
 .. function:: check_syntax_warning(testcase, statement, errtext='', *, lineno=1, offset=None)
 
-   Test for syntax warning in *statement* by attempting to compile *statement*.
-   Test also that the :exc:`SyntaxWarning` is emitted only once, and that it
-   will be converted to a :exc:`SyntaxError` when turned into error.
-   *testcase* is the :mod:`unittest` instance for the test.  *errtext* is the
-   regular expression which should match the string representation of the
-   emitted :exc:`SyntaxWarning` and raised :exc:`SyntaxError`.  If *lineno*
-   is not ``None``, compares to the line of the warning and exception.
-   If *offset* is not ``None``, compares to the offset of the exception.
+   Kiểm tra syntax warning trong *statement* bằng cách cố gắng biên dịch *statement*. Đồng thời kiểm tra rằng :exc:`SyntaxWarning` chỉ được phát ra một lần và sẽ được chuyển đổi thành :exc:`SyntaxError` khi được chuyển thành lỗi. *testcase* là instance :mod:`unittest` dùng cho bài kiểm tra. *errtext* là regular expression phải khớp với biểu diễn chuỗi của :exc:`SyntaxWarning` được phát ra và :exc:`SyntaxError` được phát sinh. Nếu *lineno* không phải là ``None``, so sánh với dòng của warning và exception. Nếu *offset* không phải là ``None``, so sánh với offset của exception.
 
    .. versionadded:: 3.8
 
 
 .. function:: check_warnings(*filters, quiet=True)
 
-   A convenience wrapper for :func:`warnings.catch_warnings` that makes it
-   easier to test that a warning was correctly raised.  It is approximately
-   equivalent to calling ``warnings.catch_warnings(record=True)`` with
-   :meth:`warnings.simplefilter` set to ``always`` and with the option to
-   automatically validate the results that are recorded.
+   Một wrapper tiện lợi cho :func:`warnings.catch_warnings`, giúp dễ dàng kiểm tra rằng một warning đã được phát sinh đúng cách. Nó gần tương đương với việc gọi ``warnings.catch_warnings(record=True)`` với
+   :meth:`warnings.simplefilter` được đặt thành ``always`` và có tùy chọn tự động xác thực các kết quả được ghi lại.
 
-   ``check_warnings`` accepts 2-tuples of the form ``("message regexp",
-   WarningCategory)`` as positional arguments. If one or more *filters* are
-   provided, or if the optional keyword argument *quiet* is ``False``,
-   it checks to make sure the warnings are as expected:  each specified filter
-   must match at least one of the warnings raised by the enclosed code or the
-   test fails, and if any warnings are raised that do not match any of the
-   specified filters the test fails.  To disable the first of these checks,
-   set *quiet* to ``True``.
+   ``check_warnings`` chấp nhận các tuple 2 phần tử có dạng ``("message regexp", WarningCategory)`` làm đối số vị trí. Nếu cung cấp một hoặc nhiều *filters*, hoặc nếu đối số keyword tùy chọn *quiet* là ``False``, hàm sẽ kiểm tra để đảm bảo các warning đúng như mong đợi: mỗi filter được chỉ định phải khớp với ít nhất một warning do đoạn mã bao quanh phát sinh, nếu không bài kiểm tra sẽ thất bại; và nếu có warning nào được phát sinh nhưng không khớp với bất kỳ filter nào đã chỉ định, bài kiểm tra cũng sẽ thất bại. Để tắt lần kiểm tra đầu tiên, đặt *quiet* thành ``True``.
 
-   If no arguments are specified, it defaults to::
+   Nếu không chỉ định đối số nào, giá trị mặc định là::
 
       check_warnings(("", Warning), quiet=True)
 
-   In this case all warnings are caught and no errors are raised.
+   Trong trường hợp này, tất cả cảnh báo đều được bắt và không có lỗi nào được phát sinh.
 
-   On entry to the context manager, a :class:`WarningRecorder` instance is
-   returned. The underlying warnings list from
-   :func:`~warnings.catch_warnings` is available via the recorder object's
-   :attr:`warnings` attribute.  As a convenience, the attributes of the object
-   representing the most recent warning can also be accessed directly through
-   the recorder object (see example below).  If no warning has been raised,
-   then any of the attributes that would otherwise be expected on an object
-   representing a warning will return ``None``.
+   Khi đi vào context manager, một thực thể :class:`WarningRecorder` được trả về. Danh sách cảnh báo bên dưới từ
+   :func:`~warnings.catch_warnings` có thể được truy cập thông qua thuộc tính
+   :attr:`warnings` của đối tượng recorder. Để thuận tiện, các thuộc tính của đối tượng biểu diễn cảnh báo gần đây nhất cũng có thể được truy cập trực tiếp thông qua đối tượng recorder (xem ví dụ bên dưới). Nếu chưa có cảnh báo nào được phát sinh, mọi thuộc tính vốn được mong đợi trên một đối tượng biểu diễn cảnh báo sẽ trả về ``None``.
 
-   The recorder object also has a :meth:`reset` method, which clears the
-   warnings list.
+   Đối tượng recorder cũng có một phương thức :meth:`reset`, dùng để xóa danh sách cảnh báo.
 
-   The context manager is designed to be used like this::
+   Context manager được thiết kế để sử dụng như sau::
 
       with check_warnings(("assertion is always true", SyntaxWarning),
                           ("", UserWarning)):
           exec('assert(False, "Hey!")')
           warnings.warn(UserWarning("Hide me!"))
 
-   In this case if either warning was not raised, or some other warning was
-   raised, :func:`check_warnings` would raise an error.
+   Trong trường hợp này, nếu một trong hai cảnh báo không được phát sinh hoặc có một cảnh báo khác được phát sinh, :func:`check_warnings` sẽ phát sinh lỗi.
 
-   When a test needs to look more deeply into the warnings, rather than
-   just checking whether or not they occurred, code like this can be used::
+   Khi một bài kiểm thử cần xem xét sâu hơn các cảnh báo, thay vì chỉ kiểm tra xem chúng có xảy ra hay không, có thể sử dụng đoạn mã như sau::
 
       with check_warnings(quiet=True) as w:
           warnings.warn("foo")
@@ -1878,14 +1494,15 @@ The :mod:`!test.support.warnings_helper` module provides support for warnings te
           assert len(w.warnings) == 0
 
 
-   Here all warnings will be caught, and the test code tests the captured
-   warnings directly.
+   Tại đây, tất cả cảnh báo sẽ được bắt lại và mã kiểm thử sẽ kiểm tra trực tiếp các cảnh báo đã thu thập.
 
    .. versionchanged:: 3.2
-      New optional arguments *filters* and *quiet*.
+      Các đối số tùy chọn mới *filters* và *quiet*.
 
 
 .. class:: WarningsRecorder()
 
-   Class used to record warnings for unit tests. See documentation of
-   :func:`check_warnings` above for more details.
+   Lớp được sử dụng để ghi lại các cảnh báo cho unit test. Xem tài liệu của
+   :func:`check_warnings` ở trên để biết thêm chi tiết.
+
+.. _`SetErrorMode`: https://msdn.microsoft.com/en-us/library/windows/desktop/ms680621.aspx

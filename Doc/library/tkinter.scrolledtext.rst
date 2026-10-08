@@ -1,38 +1,31 @@
-:mod:`!tkinter.scrolledtext` --- Scrolled text widget
-=====================================================
+:mod:`!tkinter.scrolledtext` --- Tiện ích văn bản có thanh cuộn
+===============================================================
 
 .. module:: tkinter.scrolledtext
-   :synopsis: Text widget with a vertical scroll bar.
+   :synopsis: Widget văn bản có thanh cuộn dọc.
 
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 
-**Source code:** :source:`Lib/tkinter/scrolledtext.py`
+**Mã nguồn:** :source:`Lib/tkinter/scrolledtext.py`
 
 --------------
 
-The :mod:`!tkinter.scrolledtext` module provides a class of the same name which
-implements a basic text widget which has a vertical scroll bar configured to do
-the "right thing."  Using the :class:`ScrolledText` class is a lot easier than
-setting up a text widget and scroll bar directly.
+Mô-đun :mod:`!tkinter.scrolledtext` cung cấp một lớp cùng tên, triển khai một widget văn bản cơ bản có thanh cuộn dọc được cấu hình để hoạt động "đúng cách". Sử dụng lớp :class:`ScrolledText` dễ dàng hơn nhiều so với việc trực tiếp thiết lập một widget văn bản và thanh cuộn.
 
-The text widget and scrollbar are packed together in a :class:`~tkinter.Frame`,
-and the methods of the :class:`~tkinter.Pack`, :class:`~tkinter.Grid` and
-:class:`~tkinter.Place` geometry managers are acquired from the
-:class:`~tkinter.Frame` object.
-This allows the :class:`ScrolledText` widget to be used directly to achieve
-most normal geometry management behavior.
+Widget văn bản và thanh cuộn được đóng gói cùng nhau trong một :class:`~tkinter.Frame`, còn các phương thức của :class:`~tkinter.Pack`, :class:`~tkinter.Grid` và
+các trình quản lý hình học :class:`~tkinter.Place` được lấy từ
+đối tượng :class:`~tkinter.Frame`. Điều này cho phép sử dụng trực tiếp widget :class:`ScrolledText` để đạt được hầu hết hành vi quản lý hình học thông thường.
 
-Should more specific control be necessary, the following attributes are
-available:
+Nếu cần kiểm soát cụ thể hơn, có thể sử dụng các thuộc tính sau:
 
 .. class:: ScrolledText(master=None, **kw)
 
 
    .. attribute:: frame
 
-      The frame which surrounds the text and scroll bar widgets.
+      Khung bao quanh widget văn bản và widget thanh cuộn.
 
 
    .. attribute:: vbar
 
-      The scroll bar widget.
+      Widget thanh cuộn.

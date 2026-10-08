@@ -1,74 +1,58 @@
-:mod:`!reprlib` --- Alternate :func:`repr` implementation
-=========================================================
+:mod:`!reprlib` --- Cài đặt :func:`repr` thay thế
+=================================================
 
 .. module:: reprlib
-   :synopsis: Alternate repr() implementation with size limits.
+   :synopsis: Cài đặt repr() thay thế với các giới hạn kích thước.
 
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 
-**Source code:** :source:`Lib/reprlib.py`
+**Mã nguồn:** :source:`Lib/reprlib.py`
 
 --------------
 
-The :mod:`!reprlib` module provides a means for producing object representations
-with limits on the size of the resulting strings. This is used in the Python
-debugger and may be useful in other contexts as well.
+Module :mod:`!reprlib` cung cấp một phương thức để tạo biểu diễn của đối tượng với các giới hạn về kích thước của chuỗi kết quả. Phương thức này được sử dụng trong trình gỡ lỗi Python và cũng có thể hữu ích trong các ngữ cảnh khác.
 
-This module provides a class, an instance, and a function:
+Module này cung cấp một class, một instance và một function:
 
 
 .. class:: Repr(*, maxlevel=6, maxtuple=6, maxlist=6, maxarray=5, maxdict=4, \
-                maxset=6, maxfrozenset=6, maxdeque=6, maxstring=30, maxlong=40, \
-                maxother=30, fillvalue="...", indent=None)
+                maxset=6, maxfrozenset=6, maxdeque=6, maxstring=30, maxlong=40, \ maxother=30, fillvalue="...", indent=None)
 
-   Class which provides formatting services useful in implementing functions
-   similar to the built-in :func:`repr`; size limits for  different object types
-   are added to avoid the generation of representations which are excessively long.
+   Class cung cấp các dịch vụ định dạng hữu ích trong việc triển khai những function tương tự như :func:`repr` tích hợp sẵn; các giới hạn kích thước cho những loại đối tượng khác nhau được thêm vào để tránh tạo ra các biểu diễn quá dài.
 
-   The keyword arguments of the constructor can be used as a shortcut to set the
-   attributes of the :class:`Repr` instance. Which means that the following
-   initialization::
+   Các đối số từ khóa của hàm khởi tạo có thể được dùng như một cách viết tắt để thiết lập các thuộc tính của thể hiện :class:`Repr`. Điều này có nghĩa là phép khởi tạo sau đây::
 
       aRepr = reprlib.Repr(maxlevel=3)
 
-   Is equivalent to::
+   Tương đương với::
 
       aRepr = reprlib.Repr()
       aRepr.maxlevel = 3
 
-   See section `Repr Objects`_ for more information about :class:`Repr`
-   attributes.
+   Xem phần `Repr Objects <Repr Objects_>`_ để biết thêm thông tin về các thuộc tính :class:`Repr`.
 
    .. versionchanged:: 3.12
-      Allow attributes to be set via keyword arguments.
+      Cho phép thiết lập các thuộc tính thông qua đối số từ khóa.
 
 
 .. data:: aRepr
 
-   This is an instance of :class:`Repr` which is used to provide the
-   :func:`.repr` function described below.  Changing the attributes of this
-   object will affect the size limits used by :func:`.repr` and the Python
-   debugger.
+   Đây là một thể hiện của :class:`Repr`, được dùng để cung cấp
+   hàm :func:`.repr` được mô tả bên dưới. Việc thay đổi các thuộc tính của đối tượng này sẽ ảnh hưởng đến các giới hạn kích thước được :func:`.repr` và trình gỡ lỗi Python sử dụng.
 
 
 .. function:: repr(obj)
 
-   This is the :meth:`~Repr.repr` method of ``aRepr``.  It returns a string
-   similar to that returned by the built-in function of the same name, but with
-   limits on most sizes.
+   Đây là phương thức :meth:`~Repr.repr` của ``aRepr``. Phương thức này trả về một chuỗi tương tự chuỗi được hàm dựng sẵn cùng tên trả về, nhưng có giới hạn đối với hầu hết các kích thước.
 
-In addition to size-limiting tools, the module also provides a decorator for
-detecting recursive calls to :meth:`~object.__repr__` and substituting a
-placeholder string instead.
+Ngoài các công cụ giới hạn kích thước, mô-đun này còn cung cấp một decorator để phát hiện các lệnh gọi đệ quy đến :meth:`~object.__repr__` và thay thế chúng bằng một chuỗi giữ chỗ.
 
 
 .. index:: single: ...; placeholder
 
 .. decorator:: recursive_repr(fillvalue="...")
 
-   Decorator for :meth:`~object.__repr__` methods to detect recursive calls within the
-   same thread.  If a recursive call is made, the *fillvalue* is returned,
-   otherwise, the usual :meth:`!__repr__` call is made.  For example:
+   Decorator cho các phương thức :meth:`~object.__repr__` để phát hiện các lệnh gọi đệ quy trong cùng một thread. Nếu thực hiện một lệnh gọi đệ quy, *fillvalue* sẽ được trả về; nếu không, lệnh gọi :meth:`!__repr__` thông thường sẽ được thực hiện. Ví dụ:
 
    .. doctest::
 
@@ -89,66 +73,50 @@ placeholder string instead.
 
 .. _repr-objects:
 
-Repr Objects
-------------
+.. _`Repr Objects`:
 
-:class:`Repr` instances provide several attributes which can be used to provide
-size limits for the representations of different object types,  and methods
-which format specific object types.
+Đối tượng Repr
+--------------
+
+Các thực thể :class:`Repr` cung cấp một số thuộc tính có thể được dùng để giới hạn kích thước biểu diễn của các kiểu đối tượng khác nhau, cùng các phương thức định dạng những kiểu đối tượng cụ thể.
 
 
 .. attribute:: Repr.fillvalue
 
-   This string is displayed for recursive references. It defaults to
-   ``...``.
+   Chuỗi này được hiển thị cho các tham chiếu đệ quy. Giá trị mặc định là ``...``.
 
    .. versionadded:: 3.11
 
 
 .. attribute:: Repr.maxlevel
 
-   Depth limit on the creation of recursive representations.  The default is ``6``.
+   Giới hạn độ sâu khi tạo các biểu diễn đệ quy. Giá trị mặc định là ``6``.
 
 
 .. attribute:: Repr.maxdict
-               Repr.maxlist
-               Repr.maxtuple
-               Repr.maxset
-               Repr.maxfrozenset
-               Repr.maxdeque
-               Repr.maxarray
+               Repr.maxlist Repr.maxtuple Repr.maxset Repr.maxfrozenset Repr.maxdeque Repr.maxarray
 
-   Limits on the number of entries represented for the named object type.  The
-   default is ``4`` for :attr:`maxdict`, ``5`` for :attr:`maxarray`, and  ``6`` for
-   the others.
+   Giới hạn số lượng mục được biểu diễn cho kiểu đối tượng có tên. Giá trị mặc định là ``4`` cho :attr:`maxdict`, ``5`` cho :attr:`maxarray`, và ``6`` cho các kiểu còn lại.
 
 
 .. attribute:: Repr.maxlong
 
-   Maximum number of characters in the representation for an integer.  Digits
-   are dropped from the middle.  The default is ``40``.
+   Số ký tự tối đa trong phần biểu diễn của một số nguyên. Các chữ số ở giữa sẽ bị lược bỏ. Giá trị mặc định là ``40``.
 
 
 .. attribute:: Repr.maxstring
 
-   Limit on the number of characters in the representation of the string.  Note
-   that the "normal" representation of the string is used as the character source:
-   if escape sequences are needed in the representation, these may be mangled when
-   the representation is shortened.  The default is ``30``.
+   Giới hạn số ký tự trong phần biểu diễn của chuỗi. Lưu ý rằng phần biểu diễn "bình thường" của chuỗi được dùng làm nguồn ký tự: nếu cần các chuỗi escape trong phần biểu diễn, chúng có thể bị biến đổi khi phần biểu diễn được rút ngắn. Giá trị mặc định là ``30``.
 
 
 .. attribute:: Repr.maxother
 
-   This limit is used to control the size of object types for which no specific
-   formatting method is available on the :class:`Repr` object. It is applied in a
-   similar manner as :attr:`maxstring`.  The default is ``20``.
+   Giới hạn này được dùng để kiểm soát kích thước của các kiểu đối tượng không có phương thức định dạng cụ thể trên đối tượng :class:`Repr`. Giới hạn được áp dụng tương tự như :attr:`maxstring`. Giá trị mặc định là ``20``.
 
 
 .. attribute:: Repr.indent
 
-   If this attribute is set to ``None`` (the default), the output is formatted
-   with no line breaks or indentation, like the standard :func:`repr`.
-   For example:
+   Nếu thuộc tính này được đặt thành ``None`` (mặc định), đầu ra sẽ được định dạng không có ngắt dòng hoặc thụt lề, giống như :func:`repr` tiêu chuẩn. Ví dụ:
 
    .. doctest:: indent
 
@@ -159,8 +127,7 @@ which format specific object types.
       >>> print(aRepr.repr(example))
       [1, 'spam', {'a': 2, 'b': 'spam eggs', 'c': {3: 4.5, 6: []}}, 'ham']
 
-   If :attr:`~Repr.indent` is set to a string, each recursion level
-   is placed on its own line, indented by that string:
+   Nếu :attr:`~Repr.indent` được đặt thành một chuỗi, mỗi cấp đệ quy sẽ được đặt trên một dòng riêng và thụt lề bằng chuỗi đó:
 
    .. doctest:: indent
 
@@ -180,8 +147,7 @@ which format specific object types.
       -->'ham',
       ]
 
-   Setting :attr:`~Repr.indent` to a positive integer value behaves as if it
-   was set to a string with that number of spaces:
+   Đặt :attr:`~Repr.indent` thành một giá trị số nguyên dương sẽ cho kết quả như khi đặt nó thành một chuỗi có số dấu cách tương ứng:
 
    .. doctest:: indent
 
@@ -206,37 +172,27 @@ which format specific object types.
 
 .. method:: Repr.repr(obj)
 
-   The equivalent to the built-in :func:`repr` that uses the formatting imposed by
-   the instance.
+   Tương đương với :func:`repr` tích hợp sẵn, sử dụng định dạng do instance áp đặt.
 
 
 .. method:: Repr.repr1(obj, level)
 
-   Recursive implementation used by :meth:`.repr`.  This uses the type of *obj* to
-   determine which formatting method to call, passing it *obj* and *level*.  The
-   type-specific methods should call :meth:`repr1` to perform recursive formatting,
-   with ``level - 1`` for the value of *level* in the recursive  call.
+   Phần triển khai đệ quy được :meth:`.repr` sử dụng. Phần này dùng kiểu của *obj* để xác định phương thức định dạng nào cần gọi, truyền cho phương thức đó *obj* và *level*. Các phương thức dành riêng cho từng kiểu nên gọi :meth:`repr1` để thực hiện định dạng đệ quy, với giá trị của *level* trong lời gọi đệ quy là ``level - 1``.
 
 
 .. method:: Repr.repr_TYPE(obj, level)
    :noindex:
 
-   Formatting methods for specific types are implemented as methods with a name
-   based on the type name.  In the method name, **TYPE** is replaced by
-   ``'_'.join(type(obj).__name__.split())``. Dispatch to these methods is
-   handled by :meth:`repr1`. Type-specific methods which need to recursively
-   format a value should call ``self.repr1(subobj, level - 1)``.
+   Các phương thức định dạng cho từng kiểu cụ thể được triển khai dưới dạng các phương thức có tên dựa trên tên kiểu. Trong tên phương thức, **TYPE** được thay thế bằng ``'_'.join(type(obj).__name__.split())``. Việc điều phối đến các phương thức này do :meth:`repr1` xử lý. Các phương thức dành riêng cho từng kiểu cần định dạng đệ quy một giá trị nên gọi ``self.repr1(subobj, level - 1)``.
 
 
 .. _subclassing-reprs:
 
-Subclassing Repr Objects
-------------------------
+Kế thừa Repr Objects
+--------------------
 
-The use of dynamic dispatching by :meth:`Repr.repr1` allows subclasses of
-:class:`Repr` to add support for additional built-in object types or to modify
-the handling of types already supported. This example shows how special support
-for file objects could be added:
+Việc :meth:`Repr.repr1` sử dụng cơ chế dispatch động cho phép các lớp con của
+:class:`Repr` bổ sung hỗ trợ cho các kiểu đối tượng tích hợp khác hoặc thay đổi cách xử lý các kiểu đã được hỗ trợ. Ví dụ này cho thấy cách bổ sung hỗ trợ đặc biệt cho các đối tượng tệp:
 
 .. testcode::
 
@@ -251,7 +207,7 @@ for file objects could be added:
            return repr(obj)
 
    aRepr = MyRepr()
-   print(aRepr.repr(sys.stdin))         # prints '<stdin>'
+   print(aRepr.repr(sys.stdin))         # in ra '<stdin>'
 
 .. testoutput::
 

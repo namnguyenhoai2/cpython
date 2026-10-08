@@ -1,12 +1,12 @@
-:mod:`!xml.dom.pulldom` --- Support for building partial DOM trees
-==================================================================
+:mod:`!xml.dom.pulldom` --- Hỗ trợ xây dựng các cây DOM một phần
+================================================================
 
 .. module:: xml.dom.pulldom
-   :synopsis: Support for building partial DOM trees from SAX events.
+   :synopsis: Hỗ trợ xây dựng các cây DOM một phần từ các sự kiện SAX.
 
 .. moduleauthor:: Paul Prescod <paul@prescod.net>
 
-**Source code:** :source:`Lib/xml/dom/pulldom.py`
+**Mã nguồn:** :source:`Lib/xml/dom/pulldom.py`
 
 .. The module was written by Paul Prescod and added in Python 2.0.
    It is not based on any specification: the implementation is the only
@@ -15,25 +15,17 @@
 
 --------------
 
-The :mod:`!xml.dom.pulldom` module provides a "pull parser" which can also be
-asked to produce DOM-accessible fragments of the document where necessary. The
-basic concept involves pulling "events" from a stream of incoming XML and
-processing them. In contrast to SAX which also employs an event-driven
-processing model together with callbacks, the user of a pull parser is
-responsible for explicitly pulling events from the stream, looping over those
-events until either processing is finished or an error condition occurs.
+Mô-đun :mod:`!xml.dom.pulldom` cung cấp một "pull parser", cũng có thể được yêu cầu tạo ra các phân mảnh của tài liệu có thể truy cập qua DOM khi cần. Khái niệm cơ bản là lấy các "sự kiện" từ một stream XML đến và xử lý chúng. Không giống SAX, vốn cũng sử dụng mô hình xử lý hướng sự kiện cùng với callback, người dùng pull parser chịu trách nhiệm chủ động lấy các sự kiện từ stream, lặp qua các sự kiện đó cho đến khi quá trình xử lý hoàn tất hoặc xảy ra lỗi.
 
 
 .. note::
 
-   If you need to parse untrusted or unauthenticated data, see
+   Nếu bạn cần phân tích dữ liệu không đáng tin cậy hoặc chưa được xác thực, hãy xem
    :ref:`xml-security`.
 
 .. versionchanged:: 3.7.1
 
-   The SAX parser no longer processes general external entities by default to
-   increase security by default. To enable processing of external entities,
-   pass a custom parser instance in::
+   Trình phân tích SAX không còn xử lý các thực thể bên ngoài tổng quát theo mặc định, nhằm tăng cường bảo mật theo mặc định. Để bật tính năng xử lý các thực thể bên ngoài, hãy truyền một parser tùy chỉnh vào::
 
       from xml.dom.pulldom import parse
       from xml.sax import make_parser
@@ -44,7 +36,7 @@ events until either processing is finished or an error condition occurs.
       parse(filename, parser=parser)
 
 
-Example::
+Ví dụ::
 
    from xml.dom import pulldom
 
@@ -55,127 +47,90 @@ Example::
                doc.expandNode(node)
                print(node.toxml())
 
-``event`` is one of the following constants,
-and ``node`` is the node which the event is about.
-The nodes implement the :mod:`xml.dom` interfaces;
-they are created by the DOM implementation given to :class:`PullDOM`,
-which is :mod:`xml.dom.minidom` by default.
+``event`` là một trong các hằng số sau đây, còn ``node`` là node mà sự kiện liên quan đến. Các node triển khai các interface :mod:`xml.dom`; chúng được tạo bởi DOM implementation được cung cấp cho :class:`PullDOM`, mặc định là :mod:`xml.dom.minidom`.
 
 
 .. data:: START_DOCUMENT
           END_DOCUMENT
 
-   The start and the end of the document.
-   *node* is the :class:`~xml.dom.Document`.
+   Phần bắt đầu và phần kết thúc của document. *node* là :class:`~xml.dom.Document`.
 
 
 .. data:: START_ELEMENT
           END_ELEMENT
 
-   The start tag and the end tag of an element.
-   *node* is the :class:`~xml.dom.Element`.
+   Thẻ mở và thẻ đóng của một element. *node* là :class:`~xml.dom.Element`.
 
 
 .. data:: CHARACTERS
 
-   Character data.
-   *node* is the :class:`~xml.dom.Text` node.
+   Dữ liệu ký tự. *node* là node :class:`~xml.dom.Text`.
 
 
 .. data:: IGNORABLE_WHITESPACE
 
-   White space in element content, as declared in the DTD.
-   *node* is the :class:`~xml.dom.Text` node.
+   Khoảng trắng trong nội dung element, như được khai báo trong DTD. *node* là node :class:`~xml.dom.Text`.
 
 
 .. data:: COMMENT
 
-   A comment.
-   *node* is the :class:`~xml.dom.Comment` node.
+   Một comment. *node* là nút :class:`~xml.dom.Comment` node.
 
 
 .. data:: PROCESSING_INSTRUCTION
 
-   A processing instruction.
-   *node* is the :class:`~xml.dom.ProcessingInstruction` node.
+   Một processing instruction. *node* là nút :class:`~xml.dom.ProcessingInstruction` node.
 
-Since the document is treated as a "flat" stream of events, the document "tree"
-is implicitly traversed and the desired elements are found regardless of their
-depth in the tree. In other words, one does not need to consider hierarchical
-issues such as recursive searching of the document nodes, although if the
-context of elements were important, one would either need to maintain some
-context-related state (i.e. remembering where one is in the document at any
-given point) or to make use of the :func:`DOMEventStream.expandNode` method
-and switch to DOM-related processing.
+Vì tài liệu được xử lý như một luồng sự kiện "phẳng", "cây" tài liệu được duyệt ngầm và các phần tử mong muốn được tìm thấy bất kể độ sâu của chúng trong cây. Nói cách khác, không cần xem xét các vấn đề phân cấp như tìm kiếm đệ quy các node của tài liệu, mặc dù nếu ngữ cảnh của các phần tử là quan trọng, ta sẽ cần duy trì một số trạng thái liên quan đến ngữ cảnh (tức là ghi nhớ vị trí hiện tại trong tài liệu tại bất kỳ thời điểm nào) hoặc sử dụng phương thức :func:`DOMEventStream.expandNode` và chuyển sang xử lý liên quan đến DOM.
 
 
 .. class:: PullDOM(documentFactory=None)
 
-   Subclass of :class:`xml.sax.handler.ContentHandler` which turns SAX events
-   into the events of the pull parser.
-   The nodes are created, but they are not added to the tree,
-   unless :meth:`~DOMEventStream.expandNode` is called.
-   *documentFactory*, if given, is a DOM implementation used to create
-   the document; by default the implementation of :mod:`xml.dom.minidom`
-   is used.
+   Lớp con của :class:`xml.sax.handler.ContentHandler`, chuyển các sự kiện SAX thành các sự kiện của pull parser. Các node được tạo nhưng không được thêm vào cây, trừ khi :meth:`~DOMEventStream.expandNode` được gọi. *documentFactory*, nếu được cung cấp, là một triển khai DOM được dùng để tạo tài liệu; theo mặc định, triển khai của :mod:`xml.dom.minidom` được sử dụng.
 
 
 .. class:: SAX2DOM(documentFactory=None)
 
-   Subclass of :class:`PullDOM` which also adds every created node
-   to the tree, so that the complete document is built.
+   Lớp con của :class:`PullDOM`, đồng thời thêm mọi node được tạo vào cây, nhờ đó xây dựng toàn bộ tài liệu.
 
 
 .. function:: parse(stream_or_string, parser=None, bufsize=None)
 
-   Return a :class:`DOMEventStream` from the given input. *stream_or_string* may be
-   either a file name, or a file-like object. *parser*, if given, must be an
-   :class:`~xml.sax.xmlreader.XMLReader` object. This function will change the
-   document handler of the
-   parser and activate namespace support; other parser configuration (like
-   setting an entity resolver) must have been done in advance.
+   Trả về một :class:`DOMEventStream` từ đầu vào đã cho. *stream_or_string* có thể là tên tệp hoặc một đối tượng giống tệp. *parser*, nếu được cung cấp, phải là một
+   đối tượng :class:`~xml.sax.xmlreader.XMLReader`. Hàm này sẽ thay đổi document handler của parser và kích hoạt hỗ trợ namespace; các cấu hình khác của parser (chẳng hạn như thiết lập entity resolver) phải được thực hiện trước đó.
 
-If you have XML in a string, you can use the :func:`parseString` function instead:
+Nếu bạn có XML trong một chuỗi, thay vào đó, bạn có thể sử dụng hàm :func:`parseString`:
 
 .. function:: parseString(string, parser=None)
 
-   Return a :class:`DOMEventStream` that represents the *string*.
-   *string* must be a :class:`str` instance;
-   to parse bytes, pass a binary file object to :func:`parse`.
+   Trả về một :class:`DOMEventStream` đại diện cho *chuỗi*. *Chuỗi* phải là một instance :class:`str`; để phân tích cú pháp byte, hãy truyền một đối tượng tệp nhị phân cho :func:`parse`.
 
 .. data:: default_bufsize
 
-   Default value for the *bufsize* parameter to :func:`parse`.
+   Giá trị mặc định cho tham số *bufsize* của :func:`parse`.
 
-   The value of this variable can be changed before calling :func:`parse` and
-   the new value will take effect.
+   Có thể thay đổi giá trị của biến này trước khi gọi :func:`parse`, và giá trị mới sẽ có hiệu lực.
 
 .. _domeventstream-objects:
 
-DOMEventStream Objects
-----------------------
+Đối tượng DOMEventStream
+------------------------
 
 .. class:: DOMEventStream(stream, parser, bufsize)
 
-   Produce the events for the data read from the file object *stream*
-   by the :class:`~xml.sax.xmlreader.XMLReader` *parser*.
-   The data is read by *bufsize* bytes, or characters for a text stream,
-   at a time.
+   Tạo các sự kiện cho dữ liệu được đọc từ đối tượng tệp *stream* bởi trình phân tích cú pháp :class:`~xml.sax.xmlreader.XMLReader` *parser*. Dữ liệu được đọc mỗi lần *bufsize* byte hoặc ký tự đối với luồng văn bản.
 
    .. versionchanged:: 3.11
-      Support for :meth:`~object.__getitem__` method has been removed.
+      Đã xóa hỗ trợ cho phương thức :meth:`~object.__getitem__`.
 
    .. method:: getEvent()
 
-      Return the next ``(event, node)`` tuple,
-      or ``None`` at the end of the document.
-      See above for the events and the corresponding nodes.
-      The current node does not contain information about its children, unless
-      :meth:`expandNode` is called.
+      Trả về tuple ``(event, node)`` tiếp theo hoặc ``None`` khi đến cuối tài liệu. Xem phần trên để biết các sự kiện và node tương ứng. Node hiện tại không chứa thông tin về các node con của nó, trừ khi
+      :meth:`expandNode` được gọi.
 
    .. method:: expandNode(node)
 
-      Expands all children of *node* into *node*. Example::
+      Mở rộng tất cả các node con của *node* vào *node*. Ví dụ::
 
           from xml.dom import pulldom
 
@@ -183,19 +138,17 @@ DOMEventStream Objects
           doc = pulldom.parseString(xml)
           for event, node in doc:
               if event == pulldom.START_ELEMENT and node.tagName == 'p':
-                  # Following statement only prints '<p/>'
+                  # Câu lệnh sau chỉ in '<p/>'
                   print(node.toxml())
                   doc.expandNode(node)
-                  # Following statement prints node with all its children '<p>Some text <div>and more</div></p>'
+                  # Câu lệnh sau in node cùng tất cả các node con của nó '<p>Some text <div>and more</div></p>'
                   print(node.toxml())
 
    .. method:: reset()
 
-      Discard the events which are not read yet
-      and prepare the object for parsing a new document.
+      Loại bỏ các sự kiện chưa được đọc và chuẩn bị đối tượng để phân tích cú pháp một tài liệu mới.
 
 
    .. method:: clear()
 
-      Release the parser and the document.
-      The stream is not closed, and the object can no longer be used.
+      Giải phóng parser và tài liệu. Stream không bị đóng và đối tượng không thể được sử dụng nữa.

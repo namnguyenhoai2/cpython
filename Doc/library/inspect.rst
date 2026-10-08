@@ -1,5 +1,5 @@
-:mod:`!inspect` --- Inspect live objects
-========================================
+:mod:`!inspect` --- Kiểm tra các đối tượng đang hoạt động
+=========================================================
 
 .. testsetup:: *
 
@@ -7,37 +7,26 @@
    from inspect import *
 
 .. module:: inspect
-   :synopsis: Extract information and source code from live objects.
+   :synopsis: Trích xuất thông tin và mã nguồn từ các đối tượng đang hoạt động.
 
 .. moduleauthor:: Ka-Ping Yee <ping@lfw.org>
 .. sectionauthor:: Ka-Ping Yee <ping@lfw.org>
 
-**Source code:** :source:`Lib/inspect.py`
+**Mã nguồn:** :source:`Lib/inspect.py`
 
 --------------
 
-The :mod:`!inspect` module provides several useful functions to help get
-information about live objects such as modules, classes, methods, functions,
-tracebacks, frame objects, and code objects.  For example, it can help you
-examine the contents of a class, retrieve the source code of a method, extract
-and format the argument list for a function, or get all the information you need
-to display a detailed traceback.
+Mô-đun :mod:`!inspect` cung cấp một số hàm hữu ích để lấy thông tin về các đối tượng đang hoạt động như mô-đun, lớp, phương thức, hàm, traceback, đối tượng frame và đối tượng code. Ví dụ, mô-đun này có thể giúp bạn kiểm tra nội dung của một lớp, truy xuất mã nguồn của một phương thức, trích xuất và định dạng danh sách đối số cho một hàm hoặc lấy tất cả thông tin cần thiết để hiển thị một traceback chi tiết.
 
-There are four main kinds of services provided by this module: type checking,
-getting source code, inspecting classes and functions, and examining the
-interpreter stack.
+Mô-đun này cung cấp bốn nhóm dịch vụ chính: kiểm tra kiểu, lấy mã nguồn, kiểm tra lớp và hàm, và kiểm tra stack của trình thông dịch.
 
 
 .. _inspect-types:
 
-Types and members
------------------
+Kiểu và thành viên
+------------------
 
-The :func:`getmembers` function retrieves the members of an object such as a
-class or module. The functions whose names begin with "is" are mainly
-provided as convenient choices for the second argument to :func:`getmembers`.
-They also help you determine when you can expect to find the following special
-attributes (see :ref:`import-mod-attrs` for module attributes):
+Hàm :func:`getmembers` truy xuất các thành viên của một đối tượng như lớp hoặc mô-đun. Các hàm có tên bắt đầu bằng "is" chủ yếu được cung cấp dưới dạng các lựa chọn thuận tiện cho đối số thứ hai của :func:`getmembers`. Chúng cũng giúp bạn xác định khi nào có thể mong đợi tìm thấy các thuộc tính đặc biệt sau (xem :ref:`import-mod-attrs` để biết các thuộc tính của mô-đun):
 
 .. this function name is too big to fit in the ascii-art table below
 .. |coroutine-origin-link| replace:: :func:`sys.set_coroutine_origin_tracking_depth`
@@ -312,112 +301,89 @@ attributes (see :ref:`import-mod-attrs` for module attributes):
 
 .. versionchanged:: 3.5
 
-   Add ``__qualname__`` and ``gi_yieldfrom`` attributes to generators.
+   Thêm các thuộc tính ``__qualname__`` và ``gi_yieldfrom`` vào generator.
 
-   The ``__name__`` attribute of generators is now set from the function
-   name, instead of the code name, and it can now be modified.
+   Thuộc tính ``__name__`` của generator giờ đây được đặt từ tên hàm thay vì tên mã, và hiện có thể được sửa đổi.
 
 .. versionchanged:: 3.7
 
-   Add ``cr_origin`` attribute to coroutines.
+   Thêm thuộc tính ``cr_origin`` vào coroutine.
 
 .. versionchanged:: 3.10
 
-   Add ``__builtins__`` attribute to functions.
+   Thêm thuộc tính ``__builtins__`` vào function.
 
 .. versionchanged:: 3.11
 
-   Add ``gi_suspended`` attribute to generators.
+   Thêm thuộc tính ``gi_suspended`` vào generator.
 
 .. versionchanged:: 3.11
 
-   Add ``cr_suspended`` attribute to coroutines.
+   Thêm thuộc tính ``cr_suspended`` vào coroutine.
 
 .. versionchanged:: 3.12
 
-   Add ``ag_suspended`` attribute to async generators.
+   Thêm thuộc tính ``ag_suspended`` vào async generator.
 
 .. versionchanged:: 3.14
 
-   Add ``f_generator`` attribute to frames.
+   Thêm thuộc tính ``f_generator`` vào các frame.
 
 .. function:: getmembers(object[, predicate])
 
-   Return all the members of an object in a list of ``(name, value)``
-   pairs sorted by name. If the optional *predicate* argument—which will be
-   called with the ``value`` object of each member—is supplied, only members
-   for which the predicate returns a true value are included.
+   Trả về tất cả các member của một object trong một danh sách các cặp ``(name, value)``, được sắp xếp theo tên. Nếu cung cấp đối số *predicate* tùy chọn—đối số này sẽ được gọi với object ``value`` của mỗi member—thì chỉ các member mà predicate trả về giá trị true mới được đưa vào.
 
    .. note::
 
-      :func:`getmembers` will only return class attributes defined in the
-      metaclass when the argument is a class and those attributes have been
-      listed in the metaclass' custom :meth:`~object.__dir__`.
+      :func:`getmembers` sẽ chỉ trả về các class attribute được định nghĩa trong metaclass khi đối số là một class và các attribute đó đã được liệt kê trong :meth:`~object.__dir__` tùy chỉnh của metaclass.
 
 
 .. function:: getmembers_static(object[, predicate])
 
-    Return all the members of an object in a list of ``(name, value)``
-    pairs sorted by name without triggering dynamic lookup via the descriptor
-    protocol, __getattr__ or __getattribute__. Optionally, only return members
-    that satisfy a given predicate.
+    Trả về tất cả các member của một object trong một danh sách các cặp ``(name, value)``, được sắp xếp theo tên, mà không kích hoạt dynamic lookup thông qua descriptor protocol, __getattr__ hoặc __getattribute__. Có thể chỉ trả về các member thỏa mãn một predicate đã cho.
 
     .. note::
 
-        :func:`getmembers_static` may not be able to retrieve all members
-        that getmembers can fetch (like dynamically created attributes)
-        and may find members that getmembers can't (like descriptors
-        that raise AttributeError). It can also return descriptor objects
-        instead of instance members in some cases.
+        :func:`getmembers_static` có thể không truy xuất được tất cả các member mà getmembers có thể lấy (chẳng hạn như các attribute được tạo động) và có thể tìm thấy những member mà getmembers không thể tìm thấy (chẳng hạn như các descriptor gây ra AttributeError). Trong một số trường hợp, nó cũng có thể trả về các descriptor object thay vì các instance member.
 
     .. versionadded:: 3.11
 
 
 .. function:: getmodulename(path)
 
-   Return the name of the module named by the file *path*, without including the
-   names of enclosing packages. The file extension is checked against all of
-   the entries in :func:`importlib.machinery.all_suffixes`. If it matches,
-   the final path component is returned with the extension removed.
-   Otherwise, ``None`` is returned.
+   Trả về tên của module được đặt tên bởi tệp *path*, không bao gồm tên của các package bao quanh. Phần mở rộng tệp được kiểm tra với tất cả các mục trong :func:`importlib.machinery.all_suffixes`. Nếu khớp, thành phần đường dẫn cuối cùng được trả về sau khi loại bỏ phần mở rộng. Nếu không, ``None`` được trả về.
 
-   Note that this function *only* returns a meaningful name for actual
-   Python modules - paths that potentially refer to Python packages will
-   still return ``None``.
+   Lưu ý rằng hàm này *only* trả về tên có ý nghĩa cho các module Python thực tế—các đường dẫn có khả năng trỏ đến các package Python vẫn sẽ trả về ``None``.
 
    .. versionchanged:: 3.3
-      The function is based directly on :mod:`importlib`.
+      Hàm này dựa trực tiếp trên :mod:`importlib`.
 
 
 .. function:: ismodule(object)
 
-   Return ``True`` if the object is a module.
+   Trả về ``True`` nếu đối tượng là một module.
 
 
 .. function:: isclass(object)
 
-   Return ``True`` if the object is a class, whether built-in or created in Python
-   code.
+   Trả về ``True`` nếu đối tượng là một lớp, bất kể là lớp dựng sẵn hay được tạo trong mã Python.
 
-   This function returns ``False`` for :ref:`generic aliases <types-genericalias>` of classes,
-   such as ``list[int]``.
+   Hàm này trả về ``False`` cho :ref:`các bí danh tổng quát <types-genericalias>` của các lớp, chẳng hạn như ``list[int]``.
 
 
 .. function:: ismethod(object)
 
-   Return ``True`` if the object is a bound method written in Python.
+   Trả về ``True`` nếu đối tượng là một bound method được viết bằng Python.
 
    .. note::
 
-      For example, given this class::
+      Ví dụ, với lớp sau đây::
 
           >>> class Greeter:
           ...     def say_hello(self):
           ...         print('hello!')
 
-      A bound method (also known as an *instance method*) is created when
-      accessing ``say_hello`` (a :term:`function` defined in the
-      ``Greeter`` namespace) through an instance of the ``Greeter`` class::
+      Một bound method (còn gọi là *phương thức instance*) được tạo khi truy cập ``say_hello`` (một :term:`function` được định nghĩa trong namespace ``Greeter``) thông qua một instance của lớp ``Greeter``::
 
           >>> instance = Greeter()
 
@@ -428,9 +394,7 @@ attributes (see :ref:`import-mod-attrs` for module attributes):
           >>> isfunction(instance.say_hello)
           False
 
-      Accessing ``say_hello`` through the ``Greeter`` class will return the
-      function itself. For this function, :func:`ismethod` will return
-      ``False``, but :func:`isfunction` will return ``True``::
+      Việc truy cập ``say_hello`` thông qua lớp ``Greeter`` sẽ trả về chính hàm đó. Đối với hàm này, :func:`ismethod` sẽ trả về ``False``, nhưng :func:`isfunction` sẽ trả về ``True``::
 
           >>> Greeter.say_hello
           <function Greeter.say_hello at 0x7f7503854a90>
@@ -439,84 +403,72 @@ attributes (see :ref:`import-mod-attrs` for module attributes):
           >>> isfunction(Greeter.say_hello)
           True
 
-      See :ref:`typesmethods` for details.
+      Xem :ref:`typesmethods` để biết chi tiết.
 
 
 .. function:: isfunction(object)
 
-   Return ``True`` if the object is a Python function, which includes functions
-   created by a :term:`lambda` expression.
+   Trả về ``True`` nếu đối tượng là một hàm Python, bao gồm các hàm được tạo bởi biểu thức :term:`lambda`.
 
-   See the note for :func:`~inspect.ismethod` for an example.
+   Xem ghi chú cho :func:`~inspect.ismethod` để biết ví dụ.
 
 
 .. function:: ispackage(object)
 
-   Return ``True`` if the object is a :term:`package`.
+   Trả về ``True`` nếu đối tượng là một :term:`package`.
 
    .. versionadded:: 3.14
 
 
 .. function:: isgeneratorfunction(object)
 
-   Return ``True`` if the object is a Python generator function.
+   Trả về ``True`` nếu đối tượng là một hàm generator Python.
 
-   It also returns ``True`` for bound methods created from Python generator functions
-   (see :ref:`typesmethods` for more information).
+   Hàm này cũng trả về ``True`` đối với các phương thức bound được tạo từ các hàm generator Python (xem :ref:`typesmethods` để biết thêm thông tin).
 
    .. versionchanged:: 3.8
-      Functions wrapped in :func:`functools.partial` now return ``True`` if the
-      wrapped function is a Python generator function.
+      Các hàm được bọc trong :func:`functools.partial` hiện trả về ``True`` nếu hàm được bọc là một hàm generator của Python.
 
    .. versionchanged:: 3.10.6
       :term:`Duck-typed <duck-typing>` function-like objects now return
-      ``True`` if their code object has the :data:`CO_GENERATOR` flag.
+      ``True`` nếu code object của chúng có cờ :data:`CO_GENERATOR`.
 
    .. versionchanged:: 3.13
-      Functions wrapped in :func:`functools.partialmethod` now return ``True``
-      if the wrapped function is a Python generator function.
+      Các hàm được bọc trong :func:`functools.partialmethod` hiện trả về ``True`` nếu hàm được bọc là một hàm generator của Python.
 
 .. function:: isgenerator(object)
 
-   Return ``True`` if the object is a generator.
+   Trả về ``True`` nếu đối tượng là một generator.
 
 
 .. function:: iscoroutinefunction(object)
 
-   Return ``True`` if the object is a :term:`coroutine function` (a function
-   defined with an :keyword:`async def` syntax), a :func:`functools.partial`
-   wrapping a :term:`coroutine function`, or a sync function marked with
+   Trả về ``True`` nếu đối tượng là một :term:`coroutine function` (một hàm được định nghĩa bằng cú pháp :keyword:`async def`), một :func:`functools.partial` bọc một :term:`coroutine function`, hoặc một hàm sync được đánh dấu bằng
    :func:`markcoroutinefunction`.
 
    .. versionadded:: 3.5
 
    .. versionchanged:: 3.8
-      Functions wrapped in :func:`functools.partial` now return ``True`` if the
-      wrapped function is a :term:`coroutine function`.
+      Các hàm được bọc trong :func:`functools.partial` hiện trả về ``True`` nếu hàm được bọc là một :term:`coroutine function`.
 
    .. versionchanged:: 3.10.6
       :term:`Duck-typed <duck-typing>` function-like objects now return
-      ``True`` if their code object has the :data:`CO_COROUTINE` flag.
+      ``True`` nếu code object của chúng có cờ :data:`CO_COROUTINE`.
 
    .. versionchanged:: 3.12
-      Sync functions marked with :func:`markcoroutinefunction` now return
-      ``True``.
+      Các hàm đồng bộ được đánh dấu bằng :func:`markcoroutinefunction` giờ đây trả về ``True``.
 
    .. versionchanged:: 3.13
-      Functions wrapped in :func:`functools.partialmethod` now return ``True``
-      if the wrapped function is a :term:`coroutine function`.
+      Các hàm được bọc trong :func:`functools.partialmethod` giờ đây trả về ``True`` nếu hàm được bọc là một :term:`coroutine function`.
 
 
 .. function:: markcoroutinefunction(func)
 
-   Decorator to mark a callable as a :term:`coroutine function` if it would not
-   otherwise be detected by :func:`iscoroutinefunction`.
+   Decorator dùng để đánh dấu một đối tượng có thể gọi là :term:`coroutine function` nếu đối tượng đó không được :func:`iscoroutinefunction` phát hiện theo cách khác.
 
-   This may be of use for sync functions that return a :term:`coroutine`, if
-   the function is passed to an API that requires :func:`iscoroutinefunction`.
+   Điều này có thể hữu ích cho các hàm đồng bộ trả về một :term:`coroutine`, nếu hàm được truyền cho một API yêu cầu :func:`iscoroutinefunction`.
 
-   When possible, using an :keyword:`async def` function is preferred. Also
-   acceptable is calling the function and testing the return with
+   Khi có thể, nên ưu tiên sử dụng một hàm :keyword:`async def`. Cũng có thể gọi hàm và kiểm tra giá trị trả về bằng
    :func:`iscoroutine`.
 
    .. versionadded:: 3.12
@@ -524,18 +476,17 @@ attributes (see :ref:`import-mod-attrs` for module attributes):
 
 .. function:: iscoroutine(object)
 
-   Return ``True`` if the object is a :term:`coroutine` created by an
-   :keyword:`async def` function.
+   Trả về ``True`` nếu đối tượng là một :term:`coroutine` được tạo bởi một
+   hàm :keyword:`async def`.
 
    .. versionadded:: 3.5
 
 
 .. function:: isawaitable(object)
 
-   Return ``True`` if the object can be used in :keyword:`await` expression.
+   Trả về ``True`` nếu đối tượng có thể được sử dụng trong biểu thức :keyword:`await`.
 
-   Can also be used to distinguish generator-based coroutines from regular
-   generators:
+   Cũng có thể được sử dụng để phân biệt coroutine dựa trên generator với generator thông thường:
 
    .. testcode::
 
@@ -555,8 +506,7 @@ attributes (see :ref:`import-mod-attrs` for module attributes):
 
 .. function:: isasyncgenfunction(object)
 
-   Return ``True`` if the object is an :term:`asynchronous generator` function,
-   for example:
+   Trả về ``True`` nếu đối tượng là một hàm :term:`asynchronous generator`, ví dụ:
 
    .. doctest::
 
@@ -569,239 +519,183 @@ attributes (see :ref:`import-mod-attrs` for module attributes):
    .. versionadded:: 3.6
 
    .. versionchanged:: 3.8
-      Functions wrapped in :func:`functools.partial` now return ``True`` if the
-      wrapped function is an :term:`asynchronous generator` function.
+      Các hàm được bọc trong :func:`functools.partial` giờ đây trả về ``True`` nếu hàm được bọc là một hàm :term:`asynchronous generator`.
 
    .. versionchanged:: 3.10.6
       :term:`Duck-typed <duck-typing>` function-like objects now return
-      ``True`` if their code object has the :data:`CO_ASYNC_GENERATOR` flag.
+      ``True`` nếu đối tượng mã của chúng có cờ :data:`CO_ASYNC_GENERATOR`.
 
    .. versionchanged:: 3.13
-      Functions wrapped in :func:`functools.partialmethod` now return ``True``
-      if the wrapped function is a :term:`asynchronous generator` function.
+      Các hàm được bọc trong :func:`functools.partialmethod` giờ đây trả về ``True`` nếu hàm được bọc là một hàm :term:`asynchronous generator`.
 
 .. function:: isasyncgen(object)
 
-   Return ``True`` if the object is an :term:`asynchronous generator iterator`
-   created by an :term:`asynchronous generator` function.
+   Trả về ``True`` nếu đối tượng là một :term:`asynchronous generator iterator` được tạo bởi một hàm :term:`asynchronous generator`.
 
    .. versionadded:: 3.6
 
 .. function:: istraceback(object)
 
-   Return ``True`` if the object is a traceback.
+   Trả về ``True`` nếu đối tượng là một traceback.
 
 
 .. function:: isframe(object)
 
-   Return ``True`` if the object is a frame.
+   Trả về ``True`` nếu đối tượng là một frame.
 
 
 .. function:: iscode(object)
 
-   Return ``True`` if the object is a code.
+   Trả về ``True`` nếu đối tượng là một code.
 
 
 .. function:: isbuiltin(object)
 
-   Return ``True`` if the object is a built-in function or a bound built-in method.
+   Trả về ``True`` nếu đối tượng là một hàm tích hợp hoặc một phương thức tích hợp bị ràng buộc.
 
 
 .. function:: ismethodwrapper(object)
 
-   Return ``True`` if the type of object is a :class:`~types.MethodWrapperType`.
+   Trả về ``True`` nếu kiểu của đối tượng là một :class:`~types.MethodWrapperType`.
 
-   These are instances of :class:`~types.MethodWrapperType`, such as :meth:`~object.__str__`,
-   :meth:`~object.__eq__` and :meth:`~object.__repr__`.
+   Đây là các thực thể của :class:`~types.MethodWrapperType`, chẳng hạn như :meth:`~object.__str__`,
+   :meth:`~object.__eq__` và :meth:`~object.__repr__`.
 
    .. versionadded:: 3.11
 
 
 .. function:: isroutine(object)
 
-   Return ``True`` if the object is a user-defined or built-in function or method.
+   Trả về ``True`` nếu đối tượng là hàm hoặc phương thức do người dùng định nghĩa hay được tích hợp sẵn.
 
 
 .. function:: isabstract(object)
 
-   Return ``True`` if the object is an abstract base class.
+   Trả về ``True`` nếu đối tượng là một abstract base class.
 
 
 .. function:: ismethoddescriptor(object)
 
-   Return ``True`` if the object is a method descriptor, but not if
-   :func:`isclass`, :func:`ismethod` or :func:`isfunction` is true.
+   Trả về ``True`` nếu đối tượng là một method descriptor, nhưng không nếu
+   :func:`isclass`, :func:`ismethod` hoặc :func:`isfunction` là true.
 
-   This, for example, is true of ``int.__add__``.  An object passing this test
-   has a :meth:`~object.__get__` method, but not a :meth:`~object.__set__`
-   method or a :meth:`~object.__delete__` method.  Beyond that, the set of
-   attributes varies.  A :attr:`~definition.__name__` attribute is usually
-   sensible, and :attr:`~definition.__doc__` often is.
+   Ví dụ, điều này đúng với ``int.__add__``. Một đối tượng vượt qua phép kiểm tra này có phương thức :meth:`~object.__get__`, nhưng không có phương thức :meth:`~object.__set__` hoặc phương thức :meth:`~object.__delete__`. Ngoài ra, tập hợp các thuộc tính sẽ thay đổi. Thuộc tính :attr:`~definition.__name__` thường là hợp lý, và :attr:`~definition.__doc__` cũng thường như vậy.
 
-   Method descriptors that also pass any of the other tests (:func:`!isclass`,
-   :func:`!ismethod` or :func:`!isfunction`) make this function return ``False``,
-   simply because those other tests promise more -- you can, for example, count
-   on having the :attr:`~method.__func__` attribute when an object passes
+   Các method descriptor đồng thời vượt qua bất kỳ phép kiểm tra nào khác (:func:`!isclass`,
+   :func:`!ismethod` hoặc :func:`!isfunction`) khiến hàm này trả về ``False``, đơn giản vì các phép kiểm tra khác đó đảm bảo nhiều hơn -- chẳng hạn, bạn có thể chắc chắn rằng thuộc tính :attr:`~method.__func__` tồn tại khi một đối tượng vượt qua
    :func:`ismethod`.
 
    .. versionchanged:: 3.13
-      This function no longer incorrectly reports objects with :meth:`~object.__get__`
-      and :meth:`~object.__delete__`, but not :meth:`~object.__set__`, as being method
-      descriptors (such objects are data descriptors, not method descriptors).
+      Hàm này không còn báo cáo không chính xác các đối tượng có :meth:`~object.__get__` và :meth:`~object.__delete__`, nhưng không có :meth:`~object.__set__`, là các method descriptor (bộ mô tả phương thức) nữa (những đối tượng như vậy là data descriptor (bộ mô tả dữ liệu), không phải method descriptor).
 
 
 .. function:: isdatadescriptor(object)
 
-   Return ``True`` if the object is a data descriptor, but not if
-   :func:`isclass`, :func:`ismethod` or :func:`isfunction` is true.
+   Trả về ``True`` nếu đối tượng là một data descriptor, nhưng không trả về nếu
+   :func:`isclass`, :func:`ismethod` hoặc :func:`isfunction` là true.
 
-   Data descriptors always have a :meth:`~object.__set__` method and/or
-   a :meth:`~object.__delete__` method.  Optionally, they may also have a
-   :meth:`~object.__get__` method.
+   Data descriptor luôn có phương thức :meth:`~object.__set__` và/hoặc phương thức :meth:`~object.__delete__`. Theo tùy chọn, chúng cũng có thể có một
+   phương thức :meth:`~object.__get__`.
 
-   Examples of data descriptors are :func:`properties <property>`, getsets and
-   member descriptors.  Note that for the latter two (defined only in C extension
-   modules), more specific tests are available: :func:`isgetsetdescriptor` and
-   :func:`ismemberdescriptor`, respectively.
+   Ví dụ về data descriptor là :func:`properties <property>`, getset và member descriptor. Lưu ý rằng đối với hai loại sau (chỉ được định nghĩa trong các mô-đun mở rộng C), có các phép kiểm tra cụ thể hơn: :func:`isgetsetdescriptor` và
+   :func:`ismemberdescriptor`, tương ứng.
 
-   While data descriptors may also have :attr:`~definition.__name__` and
-   :attr:`!__doc__` attributes (as properties, getsets and member descriptors
-   do), this is not necessarily the case in general.
+   Mặc dù các data descriptor cũng có thể có :attr:`~definition.__name__` và
+   :attr:`!__doc__` thuộc tính (như các property, getset và member descriptor), nhưng nhìn chung điều này không nhất thiết đúng.
 
    .. versionchanged:: 3.8
-      This function now reports objects with only a :meth:`~object.__set__` method
-      as being data descriptors (the presence of :meth:`~object.__get__` is no
-      longer required for that).  Moreover, objects with :meth:`~object.__delete__`,
-      but not :meth:`~object.__set__`, are now properly recognized as data
-      descriptors as well, which was not the case previously.
+      Hàm này hiện báo cáo các đối tượng chỉ có phương thức :meth:`~object.__set__` là data descriptor (không còn yêu cầu phải có :meth:`~object.__get__`). Hơn nữa, các đối tượng có :meth:`~object.__delete__` nhưng không có :meth:`~object.__set__` giờ đây cũng được nhận diện chính xác là data descriptor, trong khi trước đây thì không.
 
 .. function:: isgetsetdescriptor(object)
 
-   Return ``True`` if the object is a getset descriptor.
+   Trả về ``True`` nếu đối tượng là một getset descriptor.
 
    .. impl-detail::
 
-      getsets are attributes defined in extension modules via
-      :c:type:`PyGetSetDef` structures.  For Python implementations without such
-      types, this method will always return ``False``.
+      getset là các thuộc tính được định nghĩa trong các extension module thông qua
+      các cấu trúc :c:type:`PyGetSetDef`. Đối với các triển khai Python không có những kiểu như vậy, phương thức này sẽ luôn trả về ``False``.
 
 
 .. function:: ismemberdescriptor(object)
 
-   Return ``True`` if the object is a member descriptor.
+   Trả về ``True`` nếu đối tượng là một member descriptor.
 
    .. impl-detail::
 
-      Member descriptors are attributes defined in extension modules via
-      :c:type:`PyMemberDef` structures.  For Python implementations without such
-      types, this method will always return ``False``.
+      Các member descriptor là những thuộc tính được định nghĩa trong các mô-đun mở rộng thông qua
+      các cấu trúc :c:type:`PyMemberDef`. Đối với các triển khai Python không có những kiểu như vậy, phương thức này sẽ luôn trả về ``False``.
 
 
 .. _inspect-source:
 
-Retrieving source code
-----------------------
+Lấy mã nguồn
+------------
 
 .. function:: getdoc(object)
 
-   Get the documentation string for an object, cleaned up with :func:`cleandoc`.
-   If the documentation string for an object is not provided and the object is
-   a class, a method, a property or a descriptor, retrieve the documentation
-   string from the inheritance hierarchy.
-   Return ``None`` if the documentation string is invalid or missing.
+   Lấy chuỗi tài liệu của một đối tượng và làm sạch bằng :func:`cleandoc`. Nếu chuỗi tài liệu của một đối tượng không được cung cấp và đối tượng đó là một lớp, phương thức, thuộc tính hoặc descriptor, hãy lấy chuỗi tài liệu từ hệ thống phân cấp kế thừa. Trả về ``None`` nếu chuỗi tài liệu không hợp lệ hoặc bị thiếu.
 
    .. versionchanged:: 3.5
-      Documentation strings are now inherited if not overridden.
+      Giờ đây, các chuỗi tài liệu sẽ được kế thừa nếu không bị ghi đè.
 
 
 .. function:: getcomments(object)
 
-   Return in a single string any lines of comments immediately preceding the
-   object's source code (for a class, function, or method), or at the top of the
-   Python source file (if the object is a module).  If the object's source code
-   is unavailable, return ``None``.  This could happen if the object has been
-   defined in C or the interactive shell.
+   Trả về trong một chuỗi duy nhất mọi dòng chú thích ngay trước mã nguồn của đối tượng (đối với một lớp, hàm hoặc phương thức), hoặc ở đầu tệp mã nguồn Python (nếu đối tượng là một mô-đun). Nếu không thể lấy mã nguồn của đối tượng, hãy trả về ``None``. Điều này có thể xảy ra nếu đối tượng được định nghĩa bằng C hoặc trong shell tương tác.
 
 
 .. function:: getfile(object)
 
-   Return the name of the (text or binary) file in which an object was defined.
-   An :exc:`OSError` is raised if the source code cannot be retrieved.
-   This will fail with a :exc:`TypeError` if the object is a built-in module,
-   class, or function.
+   Trả về tên của tệp (văn bản hoặc nhị phân) trong đó một đối tượng được định nghĩa. Một :exc:`OSError` sẽ được phát sinh nếu không thể lấy mã nguồn. Thao tác này sẽ thất bại với :exc:`TypeError` nếu đối tượng là một mô-đun, lớp hoặc hàm tích hợp.
 
 
 .. function:: getmodule(object)
 
-   Try to guess which module an object was defined in. Return ``None``
-   if the module cannot be determined.
+   Cố gắng đoán xem một đối tượng được định nghĩa trong module nào. Trả về ``None`` nếu không thể xác định module.
 
 
 .. function:: getsourcefile(object)
 
-   Return the name of the Python source file in which an object was defined
-   or ``None`` if no way can be identified to get the source.  An :exc:`OSError` is
-   raised if the source code cannot be retrieved.
-   This will fail with a :exc:`TypeError` if the object is a built-in module,
-   class, or function.
+   Trả về tên tệp nguồn Python mà trong đó một đối tượng được định nghĩa hoặc ``None`` nếu không có cách nào xác định để lấy mã nguồn. Một :exc:`OSError` được phát sinh nếu không thể truy xuất mã nguồn. Thao tác này sẽ thất bại với :exc:`TypeError` nếu đối tượng là một module, class hoặc function tích hợp sẵn.
 
 
 .. function:: getsourcelines(object)
 
-   Return a list of source lines and starting line number for an object. The
-   argument may be a module, class, method, function, traceback, frame, or code
-   object.  The source code is returned as a list of the lines corresponding to the
-   object and the line number indicates where in the original source file the first
-   line of code was found.  An :exc:`OSError` is raised if the source code cannot
-   be retrieved.
-   A :exc:`TypeError` is raised if the object is a built-in module, class, or
-   function.
+   Trả về danh sách các dòng mã nguồn và số dòng bắt đầu của một đối tượng. Đối số có thể là một module, class, method, function, traceback, frame hoặc code object. Mã nguồn được trả về dưới dạng danh sách các dòng tương ứng với đối tượng, còn số dòng cho biết vị trí trong tệp nguồn gốc mà tại đó dòng mã đầu tiên được tìm thấy. Một :exc:`OSError` được phát sinh nếu không thể truy xuất mã nguồn. Một :exc:`TypeError` được phát sinh nếu đối tượng là một module, class hoặc function tích hợp sẵn.
 
    .. versionchanged:: 3.3
       :exc:`OSError` is raised instead of :exc:`IOError`, now an alias of the
-      former.
+      phần trước.
 
 
 .. function:: getsource(object)
 
-   Return the text of the source code for an object. The argument may be a module,
-   class, method, function, traceback, frame, or code object.  The source code is
-   returned as a single string.  An :exc:`OSError` is raised if the source code
-   cannot be retrieved.
-   A :exc:`TypeError` is raised if the object is a built-in module, class, or
-   function.
+   Trả về văn bản của mã nguồn cho một đối tượng. Đối số có thể là một module, class, method, function, traceback, frame hoặc code object. Mã nguồn được trả về dưới dạng một chuỗi duy nhất. Một :exc:`OSError` được phát sinh nếu không thể truy xuất mã nguồn. Một :exc:`TypeError` được phát sinh nếu đối tượng là một module, class hoặc function tích hợp sẵn.
 
    .. versionchanged:: 3.3
       :exc:`OSError` is raised instead of :exc:`IOError`, now an alias of the
-      former.
+      phần trước.
 
 
 .. function:: cleandoc(doc)
 
-   Clean up indentation from docstrings that are indented to line up with blocks
-   of code.
+   Dọn dẹp thụt lề khỏi các docstring được thụt lề để thẳng hàng với các khối mã.
 
-   All leading whitespace is removed from the first line.  Any leading whitespace
-   that can be uniformly removed from the second line onwards is removed.  Empty
-   lines at the beginning and end are subsequently removed.  Also, all tabs are
-   expanded to spaces.
+   Mọi khoảng trắng ở đầu dòng đều bị xóa khỏi dòng đầu tiên. Mọi khoảng trắng ở đầu dòng có thể được xóa đồng nhất từ dòng thứ hai trở đi cũng bị xóa. Sau đó, các dòng trống ở đầu và cuối cũng bị xóa. Ngoài ra, tất cả các tab đều được mở rộng thành khoảng trắng.
 
 
 .. _inspect-signature-object:
 
-Introspecting callables with the Signature object
--------------------------------------------------
+Kiểm tra nội quan các đối tượng có thể gọi bằng đối tượng Signature
+-------------------------------------------------------------------
 
 .. versionadded:: 3.3
 
-The :class:`Signature` object represents the call signature of a callable object
-and its return annotation. To retrieve a :class:`!Signature` object,
-use the :func:`!signature`
-function.
+Đối tượng :class:`Signature` đại diện cho chữ ký lời gọi của một đối tượng có thể gọi và chú thích kiểu trả về của đối tượng đó. Để lấy một đối tượng :class:`!Signature`, hãy sử dụng hàm :func:`!signature`.
 
 .. function:: signature(callable, *, follow_wrapped=True, globals=None, locals=None, eval_str=False, annotation_format=Format.VALUE)
 
-   Return a :class:`Signature` object for the given *callable*:
+   Trả về một đối tượng :class:`Signature` cho *đối tượng có thể gọi* đã cho:
 
    .. doctest::
 
@@ -820,122 +714,81 @@ function.
       >>> sig.parameters['b'].annotation
       <class 'int'>
 
-   Accepts a wide range of Python callables, from plain functions and classes to
-   :func:`functools.partial` objects.
+   Chấp nhận nhiều loại đối tượng có thể gọi trong Python, từ các hàm thông thường và lớp cho đến
+   các đối tượng :func:`functools.partial`.
 
-   If some of the annotations are strings (e.g., because
-   ``from __future__ import annotations`` was used), :func:`signature` will
-   attempt to automatically un-stringize the annotations using
-   :func:`annotationlib.get_annotations`.  The
-   *globals*, *locals*, and *eval_str* parameters are passed
-   into :func:`!annotationlib.get_annotations` when resolving the
-   annotations; see the documentation for :func:`!annotationlib.get_annotations`
-   for instructions on how to use these parameters. A member of the
-   :class:`annotationlib.Format` enum can be passed to the
-   *annotation_format* parameter to control the format of the returned
-   annotations. For example, use
-   ``annotation_format=annotationlib.Format.STRING`` to return annotations in string
-   format.
+   Nếu một số chú thích là chuỗi (ví dụ: do đã sử dụng ``from __future__ import annotations``), :func:`signature` sẽ thử tự động chuyển các chú thích từ chuỗi bằng cách sử dụng
+   :func:`annotationlib.get_annotations`. Các tham số *globals*, *locals* và *eval_str* được truyền vào :func:`!annotationlib.get_annotations` khi phân giải các annotation; xem tài liệu về :func:`!annotationlib.get_annotations` để biết hướng dẫn sử dụng các tham số này. Một thành viên của
+   enum :class:`annotationlib.Format` có thể được truyền vào tham số *annotation_format* để kiểm soát định dạng của các annotation được trả về. Ví dụ, sử dụng ``annotation_format=annotationlib.Format.STRING`` để trả về các annotation ở định dạng chuỗi.
 
-   Raises :exc:`ValueError` if no signature can be provided, and
-   :exc:`TypeError` if that type of object is not supported.  Also,
-   if the annotations are stringized, and *eval_str* is not false,
-   the ``eval()`` call(s) to un-stringize the annotations in :func:`annotationlib.get_annotations`
-   could potentially raise any kind of exception.
+   Phát sinh :exc:`ValueError` nếu không thể cung cấp signature, và
+   :exc:`TypeError` nếu loại đối tượng đó không được hỗ trợ. Ngoài ra, nếu các annotation được chuyển thành chuỗi và *eval_str* không phải là false, các lần gọi ``eval()`` để chuyển các annotation trong :func:`annotationlib.get_annotations` từ chuỗi về lại có khả năng phát sinh bất kỳ loại exception nào.
 
-   A slash (/) in the signature of a function denotes that the parameters prior
-   to it are positional-only. For more info, see
-   :ref:`the FAQ entry on positional-only parameters <faq-positional-only-arguments>`.
+   Dấu gạch chéo (/) trong signature của một hàm cho biết các tham số đứng trước nó chỉ được truyền theo vị trí. Để biết thêm thông tin, hãy xem
+   :ref:`mục FAQ về các tham số chỉ nhận theo vị trí <faq-positional-only-arguments>`.
 
    .. versionchanged:: 3.5
-      The *follow_wrapped* parameter was added.
-      Pass ``False`` to get a signature of
-      *callable* specifically (``callable.__wrapped__`` will not be used to
-      unwrap decorated callables.)
+      Đã thêm tham số *follow_wrapped*. Truyền ``False`` để lấy signature dành riêng cho *callable* (``callable.__wrapped__`` sẽ không được dùng để bỏ lớp bao quanh các callable đã được trang trí.)
 
    .. versionchanged:: 3.10
-      The *globals*, *locals*, and *eval_str* parameters were added.
+      Các tham số *globals*, *locals* và *eval_str* đã được thêm vào.
 
    .. versionchanged:: 3.14
-      The *annotation_format* parameter was added.
+      Tham số *annotation_format* đã được thêm vào.
 
    .. note::
 
-      Some callables may not be introspectable in certain implementations of
-      Python.  For example, in CPython, some built-in functions defined in
-      C provide no metadata about their arguments.
+      Một số callable có thể không thể được introspect trong một số triển khai Python nhất định. Ví dụ, trong CPython, một số hàm tích hợp được định nghĩa bằng C không cung cấp metadata về các đối số của chúng.
 
    .. impl-detail::
 
-      If the passed object has a :attr:`!__signature__` attribute,
-      we may use it to create the signature.
-      The exact semantics are an implementation detail and are subject to
-      unannounced changes. Consult the source code for current semantics.
+      Nếu đối tượng được truyền vào có thuộc tính :attr:`!__signature__`, chúng ta có thể sử dụng thuộc tính này để tạo signature. Ngữ nghĩa chính xác là một chi tiết triển khai và có thể thay đổi mà không được thông báo trước. Hãy tham khảo mã nguồn để biết ngữ nghĩa hiện tại.
 
 
 .. class:: Signature(parameters=None, *, return_annotation=Signature.empty)
 
-   A :class:`!Signature` object represents the call signature of a function
-   and its return
-   annotation.  For each parameter accepted by the function it stores a
-   :class:`Parameter` object in its :attr:`parameters` collection.
+   Một đối tượng :class:`!Signature` biểu diễn signature gọi của một hàm và annotation giá trị trả về của hàm đó. Với mỗi tham số mà hàm chấp nhận, đối tượng này lưu trữ một
+   đối tượng :class:`Parameter` trong collection :attr:`parameters` của nó.
 
-   The optional *parameters* argument is a sequence of :class:`Parameter`
-   objects, which is validated to check that there are no parameters with
-   duplicate names, and that the parameters are in the right order, i.e.
-   positional-only first, then positional-or-keyword, and that parameters with
-   defaults follow parameters without defaults.
+   Đối số tùy chọn *parameters* là một chuỗi các đối tượng :class:`Parameter`, được xác thực để kiểm tra rằng không có tham số nào trùng tên và các tham số được sắp xếp đúng thứ tự, tức là trước hết là positional-only, tiếp theo là positional-or-keyword, đồng thời các tham số có giá trị mặc định phải đứng sau các tham số không có giá trị mặc định.
 
-   The optional *return_annotation* argument can be an arbitrary Python object.
-   It represents the "return" annotation of the callable.
+   Đối số *return_annotation* tùy chọn có thể là một đối tượng Python bất kỳ. Đối số này biểu thị chú thích "return" của callable.
 
-   :class:`!Signature` objects are *immutable*.  Use :meth:`Signature.replace` or
-   :func:`copy.replace` to make a modified copy.
+   Các đối tượng :class:`!Signature` là *immutable*. Hãy sử dụng :meth:`Signature.replace` hoặc
+   :func:`copy.replace` để tạo một bản sao đã sửa đổi.
 
    .. versionchanged:: 3.5
       :class:`!Signature` objects are now picklable and :term:`hashable`.
 
    .. attribute:: Signature.empty
 
-      A special class-level marker to specify absence of a return annotation.
+      Một marker đặc biệt ở cấp lớp dùng để chỉ định rằng không có chú thích return.
 
    .. attribute:: Signature.parameters
 
-      An ordered mapping of parameters' names to the corresponding
-      :class:`Parameter` objects.  Parameters appear in strict definition
-      order, including keyword-only parameters.
+      Một ánh xạ có thứ tự từ tên của các tham số đến các đối tượng tương ứng
+      :class:`Parameter`. Các tham số xuất hiện đúng theo thứ tự định nghĩa, bao gồm cả các tham số chỉ nhận keyword.
 
       .. versionchanged:: 3.7
-         Python only explicitly guaranteed that it preserved the declaration
-         order of keyword-only parameters as of version 3.7, although in practice
-         this order had always been preserved in Python 3.
+         Python chỉ đảm bảo rõ ràng rằng thứ tự khai báo của các tham số chỉ nhận keyword được giữ nguyên kể từ phiên bản 3.7, mặc dù trên thực tế thứ tự này vốn luôn được giữ nguyên trong Python 3.
 
    .. attribute:: Signature.return_annotation
 
-      The "return" annotation for the callable.  If the callable has no "return"
-      annotation, this attribute is set to :attr:`Signature.empty`.
+      Chú thích "return" của callable. Nếu callable không có chú thích "return", thuộc tính này được đặt thành :attr:`Signature.empty`.
 
    .. method:: Signature.bind(*args, **kwargs)
 
-      Create a mapping from positional and keyword arguments to parameters.
-      Returns :class:`BoundArguments` if ``*args`` and ``**kwargs`` match the
-      signature, or raises a :exc:`TypeError`.
+      Tạo ánh xạ từ các đối số positional và keyword đến các tham số. Trả về :class:`BoundArguments` nếu ``*args`` và ``**kwargs`` khớp với signature, hoặc phát sinh :exc:`TypeError`.
 
    .. method:: Signature.bind_partial(*args, **kwargs)
 
-      Works the same way as :meth:`Signature.bind`, but allows the omission of
-      some required arguments (mimics :func:`functools.partial` behavior.)
-      Returns :class:`BoundArguments`, or raises a :exc:`TypeError` if the
-      passed arguments do not match the signature.
+      Hoạt động giống như :meth:`Signature.bind`, nhưng cho phép bỏ qua một số đối số bắt buộc (mô phỏng hành vi của :func:`functools.partial`). Trả về :class:`BoundArguments`, hoặc phát sinh :exc:`TypeError` nếu các đối số đã truyền không khớp với signature.
 
    .. method:: Signature.replace(*[, parameters][, return_annotation])
 
-      Create a new :class:`Signature` instance based on the instance
-      :meth:`replace` was invoked on.
-      It is possible to pass different *parameters* and/or
-      *return_annotation* to override the corresponding properties of the base
-      signature.  To remove ``return_annotation`` from the copied
-      :class:`!Signature`, pass in
+      Tạo một đối tượng :class:`Signature` mới dựa trên đối tượng
+      mà :meth:`replace` được gọi trên đó. Có thể truyền các *tham số* khác nhau và/hoặc *return_annotation* để ghi đè các thuộc tính tương ứng của signature cơ sở. Để xóa ``return_annotation`` khỏi signature đã sao chép
+      :class:`!Signature`, hãy truyền vào
       :attr:`Signature.empty`.
 
       .. doctest::
@@ -948,35 +801,28 @@ function.
          >>> str(new_sig)
          "(a, b) -> 'new return anno'"
 
-      :class:`Signature` objects are also supported by the generic function
+      Các đối tượng :class:`Signature` cũng được hàm generic hỗ trợ
       :func:`copy.replace`.
 
    .. method:: format(*, max_width=None, quote_annotation_strings=True)
 
-      Create a string representation of the :class:`Signature` object.
+      Tạo biểu diễn chuỗi của đối tượng :class:`Signature`.
 
-      If *max_width* is passed, the method will attempt to fit
-      the signature into lines of at most *max_width* characters.
-      If the signature is longer than *max_width*,
-      all parameters will be on separate lines.
+      Nếu truyền *max_width*, phương thức sẽ cố gắng đưa signature vào các dòng có tối đa *max_width* ký tự. Nếu signature dài hơn *max_width*, tất cả tham số sẽ nằm trên các dòng riêng biệt.
 
-      If *quote_annotation_strings* is False, :term:`annotations <annotation>`
-      in the signature are displayed without opening and closing quotation
-      marks if they are strings. This is useful if the signature was created with the
-      :attr:`~annotationlib.Format.STRING` format or if
-      ``from __future__ import annotations`` was used.
+      Nếu *quote_annotation_strings* là False, :term:`annotations <annotation>` trong signature sẽ được hiển thị mà không có dấu ngoặc kép mở và đóng nếu chúng là chuỗi. Điều này hữu ích nếu signature được tạo bằng định dạng
+      :attr:`~annotationlib.Format.STRING` hoặc nếu đã sử dụng ``from __future__ import annotations``.
 
       .. versionadded:: 3.13
 
       .. versionchanged:: 3.14
-         The *unquote_annotations* parameter was added.
+         Tham số *unquote_annotations* đã được thêm.
 
    .. classmethod:: Signature.from_callable(obj, *, follow_wrapped=True, globals=None, locals=None, eval_str=False)
 
-       Return a :class:`Signature` (or its subclass) object for a given callable
-       *obj*.
+       Trả về một đối tượng :class:`Signature` (hoặc lớp con của nó) cho một callable *obj* nhất định.
 
-       This method simplifies subclassing of :class:`Signature`:
+       Phương thức này giúp đơn giản hóa việc tạo lớp con của :class:`Signature`:
 
        .. testcode::
 
@@ -985,91 +831,65 @@ function.
           sig = MySignature.from_callable(sum)
           assert isinstance(sig, MySignature)
 
-       Its behavior is otherwise identical to that of :func:`signature`.
+       Hành vi của nó giống hệt :func:`signature` về mọi mặt khác.
 
        .. versionadded:: 3.5
 
        .. versionchanged:: 3.10
-         The *globals*, *locals*, and *eval_str* parameters were added.
+         Các tham số *globals*, *locals* và *eval_str* đã được thêm vào.
 
 
 .. class:: Parameter(name, kind, *, default=Parameter.empty, annotation=Parameter.empty)
 
-   :class:`!Parameter` objects are *immutable*.
-   Instead of modifying a :class:`!Parameter` object,
-   you can use :meth:`Parameter.replace` or :func:`copy.replace` to create a modified copy.
+   Các đối tượng :class:`!Parameter` là *bất biến*. Thay vì sửa đổi một đối tượng :class:`!Parameter`, bạn có thể sử dụng :meth:`Parameter.replace` hoặc :func:`copy.replace` để tạo một bản sao đã sửa đổi.
 
    .. versionchanged:: 3.5
-      Parameter objects are now picklable and :term:`hashable`.
+      Các đối tượng Parameter hiện có thể được pickle và :term:`hashable`.
 
    .. attribute:: Parameter.empty
 
-      A special class-level marker to specify absence of default values and
-      annotations.
+      Một marker đặc biệt ở cấp lớp để chỉ định việc không có giá trị mặc định và chú thích.
 
    .. attribute:: Parameter.name
 
-      The name of the parameter as a string.  The name must be a valid
-      Python identifier.
+      Tên của parameter dưới dạng chuỗi. Tên này phải là một mã định danh Python hợp lệ.
 
       .. impl-detail::
 
-         CPython generates implicit parameter names of the form ``.0`` on the
-         code objects used to implement comprehensions and generator
-         expressions.
+         CPython tạo các tên parameter ngầm định có dạng ``.0`` trên các code object được dùng để triển khai các biểu thức comprehension và generator.
 
          .. versionchanged:: 3.6
-            These parameter names are now exposed by this module as names like
-            ``implicit0``.
+            Các tên tham số này hiện được module này cung cấp dưới dạng những tên như ``implicit0``.
 
    .. attribute:: Parameter.default
 
-      The default value for the parameter.  If the parameter has no default
-      value, this attribute is set to :attr:`Parameter.empty`.
+      Giá trị mặc định của tham số. Nếu tham số không có giá trị mặc định, thuộc tính này được đặt thành :attr:`Parameter.empty`.
 
    .. attribute:: Parameter.annotation
 
-      The annotation for the parameter.  If the parameter has no annotation,
-      this attribute is set to :attr:`Parameter.empty`.
+      Chú thích của tham số. Nếu tham số không có chú thích, thuộc tính này được đặt thành :attr:`Parameter.empty`.
 
    .. attribute:: Parameter.kind
 
-      Describes how argument values are bound to the parameter.  The possible
-      values are accessible via :class:`Parameter` (like ``Parameter.KEYWORD_ONLY``),
-      and support comparison and ordering, in the following order:
+      Mô tả cách các giá trị đối số được liên kết với tham số. Các giá trị có thể có được truy cập thông qua :class:`Parameter` (chẳng hạn như ``Parameter.KEYWORD_ONLY``), đồng thời hỗ trợ phép so sánh và sắp xếp theo thứ tự sau:
 
       .. tabularcolumns:: |l|L|
 
-      +------------------------+----------------------------------------------+
-      |    Name                | Meaning                                      |
-      +========================+==============================================+
-      | *POSITIONAL_ONLY*      | Value must be supplied as a positional       |
-      |                        | argument. Positional only parameters are     |
-      |                        | those which appear before a ``/`` entry (if  |
-      |                        | present) in a Python function definition.    |
-      +------------------------+----------------------------------------------+
-      | *POSITIONAL_OR_KEYWORD*| Value may be supplied as either a keyword or |
-      |                        | positional argument (this is the standard    |
-      |                        | binding behaviour for functions implemented  |
-      |                        | in Python.)                                  |
-      +------------------------+----------------------------------------------+
-      | *VAR_POSITIONAL*       | A tuple of positional arguments that aren't  |
-      |                        | bound to any other parameter. This           |
-      |                        | corresponds to a ``*args`` parameter in a    |
-      |                        | Python function definition.                  |
-      +------------------------+----------------------------------------------+
-      | *KEYWORD_ONLY*         | Value must be supplied as a keyword argument.|
-      |                        | Keyword only parameters are those which      |
-      |                        | appear after a ``*`` or ``*args`` entry in a |
-      |                        | Python function definition.                  |
-      +------------------------+----------------------------------------------+
-      | *VAR_KEYWORD*          | A dict of keyword arguments that aren't bound|
-      |                        | to any other parameter. This corresponds to a|
-      |                        | ``**kwargs`` parameter in a Python function  |
-      |                        | definition.                                  |
-      +------------------------+----------------------------------------------+
+      +-------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+      | Tên                     | Ý nghĩa                                                                                                                                                                  |
+      +=========================+==========================================================================================================================================================================+
+      | *POSITIONAL_ONLY*       | Giá trị phải được cung cấp dưới dạng đối số positional. Các tham số chỉ nhận positional là những tham số xuất hiện trước mục ``/`` (nếu có) trong định nghĩa hàm Python. |
+      +-------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+      | *POSITIONAL_OR_KEYWORD* | Giá trị có thể được cung cấp dưới dạng đối số keyword hoặc positional (đây là hành vi binding tiêu chuẩn đối với các hàm được triển khai bằng Python.)                   |
+      +-------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+      | *VAR_POSITIONAL*        | Một tuple gồm các đối số positional không được liên kết với bất kỳ tham số nào khác. Điều này tương ứng với tham số ``*args`` trong định nghĩa hàm Python.               |
+      +-------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+      | *KEYWORD_ONLY*          | Giá trị phải được cung cấp dưới dạng đối số keyword. Các tham số chỉ nhận keyword là những tham số xuất hiện sau mục ``*`` hoặc ``*args`` trong định nghĩa hàm Python.   |
+      +-------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+      | *VAR_KEYWORD*           | Một dict chứa các đối số từ khóa không được liên kết với bất kỳ tham số nào khác. Điều này tương ứng với một tham số ``**kwargs`` trong định nghĩa hàm Python.           |
+      +-------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-      Example: print all keyword-only arguments without default values:
+      Ví dụ: in tất cả các đối số chỉ nhận từ khóa không có giá trị mặc định:
 
       .. doctest::
 
@@ -1085,11 +905,11 @@ function.
 
    .. attribute:: Parameter.kind.description
 
-      Describes an enum value of :attr:`Parameter.kind`.
+      Mô tả một giá trị enum của :attr:`Parameter.kind`.
 
       .. versionadded:: 3.8
 
-      Example: print all descriptions of arguments:
+      Ví dụ: in tất cả mô tả của các đối số:
 
       .. doctest::
 
@@ -1106,10 +926,8 @@ function.
 
    .. method:: Parameter.replace(*[, name][, kind][, default][, annotation])
 
-      Create a new :class:`Parameter` instance based on the instance replaced was invoked
-      on.  To override a :class:`!Parameter` attribute, pass the corresponding
-      argument.  To remove a default value or/and an annotation from a
-      :class:`!Parameter`, pass :attr:`Parameter.empty`.
+      Tạo một instance :class:`Parameter` mới dựa trên instance mà phương thức được gọi trên đó. Để ghi đè một thuộc tính :class:`!Parameter`, hãy truyền đối số tương ứng. Để xóa một giá trị mặc định hoặc/và một chú thích khỏi một
+      :class:`!Parameter`, hãy truyền :attr:`Parameter.empty`.
 
       .. doctest::
 
@@ -1118,69 +936,58 @@ function.
          >>> str(param)
          'foo=42'
 
-         >>> str(param.replace()) # Will create a shallow copy of 'param'
+         >>> str(param.replace()) # Sẽ tạo một bản sao nông của 'param'
          'foo=42'
 
          >>> str(param.replace(default=Parameter.empty, annotation='spam'))
          "foo: 'spam'"
 
-      :class:`Parameter` objects are also supported by the generic function
+      Các đối tượng :class:`Parameter` cũng được hàm generic hỗ trợ
       :func:`copy.replace`.
 
    .. versionchanged:: 3.4
-      In Python 3.3 :class:`Parameter` objects were allowed to have ``name`` set
-      to ``None`` if their ``kind`` was set to ``POSITIONAL_ONLY``.
-      This is no longer permitted.
+      Trong Python 3.3, các đối tượng :class:`Parameter` được phép có ``name`` được đặt thành ``None`` nếu ``kind`` của chúng được đặt thành ``POSITIONAL_ONLY``. Điều này không còn được phép.
 
 .. class:: BoundArguments
 
-   Result of a :meth:`Signature.bind` or :meth:`Signature.bind_partial` call.
-   Holds the mapping of arguments to the function's parameters.
+   Kết quả của lệnh gọi :meth:`Signature.bind` hoặc :meth:`Signature.bind_partial`. Chứa ánh xạ các đối số với các tham số của hàm.
 
    .. attribute:: BoundArguments.arguments
 
-      A mutable mapping of parameters' names to arguments' values.
-      Contains only explicitly bound arguments.  Changes in :attr:`arguments`
-      will reflect in :attr:`args` and :attr:`kwargs`.
+      Một ánh xạ có thể thay đổi từ tên của tham số đến giá trị của đối số. Chỉ chứa các đối số được liên kết một cách rõ ràng. Các thay đổi trong :attr:`arguments` sẽ được phản ánh trong :attr:`args` và :attr:`kwargs`.
 
-      Should be used in conjunction with :attr:`Signature.parameters` for any
-      argument processing purposes.
+      Nên được sử dụng cùng với :attr:`Signature.parameters` cho mọi mục đích xử lý đối số.
 
       .. note::
 
-         Arguments for which :meth:`Signature.bind` or
-         :meth:`Signature.bind_partial` relied on a default value are skipped.
-         However, if needed, use :meth:`BoundArguments.apply_defaults` to add
-         them.
+         Các đối số mà :meth:`Signature.bind` hoặc
+         Các :meth:`Signature.bind_partial` dựa vào một giá trị mặc định sẽ bị bỏ qua. Tuy nhiên, nếu cần, hãy sử dụng :meth:`BoundArguments.apply_defaults` để thêm chúng.
 
       .. versionchanged:: 3.9
          :attr:`arguments` is now of type :class:`dict`. Formerly, it was of
-         type :class:`collections.OrderedDict`.
+         kiểu :class:`collections.OrderedDict`.
 
    .. attribute:: BoundArguments.args
 
-      A tuple of positional arguments values.  Dynamically computed from the
-      :attr:`arguments` attribute.
+      Một tuple chứa các giá trị đối số vị trí. Được tính động từ
+      thuộc tính :attr:`arguments`.
 
    .. attribute:: BoundArguments.kwargs
 
-      A dict of keyword arguments values.  Dynamically computed from the
-      :attr:`arguments` attribute.  Arguments that can be passed positionally
-      are included in :attr:`args` instead.
+      Một dict chứa các giá trị đối số từ khóa. Được tính động từ
+      thuộc tính :attr:`arguments`. Các đối số có thể được truyền theo vị trí sẽ được đưa vào :attr:`args` thay vào đó.
 
    .. attribute:: BoundArguments.signature
 
-      A reference to the parent :class:`Signature` object.
+      Một tham chiếu đến đối tượng :class:`Signature` cha.
 
    .. method:: BoundArguments.apply_defaults()
 
-      Set default values for missing arguments.
+      Đặt các giá trị mặc định cho những đối số bị thiếu.
 
-      For variable-positional arguments (``*args``) the default is an
-      empty tuple.
+      Đối với các đối số biến-positional (``*args``), giá trị mặc định là một tuple rỗng.
 
-      For variable-keyword arguments (``**kwargs``) the default is an
-      empty dict.
+      Đối với các đối số biến-keyword (``**kwargs``), giá trị mặc định là một dict rỗng.
 
       .. doctest::
 
@@ -1192,8 +999,7 @@ function.
 
       .. versionadded:: 3.5
 
-   The :attr:`args` and :attr:`kwargs` properties can be used to invoke
-   functions:
+   Có thể sử dụng các thuộc tính :attr:`args` và :attr:`kwargs` để gọi các hàm:
 
    .. testcode::
 
@@ -1207,114 +1013,71 @@ function.
 
 .. seealso::
 
-   :pep:`362` - Function Signature Object.
-      The detailed specification, implementation details and examples.
+   :pep:`362` - Đối tượng Signature của hàm.
+      Đặc tả chi tiết, thông tin chi tiết về cách triển khai và các ví dụ.
 
 
 .. _inspect-classes-functions:
 
-Classes and functions
----------------------
+Các lớp và hàm
+--------------
 
 .. function:: getclasstree(classes, unique=False)
 
-   Arrange the given list of classes into a hierarchy of nested lists. Where a
-   nested list appears, it contains classes derived from the class whose entry
-   immediately precedes the list.  Each entry is a 2-tuple containing a class and a
-   tuple of its base classes.  If the *unique* argument is true, exactly one entry
-   appears in the returned structure for each class in the given list.  Otherwise,
-   classes using multiple inheritance and their descendants will appear multiple
-   times.
+   Sắp xếp danh sách lớp đã cho thành một hệ phân cấp gồm các danh sách lồng nhau. Khi xuất hiện một danh sách lồng nhau, danh sách đó chứa các lớp dẫn xuất từ lớp có mục nhập ngay trước danh sách. Mỗi mục nhập là một bộ 2 phần tử gồm một lớp và một tuple chứa các lớp cơ sở của lớp đó. Nếu đối số *unique* là true, cấu trúc được trả về sẽ chứa chính xác một mục nhập cho mỗi lớp trong danh sách đã cho. Nếu không, các lớp sử dụng đa kế thừa và các lớp dẫn xuất của chúng sẽ xuất hiện nhiều lần.
 
 
 .. function:: getfullargspec(func)
 
-   Get the names and default values of a Python function's parameters.  A
-   :term:`named tuple` is returned:
+   Lấy tên và giá trị mặc định của các tham số trong một hàm Python. Một
+   :term:`named tuple` được trả về:
 
    ``FullArgSpec(args, varargs, varkw, defaults, kwonlyargs, kwonlydefaults,
    annotations)``
 
-   *args* is a list of the positional parameter names.
-   *varargs* is the name of the ``*`` parameter or ``None`` if arbitrary
-   positional arguments are not accepted.
-   *varkw* is the name of the ``**`` parameter or ``None`` if arbitrary
-   keyword arguments are not accepted.
-   *defaults* is an *n*-tuple of default argument values corresponding to the
-   last *n* positional parameters, or ``None`` if there are no such defaults
-   defined.
-   *kwonlyargs* is a list of keyword-only parameter names in declaration order.
-   *kwonlydefaults* is a dictionary mapping parameter names from *kwonlyargs*
-   to the default values used if no argument is supplied.
-   *annotations* is a dictionary mapping parameter names to annotations.
-   The special key ``"return"`` is used to report the function return value
-   annotation (if any).
+   *args* là danh sách tên của các tham số vị trí. *varargs* là tên của tham số ``*`` hoặc ``None`` nếu không chấp nhận các đối số vị trí tùy ý. *varkw* là tên của tham số ``**`` hoặc ``None`` nếu không chấp nhận các đối số từ khóa tùy ý. *defaults* là một tuple gồm *n* giá trị mặc định của đối số, tương ứng với *n* tham số vị trí cuối cùng, hoặc ``None`` nếu không có giá trị mặc định nào như vậy được định nghĩa. *kwonlyargs* là danh sách tên các tham số chỉ từ khóa theo thứ tự khai báo. *kwonlydefaults* là một dictionary ánh xạ tên các tham số từ *kwonlyargs* tới các giá trị mặc định được sử dụng khi không cung cấp đối số. *annotations* là một dictionary ánh xạ tên tham số tới các chú thích. Khóa đặc biệt ``"return"`` được dùng để báo cáo chú thích cho giá trị trả về của hàm (nếu có).
 
-   Note that :func:`signature` and
-   :ref:`Signature Object <inspect-signature-object>` provide the recommended
-   API for callable introspection, and support additional behaviours (like
-   positional-only arguments) that are sometimes encountered in extension module
-   APIs. This function is retained primarily for use in code that needs to
-   maintain compatibility with the Python 2 ``inspect`` module API.
+   Lưu ý rằng :func:`signature` và
+   :ref:`Signature Object <inspect-signature-object>` cung cấp API được khuyến nghị để introspection các đối tượng callable và hỗ trợ thêm các hành vi (chẳng hạn như đối số chỉ vị trí) đôi khi gặp trong API của các extension module. Hàm này chủ yếu được giữ lại để sử dụng trong mã cần duy trì khả năng tương thích với API của module ``inspect`` trong Python 2.
 
    .. versionchanged:: 3.4
-      This function is now based on :func:`signature`, but still ignores
-      ``__wrapped__`` attributes and includes the already bound first
-      parameter in the signature output for bound methods.
+      Hàm này hiện dựa trên :func:`signature`, nhưng vẫn bỏ qua các thuộc tính ``__wrapped__`` và bao gồm tham số đầu tiên đã được binding trong đầu ra chữ ký đối với các bound method.
 
    .. versionchanged:: 3.6
-      This method was previously documented as deprecated in favour of
-      :func:`signature` in Python 3.5, but that decision has been reversed
-      in order to restore a clearly supported standard interface for
-      single-source Python 2/3 code migrating away from the legacy
+      Phương thức này trước đây được ghi nhận là không còn được khuyến nghị sử dụng để thay cho
+      :func:`signature` trong Python 3.5, nhưng quyết định đó đã được đảo ngược nhằm khôi phục một giao diện chuẩn được hỗ trợ rõ ràng cho mã Python 2/3 dùng chung một nguồn đang chuyển khỏi API cũ
       :func:`!getargspec` API.
 
    .. versionchanged:: 3.7
-      Python only explicitly guaranteed that it preserved the declaration
-      order of keyword-only parameters as of version 3.7, although in practice
-      this order had always been preserved in Python 3.
+      Python chỉ đảm bảo tường minh rằng thứ tự khai báo của các tham số chỉ dùng từ khóa được giữ nguyên kể từ phiên bản 3.7, mặc dù trên thực tế thứ tự này luôn được giữ nguyên trong Python 3.
 
 
 .. function:: getargvalues(frame)
 
-   Get information about arguments passed into a particular frame.  A
-   :term:`named tuple` ``ArgInfo(args, varargs, keywords, locals)`` is
-   returned. *args* is a list of the argument names.  *varargs* and *keywords*
-   are the names of the ``*`` and ``**`` arguments or ``None``.  *locals* is the
-   locals dictionary of the given frame.
+   Lấy thông tin về các đối số được truyền vào một frame cụ thể. Một
+   :term:`named tuple` ``ArgInfo(args, varargs, keywords, locals)`` được trả về. *args* là danh sách tên các đối số. *varargs* và *keywords* là tên của các đối số ``*`` và ``**`` hoặc ``None``. *locals* là từ điển biến cục bộ của frame đã cho.
 
    .. note::
-      This function was inadvertently marked as deprecated in Python 3.5.
+      Hàm này đã vô tình được đánh dấu là không còn được khuyến nghị sử dụng trong Python 3.5.
 
 
 .. function:: formatargvalues(args[, varargs, varkw, locals, formatarg, formatvarargs, formatvarkw, formatvalue])
 
-   Format a pretty argument spec from the four values returned by
-   :func:`getargvalues`.  The format\* arguments are the corresponding optional
-   formatting functions that are called to turn names and values into strings.
+   Định dạng một đặc tả đối số dễ đọc từ bốn giá trị được trả về bởi
+   :func:`getargvalues`.  Các đối số format\* là những hàm định dạng tùy chọn tương ứng, được gọi để chuyển tên và giá trị thành chuỗi.
 
    .. note::
-      This function was inadvertently marked as deprecated in Python 3.5.
+      Hàm này đã vô tình được đánh dấu là không còn được khuyến nghị sử dụng trong Python 3.5.
 
 
 .. function:: getmro(cls)
 
-   Return a tuple of class cls's base classes, including cls, in method resolution
-   order.  No class appears more than once in this tuple. Note that the method
-   resolution order depends on cls's type.  Unless a very peculiar user-defined
-   metatype is in use, cls will be the first element of the tuple.
+   Trả về một tuple gồm các lớp cơ sở của lớp cls, bao gồm cả cls, theo thứ tự phân giải phương thức. Không có lớp nào xuất hiện quá một lần trong tuple này. Lưu ý rằng thứ tự phân giải phương thức phụ thuộc vào kiểu của cls. Trừ khi đang sử dụng một metaclass do người dùng định nghĩa rất đặc biệt, cls sẽ là phần tử đầu tiên của tuple.
 
 
 .. function:: getcallargs(func, /, *args, **kwds)
 
-   Bind the *args* and *kwds* to the argument names of the Python function or
-   method *func*, as if it was called with them. For bound methods, bind also the
-   first argument (typically named ``self``) to the associated instance. A dict
-   is returned, mapping the argument names (including the names of the ``*`` and
-   ``**`` arguments, if any) to their values from *args* and *kwds*. In case of
-   invoking *func* incorrectly, i.e. whenever ``func(*args, **kwds)`` would raise
-   an exception because of incompatible signature, an exception of the same type
-   and the same or similar message is raised. For example:
+   Liên kết *args* và *kwds* với tên các đối số của hàm hoặc phương thức Python *func*, như thể hàm hoặc phương thức đó được gọi cùng các đối số này. Đối với các phương thức đã liên kết, đồng thời liên kết đối số đầu tiên (thường có tên là ``self``) với thực thể liên kết. Một dict được trả về, ánh xạ tên các đối số (bao gồm tên của các đối số ``*`` và ``**``, nếu có) với các giá trị tương ứng của chúng từ *args* và *kwds*. Nếu gọi *func* không đúng cách, tức là khi ``func(*args, **kwds)`` sẽ phát sinh một ngoại lệ do chữ ký không tương thích, một ngoại lệ cùng kiểu và có thông báo giống hoặc tương tự sẽ được phát sinh. Ví dụ:
 
    .. doctest::
 
@@ -1334,302 +1097,224 @@ Classes and functions
    .. versionadded:: 3.2
 
    .. deprecated:: 3.5
-      Use :meth:`Signature.bind` and :meth:`Signature.bind_partial` instead.
+      Thay vào đó, hãy sử dụng :meth:`Signature.bind` và :meth:`Signature.bind_partial`.
 
 
 .. function:: getclosurevars(func)
 
-   Get the mapping of external name references in a Python function or
-   method *func* to their current values. A
-   :term:`named tuple` ``ClosureVars(nonlocals, globals, builtins, unbound)``
-   is returned. *nonlocals* maps referenced names to lexical closure
-   variables, *globals* to the function's module globals and *builtins* to
-   the builtins visible from the function body. *unbound* is the set of names
-   referenced in the function that could not be resolved at all given the
-   current module globals and builtins.
+   Lấy ánh xạ các tham chiếu tên bên ngoài trong hàm hoặc phương thức Python *func* tới các giá trị hiện tại của chúng. Một
+   :term:`named tuple` ``ClosureVars(nonlocals, globals, builtins, unbound)`` được trả về. *nonlocals* ánh xạ các tên được tham chiếu tới các biến closure theo phạm vi từ vựng, *globals* tới các biến toàn cục của module chứa hàm và *builtins* tới các builtins có thể truy cập từ phần thân hàm. *unbound* là tập hợp các tên được tham chiếu trong hàm nhưng hoàn toàn không thể phân giải dựa trên các biến toàn cục và builtins hiện tại của module.
 
-   :exc:`TypeError` is raised if *func* is not a Python function or method.
+   :exc:`TypeError` được phát sinh nếu *func* không phải là một hàm hoặc phương thức Python.
 
    .. versionadded:: 3.3
 
 
 .. function:: unwrap(func, *, stop=None)
 
-   Get the object wrapped by *func*. It follows the chain of :attr:`__wrapped__`
-   attributes returning the last object in the chain.
+   Lấy đối tượng được *func* bọc. Hàm này lần theo chuỗi các thuộc tính :attr:`__wrapped__` và trả về đối tượng cuối cùng trong chuỗi.
 
-   *stop* is an optional callback accepting an object in the wrapper chain
-   as its sole argument that allows the unwrapping to be terminated early if
-   the callback returns a true value. If the callback never returns a true
-   value, the last object in the chain is returned as usual. For example,
-   :func:`signature` uses this to stop unwrapping if any object in the
-   chain has a ``__signature__`` attribute defined.
+   *stop* là một callback tùy chọn, nhận một đối tượng trong chuỗi wrapper làm đối số duy nhất và cho phép dừng quá trình tháo bọc sớm nếu callback trả về một giá trị true. Nếu callback không bao giờ trả về một giá trị true, đối tượng cuối cùng trong chuỗi sẽ được trả về như thường lệ. Ví dụ:
+   :func:`signature` sử dụng điều này để dừng quá trình tháo bọc nếu bất kỳ đối tượng nào trong chuỗi có thuộc tính ``__signature__`` được định nghĩa.
 
-   :exc:`ValueError` is raised if a cycle is encountered.
+   :exc:`ValueError` được phát sinh nếu phát hiện một chu kỳ.
 
    .. versionadded:: 3.4
 
 
 .. function:: get_annotations(obj, *, globals=None, locals=None, eval_str=False, format=annotationlib.Format.VALUE)
 
-   Compute the annotations dict for an object.
+   Tính toán dict annotations cho một đối tượng.
 
-   This is an alias for :func:`annotationlib.get_annotations`; see the documentation
-   of that function for more information.
+   Đây là bí danh của :func:`annotationlib.get_annotations`; xem tài liệu về hàm đó để biết thêm thông tin.
 
    .. caution::
 
-      This function may execute arbitrary code contained in annotations.
-      See :ref:`annotationlib-security` for more information.
+      Hàm này có thể thực thi mã tùy ý có trong các annotation. Xem :ref:`annotationlib-security` để biết thêm thông tin.
 
    .. versionadded:: 3.10
 
    .. versionchanged:: 3.14
-      This function is now an alias for :func:`annotationlib.get_annotations`.
-      Calling it as ``inspect.get_annotations`` will continue to work.
+      Hàm này hiện là bí danh của :func:`annotationlib.get_annotations`. Gọi nó dưới dạng ``inspect.get_annotations`` vẫn sẽ tiếp tục hoạt động.
 
 
 .. _inspect-stack:
 
-The interpreter stack
----------------------
+Ngăn xếp của interpreter
+------------------------
 
-Some of the following functions return
-:class:`FrameInfo` objects. For backwards compatibility these objects allow
-tuple-like operations on all attributes except ``positions``. This behavior
-is considered deprecated and may be removed in the future.
+Một số hàm sau đây trả về
+các đối tượng :class:`FrameInfo`. Để đảm bảo khả năng tương thích ngược, các đối tượng này cho phép thực hiện các thao tác kiểu tuple trên mọi thuộc tính, ngoại trừ ``positions``. Hành vi này được xem là đã lỗi thời và có thể bị loại bỏ trong tương lai.
 
 .. class:: FrameInfo
 
    .. attribute:: frame
 
-      The :ref:`frame object <frame-objects>` that the record corresponds to.
+      :ref:`Đối tượng frame <frame-objects>` mà bản ghi tương ứng với.
 
    .. attribute:: filename
 
-      The file name associated with the code being executed by the frame this record
-      corresponds to.
+      Tên tệp liên kết với đoạn mã đang được thực thi bởi frame mà bản ghi này tương ứng.
 
    .. attribute:: lineno
 
-      The line number of the current line associated with the code being
-      executed by the frame this record corresponds to.
+      Số dòng của dòng hiện tại liên kết với đoạn mã đang được thực thi bởi frame mà bản ghi này tương ứng.
 
    .. attribute:: function
 
-      The function name that is being executed by the frame this record corresponds to.
+      Tên hàm đang được thực thi bởi frame mà bản ghi này tương ứng.
 
    .. attribute:: code_context
 
-      A list of lines of context from the source code that's being executed by the frame
-      this record corresponds to.
+      Danh sách các dòng ngữ cảnh từ mã nguồn đang được thực thi bởi frame mà bản ghi này tương ứng.
 
    .. attribute:: index
 
-      The index of the current line being executed in the :attr:`code_context` list.
+      Chỉ mục của dòng hiện tại đang được thực thi trong danh sách :attr:`code_context`.
 
    .. attribute:: positions
 
-      A :class:`dis.Positions` object containing the start line number, end line
-      number, start column offset, and end column offset associated with the
-      instruction being executed by the frame this record corresponds to.
+      Một đối tượng :class:`dis.Positions` chứa số dòng bắt đầu, số dòng kết thúc, độ lệch cột bắt đầu và độ lệch cột kết thúc liên kết với lệnh đang được thực thi bởi frame mà bản ghi này tương ứng.
 
    .. versionchanged:: 3.5
-      Return a :term:`named tuple` instead of a :class:`tuple`.
+      Trả về một :term:`named tuple` thay vì một :class:`tuple`.
 
    .. versionchanged:: 3.11
       :class:`!FrameInfo` is now a class instance
-      (that is backwards compatible with the previous :term:`named tuple`).
+      (tương thích ngược với :term:`named tuple` trước đó).
 
 
 .. class:: Traceback
 
    .. attribute:: filename
 
-      The file name associated with the code being executed by the frame this traceback
-      corresponds to.
+      Tên tệp liên kết với đoạn mã đang được thực thi bởi frame mà traceback này tương ứng.
 
    .. attribute:: lineno
 
-      The line number of the current line associated with the code being
-      executed by the frame this traceback corresponds to.
+      Số dòng của dòng hiện tại liên kết với đoạn mã đang được thực thi bởi frame mà traceback này tương ứng.
 
    .. attribute:: function
 
-      The function name that is being executed by the frame this traceback corresponds to.
+      Tên hàm đang được thực thi bởi frame mà traceback này tương ứng.
 
    .. attribute:: code_context
 
-      A list of lines of context from the source code that's being executed by the frame
-      this traceback corresponds to.
+      Danh sách các dòng ngữ cảnh từ mã nguồn đang được thực thi bởi frame mà traceback này tương ứng.
 
    .. attribute:: index
 
-      The index of the current line being executed in the :attr:`code_context` list.
+      Chỉ mục của dòng hiện tại đang được thực thi trong danh sách :attr:`code_context`.
 
    .. attribute:: positions
 
-      A :class:`dis.Positions` object containing the start line number, end
-      line number, start column offset, and end column offset associated with
-      the instruction being executed by the frame this traceback corresponds
-      to.
+      Một đối tượng :class:`dis.Positions` chứa số dòng bắt đầu, số dòng kết thúc, offset cột bắt đầu và offset cột kết thúc liên kết với instruction đang được thực thi bởi frame mà traceback này tương ứng.
 
    .. versionchanged:: 3.11
       :class:`!Traceback` is now a class instance
-      (that is backwards compatible with the previous :term:`named tuple`).
+      (tương thích ngược với :term:`named tuple` trước đó).
 
 
 .. note::
 
-   Keeping references to frame objects, as found in the first element of the frame
-   records these functions return, can cause your program to create reference
-   cycles.  Once a reference cycle has been created, the lifespan of all objects
-   which can be accessed from the objects which form the cycle can become much
-   longer even if Python's optional cycle detector is enabled.  If such cycles must
-   be created, it is important to ensure they are explicitly broken to avoid the
-   delayed destruction of objects and increased memory consumption which occurs.
+   Việc giữ các tham chiếu đến đối tượng frame, như tham chiếu nằm trong phần tử đầu tiên của các bản ghi frame mà những hàm này trả về, có thể khiến chương trình của bạn tạo ra các chu kỳ tham chiếu. Một khi chu kỳ tham chiếu được tạo, vòng đời của tất cả đối tượng có thể được truy cập từ các đối tượng tạo thành chu kỳ có thể kéo dài hơn nhiều, ngay cả khi trình phát hiện chu kỳ tùy chọn của Python được bật. Nếu bắt buộc phải tạo các chu kỳ như vậy, điều quan trọng là phải bảo đảm chúng được ngắt một cách rõ ràng để tránh việc hủy các đối tượng bị trì hoãn và mức tiêu thụ bộ nhớ tăng lên do đó gây ra.
 
-   Though the cycle detector will catch these, destruction of the frames (and local
-   variables) can be made deterministic by removing the cycle in a
-   :keyword:`finally` clause.  This is also important if the cycle detector was
-   disabled when Python was compiled or using :func:`gc.disable`.  For example::
+   Mặc dù trình phát hiện chu kỳ sẽ phát hiện các chu kỳ này, việc hủy các frame (và biến cục bộ) có thể được thực hiện một cách xác định bằng cách loại bỏ chu kỳ trong một
+   mệnh đề :keyword:`finally`. Điều này cũng quan trọng nếu trình phát hiện chu kỳ đã bị tắt khi biên dịch Python hoặc khi sử dụng :func:`gc.disable`. Ví dụ:::
 
       def handle_stackframe_without_leak():
           frame = inspect.currentframe()
           try:
-              # do something with the frame
+              # thực hiện gì đó với frame
           finally:
               del frame
 
-   If you want to keep the frame around (for example to print a traceback
-   later), you can also break reference cycles by using the
-   :meth:`frame.clear` method.
+   Nếu muốn giữ frame lại (chẳng hạn để in traceback sau này), bạn cũng có thể ngắt các chu kỳ tham chiếu bằng cách sử dụng
+   phương thức :meth:`frame.clear`.
 
-The optional *context* argument supported by most of these functions specifies
-the number of lines of context to return, which are centered around the current
-line.
+Đối số *context* tùy chọn được hầu hết các hàm này hỗ trợ chỉ định số dòng ngữ cảnh cần trả về, được căn giữa quanh dòng hiện tại.
 
 
 .. function:: getframeinfo(frame, context=1)
 
-   Get information about a frame or traceback object.  A :class:`Traceback` object
-   is returned.
+   Lấy thông tin về một frame hoặc đối tượng traceback. Một đối tượng :class:`Traceback` được trả về.
 
    .. versionchanged:: 3.11
-      A :class:`Traceback` object is returned instead of a named tuple.
+      Một đối tượng :class:`Traceback` được trả về thay vì một named tuple.
 
 .. function:: getouterframes(frame, context=1)
 
-   Get a list of :class:`FrameInfo` objects for a frame and all outer frames.
-   These frames represent the calls that lead to the creation of *frame*. The
-   first entry in the returned list represents *frame*; the last entry
-   represents the outermost call on *frame*'s stack.
+   Lấy danh sách các đối tượng :class:`FrameInfo` cho một frame và tất cả các frame bên ngoài. Các frame này biểu diễn những lời gọi dẫn đến việc tạo ra *frame*. Mục đầu tiên trong danh sách được trả về biểu diễn *frame*; mục cuối cùng biểu diễn lời gọi ngoài cùng trên ngăn xếp của *frame*.
 
    .. versionchanged:: 3.5
-      A list of :term:`named tuples <named tuple>`
-      ``FrameInfo(frame, filename, lineno, function, code_context, index)``
-      is returned.
+      Một danh sách các :term:`named tuples <named tuple>` ``FrameInfo(frame, filename, lineno, function, code_context, index)`` được trả về.
 
    .. versionchanged:: 3.11
-      A list of :class:`FrameInfo` objects is returned.
+      Một danh sách các đối tượng :class:`FrameInfo` được trả về.
 
 .. function:: getinnerframes(traceback, context=1)
 
-   Get a list of :class:`FrameInfo` objects for a traceback's frame and all
-   inner frames.  These frames represent calls made as a consequence of *frame*.
-   The first entry in the list represents *traceback*; the last entry represents
-   where the exception was raised.
+   Lấy danh sách các đối tượng :class:`FrameInfo` cho frame của traceback và tất cả các frame bên trong. Các frame này biểu diễn những lời gọi được thực hiện do *frame* gây ra. Mục đầu tiên trong danh sách biểu diễn *traceback*; mục cuối cùng biểu diễn nơi ngoại lệ được phát sinh.
 
    .. versionchanged:: 3.5
-      A list of :term:`named tuples <named tuple>`
-      ``FrameInfo(frame, filename, lineno, function, code_context, index)``
-      is returned.
+      Một danh sách các :term:`named tuples <named tuple>` ``FrameInfo(frame, filename, lineno, function, code_context, index)`` được trả về.
 
    .. versionchanged:: 3.11
-      A list of :class:`FrameInfo` objects is returned.
+      Một danh sách các đối tượng :class:`FrameInfo` được trả về.
 
 .. function:: currentframe()
 
-   Return the frame object for the caller's stack frame.
+   Trả về đối tượng frame cho stack frame của bên gọi.
 
    .. impl-detail::
 
-      This function relies on Python stack frame support in the interpreter,
-      which isn't guaranteed to exist in all implementations of Python.  If
-      running in an implementation without Python stack frame support this
-      function returns ``None``.
+      Hàm này dựa vào khả năng hỗ trợ stack frame Python trong interpreter, nhưng khả năng này không được đảm bảo tồn tại trong mọi triển khai Python. Nếu chạy trong một triển khai không hỗ trợ stack frame Python, hàm này sẽ trả về ``None``.
 
 
 .. function:: stack(context=1)
 
-   Return a list of :class:`FrameInfo` objects for the caller's stack.  The
-   first entry in the returned list represents the caller; the last entry
-   represents the outermost call on the stack.
+   Trả về danh sách các đối tượng :class:`FrameInfo` cho stack của bên gọi. Mục đầu tiên trong danh sách được trả về đại diện cho bên gọi; mục cuối cùng đại diện cho lời gọi ngoài cùng trên stack.
 
    .. versionchanged:: 3.5
-      A list of :term:`named tuples <named tuple>`
-      ``FrameInfo(frame, filename, lineno, function, code_context, index)``
-      is returned.
+      Một danh sách các :term:`named tuples <named tuple>` ``FrameInfo(frame, filename, lineno, function, code_context, index)`` được trả về.
 
    .. versionchanged:: 3.11
-      A list of :class:`FrameInfo` objects is returned.
+      Một danh sách các đối tượng :class:`FrameInfo` được trả về.
 
 .. function:: trace(context=1)
 
-   Return a list of :class:`FrameInfo` objects for the stack between the current
-   frame and the frame in which an exception currently being handled was raised
-   in.  The first entry in the list represents the caller; the last entry
-   represents where the exception was raised.
+   Trả về một danh sách các đối tượng :class:`FrameInfo` cho ngăn xếp giữa frame hiện tại và frame nơi ngoại lệ đang được xử lý được phát sinh. Phần tử đầu tiên trong danh sách đại diện cho caller; phần tử cuối cùng đại diện cho nơi ngoại lệ được phát sinh.
 
    .. versionchanged:: 3.5
-      A list of :term:`named tuples <named tuple>`
-      ``FrameInfo(frame, filename, lineno, function, code_context, index)``
-      is returned.
+      Một danh sách các :term:`named tuples <named tuple>` ``FrameInfo(frame, filename, lineno, function, code_context, index)`` được trả về.
 
    .. versionchanged:: 3.11
-      A list of :class:`FrameInfo` objects is returned.
+      Một danh sách các đối tượng :class:`FrameInfo` được trả về.
 
-Fetching attributes statically
-------------------------------
+Lấy thuộc tính theo cách tĩnh
+-----------------------------
 
-Both :func:`getattr` and :func:`hasattr` can trigger code execution when
-fetching or checking for the existence of attributes. Descriptors, like
-properties, will be invoked and :meth:`~object.__getattr__` and
-:meth:`~object.__getattribute__`
-may be called.
+Cả :func:`getattr` và :func:`hasattr` đều có thể kích hoạt việc thực thi mã khi lấy thuộc tính hoặc kiểm tra sự tồn tại của thuộc tính. Các descriptor, chẳng hạn như property, sẽ được gọi và :meth:`~object.__getattr__` và
+:meth:`~object.__getattribute__` có thể được gọi.
 
-For cases where you want passive introspection, like documentation tools, this
-can be inconvenient. :func:`getattr_static` has a similar signature as :func:`getattr`
-but avoids executing code when it fetches attributes.
+Trong những trường hợp bạn muốn thực hiện việc introspection thụ động, chẳng hạn như với các công cụ tài liệu, điều này có thể gây bất tiện. :func:`getattr_static` có chữ ký tương tự :func:`getattr` nhưng tránh thực thi mã khi lấy thuộc tính.
 
 .. function:: getattr_static(obj, attr)
               getattr_static(obj, attr, default)
 
-   Retrieve attributes without triggering dynamic lookup via the
-   descriptor protocol, :meth:`~object.__getattr__`
-   or :meth:`~object.__getattribute__`.
+   Truy xuất các thuộc tính mà không kích hoạt tra cứu động thông qua giao thức descriptor, :meth:`~object.__getattr__` hoặc :meth:`~object.__getattribute__`.
 
-   Note: this function may not be able to retrieve all attributes
-   that getattr can fetch (like dynamically created attributes)
-   and may find attributes that getattr can't (like descriptors
-   that raise AttributeError). It can also return descriptors objects
-   instead of instance members.
+   Lưu ý: hàm này có thể không truy xuất được tất cả các thuộc tính mà getattr có thể lấy (chẳng hạn như các thuộc tính được tạo động), đồng thời có thể tìm thấy những thuộc tính mà getattr không thể tìm thấy (chẳng hạn như các descriptor gây ra AttributeError). Hàm này cũng có thể trả về các đối tượng descriptor thay vì các thành viên của instance.
 
-   If the instance :attr:`~object.__dict__` is shadowed by another member (for
-   example a property) then this function will be unable to find instance
-   members.
+   Nếu :attr:`~object.__dict__` của instance bị một thành viên khác che khuất (ví dụ như một property), hàm này sẽ không thể tìm thấy các thành viên của instance.
 
    .. versionadded:: 3.2
 
-:func:`getattr_static` does not resolve descriptors, for example slot descriptors or
-getset descriptors on objects implemented in C. The descriptor object
-is returned instead of the underlying attribute.
+:func:`getattr_static` không phân giải các descriptor, chẳng hạn như các slot descriptor hoặc getset descriptor trên những đối tượng được triển khai bằng C. Đối tượng descriptor được trả về thay cho thuộc tính bên dưới.
 
-You can handle these with code like the following. Note that
-for arbitrary getset descriptors invoking these may trigger
-code execution::
+Bạn có thể xử lý các trường hợp này bằng đoạn mã sau. Lưu ý rằng với các getset descriptor tùy ý, việc gọi chúng có thể kích hoạt thực thi mã::
 
-   # example code for resolving the builtin descriptor types
+   # mã ví dụ để phân giải các loại descriptor tích hợp sẵn
    class _foo:
        __slots__ = ['foo']
 
@@ -1643,200 +1328,159 @@ code execution::
        try:
            result = result.__get__()
        except AttributeError:
-           # descriptors can raise AttributeError to
-           # indicate there is no underlying value
-           # in which case the descriptor itself will
-           # have to do
+           # descriptor có thể raise AttributeError để
+           # cho biết không có giá trị nền tảng
+           # trong trường hợp đó, descriptor sẽ tự
+           # phải thực hiện việc này
            pass
 
 
-Current State of Generators, Coroutines, and Asynchronous Generators
---------------------------------------------------------------------
+Trạng thái hiện tại của Generator, Coroutine và Asynchronous Generator
+----------------------------------------------------------------------
 
-When implementing coroutine schedulers and for other advanced uses of
-generators, it is useful to determine whether a generator is currently
-executing, is waiting to start or resume or execution, or has already
-terminated. :func:`getgeneratorstate` allows the current state of a
-generator to be determined easily.
+Khi triển khai các bộ lập lịch coroutine và cho những mục đích nâng cao khác của generator, việc xác định một generator hiện đang thực thi, đang chờ bắt đầu hoặc tiếp tục thực thi, hay đã kết thúc là rất hữu ích. :func:`getgeneratorstate` cho phép dễ dàng xác định trạng thái hiện tại của một generator.
 
 .. function:: getgeneratorstate(generator)
 
-   Get current state of a generator-iterator.
+   Lấy trạng thái hiện tại của generator-iterator.
 
-   Possible states are:
+   Các trạng thái có thể có là:
 
-   * GEN_CREATED: Waiting to start execution.
-   * GEN_RUNNING: Currently being executed by the interpreter.
-   * GEN_SUSPENDED: Currently suspended at a yield expression.
-   * GEN_CLOSED: Execution has completed.
+   * GEN_CREATED: Đang chờ bắt đầu thực thi.
+   * GEN_RUNNING: Hiện đang được interpreter thực thi.
+   * GEN_SUSPENDED: Hiện đang bị tạm dừng tại một biểu thức yield.
+   * GEN_CLOSED: Đã hoàn tất thực thi.
 
    .. versionadded:: 3.2
 
 .. function:: getcoroutinestate(coroutine)
 
-   Get current state of a coroutine object.  The function is intended to be
-   used with coroutine objects created by :keyword:`async def` functions, but
-   will accept any coroutine-like object that has ``cr_running`` and
-   ``cr_frame`` attributes.
+   Lấy trạng thái hiện tại của một đối tượng coroutine. Hàm này được thiết kế để sử dụng với các đối tượng coroutine được tạo bởi các hàm :keyword:`async def`, nhưng sẽ chấp nhận mọi đối tượng tương tự coroutine có các thuộc tính ``cr_running`` và ``cr_frame``.
 
-   Possible states are:
+   Các trạng thái có thể có là:
 
-   * CORO_CREATED: Waiting to start execution.
-   * CORO_RUNNING: Currently being executed by the interpreter.
-   * CORO_SUSPENDED: Currently suspended at an await expression.
-   * CORO_CLOSED: Execution has completed.
+   * CORO_CREATED: Đang chờ bắt đầu thực thi.
+   * CORO_RUNNING: Hiện đang được trình thông dịch thực thi.
+   * CORO_SUSPENDED: Hiện đang bị tạm dừng tại một biểu thức await.
+   * CORO_CLOSED: Quá trình thực thi đã hoàn tất.
 
    .. versionadded:: 3.5
 
 .. function:: getasyncgenstate(agen)
 
-   Get current state of an asynchronous generator object.  The function is
-   intended to be used with asynchronous iterator objects created by
-   :keyword:`async def` functions which use the :keyword:`yield` statement,
-   but will accept any asynchronous generator-like object that has
-   ``ag_running`` and ``ag_frame`` attributes.
+   Lấy trạng thái hiện tại của một đối tượng asynchronous generator. Hàm này được thiết kế để sử dụng với các đối tượng asynchronous iterator được tạo bởi
+   các hàm :keyword:`async def` sử dụng câu lệnh :keyword:`yield`, nhưng sẽ chấp nhận mọi đối tượng giống asynchronous generator có các thuộc tính ``ag_running`` và ``ag_frame``.
 
-   Possible states are:
+   Các trạng thái có thể có là:
 
-   * AGEN_CREATED: Waiting to start execution.
-   * AGEN_RUNNING: Currently being executed by the interpreter.
-   * AGEN_SUSPENDED: Currently suspended at a yield expression.
-   * AGEN_CLOSED: Execution has completed.
+   * AGEN_CREATED: Đang chờ bắt đầu thực thi.
+   * AGEN_RUNNING: Hiện đang được interpreter thực thi.
+   * AGEN_SUSPENDED: Hiện đang tạm dừng tại một biểu thức yield.
+   * AGEN_CLOSED: Đã hoàn tất thực thi.
 
    .. versionadded:: 3.12
 
-The current internal state of the generator can also be queried. This is
-mostly useful for testing purposes, to ensure that internal state is being
-updated as expected:
+Bạn cũng có thể truy vấn trạng thái nội bộ hiện tại của generator. Điều này chủ yếu hữu ích cho mục đích kiểm thử, nhằm đảm bảo trạng thái nội bộ được cập nhật như mong đợi:
 
 .. function:: getgeneratorlocals(generator)
 
-   Get the mapping of live local variables in *generator* to their current
-   values.  A dictionary is returned that maps from variable names to values.
-   This is the equivalent of calling :func:`locals` in the body of the
-   generator, and all the same caveats apply.
+   Lấy ánh xạ các biến cục bộ đang hoạt động trong *generator* tới các giá trị hiện tại của chúng. Một dictionary được trả về, ánh xạ từ tên biến tới giá trị. Đây tương đương với việc gọi :func:`locals` trong phần thân của generator, và mọi lưu ý tương tự đều được áp dụng.
 
-   If *generator* is a :term:`generator` with no currently associated frame,
-   then an empty dictionary is returned.  :exc:`TypeError` is raised if
-   *generator* is not a Python generator object.
+   Nếu *generator* là một :term:`generator` không có frame liên kết hiện tại, một dictionary rỗng sẽ được trả về. :exc:`TypeError` được đưa ra nếu *generator* không phải là một đối tượng generator Python.
 
    .. impl-detail::
 
-      This function relies on the generator exposing a Python stack frame
-      for introspection, which isn't guaranteed to be the case in all
-      implementations of Python. In such cases, this function will always
-      return an empty dictionary.
+      Hàm này dựa vào việc generator cung cấp một stack frame Python để introspection, điều này không được đảm bảo trong mọi triển khai Python. Trong những trường hợp như vậy, hàm này sẽ luôn trả về một dictionary rỗng.
 
    .. versionadded:: 3.3
 
 .. function:: getcoroutinelocals(coroutine)
 
-   This function is analogous to :func:`~inspect.getgeneratorlocals`, but
-   works for coroutine objects created by :keyword:`async def` functions.
+   Hàm này tương tự như :func:`~inspect.getgeneratorlocals`, nhưng hoạt động với các đối tượng coroutine được tạo bởi các hàm :keyword:`async def`.
 
    .. versionadded:: 3.5
 
 .. function:: getasyncgenlocals(agen)
 
-   This function is analogous to :func:`~inspect.getgeneratorlocals`, but
-   works for asynchronous generator objects created by :keyword:`async def`
-   functions which use the :keyword:`yield` statement.
+   Hàm này tương tự như :func:`~inspect.getgeneratorlocals`, nhưng hoạt động với các đối tượng asynchronous generator được tạo bởi các hàm :keyword:`async def` sử dụng câu lệnh :keyword:`yield`.
 
    .. versionadded:: 3.12
 
 
 .. _inspect-module-co-flags:
 
-Code Objects Bit Flags
-----------------------
+Các cờ bit của đối tượng code
+-----------------------------
 
-Python code objects have a :attr:`~codeobject.co_flags` attribute,
-which is a bitmap of the following flags:
+Các đối tượng code Python có thuộc tính :attr:`~codeobject.co_flags`, là một bitmap gồm các cờ sau:
 
 .. data:: CO_OPTIMIZED
 
-   The code object is optimized, using fast locals.
+   Đối tượng code được tối ưu hóa, sử dụng các local nhanh.
 
 .. data:: CO_NEWLOCALS
 
-   If set, a new dict will be created for the frame's :attr:`~frame.f_locals`
-   when the code object is executed.
+   Nếu được thiết lập, một dict mới sẽ được tạo cho :attr:`~frame.f_locals` của frame khi đối tượng code được thực thi.
 
 .. data:: CO_VARARGS
 
-   The code object has a variable positional parameter (``*args``-like).
+   Đối tượng mã có một tham số vị trí biến đổi (tương tự ``*args``).
 
 .. data:: CO_VARKEYWORDS
 
-   The code object has a variable keyword parameter (``**kwargs``-like).
+   Đối tượng mã có một tham số từ khóa biến đổi (tương tự ``**kwargs``).
 
 .. data:: CO_NESTED
 
-   The flag is set when the code object is a nested function.
+   Cờ được thiết lập khi đối tượng mã là một hàm lồng nhau.
 
 .. data:: CO_GENERATOR
 
-   The flag is set when the code object is a generator function, i.e.
-   a generator object is returned when the code object is executed.
+   Cờ được thiết lập khi đối tượng mã là một hàm generator, tức là một đối tượng generator được trả về khi đối tượng mã được thực thi.
 
 .. data:: CO_COROUTINE
 
-   The flag is set when the code object is a coroutine function.
-   When the code object is executed it returns a coroutine object.
-   See :pep:`492` for more details.
+   Cờ được thiết lập khi đối tượng mã là một hàm coroutine. Khi đối tượng mã được thực thi, nó trả về một đối tượng coroutine. Xem :pep:`492` để biết thêm chi tiết.
 
    .. versionadded:: 3.5
 
 .. data:: CO_ITERABLE_COROUTINE
 
-   The flag is used to transform generators into generator-based
-   coroutines.  Generator objects with this flag can be used in
-   ``await`` expression, and can ``yield from`` coroutine objects.
-   See :pep:`492` for more details.
+   Cờ này được dùng để chuyển đổi generator thành coroutine dựa trên generator. Các đối tượng generator có cờ này có thể được dùng trong biểu thức ``await`` và có thể ``yield from`` các đối tượng coroutine. Xem :pep:`492` để biết thêm chi tiết.
 
    .. versionadded:: 3.5
 
 .. data:: CO_ASYNC_GENERATOR
 
-   The flag is set when the code object is an asynchronous generator
-   function.  When the code object is executed it returns an
-   asynchronous generator object.  See :pep:`525` for more details.
+   Cờ được thiết lập khi đối tượng mã là một hàm generator bất đồng bộ. Khi đối tượng mã được thực thi, nó trả về một đối tượng generator bất đồng bộ. Xem :pep:`525` để biết thêm chi tiết.
 
    .. versionadded:: 3.6
 
 .. data:: CO_HAS_DOCSTRING
 
-   The flag is set when there is a docstring for the code object in
-   the source code. If set, it will be the first item in
+   Cờ được thiết lập khi mã nguồn có docstring cho đối tượng mã. Nếu được thiết lập, đây sẽ là mục đầu tiên trong
    :attr:`~codeobject.co_consts`.
 
    .. versionadded:: 3.14
 
 .. data:: CO_METHOD
 
-   The flag is set when the code object is a function defined in class
-   scope.
+   Cờ được thiết lập khi đối tượng mã là một hàm được định nghĩa trong phạm vi lớp.
 
    .. versionadded:: 3.14
 
 .. note::
-   The flags are specific to CPython, and may not be defined in other
-   Python implementations.  Furthermore, the flags are an implementation
-   detail, and can be removed or deprecated in future Python releases.
-   It's recommended to use public APIs from the :mod:`!inspect` module
-   for any introspection needs.
+   Các cờ này dành riêng cho CPython và có thể không được định nghĩa trong các triển khai Python khác. Hơn nữa, các cờ này là một chi tiết triển khai và có thể bị loại bỏ hoặc ngừng hỗ trợ trong các bản phát hành Python trong tương lai. Bạn nên sử dụng các API công khai từ mô-đun :mod:`!inspect` cho mọi nhu cầu introspection.
 
 
-Buffer flags
-------------
+Cờ buffer
+---------
 
 .. class:: BufferFlags
 
-   This is an :class:`enum.IntFlag` that represents the flags that
-   can be passed to the :meth:`~object.__buffer__` method of objects
-   implementing the :ref:`buffer protocol <bufferobjects>`.
+   Đây là một :class:`enum.IntFlag` đại diện cho các cờ có thể được truyền vào phương thức :meth:`~object.__buffer__` của các đối tượng triển khai :ref:`giao thức buffer <bufferobjects>`.
 
-   The meaning of the flags is explained at :ref:`buffer-request-types`.
+   Ý nghĩa của các cờ được giải thích tại :ref:`buffer-request-types`.
 
    .. attribute:: BufferFlags.SIMPLE
    .. attribute:: BufferFlags.WRITABLE
@@ -1862,18 +1506,15 @@ Buffer flags
 
 .. _inspect-module-cli:
 
-Command-line interface
-----------------------
+Giao diện dòng lệnh
+-------------------
 
-The :mod:`!inspect` module also provides a basic introspection capability
-from the command line.
+Mô-đun :mod:`!inspect` cũng cung cấp khả năng introspection cơ bản từ dòng lệnh.
 
 .. program:: inspect
 
-By default, accepts the name of a module and prints the source of that
-module. A class or function within the module can be printed instead by
-appended a colon and the qualified name of the target object.
+Theo mặc định, lệnh này nhận tên của một mô-đun và in mã nguồn của mô-đun đó. Có thể in một lớp hoặc hàm bên trong mô-đun bằng cách thêm dấu hai chấm và tên đầy đủ của đối tượng đích.
 
 .. option:: --details
 
-   Print information about the specified object rather than the source code
+   In thông tin về đối tượng được chỉ định thay vì mã nguồn

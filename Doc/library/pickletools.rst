@@ -1,38 +1,28 @@
-:mod:`!pickletools` --- Tools for pickle developers
-===================================================
+:mod:`!pickletools` --- Công cụ dành cho nhà phát triển pickle
+==============================================================
 
 .. module:: pickletools
-   :synopsis: Contains extensive comments about the pickle protocols and
-              pickle-machine opcodes, as well as some useful functions.
+   :synopsis: Chứa các chú thích chi tiết về các protocol pickle và opcode của máy pickle, cùng một số hàm hữu ích.
 
-**Source code:** :source:`Lib/pickletools.py`
+**Mã nguồn:** :source:`Lib/pickletools.py`
 
 --------------
 
 
-This module contains various constants relating to the intimate details of the
-:mod:`pickle` module, some lengthy comments about the implementation, and a
-few useful functions for analyzing pickled data.  The contents of this module
-are useful for Python core developers who are working on the :mod:`pickle`;
-ordinary users of the :mod:`pickle` module probably won't find the
-:mod:`!pickletools` module relevant.
+Mô-đun này chứa nhiều hằng số liên quan đến các chi tiết chuyên sâu của
+:mod:`pickle` mô-đun, một số chú thích dài về cách triển khai và một vài hàm hữu ích để phân tích dữ liệu đã được pickle. Nội dung của mô-đun này hữu ích cho các nhà phát triển cốt lõi Python đang làm việc trên :mod:`pickle`; người dùng thông thường của mô-đun :mod:`pickle` có lẽ sẽ không thấy
+:mod:`!pickletools` mô-đun này có liên quan.
 
 .. _pickletools-cli:
 
-Command-line usage
-------------------
+Cách sử dụng dòng lệnh
+----------------------
 
 .. versionadded:: 3.2
 
-When invoked from the command line, ``python -m pickletools`` will
-disassemble the contents of one or more pickle files.  Note that if
-you want to see the Python object stored in the pickle rather than the
-details of pickle format, you may want to use ``-m pickle`` instead.
-However, when the pickle file that you want to examine comes from an
-untrusted source, ``-m pickletools`` is a safer option because it does
-not execute pickle bytecode.
+Khi được gọi từ command line, ``python -m pickletools`` sẽ phân tích nội dung của một hoặc nhiều tệp pickle. Lưu ý rằng nếu bạn muốn xem đối tượng Python được lưu trong pickle thay vì các chi tiết của định dạng pickle, bạn có thể muốn sử dụng ``-m pickle`` thay thế. Tuy nhiên, khi tệp pickle bạn muốn kiểm tra đến từ một nguồn không đáng tin cậy, ``-m pickletools`` là lựa chọn an toàn hơn vì nó không thực thi bytecode của pickle.
 
-For example, with a tuple ``(1, 2)`` pickled in file ``x.pickle``:
+Ví dụ, với một tuple ``(1, 2)`` được pickle trong tệp ``x.pickle``:
 
 .. code-block:: shell-session
 
@@ -48,69 +38,53 @@ For example, with a tuple ``(1, 2)`` pickled in file ``x.pickle``:
         9: .    STOP
     highest protocol among opcodes = 2
 
-Command-line options
-^^^^^^^^^^^^^^^^^^^^
+Các tùy chọn command line
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. program:: pickletools
 
 .. option:: -a, --annotate
 
-   Annotate each line with a short opcode description.
+   Chú thích mỗi dòng bằng mô tả opcode ngắn gọn.
 
 .. option:: -o, --output=<file>
 
-   Name of a file where the output should be written.
+   Tên của tệp mà đầu ra sẽ được ghi vào.
 
 .. option:: -l, --indentlevel=<num>
 
-   The number of blanks by which to indent a new MARK level.
+   Số lượng khoảng trắng dùng để thụt lề một cấp MARK mới.
 
 .. option:: -m, --memo
 
-   When multiple objects are disassembled, preserve memo between
-   disassemblies.
+   Khi phân tích nhiều đối tượng, giữ nguyên memo giữa các lần phân tích.
 
 .. option:: -p, --preamble=<preamble>
 
-   When more than one pickle file is specified, print given preamble
-   before each disassembly.
+   Khi chỉ định nhiều hơn một tệp pickle, in phần mở đầu đã cho trước mỗi lần disassembly.
 
 .. option:: pickle_file
 
-   A pickle file to read, or ``-`` to indicate reading from standard input.
+   Một tệp pickle cần đọc, hoặc ``-`` để chỉ việc đọc từ đầu vào tiêu chuẩn.
 
 
 
-Programmatic interface
-----------------------
+Giao diện lập trình
+-------------------
 
 
 .. function:: dis(pickle, out=None, memo=None, indentlevel=4, annotate=0)
 
-   Outputs a symbolic disassembly of the pickle to the file-like
-   object *out*, defaulting to ``sys.stdout``.  *pickle* can be a
-   string or a file-like object.  *memo* can be a Python dictionary
-   that will be used as the pickle's memo; it can be used to perform
-   disassemblies across multiple pickles created by the same
-   pickler. Successive levels, indicated by ``MARK`` opcodes in the
-   stream, are indented by *indentlevel* spaces.  If a nonzero value
-   is given to *annotate*, each opcode in the output is annotated with
-   a short description.  The value of *annotate* is used as a hint for
-   the column where annotation should start.
+   Xuất bản disassembly dạng ký hiệu của pickle tới đối tượng dạng tệp *out*, mặc định là ``sys.stdout``. *pickle* có thể là một chuỗi hoặc một đối tượng dạng tệp. *memo* có thể là một từ điển Python được dùng làm memo của pickle; có thể sử dụng nó để thực hiện disassembly trên nhiều pickle được tạo bởi cùng một pickler. Các cấp độ liên tiếp, được biểu thị bằng các opcode ``MARK`` trong luồng, sẽ được thụt lề bằng *indentlevel* dấu cách. Nếu cung cấp giá trị khác không cho *annotate*, mỗi opcode trong đầu ra sẽ được chú thích bằng một mô tả ngắn. Giá trị của *annotate* được dùng làm gợi ý cho cột bắt đầu chú thích.
 
    .. versionchanged:: 3.2
-      Added the *annotate* parameter.
+      Đã thêm tham số *annotate*.
 
 .. function:: genops(pickle)
 
-   Provides an :term:`iterator` over all of the opcodes in a pickle, returning a
-   sequence of ``(opcode, arg, pos)`` triples.  *opcode* is an instance of an
-   :class:`OpcodeInfo` class; *arg* is the decoded value, as a Python object, of
-   the opcode's argument; *pos* is the position at which this opcode is located.
-   *pickle* can be a string or a file-like object.
+   Cung cấp một :term:`iterator` trên tất cả các opcode trong một pickle, trả về một chuỗi các bộ ba ``(opcode, arg, pos)``. *opcode* là một thể hiện của
+   lớp :class:`OpcodeInfo`; *arg* là giá trị đã giải mã, dưới dạng một đối tượng Python, của đối số của opcode; *pos* là vị trí của opcode này. *pickle* có thể là một chuỗi hoặc một đối tượng dạng tệp.
 
 .. function:: optimize(picklestring)
 
-   Returns a new equivalent pickle string after eliminating unused ``PUT``
-   opcodes. The optimized pickle is shorter, takes less transmission time,
-   requires less storage space, and unpickles more efficiently.
+   Trả về một chuỗi pickle tương đương mới sau khi loại bỏ các opcode ``PUT`` không được sử dụng. Pickle đã được tối ưu sẽ ngắn hơn, mất ít thời gian truyền hơn, cần ít dung lượng lưu trữ hơn và được unpickle hiệu quả hơn.

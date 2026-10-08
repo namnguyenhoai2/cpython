@@ -1,342 +1,251 @@
-:mod:`!lzma` --- Compression using the LZMA algorithm
-=====================================================
+:mod:`!lzma` --- Nén bằng thuật toán LZMA
+=========================================
 
 .. module:: lzma
-   :synopsis: A Python wrapper for the liblzma compression library.
+   :synopsis: Lớp bao bọc Python cho thư viện nén liblzma.
 
 .. moduleauthor:: Nadeem Vawda <nadeem.vawda@gmail.com>
 .. sectionauthor:: Nadeem Vawda <nadeem.vawda@gmail.com>
 
 .. versionadded:: 3.3
 
-**Source code:** :source:`Lib/lzma.py`
+**Mã nguồn:** :source:`Lib/lzma.py`
 
 --------------
 
-This module provides classes and convenience functions for compressing and
-decompressing data using the LZMA compression algorithm. Also included is a file
-interface supporting the ``.xz`` and legacy ``.lzma`` file formats used by the
-:program:`xz` utility, as well as raw compressed streams.
+Mô-đun này cung cấp các lớp và hàm tiện ích để nén và giải nén dữ liệu bằng thuật toán nén LZMA. Mô-đun cũng bao gồm một giao diện tệp hỗ trợ các định dạng tệp ``.xz`` và ``.lzma`` cũ được sử dụng bởi
+:program:`xz` tiện ích, cũng như các luồng nén thô.
 
-The interface provided by this module is very similar to that of the :mod:`bz2`
-module. Note that :class:`LZMAFile` and :class:`bz2.BZ2File` are *not*
-thread-safe, so if you need to use a single :class:`LZMAFile` instance
-from multiple threads, it is necessary to protect it with a lock.
+Giao diện do mô-đun này cung cấp rất giống với giao diện của mô-đun :mod:`bz2`. Lưu ý rằng :class:`LZMAFile` và :class:`bz2.BZ2File` *không* thread-safe, vì vậy nếu bạn cần sử dụng một đối tượng :class:`LZMAFile` duy nhất từ nhiều thread, bạn cần bảo vệ nó bằng một lock.
 
 .. include:: ../includes/optional-module.rst
 
 
 .. exception:: LZMAError
 
-   This exception is raised when an error occurs during compression or
-   decompression, or while initializing the compressor/decompressor state.
+   Ngoại lệ này được phát sinh khi xảy ra lỗi trong quá trình nén hoặc giải nén, hoặc khi khởi tạo trạng thái của bộ nén/bộ giải nén.
 
 
-Reading and writing compressed files
-------------------------------------
+Đọc và ghi các tệp được nén
+---------------------------
 
 .. function:: open(filename, mode="rb", *, format=None, check=-1, preset=None, filters=None, encoding=None, errors=None, newline=None)
 
-   Open an LZMA-compressed file in binary or text mode, returning a :term:`file
-   object`.
+   Mở một tệp được nén bằng LZMA ở chế độ nhị phân hoặc văn bản, trả về một :term:`file object`.
 
-   The *filename* argument can be either an actual file name (given as a
-   :class:`str`, :class:`bytes` or :term:`path-like <path-like object>` object), in
-   which case the named file is opened, or it can be an existing file object
-   to read from or write to.
+   Đối số *filename* có thể là tên tệp thực tế (được cung cấp dưới dạng
+   :class:`str`, :class:`bytes` hoặc đối tượng :term:`path-like <path-like object>`), trong trường hợp đó tệp được chỉ định sẽ được mở, hoặc có thể là một file object hiện có để đọc từ đó hoặc ghi vào đó.
 
-   The *mode* argument can be any of ``"r"``, ``"rb"``, ``"w"``, ``"wb"``,
-   ``"x"``, ``"xb"``, ``"a"`` or ``"ab"`` for binary mode, or ``"rt"``,
-   ``"wt"``, ``"xt"``, or ``"at"`` for text mode. The default is ``"rb"``.
+   Đối số *mode* có thể là bất kỳ giá trị nào trong số ``"r"``, ``"rb"``, ``"w"``, ``"wb"``, ``"x"``, ``"xb"``, ``"a"`` hoặc ``"ab"`` cho chế độ nhị phân, hoặc ``"rt"``, ``"wt"``, ``"xt"`` hoặc ``"at"`` cho chế độ văn bản. Giá trị mặc định là ``"rb"``.
 
-   When opening a file for reading, the *format* and *filters* arguments have
-   the same meanings as for :class:`LZMADecompressor`. In this case, the *check*
-   and *preset* arguments should not be used.
+   Khi mở một tệp để đọc, các đối số *format* và *filters* có cùng ý nghĩa như trong :class:`LZMADecompressor`. Trong trường hợp này, không nên sử dụng các đối số *check* và *preset*.
 
-   When opening a file for writing, the *format*, *check*, *preset* and
-   *filters* arguments have the same meanings as for :class:`LZMACompressor`.
+   Khi mở một tệp để ghi, các đối số *format*, *check*, *preset* và *filters* có cùng ý nghĩa như trong :class:`LZMACompressor`.
 
-   For binary mode, this function is equivalent to the :class:`LZMAFile`
-   constructor: ``LZMAFile(filename, mode, ...)``. In this case, the *encoding*,
-   *errors* and *newline* arguments must not be provided.
+   Ở chế độ nhị phân, hàm này tương đương với constructor :class:`LZMAFile`: ``LZMAFile(filename, mode, ...)``. Trong trường hợp này, không được cung cấp các đối số *encoding*, *errors* và *newline*.
 
-   For text mode, a :class:`LZMAFile` object is created, and wrapped in an
-   :class:`io.TextIOWrapper` instance with the specified encoding, error
-   handling behavior, and line ending(s).
+   Ở chế độ văn bản, một đối tượng :class:`LZMAFile` được tạo và được bọc trong một
+   instance :class:`io.TextIOWrapper` với encoding, cách xử lý lỗi và (các) ký tự kết thúc dòng được chỉ định.
 
    .. versionchanged:: 3.4
-      Added support for the ``"x"``, ``"xb"`` and ``"xt"`` modes.
+      Đã bổ sung hỗ trợ cho các chế độ ``"x"``, ``"xb"`` và ``"xt"``.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. class:: LZMAFile(filename=None, mode="r", *, format=None, check=-1, preset=None, filters=None)
 
-   Open an LZMA-compressed file in binary mode.
+   Mở một tệp được nén bằng LZMA ở chế độ nhị phân.
 
-   An :class:`LZMAFile` can wrap an already-open :term:`file object`, or operate
-   directly on a named file. The *filename* argument specifies either the file
-   object to wrap, or the name of the file to open (as a :class:`str`,
-   :class:`bytes` or :term:`path-like <path-like object>` object). When wrapping an
-   existing file object, the wrapped file will not be closed when the
-   :class:`LZMAFile` is closed.
+   Một :class:`LZMAFile` có thể bọc một :term:`file object` đã được mở hoặc hoạt động trực tiếp trên một tệp có tên. Đối số *filename* chỉ định đối tượng tệp cần bọc hoặc tên tệp cần mở (dưới dạng một :class:`str`,
+   :class:`bytes` hoặc đối tượng :term:`path-like <path-like object>`). Khi bao bọc một đối tượng tệp hiện có, tệp được bao bọc sẽ không bị đóng khi
+   :class:`LZMAFile` được đóng.
 
-   The *mode* argument can be either ``"r"`` for reading (default), ``"w"`` for
-   overwriting, ``"x"`` for exclusive creation, or ``"a"`` for appending. These
-   can equivalently be given as ``"rb"``, ``"wb"``, ``"xb"`` and ``"ab"``
-   respectively.
+   Đối số *mode* có thể là ``"r"`` để đọc (mặc định), ``"w"`` để ghi đè, ``"x"`` để tạo độc quyền hoặc ``"a"`` để nối thêm. Tương ứng, bạn cũng có thể cung cấp các giá trị này dưới dạng ``"rb"``, ``"wb"``, ``"xb"`` và ``"ab"``.
 
-   If *filename* is a file object (rather than an actual file name), a mode of
-   ``"w"`` does not truncate the file, and is instead equivalent to ``"a"``.
+   Nếu *filename* là một đối tượng tệp (thay vì tên tệp thực tế), chế độ ``"w"`` sẽ không cắt ngắn tệp mà tương đương với ``"a"``.
 
-   When opening a file for reading, the input file may be the concatenation of
-   multiple separate compressed streams. These are transparently decoded as a
-   single logical stream.
+   Khi mở một tệp để đọc, tệp đầu vào có thể là phép nối của nhiều luồng nén riêng biệt. Các luồng này sẽ được giải mã trong suốt như một luồng logic duy nhất.
 
-   When opening a file for reading, the *format* and *filters* arguments have
-   the same meanings as for :class:`LZMADecompressor`. In this case, the *check*
-   and *preset* arguments should not be used.
+   Khi mở một tệp để đọc, các đối số *format* và *filters* có cùng ý nghĩa như trong :class:`LZMADecompressor`. Trong trường hợp này, không nên sử dụng các đối số *check* và *preset*.
 
-   When opening a file for writing, the *format*, *check*, *preset* and
-   *filters* arguments have the same meanings as for :class:`LZMACompressor`.
+   Khi mở một tệp để ghi, các đối số *format*, *check*, *preset* và *filters* có cùng ý nghĩa như trong :class:`LZMACompressor`.
 
-   :class:`LZMAFile` supports all the members specified by
-   :class:`io.BufferedIOBase`, except for :meth:`~io.BufferedIOBase.detach`
-   and :meth:`~io.IOBase.truncate`.
-   Iteration and the :keyword:`with` statement are supported.
+   :class:`LZMAFile` hỗ trợ tất cả các thành viên được chỉ định bởi
+   :class:`io.BufferedIOBase`, ngoại trừ :meth:`~io.BufferedIOBase.detach` và :meth:`~io.IOBase.truncate`. Việc lặp và câu lệnh :keyword:`with` được hỗ trợ.
 
-   The following method and attributes are also provided:
+   Các phương thức và thuộc tính sau đây cũng được cung cấp:
 
    .. method:: peek(size=-1)
 
-      Return buffered data without advancing the file position. At least one
-      byte of data will be returned, unless EOF has been reached. The exact
-      number of bytes returned is unspecified (the *size* argument is ignored).
+      Trả về dữ liệu đã được đệm mà không thay đổi vị trí tệp. Ít nhất một byte dữ liệu sẽ được trả về, trừ khi đã đạt EOF. Số byte được trả về chính xác không được quy định (đối số *size* bị bỏ qua).
 
-      .. note:: While calling :meth:`peek` does not change the file position of
-         the :class:`LZMAFile`, it may change the position of the underlying
-         file object (e.g. if the :class:`LZMAFile` was constructed by passing a
-         file object for *filename*).
+      .. note:: Mặc dù việc gọi :meth:`peek` không thay đổi vị trí tệp của :class:`LZMAFile`, thao tác này có thể thay đổi vị trí của đối tượng tệp bên dưới (ví dụ: nếu :class:`LZMAFile` được tạo bằng cách truyền một đối tượng tệp cho *filename*).
 
    .. attribute:: mode
 
-      ``'rb'`` for reading and ``'wb'`` for writing.
+      ``'rb'`` để đọc và ``'wb'`` để ghi.
 
       .. versionadded:: 3.13
 
    .. attribute:: name
 
-      The lzma file name.  Equivalent to the :attr:`~io.FileIO.name`
-      attribute of the underlying :term:`file object`.
+      Tên tệp lzma. Tương đương với thuộc tính :attr:`~io.FileIO.name` của :term:`file object` bên dưới.
 
       .. versionadded:: 3.13
 
 
    .. versionchanged:: 3.4
-      Added support for the ``"x"`` and ``"xb"`` modes.
+      Đã bổ sung hỗ trợ cho các chế độ ``"x"`` và ``"xb"``.
 
    .. versionchanged:: 3.5
-      The :meth:`~io.BufferedIOBase.read` method now accepts an argument of
-      ``None``.
+      Phương thức :meth:`~io.BufferedIOBase.read` hiện chấp nhận đối số có giá trị ``None``.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
-Compressing and decompressing data in memory
---------------------------------------------
+Nén và giải nén dữ liệu trong bộ nhớ
+------------------------------------
 
 .. class:: LZMACompressor(format=FORMAT_XZ, check=-1, preset=None, filters=None)
 
-   Create a compressor object, which can be used to compress data incrementally.
+   Tạo một đối tượng compressor, có thể dùng để nén dữ liệu tăng dần.
 
-   For a more convenient way of compressing a single chunk of data, see
+   Để có cách thuận tiện hơn khi nén một khối dữ liệu đơn lẻ, hãy xem
    :func:`compress`.
 
-   The *format* argument specifies what container format should be used.
-   Possible values are :const:`FORMAT_XZ` (the default),
-   :const:`FORMAT_ALONE` and :const:`FORMAT_RAW`.
+   Đối số *format* chỉ định định dạng container cần sử dụng. Các giá trị có thể có là :const:`FORMAT_XZ` (mặc định),
+   :const:`FORMAT_ALONE` và :const:`FORMAT_RAW`.
 
-   The *check* argument specifies the type of integrity check to include in the
-   compressed data. This check is used when decompressing, to ensure that the
-   data has not been corrupted. Possible values are :const:`CHECK_NONE`,
-   :const:`CHECK_CRC32`, :const:`CHECK_CRC64` (the default for
-   :const:`FORMAT_XZ`) and :const:`CHECK_SHA256`.
+   Đối số *check* chỉ định loại kiểm tra tính toàn vẹn cần đưa vào dữ liệu đã nén. Kiểm tra này được sử dụng khi giải nén để đảm bảo dữ liệu không bị hỏng. Các giá trị có thể có là :const:`CHECK_NONE`,
+   :const:`CHECK_CRC32`, :const:`CHECK_CRC64` (mặc định cho
+   :const:`FORMAT_XZ`) và :const:`CHECK_SHA256`.
 
-   If the specified check is not supported, an :class:`LZMAError` is raised.
+   Nếu kiểm tra được chỉ định không được hỗ trợ, một :class:`LZMAError` sẽ được phát sinh.
 
-   The compression settings can be specified either as a preset compression
-   level (with the *preset* argument), or in detail as a custom filter chain
-   (with the *filters* argument).
+   Các thiết lập nén có thể được chỉ định dưới dạng mức nén đặt sẵn (với đối số *preset*) hoặc chỉ định chi tiết dưới dạng một chuỗi bộ lọc tùy chỉnh (với đối số *filters*).
 
-   The *preset* argument (if provided) should be an integer between ``0`` and
-   ``9`` (inclusive), optionally OR-ed with the constant
-   :const:`PRESET_EXTREME`. If neither *preset* nor *filters* are given, the
-   default behavior is to use :const:`PRESET_DEFAULT` (preset level ``6``).
-   Higher presets produce smaller output, but make the compression process
-   slower.
+   Đối số *preset* (nếu được cung cấp) phải là một số nguyên từ ``0`` đến ``9`` (bao gồm cả hai đầu), tùy chọn được OR với hằng số
+   :const:`PRESET_EXTREME`. Nếu không cung cấp *preset* hoặc *filters*, hành vi mặc định là sử dụng :const:`PRESET_DEFAULT` (mức preset ``6``). Các preset cao hơn tạo ra đầu ra nhỏ hơn nhưng khiến quá trình nén chậm hơn.
 
    .. note::
 
-      In addition to being more CPU-intensive, compression with higher presets
-      also requires much more memory (and produces output that needs more memory
-      to decompress). With preset ``9`` for example, the overhead for an
-      :class:`LZMACompressor` object can be as high as 800 MiB. For this reason,
-      it is generally best to stick with the default preset.
+      Ngoài việc tiêu tốn nhiều CPU hơn, việc nén bằng các preset cao hơn cũng yêu cầu nhiều bộ nhớ hơn đáng kể (và tạo ra đầu ra cần nhiều bộ nhớ hơn để giải nén). Chẳng hạn, với preset ``9``, phần chi phí phụ trội cho một
+      đối tượng :class:`LZMACompressor` có thể lên tới 800 MiB. Vì lý do này, nhìn chung tốt nhất là sử dụng preset mặc định.
 
-   The *filters* argument (if provided) should be a filter chain specifier.
-   See :ref:`filter-chain-specs` for details.
+   Đối số *filters* (nếu được cung cấp) phải là một filter chain specifier. Xem :ref:`filter-chain-specs` để biết chi tiết.
 
    .. method:: compress(data)
 
-      Compress *data* (a :class:`bytes` object), returning a :class:`bytes`
-      object containing compressed data for at least part of the input. Some of
-      *data* may be buffered internally, for use in later calls to
-      :meth:`compress` and :meth:`flush`. The returned data should be
-      concatenated with the output of any previous calls to :meth:`compress`.
+      Nén *data* (một đối tượng :class:`bytes`), trả về một đối tượng :class:`bytes` chứa dữ liệu đã nén cho ít nhất một phần dữ liệu đầu vào. Một phần *data* có thể được lưu đệm nội bộ để sử dụng trong các lần gọi sau tới
+      :meth:`compress` và :meth:`flush`. Dữ liệu được trả về phải được nối với đầu ra của mọi lần gọi trước đó tới :meth:`compress`.
 
    .. method:: flush()
 
-      Finish the compression process, returning a :class:`bytes` object
-      containing any data stored in the compressor's internal buffers.
+      Kết thúc quá trình nén, trả về một đối tượng :class:`bytes` chứa mọi dữ liệu được lưu trong các bộ đệm nội bộ của compressor.
 
-      The compressor cannot be used after this method has been called.
+      Không thể sử dụng compressor sau khi phương thức này được gọi.
 
 
 .. class:: LZMADecompressor(format=FORMAT_AUTO, memlimit=None, filters=None)
 
-   Create a decompressor object, which can be used to decompress data
-   incrementally.
+   Tạo một đối tượng decompressor, có thể được dùng để giải nén dữ liệu từng phần.
 
-   For a more convenient way of decompressing an entire compressed stream at
-   once, see :func:`decompress`.
+   Để có cách thuận tiện hơn nhằm giải nén toàn bộ compressed stream cùng một lúc, hãy xem :func:`decompress`.
 
-   The *format* argument specifies the container format that should be used. The
-   default is :const:`FORMAT_AUTO`, which can decompress both ``.xz`` and
-   ``.lzma`` files. Other possible values are :const:`FORMAT_XZ`,
-   :const:`FORMAT_ALONE`, and :const:`FORMAT_RAW`.
+   Đối số *format* chỉ định container format cần sử dụng. Giá trị mặc định là :const:`FORMAT_AUTO`, có thể giải nén cả tệp ``.xz`` và ``.lzma``. Các giá trị khả dụng khác là :const:`FORMAT_XZ`,
+   :const:`FORMAT_ALONE` và :const:`FORMAT_RAW`.
 
-   The *memlimit* argument specifies a limit (in bytes) on the amount of memory
-   that the decompressor can use. When this argument is used, decompression will
-   fail with an :class:`LZMAError` if it is not possible to decompress the input
-   within the given memory limit.
+   Đối số *memlimit* chỉ định giới hạn (tính bằng byte) về lượng bộ nhớ mà decompressor có thể sử dụng. Khi sử dụng đối số này, quá trình giải nén sẽ thất bại với :class:`LZMAError` nếu không thể giải nén đầu vào trong giới hạn bộ nhớ đã cho.
 
-   The *filters* argument specifies the filter chain that was used to create
-   the stream being decompressed. This argument is required if *format* is
-   :const:`FORMAT_RAW`, but should not be used for other formats.
-   See :ref:`filter-chain-specs` for more information about filter chains.
+   Đối số *filters* chỉ định filter chain được sử dụng để tạo stream đang được giải nén. Đối số này là bắt buộc nếu *format* là
+   :const:`FORMAT_RAW`, nhưng không nên được sử dụng cho các định dạng khác. Xem :ref:`filter-chain-specs` để biết thêm thông tin về các chuỗi bộ lọc.
 
    .. note::
-      This class does not transparently handle inputs containing multiple
-      compressed streams, unlike :func:`decompress` and :class:`LZMAFile`. To
-      decompress a multi-stream input with :class:`LZMADecompressor`, you must
-      create a new decompressor for each stream.
+      Lớp này không tự động xử lý các đầu vào chứa nhiều luồng đã nén, không giống như :func:`decompress` và :class:`LZMAFile`. Để giải nén đầu vào gồm nhiều luồng bằng :class:`LZMADecompressor`, bạn phải tạo một bộ giải nén mới cho mỗi luồng.
 
    .. method:: decompress(data, max_length=-1)
 
-      Decompress *data* (a :term:`bytes-like object`), returning
-      uncompressed data as bytes. Some of *data* may be buffered
-      internally, for use in later calls to :meth:`decompress`. The
-      returned data should be concatenated with the output of any
-      previous calls to :meth:`decompress`.
+      Giải nén *data* (một :term:`bytes-like object`), trả về dữ liệu chưa nén dưới dạng bytes. Một phần *data* có thể được đệm nội bộ để sử dụng trong các lần gọi :meth:`decompress` sau. Dữ liệu được trả về nên được nối với đầu ra của mọi lần gọi :meth:`decompress` trước đó.
 
-      If *max_length* is nonnegative, returns at most *max_length*
-      bytes of decompressed data. If this limit is reached and further
-      output can be produced, the :attr:`~.needs_input` attribute will
-      be set to ``False``. In this case, the next call to
-      :meth:`~.decompress` may provide *data* as ``b''`` to obtain
-      more of the output.
+      Nếu *max_length* không âm, trả về nhiều nhất *max_length* byte dữ liệu đã giải nén. Nếu đạt đến giới hạn này và vẫn có thể tạo thêm đầu ra, thuộc tính :attr:`~.needs_input` sẽ được đặt thành ``False``. Trong trường hợp này, lần gọi tiếp theo đến
+      :meth:`~.decompress` có thể cung cấp *data* dưới dạng ``b''`` để lấy thêm đầu ra.
 
-      If all of the input data was decompressed and returned (either
-      because this was less than *max_length* bytes, or because
-      *max_length* was negative), the :attr:`~.needs_input` attribute
-      will be set to ``True``.
+      Nếu toàn bộ dữ liệu đầu vào đã được giải nén và trả về (do dữ liệu này ít hơn *max_length* byte, hoặc do *max_length* là số âm), thuộc tính :attr:`~.needs_input` sẽ được đặt thành ``True``.
 
-      Attempting to decompress data after the end of stream is reached
-      raises an :exc:`EOFError`.  Any data found after the end of the
-      stream is ignored and saved in the :attr:`~.unused_data` attribute.
+      Việc cố gắng giải nén dữ liệu sau khi đạt đến cuối luồng sẽ phát sinh một :exc:`EOFError`. Mọi dữ liệu được tìm thấy sau cuối luồng sẽ bị bỏ qua và được lưu trong thuộc tính :attr:`~.unused_data`.
 
       .. versionchanged:: 3.5
-         Added the *max_length* parameter.
+         Đã thêm tham số *max_length*.
 
    .. attribute:: check
 
-      The ID of the integrity check used by the input stream. This may be
-      :const:`CHECK_UNKNOWN` until enough of the input has been decoded to
-      determine what integrity check it uses.
+      Mã định danh của phép kiểm tra tính toàn vẹn được luồng đầu vào sử dụng. Giá trị này có thể là
+      :const:`CHECK_UNKNOWN` cho đến khi đã giải mã đủ dữ liệu đầu vào để xác định phép kiểm tra tính toàn vẹn mà luồng sử dụng.
 
    .. attribute:: eof
 
-      ``True`` if the end-of-stream marker has been reached.
+      ``True`` nếu đã đạt đến dấu kết thúc luồng.
 
    .. attribute:: unused_data
 
-      Data found after the end of the compressed stream.
+      Dữ liệu được tìm thấy sau phần cuối của luồng đã nén.
 
-      Before the end of the stream is reached, this will be ``b""``.
+      Trước khi đạt đến phần cuối của luồng, giá trị này sẽ là ``b""``.
 
    .. attribute:: needs_input
 
-      ``False`` if the :meth:`.decompress` method can provide more
-      decompressed data before requiring new uncompressed input.
+      ``False`` nếu phương thức :meth:`.decompress` có thể cung cấp thêm dữ liệu đã giải nén trước khi cần dữ liệu đầu vào chưa nén mới.
 
       .. versionadded:: 3.5
 
 .. function:: compress(data, format=FORMAT_XZ, check=-1, preset=None, filters=None)
 
-   Compress *data* (a :class:`bytes` object), returning the compressed data as a
-   :class:`bytes` object.
+   Nén *data* (một đối tượng :class:`bytes`), trả về dữ liệu đã nén dưới dạng
+   đối tượng :class:`bytes`.
 
-   See :class:`LZMACompressor` above for a description of the *format*, *check*,
-   *preset* and *filters* arguments.
+   Xem :class:`LZMACompressor` ở trên để biết mô tả về các đối số *format*, *check*, *preset* và *filters*.
 
 
 .. function:: decompress(data, format=FORMAT_AUTO, memlimit=None, filters=None)
 
-   Decompress *data* (a :class:`bytes` object), returning the uncompressed data
-   as a :class:`bytes` object.
+   Giải nén *data* (một đối tượng :class:`bytes`), trả về dữ liệu chưa nén dưới dạng đối tượng :class:`bytes`.
 
-   If *data* is the concatenation of multiple distinct compressed streams,
-   decompress all of these streams, and return the concatenation of the results.
+   Nếu *data* là phép nối của nhiều stream đã nén riêng biệt, hãy giải nén tất cả các stream này và trả về phép nối của các kết quả.
 
-   See :class:`LZMADecompressor` above for a description of the *format*,
-   *memlimit* and *filters* arguments.
+   Xem :class:`LZMADecompressor` ở trên để biết mô tả về các đối số *format*, *memlimit* và *filters*.
 
 
-Miscellaneous
--------------
+Linh tinh
+---------
 
 .. function:: is_check_supported(check)
 
-   Return ``True`` if the given integrity check is supported on this system.
+   Trả về ``True`` nếu phép kiểm tra tính toàn vẹn đã cho được hệ thống này hỗ trợ.
 
-   :const:`CHECK_NONE` and :const:`CHECK_CRC32` are always supported.
-   :const:`CHECK_CRC64` and :const:`CHECK_SHA256` may be unavailable if you are
-   using a version of :program:`liblzma` that was compiled with a limited
-   feature set.
+   :const:`CHECK_NONE` và :const:`CHECK_CRC32` luôn được hỗ trợ.
+   :const:`CHECK_CRC64` và :const:`CHECK_SHA256` có thể không khả dụng nếu bạn đang sử dụng một phiên bản :program:`liblzma` được biên dịch với tập tính năng hạn chế.
 
 
 .. _filter-chain-specs:
 
-Specifying custom filter chains
+Chỉ định chuỗi bộ lọc tùy chỉnh
 -------------------------------
 
-A filter chain specifier is a sequence of dictionaries, where each dictionary
-contains the ID and options for a single filter. Each dictionary must contain
-the key ``"id"``, and may contain additional keys to specify filter-dependent
-options. Valid filter IDs are as follows:
+Bộ chỉ định chuỗi bộ lọc là một chuỗi các dictionary, trong đó mỗi dictionary chứa ID và các tùy chọn cho một bộ lọc. Mỗi dictionary phải chứa khóa ``"id"``, và có thể chứa các khóa bổ sung để chỉ định các tùy chọn phụ thuộc vào bộ lọc. Các ID bộ lọc hợp lệ như sau:
 
-* Compression filters:
+* Bộ lọc nén:
 
-  * :const:`FILTER_LZMA1` (for use with :const:`FORMAT_ALONE`)
-  * :const:`FILTER_LZMA2` (for use with :const:`FORMAT_XZ` and :const:`FORMAT_RAW`)
+  * :const:`FILTER_LZMA1` (dùng với :const:`FORMAT_ALONE`)
+  * :const:`FILTER_LZMA2` (dùng với :const:`FORMAT_XZ` và :const:`FORMAT_RAW`)
 
-* Delta filter:
+* Bộ lọc Delta:
 
   * :const:`FILTER_DELTA`
 
-* Branch-Call-Jump (BCJ) filters:
+* Bộ lọc Branch-Call-Jump (BCJ):
 
   * :const:`!FILTER_X86`
   * :const:`!FILTER_IA64`
@@ -345,164 +254,134 @@ options. Valid filter IDs are as follows:
   * :const:`!FILTER_POWERPC`
   * :const:`!FILTER_SPARC`
 
-A filter chain can consist of up to 4 filters, and cannot be empty. The last
-filter in the chain must be a compression filter, and any other filters must be
-delta or BCJ filters.
+Một chuỗi bộ lọc có thể gồm tối đa 4 bộ lọc và không được để trống. Bộ lọc cuối cùng trong chuỗi phải là bộ lọc nén, còn các bộ lọc khác phải là bộ lọc Delta hoặc BCJ.
 
-Compression filters support the following options (specified as additional
-entries in the dictionary representing the filter):
+Bộ lọc nén hỗ trợ các tùy chọn sau (được chỉ định dưới dạng các mục bổ sung trong dictionary đại diện cho bộ lọc):
 
-* ``preset``: A compression preset to use as a source of default values for
-  options that are not specified explicitly.
-* ``dict_size``: Dictionary size in bytes. This should be between 4 KiB and
-  1.5 GiB (inclusive).
-* ``lc``: Number of literal context bits.
-* ``lp``: Number of literal position bits. The sum ``lc + lp`` must be at
-  most 4.
-* ``pb``: Number of position bits; must be at most 4.
-* ``mode``: :const:`MODE_FAST` or :const:`MODE_NORMAL`.
-* ``nice_len``: What should be considered a "nice length" for a match.
-  This should be 273 or less.
-* ``mf``: What match finder to use -- :const:`MF_HC3`, :const:`MF_HC4`,
-  :const:`MF_BT2`, :const:`MF_BT3`, or :const:`MF_BT4`.
-* ``depth``: Maximum search depth used by match finder. 0 (default) means to
-  select automatically based on other filter options.
+* ``preset``: Compression preset được dùng làm nguồn các giá trị mặc định cho những tùy chọn không được chỉ định rõ ràng.
+* ``dict_size``: Kích thước dictionary tính bằng byte. Giá trị này phải nằm trong khoảng từ 4 KiB đến 1.5 GiB (bao gồm cả hai đầu mút).
+* ``lc``: Số lượng bit ngữ cảnh literal.
+* ``lp``: Số lượng bit vị trí literal. Tổng ``lc + lp`` phải tối đa là 4.
+* ``pb``: Số lượng bit vị trí; phải tối đa là 4.
+* ``mode``: :const:`MODE_FAST` hoặc :const:`MODE_NORMAL`.
+* ``nice_len``: Độ dài nào nên được xem là "độ dài phù hợp" cho một kết quả khớp. Giá trị này phải là 273 hoặc nhỏ hơn.
+* ``mf``: Trình tìm kiếm kết quả khớp cần sử dụng -- :const:`MF_HC3`, :const:`MF_HC4`,
+  :const:`MF_BT2`, :const:`MF_BT3`, hoặc :const:`MF_BT4`.
+* ``depth``: Độ sâu tìm kiếm tối đa được bộ tìm kiếm khớp sử dụng. 0 (mặc định) có nghĩa là tự động chọn dựa trên các tùy chọn bộ lọc khác.
 
-The delta filter stores the differences between bytes, producing more repetitive
-input for the compressor in certain circumstances. It supports one option,
-``dist``. This indicates the distance between bytes to be subtracted. The
-default is 1, i.e. take the differences between adjacent bytes.
+Bộ lọc delta lưu trữ sự khác biệt giữa các byte, tạo ra dữ liệu đầu vào có tính lặp lại cao hơn cho bộ nén trong một số trường hợp. Bộ lọc này hỗ trợ một tùy chọn, ``dist``. Tùy chọn này cho biết khoảng cách giữa các byte cần lấy hiệu. Giá trị mặc định là 1, tức là lấy hiệu giữa các byte liền kề.
 
-The BCJ filters are intended to be applied to machine code. They convert
-relative branches, calls and jumps in the code to use absolute addressing, with
-the aim of increasing the redundancy that can be exploited by the compressor.
-These filters support one option, ``start_offset``. This specifies the address
-that should be mapped to the beginning of the input data. The default is 0.
+Các bộ lọc BCJ được thiết kế để áp dụng cho mã máy. Chúng chuyển đổi các nhánh, lệnh gọi và lệnh nhảy tương đối trong mã để sử dụng địa chỉ tuyệt đối, nhằm tăng tính dư thừa mà bộ nén có thể khai thác. Các bộ lọc này hỗ trợ một tùy chọn, ``start_offset``. Tùy chọn này chỉ định địa chỉ cần được ánh xạ tới đầu dữ liệu đầu vào. Giá trị mặc định là 0.
 
 
-Constants
----------
+Hằng số
+-------
 
-The following module-level constants are provided for use as the *format*,
-*check*, *preset* and *filters* arguments of the classes and functions above.
+Các hằng số cấp mô-đun sau đây được cung cấp để sử dụng làm các đối số *format*, *check*, *preset* và *filters* của các lớp và hàm ở trên.
 
-Container formats:
+Các định dạng container:
 
 .. data:: FORMAT_XZ
 
-   The ``.xz`` container format.
+   Định dạng container ``.xz``.
 
 .. data:: FORMAT_ALONE
 
-   The legacy ``.lzma`` container format.  This format is more limited than
-   ``.xz`` -- it does not support integrity checks or multiple filters.
+   Định dạng container ``.lzma`` cũ. Định dạng này bị giới hạn hơn ``.xz`` -- nó không hỗ trợ kiểm tra tính toàn vẹn hoặc nhiều bộ lọc.
 
 .. data:: FORMAT_RAW
 
-   A raw data stream, not using any container format.  This format specifier
-   does not support integrity checks, and requires that you always specify a
-   custom filter chain (for both compression and decompression).  Additionally,
-   data compressed in this manner cannot be decompressed using
+   Một luồng dữ liệu thô, không sử dụng bất kỳ định dạng container nào. Bộ chỉ định định dạng này không hỗ trợ kiểm tra tính toàn vẹn và yêu cầu bạn luôn chỉ định một chuỗi bộ lọc tùy chỉnh (cho cả quá trình nén và giải nén). Ngoài ra, dữ liệu được nén theo cách này không thể được giải nén bằng
    :const:`FORMAT_AUTO`.
 
 .. data:: FORMAT_AUTO
 
-   Used for decompression only.  The container format is detected
-   automatically, so that both ``.xz`` and ``.lzma`` files can be decompressed.
+   Chỉ được sử dụng để giải nén. Định dạng container được tự động phát hiện, vì vậy cả tệp ``.xz`` và ``.lzma`` đều có thể được giải nén.
 
-Integrity checks:
+Kiểm tra tính toàn vẹn:
 
 .. data:: CHECK_NONE
 
-   No integrity check.  This is the default (and the only acceptable value) for
-   :const:`FORMAT_ALONE` and :const:`FORMAT_RAW`.
+   Không kiểm tra tính toàn vẹn. Đây là giá trị mặc định (và là giá trị duy nhất được chấp nhận) cho
+   :const:`FORMAT_ALONE` và :const:`FORMAT_RAW`.
 
 .. data:: CHECK_CRC32
 
-   A 32-bit Cyclic Redundancy Check.
+   Một mã kiểm tra dư vòng (Cyclic Redundancy Check) 32-bit.
 
 .. data:: CHECK_CRC64
 
-   A 64-bit Cyclic Redundancy Check.  This is the default for
+   Một mã kiểm tra dư vòng 64-bit (Cyclic Redundancy Check). Đây là giá trị mặc định cho
    :const:`FORMAT_XZ`.
 
 .. data:: CHECK_SHA256
 
-   A 256-bit Secure Hash Algorithm.
+   Một Thuật toán Băm An toàn 256-bit (Secure Hash Algorithm).
 
 .. data:: CHECK_UNKNOWN
 
-   The integrity check used by a stream could not yet be determined.  This may
-   be the value of the :attr:`LZMADecompressor.check` attribute until enough of
-   the input has been decoded.
+   Chưa thể xác định được phép kiểm tra tính toàn vẹn mà một stream sử dụng. Đây có thể là giá trị của thuộc tính :attr:`LZMADecompressor.check` cho đến khi đủ dữ liệu đầu vào được giải mã.
 
 .. data:: CHECK_ID_MAX
 
-   The largest supported integrity-check ID.
+   ID kiểm tra tính toàn vẹn lớn nhất được hỗ trợ.
 
-Compression presets:
+Các preset nén:
 
 .. data:: PRESET_DEFAULT
 
-   The default compression preset, equivalent to preset level ``6``.
+   Preset nén mặc định, tương đương với mức preset ``6``.
 
 .. data:: PRESET_EXTREME
 
-   A flag that may be bitwise OR-ed with a preset level (``0`` to ``9``) to
-   select a slower but more thorough variant of that preset.
+   Một cờ có thể được OR theo bit với một mức preset (từ ``0`` đến ``9``) để chọn biến thể chậm hơn nhưng kiểm tra kỹ lưỡng hơn của preset đó.
 
-Filter IDs and options:
+ID bộ lọc và các tùy chọn:
 
 .. data:: FILTER_LZMA1
           FILTER_LZMA2
 
-   The LZMA1 and LZMA2 compression filters.  :const:`FILTER_LZMA1` is for use
-   with :const:`FORMAT_ALONE`, while :const:`FILTER_LZMA2` is for use with
-   :const:`FORMAT_XZ` and :const:`FORMAT_RAW`.
+   Các bộ lọc nén LZMA1 và LZMA2. :const:`FILTER_LZMA1` được dùng với :const:`FORMAT_ALONE`, còn :const:`FILTER_LZMA2` được dùng với
+   :const:`FORMAT_XZ` và :const:`FORMAT_RAW`.
 
 .. data:: FILTER_DELTA
 
-   The delta filter.
+   Bộ lọc delta.
 
 .. data:: MODE_FAST
           MODE_NORMAL
 
-   Compression modes that may be used as the ``mode`` option of a filter
-   specifier (see :ref:`filter-chain-specs`).
+   Các chế độ nén có thể được dùng làm tùy chọn ``mode`` của bộ chỉ định bộ lọc (xem :ref:`filter-chain-specs`).
 
 .. data:: MF_HC3
-          MF_HC4
-          MF_BT2
-          MF_BT3
-          MF_BT4
+          MF_HC4 MF_BT2 MF_BT3 MF_BT4
 
-   Match finders that may be used as the ``mf`` option of a filter specifier
-   (see :ref:`filter-chain-specs`).
+   Các match finder có thể được sử dụng làm tùy chọn ``mf`` của bộ chỉ định bộ lọc (xem :ref:`filter-chain-specs`).
 
 
-Examples
---------
+Ví dụ
+-----
 
-Reading in a compressed file::
+Đọc tệp đã nén::
 
    import lzma
    with lzma.open("file.xz") as f:
        file_content = f.read()
 
-Creating a compressed file::
+Tạo tệp nén::
 
    import lzma
    data = b"Insert Data Here"
    with lzma.open("file.xz", "w") as f:
        f.write(data)
 
-Compressing data in memory::
+Nén dữ liệu trong bộ nhớ::
 
    import lzma
    data_in = b"Insert Data Here"
    data_out = lzma.compress(data_in)
 
-Incremental compression::
+Nén tăng dần::
 
    import lzma
    lzc = lzma.LZMACompressor()
@@ -510,10 +389,10 @@ Incremental compression::
    out2 = lzc.compress(b"Another piece of data\n")
    out3 = lzc.compress(b"Even more data\n")
    out4 = lzc.flush()
-   # Concatenate all the partial results:
+   # Nối tất cả các kết quả từng phần:
    result = b"".join([out1, out2, out3, out4])
 
-Writing compressed data to an already-open file::
+Ghi dữ liệu đã nén vào một tệp đã được mở sẵn::
 
    import lzma
    with open("file.xz", "wb") as f:
@@ -522,7 +401,7 @@ Writing compressed data to an already-open file::
            lzf.write(b"This *will* be compressed\n")
        f.write(b"Not compressed\n")
 
-Creating a compressed file using a custom filter chain::
+Tạo tệp đã nén bằng chuỗi bộ lọc tùy chỉnh::
 
    import lzma
    my_filters = [

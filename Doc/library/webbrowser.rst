@@ -1,74 +1,53 @@
-:mod:`!webbrowser` --- Convenient web-browser controller
-========================================================
+:mod:`!webbrowser` --- Trình điều khiển trình duyệt web tiện lợi
+================================================================
 
 .. module:: webbrowser
-   :synopsis: Easy-to-use controller for web browsers.
+   :synopsis: Trình điều khiển dễ sử dụng cho các trình duyệt web.
 
 .. moduleauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 
-**Source code:** :source:`Lib/webbrowser.py`
+**Mã nguồn:** :source:`Lib/webbrowser.py`
 
 --------------
 
-The :mod:`!webbrowser` module provides a high-level interface to allow displaying
-web-based documents to users. Under most circumstances, simply calling the
-:func:`.open` function from this module will do the right thing.
+Mô-đun :mod:`!webbrowser` cung cấp giao diện cấp cao cho phép hiển thị các tài liệu trên nền web cho người dùng. Trong hầu hết trường hợp, chỉ cần gọi
+hàm :func:`.open` của mô-đun này là đủ để thực hiện đúng việc cần làm.
 
-Under Unix, graphical browsers are preferred under X11, but text-mode browsers
-will be used if graphical browsers are not available or an X11 display isn't
-available.  If text-mode browsers are used, the calling process will block until
-the user exits the browser.
+Trên Unix, các trình duyệt đồ họa được ưu tiên trong X11, nhưng các trình duyệt ở chế độ văn bản sẽ được sử dụng nếu không có trình duyệt đồ họa hoặc không có màn hình X11. Nếu sử dụng trình duyệt ở chế độ văn bản, tiến trình gọi sẽ bị chặn cho đến khi người dùng thoát khỏi trình duyệt.
 
-If the environment variable :envvar:`BROWSER` exists, it is interpreted as the
-:data:`os.pathsep`-separated list of browsers to try ahead of the platform
-defaults.  When the value of a list part contains the string ``%s``, then it is
-interpreted as a literal browser command line to be used with the argument URL
-substituted for ``%s``; if the value is a single word that refers to one of the
-already registered browsers this browser is added to the front of the search list;
-if the part does not contain ``%s``, it is simply interpreted as the name of the
-browser to launch. [1]_
+Nếu biến môi trường :envvar:`BROWSER` tồn tại, nó được hiểu là
+Danh sách các trình duyệt được phân tách bằng :data:`os.pathsep` để thử trước các mặc định của nền tảng. Khi giá trị của một phần trong danh sách chứa chuỗi ``%s``, giá trị đó được diễn giải là một dòng lệnh trình duyệt theo nghĩa đen, dùng URL trong đối số thay thế cho ``%s``; nếu giá trị là một từ đơn chỉ một trong các trình duyệt đã đăng ký, trình duyệt này sẽ được thêm vào đầu danh sách tìm kiếm; nếu phần đó không chứa ``%s``, giá trị đó chỉ được diễn giải là tên của trình duyệt cần khởi chạy. [1]_
 
 .. versionchanged:: 3.14
 
-   The :envvar:`BROWSER` variable can now also be used to reorder the list of
-   platform defaults. This is particularly useful on macOS where the platform
-   defaults do not refer to command-line tools on :envvar:`PATH`.
+   Biến :envvar:`BROWSER` giờ đây cũng có thể được dùng để sắp xếp lại danh sách các giá trị mặc định của nền tảng. Điều này đặc biệt hữu ích trên macOS, nơi các giá trị mặc định của nền tảng không tham chiếu đến các công cụ dòng lệnh trên :envvar:`PATH`.
 
 
-For non-Unix platforms, or when a remote browser is available on Unix, the
-controlling process will not wait for the user to finish with the browser, but
-allow the remote browser to maintain its own windows on the display.  If remote
-browsers are not available on Unix, the controlling process will launch a new
-browser and wait.
+Trên các nền tảng không phải Unix hoặc khi có một trình duyệt từ xa trên Unix, tiến trình điều khiển sẽ không chờ người dùng sử dụng trình duyệt xong mà cho phép trình duyệt từ xa tự quản lý các cửa sổ của nó trên màn hình. Nếu không có trình duyệt từ xa trên Unix, tiến trình điều khiển sẽ khởi chạy một trình duyệt mới và chờ.
 
-On iOS, the :envvar:`BROWSER` environment variable, as well as any arguments
-controlling autoraise, browser preference, and new tab/window creation will be
-ignored. Web pages will *always* be opened in the user's preferred browser, in
-a new tab, with the browser being brought to the foreground. The use of the
-:mod:`!webbrowser` module on iOS requires the :mod:`ctypes` module. If
-:mod:`ctypes` isn't available, calls to :func:`.open` will fail.
+Trên iOS, biến môi trường :envvar:`BROWSER`, cũng như mọi đối số điều khiển việc tự động đưa trình duyệt lên trước, tùy chọn trình duyệt và việc tạo tab/cửa sổ mới, sẽ bị bỏ qua. Các trang web *luôn* được mở trong trình duyệt ưa thích của người dùng, trong một tab mới, đồng thời trình duyệt được đưa lên trước. Việc sử dụng
+module :mod:`!webbrowser` trên iOS yêu cầu module :mod:`ctypes`. Nếu
+:mod:`ctypes` không khả dụng, các lệnh gọi đến :func:`.open` sẽ thất bại.
 
 .. _webbrowser-cli:
 
-Command-line interface
-----------------------
+Giao diện dòng lệnh
+-------------------
 
 .. program:: webbrowser
 
-The script :program:`webbrowser` can be used as a command-line interface for the
-module. It accepts a URL as the argument. It accepts the following optional
-parameters:
+Script :program:`webbrowser` có thể được sử dụng làm giao diện dòng lệnh cho module. Script này nhận một URL làm đối số. Script này nhận các tham số tùy chọn sau:
 
 .. option:: -n, --new-window
 
-   Opens the URL in a new browser window, if possible.
+   Mở URL trong một cửa sổ trình duyệt mới, nếu có thể.
 
 .. option:: -t, --new-tab
 
-   Opens the URL in a new browser tab.
+   Mở URL trong một tab trình duyệt mới.
 
-The options are, naturally, mutually exclusive.  Usage example:
+Đương nhiên, các tùy chọn này loại trừ lẫn nhau. Ví dụ sử dụng:
 
 .. code-block:: bash
 
@@ -76,200 +55,167 @@ The options are, naturally, mutually exclusive.  Usage example:
 
 .. availability:: not WASI, not Android.
 
-The following exception is defined:
+Ngoại lệ sau được định nghĩa:
 
 
 .. exception:: Error
 
-   Exception raised when a browser control error occurs.
+   Ngoại lệ được phát sinh khi xảy ra lỗi điều khiển trình duyệt.
 
-The following functions are defined:
+Các hàm sau được định nghĩa:
 
 
 .. function:: open(url, new=0, autoraise=True)
 
-   Display *url* using the default browser. If *new* is 0, the *url* is opened
-   in the same browser window if possible.  If *new* is 1, a new browser window
-   is opened if possible.  If *new* is 2, a new browser page ("tab") is opened
-   if possible.  If *autoraise* is ``True``, the window is raised if possible
-   (note that under many window managers this will occur regardless of the
-   setting of this variable).
+   Hiển thị *url* bằng trình duyệt mặc định. Nếu *new* là 0, *url* sẽ được mở trong cùng cửa sổ trình duyệt nếu có thể. Nếu *new* là 1, một cửa sổ trình duyệt mới sẽ được mở nếu có thể. Nếu *new* là 2, một trang trình duyệt mới ("tab") sẽ được mở nếu có thể. Nếu *autoraise* là ``True``, cửa sổ sẽ được đưa lên trước nếu có thể (lưu ý rằng trong nhiều trình quản lý cửa sổ, điều này sẽ xảy ra bất kể giá trị của biến này).
 
-   Returns ``True`` if a browser was successfully launched, ``False`` otherwise.
+   Trả về ``True`` nếu trình duyệt được khởi chạy thành công, nếu không thì trả về ``False``.
 
-   Note that on some platforms, trying to open a filename using this function,
-   may work and start the operating system's associated program.  However, this
-   is neither supported nor portable.
+   Lưu ý rằng trên một số nền tảng, việc cố mở tên tệp bằng hàm này có thể hoạt động và khởi động chương trình liên kết của hệ điều hành. Tuy nhiên, điều này không được hỗ trợ và không có tính portable.
 
    .. audit-event:: webbrowser.open url webbrowser.open
 
 
 .. function:: open_new(url)
 
-   Open *url* in a new window of the default browser, if possible, otherwise, open
-   *url* in the only browser window.
+   Mở *url* trong cửa sổ mới của trình duyệt mặc định nếu có thể; nếu không, mở *url* trong cửa sổ trình duyệt duy nhất.
 
-   Returns ``True`` if a browser was successfully launched, ``False`` otherwise.
+   Trả về ``True`` nếu trình duyệt được khởi chạy thành công, nếu không thì trả về ``False``.
 
 
 .. function:: open_new_tab(url)
 
-   Open *url* in a new page ("tab") of the default browser, if possible, otherwise
-   equivalent to :func:`open_new`.
+   Mở *url* trong trang mới ("tab") của trình duyệt mặc định nếu có thể; nếu không, tương đương với :func:`open_new`.
 
-   Returns ``True`` if a browser was successfully launched, ``False`` otherwise.
+   Trả về ``True`` nếu trình duyệt được khởi chạy thành công, nếu không thì trả về ``False``.
 
 
 .. function:: get(using=None)
 
-   Return a controller object for the browser type *using*.  If *using* is
-   ``None``, return a controller for a default browser appropriate to the
-   caller's environment.
+   Trả về một đối tượng controller cho loại trình duyệt *using*.  Nếu *using* là ``None``, hãy trả về một controller cho trình duyệt mặc định phù hợp với môi trường của bên gọi.
 
 
 .. function:: register(name, constructor, instance=None, *, preferred=False)
 
-   Register the browser type *name*.  Once a browser type is registered, the
-   :func:`get` function can return a controller for that browser type.  If
-   *instance* is not provided, or is ``None``, *constructor* will be called without
-   parameters to create an instance when needed.  If *instance* is provided,
-   *constructor* will never be called, and may be ``None``.
+   Đăng ký loại trình duyệt *name*.  Sau khi một loại trình duyệt được đăng ký, hàm
+   :func:`get` có thể trả về một controller cho loại trình duyệt đó.  Nếu *instance* không được cung cấp hoặc là ``None``, *constructor* sẽ được gọi không có tham số để tạo một instance khi cần.  Nếu *instance* được cung cấp, *constructor* sẽ không bao giờ được gọi và có thể là ``None``.
 
-   Setting *preferred* to ``True`` makes this browser a preferred result for
-   a :func:`get` call with no argument.  Otherwise, this entry point is only
-   useful if you plan to either set the :envvar:`BROWSER` variable or call
-   :func:`get` with a nonempty argument matching the name of a handler you
-   declare.
+   Đặt *preferred* thành ``True`` sẽ khiến trình duyệt này trở thành kết quả ưu tiên cho một lệnh gọi :func:`get` không có đối số.  Nếu không, entry point này chỉ hữu ích nếu bạn dự định đặt biến :envvar:`BROWSER` hoặc gọi
+   :func:`get` với một đối số không rỗng khớp với tên của một handler mà bạn khai báo.
 
    .. versionchanged:: 3.7
-      *preferred* keyword-only parameter was added.
+      Đã thêm tham số chỉ dành cho keyword *preferred*.
 
-A number of browser types are predefined.  This table gives the type names that
-may be passed to the :func:`get` function and the corresponding instantiations
-for the controller classes, all defined in this module.
+Một số loại trình duyệt được định nghĩa sẵn.  Bảng này cung cấp các tên loại có thể được truyền vào hàm :func:`get` và các cách khởi tạo tương ứng cho các lớp controller, tất cả đều được định nghĩa trong module này.
 
-+------------------------+-----------------------------------------+-------+
-| Type Name              | Class Name                              | Notes |
-+========================+=========================================+=======+
-| ``'mozilla'``          | ``Mozilla('mozilla')``                  |       |
-+------------------------+-----------------------------------------+-------+
-| ``'firefox'``          | ``Mozilla('mozilla')``                  |       |
-+------------------------+-----------------------------------------+-------+
-| ``'epiphany'``         | ``Epiphany('epiphany')``                |       |
-+------------------------+-----------------------------------------+-------+
-| ``'kfmclient'``        | ``Konqueror()``                         | \(1)  |
-+------------------------+-----------------------------------------+-------+
-| ``'konqueror'``        | ``Konqueror()``                         | \(1)  |
-+------------------------+-----------------------------------------+-------+
-| ``'kfm'``              | ``Konqueror()``                         | \(1)  |
-+------------------------+-----------------------------------------+-------+
-| ``'opera'``            | ``Opera()``                             |       |
-+------------------------+-----------------------------------------+-------+
-| ``'links'``            | ``GenericBrowser('links')``             |       |
-+------------------------+-----------------------------------------+-------+
-| ``'elinks'``           | ``Elinks('elinks')``                    |       |
-+------------------------+-----------------------------------------+-------+
-| ``'lynx'``             | ``GenericBrowser('lynx')``              |       |
-+------------------------+-----------------------------------------+-------+
-| ``'w3m'``              | ``GenericBrowser('w3m')``               |       |
-+------------------------+-----------------------------------------+-------+
-| ``'windows-default'``  | ``WindowsDefault``                      | \(2)  |
-+------------------------+-----------------------------------------+-------+
-| ``'macosx'``           | ``MacOSXOSAScript('default')``          | \(3)  |
-+------------------------+-----------------------------------------+-------+
-| ``'safari'``           | ``MacOSXOSAScript('safari')``           | \(3)  |
-+------------------------+-----------------------------------------+-------+
-| ``'google-chrome'``    | ``Chrome('google-chrome')``             |       |
-+------------------------+-----------------------------------------+-------+
-| ``'chrome'``           | ``Chrome('chrome')``                    |       |
-+------------------------+-----------------------------------------+-------+
-| ``'chromium'``         | ``Chromium('chromium')``                |       |
-+------------------------+-----------------------------------------+-------+
-| ``'chromium-browser'`` | ``Chromium('chromium-browser')``        |       |
-+------------------------+-----------------------------------------+-------+
-| ``'iosbrowser'``       | ``IOSBrowser``                          | \(4)  |
-+------------------------+-----------------------------------------+-------+
++------------------------+----------------------------------+---------+
+| Tên kiểu               | Tên lớp                          | Ghi chú |
++========================+==================================+=========+
+| ``'mozilla'``          | ``Mozilla('mozilla')``           |         |
++------------------------+----------------------------------+---------+
+| ``'firefox'``          | ``Mozilla('mozilla')``           |         |
++------------------------+----------------------------------+---------+
+| ``'epiphany'``         | ``Epiphany('epiphany')``         |         |
++------------------------+----------------------------------+---------+
+| ``'kfmclient'``        | ``Konqueror()``                  | \(1)    |
++------------------------+----------------------------------+---------+
+| ``'konqueror'``        | ``Konqueror()``                  | \(1)    |
++------------------------+----------------------------------+---------+
+| ``'kfm'``              | ``Konqueror()``                  | \(1)    |
++------------------------+----------------------------------+---------+
+| ``'opera'``            | ``Opera()``                      |         |
++------------------------+----------------------------------+---------+
+| ``'links'``            | ``GenericBrowser('links')``      |         |
++------------------------+----------------------------------+---------+
+| ``'elinks'``           | ``Elinks('elinks')``             |         |
++------------------------+----------------------------------+---------+
+| ``'lynx'``             | ``GenericBrowser('lynx')``       |         |
++------------------------+----------------------------------+---------+
+| ``'w3m'``              | ``GenericBrowser('w3m')``        |         |
++------------------------+----------------------------------+---------+
+| ``'windows-default'``  | ``WindowsDefault``               | \(2)    |
++------------------------+----------------------------------+---------+
+| ``'macosx'``           | ``MacOSXOSAScript('default')``   | \(3)    |
++------------------------+----------------------------------+---------+
+| ``'safari'``           | ``MacOSXOSAScript('safari')``    | \(3)    |
++------------------------+----------------------------------+---------+
+| ``'google-chrome'``    | ``Chrome('google-chrome')``      |         |
++------------------------+----------------------------------+---------+
+| ``'chrome'``           | ``Chrome('chrome')``             |         |
++------------------------+----------------------------------+---------+
+| ``'chromium'``         | ``Chromium('chromium')``         |         |
++------------------------+----------------------------------+---------+
+| ``'chromium-browser'`` | ``Chromium('chromium-browser')`` |         |
++------------------------+----------------------------------+---------+
+| ``'iosbrowser'``       | ``IOSBrowser``                   | \(4)    |
++------------------------+----------------------------------+---------+
 
-Notes:
+Ghi chú:
 
 (1)
-   "Konqueror" is the file manager for the KDE desktop environment for Unix, and
-   only makes sense to use if KDE is running.  Some way of reliably detecting KDE
-   would be nice; the :envvar:`!KDEDIR` variable is not sufficient.  Note also that
-   the name "kfm" is used even when using the :program:`konqueror` command with KDE
-   2 --- the implementation selects the best strategy for running Konqueror.
+   "Konqueror" là trình quản lý tệp cho môi trường desktop KDE trên Unix và chỉ có ý nghĩa khi KDE đang chạy. Sẽ rất hữu ích nếu có cách phát hiện KDE đáng tin cậy; biến :envvar:`!KDEDIR` là chưa đủ. Cũng lưu ý rằng tên "kfm" vẫn được sử dụng ngay cả khi dùng lệnh :program:`konqueror` với KDE 2 --- phần triển khai sẽ chọn chiến lược tốt nhất để chạy Konqueror.
 
 (2)
-   Only on Windows platforms.
+   Chỉ trên các nền tảng Windows.
 
 (3)
-   Only on macOS.
+   Chỉ trên macOS.
 
 (4)
-   Only on iOS.
+   Chỉ trên iOS.
 
 .. versionadded:: 3.2
-   A new :class:`!MacOSXOSAScript` class has been added
-   and is used on Mac instead of the previous :class:`!MacOSX` class.
-   This adds support for opening browsers not currently set as the OS default.
+   Một lớp :class:`!MacOSXOSAScript` mới đã được thêm vào và được sử dụng trên Mac thay cho lớp :class:`!MacOSX` trước đây. Lớp này hỗ trợ mở các trình duyệt hiện không được đặt làm trình duyệt mặc định của hệ điều hành.
 
 .. versionadded:: 3.3
-   Support for Chrome/Chromium has been added.
+   Đã thêm hỗ trợ cho Chrome/Chromium.
 
 .. versionchanged:: 3.12
-   Support for several obsolete browsers has been removed.
-   Removed browsers include Grail, Mosaic, Netscape, Galeon,
-   Skipstone, Iceape, and Firefox versions 35 and below.
+   Đã loại bỏ hỗ trợ cho một số trình duyệt lỗi thời. Các trình duyệt bị loại bỏ gồm Grail, Mosaic, Netscape, Galeon, Skipstone, Iceape và Firefox phiên bản 35 trở xuống.
 
 .. versionchanged:: 3.13
-   Support for iOS has been added.
+   Đã thêm hỗ trợ cho iOS.
 
-Here are some simple examples::
+Sau đây là một số ví dụ đơn giản::
 
    url = 'https://docs.python.org/'
 
-   # Open URL in a new tab, if a browser window is already open.
+   # Mở URL trong tab mới nếu cửa sổ trình duyệt đã mở.
    webbrowser.open_new_tab(url)
 
-   # Open URL in new window, raising the window if possible.
+   # Mở URL trong cửa sổ mới, đưa cửa sổ lên phía trước nếu có thể.
    webbrowser.open_new(url)
 
 
 .. _browser-controllers:
 
-Browser controller objects
---------------------------
+Đối tượng điều khiển trình duyệt
+--------------------------------
 
-Browser controllers provide the :attr:`~controller.name` attribute,
-and the following three methods which parallel module-level convenience functions:
+Các bộ điều khiển trình duyệt cung cấp thuộc tính :attr:`~controller.name` và ba phương thức sau, tương ứng với các hàm tiện ích cấp mô-đun:
 
 
 .. attribute:: controller.name
 
-   System-dependent name for the browser.
+   Tên phụ thuộc vào hệ thống của trình duyệt.
 
 
 .. method:: controller.open(url, new=0, autoraise=True)
 
-   Display *url* using the browser handled by this controller. If *new* is 1, a new
-   browser window is opened if possible. If *new* is 2, a new browser page ("tab")
-   is opened if possible.
+   Hiển thị *url* bằng trình duyệt do bộ điều khiển này quản lý. Nếu *new* là 1, một cửa sổ trình duyệt mới sẽ được mở nếu có thể. Nếu *new* là 2, một trang trình duyệt mới ("tab") sẽ được mở nếu có thể.
 
 
 .. method:: controller.open_new(url)
 
-   Open *url* in a new window of the browser handled by this controller, if
-   possible, otherwise, open *url* in the only browser window.  Alias
+   Mở *url* trong cửa sổ mới của trình duyệt do bộ điều khiển này quản lý nếu có thể; nếu không, mở *url* trong cửa sổ trình duyệt duy nhất. Bí danh
    :func:`open_new`.
 
 
 .. method:: controller.open_new_tab(url)
 
-   Open *url* in a new page ("tab") of the browser handled by this controller, if
-   possible, otherwise equivalent to :func:`open_new`.
+   Mở *url* trong trang mới ("tab") của trình duyệt do bộ điều khiển này quản lý nếu có thể; nếu không, tương đương với :func:`open_new`.
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [1] Executables named here without a full path will be searched in the
-       directories given in the :envvar:`PATH` environment variable.
+.. [1] Các tệp thực thi được nêu ở đây mà không có đường dẫn đầy đủ sẽ được tìm kiếm trong các thư mục được chỉ định trong biến môi trường :envvar:`PATH`.

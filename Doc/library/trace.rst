@@ -1,224 +1,182 @@
-:mod:`!trace` --- Trace or track Python statement execution
-===========================================================
+:mod:`!trace` --- Theo dõi hoặc truy vết quá trình thực thi câu lệnh Python
+===========================================================================
 
 .. module:: trace
-   :synopsis: Trace or track Python statement execution.
+   :synopsis: Theo dõi hoặc truy vết quá trình thực thi câu lệnh Python.
 
-**Source code:** :source:`Lib/trace.py`
+**Mã nguồn:** :source:`Lib/trace.py`
 
 --------------
 
-The :mod:`!trace` module allows you to trace program execution, generate
-annotated statement coverage listings, print caller/callee relationships and
-list functions executed during a program run.  It can be used in another program
-or from the command line.
+Mô-đun :mod:`!trace` cho phép bạn truy vết quá trình thực thi chương trình, tạo các danh sách độ bao phủ câu lệnh có chú thích, in ra mối quan hệ giữa hàm gọi và hàm được gọi, cũng như liệt kê các hàm được thực thi trong một lần chạy chương trình. Bạn có thể sử dụng mô-đun này trong một chương trình khác hoặc từ dòng lệnh.
 
 .. seealso::
 
    `Coverage.py <https://coverage.readthedocs.io/>`_
-      A popular third-party coverage tool that provides HTML
-      output along with advanced features such as branch coverage.
+      Một công cụ đo độ bao phủ phổ biến của bên thứ ba, cung cấp đầu ra HTML cùng các tính năng nâng cao như độ bao phủ nhánh.
 
 .. _trace-cli:
 
-Command-Line Usage
-------------------
+Sử dụng dòng lệnh
+-----------------
 
-The :mod:`!trace` module can be invoked from the command line.  It can be as
-simple as ::
+Mô-đun :mod:`!trace` có thể được gọi từ dòng lệnh. Cách dùng có thể đơn giản như sau::
 
    python -m trace --count -C . somefile.py ...
 
-The above will execute :file:`somefile.py` and generate annotated listings of
-all Python modules imported during the execution into the current directory.
+Lệnh trên sẽ thực thi :file:`somefile.py` và tạo các danh sách có chú thích của tất cả mô-đun Python được import trong quá trình thực thi vào thư mục hiện tại.
 
 .. program:: trace
 
 .. option:: --help
 
-   Display usage and exit.
+   Hiển thị thông tin cách dùng rồi thoát.
 
 .. option:: --version
 
-   Display the version of the module and exit.
+   Hiển thị phiên bản của mô-đun rồi thoát.
 
 .. versionadded:: 3.8
-    Added ``--module`` option that allows running an executable module.
+    Đã thêm tùy chọn ``--module`` cho phép chạy một mô-đun thực thi.
 
-Main options
-^^^^^^^^^^^^
+Các tùy chọn chính
+^^^^^^^^^^^^^^^^^^
 
-At least one of the following options must be specified when invoking
-:mod:`!trace`.  The :option:`--listfuncs <-l>` option is mutually exclusive with
-the :option:`--trace <-t>` and :option:`--count <-c>` options. When
-:option:`--listfuncs <-l>` is provided, neither :option:`--count <-c>` nor
-:option:`--trace <-t>` are accepted, and vice versa.
+Phải chỉ định ít nhất một trong các tùy chọn sau khi gọi
+:mod:`!trace`. Tùy chọn :option:`--listfuncs <-l>` loại trừ lẫn nhau với các tùy chọn :option:`--trace <-t>` và :option:`--count <-c>`. Khi
+:option:`--listfuncs <-l>` được cung cấp, cả :option:`--count <-c>` lẫn
+:option:`--trace <-t>` đều không được chấp nhận, và ngược lại.
 
 .. program:: trace
 
 .. option:: -c, --count
 
-   Produce a set of annotated listing files upon program completion that shows
-   how many times each statement was executed.  See also
-   :option:`--coverdir <-C>`, :option:`--file <-f>` and
-   :option:`--no-report <-R>` below.
+   Tạo một tập hợp các tệp listing có chú thích sau khi chương trình hoàn tất, cho biết mỗi câu lệnh được thực thi bao nhiêu lần. Xem thêm
+   :option:`--coverdir <-C>`, :option:`--file <-f>` và
+   :option:`--no-report <-R>` bên dưới.
 
 .. option:: -t, --trace
 
-   Display lines as they are executed.
+   Hiển thị các dòng khi chúng được thực thi.
 
 .. option:: -l, --listfuncs
 
-   Display the functions executed by running the program.
+   Hiển thị các hàm được thực thi khi chạy chương trình.
 
 .. option:: -r, --report
 
-   Produce an annotated list from an earlier program run that used the
-   :option:`--count <-c>` and :option:`--file <-f>` option.  This does not
-   execute any code.
+   Tạo danh sách có chú thích từ một lần chạy chương trình trước đó có sử dụng tùy chọn
+   :option:`--count <-c>` và :option:`--file <-f>`. Thao tác này không thực thi bất kỳ mã nào.
 
 .. option:: -T, --trackcalls
 
-   Display the calling relationships exposed by running the program.
+   Hiển thị các mối quan hệ gọi được thể hiện khi chạy chương trình.
 
-Modifiers
-^^^^^^^^^
+Tùy chọn bổ trợ
+^^^^^^^^^^^^^^^
 
 .. program:: trace
 
 .. option:: -f, --file=<file>
 
-   Name of a file to accumulate counts over several tracing runs.  Should be
-   used with the :option:`--count <-c>` option.
+   Tên tệp dùng để cộng dồn số liệu qua nhiều lần tracing. Nên sử dụng cùng với tùy chọn :option:`--count <-c>`.
 
 .. option:: -C, --coverdir=<dir>
 
-   Directory where the report files go.  The coverage report for
-   ``package.module`` is written to file :file:`{dir}/{package}/{module}.cover`.
+   Thư mục lưu các tệp báo cáo. Báo cáo coverage cho ``package.module`` được ghi vào tệp :file:`{dir}/{package}/{module}.cover`.
 
 .. option:: -m, --missing
 
-   When generating annotated listings, mark lines which were not executed with
-   ``>>>>>>``.
+   Khi tạo các danh sách có chú thích, hãy đánh dấu những dòng chưa được thực thi bằng ``>>>>>>``.
 
 .. option:: -s, --summary
 
-   When using :option:`--count <-c>` or :option:`--report <-r>`, write a brief
-   summary to stdout for each file processed.
+   Khi sử dụng :option:`--count <-c>` hoặc :option:`--report <-r>`, hãy ghi một bản tóm tắt ngắn vào stdout cho mỗi tệp được xử lý.
 
 .. option:: -R, --no-report
 
-   Do not generate annotated listings.  This is useful if you intend to make
-   several runs with :option:`--count <-c>`, and then produce a single set of
-   annotated listings at the end.
+   Không tạo các danh sách có chú thích. Điều này hữu ích nếu bạn định chạy nhiều lần với :option:`--count <-c>`, rồi tạo một bộ danh sách có chú thích duy nhất ở cuối.
 
 .. option:: -g, --timing
 
-   Prefix each line with the time since the program started.  Only used while
-   tracing.
+   Thêm thời gian kể từ khi chương trình khởi động vào đầu mỗi dòng. Chỉ được sử dụng khi tracing.
 
-Filters
-^^^^^^^
+Bộ lọc
+^^^^^^
 
-These options may be repeated multiple times.
+Các tùy chọn này có thể được lặp lại nhiều lần.
 
 .. program:: trace
 
 .. option:: --ignore-module=<mod>
 
-   Ignore each of the given module names and its submodules (if it is a
-   package).  The argument can be a list of names separated by a comma.
+   Bỏ qua từng tên module được cung cấp và các module con của nó (nếu đó là một package). Đối số có thể là danh sách các tên được phân tách bằng dấu phẩy.
 
 .. option:: --ignore-dir=<dir>
 
-   Ignore all modules and packages in the named directory and subdirectories.
-   The argument can be a list of directories separated by :data:`os.pathsep`.
+   Bỏ qua tất cả các module và package trong thư mục được chỉ định và các thư mục con. Đối số này có thể là danh sách các thư mục được phân tách bằng :data:`os.pathsep`.
 
 .. _trace-api:
 
-Programmatic Interface
-----------------------
+Giao diện lập trình
+-------------------
 
 .. class:: Trace(count=1, trace=1, countfuncs=0, countcallers=0, ignoremods=(),\
                  ignoredirs=(), infile=None, outfile=None, timing=False)
 
-   Create an object to trace execution of a single statement or expression.  All
-   parameters are optional.  *count* enables counting of line numbers.  *trace*
-   enables line execution tracing.  *countfuncs* enables listing of the
-   functions called during the run.  *countcallers* enables call relationship
-   tracking.  *ignoremods* is a list of modules or packages to ignore.
-   *ignoredirs* is a list of directories whose modules or packages should be
-   ignored.  *infile* is the name of the file from which to read stored count
-   information.  *outfile* is the name of the file in which to write updated
-   count information.  *timing* enables a timestamp relative to when tracing was
-   started to be displayed.
+   Tạo một đối tượng để trace việc thực thi một câu lệnh hoặc biểu thức. Tất cả tham số đều là tùy chọn. *count* bật chức năng đếm số dòng. *trace* bật chức năng trace việc thực thi từng dòng. *countfuncs* bật chức năng liệt kê các hàm được gọi trong quá trình chạy. *countcallers* bật chức năng theo dõi quan hệ gọi. *ignoremods* là danh sách các module hoặc package cần bỏ qua. *ignoredirs* là danh sách các thư mục có module hoặc package cần được bỏ qua. *infile* là tên tệp dùng để đọc thông tin đếm đã lưu. *outfile* là tên tệp dùng để ghi thông tin đếm đã cập nhật. *timing* bật hiển thị dấu thời gian tính từ khi bắt đầu trace.
 
    .. method:: run(cmd)
 
-      Execute the command and gather statistics from the execution with
-      the current tracing parameters.  *cmd* must be a string or code object,
-      suitable for passing into :func:`exec`.
+      Thực thi lệnh và thu thập số liệu thống kê từ quá trình thực thi bằng các tham số trace hiện tại. *cmd* phải là một chuỗi hoặc đối tượng mã, phù hợp để truyền vào :func:`exec`.
 
    .. method:: runctx(cmd, globals=None, locals=None)
 
-      Execute the command and gather statistics from the execution with the
-      current tracing parameters, in the defined global and local
-      environments.  If not defined, *globals* and *locals* default to empty
-      dictionaries.
+      Thực thi lệnh và thu thập số liệu thống kê từ quá trình thực thi bằng các tham số trace hiện tại, trong các môi trường global và local đã xác định. Nếu chưa được xác định, *globals* và *locals* mặc định là các dictionary rỗng.
 
    .. method:: runfunc(func, /, *args, **kwds)
 
-      Call *func* with the given arguments under control of the :class:`Trace`
-      object with the current tracing parameters.
+      Gọi *func* với các đối số đã cho dưới sự điều khiển của đối tượng :class:`Trace`, bằng các tham số trace hiện tại.
 
    .. method:: results()
 
-      Return a :class:`CoverageResults` object that contains the cumulative
-      results of all previous calls to ``run``, ``runctx`` and ``runfunc``
-      for the given :class:`Trace` instance.  Does not reset the accumulated
-      trace results.
+      Trả về một đối tượng :class:`CoverageResults` chứa kết quả tích lũy của tất cả các lần gọi trước đó tới ``run``, ``runctx`` và ``runfunc`` cho instance :class:`Trace` đã cho. Không đặt lại các kết quả trace đã tích lũy.
 
 .. class:: CoverageResults
 
-   A container for coverage results, created by :meth:`Trace.results`.  Should
-   not be created directly by the user.
+   Một vùng chứa cho các kết quả coverage, được tạo bởi :meth:`Trace.results`. Người dùng không nên trực tiếp tạo đối tượng này.
 
    .. method:: update(other)
 
-      Merge in data from another :class:`CoverageResults` object.
+      Gộp dữ liệu từ một đối tượng :class:`CoverageResults` khác.
 
    .. method:: write_results(show_missing=True, summary=False, coverdir=None,\
                              *, ignore_missing_files=False)
 
-      Write coverage results.  Set *show_missing* to show lines that had no
-      hits.  Set *summary* to include in the output the coverage summary per
-      module.  *coverdir* specifies the directory into which the coverage
-      result files will be output.  If ``None``, the results for each source
-      file are placed in its directory.
+      Ghi các kết quả coverage. Đặt *show_missing* để hiển thị các dòng không có lượt thực thi. Đặt *summary* để đưa bản tóm tắt coverage theo từng module vào đầu ra. *coverdir* chỉ định thư mục mà các tệp kết quả coverage sẽ được xuất vào. Nếu ``None``, kết quả của mỗi tệp nguồn sẽ được đặt trong thư mục của tệp đó.
 
-      If *ignore_missing_files* is ``True``, coverage counts for files that no
-      longer exist are silently ignored. Otherwise, a missing file will
-      raise a :exc:`FileNotFoundError`.
+      Nếu *ignore_missing_files* là ``True``, các số liệu coverage của những tệp không còn tồn tại sẽ được âm thầm bỏ qua. Nếu không, một tệp bị thiếu sẽ gây ra :exc:`FileNotFoundError`.
 
       .. versionchanged:: 3.13
-         Added *ignore_missing_files* parameter.
+         Đã thêm tham số *ignore_missing_files*.
 
-A simple example demonstrating the use of the programmatic interface::
+Một ví dụ đơn giản minh họa cách sử dụng giao diện lập trình::
 
    import sys
    import trace
 
-   # create a Trace object, telling it what to ignore, and whether to
-   # do tracing or line-counting or both.
+   # tạo một đối tượng Trace, cho biết những gì cần bỏ qua và có thực hiện
+   # tracing hoặc đếm dòng, hay thực hiện cả hai hay không.
    tracer = trace.Trace(
        ignoredirs=[sys.prefix, sys.exec_prefix],
        trace=0,
        count=1)
 
-   # run the new command using the given tracer
+   # chạy lệnh mới bằng tracer đã cho
    tracer.run('main()')
 
-   # make a report, placing output in the current directory
+   # tạo báo cáo, đặt đầu ra trong thư mục hiện tại
    r = tracer.results()
    r.write_results(show_missing=True, coverdir=".")
 
+.. _`Coverage.py`: https://coverage.readthedocs.io/

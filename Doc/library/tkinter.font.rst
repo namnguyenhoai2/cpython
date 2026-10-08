@@ -1,122 +1,96 @@
-:mod:`!tkinter.font` --- Tkinter font wrapper
-=============================================
+:mod:`!tkinter.font` --- Trình bao font Tkinter
+===============================================
 
 .. module:: tkinter.font
-   :synopsis: Tkinter font-wrapping class
+   :synopsis: Lớp trình bao font Tkinter
 
-**Source code:** :source:`Lib/tkinter/font.py`
+**Mã nguồn:** :source:`Lib/tkinter/font.py`
 
 --------------
 
-The :mod:`!tkinter.font` module provides the :class:`Font` class for creating
-and using named fonts.
+Mô-đun :mod:`!tkinter.font` cung cấp lớp :class:`Font` để tạo và sử dụng các font có tên.
 
-The different font weights and slants are:
+Các độ đậm và kiểu nghiêng khác nhau của font là:
 
 .. data:: NORMAL
-          BOLD
-          ITALIC
-          ROMAN
+          ĐẬM NGHIÊNG THƯỜNG
 
 .. class:: Font(root=None, font=None, name=None, exists=False, **options)
 
-   The :class:`Font` class represents a named font. *Font* instances are given
-   unique names and can be specified by their family, size, and style
-   configuration. Named fonts are Tk's method of creating and identifying
-   fonts as a single object, rather than specifying a font by its attributes
-   with each occurrence.
+   Lớp :class:`Font` đại diện cho một font có tên. Các thực thể *Font* được cấp tên duy nhất và có thể được chỉ định bằng họ font, kích thước và cấu hình kiểu. Font có tên là cách Tk tạo và nhận diện font như một đối tượng duy nhất, thay vì chỉ định font bằng các thuộc tính của nó trong mỗi lần xuất hiện.
 
    .. versionchanged:: 3.10
-      Two fonts now compare equal (``==``) only when both are :class:`Font`
-      instances with the same name belonging to the same Tcl interpreter.
+      Hai font hiện chỉ được xem là bằng nhau (``==``) khi cả hai đều là các instance :class:`Font` có cùng tên và thuộc cùng một trình thông dịch Tcl.
 
-    arguments:
+    đối số:
 
-       | *font* - font specifier tuple (family, size, options)
-       | *name* - unique font name
-       | *exists* - self points to existing named font if true
+       | *font* - tuple chỉ định font (họ font, kích thước, các tùy chọn)
+       | *name* - tên font duy nhất
+       | *exists* - self trỏ đến font có tên hiện có nếu giá trị là true
 
-    additional keyword options (ignored if *font* is specified):
+    các tùy chọn từ khóa bổ sung (bị bỏ qua nếu đã chỉ định *font*):
 
-       | *family* - font family, for example, Courier, Times
-       | *size* - font size
-       |     If *size* is positive it is interpreted as size in points.
-       |     If *size* is a negative number its absolute value is treated
-       |     as size in pixels.
-       | *weight* - font emphasis (NORMAL, BOLD)
+       | *family* - họ font, ví dụ: Courier, Times
+       | *size* - cỡ phông chữ
+       | Nếu *size* là số dương, nó được hiểu là kích thước theo point.
+       | Nếu *size* là số âm, giá trị tuyệt đối của nó được xem là
+       | kích thước theo pixel.
+       | *weight* - độ nhấn mạnh của phông chữ (NORMAL, BOLD)
        | *slant* - ROMAN, ITALIC
-       | *underline* - font underlining (0 - none, 1 - underline)
-       | *overstrike* - font strikeout (0 - none, 1 - strikeout)
+       | *underline* - gạch chân phông chữ (0 - không có, 1 - gạch chân)
+       | *overstrike* - phông chữ gạch ngang (0 - không có, 1 - gạch ngang)
 
    .. method:: actual(option=None, displayof=None)
 
-      Return the actual attributes of the font, which may differ from the
-      requested ones because of platform limitations.
-      With no *option*, return a dictionary of all the attributes; if *option*
-      is given, return the value of that single attribute.
-      The attributes are resolved on the display of the *displayof* widget,
-      or the main application window if it is not specified.
+      Trả về các thuộc tính thực tế của font, có thể khác với các thuộc tính được yêu cầu do những hạn chế của nền tảng. Nếu không có *option*, trả về một dictionary chứa tất cả các thuộc tính; nếu cung cấp *option*, trả về giá trị của riêng thuộc tính đó. Các thuộc tính được xác định theo display của widget *displayof*, hoặc cửa sổ ứng dụng chính nếu không được chỉ định.
 
    .. method:: cget(option)
 
-      Retrieve an attribute of the font.
+      Lấy một thuộc tính của font.
 
    .. method:: config(**options)
       :no-typesetting:
 
    .. method:: configure(**options)
 
-      Modify one or more attributes of the font.
-      With no arguments, return a dictionary of the current attributes.
+      Sửa đổi một hoặc nhiều thuộc tính của font. Nếu không có đối số, trả về một dictionary chứa các thuộc tính hiện tại.
 
-      :meth:`config` is an alias of :meth:`!configure`.
+      :meth:`config` là bí danh của :meth:`!configure`.
 
    .. method:: copy()
 
-      Return a distinct copy of the current font:
-      a new named font with the same attributes but a different name,
-      which can be reconfigured independently of the original.
-      If the current font wraps a font description,
-      the copy is instead a named font with its resolved attributes.
+      Trả về một bản sao riêng biệt của font hiện tại: một font có tên mới với cùng các thuộc tính nhưng tên khác, có thể được cấu hình độc lập với font ban đầu. Nếu font hiện tại bao bọc một mô tả font, bản sao sẽ thay vào đó là một font có tên với các thuộc tính đã được phân giải.
 
    .. method:: measure(text, displayof=None)
 
-      Return amount of space the text would occupy on the specified display
-      when formatted in the current font, as an integer number of pixels.
-      If no display is specified then the main application window is assumed.
+      Trả về lượng không gian mà văn bản sẽ chiếm trên display được chỉ định khi được định dạng bằng font hiện tại, dưới dạng một số nguyên pixel. Nếu không chỉ định display thì giả định sử dụng cửa sổ ứng dụng chính.
 
    .. method:: metrics(*options, **kw)
 
-      Return font-specific data.
-      With no options, return a dictionary mapping each metric name to its
-      integer value; if one option name is given, return that metric's value as
-      an integer.
-      Options include:
+      Trả về dữ liệu riêng của font. Khi không có tùy chọn, trả về một dictionary ánh xạ từng tên metric với giá trị số nguyên tương ứng; nếu cung cấp một tên tùy chọn, trả về giá trị của metric đó dưới dạng số nguyên. Các tùy chọn gồm:
 
-      *ascent* - distance between baseline and highest point that a
-         character of the font can occupy
+      *ascent* - khoảng cách giữa đường cơ sở và điểm cao nhất mà một
+         ký tự của font có thể chiếm giữ
 
-      *descent* - distance between baseline and lowest point that a
-         character of the font can occupy
+      *descent* - khoảng cách giữa đường cơ sở và điểm thấp nhất mà một
+         ký tự của font có thể chiếm giữ
 
-      *linespace* - minimum vertical separation necessary between any two
-         characters of the font that ensures no vertical overlap between lines.
+      *linespace* - khoảng cách dọc tối thiểu cần thiết giữa bất kỳ hai
+         ký tự nào của font để đảm bảo các dòng không bị chồng lấn theo chiều dọc.
 
-      *fixed* - 1 if font is fixed-width else 0
+      *fixed* - 1 nếu font có độ rộng cố định, ngược lại là 0
 
 .. function:: families(root=None, displayof=None)
 
-   Return a tuple of the names of the available font families.
+   Trả về một tuple chứa tên của các font family hiện có.
 
 .. function:: names(root=None)
 
-   Return a tuple of the names of all the defined fonts.
+   Trả về một tuple chứa tên của tất cả các font đã được định nghĩa.
 
 .. function:: nametofont(name, root=None)
 
-   Return a :class:`Font` representation of the existing named font *name*.
-   *root* is the widget whose Tcl interpreter owns the font; if omitted, the
-   default root window is used.
+   Trả về biểu diễn :class:`Font` của font có tên hiện có *name*. *root* là widget có Tcl interpreter sở hữu font; nếu bị bỏ qua, cửa sổ root mặc định sẽ được sử dụng.
 
    .. versionchanged:: 3.10
-      The *root* parameter was added.
+      Tham số *root* đã được thêm vào.

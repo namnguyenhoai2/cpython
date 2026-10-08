@@ -1,232 +1,147 @@
-:mod:`!xmlrpc.client` --- XML-RPC client access
-===============================================
+:mod:`!xmlrpc.client` --- Truy cập client XML-RPC
+=================================================
 
 .. module:: xmlrpc.client
-   :synopsis: XML-RPC client access.
+   :synopsis: Truy cập client XML-RPC.
 
 .. moduleauthor:: Fredrik Lundh <fredrik@pythonware.com>
 .. sectionauthor:: Eric S. Raymond <esr@snark.thyrsus.com>
 
-**Source code:** :source:`Lib/xmlrpc/client.py`
+**Mã nguồn:** :source:`Lib/xmlrpc/client.py`
 
 .. XXX Not everything is documented yet.  It might be good to describe
    Marshaller, Unmarshaller, getparser and Transport.
 
 --------------
 
-XML-RPC is a Remote Procedure Call method that uses XML passed via HTTP(S) as a
-transport.  With it, a client can call methods with parameters on a remote
-server (the server is named by a URI) and get back structured data.  This module
-supports writing XML-RPC client code; it handles all the details of translating
-between conformable Python objects and XML on the wire.
+XML-RPC là một phương thức Remote Procedure Call sử dụng XML được truyền qua HTTP(S) làm phương tiện truyền tải. Với phương thức này, client có thể gọi các phương thức kèm tham số trên một máy chủ từ xa (máy chủ được xác định bằng một URI) và nhận lại dữ liệu có cấu trúc. Mô-đun này hỗ trợ viết mã client XML-RPC; mô-đun xử lý mọi chi tiết của việc chuyển đổi giữa các đối tượng Python tương thích và XML trên đường truyền.
 
 
 .. warning::
 
-   The :mod:`!xmlrpc.client` module is not secure against maliciously
-   constructed data.  If you need to parse untrusted or unauthenticated data,
-   see :ref:`xml-security`.
+   Mô-đun :mod:`!xmlrpc.client` không an toàn trước dữ liệu được tạo nhằm mục đích xấu. Nếu bạn cần phân tích dữ liệu không đáng tin cậy hoặc chưa được xác thực, hãy xem :ref:`xml-security`.
 
 .. versionchanged:: 3.5
 
-   For HTTPS URIs, :mod:`!xmlrpc.client` now performs all the necessary
-   certificate and hostname checks by default.
+   Đối với các URI HTTPS, :mod:`!xmlrpc.client` hiện thực hiện tất cả các bước kiểm tra chứng chỉ và hostname cần thiết theo mặc định.
 
 .. include:: ../includes/wasm-notavail.rst
 
 .. class:: ServerProxy(uri, transport=None, encoding=None, verbose=False, \
-                       allow_none=False, use_datetime=False, \
-                       use_builtin_types=False, *, headers=(), context=None)
+                       allow_none=False, use_datetime=False, \ use_builtin_types=False, *, headers=(), context=None)
 
-   A :class:`ServerProxy` instance is an object that manages communication with a
-   remote XML-RPC server.  The required first argument is a URI (Uniform Resource
-   Indicator), and will normally be the URL of the server.  The optional second
-   argument is a transport factory instance; by default it is an internal
-   :class:`SafeTransport` instance for https: URLs and an internal HTTP
-   :class:`Transport` instance otherwise.  The optional third argument is an
-   encoding, by default UTF-8. The optional fourth argument is a debugging flag.
+   Một instance :class:`ServerProxy` là một đối tượng quản lý việc giao tiếp với máy chủ XML-RPC từ xa. Đối số đầu tiên bắt buộc là một URI (Uniform Resource Indicator), và thông thường sẽ là URL của máy chủ. Đối số thứ hai tùy chọn là một instance của transport factory; theo mặc định, đó là một đối tượng nội bộ
+   :class:`SafeTransport` cho các URL https: và một đối tượng HTTP nội bộ
+   :class:`Transport` trong các trường hợp khác. Đối số thứ ba tùy chọn là encoding, mặc định là UTF-8. Đối số thứ tư tùy chọn là một cờ debugging.
 
-   The following parameters govern the use of the returned proxy instance.
-   If *allow_none* is true,  the Python constant ``None`` will be translated into
-   XML; the default behaviour is for ``None`` to raise a :exc:`TypeError`. This is
-   a commonly used extension to the XML-RPC specification, but isn't supported by
-   all clients and servers; see `http://ontosys.com/xml-rpc/extensions.php
-   <https://web.archive.org/web/20130120074804/http://ontosys.com/xml-rpc/extensions.php>`_
-   for a description.
-   The *use_builtin_types* flag can be used to cause date/time values
-   to be presented as :class:`datetime.datetime` objects and binary data to be
-   presented as :class:`bytes` objects; this flag is false by default.
-   :class:`datetime.datetime`, :class:`bytes` and :class:`bytearray` objects
-   may be passed to calls.
-   The *headers* parameter is an optional sequence of HTTP headers to send with
-   each request, expressed as a sequence of 2-tuples representing the header
-   name and value. (e.g. ``[('Header-Name', 'value')]``).
-   If an HTTPS URL is provided, *context* may be :class:`ssl.SSLContext`
-   and configures the SSL settings of the underlying HTTPS connection.
-   The obsolete *use_datetime* flag is similar to *use_builtin_types* but it
-   applies only to date/time values.
+   Các tham số sau đây chi phối việc sử dụng instance proxy được trả về. Nếu *allow_none* là true, hằng số Python ``None`` sẽ được chuyển thành XML; hành vi mặc định là ``None`` sẽ raise một :exc:`TypeError`. Đây là một phần mở rộng thường được sử dụng của đặc tả XML-RPC, nhưng không được tất cả client và server hỗ trợ; xem `http://ontosys.com/xml-rpc/extensions.php <https://web.archive.org/web/20130120074804/http://ontosys.com/xml-rpc/extensions.php>`_ để biết mô tả. Cờ *use_builtin_types* có thể được dùng để khiến các giá trị ngày/giờ được biểu diễn dưới dạng đối tượng :class:`datetime.datetime` và dữ liệu nhị phân được biểu diễn dưới dạng đối tượng :class:`bytes`; theo mặc định, cờ này là false.
+   Các đối tượng :class:`datetime.datetime`, :class:`bytes` và :class:`bytearray` có thể được truyền vào các lệnh gọi. Tham số *headers* là một dãy tùy chọn các header HTTP sẽ được gửi cùng mỗi request, được biểu diễn dưới dạng một dãy các bộ 2-tuple đại diện cho tên và giá trị của header. (ví dụ: ``[('Header-Name', 'value')]``). Nếu cung cấp URL HTTPS, *context* có thể là :class:`ssl.SSLContext` và cấu hình các thiết lập SSL của kết nối HTTPS bên dưới. Cờ lỗi thời *use_datetime* tương tự như *use_builtin_types* nhưng chỉ áp dụng cho các giá trị ngày/giờ.
 
    .. versionchanged:: 3.3
-      The *use_builtin_types* flag was added.
+      Cờ *use_builtin_types* đã được thêm.
 
    .. versionchanged:: 3.8
-      The *headers* parameter was added.
+      Tham số *headers* đã được thêm.
 
-   Both the HTTP and HTTPS transports support the URL syntax extension for HTTP
-   Basic Authentication: ``http://user:pass@host:port/path``.  The  ``user:pass``
-   portion will be base64-encoded as an HTTP 'Authorization' header, and sent to
-   the remote server as part of the connection process when invoking an XML-RPC
-   method.  You only need to use this if the remote server requires a Basic
-   Authentication user and password.
+   Cả transport HTTP và HTTPS đều hỗ trợ phần mở rộng cú pháp URL cho Basic Authentication của HTTP: ``http://user:pass@host:port/path``. Phần ``user:pass`` sẽ được mã hóa bằng base64 dưới dạng header HTTP 'Authorization' và được gửi đến máy chủ từ xa như một phần của quá trình kết nối khi gọi một phương thức XML-RPC. Bạn chỉ cần sử dụng tính năng này nếu máy chủ từ xa yêu cầu tên người dùng và mật khẩu để Basic Authentication.
 
-   The returned instance is a proxy object with methods that can be used to invoke
-   corresponding RPC calls on the remote server.  If the remote server supports the
-   introspection API, the proxy can also be used to query the remote server for the
-   methods it supports (service discovery) and fetch other server-associated
-   metadata.
+   Instance được trả về là một proxy object có các phương thức có thể được dùng để gọi các RPC tương ứng trên máy chủ từ xa. Nếu máy chủ từ xa hỗ trợ introspection API, proxy cũng có thể được dùng để truy vấn máy chủ từ xa về các phương thức mà máy chủ hỗ trợ (service discovery) và lấy các metadata khác liên kết với máy chủ.
 
-   Types that are conformable (e.g. that can be marshalled through XML),
-   include the following (and except where noted, they are unmarshalled
-   as the same Python type):
+   Các kiểu dữ liệu tương thích (ví dụ: có thể được marshal qua XML) bao gồm những kiểu sau (trừ khi có ghi chú khác, chúng sẽ được unmarshal thành cùng kiểu Python):
 
    .. tabularcolumns:: |l|L|
 
-   +----------------------+-------------------------------------------------------+
-   | XML-RPC type         | Python type                                           |
-   +======================+=======================================================+
-   | ``boolean``          | :class:`bool`                                         |
-   +----------------------+-------------------------------------------------------+
-   | ``int``, ``i1``,     | :class:`int` in range from -2147483648 to 2147483647. |
-   | ``i2``,  ``i4``,     | Values get the ``<int>`` tag.                         |
-   | ``i8`` or            |                                                       |
-   | ``biginteger``       |                                                       |
-   +----------------------+-------------------------------------------------------+
-   | ``double`` or        | :class:`float`.  Values get the ``<double>`` tag.     |
-   | ``float``            |                                                       |
-   +----------------------+-------------------------------------------------------+
-   | ``string``           | :class:`str`                                          |
-   +----------------------+-------------------------------------------------------+
-   | ``array``            | :class:`list` or :class:`tuple` containing            |
-   |                      | conformable elements.  Arrays are returned as         |
-   |                      | :class:`lists <list>`.                                |
-   +----------------------+-------------------------------------------------------+
-   | ``struct``           | :class:`dict`.  Keys must be strings, values may be   |
-   |                      | any conformable type.  Objects of user-defined        |
-   |                      | classes can be passed in; only their                  |
-   |                      | :attr:`~object.__dict__` attribute is transmitted.    |
-   +----------------------+-------------------------------------------------------+
-   | ``dateTime.iso8601`` | :class:`DateTime` or :class:`datetime.datetime`.      |
-   |                      | Returned type depends on values of                    |
-   |                      | *use_builtin_types* and *use_datetime* flags.         |
-   +----------------------+-------------------------------------------------------+
-   | ``base64``           | :class:`Binary`, :class:`bytes` or                    |
-   |                      | :class:`bytearray`.  Returned type depends on the     |
-   |                      | value of the *use_builtin_types* flag.                |
-   +----------------------+-------------------------------------------------------+
-   | ``nil``              | The ``None`` constant.  Passing is allowed only if    |
-   |                      | *allow_none* is true.                                 |
-   +----------------------+-------------------------------------------------------+
-   | ``bigdecimal``       | :class:`decimal.Decimal`.  Returned type only.        |
-   +----------------------+-------------------------------------------------------+
+   +-------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | Kiểu XML-RPC                                                | Kiểu Python                                                                                                                                                  |
+   +=============================================================+==============================================================================================================================================================+
+   | ``boolean``                                                 | :class:`bool`                                                                                                                                                |
+   +-------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``int``, ``i1``, ``i2``, ``i4``, ``i8`` hoặc ``biginteger`` | :class:`int` trong phạm vi từ -2147483648 đến 2147483647. Các giá trị nhận thẻ ``<int>``.                                                                    |
+   +-------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``double`` hoặc ``float``                                   | :class:`float`. Giá trị được gắn thẻ ``<double>``.                                                                                                           |
+   +-------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``string``                                                  | :class:`str`                                                                                                                                                 |
+   +-------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``array``                                                   | :class:`list` hoặc :class:`tuple` chứa các phần tử tương thích. Các mảng được trả về dưới dạng                                                               |
+   |                                                             | :class:`lists <list>`.                                                                                                                                       |
+   +-------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``struct``                                                  | :class:`dict`. Khóa phải là chuỗi, còn giá trị có thể thuộc bất kỳ kiểu tương thích nào. Có thể truyền các đối tượng thuộc lớp do người dùng định nghĩa; chỉ |
+   |                                                             | :attr:`~object.__dict__` của chúng được truyền đi.                                                                                                           |
+   +-------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``dateTime.iso8601``                                        | :class:`DateTime` hoặc :class:`datetime.datetime`. Kiểu được trả về phụ thuộc vào giá trị của các cờ *use_builtin_types* và *use_datetime*.                  |
+   +-------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``base64``                                                  | :class:`Binary`, :class:`bytes` hoặc                                                                                                                         |
+   |                                                             | :class:`bytearray`. Kiểu trả về phụ thuộc vào cờ *use_builtin_types*.                                                                                        |
+   +-------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``nil``                                                     | Hằng số ``None``. Chỉ được phép truyền vào nếu *allow_none* là true.                                                                                         |
+   +-------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+
+   | ``bigdecimal``                                              | :class:`decimal.Decimal`. Chỉ có kiểu trả về.                                                                                                                |
+   +-------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-   This is the full set of data types supported by XML-RPC.  Method calls may also
-   raise a special :exc:`Fault` instance, used to signal XML-RPC server errors, or
-   :exc:`ProtocolError` used to signal an error in the HTTP/HTTPS transport layer.
-   Both :exc:`Fault` and :exc:`ProtocolError` derive from a base class called
-   :exc:`Error`.  Note that the xmlrpc client module currently does not marshal
-   instances of subclasses of built-in types.
+   Đây là toàn bộ các kiểu dữ liệu được XML-RPC hỗ trợ. Các lệnh gọi phương thức cũng có thể đưa ra một thể hiện :exc:`Fault` đặc biệt, được dùng để báo hiệu lỗi của máy chủ XML-RPC, hoặc
+   :exc:`ProtocolError` được dùng để báo hiệu lỗi trong tầng truyền tải HTTP/HTTPS. Cả :exc:`Fault` và :exc:`ProtocolError` đều kế thừa từ một lớp cơ sở có tên là
+   :exc:`Error`. Lưu ý rằng mô-đun xmlrpc client hiện không marshal các thể hiện của lớp con của các kiểu dựng sẵn.
 
-   When passing strings, characters special to XML such as ``<``, ``>``, and ``&``
-   will be automatically escaped.  However, it's the caller's responsibility to
-   ensure that the string is free of characters that aren't allowed in XML, such as
-   the control characters with ASCII values between 0 and 31 (except, of course,
-   tab, newline and carriage return); failing to do this will result in an XML-RPC
-   request that isn't well-formed XML.  If you have to pass arbitrary bytes
-   via XML-RPC, use :class:`bytes` or :class:`bytearray` classes or the
-   :class:`Binary` wrapper class described below.
+   Khi truyền chuỗi, các ký tự đặc biệt đối với XML như ``<``, ``>`` và ``&`` sẽ tự động được escape. Tuy nhiên, người gọi có trách nhiệm đảm bảo chuỗi không chứa các ký tự không được XML cho phép, chẳng hạn như các ký tự điều khiển có giá trị ASCII từ 0 đến 31 (tất nhiên, ngoại trừ tab, dòng mới và ký tự xuống dòng); nếu không, kết quả sẽ là một yêu cầu XML-RPC không phải là XML đúng định dạng. Nếu cần truyền các byte tùy ý qua XML-RPC, hãy sử dụng các lớp :class:`bytes` hoặc :class:`bytearray` hoặc
+   :class:`Binary` lớp wrapper được mô tả dưới đây.
 
-   :class:`Server` is retained as an alias for :class:`ServerProxy` for backwards
-   compatibility.  New code should use :class:`ServerProxy`.
+   :class:`Server` được giữ lại làm bí danh cho :class:`ServerProxy` để tương thích ngược. Mã mới nên sử dụng :class:`ServerProxy`.
 
    .. versionchanged:: 3.5
-      Added the *context* argument.
+      Đã bổ sung đối số *context*.
 
    .. versionchanged:: 3.6
-      Added support of type tags with prefixes (e.g. ``ex:nil``).
-      Added support of unmarshalling additional types used by Apache XML-RPC
-      implementation for numerics: ``i1``, ``i2``, ``i8``, ``biginteger``,
-      ``float`` and ``bigdecimal``.
-      See https://ws.apache.org/xmlrpc/types.html for a description.
+      Đã bổ sung hỗ trợ các thẻ kiểu có tiền tố (ví dụ: ``ex:nil``). Đã bổ sung hỗ trợ giải mã các kiểu bổ sung được triển khai Apache XML-RPC sử dụng cho các giá trị số: ``i1``, ``i2``, ``i8``, ``biginteger``, ``float`` và ``bigdecimal``. Xem https://ws.apache.org/xmlrpc/types.html để biết mô tả.
 
 
 .. seealso::
 
    `XML-RPC HOWTO <https://tldp.org/HOWTO/XML-RPC-HOWTO/index.html>`_
-      A good description of XML-RPC operation and client software in several languages.
-      Contains pretty much everything an XML-RPC client developer needs to know.
+      Mô tả hữu ích về hoạt động của XML-RPC và phần mềm client bằng một số ngôn ngữ. Tài liệu này chứa gần như mọi thông tin mà nhà phát triển client XML-RPC cần biết.
 
    `XML-RPC Introspection <https://xmlrpc-c.sourceforge.io/introspection.html>`_
-      Describes the XML-RPC protocol extension for introspection.
+      Mô tả phần mở rộng giao thức XML-RPC để introspection.
 
-   `XML-RPC Specification <http://xmlrpc.scripting.com/spec.html>`_
-      The official specification.
+   `Đặc tả XML-RPC <http://xmlrpc.scripting.com/spec.html>`_
+      Đặc tả chính thức.
 
 .. _serverproxy-objects:
 
-ServerProxy Objects
--------------------
+Các đối tượng ServerProxy
+-------------------------
 
-A :class:`ServerProxy` instance has a method corresponding to each remote
-procedure call accepted by the XML-RPC server.  Calling the method performs an
-RPC, dispatched by both name and argument signature (e.g. the same method name
-can be overloaded with multiple argument signatures).  The RPC finishes by
-returning a value, which may be either returned data in a conformant type or a
-:class:`Fault` or :class:`ProtocolError` object indicating an error.
+Một instance :class:`ServerProxy` có một phương thức tương ứng với mỗi lệnh gọi thủ tục từ xa được máy chủ XML-RPC chấp nhận. Việc gọi phương thức sẽ thực hiện một RPC, được phân phối dựa trên cả tên và chữ ký tham số (ví dụ: cùng một tên phương thức có thể được nạp chồng với nhiều chữ ký tham số). RPC kết thúc bằng cách trả về một giá trị, có thể là dữ liệu được trả về thuộc một kiểu phù hợp hoặc một
+đối tượng :class:`Fault` hoặc :class:`ProtocolError` cho biết đã xảy ra lỗi.
 
-Servers that support the XML introspection API support some common methods
-grouped under the reserved :attr:`~ServerProxy.system` attribute:
+Các máy chủ hỗ trợ API introspection của XML sẽ hỗ trợ một số phương thức phổ biến được nhóm dưới thuộc tính dành riêng :attr:`~ServerProxy.system`:
 
 
 .. method:: ServerProxy.system.listMethods()
 
-   This method returns a list of strings, one for each (non-system) method
-   supported by the XML-RPC server.
+   Phương thức này trả về một danh sách chuỗi, mỗi chuỗi tương ứng với một phương thức (không thuộc hệ thống) được máy chủ XML-RPC hỗ trợ.
 
 
 .. method:: ServerProxy.system.methodSignature(name)
 
-   This method takes one parameter, the name of a method implemented by the XML-RPC
-   server. It returns an array of possible signatures for this method. A signature
-   is an array of types. The first of these types is the return type of the method,
-   the rest are parameters.
+   Phương thức này nhận một tham số là tên của một phương thức được máy chủ XML-RPC triển khai. Phương thức trả về một mảng gồm các signature khả dĩ của phương thức này. Một signature là một mảng các kiểu. Kiểu đầu tiên là kiểu trả về của phương thức, các kiểu còn lại là các tham số.
 
-   Because multiple signatures (ie. overloading) is permitted, this method returns
-   a list of signatures rather than a singleton.
+   Vì cho phép có nhiều signature (tức là overloading), phương thức này trả về một danh sách các signature thay vì một giá trị đơn.
 
-   Signatures themselves are restricted to the top level parameters expected by a
-   method. For instance if a method expects one array of structs as a parameter,
-   and it returns a string, its signature is simply "string, array". If it expects
-   three integers and returns a string, its signature is "string, int, int, int".
+   Bản thân các signature chỉ giới hạn ở những tham số cấp cao nhất mà một phương thức yêu cầu. Ví dụ, nếu một phương thức yêu cầu một mảng các struct làm tham số và trả về một chuỗi, signature của nó đơn giản là "string, array". Nếu phương thức yêu cầu ba số nguyên và trả về một chuỗi, signature của nó là "string, int, int, int".
 
-   If no signature is defined for the method, a non-array value is returned. In
-   Python this means that the type of the returned  value will be something other
-   than list.
+   Nếu không có signature nào được định nghĩa cho phương thức, một giá trị không phải mảng sẽ được trả về. Trong Python, điều này có nghĩa là kiểu của giá trị được trả về sẽ khác với list.
 
 
 .. method:: ServerProxy.system.methodHelp(name)
 
-   This method takes one parameter, the name of a method implemented by the XML-RPC
-   server.  It returns a documentation string describing the use of that method. If
-   no such string is available, an empty string is returned. The documentation
-   string may contain HTML markup.
+   Phương thức này nhận một tham số là tên của một phương thức được máy chủ XML-RPC triển khai. Phương thức trả về một chuỗi tài liệu mô tả cách sử dụng phương thức đó. Nếu không có chuỗi như vậy, một chuỗi rỗng sẽ được trả về. Chuỗi tài liệu có thể chứa markup HTML.
 
 .. versionchanged:: 3.5
 
-   Instances of :class:`ServerProxy` support the :term:`context manager` protocol
-   for closing the underlying transport.
+   Các thể hiện của :class:`ServerProxy` hỗ trợ giao thức :term:`context manager` để đóng transport bên dưới.
 
 
-A working example follows. The server code::
+Sau đây là một ví dụ hoạt động. Mã server::
 
    from xmlrpc.server import SimpleXMLRPCServer
 
@@ -238,7 +153,7 @@ A working example follows. The server code::
    server.register_function(is_even, "is_even")
    server.serve_forever()
 
-The client code for the preceding server::
+Mã client cho server ở trên::
 
    import xmlrpc.client
 
@@ -248,32 +163,27 @@ The client code for the preceding server::
 
 .. _datetime-objects:
 
-DateTime Objects
-----------------
+Đối tượng DateTime
+------------------
 
 .. class:: DateTime
 
-   This class may be initialized with seconds since the epoch, a time
-   tuple, an ISO 8601 time/date string, or a :class:`datetime.datetime`
-   instance.  It has the following methods, supported mainly for internal
-   use by the marshalling/unmarshalling code:
+   Có thể khởi tạo lớp này bằng số giây kể từ epoch, một time tuple, chuỗi thời gian/ngày tháng theo chuẩn ISO 8601 hoặc một đối tượng :class:`datetime.datetime`. Lớp này có các phương thức sau, chủ yếu được hỗ trợ để mã marshalling/unmarshalling sử dụng nội bộ:
 
 
    .. method:: decode(string)
 
-      Accept a string as the instance's new time value.
+      Chấp nhận một chuỗi làm giá trị thời gian mới của instance.
 
 
    .. method:: encode(out)
 
-      Write the XML-RPC encoding of this :class:`DateTime` item to the *out* stream
-      object.
+      Ghi phần mã hóa XML-RPC của mục :class:`DateTime` này vào đối tượng stream *out*.
 
-   It also supports certain of Python's built-in operators through
-   :meth:`rich comparison <object.__lt__>` and :meth:`~object.__repr__`
-   methods.
+   Lớp này cũng hỗ trợ một số toán tử dựng sẵn của Python thông qua
+   các phương thức :meth:`rich comparison <object.__lt__>` và :meth:`~object.__repr__`.
 
-A working example follows. The server code::
+Sau đây là một ví dụ hoạt động. Mã server::
 
    import datetime as dt
    from xmlrpc.server import SimpleXMLRPCServer
@@ -288,7 +198,7 @@ A working example follows. The server code::
    server.register_function(today, "today")
    server.serve_forever()
 
-The client code for the preceding server::
+Mã client cho server nêu trên::
 
    import xmlrpc.client
    import datetime as dt
@@ -296,50 +206,43 @@ The client code for the preceding server::
    proxy = xmlrpc.client.ServerProxy("http://localhost:8000/")
 
    today = proxy.today()
-   # convert the ISO 8601 string to a datetime object
+   # chuyển chuỗi ISO 8601 thành đối tượng datetime
    converted = dt.datetime.strptime(today.value, "%Y%m%dT%H:%M:%S")
    print(f"Today: {converted.strftime('%d.%m.%Y, %H:%M')}")
 
 .. _binary-objects:
 
-Binary Objects
---------------
+Đối tượng nhị phân
+------------------
 
 .. class:: Binary
 
-   This class may be initialized from bytes data (which may include NULs). The
-   primary access to the content of a :class:`Binary` object is provided by an
-   attribute:
+   Lớp này có thể được khởi tạo từ dữ liệu bytes (có thể bao gồm các byte NUL). Quyền truy cập chính vào nội dung của đối tượng :class:`Binary` được cung cấp thông qua một thuộc tính:
 
 
    .. attribute:: data
 
-      The binary data encapsulated by the :class:`Binary` instance.  The data is
-      provided as a :class:`bytes` object.
+      Dữ liệu nhị phân được đóng gói bởi thể hiện :class:`Binary`. Dữ liệu được cung cấp dưới dạng đối tượng :class:`bytes`.
 
-   :class:`Binary` objects have the following methods, supported mainly for
-   internal use by the marshalling/unmarshalling code:
+   Các đối tượng :class:`Binary` có các phương thức sau, chủ yếu được hỗ trợ để mã hóa và giải mã dữ liệu nội bộ:
 
 
    .. method:: decode(bytes)
 
-      Accept a base64 :class:`bytes` object and decode it as the instance's new data.
+      Nhận một đối tượng :class:`bytes` base64 và giải mã nó thành dữ liệu mới của instance.
 
 
    .. method:: encode(out)
 
-      Write the XML-RPC base 64 encoding of this binary item to the *out* stream object.
+      Ghi dữ liệu được mã hóa base64 theo chuẩn XML-RPC của mục nhị phân này vào đối tượng stream *out*.
 
-      The encoded data will have newlines every 76 characters as per
-      :rfc:`RFC 2045 section 6.8 <2045#section-6.8>`,
-      which was the de facto standard base64 specification when the
-      XML-RPC spec was written.
+      Dữ liệu được mã hóa sẽ có ký tự xuống dòng sau mỗi 76 ký tự, theo
+      :rfc:`RFC 2045 section 6.8 <2045#section-6.8>`, vốn là đặc tả base64 trên thực tế khi đặc tả XML-RPC được viết.
 
-   It also supports certain of Python's built-in operators through
-   :meth:`~object.__eq__` and :meth:`~object.__ne__` methods.
+   Nó cũng hỗ trợ một số toán tử tích hợp sẵn của Python thông qua
+   các phương thức :meth:`~object.__eq__` và :meth:`~object.__ne__`.
 
-Example usage of the binary objects.  We're going to transfer an image over
-XMLRPC::
+Ví dụ sử dụng các đối tượng nhị phân. Chúng ta sẽ truyền một hình ảnh qua XMLRPC::
 
    from xmlrpc.server import SimpleXMLRPCServer
    import xmlrpc.client
@@ -354,7 +257,7 @@ XMLRPC::
 
    server.serve_forever()
 
-The client gets the image and saves it to a file::
+Client nhận hình ảnh và lưu vào một tệp::
 
    import xmlrpc.client
 
@@ -364,31 +267,29 @@ The client gets the image and saves it to a file::
 
 .. _fault-objects:
 
-Fault Objects
--------------
+Đối tượng Fault
+---------------
 
 .. class:: Fault
 
-   A :class:`Fault` object encapsulates the content of an XML-RPC fault tag. Fault
-   objects have the following attributes:
+   Một đối tượng :class:`Fault` đóng gói nội dung của thẻ fault XML-RPC. Các đối tượng Fault có những thuộc tính sau:
 
 
    .. attribute:: faultCode
 
-      An int indicating the fault type.
+      Một số nguyên cho biết loại fault.
 
 
    .. attribute:: faultString
 
-      A string containing a diagnostic message associated with the fault.
+      Một chuỗi chứa thông báo chẩn đoán liên quan đến fault.
 
-In the following example we're going to intentionally cause a :exc:`Fault` by
-returning a complex type object.  The server code::
+Trong ví dụ sau, chúng ta sẽ cố ý gây ra một :exc:`Fault` bằng cách trả về một đối tượng kiểu phức hợp. Mã máy chủ::
 
    from xmlrpc.server import SimpleXMLRPCServer
 
-   # A marshalling error is going to occur because we're returning a
-   # complex number
+   # Lỗi marshalling sẽ xảy ra vì chúng ta đang trả về một
+   # số phức
    def add(x, y):
        return x+y+0j
 
@@ -398,7 +299,7 @@ returning a complex type object.  The server code::
 
    server.serve_forever()
 
-The client code for the preceding server::
+Mã client cho server trước đó::
 
    import xmlrpc.client
 
@@ -414,42 +315,38 @@ The client code for the preceding server::
 
 .. _protocol-error-objects:
 
-ProtocolError Objects
----------------------
+Đối tượng ProtocolError
+-----------------------
 
 .. class:: ProtocolError
 
-   A :class:`ProtocolError` object describes a protocol error in the underlying
-   transport layer (such as a 404 'not found' error if the server named by the URI
-   does not exist).  It has the following attributes:
+   Một đối tượng :class:`ProtocolError` mô tả lỗi giao thức trong lớp truyền tải bên dưới (chẳng hạn như lỗi 404 'không tìm thấy' nếu server được URI chỉ định không tồn tại). Đối tượng này có các thuộc tính sau:
 
 
    .. attribute:: url
 
-      The URI or URL that triggered the error.
+      URI hoặc URL đã gây ra lỗi.
 
 
    .. attribute:: errcode
 
-      The error code.
+      Mã lỗi.
 
 
    .. attribute:: errmsg
 
-      The error message or diagnostic string.
+      Thông báo lỗi hoặc chuỗi chẩn đoán.
 
 
    .. attribute:: headers
 
-      A dict containing the headers of the HTTP/HTTPS request that triggered the
-      error.
+      Một dict chứa các header của request HTTP/HTTPS gây ra lỗi.
 
-In the following example we're going to intentionally cause a :exc:`ProtocolError`
-by providing an invalid URI::
+Trong ví dụ sau, chúng ta sẽ cố ý gây ra một :exc:`ProtocolError` bằng cách cung cấp một URI không hợp lệ::
 
    import xmlrpc.client
 
-   # create a ServerProxy with a URI that doesn't respond to XMLRPC requests
+   # tạo một ServerProxy với URI không phản hồi các request XMLRPC
    proxy = xmlrpc.client.ServerProxy("http://google.com/")
 
    try:
@@ -461,24 +358,18 @@ by providing an invalid URI::
        print("Error code: %d" % err.errcode)
        print("Error message: %s" % err.errmsg)
 
-MultiCall Objects
------------------
+Các đối tượng MultiCall
+-----------------------
 
-The :class:`MultiCall` object provides a way to encapsulate multiple calls to a
-remote server into a single request [#]_.
+Đối tượng :class:`MultiCall` cung cấp một cách đóng gói nhiều lần gọi đến máy chủ từ xa vào một request duy nhất [#]_.
 
 
 .. class:: MultiCall(server)
 
-   Create an object used to boxcar method calls. *server* is the eventual target of
-   the call. Calls can be made to the result object, but they will immediately
-   return ``None``, and only store the call name and parameters in the
-   :class:`MultiCall` object. Calling the object itself causes all stored calls to
-   be transmitted as a single ``system.multicall`` request. The result of this call
-   is a :term:`generator`; iterating over this generator yields the individual
-   results.
+   Tạo một đối tượng dùng để xếp hàng các lần gọi phương thức. *server* là đích cuối cùng của lần gọi. Có thể thực hiện các lần gọi trên đối tượng kết quả, nhưng chúng sẽ ngay lập tức trả về ``None``, và chỉ lưu tên lần gọi cùng các tham số vào
+   đối tượng :class:`MultiCall`. Việc gọi chính đối tượng này sẽ khiến tất cả các lệnh gọi đã lưu được truyền đi dưới dạng một yêu cầu ``system.multicall`` duy nhất. Kết quả của lần gọi này là một :term:`generator`; việc lặp qua generator này sẽ trả về từng kết quả riêng lẻ.
 
-A usage example of this class follows.  The server code::
+Sau đây là một ví dụ sử dụng lớp này. Mã server::
 
    from xmlrpc.server import SimpleXMLRPCServer
 
@@ -494,7 +385,7 @@ A usage example of this class follows.  The server code::
    def divide(x, y):
        return x // y
 
-   # A simple server with simple arithmetic functions
+   # Một server đơn giản với các hàm số học đơn giản
    server = SimpleXMLRPCServer(("localhost", 8000))
    print("Listening on port 8000...")
    server.register_multicall_functions()
@@ -504,7 +395,7 @@ A usage example of this class follows.  The server code::
    server.register_function(divide, 'divide')
    server.serve_forever()
 
-The client code for the preceding server::
+Mã client cho server ở trên::
 
    import xmlrpc.client
 
@@ -519,48 +410,36 @@ The client code for the preceding server::
    print("7+3=%d, 7-3=%d, 7*3=%d, 7//3=%d" % tuple(result))
 
 
-Convenience Functions
----------------------
+Các hàm tiện ích
+----------------
 
 .. function:: dumps(params, methodname=None, methodresponse=None, encoding=None, allow_none=False)
 
-   Convert *params* into an XML-RPC request, or into a response if *methodresponse*
-   is true. *params* can be either a tuple of arguments or an instance of the
-   :exc:`Fault` exception class.  If *methodresponse* is true, only a single value
-   can be returned, meaning that *params* must be of length 1. *encoding*, if
-   supplied, is the encoding to use in the generated XML; the default is UTF-8.
-   Python's :const:`None` value cannot be used in standard XML-RPC; to allow using
-   it via an extension,  provide a true value for *allow_none*.
+   Chuyển *params* thành một yêu cầu XML-RPC hoặc thành một response nếu *methodresponse* là true. *params* có thể là một tuple các đối số hoặc một instance của
+   :exc:`Fault` lớp ngoại lệ. Nếu *methodresponse* là true, chỉ có thể trả về một giá trị duy nhất, nghĩa là *params* phải có độ dài là 1. *encoding*, nếu được cung cấp, là encoding sẽ dùng trong XML được tạo; mặc định là UTF-8. Giá trị :const:`None` của Python không thể được sử dụng trong XML-RPC tiêu chuẩn; để cho phép sử dụng giá trị này thông qua một phần mở rộng, hãy cung cấp giá trị true cho *allow_none*.
 
 
 .. function:: loads(data, use_datetime=False, use_builtin_types=False)
 
-   Convert an XML-RPC request or response into Python objects, a ``(params,
-   methodname)``.  *params* is a tuple of argument; *methodname* is a string, or
-   ``None`` if no method name is present in the packet. If the XML-RPC packet
-   represents a fault condition, this function will raise a :exc:`Fault` exception.
-   The *use_builtin_types* flag can be used to cause date/time values to be
-   presented as :class:`datetime.datetime` objects and binary data to be
-   presented as :class:`bytes` objects; this flag is false by default.
+   Chuyển đổi một request hoặc response XML-RPC thành các đối tượng Python, một ``(params, methodname)``. *params* là một tuple các đối số; *methodname* là một chuỗi hoặc ``None`` nếu packet không có tên method. Nếu packet XML-RPC biểu thị một điều kiện lỗi, hàm này sẽ raise một exception :exc:`Fault`. Cờ *use_builtin_types* có thể được dùng để khiến các giá trị ngày/giờ được biểu diễn dưới dạng các đối tượng :class:`datetime.datetime` và dữ liệu nhị phân được biểu diễn dưới dạng các đối tượng :class:`bytes`; theo mặc định, cờ này là false.
 
-   The obsolete *use_datetime* flag is similar to *use_builtin_types* but it
-   applies only to date/time values.
+   Cờ *use_datetime* đã lỗi thời tương tự như *use_builtin_types* nhưng chỉ áp dụng cho các giá trị ngày/giờ.
 
    .. versionchanged:: 3.3
-      The *use_builtin_types* flag was added.
+      Cờ *use_builtin_types* đã được thêm vào.
 
 
 .. _xmlrpc-client-example:
 
-Example of Client Usage
------------------------
+Ví dụ về cách sử dụng Client
+----------------------------
 
 ::
 
-   # simple test program (from the XML-RPC specification)
+   # chương trình kiểm thử đơn giản (từ đặc tả XML-RPC)
    from xmlrpc.client import ServerProxy, Error
 
-   # server = ServerProxy("http://localhost:8000") # local server
+   # server = ServerProxy("http://localhost:8000") # máy chủ cục bộ
    with ServerProxy("http://betty.userland.com") as proxy:
 
        print(proxy)
@@ -570,8 +449,7 @@ Example of Client Usage
        except Error as v:
            print("ERROR", v)
 
-To access an XML-RPC server through a HTTP proxy, you need to define a custom
-transport.  The following example shows how::
+Để truy cập máy chủ XML-RPC thông qua HTTP proxy, bạn cần định nghĩa một transport tùy chỉnh. Ví dụ sau đây cho biết cách thực hiện::
 
    import http.client
    import xmlrpc.client
@@ -594,16 +472,21 @@ transport.  The following example shows how::
    print(server.examples.getStateName(41))
 
 
-Example of Client and Server Usage
-----------------------------------
+Ví dụ về cách sử dụng Client và Server
+--------------------------------------
 
-See :ref:`simplexmlrpcserver-example`.
+Xem :ref:`simplexmlrpcserver-example`.
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] This approach has been first presented in `a discussion on xmlrpc.com
-   <https://web.archive.org/web/20060624230303/http://www.xmlrpc.com/discuss/msgReader$1208?mode=topic>`_.
+.. [#] Cách tiếp cận này lần đầu được trình bày trong `một cuộc thảo luận trên xmlrpc.com <https://web.archive.org/web/20060624230303/http://www.xmlrpc.com/discuss/msgReader$1208?mode=topic>`_.
 .. the link now points to webarchive since the one at
 .. http://www.xmlrpc.com/discuss/msgReader%241208 is broken (and webadmin
 .. doesn't reply)
+
+.. _`http://ontosys.com/xml-rpc/extensions.php`: https://web.archive.org/web/20130120074804/http://ontosys.com/xml-rpc/extensions.php
+.. _`XML-RPC HOWTO`: https://tldp.org/HOWTO/XML-RPC-HOWTO/index.html
+.. _`XML-RPC Introspection`: https://xmlrpc-c.sourceforge.io/introspection.html
+.. _`XML-RPC Specification`: http://xmlrpc.scripting.com/spec.html
+.. _`a discussion on xmlrpc.com`: https://web.archive.org/web/20060624230303/http://www.xmlrpc.com/discuss/msgReader$1208?mode=topic

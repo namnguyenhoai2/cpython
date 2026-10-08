@@ -1,82 +1,67 @@
-:mod:`!shlex` --- Simple lexical analysis
-=========================================
+:mod:`!shlex` --- Phân tích từ vựng đơn giản
+============================================
 
 .. module:: shlex
-   :synopsis: Simple lexical analysis for Unix shell-like languages.
+   :synopsis: Phân tích từ vựng đơn giản cho các ngôn ngữ giống shell Unix.
 
 .. moduleauthor:: Eric S. Raymond <esr@snark.thyrsus.com>
 .. moduleauthor:: Gustavo Niemeyer <niemeyer@conectiva.com>
 .. sectionauthor:: Eric S. Raymond <esr@snark.thyrsus.com>
 .. sectionauthor:: Gustavo Niemeyer <niemeyer@conectiva.com>
 
-**Source code:** :source:`Lib/shlex.py`
+**Mã nguồn:** :source:`Lib/shlex.py`
 
 --------------
 
-The :class:`~shlex.shlex` class makes it easy to write lexical analyzers for
-simple syntaxes resembling that of the Unix shell.  This will often be useful
-for writing minilanguages, (for example, in run control files for Python
-applications) or for parsing quoted strings.
+Lớp :class:`~shlex.shlex` giúp dễ dàng viết các bộ phân tích từ vựng cho những cú pháp đơn giản tương tự shell Unix. Điều này thường hữu ích khi viết các ngôn ngữ nhỏ (ví dụ: trong các tệp điều khiển chạy cho ứng dụng Python) hoặc khi phân tích các chuỗi được đặt trong dấu trích dẫn.
 
-The :mod:`!shlex` module defines the following functions:
+Module :mod:`!shlex` định nghĩa các hàm sau:
 
 
 .. function:: split(s, comments=False, posix=True)
 
-   Split the string *s* using shell-like syntax. If *comments* is :const:`False`
-   (the default), the parsing of comments in the given string will be disabled
-   (setting the :attr:`~shlex.commenters` attribute of the
-   :class:`~shlex.shlex` instance to the empty string).  This function operates
-   in POSIX mode by default, but uses non-POSIX mode if the *posix* argument is
-   false.
+   Tách chuỗi *s* bằng cú pháp tương tự shell. Nếu *comments* là :const:`False` (mặc định), việc phân tích chú thích trong chuỗi đã cho sẽ bị tắt (bằng cách đặt thuộc tính :attr:`~shlex.commenters` của
+   :class:`~shlex.shlex` instance thành chuỗi rỗng). Hàm này hoạt động ở chế độ POSIX theo mặc định, nhưng sử dụng chế độ không phải POSIX nếu đối số *posix* là false.
 
    .. versionchanged:: 3.12
-      Passing ``None`` for *s* argument now raises an exception, rather than
-      reading :data:`sys.stdin`.
+      Việc truyền ``None`` cho đối số *s* hiện sẽ gây ra một ngoại lệ, thay vì đọc :data:`sys.stdin`.
 
 .. function:: join(split_command)
 
-   Concatenate the tokens of the list *split_command* and return a string.
-   This function is the inverse of :func:`split`.
+   Nối các token trong danh sách *split_command* và trả về một chuỗi. Hàm này là phép nghịch đảo của :func:`split`.
 
       >>> from shlex import join
       >>> print(join(['echo', '-n', 'Multiple words']))
       echo -n 'Multiple words'
 
-   The returned value is shell-escaped to protect against injection
-   vulnerabilities (see :func:`quote`).
+   Giá trị trả về được escape cho shell để bảo vệ khỏi các lỗ hổng chèn lệnh (xem :func:`quote`).
 
    .. versionadded:: 3.8
 
 
 .. function:: quote(s)
 
-   Return a shell-escaped version of the string *s*.  The returned value is a
-   string that can safely be used as one token in a shell command line, for
-   cases where you cannot use a list.
+   Trả về phiên bản được escape cho shell của chuỗi *s*. Giá trị trả về là một chuỗi có thể được sử dụng an toàn làm một token trong dòng lệnh shell, trong các trường hợp bạn không thể sử dụng một danh sách.
 
    .. _shlex-quote-warning:
 
    .. warning::
 
-      The ``shlex`` module is **only designed for Unix shells**.
+      Mô-đun ``shlex`` **chỉ được thiết kế cho Unix shells**.
 
-      The :func:`quote` function is not guaranteed to be correct on non-POSIX
-      compliant shells or shells from other operating systems such as Windows.
-      Executing commands quoted by this module on such shells can open up the
-      possibility of a command injection vulnerability.
+      Hàm :func:`quote` không được đảm bảo là chính xác trên các shell không tuân thủ POSIX hoặc các shell của những hệ điều hành khác như Windows. Việc thực thi các lệnh được module này đặt trong dấu quote trên những shell đó có thể làm phát sinh nguy cơ lỗ hổng chèn lệnh.
 
-      Consider using functions that pass command arguments with lists such as
-      :func:`subprocess.run` with ``shell=False``.
+      Hãy cân nhắc sử dụng các hàm truyền đối số lệnh bằng danh sách, chẳng hạn như
+      :func:`subprocess.run` với ``shell=False``.
 
-   This idiom would be unsafe:
+   Cách viết này sẽ không an toàn:
 
       >>> filename = 'somefile; rm -rf ~'
       >>> command = 'ls -l {}'.format(filename)
-      >>> print(command)  # executed by a shell: boom!
+      >>> print(command)  # được shell thực thi: boom!
       ls -l somefile; rm -rf ~
 
-   :func:`quote` lets you plug the security hole:
+   :func:`quote` cho phép bạn khắc phục lỗ hổng bảo mật này:
 
       >>> from shlex import quote
       >>> command = 'ls -l {}'.format(quote(filename))
@@ -86,7 +71,7 @@ The :mod:`!shlex` module defines the following functions:
       >>> print(remote_command)
       ssh home 'ls -l '"'"'somefile; rm -rf ~'"'"''
 
-   The quoting is compatible with UNIX shells and with :func:`split`:
+   Cách trích dẫn này tương thích với các shell UNIX và với :func:`split`:
 
       >>> from shlex import split
       >>> remote_command = split(remote_command)
@@ -98,316 +83,211 @@ The :mod:`!shlex` module defines the following functions:
 
    .. versionadded:: 3.3
 
-The :mod:`!shlex` module defines the following class:
+Mô-đun :mod:`!shlex` định nghĩa lớp sau:
 
 
 .. class:: shlex(instream=None, infile=None, posix=False, punctuation_chars=False)
 
-   A :class:`~shlex.shlex` instance or subclass instance is a lexical analyzer
-   object.  The initialization argument, if present, specifies where to read
-   characters from.  It must be a file-/stream-like object with
-   :meth:`~io.TextIOBase.read` and :meth:`~io.TextIOBase.readline` methods, or
-   a string.  If no argument is given, input will be taken from ``sys.stdin``.
-   The second optional argument is a filename string, which sets the initial
-   value of the :attr:`~shlex.infile` attribute.  If the *instream*
-   argument is omitted or equal to ``sys.stdin``, this second argument
-   defaults to "stdin".  The *posix* argument defines the operational mode:
-   when *posix* is not true (default), the :class:`~shlex.shlex` instance will
-   operate in compatibility mode.  When operating in POSIX mode,
-   :class:`~shlex.shlex` will try to be as close as possible to the POSIX shell
-   parsing rules.  The *punctuation_chars* argument provides a way to make the
-   behaviour even closer to how real shells parse.  This can take a number of
-   values: the default value, ``False``, preserves the behaviour seen under
-   Python 3.5 and earlier.  If set to ``True``, then parsing of the characters
-   ``();<>|&`` is changed: any run of these characters (considered punctuation
-   characters) is returned as a single token.  If set to a non-empty string of
-   characters, those characters will be used as the punctuation characters.  Any
-   characters in the :attr:`wordchars` attribute that appear in
-   *punctuation_chars* will be removed from :attr:`wordchars`.  See
-   :ref:`improved-shell-compatibility` for more information. *punctuation_chars*
-   can be set only upon :class:`~shlex.shlex` instance creation and can't be
-   modified later.
+   Một đối tượng :class:`~shlex.shlex` hoặc một đối tượng của lớp con là một đối tượng bộ phân tích từ vựng. Đối số khởi tạo, nếu có, chỉ định nơi đọc các ký tự. Đối số này phải là một đối tượng giống tệp/luồng có
+   các phương thức :meth:`~io.TextIOBase.read` và :meth:`~io.TextIOBase.readline`, hoặc một chuỗi. Nếu không cung cấp đối số, dữ liệu đầu vào sẽ được lấy từ ``sys.stdin``. Đối số tùy chọn thứ hai là một chuỗi tên tệp, dùng để thiết lập giá trị ban đầu của thuộc tính :attr:`~shlex.infile`. Nếu đối số *instream* bị bỏ qua hoặc bằng ``sys.stdin``, đối số thứ hai này mặc định là "stdin". Đối số *posix* xác định chế độ hoạt động: khi *posix* không phải là true (mặc định), thực thể :class:`~shlex.shlex` sẽ hoạt động ở chế độ tương thích. Khi hoạt động ở chế độ POSIX,
+   :class:`~shlex.shlex` sẽ cố gắng tuân thủ các quy tắc phân tích cú pháp của shell POSIX sát nhất có thể. Đối số *punctuation_chars* cung cấp một cách để hành vi này gần với cách các shell thực tế phân tích cú pháp hơn nữa. Đối số này có thể nhận một số giá trị: giá trị mặc định, ``False``, giữ nguyên hành vi có trong Python 3.5 trở về trước. Nếu được đặt thành ``True``, việc phân tích cú pháp các ký tự ``();<>|&`` sẽ thay đổi: mọi chuỗi liên tiếp gồm các ký tự này (được xem là các ký tự dấu câu) sẽ được trả về dưới dạng một token duy nhất. Nếu được đặt thành một chuỗi ký tự không rỗng, các ký tự đó sẽ được dùng làm các ký tự dấu câu. Mọi ký tự trong thuộc tính :attr:`wordchars` xuất hiện trong *punctuation_chars* sẽ bị loại bỏ khỏi :attr:`wordchars`. Xem
+   :ref:`improved-shell-compatibility` để biết thêm thông tin. Chỉ có thể đặt *punctuation_chars* khi tạo thực thể :class:`~shlex.shlex` và không thể sửa đổi sau đó.
 
    .. versionchanged:: 3.6
-      The *punctuation_chars* parameter was added.
+      Tham số *punctuation_chars* đã được thêm vào.
 
 .. seealso::
 
-   Module :mod:`configparser`
-      Parser for configuration files similar to the Windows :file:`.ini` files.
+   Mô-đun :mod:`configparser`
+      Bộ phân tích cú pháp cho các tệp cấu hình tương tự như các tệp :file:`.ini` của Windows.
 
 
 .. _shlex-objects:
 
-shlex Objects
--------------
+Đối tượng shlex
+---------------
 
-A :class:`~shlex.shlex` instance has the following methods:
+Một instance :class:`~shlex.shlex` có các phương thức sau:
 
 
 .. method:: shlex.get_token()
 
-   Return a token.  If tokens have been stacked using :meth:`push_token`, pop a
-   token off the stack.  Otherwise, read one from the input stream.  If reading
-   encounters an immediate end-of-file, :attr:`eof` is returned (the empty
-   string (``''``) in non-POSIX mode, and ``None`` in POSIX mode).
+   Trả về một token. Nếu các token đã được xếp chồng bằng :meth:`push_token`, lấy một token khỏi ngăn xếp. Nếu không, đọc một token từ luồng đầu vào. Nếu thao tác đọc gặp ngay cuối tệp, :attr:`eof` được trả về (chuỗi rỗng (``''``) ở chế độ không POSIX và ``None`` ở chế độ POSIX).
 
 
 .. method:: shlex.push_token(str)
 
-   Push the argument onto the token stack.
+   Đẩy đối số vào ngăn xếp token.
 
 
 .. method:: shlex.read_token()
 
-   Read a raw token.  Ignore the pushback stack, and do not interpret source
-   requests.  (This is not ordinarily a useful entry point, and is documented here
-   only for the sake of completeness.)
+   Đọc một raw token. Bỏ qua ngăn xếp pushback và không diễn giải các yêu cầu source. (Đây thường không phải là một điểm truy cập hữu ích và chỉ được ghi lại ở đây để đầy đủ.)
 
 
 .. method:: shlex.sourcehook(filename)
 
-   When :class:`~shlex.shlex` detects a source request (see :attr:`source`
-   below) this method is given the following token as argument, and expected
-   to return a tuple consisting of a filename and an open file-like object.
+   Khi :class:`~shlex.shlex` phát hiện một yêu cầu source (xem :attr:`source` bên dưới), phương thức này được truyền token tiếp theo làm đối số và phải trả về một tuple gồm tên tệp và một đối tượng giống tệp đã mở.
 
-   Normally, this method first strips any quotes off the argument.  If the result
-   is an absolute pathname, or there was no previous source request in effect, or
-   the previous source was a stream (such as ``sys.stdin``), the result is left
-   alone.  Otherwise, if the result is a relative pathname, the directory part of
-   the name of the file immediately before it on the source inclusion stack is
-   prepended (this behavior is like the way the C preprocessor handles ``#include
-   "file.h"``).
+   Thông thường, phương thức này trước tiên loại bỏ mọi dấu ngoặc kép khỏi đối số. Nếu kết quả là một pathname tuyệt đối, hoặc trước đó chưa có yêu cầu source nào, hoặc source trước đó là một stream (chẳng hạn như ``sys.stdin``), thì giữ nguyên kết quả. Nếu không, khi kết quả là một pathname tương đối, phần thư mục trong tên của tệp ngay trước nó trên ngăn xếp đưa source vào sẽ được thêm vào trước (cách hoạt động này tương tự cách bộ tiền xử lý C xử lý ``#include "file.h"``).
 
-   The result of the manipulations is treated as a filename, and returned as the
-   first component of the tuple, with :func:`open` called on it to yield the second
-   component. (Note: this is the reverse of the order of arguments in instance
-   initialization!)
+   Kết quả của các thao tác trên được xem là tên tệp và được trả về dưới dạng thành phần đầu tiên của tuple, còn :func:`open` được gọi trên nó để tạo thành phần thứ hai. (Lưu ý: thứ tự này ngược với thứ tự các đối số khi khởi tạo instance!)
 
-   This hook is exposed so that you can use it to implement directory search paths,
-   addition of file extensions, and other namespace hacks. There is no
-   corresponding 'close' hook, but a shlex instance will call the
-   :meth:`~io.IOBase.close` method of the sourced input stream when it returns
-   EOF.
+   Hook này được cung cấp để bạn có thể dùng nó triển khai các đường dẫn tìm kiếm thư mục, việc bổ sung phần mở rộng tệp và các thủ thuật namespace khác. Không có hook 'close' tương ứng, nhưng một instance shlex sẽ gọi
+   phương thức :meth:`~io.IOBase.close` của input stream nguồn khi nó trả về EOF.
 
-   For more explicit control of source stacking, use the :meth:`push_source` and
-   :meth:`pop_source` methods.
+   Để kiểm soát rõ ràng hơn việc xếp chồng nguồn, hãy sử dụng các phương thức :meth:`push_source` và
+   :meth:`pop_source`.
 
 
 .. method:: shlex.push_source(newstream, newfile=None)
 
-   Push an input source stream onto the input stack.  If the filename argument is
-   specified it will later be available for use in error messages.  This is the
-   same method used internally by the :meth:`sourcehook` method.
+   Đẩy một input source stream vào input stack. Nếu chỉ định đối số filename, giá trị này sẽ có sẵn để sử dụng sau trong các thông báo lỗi. Đây cũng là phương thức được :meth:`sourcehook` sử dụng nội bộ.
 
 
 .. method:: shlex.pop_source()
 
-   Pop the last-pushed input source from the input stack. This is the same method
-   used internally when the lexer reaches EOF on a stacked input stream.
+   Lấy input source được đẩy vào sau cùng ra khỏi input stack. Đây cũng là phương thức được sử dụng nội bộ khi lexer gặp EOF trên một input stream đã được xếp chồng.
 
 
 .. method:: shlex.error_leader(infile=None, lineno=None)
 
-   This method generates an error message leader in the format of a Unix C compiler
-   error label; the format is ``'"%s", line %d: '``, where the ``%s`` is replaced
-   with the name of the current source file and the ``%d`` with the current input
-   line number (the optional arguments can be used to override these).
+   Phương thức này tạo phần đầu của thông báo lỗi theo định dạng nhãn lỗi của trình biên dịch Unix C; định dạng là ``'"%s", line %d: '``, trong đó ``%s`` được thay thế bằng tên của tệp nguồn hiện tại và ``%d`` bằng số dòng input hiện tại (có thể sử dụng các đối số tùy chọn để ghi đè các giá trị này).
 
-   This convenience is provided to encourage :mod:`!shlex` users to generate error
-   messages in the standard, parseable format understood by Emacs and other Unix
-   tools.
+   Tính tiện lợi này được cung cấp nhằm khuyến khích người dùng :mod:`!shlex` tạo thông báo lỗi theo định dạng chuẩn, có thể phân tích cú pháp, được Emacs và các công cụ Unix khác hiểu.
 
-Instances of :class:`~shlex.shlex` subclasses have some public instance
-variables which either control lexical analysis or can be used for debugging:
+Các thể hiện của những lớp con :class:`~shlex.shlex` có một số biến thể hiện công khai, dùng để điều khiển việc phân tích từ vựng hoặc phục vụ gỡ lỗi:
 
 
 .. attribute:: shlex.commenters
 
-   The string of characters that are recognized as comment beginners. All
-   characters from the comment beginner to end of line are ignored. Includes just
-   ``'#'`` by default.
+   Chuỗi các ký tự được nhận diện là ký tự bắt đầu chú thích. Tất cả ký tự từ ký tự bắt đầu chú thích đến cuối dòng đều bị bỏ qua. Theo mặc định, chỉ bao gồm ``'#'``.
 
 
 .. attribute:: shlex.wordchars
 
-   The string of characters that will accumulate into multi-character tokens.  By
-   default, includes all ASCII alphanumerics and underscore.  In POSIX mode, the
-   accented characters in the Latin-1 set are also included.  If
-   :attr:`punctuation_chars` is not empty, the characters ``~-./*?=``, which can
-   appear in filename specifications and command line parameters, will also be
-   included in this attribute, and any characters which appear in
-   ``punctuation_chars`` will be removed from ``wordchars`` if they are present
-   there. If :attr:`whitespace_split` is set to ``True``, this will have no
-   effect.
+   Chuỗi các ký tự sẽ được tích lũy thành các token nhiều ký tự. Theo mặc định, bao gồm tất cả các ký tự chữ và số ASCII cùng dấu gạch dưới. Ở chế độ POSIX, các ký tự có dấu trong bộ Latin-1 cũng được bao gồm. Nếu
+   :attr:`punctuation_chars` không rỗng, các ký tự ``~-./*?=``, có thể xuất hiện trong đặc tả tên tệp và tham số dòng lệnh, cũng sẽ được bao gồm trong thuộc tính này, và mọi ký tự xuất hiện trong ``punctuation_chars`` sẽ bị xóa khỏi ``wordchars`` nếu chúng có mặt ở đó. Nếu :attr:`whitespace_split` được đặt thành ``True``, điều này sẽ không có tác dụng.
 
 
 .. attribute:: shlex.whitespace
 
-   Characters that will be considered whitespace and skipped.  Whitespace bounds
-   tokens.  By default, includes space, tab, linefeed and carriage-return.
+   Các ký tự được xem là khoảng trắng và bị bỏ qua. Khoảng trắng phân tách các token. Theo mặc định, bao gồm dấu cách, tab, ký tự xuống dòng và ký tự về đầu dòng.
 
 
 .. attribute:: shlex.escape
 
-   Characters that will be considered as escape. This will be only used in POSIX
-   mode, and includes just ``'\'`` by default.
+   Các ký tự được xem là ký tự escape. Thuộc tính này chỉ được sử dụng ở chế độ POSIX và theo mặc định chỉ bao gồm ``'\'``.
 
 
 .. attribute:: shlex.quotes
 
-   Characters that will be considered string quotes.  The token accumulates until
-   the same quote is encountered again (thus, different quote types protect each
-   other as in the shell.)  By default, includes ASCII single and double quotes.
+   Các ký tự được coi là dấu nháy chuỗi. Token sẽ được tích lũy cho đến khi gặp lại cùng dấu nháy đó (do đó, các loại dấu nháy khác nhau sẽ bảo vệ lẫn nhau như trong shell). Mặc định, bao gồm dấu nháy đơn và dấu nháy kép ASCII.
 
 
 .. attribute:: shlex.escapedquotes
 
-   Characters in :attr:`quotes` that will interpret escape characters defined in
-   :attr:`escape`.  This is only used in POSIX mode, and includes just ``'"'`` by
-   default.
+   Các ký tự trong :attr:`quotes` sẽ diễn giải các ký tự escape được định nghĩa trong
+   :attr:`escape`. Tùy chọn này chỉ được sử dụng ở chế độ POSIX và theo mặc định chỉ bao gồm ``'"'``.
 
 
 .. attribute:: shlex.whitespace_split
 
-   If ``True``, tokens will only be split in whitespaces.  This is useful, for
-   example, for parsing command lines with :class:`~shlex.shlex`, getting
-   tokens in a similar way to shell arguments.  When used in combination with
-   :attr:`punctuation_chars`, tokens will be split on whitespace in addition to
-   those characters.
+   Nếu ``True``, các token sẽ chỉ được tách tại khoảng trắng. Điều này hữu ích, chẳng hạn, khi phân tích các dòng lệnh có :class:`~shlex.shlex`, để lấy các token theo cách tương tự như các đối số shell. Khi được sử dụng kết hợp với
+   :attr:`punctuation_chars`, các token sẽ được tách tại khoảng trắng ngoài các ký tự đó.
 
    .. versionchanged:: 3.8
-      The :attr:`punctuation_chars` attribute was made compatible with the
-      :attr:`whitespace_split` attribute.
+      Thuộc tính :attr:`punctuation_chars` được tạo để tương thích với thuộc tính
+      :attr:`whitespace_split`.
 
 
 .. attribute:: shlex.infile
 
-   The name of the current input file, as initially set at class instantiation time
-   or stacked by later source requests.  It may be useful to examine this when
-   constructing error messages.
+   Tên của tệp đầu vào hiện tại, được thiết lập ban đầu khi khởi tạo lớp hoặc được xếp chồng bởi các yêu cầu nguồn sau đó. Có thể hữu ích khi kiểm tra tên này trong lúc xây dựng thông báo lỗi.
 
 
 .. attribute:: shlex.instream
 
-   The input stream from which this :class:`~shlex.shlex` instance is reading
-   characters.
+   Luồng đầu vào mà từ đó thực thể :class:`~shlex.shlex` này đang đọc các ký tự.
 
 
 .. attribute:: shlex.source
 
-   This attribute is ``None`` by default.  If you assign a string to it, that
-   string will be recognized as a lexical-level inclusion request similar to the
-   ``source`` keyword in various shells.  That is, the immediately following token
-   will be opened as a filename and input will be taken from that stream until
-   EOF, at which point the :meth:`~io.IOBase.close` method of that stream will be
-   called and the input source will again become the original input stream.  Source
-   requests may be stacked any number of levels deep.
+   Theo mặc định, thuộc tính này là ``None``. Nếu bạn gán cho nó một chuỗi, chuỗi đó sẽ được nhận diện là yêu cầu đưa vào ở cấp từ vựng, tương tự từ khóa ``source`` trong nhiều shell. Nghĩa là, token ngay sau đó sẽ được mở dưới dạng tên tệp và dữ liệu đầu vào sẽ được đọc từ luồng đó cho đến EOF; tại thời điểm đó, phương thức :meth:`~io.IOBase.close` của luồng sẽ được gọi và nguồn đầu vào sẽ trở lại luồng đầu vào ban đầu. Các yêu cầu nguồn có thể được xếp chồng ở bất kỳ số cấp nào.
 
 
 .. attribute:: shlex.debug
 
-   If this attribute is numeric and ``1`` or more, a :class:`~shlex.shlex`
-   instance will print verbose progress output on its behavior.  If you need
-   to use this, you can read the module source code to learn the details.
+   Nếu thuộc tính này là số và lớn hơn hoặc bằng ``1``, một thực thể :class:`~shlex.shlex` sẽ in thông tin tiến trình chi tiết về hoạt động của nó. Nếu cần sử dụng tính năng này, bạn có thể đọc mã nguồn của module để tìm hiểu chi tiết.
 
 
 .. attribute:: shlex.lineno
 
-   Source line number (count of newlines seen so far plus one).
+   Số dòng nguồn (số dòng mới đã gặp cho đến thời điểm hiện tại cộng một).
 
 
 .. attribute:: shlex.token
 
-   The token buffer.  It may be useful to examine this when catching exceptions.
+   Bộ đệm token. Có thể hữu ích khi kiểm tra bộ đệm này trong lúc bắt ngoại lệ.
 
 
 .. attribute:: shlex.eof
 
-   Token used to determine end of file. This will be set to the empty string
-   (``''``), in non-POSIX mode, and to ``None`` in POSIX mode.
+   Token được dùng để xác định cuối tệp. Ở chế độ không phải POSIX, token này sẽ được đặt thành chuỗi rỗng (``''``), còn ở chế độ POSIX sẽ được đặt thành ``None``.
 
 
 .. attribute:: shlex.punctuation_chars
 
-   A read-only property. Characters that will be considered punctuation. Runs of
-   punctuation characters will be returned as a single token. However, note that no
-   semantic validity checking will be performed: for example, '>>>' could be
-   returned as a token, even though it may not be recognised as such by shells.
+   Một thuộc tính chỉ đọc. Các ký tự được xem là dấu câu. Các chuỗi ký tự dấu câu sẽ được trả về dưới dạng một token duy nhất. Tuy nhiên, lưu ý rằng sẽ không thực hiện kiểm tra tính hợp lệ về mặt ngữ nghĩa: chẳng hạn, '>>>' có thể được trả về dưới dạng một token, dù shell có thể không nhận dạng nó như vậy.
 
    .. versionadded:: 3.6
 
 
 .. _shlex-parsing-rules:
 
-Parsing Rules
--------------
+Quy tắc phân tích cú pháp
+-------------------------
 
-When operating in non-POSIX mode, :class:`~shlex.shlex` will try to obey the
-following rules.
+Khi hoạt động ở chế độ không phải POSIX, :class:`~shlex.shlex` sẽ cố gắng tuân theo các quy tắc sau.
 
-* Quote characters are not recognized within words (``Do"Not"Separate`` is
-  parsed as the single word ``Do"Not"Separate``);
+* Các ký tự trích dẫn không được nhận dạng bên trong từ (``Do"Not"Separate`` được phân tích thành một từ duy nhất là ``Do"Not"Separate``);
 
-* Escape characters are not recognized;
+* Các ký tự escape không được nhận dạng;
 
-* Enclosing characters in quotes preserve the literal value of all characters
-  within the quotes;
+* Việc đặt các ký tự bên trong dấu trích dẫn sẽ giữ nguyên giá trị literal của tất cả các ký tự nằm trong dấu trích dẫn;
 
-* Closing quotes separate words (``"Do"Separate`` is parsed as ``"Do"`` and
-  ``Separate``);
+* Dấu trích dẫn đóng sẽ phân tách các từ (``"Do"Separate`` được phân tích thành ``"Do"`` và ``Separate``);
 
-* If :attr:`~shlex.whitespace_split` is ``False``, any character not
-  declared to be a word character, whitespace, or a quote will be returned as
-  a single-character token. If it is ``True``, :class:`~shlex.shlex` will only
-  split words in whitespaces;
+* Nếu :attr:`~shlex.whitespace_split` là ``False``, mọi ký tự không được khai báo là ký tự từ, khoảng trắng hoặc dấu ngoặc kép sẽ được trả về dưới dạng một token đơn ký tự. Nếu là ``True``, :class:`~shlex.shlex` sẽ chỉ tách các từ tại khoảng trắng;
 
-* EOF is signaled with an empty string (``''``);
+* EOF được báo hiệu bằng một chuỗi rỗng (``''``);
 
-* It's not possible to parse empty strings, even if quoted.
+* Không thể phân tích cú pháp các chuỗi rỗng, ngay cả khi chúng được đặt trong dấu ngoặc kép.
 
-When operating in POSIX mode, :class:`~shlex.shlex` will try to obey the
-following parsing rules.
+Khi hoạt động ở chế độ POSIX, :class:`~shlex.shlex` sẽ cố gắng tuân theo các quy tắc phân tích cú pháp sau đây.
 
-* Quotes are stripped out, and do not separate words (``"Do"Not"Separate"`` is
-  parsed as the single word ``DoNotSeparate``);
+* Các dấu ngoặc kép sẽ bị loại bỏ và không phân tách các từ (``"Do"Not"Separate"`` được phân tích thành từ duy nhất ``DoNotSeparate``);
 
-* Non-quoted escape characters (e.g. ``'\'``) preserve the literal value of the
-  next character that follows;
+* Các ký tự escape không được đặt trong dấu ngoặc kép (ví dụ: ``'\'``) bảo toàn giá trị literal của ký tự tiếp theo sau đó;
 
-* Enclosing characters in quotes which are not part of
-  :attr:`~shlex.escapedquotes` (e.g. ``"'"``) preserve the literal value
-  of all characters within the quotes;
+* Việc đặt các ký tự bao quanh trong dấu ngoặc kép mà không phải là một phần của
+  :attr:`~shlex.escapedquotes` (ví dụ: ``"'"``) bảo toàn giá trị nguyên gốc của tất cả các ký tự nằm trong dấu nháy;
 
-* Enclosing characters in quotes which are part of
-  :attr:`~shlex.escapedquotes` (e.g. ``'"'``) preserves the literal value
-  of all characters within the quotes, with the exception of the characters
-  mentioned in :attr:`~shlex.escape`.  The escape characters retain their
-  special meaning only when followed by the quote in use, or the escape
-  character itself. Otherwise the escape character will be considered a
-  normal character.
+* Các ký tự bao quanh trong dấu nháy là một phần của
+  :attr:`~shlex.escapedquotes` (ví dụ: ``'"'``) bảo toàn giá trị nguyên gốc của tất cả các ký tự nằm trong dấu nháy, ngoại trừ các ký tự được đề cập trong :attr:`~shlex.escape`. Các ký tự escape chỉ giữ ý nghĩa đặc biệt khi đứng trước dấu nháy đang được sử dụng hoặc chính ký tự escape. Trong các trường hợp khác, ký tự escape sẽ được coi là ký tự thông thường.
 
-* EOF is signaled with a :const:`None` value;
+* EOF được báo hiệu bằng giá trị :const:`None`;
 
-* Quoted empty strings (``''``) are allowed.
+* Cho phép sử dụng các chuỗi rỗng được đặt trong dấu nháy (``''``).
 
 .. _improved-shell-compatibility:
 
-Improved Compatibility with Shells
-----------------------------------
+Cải thiện khả năng tương thích với Shell
+----------------------------------------
 
 .. versionadded:: 3.6
 
-The :class:`shlex` class provides compatibility with the parsing performed by
-common Unix shells like ``bash``, ``dash``, and ``sh``.  To take advantage of
-this compatibility, specify the ``punctuation_chars`` argument in the
-constructor.  This defaults to ``False``, which preserves pre-3.6 behaviour.
-However, if it is set to ``True``, then parsing of the characters ``();<>|&``
-is changed: any run of these characters is returned as a single token.  While
-this is short of a full parser for shells (which would be out of scope for the
-standard library, given the multiplicity of shells out there), it does allow
-you to perform processing of command lines more easily than you could
-otherwise.  To illustrate, you can see the difference in the following snippet:
+Lớp :class:`shlex` cung cấp khả năng tương thích với cách phân tích cú pháp của các Unix shell phổ biến như ``bash``, ``dash`` và ``sh``. Để tận dụng khả năng tương thích này, hãy chỉ định đối số ``punctuation_chars`` trong constructor. Giá trị mặc định là ``False``, giúp duy trì hành vi trước phiên bản 3.6. Tuy nhiên, nếu đặt thành ``True``, cách phân tích các ký tự ``();<>|&`` sẽ thay đổi: mọi chuỗi liên tiếp gồm các ký tự này sẽ được trả về dưới dạng một token duy nhất. Mặc dù chưa phải là một parser đầy đủ cho shell (điều này nằm ngoài phạm vi của standard library vì có rất nhiều shell khác nhau), tính năng này vẫn cho phép bạn xử lý command line dễ dàng hơn so với trước đây. Để minh họa, bạn có thể xem sự khác biệt trong đoạn mã sau:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -424,22 +304,16 @@ otherwise.  To illustrate, you can see the difference in the following snippet:
    ['a', '&&', 'b', ';', 'c', '&&', 'd', '||', 'e', ';', 'f', '>', 'abc', ';',
    '(', 'def', 'ghi', ')']
 
-Of course, tokens will be returned which are not valid for shells, and you'll
-need to implement your own error checks on the returned tokens.
+Tất nhiên, sẽ có những token được trả về không hợp lệ đối với shell, và bạn sẽ cần tự triển khai việc kiểm tra lỗi trên các token được trả về.
 
-Instead of passing ``True`` as the value for the punctuation_chars parameter,
-you can pass a string with specific characters, which will be used to determine
-which characters constitute punctuation. For example::
+Thay vì truyền ``True`` làm giá trị cho tham số punctuation_chars, bạn có thể truyền một chuỗi gồm các ký tự cụ thể, được dùng để xác định những ký tự nào tạo thành dấu câu. Ví dụ::
 
    >>> import shlex
    >>> s = shlex.shlex("a && b || c", punctuation_chars="|")
    >>> list(s)
    ['a', '&', '&', 'b', '||', 'c']
 
-.. note:: When ``punctuation_chars`` is specified, the :attr:`~shlex.wordchars`
-   attribute is augmented with the characters ``~-./*?=``.  That is because these
-   characters can appear in file names (including wildcards) and command-line
-   arguments (e.g. ``--color=auto``). Hence::
+.. note:: Khi ``punctuation_chars`` được chỉ định, thuộc tính :attr:`~shlex.wordchars` sẽ được bổ sung các ký tự ``~-./*?=``. Đó là vì các ký tự này có thể xuất hiện trong tên tệp (bao gồm cả wildcard) và đối số dòng lệnh (ví dụ: ``--color=auto``). Do đó::
 
       >>> import shlex
       >>> s = shlex.shlex('~/a && b-c --color=auto || d *.py?',
@@ -447,11 +321,9 @@ which characters constitute punctuation. For example::
       >>> list(s)
       ['~/a', '&&', 'b-c', '--color=auto', '||', 'd', '*.py?']
 
-   However, to match the shell as closely as possible, it is recommended to
-   always use ``posix`` and :attr:`~shlex.whitespace_split` when using
-   :attr:`~shlex.punctuation_chars`, which will negate
-   :attr:`~shlex.wordchars` entirely.
+   Tuy nhiên, để khớp với shell sát nhất có thể, bạn nên luôn sử dụng ``posix`` và :attr:`~shlex.whitespace_split` khi sử dụng
+   :attr:`~shlex.punctuation_chars`, điều này sẽ vô hiệu hóa
+   hoàn toàn :attr:`~shlex.wordchars`.
 
-For best effect, ``punctuation_chars`` should be set in conjunction with
-``posix=True``. (Note that ``posix=False`` is the default for
+Để đạt hiệu quả tốt nhất, ``punctuation_chars`` nên được đặt cùng với ``posix=True``. (Lưu ý rằng ``posix=False`` là mặc định cho
 :class:`~shlex.shlex`.)

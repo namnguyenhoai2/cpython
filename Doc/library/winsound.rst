@@ -1,217 +1,195 @@
-:mod:`!winsound` --- Sound-playing interface for Windows
+:mod:`!winsound` --- Giao diện phát âm thanh cho Windows
 ========================================================
 
 .. module:: winsound
-   :synopsis: Access to the sound-playing machinery for Windows.
+   :synopsis: Truy cập vào cơ chế phát âm thanh cho Windows.
 
 .. moduleauthor:: Toby Dickenson <htrd90@zepler.org>
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 
 --------------
 
-The :mod:`!winsound` module provides access to the basic sound-playing machinery
-provided by Windows platforms.  It includes functions and several constants.
+Mô-đun :mod:`!winsound` cung cấp quyền truy cập vào cơ chế phát âm thanh cơ bản do các nền tảng Windows cung cấp. Mô-đun này bao gồm các hàm và một số hằng số.
 
 .. availability:: Windows.
 
 
 .. function:: Beep(frequency, duration)
 
-   Beep the PC's speaker. The *frequency* parameter specifies frequency, in hertz,
-   of the sound, and must be in the range 37 through 32,767. The *duration*
-   parameter specifies the number of milliseconds the sound should last.  If the
-   system is not able to beep the speaker, :exc:`RuntimeError` is raised.
+   Phát tiếng bíp từ loa của PC. Tham số *frequency* chỉ định tần số của âm thanh, tính bằng hertz, và phải nằm trong khoảng từ 37 đến 32.767. Tham số *duration* chỉ định số mili giây mà âm thanh sẽ kéo dài. Nếu hệ thống không thể phát tiếng bíp từ loa, :exc:`RuntimeError` sẽ được phát sinh.
 
 
 .. function:: PlaySound(sound, flags)
 
-   Call the underlying :c:func:`!PlaySound` function from the Platform API.  The
-   *sound* parameter may be a filename, a system sound alias, audio data as a
-   :term:`bytes-like object`, or ``None``.  Its
-   interpretation depends on the value of *flags*, which can be a bitwise ORed
-   combination of the constants described below. If the *sound* parameter is
-   ``None``, any currently playing waveform sound is stopped. If the system
-   indicates an error, :exc:`RuntimeError` is raised.
+   Gọi hàm :c:func:`!PlaySound` bên dưới từ Platform API. Tham số *sound* có thể là tên tệp, bí danh âm thanh hệ thống, dữ liệu âm thanh dưới dạng một
+   :term:`bytes-like object`, hoặc ``None``. Cách diễn giải tham số này phụ thuộc vào giá trị của *flags*, có thể là sự kết hợp các hằng số được mô tả dưới đây bằng phép OR theo bit. Nếu tham số *sound* là ``None``, mọi âm thanh dạng waveform đang phát sẽ bị dừng. Nếu hệ thống cho biết có lỗi, :exc:`RuntimeError` sẽ được phát sinh.
 
 
 .. function:: MessageBeep(type=MB_OK)
 
-   Call the underlying :c:func:`!MessageBeep` function from the Platform API.  This
-   plays a sound as specified in the registry.  The *type* argument specifies which
-   sound to play; possible values are ``-1``, ``MB_ICONASTERISK``,
-   ``MB_ICONEXCLAMATION``, ``MB_ICONHAND``, ``MB_ICONQUESTION``, and ``MB_OK``, all
-   described below.  The value ``-1`` produces a "simple beep"; this is the final
-   fallback if a sound cannot be played otherwise.  If the system indicates an
-   error, :exc:`RuntimeError` is raised.
+   Gọi hàm :c:func:`!MessageBeep` bên dưới từ Platform API. Hàm này phát âm thanh như được chỉ định trong registry. Đối số *type* chỉ định âm thanh cần phát; các giá trị có thể là ``-1``, ``MB_ICONASTERISK``, ``MB_ICONEXCLAMATION``, ``MB_ICONHAND``, ``MB_ICONQUESTION`` và ``MB_OK``, tất cả đều được mô tả dưới đây. Giá trị ``-1`` tạo ra một "tiếng bíp đơn giản"; đây là phương án dự phòng cuối cùng nếu không thể phát âm thanh theo cách khác. Nếu hệ thống cho biết có lỗi, :exc:`RuntimeError` sẽ được phát sinh.
 
 
 .. data:: SND_FILENAME
 
-   The *sound* parameter is the name of a WAV file. Do not use with
+   Tham số *sound* là tên của một tệp WAV. Không sử dụng cùng với
    :const:`SND_ALIAS`.
 
 
 .. data:: SND_ALIAS
 
-   The *sound* parameter is a sound association name from the registry.  If the
-   registry contains no such name, play the system default sound unless
-   :const:`SND_NODEFAULT` is also specified. If no default sound is registered,
-   raise :exc:`RuntimeError`. Do not use with :const:`SND_FILENAME`.
+   Tham số *sound* là tên liên kết âm thanh từ registry. Nếu registry không chứa tên đó, hãy phát âm thanh mặc định của hệ thống, trừ khi
+   :const:`SND_NODEFAULT` cũng được chỉ định. Nếu không đăng ký âm thanh mặc định nào, hãy raise :exc:`RuntimeError`. Không sử dụng cùng với :const:`SND_FILENAME`.
 
-   All Win32 systems support at least the following; most systems support many
-   more:
+   Tất cả các hệ thống Win32 đều hỗ trợ ít nhất những mục sau; hầu hết các hệ thống còn hỗ trợ nhiều mục khác:
 
-   +--------------------------+----------------------------------------+
-   | :func:`PlaySound` *name* | Corresponding Control Panel Sound name |
-   +==========================+========================================+
-   | ``'SystemAsterisk'``     | Asterisk                               |
-   +--------------------------+----------------------------------------+
-   | ``'SystemExclamation'``  | Exclamation                            |
-   +--------------------------+----------------------------------------+
-   | ``'SystemExit'``         | Exit Windows                           |
-   +--------------------------+----------------------------------------+
-   | ``'SystemHand'``         | Critical Stop                          |
-   +--------------------------+----------------------------------------+
-   | ``'SystemQuestion'``     | Question                               |
-   +--------------------------+----------------------------------------+
+   +-------------------------+-----------------------------------------+
+   | :func:`PlaySound` *tên* | Tên Sound tương ứng trong Control Panel |
+   +=========================+=========================================+
+   | ``'SystemAsterisk'``    | Asterisk                                |
+   +-------------------------+-----------------------------------------+
+   | ``'SystemExclamation'`` | Dấu chấm than                           |
+   +-------------------------+-----------------------------------------+
+   | ``'SystemExit'``        | Thoát Windows                           |
+   +-------------------------+-----------------------------------------+
+   | ``'SystemHand'``        | Dừng nghiêm trọng                       |
+   +-------------------------+-----------------------------------------+
+   | ``'SystemQuestion'``    | Câu hỏi                                 |
+   +-------------------------+-----------------------------------------+
 
-   For example::
+   Ví dụ::
 
       import winsound
-      # Play Windows exit sound.
+      # Phát âm thanh thoát Windows.
       winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
 
-      # Probably play Windows default sound, if any is registered (because
-      # "*" probably isn't the registered name of any sound).
+      # Có lẽ phát âm thanh mặc định của Windows, nếu có âm thanh nào được đăng ký (vì
+      # "*" có lẽ không phải là tên đã đăng ký của bất kỳ âm thanh nào).
       winsound.PlaySound("*", winsound.SND_ALIAS)
 
 
 .. data:: SND_LOOP
 
-   Play the sound repeatedly.  The :const:`SND_ASYNC` flag must also be used to
-   avoid blocking.  Cannot be used with :const:`SND_MEMORY`.
+   Phát âm thanh lặp lại. Cũng phải sử dụng cờ :const:`SND_ASYNC` để tránh chặn. Không thể sử dụng với :const:`SND_MEMORY`.
 
 
 .. data:: SND_MEMORY
 
-   The *sound* parameter to :func:`PlaySound` is a memory image of a WAV file, as a
+   Tham số *sound* của :func:`PlaySound` là một ảnh bộ nhớ của tệp WAV, dưới dạng
    :term:`bytes-like object`.
 
    .. note::
 
-      This module does not support playing from a memory image asynchronously, so a
-      combination of this flag and :const:`SND_ASYNC` will raise :exc:`RuntimeError`.
+      Module này không hỗ trợ phát từ ảnh bộ nhớ một cách bất đồng bộ, vì vậy việc kết hợp cờ này với :const:`SND_ASYNC` sẽ phát sinh :exc:`RuntimeError`.
 
 
 .. data:: SND_PURGE
 
-   Stop playing all instances of the specified sound.
+   Dừng phát tất cả các phiên bản của âm thanh được chỉ định.
 
    .. note::
 
-      This flag is not supported on modern Windows platforms.
+      Cờ này không được hỗ trợ trên các nền tảng Windows hiện đại.
 
 
 .. data:: SND_ASYNC
 
-   Return immediately, allowing sounds to play asynchronously.
+   Trả về ngay lập tức, cho phép âm thanh phát không đồng bộ.
 
 
 .. data:: SND_NODEFAULT
 
-   If the specified sound cannot be found, do not play the system default sound.
+   Nếu không tìm thấy âm thanh được chỉ định, không phát âm thanh mặc định của hệ thống.
 
 
 .. data:: SND_NOSTOP
 
-   Do not interrupt sounds currently playing.
+   Không ngắt các âm thanh hiện đang phát.
 
 
 .. data:: SND_NOWAIT
 
-   Return immediately if the sound driver is busy.
+   Trả về ngay lập tức nếu sound driver đang bận.
 
    .. note::
 
-      This flag is not supported on modern Windows platforms.
+      Cờ này không được hỗ trợ trên các nền tảng Windows hiện đại.
 
 
 .. data:: SND_APPLICATION
 
-   The *sound* parameter is an application-specific alias in the registry.
-   This flag can be combined with the :const:`SND_ALIAS` flag
-   to specify an application-defined sound alias.
+   Tham số *sound* là bí danh dành riêng cho ứng dụng trong registry. Có thể kết hợp flag này với flag :const:`SND_ALIAS` để chỉ định bí danh âm thanh do ứng dụng định nghĩa.
 
 
 .. data:: SND_SENTRY
 
-   Triggers a SoundSentry event when the sound is played.
+   Kích hoạt một sự kiện SoundSentry khi âm thanh được phát.
 
    .. versionadded:: 3.14
 
 
 .. data:: SND_SYNC
 
-   The sound is played synchronously.  This is the default behavior.
+   Âm thanh được phát đồng bộ. Đây là hành vi mặc định.
 
    .. versionadded:: 3.14
 
 
 .. data:: SND_SYSTEM
 
-   Assign the sound to the audio session for system notification sounds.
+   Gán âm thanh cho phiên âm thanh dành cho các âm thanh thông báo của hệ thống.
 
    .. versionadded:: 3.14
 
 
 .. data:: MB_ICONASTERISK
 
-   Play the ``SystemDefault`` sound.
+   Phát âm thanh ``SystemDefault``.
 
 
 .. data:: MB_ICONEXCLAMATION
 
-   Play the ``SystemExclamation`` sound.
+   Phát âm thanh ``SystemExclamation``.
 
 
 .. data:: MB_ICONHAND
 
-   Play the ``SystemHand`` sound.
+   Phát âm thanh ``SystemHand``.
 
 
 .. data:: MB_ICONQUESTION
 
-   Play the ``SystemQuestion`` sound.
+   Phát âm thanh ``SystemQuestion``.
 
 
 .. data:: MB_OK
 
-   Play the ``SystemDefault`` sound.
+   Phát âm thanh ``SystemDefault``.
 
 
 .. data:: MB_ICONERROR
 
-   Play the ``SystemHand`` sound.
+   Phát âm thanh ``SystemHand``.
 
    .. versionadded:: 3.14
 
 
 .. data:: MB_ICONINFORMATION
 
-   Play the ``SystemDefault`` sound.
+   Phát âm thanh ``SystemDefault``.
 
    .. versionadded:: 3.14
 
 
 .. data:: MB_ICONSTOP
 
-   Play the ``SystemHand`` sound.
+   Phát âm thanh ``SystemHand``.
 
    .. versionadded:: 3.14
 
 
 .. data:: MB_ICONWARNING
 
-   Play the ``SystemExclamation`` sound.
+   Phát âm thanh ``SystemExclamation``.
 
    .. versionadded:: 3.14

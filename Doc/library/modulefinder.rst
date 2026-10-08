@@ -1,66 +1,53 @@
-:mod:`!modulefinder` --- Find modules used by a script
-======================================================
+:mod:`!modulefinder` --- Tìm các mô-đun được một tập lệnh sử dụng
+=================================================================
 
 .. module:: modulefinder
-   :synopsis: Find modules used by a script.
+   :synopsis: Tìm các mô-đun được một tập lệnh sử dụng.
 
 .. sectionauthor:: A.M. Kuchling <amk@amk.ca>
 
-**Source code:** :source:`Lib/modulefinder.py`
+**Mã nguồn:** :source:`Lib/modulefinder.py`
 
 --------------
 
-This module provides a :class:`ModuleFinder` class that can be used to determine
-the set of modules imported by a script. ``modulefinder.py`` can also be run as
-a script, giving the filename of a Python script as its argument, after which a
-report of the imported modules will be printed.
+Mô-đun này cung cấp một lớp :class:`ModuleFinder` có thể được sử dụng để xác định tập hợp các mô-đun được một tập lệnh import. ``modulefinder.py`` cũng có thể được chạy như một tập lệnh, với tên tệp của một tập lệnh Python làm đối số; sau đó, một báo cáo về các mô-đun đã import sẽ được in ra.
 
 
 .. function:: AddPackagePath(pkg_name, path)
 
-   Record that the package named *pkg_name* can be found in the specified *path*.
+   Ghi nhận rằng package có tên *pkg_name* có thể được tìm thấy trong *path* được chỉ định.
 
 
 .. function:: ReplacePackage(oldname, newname)
 
-   Allows specifying that the module named *oldname* is in fact the package named
-   *newname*.
+   Cho phép chỉ định rằng mô-đun có tên *oldname* thực chất là package có tên *newname*.
 
 
 .. class:: ModuleFinder(path=None, debug=0, excludes=[], replace_paths=[])
 
-   This class provides :meth:`run_script` and :meth:`report` methods to determine
-   the set of modules imported by a script. *path* can be a list of directories to
-   search for modules; if not specified, ``sys.path`` is used.  *debug* sets the
-   debugging level; higher values make the class print debugging messages about
-   what it's doing. *excludes* is a list of module names to exclude from the
-   analysis. *replace_paths* is a list of ``(oldpath, newpath)`` tuples that will
-   be replaced in module paths.
+   Lớp này cung cấp các phương thức :meth:`run_script` và :meth:`report` để xác định tập hợp các mô-đun được một tập lệnh import. *path* có thể là một danh sách các thư mục để tìm kiếm mô-đun; nếu không được chỉ định, ``sys.path`` sẽ được sử dụng. *debug* đặt mức độ debug; các giá trị cao hơn khiến lớp in ra các thông báo debug về những gì nó đang thực hiện. *excludes* là một danh sách các tên mô-đun cần loại trừ khỏi quá trình phân tích. *replace_paths* là một danh sách các tuple ``(oldpath, newpath)`` sẽ được thay thế trong các đường dẫn mô-đun.
 
 
    .. method:: report()
 
-      Print a report to standard output that lists the modules imported by the
-      script and their paths, as well as modules that are missing or seem to be
-      missing.
+      In ra đầu ra tiêu chuẩn một báo cáo liệt kê các module được script import và đường dẫn của chúng, cũng như các module bị thiếu hoặc có vẻ bị thiếu.
 
    .. method:: run_script(pathname)
 
-      Analyze the contents of the *pathname* file, which must contain Python
-      code.
+      Phân tích nội dung của tệp *pathname*, tệp này phải chứa mã Python.
 
    .. attribute:: modules
 
-      A dictionary mapping module names to modules. See
+      Một dictionary ánh xạ tên module với các module. Xem
       :ref:`modulefinder-example`.
 
 
 .. _modulefinder-example:
 
-Example usage of :class:`ModuleFinder`
---------------------------------------
+Ví dụ sử dụng :class:`ModuleFinder`
+-----------------------------------
 
-The script that is going to get analyzed later on (bacon.py)::
+Script sẽ được phân tích sau đó (bacon.py)::
 
    import re, itertools
 
@@ -75,7 +62,7 @@ The script that is going to get analyzed later on (bacon.py)::
        pass
 
 
-The script that will output the report of bacon.py::
+Script sẽ xuất báo cáo về bacon.py::
 
    from modulefinder import ModuleFinder
 
@@ -91,7 +78,7 @@ The script that will output the report of bacon.py::
    print('Modules not imported:')
    print('\n'.join(finder.badmodules.keys()))
 
-Sample output (may vary depending on the architecture)::
+Đầu ra mẫu (có thể thay đổi tùy thuộc vào kiến trúc)::
 
     Loaded modules:
     _types:

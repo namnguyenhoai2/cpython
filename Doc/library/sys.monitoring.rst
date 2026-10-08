@@ -1,8 +1,8 @@
-:mod:`!sys.monitoring` --- Execution event monitoring
-=====================================================
+:mod:`!sys.monitoring` --- Giám sát sự kiện thực thi
+====================================================
 
 .. module:: sys.monitoring
-   :synopsis: Access and control event monitoring
+   :synopsis: Truy cập và kiểm soát việc giám sát sự kiện
 
 .. versionadded:: 3.12
 
@@ -10,70 +10,53 @@
 
 .. note::
 
-    :mod:`!sys.monitoring` is a namespace within the :mod:`sys` module,
-    not an independent module, and ``import sys.monitoring`` would fail
-    with a :exc:`ModuleNotFoundError`. Instead, simply ``import sys``
-    and then use ``sys.monitoring``.
+    :mod:`!sys.monitoring` là một namespace trong module :mod:`sys`, không phải là một module độc lập, và ``import sys.monitoring`` sẽ gây ra :exc:`ModuleNotFoundError`. Thay vào đó, chỉ cần ``import sys``, rồi sử dụng ``sys.monitoring``.
 
 
-This namespace provides access to the functions and constants necessary to
-activate and control event monitoring.
+Namespace này cung cấp quyền truy cập vào các hàm và hằng số cần thiết để kích hoạt và kiểm soát việc giám sát sự kiện.
 
-As programs execute, events occur that might be of interest to tools that
-monitor execution. The :mod:`!sys.monitoring` namespace provides means to
-receive callbacks when events of interest occur.
+Khi chương trình thực thi, các sự kiện xảy ra có thể được các công cụ giám sát quá trình thực thi quan tâm. Namespace :mod:`!sys.monitoring` cung cấp phương thức để nhận callback khi các sự kiện cần quan tâm xảy ra.
 
-The monitoring API consists of three components:
+API giám sát gồm ba thành phần:
 
-* `Tool identifiers`_
+* `Mã định danh công cụ <Tool identifiers_>`_
 * `Events`_
-* :ref:`Callbacks <callbacks>`
+* :ref:`Callback <callbacks>`
 
-Tool identifiers
-----------------
+.. _`Tool identifiers`:
 
-A tool identifier is an integer and the associated name.
-Tool identifiers are used to discourage tools from interfering with each
-other and to allow multiple tools to operate at the same time.
-Currently tools are completely independent and cannot be used to
-monitor each other. This restriction may be lifted in the future.
+Mã định danh công cụ
+--------------------
 
-Before registering or activating events, a tool should choose an identifier.
-Identifiers are integers in the range 0 to 5 inclusive.
+Mã định danh công cụ là một số nguyên và tên tương ứng. Mã định danh công cụ được sử dụng để ngăn các công cụ can thiệp lẫn nhau và cho phép nhiều công cụ hoạt động đồng thời. Hiện tại, các công cụ hoàn toàn độc lập và không thể được dùng để giám sát lẫn nhau. Hạn chế này có thể được gỡ bỏ trong tương lai.
 
-Registering and using tools
-'''''''''''''''''''''''''''
+Trước khi đăng ký hoặc kích hoạt các sự kiện, một công cụ nên chọn một mã định danh. Mã định danh là các số nguyên trong phạm vi từ 0 đến 5, bao gồm cả hai giá trị này.
+
+Đăng ký và sử dụng công cụ
+''''''''''''''''''''''''''
 
 .. function:: use_tool_id(tool_id: int, name: str, /) -> None
 
-   Must be called before *tool_id* can be used.
-   *tool_id* must be in the range 0 to 5 inclusive.
-   Raises a :exc:`ValueError` if *tool_id* is in use.
+   Phải được gọi trước khi có thể sử dụng *tool_id*. *tool_id* phải nằm trong phạm vi từ 0 đến 5, bao gồm cả hai giá trị này. Phát sinh một :exc:`ValueError` nếu *tool_id* đang được sử dụng.
 
 .. function:: clear_tool_id(tool_id: int, /) -> None
 
-   Unregister all events and callback functions associated with *tool_id*.
+   Hủy đăng ký tất cả sự kiện và các hàm callback liên kết với *tool_id*.
 
    .. versionadded:: 3.14
 
 .. function:: free_tool_id(tool_id: int, /) -> None
 
-   Should be called once a tool no longer requires *tool_id*.
-   Will call :func:`clear_tool_id` before releasing *tool_id*.
+   Nên được gọi một lần khi một tool không còn yêu cầu *tool_id*. Sẽ gọi :func:`clear_tool_id` trước khi giải phóng *tool_id*.
 
    .. versionchanged:: 3.14
-      Now calls :func:`clear_tool_id` before releasing *tool_id*.
-      Previously, it would not disable global or local events associated
-      with *tool_id*, nor unregister any callback functions.
+      Giờ đây sẽ gọi :func:`clear_tool_id` trước khi giải phóng *tool_id*. Trước đây, hàm này không vô hiệu hóa các event toàn cục hoặc cục bộ liên kết với *tool_id*, cũng không hủy đăng ký bất kỳ callback function nào.
 
 .. function:: get_tool(tool_id: int, /) -> str | None
 
-   Returns the name of the tool if *tool_id* is in use,
-   otherwise it returns ``None``.
-   *tool_id* must be in the range 0 to 5 inclusive.
+   Trả về tên của tool nếu *tool_id* đang được sử dụng; nếu không, trả về ``None``. *tool_id* phải nằm trong khoảng từ 0 đến 5, bao gồm cả hai đầu mút.
 
-All IDs are treated the same by the VM with regard to events, but the
-following IDs are pre-defined to make co-operation of tools easier::
+VM xử lý tất cả ID như nhau đối với các event, nhưng các ID sau đây được định nghĩa sẵn để giúp các tool phối hợp dễ dàng hơn::
 
   sys.monitoring.DEBUGGER_ID = 0
   sys.monitoring.COVERAGE_ID = 1
@@ -81,114 +64,105 @@ following IDs are pre-defined to make co-operation of tools easier::
   sys.monitoring.OPTIMIZER_ID = 5
 
 
-Events
-------
+Sự kiện
+-------
 
-The following events are supported:
+Các event sau được hỗ trợ:
 
 .. monitoring-event:: BRANCH_LEFT
 
-   A conditional branch goes left.
+   Một nhánh điều kiện rẽ sang trái.
 
-   It is up to the tool to determine how to present "left" and "right" branches.
-   There is no guarantee which branch is "left" and which is "right", except
-   that it will be consistent for the duration of the program.
+   Công cụ sẽ quyết định cách trình bày các nhánh "left" và "right". Không có gì đảm bảo nhánh nào là "left" và nhánh nào là "right", ngoại trừ việc cách này sẽ nhất quán trong suốt thời gian chạy của chương trình.
 
 .. monitoring-event:: BRANCH_RIGHT
 
-   A conditional branch goes right.
+   Một nhánh điều kiện đi sang phải.
 
 .. monitoring-event:: CALL
 
-   A call in Python code (event occurs before the call).
+   Một lệnh gọi trong mã Python (event xảy ra trước lệnh gọi).
 
 .. monitoring-event:: C_RAISE
 
-   An exception raised from any callable, except for Python functions (event occurs after the exit).
+   Một exception được nêu ra từ bất kỳ callable nào, ngoại trừ các hàm Python (event xảy ra sau khi thoát).
 
 .. monitoring-event:: C_RETURN
 
-   Return from any callable, except for Python functions (event occurs after the return).
+   Trả về từ bất kỳ callable nào, ngoại trừ các hàm Python (event xảy ra sau khi trả về).
 
 .. monitoring-event:: EXCEPTION_HANDLED
 
-   An exception is handled.
+   Một exception được xử lý.
 
 .. monitoring-event:: INSTRUCTION
 
-   A VM instruction is about to be executed.
+   Một chỉ thị VM sắp được thực thi.
 
 .. monitoring-event:: JUMP
 
-   An unconditional jump in the control flow graph is made.
+   Một bước nhảy vô điều kiện trong đồ thị luồng điều khiển được thực hiện.
 
 .. monitoring-event:: LINE
 
-   An instruction is about to be executed that has a different line number from the preceding instruction.
+   Một instruction sắp được thực thi có số dòng khác với instruction ngay trước đó.
 
 .. monitoring-event:: PY_RESUME
 
-   Resumption of a Python function (for generator and coroutine functions), except for ``throw()`` calls.
+   Tiếp tục thực thi một hàm Python (đối với các hàm generator và coroutine), ngoại trừ các lệnh gọi ``throw()``.
 
 .. monitoring-event:: PY_RETURN
 
-   Return from a Python function (occurs immediately before the return, the callee's frame will be on the stack).
+   Trở về từ một hàm Python (xảy ra ngay trước khi return; frame của callee sẽ nằm trên stack).
 
 .. monitoring-event:: PY_START
 
-   Start of a Python function (occurs immediately after the call, the callee's frame will be on the stack)
+   Bắt đầu một hàm Python (xảy ra ngay sau lệnh gọi; frame của callee sẽ nằm trên stack).
 
 .. monitoring-event:: PY_THROW
 
-   A Python function is resumed by a ``throw()`` call.
+   Một hàm Python được tiếp tục thực thi bởi một lệnh gọi ``throw()``.
 
 .. monitoring-event:: PY_UNWIND
 
-   Exit from a Python function during exception unwinding. This includes exceptions raised directly within the
-   function and that are allowed to continue to propagate.
+   Thoát khỏi một hàm Python trong quá trình unwind ngoại lệ. Điều này bao gồm các ngoại lệ được phát sinh trực tiếp bên trong hàm và được phép tiếp tục lan truyền.
 
 .. monitoring-event:: PY_YIELD
 
-   Yield from a Python function (occurs immediately before the yield, the callee's frame will be on the stack).
+   Yield từ một hàm Python (xảy ra ngay trước yield, frame của callee sẽ nằm trên stack).
 
 .. monitoring-event:: RAISE
 
-   An exception is raised, except those that cause a :monitoring-event:`STOP_ITERATION` event.
+   Một exception được raised, ngoại trừ những exception gây ra sự kiện :monitoring-event:`STOP_ITERATION`.
 
 .. monitoring-event:: RERAISE
 
-   An exception is re-raised, for example at the end of a :keyword:`finally` block.
+   Một exception được re-raised, chẳng hạn ở cuối khối :keyword:`finally`.
 
 .. monitoring-event:: STOP_ITERATION
 
-   An artificial :exc:`StopIteration` is raised; see `the STOP_ITERATION event`_.
+   Một :exc:`StopIteration` nhân tạo được raised; xem `sự kiện STOP_ITERATION <the STOP_ITERATION event_>`_.
 
 
-More events may be added in the future.
+Có thể sẽ bổ sung thêm các sự kiện trong tương lai.
 
-These events are attributes of the :mod:`!sys.monitoring.events` namespace.
-Each event is represented as a power-of-2 integer constant.
-To define a set of events, simply bitwise OR the individual events together.
-For example, to specify both :monitoring-event:`PY_RETURN` and :monitoring-event:`PY_START`
-events, use the expression ``PY_RETURN | PY_START``.
+Các sự kiện này là các thuộc tính của namespace :mod:`!sys.monitoring.events`. Mỗi sự kiện được biểu diễn bằng một hằng số nguyên có giá trị là lũy thừa của 2. Để định nghĩa một tập hợp sự kiện, chỉ cần thực hiện phép OR theo bitwise giữa các sự kiện riêng lẻ. Ví dụ, để chỉ định cả hai sự kiện :monitoring-event:`PY_RETURN` và :monitoring-event:`PY_START`, hãy sử dụng biểu thức ``PY_RETURN | PY_START``.
 
 .. monitoring-event:: NO_EVENTS
 
-    An alias for ``0`` so users can do explicit comparisons like::
+    Một bí danh cho ``0`` để người dùng có thể thực hiện các phép so sánh tường minh như::
 
       if get_events(DEBUGGER_ID) == NO_EVENTS:
           ...
 
-    Setting this event deactivates all events.
+    Việc thiết lập sự kiện này sẽ vô hiệu hóa tất cả các sự kiện.
 
 .. _monitoring-event-local:
 
-Local events
-''''''''''''
+Các sự kiện cục bộ
+''''''''''''''''''
 
-Local events are associated with normal execution of the program and happen
-at clearly defined locations. All local events can be disabled.
-The local events are:
+Các sự kiện cục bộ gắn liền với quá trình thực thi thông thường của chương trình và xảy ra tại những vị trí được xác định rõ ràng. Có thể vô hiệu hóa tất cả các sự kiện cục bộ. Các sự kiện cục bộ bao gồm:
 
 * :monitoring-event:`PY_START`
 * :monitoring-event:`PY_RESUME`
@@ -202,40 +176,33 @@ The local events are:
 * :monitoring-event:`BRANCH_RIGHT`
 * :monitoring-event:`STOP_ITERATION`
 
-Deprecated event
-''''''''''''''''
+Sự kiện không còn được dùng
+'''''''''''''''''''''''''''
 
 * ``BRANCH``
 
-The ``BRANCH`` event is deprecated in 3.14.
-Using :monitoring-event:`BRANCH_LEFT` and :monitoring-event:`BRANCH_RIGHT`
-events will give much better performance as they can be disabled
-independently.
+Sự kiện ``BRANCH`` không còn được dùng kể từ phiên bản 3.14. Việc sử dụng các sự kiện :monitoring-event:`BRANCH_LEFT` và :monitoring-event:`BRANCH_RIGHT` sẽ mang lại hiệu suất tốt hơn nhiều vì bạn có thể vô hiệu hóa chúng độc lập.
 
-Ancillary events
-''''''''''''''''
+Các sự kiện phụ trợ
+'''''''''''''''''''
 
-Ancillary events can be monitored like other events, but are controlled
-by another event:
+Các sự kiện phụ trợ có thể được giám sát như những sự kiện khác, nhưng được điều khiển bởi một sự kiện khác:
 
 * :monitoring-event:`C_RAISE`
 * :monitoring-event:`C_RETURN`
 
-The :monitoring-event:`C_RETURN` and :monitoring-event:`C_RAISE` events
-are controlled by the :monitoring-event:`CALL` event.
-:monitoring-event:`C_RETURN` and :monitoring-event:`C_RAISE` events will only be
-seen if the corresponding :monitoring-event:`CALL` event is being monitored.
+Các sự kiện :monitoring-event:`C_RETURN` và :monitoring-event:`C_RAISE` được điều khiển bởi sự kiện :monitoring-event:`CALL`.
+Các sự kiện :monitoring-event:`C_RETURN` và :monitoring-event:`C_RAISE` chỉ xuất hiện nếu sự kiện :monitoring-event:`CALL` tương ứng đang được giám sát.
 
 
 .. _monitoring-event-global:
 
-Other events
-''''''''''''
+Các sự kiện khác
+''''''''''''''''
 
-Other events are not necessarily tied to a specific location in the
-program and cannot be individually disabled via :data:`DISABLE`.
+Các sự kiện khác không nhất thiết gắn với một vị trí cụ thể trong chương trình và không thể bị vô hiệu hóa riêng lẻ thông qua :data:`DISABLE`.
 
-The other events that can be monitored are:
+Các sự kiện khác có thể được giám sát là:
 
 * :monitoring-event:`PY_THROW`
 * :monitoring-event:`PY_UNWIND`
@@ -243,162 +210,122 @@ The other events that can be monitored are:
 * :monitoring-event:`EXCEPTION_HANDLED`
 
 
-The STOP_ITERATION event
-''''''''''''''''''''''''
+.. _`The STOP_ITERATION event`:
 
-:pep:`PEP 380 <380#use-of-stopiteration-to-return-values>`
-specifies that a :exc:`StopIteration` exception is raised when returning a value
-from a generator or coroutine. However, this is a very inefficient way to
-return a value, so some Python implementations, notably CPython 3.12+, do not
-raise an exception unless it would be visible to other code.
+Sự kiện STOP_ITERATION
+''''''''''''''''''''''
 
-To allow tools to monitor for real exceptions without slowing down generators
-and coroutines, the :monitoring-event:`STOP_ITERATION` event is provided.
-:monitoring-event:`STOP_ITERATION` can be locally disabled, unlike
+:pep:`PEP 380 <380#use-of-stopiteration-to-return-values>` chỉ định rằng một ngoại lệ :exc:`StopIteration` được raised khi trả về một giá trị từ generator hoặc coroutine. Tuy nhiên, đây là cách trả về giá trị rất kém hiệu quả, vì vậy một số triển khai Python, đáng chú ý là CPython 3.12+, không raised ngoại lệ trừ khi ngoại lệ đó có thể được mã khác quan sát.
+
+Để cho phép các công cụ theo dõi các ngoại lệ thực sự mà không làm chậm generators và coroutines, sự kiện :monitoring-event:`STOP_ITERATION` được cung cấp.
+:monitoring-event:`STOP_ITERATION` có thể được tắt cục bộ, không giống như
 :monitoring-event:`RAISE`.
 
-Note that the :monitoring-event:`STOP_ITERATION` event and the
-:monitoring-event:`RAISE` event for a :exc:`StopIteration` exception are
-equivalent, and are treated as interchangeable when generating events.
-Implementations will favor :monitoring-event:`STOP_ITERATION` for performance
-reasons, but may generate a :monitoring-event:`RAISE` event with a
+Lưu ý rằng sự kiện :monitoring-event:`STOP_ITERATION` và
+sự kiện :monitoring-event:`RAISE` đối với một ngoại lệ :exc:`StopIteration` là tương đương và được xử lý như có thể thay thế cho nhau khi tạo sự kiện. Các triển khai sẽ ưu tiên :monitoring-event:`STOP_ITERATION` vì lý do hiệu năng, nhưng có thể tạo một sự kiện :monitoring-event:`RAISE` với một
 :exc:`StopIteration`.
 
-Turning events on and off
--------------------------
+Bật và tắt các sự kiện
+----------------------
 
-In order to monitor an event, it must be turned on and a corresponding callback
-must be registered. Events can be turned on or off by setting the events either
-globally and/or for a particular code object. An event will trigger only once,
-even if it is turned on both globally and locally.
+Để theo dõi một sự kiện, cần bật sự kiện đó và đăng ký callback tương ứng. Có thể bật hoặc tắt các sự kiện bằng cách thiết lập chúng trên toàn cục và/hoặc cho một đối tượng mã cụ thể. Một sự kiện sẽ chỉ được kích hoạt một lần, ngay cả khi được bật cả trên toàn cục lẫn cục bộ.
 
 
-Setting events globally
-'''''''''''''''''''''''
+Thiết lập sự kiện trên toàn cục
+'''''''''''''''''''''''''''''''
 
-Events can be controlled globally by modifying the set of events being monitored.
+Có thể kiểm soát các event trên toàn cục bằng cách sửa đổi tập hợp các event đang được giám sát.
 
 .. function:: get_events(tool_id: int, /) -> int
 
-   Returns the ``int`` representing all the active events.
+   Trả về ``int`` đại diện cho tất cả các event đang hoạt động.
 
 .. function:: set_events(tool_id: int, event_set: int, /) -> None
 
-   Activates all events which are set in *event_set*.
-   Raises a :exc:`ValueError` if *tool_id* is not in use.
+   Kích hoạt tất cả các event được thiết lập trong *event_set*. Phát sinh :exc:`ValueError` nếu *tool_id* không được sử dụng.
 
-No events are active by default.
+Theo mặc định, không có event nào đang hoạt động.
 
-Per code object events
-''''''''''''''''''''''
+Event theo từng code object
+'''''''''''''''''''''''''''
 
-Events can also be controlled on a per code object basis. The functions
-defined below which accept a :class:`types.CodeType` should be prepared
-to accept a look-alike object from functions which are not defined
-in Python (see :ref:`c-api-monitoring`).
+Các event cũng có thể được kiểm soát theo từng code object. Các hàm được định nghĩa bên dưới và nhận :class:`types.CodeType` cần sẵn sàng chấp nhận một đối tượng tương tự từ các hàm không được định nghĩa trong Python (xem :ref:`c-api-monitoring`).
 
 .. function:: get_local_events(tool_id: int, code: CodeType, /) -> int
 
-   Returns all the :ref:`local events <monitoring-event-local>` for *code*
+   Trả về tất cả :ref:`local events <monitoring-event-local>` cho *code*
 
 .. function:: set_local_events(tool_id: int, code: CodeType, event_set: int, /) -> None
 
-   Activates all the :ref:`local events <monitoring-event-local>` for *code*
-   which are set in *event_set*. Raises a :exc:`ValueError` if *tool_id* is not
-   in use.
+   Kích hoạt tất cả :ref:`event cục bộ <monitoring-event-local>` cho *code* được thiết lập trong *event_set*. Phát sinh :exc:`ValueError` nếu *tool_id* không được sử dụng.
 
 
-Disabling events
-''''''''''''''''
+Vô hiệu hóa event
+'''''''''''''''''
 
 .. data:: DISABLE
 
-   A special value that can be returned from a callback function to disable
-   events for the current code location.
+   Một giá trị đặc biệt có thể được trả về từ hàm callback để vô hiệu hóa event tại vị trí code hiện tại.
 
-:ref:`Local events <monitoring-event-local>` can be disabled for a specific code
-location by returning :data:`sys.monitoring.DISABLE` from a callback function.
-This does not change which events are set, or any other code locations for the
-same event.
+Có thể vô hiệu hóa :ref:`event cục bộ <monitoring-event-local>` cho một vị trí code cụ thể bằng cách trả về :data:`sys.monitoring.DISABLE` từ một hàm callback. Việc này không thay đổi các event được thiết lập hoặc bất kỳ vị trí code nào khác đối với cùng event.
 
-Disabling events for specific locations is very important for high
-performance monitoring. For example, a program can be run under a
-debugger with no overhead if the debugger disables all monitoring
-except for a few breakpoints.
+Việc vô hiệu hóa event tại các vị trí cụ thể rất quan trọng đối với hoạt động giám sát hiệu năng cao. Ví dụ, một chương trình có thể được chạy dưới debugger mà không phát sinh overhead nếu debugger vô hiệu hóa toàn bộ hoạt động giám sát, ngoại trừ một vài breakpoint.
 
-If :data:`DISABLE` is returned by a callback for a
-:ref:`global event <monitoring-event-global>`, :exc:`ValueError` will be raised
-by the interpreter in a non-specific location (that is, no traceback will be
-provided).
+Nếu :data:`DISABLE` được callback trả về cho một
+:ref:`event toàn cục <monitoring-event-global>`, :exc:`ValueError` sẽ được interpreter phát sinh tại một vị trí không cụ thể (nghĩa là sẽ không cung cấp traceback).
 
 .. function:: restart_events() -> None
 
-   Enable all the events that were disabled by :data:`sys.monitoring.DISABLE`
-   for all tools.
+   Bật tất cả các sự kiện đã bị :data:`sys.monitoring.DISABLE` vô hiệu hóa cho mọi công cụ.
 
 
 .. _callbacks:
 
-Registering callback functions
-------------------------------
+Đăng ký các hàm callback
+------------------------
 
 .. function:: register_callback(tool_id: int, event: int, func: Callable | None, /) -> Callable | None
 
-   Registers the callable *func* for the *event* with the given *tool_id*
+   Đăng ký callable *func* cho *event* với *tool_id* đã cho
 
-   If another callback was registered for the given *tool_id* and *event*,
-   it is unregistered and returned.
-   Otherwise :func:`register_callback` returns ``None``.
+   Nếu một callback khác đã được đăng ký cho *tool_id* và *event*, callback đó sẽ bị hủy đăng ký và được trả về. Nếu không, :func:`register_callback` trả về ``None``.
 
    .. audit-event:: sys.monitoring.register_callback func sys.monitoring.register_callback
 
-Functions can be unregistered by calling
-``sys.monitoring.register_callback(tool_id, event, None)``.
+Có thể hủy đăng ký các hàm bằng cách gọi ``sys.monitoring.register_callback(tool_id, event, None)``.
 
-Callback functions can be registered and unregistered at any time.
+Có thể đăng ký và hủy đăng ký các hàm callback bất kỳ lúc nào.
 
-Callbacks are called only once regardless if the event is turned on both
-globally and locally. As such, if an event could be turned on for both global
-and local events by your code then the callback needs to be written to handle
-either trigger.
+Các callback chỉ được gọi một lần, bất kể sự kiện được bật cả trên phạm vi toàn cục và cục bộ. Vì vậy, nếu mã của bạn có thể bật một sự kiện cho cả sự kiện toàn cục và cục bộ thì callback cần được viết để xử lý cả hai cách kích hoạt.
 
 
-Callback function arguments
-'''''''''''''''''''''''''''
+Đối số của hàm callback
+'''''''''''''''''''''''
 
 .. data:: MISSING
 
-   A special value that is passed to a callback function to indicate
-   that there are no arguments to the call.
+   Một giá trị đặc biệt được truyền cho hàm callback để cho biết rằng lệnh gọi không có đối số nào.
 
-When an active event occurs, the registered callback function is called.
-Callback functions returning an object other than :data:`DISABLE` will have no effect.
-Different events will provide the callback function with different arguments, as follows:
+Khi một sự kiện đang hoạt động xảy ra, hàm callback đã đăng ký sẽ được gọi. Các hàm callback trả về một đối tượng khác :data:`DISABLE` sẽ không có tác dụng. Các sự kiện khác nhau sẽ cung cấp cho hàm callback những đối số khác nhau, như sau:
 
-* :monitoring-event:`PY_START` and :monitoring-event:`PY_RESUME`::
+* :monitoring-event:`PY_START` và :monitoring-event:`PY_RESUME`::
 
     func(code: CodeType, instruction_offset: int) -> object
 
-* :monitoring-event:`PY_RETURN` and :monitoring-event:`PY_YIELD`::
+* :monitoring-event:`PY_RETURN` và :monitoring-event:`PY_YIELD`::
 
     func(code: CodeType, instruction_offset: int, retval: object) -> object
 
-* :monitoring-event:`CALL`, :monitoring-event:`C_RAISE` and :monitoring-event:`C_RETURN`
-  (*arg0* can be :data:`MISSING` specifically)::
+* :monitoring-event:`CALL`, :monitoring-event:`C_RAISE` và :monitoring-event:`C_RETURN` (*arg0* cụ thể có thể là :data:`MISSING`)::
 
     func(code: CodeType, instruction_offset: int, callable: object, arg0: object) -> object
 
-  *code* represents the code object where the call is being made, while
-  *callable* is the object that is about to be called (and thus
-  triggered the event).
-  If there are no arguments, *arg0* is set to :data:`sys.monitoring.MISSING`.
+  *code* đại diện cho đối tượng code nơi lệnh gọi được thực hiện, còn *callable* là đối tượng sắp được gọi (và do đó đã kích hoạt sự kiện). Nếu không có đối số nào, *arg0* được đặt thành :data:`sys.monitoring.MISSING`.
 
-  For instance methods, *callable* will be the function object as found on the
-  class with *arg0* set to the instance (i.e. the ``self`` argument to the
-  method).
+  Đối với các phương thức của instance, *callable* sẽ là đối tượng hàm được tìm thấy trên class, với *arg0* được đặt thành instance (tức là đối số ``self`` của phương thức).
 
 * :monitoring-event:`RAISE`, :monitoring-event:`RERAISE`, :monitoring-event:`EXCEPTION_HANDLED`,
-  :monitoring-event:`PY_UNWIND`, :monitoring-event:`PY_THROW` and :monitoring-event:`STOP_ITERATION`::
+  :monitoring-event:`PY_UNWIND`, :monitoring-event:`PY_THROW` và :monitoring-event:`STOP_ITERATION`::
 
     func(code: CodeType, instruction_offset: int, exception: BaseException) -> object
 
@@ -406,7 +333,7 @@ Different events will provide the callback function with different arguments, as
 
     func(code: CodeType, line_number: int) -> object
 
-* :monitoring-event:`BRANCH_LEFT`, :monitoring-event:`BRANCH_RIGHT` and :monitoring-event:`JUMP`::
+* :monitoring-event:`BRANCH_LEFT`, :monitoring-event:`BRANCH_RIGHT` và :monitoring-event:`JUMP`::
 
     func(code: CodeType, instruction_offset: int, destination_offset: int) -> object
 

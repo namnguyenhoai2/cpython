@@ -1,95 +1,70 @@
-:mod:`!xmlrpc.server` --- Basic XML-RPC servers
-===============================================
+:mod:`!xmlrpc.server` --- Máy chủ XML-RPC cơ bản
+================================================
 
 .. module:: xmlrpc.server
-   :synopsis: Basic XML-RPC server implementations.
+   :synopsis: Các triển khai máy chủ XML-RPC cơ bản.
 
 .. moduleauthor:: Brian Quinlan <brianq@activestate.com>
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 
-**Source code:** :source:`Lib/xmlrpc/server.py`
+**Mã nguồn:** :source:`Lib/xmlrpc/server.py`
 
 --------------
 
-The :mod:`!xmlrpc.server` module provides a basic server framework for XML-RPC
-servers written in Python.  Servers can either be free standing, using
-:class:`SimpleXMLRPCServer`, or embedded in a CGI environment, using
+Mô-đun :mod:`!xmlrpc.server` cung cấp một framework máy chủ cơ bản cho các máy chủ XML-RPC được viết bằng Python. Máy chủ có thể hoạt động độc lập, bằng cách sử dụng
+:class:`SimpleXMLRPCServer`, hoặc được nhúng trong môi trường CGI, bằng cách sử dụng
 :class:`CGIXMLRPCRequestHandler`.
 
 
 .. warning::
 
-   The :mod:`!xmlrpc.server` module is not secure against maliciously
-   constructed data.  If you need to parse untrusted or unauthenticated data,
-   see :ref:`xml-security`.
+   Mô-đun :mod:`!xmlrpc.server` không an toàn trước dữ liệu được tạo dựng với mục đích độc hại. Nếu bạn cần phân tích dữ liệu không đáng tin cậy hoặc chưa được xác thực, hãy xem :ref:`xml-security`.
 
 .. include:: ../includes/wasm-notavail.rst
 
 .. class:: SimpleXMLRPCServer(addr, requestHandler=SimpleXMLRPCRequestHandler,\
-               logRequests=True, allow_none=False, encoding=None,\
-               bind_and_activate=True, use_builtin_types=False)
+               logRequests=True, allow_none=False, encoding=None,\ bind_and_activate=True, use_builtin_types=False)
 
-   Create a new server instance.  This class provides methods for registration of
-   functions that can be called by the XML-RPC protocol.  The *requestHandler*
-   parameter should be a factory for request handler instances; it defaults to
-   :class:`SimpleXMLRPCRequestHandler`.  The *addr* and *requestHandler* parameters
-   are passed to the :class:`socketserver.TCPServer` constructor.  If *logRequests*
-   is true (the default), requests will be logged; setting this parameter to false
-   will turn off logging.   The *allow_none* and *encoding* parameters are passed
-   on to :mod:`xmlrpc.client` and control the XML-RPC responses that will be returned
-   from the server. The *bind_and_activate* parameter controls whether
-   :meth:`server_bind` and :meth:`server_activate` are called immediately by the
-   constructor; it defaults to true. Setting it to false allows code to manipulate
-   the *allow_reuse_address* class variable before the address is bound.
-   The *use_builtin_types* parameter is passed to the
-   :func:`~xmlrpc.client.loads` function and controls which types are processed
-   when date/times values or binary data are received; it defaults to false.
+   Tạo một server instance mới. Lớp này cung cấp các phương thức để đăng ký các function có thể được gọi bằng giao thức XML-RPC. Tham số *requestHandler* phải là một factory tạo các request handler instance; mặc định là
+   :class:`SimpleXMLRPCRequestHandler`. Các tham số *addr* và *requestHandler* được truyền cho constructor :class:`socketserver.TCPServer`. Nếu *logRequests* là true (mặc định), các request sẽ được ghi log; đặt tham số này thành false sẽ tắt việc ghi log. Các tham số *allow_none* và *encoding* được truyền tiếp cho :mod:`xmlrpc.client` và kiểm soát các phản hồi XML-RPC sẽ được server trả về. Tham số *bind_and_activate* kiểm soát việc liệu
+   :meth:`server_bind` và :meth:`server_activate` có được constructor gọi ngay hay không; mặc định là true. Đặt thành false cho phép code thao tác với biến lớp *allow_reuse_address* trước khi địa chỉ được bind. Tham số *use_builtin_types* được truyền cho
+   function :func:`~xmlrpc.client.loads` và kiểm soát các kiểu dữ liệu được xử lý khi nhận các giá trị date/time hoặc dữ liệu nhị phân; mặc định là false.
 
    .. versionchanged:: 3.3
-      The *use_builtin_types* flag was added.
+      Cờ *use_builtin_types* đã được thêm vào.
 
 
 .. class:: CGIXMLRPCRequestHandler(allow_none=False, encoding=None,\
                use_builtin_types=False)
 
-   Create a new instance to handle XML-RPC requests in a CGI environment.  The
-   *allow_none* and *encoding* parameters are passed on to :mod:`xmlrpc.client`
-   and control the XML-RPC responses that will be returned from the server.
-   The *use_builtin_types* parameter is passed to the
-   :func:`~xmlrpc.client.loads` function and controls which types are processed
-   when date/times values or binary data are received; it defaults to false.
+   Tạo một instance mới để xử lý các request XML-RPC trong môi trường CGI. Các tham số *allow_none* và *encoding* được truyền tiếp cho :mod:`xmlrpc.client` và kiểm soát các phản hồi XML-RPC sẽ được server trả về. Tham số *use_builtin_types* được truyền cho
+   function :func:`~xmlrpc.client.loads` và kiểm soát các kiểu dữ liệu được xử lý khi nhận các giá trị date/time hoặc dữ liệu nhị phân; mặc định là false.
 
    .. versionchanged:: 3.3
-      The *use_builtin_types* flag was added.
+      Cờ *use_builtin_types* đã được thêm vào.
 
 
 .. class:: SimpleXMLRPCRequestHandler()
 
-   Create a new request handler instance.  This request handler supports ``POST``
-   requests and modifies logging so that the *logRequests* parameter to the
-   :class:`SimpleXMLRPCServer` constructor parameter is honored.
+   Tạo một instance request handler mới. Request handler này hỗ trợ các request ``POST`` và sửa đổi việc logging để tham số *logRequests* đối với
+   tham số constructor :class:`SimpleXMLRPCServer` được áp dụng.
 
 
 .. _simple-xmlrpc-servers:
 
-SimpleXMLRPCServer objects
---------------------------
+Các đối tượng SimpleXMLRPCServer
+--------------------------------
 
-The :class:`SimpleXMLRPCServer` class is based on
-:class:`socketserver.TCPServer` and provides a means of creating simple, stand
-alone XML-RPC servers.
+Lớp :class:`SimpleXMLRPCServer` được xây dựng dựa trên
+:class:`socketserver.TCPServer` và cung cấp phương tiện để tạo các XML-RPC server đơn giản, độc lập.
 
 
 .. method:: SimpleXMLRPCServer.register_function(function=None, name=None)
 
-   Register a function that can respond to XML-RPC requests.  If *name* is given,
-   it will be the method name associated with *function*, otherwise
-   :attr:`function.__name__` will be used.  *name* is a string, and may contain
-   characters not legal in Python identifiers, including the period character.
+   Đăng ký một hàm có thể phản hồi các yêu cầu XML-RPC. Nếu *name* được cung cấp, đó sẽ là tên phương thức được liên kết với *function*, nếu không thì
+   :attr:`function.__name__` sẽ được sử dụng. *name* là một chuỗi và có thể chứa các ký tự không hợp lệ trong định danh Python, bao gồm cả dấu chấm.
 
-   This method can also be used as a decorator.  When used as a decorator,
-   *name* can only be given as a keyword argument to register *function* under
-   *name*.  If no *name* is given, :attr:`function.__name__` will be used.
+   Phương thức này cũng có thể được sử dụng như một decorator. Khi được sử dụng như một decorator, chỉ có thể cung cấp *name* dưới dạng đối số từ khóa để đăng ký *function* dưới *name*. Nếu không cung cấp *name*, :attr:`function.__name__` sẽ được sử dụng.
 
    .. versionchanged:: 3.7
       :meth:`register_function` can be used as a decorator.
@@ -97,103 +72,83 @@ alone XML-RPC servers.
 
 .. method:: SimpleXMLRPCServer.register_instance(instance, allow_dotted_names=False)
 
-   Register an object which is used to expose method names which have not been
-   registered using :meth:`register_function`.  If *instance* contains a
-   :meth:`_dispatch` method, it is called with the requested method name and the
-   parameters from the request.  Its API is ``def _dispatch(self, method, params)``
-   (note that *params* does not represent a variable argument list).  If it calls
-   an underlying function to perform its task, that function is called as
-   ``func(*params)``, expanding the parameter list. The return value from
-   :meth:`_dispatch` is returned to the client as the result.  If *instance* does
-   not have a :meth:`_dispatch` method, it is searched for an attribute matching
-   the name of the requested method.
+   Đăng ký một đối tượng được dùng để cung cấp các tên phương thức chưa được đăng ký bằng :meth:`register_function`. Nếu *instance* chứa một
+   :meth:`_dispatch` method, phương thức đó được gọi với tên phương thức được yêu cầu và các tham số từ yêu cầu. API của nó là ``def _dispatch(self, method, params)`` (lưu ý rằng *params* không biểu thị một danh sách đối số biến đổi). Nếu phương thức này gọi một hàm underlying để thực hiện tác vụ, hàm đó được gọi dưới dạng ``func(*params)``, với danh sách tham số được mở rộng. Giá trị trả về từ
+   :meth:`_dispatch` được trả về cho client làm kết quả. Nếu *instance* không có phương thức :meth:`_dispatch`, một thuộc tính khớp với tên của phương thức được yêu cầu sẽ được tìm kiếm.
 
-   If the optional *allow_dotted_names* argument is true and the instance does not
-   have a :meth:`_dispatch` method, then if the requested method name contains
-   periods, each component of the method name is searched for individually, with
-   the effect that a simple hierarchical search is performed.  The value found from
-   this search is then called with the parameters from the request, and the return
-   value is passed back to the client.
+   Nếu đối số tùy chọn *allow_dotted_names* là true và instance không có phương thức :meth:`_dispatch`, thì nếu tên phương thức được yêu cầu chứa dấu chấm, từng thành phần của tên phương thức sẽ được tìm kiếm riêng lẻ, nhờ đó thực hiện một quy trình tìm kiếm phân cấp đơn giản. Giá trị tìm được từ quy trình tìm kiếm này sau đó được gọi với các tham số từ yêu cầu, và giá trị trả về được chuyển lại cho client.
 
    .. warning::
 
-      Enabling the *allow_dotted_names* option allows intruders to access your
-      module's global variables and may allow intruders to execute arbitrary code on
-      your machine.  Only use this option on a secure, closed network.
+      Việc bật tùy chọn *allow_dotted_names* cho phép kẻ xâm nhập truy cập các biến toàn cục của module và có thể cho phép chúng thực thi mã tùy ý trên máy của bạn. Chỉ sử dụng tùy chọn này trên một mạng an toàn, khép kín.
 
 
 .. method:: SimpleXMLRPCServer.register_introspection_functions()
 
-   Registers the XML-RPC introspection functions ``system.listMethods``,
-   ``system.methodHelp`` and ``system.methodSignature``.
+   Đăng ký các hàm introspection XML-RPC ``system.listMethods``, ``system.methodHelp`` và ``system.methodSignature``.
 
 
 .. method:: SimpleXMLRPCServer.register_multicall_functions()
 
-   Registers the XML-RPC multicall function system.multicall.
+   Đăng ký hàm multicall XML-RPC system.multicall.
 
 
 .. attribute:: SimpleXMLRPCRequestHandler.rpc_paths
 
-   An attribute value that must be a tuple listing valid path portions of the URL
-   for receiving XML-RPC requests.  Requests posted to other paths will result in a
-   404 "no such page" HTTP error.  If this tuple is empty, all paths will be
-   considered valid. The default value is ``('/', '/RPC2')``.
+   Một giá trị thuộc tính phải là một tuple liệt kê các phần đường dẫn hợp lệ của URL dùng để nhận các yêu cầu XML-RPC. Các yêu cầu được gửi đến những đường dẫn khác sẽ dẫn đến lỗi HTTP 404 "không có trang như vậy". Nếu tuple này rỗng, mọi đường dẫn sẽ được coi là hợp lệ. Giá trị mặc định là ``('/', '/RPC2')``.
 
 
 .. _simplexmlrpcserver-example:
 
-SimpleXMLRPCServer example
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-Server code::
+Ví dụ về SimpleXMLRPCServer
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mã server::
 
    from xmlrpc.server import SimpleXMLRPCServer
    from xmlrpc.server import SimpleXMLRPCRequestHandler
 
-   # Restrict to a particular path.
+   # Giới hạn ở một đường dẫn cụ thể.
    class RequestHandler(SimpleXMLRPCRequestHandler):
        rpc_paths = ('/RPC2',)
 
-   # Create server
+   # Tạo máy chủ
    with SimpleXMLRPCServer(('localhost', 8000),
                            requestHandler=RequestHandler) as server:
        server.register_introspection_functions()
 
-       # Register pow() function; this will use the value of
-       # pow.__name__ as the name, which is just 'pow'.
+       # Đăng ký hàm pow(); hàm này sẽ sử dụng giá trị của
+       # pow.__name__ làm tên, tức là 'pow'.
        server.register_function(pow)
 
-       # Register a function under a different name
+       # Đăng ký một hàm với tên khác
        def adder_function(x, y):
            return x + y
        server.register_function(adder_function, 'add')
 
-       # Register an instance; all the methods of the instance are
-       # published as XML-RPC methods (in this case, just 'mul').
+       # Đăng ký một instance; tất cả các phương thức của instance đều được
+       # công bố dưới dạng các phương thức XML-RPC (trong trường hợp này chỉ là 'mul').
        class MyFuncs:
            def mul(self, x, y):
                return x * y
 
        server.register_instance(MyFuncs())
 
-       # Run the server's main loop
+       # Chạy vòng lặp chính của máy chủ
        server.serve_forever()
 
-The following client code will call the methods made available by the preceding
-server::
+Đoạn mã client sau đây sẽ gọi các phương thức được server ở trên cung cấp::
 
    import xmlrpc.client
 
    s = xmlrpc.client.ServerProxy('http://localhost:8000')
-   print(s.pow(2,3))  # Returns 2**3 = 8
-   print(s.add(2,3))  # Returns 5
-   print(s.mul(5,2))  # Returns 5*2 = 10
+   print(s.pow(2,3))  # Trả về 2**3 = 8
+   print(s.add(2,3))  # Trả về 5
+   print(s.mul(5,2))  # Trả về 5*2 = 10
 
-   # Print list of available methods
+   # In danh sách các phương thức hiện có
    print(s.system.listMethods())
 
-:meth:`register_function` can also be used as a decorator. The previous server
-example can register functions in a decorator way::
+:meth:`register_function` cũng có thể được sử dụng như một decorator. Ví dụ server trước đó có thể đăng ký các hàm theo cách sử dụng decorator::
 
    from xmlrpc.server import SimpleXMLRPCServer
    from xmlrpc.server import SimpleXMLRPCRequestHandler
@@ -205,32 +160,29 @@ example can register functions in a decorator way::
                            requestHandler=RequestHandler) as server:
        server.register_introspection_functions()
 
-       # Register pow() function; this will use the value of
-       # pow.__name__ as the name, which is just 'pow'.
+       # Đăng ký hàm pow(); hàm này sẽ sử dụng giá trị của
+       # pow.__name__ làm tên, tức là 'pow'.
        server.register_function(pow)
 
-       # Register a function under a different name, using
-       # register_function as a decorator. *name* can only be given
-       # as a keyword argument.
+       # Đăng ký một hàm dưới tên khác bằng cách sử dụng
+       # register_function dưới dạng decorator. Chỉ có thể cung cấp *name*
+       # dưới dạng đối số từ khóa.
        @server.register_function(name='add')
        def adder_function(x, y):
            return x + y
 
-       # Register a function under function.__name__.
+       # Đăng ký một hàm dưới function.__name__.
        @server.register_function
        def mul(x, y):
            return x * y
 
        server.serve_forever()
 
-The following example included in the :file:`Lib/xmlrpc/server.py` module shows
-a server allowing dotted names and registering a multicall function.
+Ví dụ sau đây trong module :file:`Lib/xmlrpc/server.py` cho thấy một server cho phép các tên có dấu chấm và đăng ký một hàm multicall.
 
 .. warning::
 
-  Enabling the *allow_dotted_names* option allows intruders to access your
-  module's global variables and may allow intruders to execute arbitrary code on
-  your machine.  Only use this example within a secure, closed network.
+  Bật tùy chọn *allow_dotted_names* cho phép kẻ xâm nhập truy cập các biến toàn cục của module và có thể cho phép chúng thực thi mã tùy ý trên máy của bạn. Chỉ sử dụng ví dụ này trong một mạng an toàn, khép kín.
 
 ::
 
@@ -257,13 +209,12 @@ a server allowing dotted names and registering a multicall function.
             print("\nKeyboard interrupt received, exiting.")
             sys.exit(0)
 
-This ExampleService demo can be invoked from the command line::
+Có thể gọi bản demo ExampleService này từ dòng lệnh::
 
     python -m xmlrpc.server
 
 
-The client that interacts with the above server is included in
-``Lib/xmlrpc/client.py``::
+Client tương tác với server ở trên được bao gồm trong ``Lib/xmlrpc/client.py``::
 
     server = ServerProxy("http://localhost:8000")
 
@@ -282,7 +233,7 @@ The client that interacts with the above server is included in
     except Error as v:
         print("ERROR", v)
 
-This client which interacts with the demo XMLRPC server can be invoked as::
+Có thể gọi client tương tác với server XMLRPC demo này như sau::
 
     python -m xmlrpc.client
 
@@ -290,20 +241,15 @@ This client which interacts with the demo XMLRPC server can be invoked as::
 CGIXMLRPCRequestHandler
 -----------------------
 
-The :class:`CGIXMLRPCRequestHandler` class can be used to handle XML-RPC
-requests sent to Python CGI scripts.
+Có thể sử dụng lớp :class:`CGIXMLRPCRequestHandler` để xử lý các yêu cầu XML-RPC được gửi đến các tập lệnh CGI của Python.
 
 
 .. method:: CGIXMLRPCRequestHandler.register_function(function=None, name=None)
 
-   Register a function that can respond to XML-RPC requests.  If *name* is given,
-   it will be the method name associated with *function*, otherwise
-   :attr:`function.__name__` will be used.  *name* is a string, and may contain
-   characters not legal in Python identifiers, including the period character.
+   Đăng ký một hàm có thể phản hồi các yêu cầu XML-RPC. Nếu cung cấp *name*, đây sẽ là tên phương thức được liên kết với *function*, nếu không thì
+   :attr:`function.__name__` sẽ được sử dụng. *name* là một chuỗi và có thể chứa các ký tự không hợp lệ trong các định danh Python, bao gồm cả ký tự dấu chấm.
 
-   This method can also be used as a decorator.  When used as a decorator,
-   *name* can only be given as a keyword argument to register *function* under
-   *name*.  If no *name* is given, :attr:`function.__name__` will be used.
+   Phương thức này cũng có thể được dùng làm decorator. Khi được dùng làm decorator, *name* chỉ có thể được cung cấp dưới dạng đối số keyword để đăng ký *function* dưới *name*. Nếu không cung cấp *name*, :attr:`function.__name__` sẽ được dùng.
 
    .. versionchanged:: 3.7
       :meth:`register_function` can be used as a decorator.
@@ -311,35 +257,25 @@ requests sent to Python CGI scripts.
 
 .. method:: CGIXMLRPCRequestHandler.register_instance(instance)
 
-   Register an object which is used to expose method names  which have not been
-   registered using :meth:`register_function`. If  instance contains a
-   :meth:`_dispatch` method, it is called with the  requested method name and the
-   parameters from the  request; the return value is returned to the client as the
-   result. If instance does not have a :meth:`_dispatch` method, it is searched
-   for an attribute matching the name of the requested method; if  the requested
-   method name contains periods, each  component of the method name is searched for
-   individually,  with the effect that a simple hierarchical search is performed.
-   The value found from this search is then called with the  parameters from the
-   request, and the return value is passed  back to the client.
+   Đăng ký một đối tượng được dùng để cung cấp các tên phương thức chưa được đăng ký bằng :meth:`register_function`. Nếu instance chứa một
+   :meth:`_dispatch` method, phương thức này được gọi với tên phương thức được yêu cầu và các tham số từ request; giá trị trả về được gửi cho client làm kết quả. Nếu instance không có phương thức :meth:`_dispatch`, một thuộc tính khớp với tên của phương thức được yêu cầu sẽ được tìm kiếm; nếu tên phương thức được yêu cầu chứa dấu chấm, từng thành phần của tên phương thức sẽ được tìm kiếm riêng, nhờ đó thực hiện một tìm kiếm phân cấp đơn giản. Giá trị tìm được từ quá trình tìm kiếm này sau đó được gọi với các tham số từ request, và giá trị trả về được gửi lại cho client.
 
 
 .. method:: CGIXMLRPCRequestHandler.register_introspection_functions()
 
-   Register the XML-RPC introspection functions  ``system.listMethods``,
-   ``system.methodHelp`` and  ``system.methodSignature``.
+   Đăng ký các hàm introspection XML-RPC ``system.listMethods``, ``system.methodHelp`` và ``system.methodSignature``.
 
 
 .. method:: CGIXMLRPCRequestHandler.register_multicall_functions()
 
-   Register the XML-RPC multicall function ``system.multicall``.
+   Đăng ký hàm multicall XML-RPC ``system.multicall``.
 
 
 .. method:: CGIXMLRPCRequestHandler.handle_request(request_text=None)
 
-   Handle an XML-RPC request. If *request_text* is given, it should be the POST
-   data provided by the HTTP server,  otherwise the contents of stdin will be used.
+   Xử lý một request XML-RPC. Nếu *request_text* được cung cấp, đó phải là dữ liệu POST do HTTP server cung cấp; nếu không, nội dung của stdin sẽ được sử dụng.
 
-Example::
+Ví dụ::
 
    class MyFuncs:
        def mul(self, x, y):
@@ -354,93 +290,75 @@ Example::
    handler.handle_request()
 
 
-Documenting XMLRPC server
--------------------------
+Tài liệu về máy chủ XMLRPC
+--------------------------
 
-These classes extend the above classes to serve HTML documentation in response
-to HTTP GET requests.  Servers can either be free standing, using
-:class:`DocXMLRPCServer`, or embedded in a CGI environment, using
+Các lớp này mở rộng các lớp ở trên để cung cấp tài liệu HTML khi nhận được các yêu cầu HTTP GET. Máy chủ có thể hoạt động độc lập, sử dụng
+:class:`DocXMLRPCServer`
 :class:`DocCGIXMLRPCRequestHandler`.
 
 
 .. class:: DocXMLRPCServer(addr, requestHandler=DocXMLRPCRequestHandler,\
-               logRequests=True, allow_none=False, encoding=None,\
-               bind_and_activate=True, use_builtin_types=True)
+               logRequests=True, allow_none=False, encoding=None,\ bind_and_activate=True, use_builtin_types=True)
 
-   Create a new server instance. All parameters have the same meaning as for
-   :class:`SimpleXMLRPCServer`; *requestHandler* defaults to
+   Tạo một phiên bản máy chủ mới. Tất cả tham số có cùng ý nghĩa như trong
+   :class:`SimpleXMLRPCServer`; *requestHandler* mặc định là
    :class:`DocXMLRPCRequestHandler`.
 
    .. versionchanged:: 3.3
-      The *use_builtin_types* flag was added.
+      Cờ *use_builtin_types* đã được thêm vào.
 
 
 .. class:: DocCGIXMLRPCRequestHandler()
 
-   Create a new instance to handle XML-RPC requests in a CGI environment.
+   Tạo một instance mới để xử lý các yêu cầu XML-RPC trong môi trường CGI.
 
 
 .. class:: DocXMLRPCRequestHandler()
 
-   Create a new request handler instance. This request handler supports XML-RPC
-   POST requests, documentation GET requests, and modifies logging so that the
-   *logRequests* parameter to the :class:`DocXMLRPCServer` constructor parameter is
-   honored.
+   Tạo một instance request handler mới. Request handler này hỗ trợ các yêu cầu XML-RPC POST, các yêu cầu GET để xem tài liệu và điều chỉnh việc ghi log để tham số *logRequests* truyền cho tham số constructor :class:`DocXMLRPCServer` được áp dụng.
 
 
 .. _doc-xmlrpc-servers:
 
-DocXMLRPCServer objects
------------------------
+Các đối tượng DocXMLRPCServer
+-----------------------------
 
-The :class:`DocXMLRPCServer` class is derived from :class:`SimpleXMLRPCServer`
-and provides a means of creating self-documenting, stand alone XML-RPC
-servers. HTTP POST requests are handled as XML-RPC method calls. HTTP GET
-requests are handled by generating pydoc-style HTML documentation. This allows a
-server to provide its own web-based documentation.
+Lớp :class:`DocXMLRPCServer` được kế thừa từ :class:`SimpleXMLRPCServer` và cung cấp cách tạo các XML-RPC server độc lập, có tài liệu tự mô tả. Các yêu cầu HTTP POST được xử lý dưới dạng các lệnh gọi phương thức XML-RPC. Các yêu cầu HTTP GET được xử lý bằng cách tạo tài liệu HTML theo kiểu pydoc. Điều này cho phép server cung cấp tài liệu dựa trên web của chính nó.
 
 
 .. method:: DocXMLRPCServer.set_server_title(server_title)
 
-   Set the title used in the generated HTML documentation. This title will be used
-   inside the HTML "title" element.
+   Đặt tiêu đề được sử dụng trong tài liệu HTML được tạo. Tiêu đề này sẽ được sử dụng bên trong phần tử HTML "title".
 
 
 .. method:: DocXMLRPCServer.set_server_name(server_name)
 
-   Set the name used in the generated HTML documentation. This name will appear at
-   the top of the generated documentation inside a "h1" element.
+   Đặt tên được sử dụng trong tài liệu HTML được tạo. Tên này sẽ xuất hiện ở đầu tài liệu được tạo, bên trong phần tử "h1".
 
 
 .. method:: DocXMLRPCServer.set_server_documentation(server_documentation)
 
-   Set the description used in the generated HTML documentation. This description
-   will appear as a paragraph, below the server name, in the documentation.
+   Đặt mô tả được sử dụng trong tài liệu HTML được tạo. Mô tả này sẽ xuất hiện dưới dạng một đoạn văn, bên dưới tên server, trong tài liệu.
 
 
 DocCGIXMLRPCRequestHandler
 --------------------------
 
-The :class:`DocCGIXMLRPCRequestHandler` class is derived from
-:class:`CGIXMLRPCRequestHandler` and provides a means of creating
-self-documenting, XML-RPC CGI scripts. HTTP POST requests are handled as XML-RPC
-method calls. HTTP GET requests are handled by generating pydoc-style HTML
-documentation. This allows a server to provide its own web-based documentation.
+Lớp :class:`DocCGIXMLRPCRequestHandler` được dẫn xuất từ
+:class:`CGIXMLRPCRequestHandler` và cung cấp một phương thức để tạo các tập lệnh CGI XML-RPC có tài liệu tự mô tả. Các yêu cầu HTTP POST được xử lý dưới dạng các lệnh gọi phương thức XML-RPC. Các yêu cầu HTTP GET được xử lý bằng cách tạo tài liệu HTML theo kiểu pydoc. Điều này cho phép máy chủ cung cấp tài liệu dựa trên web của riêng mình.
 
 
 .. method:: DocCGIXMLRPCRequestHandler.set_server_title(server_title)
 
-   Set the title used in the generated HTML documentation. This title will be used
-   inside the HTML "title" element.
+   Đặt tiêu đề được sử dụng trong tài liệu HTML được tạo. Tiêu đề này sẽ được sử dụng bên trong phần tử HTML "title".
 
 
 .. method:: DocCGIXMLRPCRequestHandler.set_server_name(server_name)
 
-   Set the name used in the generated HTML documentation. This name will appear at
-   the top of the generated documentation inside a "h1" element.
+   Đặt tên được sử dụng trong tài liệu HTML được tạo. Tên này sẽ xuất hiện ở đầu tài liệu được tạo, bên trong phần tử "h1".
 
 
 .. method:: DocCGIXMLRPCRequestHandler.set_server_documentation(server_documentation)
 
-   Set the description used in the generated HTML documentation. This description
-   will appear as a paragraph, below the server name, in the documentation.
+   Đặt phần mô tả được sử dụng trong tài liệu HTML được tạo. Phần mô tả này sẽ xuất hiện dưới dạng một đoạn văn, bên dưới tên máy chủ, trong tài liệu.

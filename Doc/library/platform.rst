@@ -1,399 +1,310 @@
-:mod:`!platform` ---  Access to underlying platform's identifying data
-======================================================================
+:mod:`!platform` ---  Truy cập dữ liệu nhận dạng của nền tảng cơ sở
+===================================================================
 
 .. module:: platform
-   :synopsis: Retrieves as much platform identifying data as possible.
+   :synopsis: Truy xuất nhiều nhất có thể dữ liệu nhận dạng của nền tảng.
 
 .. moduleauthor:: Marc-André Lemburg <mal@egenix.com>
 .. sectionauthor:: Bjorn Pettersen <bpettersen@corp.fairisaac.com>
 
-**Source code:** :source:`Lib/platform.py`
+**Mã nguồn:** :source:`Lib/platform.py`
 
 --------------
 
 .. note::
 
-   Specific platforms listed alphabetically, with Linux included in the Unix
-   section.
+   Các nền tảng cụ thể được liệt kê theo thứ tự bảng chữ cái, trong đó Linux được đưa vào phần Unix.
 
 
-Cross platform
---------------
+Đa nền tảng
+-----------
 
 
 .. function:: architecture(executable=sys.executable, bits='', linkage='')
 
-   Queries the given executable (defaults to the Python interpreter binary) for
-   various architecture information.
+   Truy vấn tệp thực thi đã cho (mặc định là tệp nhị phân trình thông dịch Python) để lấy nhiều thông tin khác nhau về kiến trúc.
 
-   Returns a tuple ``(bits, linkage)`` which contain information about the bit
-   architecture and the linkage format used for the executable. Both values are
-   returned as strings.
+   Trả về một tuple ``(bits, linkage)`` chứa thông tin về kiến trúc bit và định dạng liên kết được sử dụng cho tệp thực thi. Cả hai giá trị đều được trả về dưới dạng chuỗi.
 
-   Values that cannot be determined are returned as given by the parameter presets.
-   If bits is given as ``''``, the ``sizeof(pointer)`` (or
-   ``sizeof(long)`` on Python version < 1.5.2) is used as indicator for the
-   supported pointer size.
+   Các giá trị không thể xác định sẽ được trả về theo các giá trị đặt trước của tham số. Nếu bits được cung cấp dưới dạng ``''``, thì ``sizeof(pointer)`` (hoặc ``sizeof(long)`` trên Python phiên bản < 1.5.2) được sử dụng làm chỉ báo cho kích thước con trỏ được hỗ trợ.
 
-   The function relies on the system's :file:`file` command to do the actual work.
-   This is available on most if not all Unix  platforms and some non-Unix platforms
-   and then only if the executable points to the Python interpreter.  Reasonable
-   defaults are used when the above needs are not met.
+   Hàm này dựa vào lệnh :file:`file` của hệ thống để thực hiện công việc thực tế. Lệnh này có sẵn trên hầu hết, nếu không phải tất cả, các nền tảng Unix và một số nền tảng không phải Unix, nhưng chỉ khi tệp thực thi trỏ đến trình thông dịch Python. Các giá trị mặc định hợp lý được sử dụng khi các yêu cầu nêu trên không được đáp ứng.
 
    .. note::
 
-      On macOS (and perhaps other platforms), executable files may be
-      universal files containing multiple architectures.
+      Trên macOS (và có thể cả các nền tảng khác), các tệp thực thi có thể là các tệp universal chứa nhiều kiến trúc.
 
-      To get at the "64-bitness" of the current interpreter, it is more
-      reliable to query the :data:`sys.maxsize` attribute::
+      Để xác định "64-bit" của trình thông dịch hiện tại, việc truy vấn thuộc tính :data:`sys.maxsize` đáng tin cậy hơn::
 
          is_64bits = sys.maxsize > 2**32
 
 
 .. function:: machine()
 
-   Returns the machine type, e.g. ``'AMD64'``. An empty string is returned if the
-   value cannot be determined.
+   Trả về loại máy, ví dụ: ``'AMD64'``. Nếu không thể xác định giá trị, một chuỗi rỗng sẽ được trả về.
 
-   The output is platform-dependent and may differ in casing and naming conventions.
+   Kết quả phụ thuộc vào nền tảng và có thể khác nhau về cách viết hoa cũng như quy ước đặt tên.
 
 
 .. function:: node()
 
-   Returns the computer's network name (may not be fully qualified!). An empty
-   string is returned if the value cannot be determined.
+   Trả về tên mạng của máy tính (có thể chưa đầy đủ!). Nếu không thể xác định giá trị, một chuỗi rỗng sẽ được trả về.
 
 
 .. function:: platform(aliased=False, terse=False)
 
-   Returns a single string identifying the underlying platform with as much useful
-   information as possible.
+   Trả về một chuỗi duy nhất nhận dạng nền tảng cơ sở với nhiều thông tin hữu ích nhất có thể.
 
-   The output is intended to be *human readable* rather than machine parseable. It
-   may look different on different platforms and this is intended.
+   Đầu ra nhằm mục đích *dễ đọc đối với con người* thay vì có thể được phân tích cú pháp bằng máy. Đầu ra có thể khác nhau trên các nền tảng khác nhau và đây là điều được dự kiến.
 
-   If *aliased* is true, the function will use aliases for various platforms that
-   report system names which differ from their common names, for example SunOS will
-   be reported as Solaris.  The :func:`system_alias` function is used to implement
-   this.
+   Nếu *aliased* là true, hàm sẽ sử dụng bí danh cho nhiều nền tảng báo cáo tên hệ thống khác với tên thông dụng của chúng; chẳng hạn, SunOS sẽ được báo cáo là Solaris. Hàm :func:`system_alias` được dùng để triển khai việc này.
 
-   Setting *terse* to true causes the function to return only the absolute minimum
-   information needed to identify the platform.
+   Đặt *terse* thành true khiến hàm chỉ trả về lượng thông tin tối thiểu tuyệt đối cần thiết để nhận dạng nền tảng.
 
    .. versionchanged:: 3.8
-      On macOS, the function now uses :func:`mac_ver`, if it returns a
-      non-empty release string, to get the macOS version rather than the darwin
-      version.
+      Trên macOS, giờ đây hàm sử dụng :func:`mac_ver`, nếu hàm này trả về một chuỗi release không rỗng, để lấy phiên bản macOS thay vì phiên bản darwin.
 
 
 .. function:: processor()
 
-   Returns the (real) processor name, e.g. ``'amdk6'``.
+   Trả về tên bộ xử lý (thực), ví dụ: ``'amdk6'``.
 
-   An empty string is returned if the value cannot be determined. Note that many
-   platforms do not provide this information or simply return the same value as for
-   :func:`machine`.  NetBSD does this.
+   Trả về một chuỗi rỗng nếu không thể xác định giá trị. Lưu ý rằng nhiều nền tảng không cung cấp thông tin này hoặc đơn giản trả về cùng một giá trị như
+   :func:`machine`. NetBSD thực hiện việc này.
 
 
 .. function:: python_build()
 
-   Returns a tuple ``(buildno, builddate)`` stating the Python build number and
-   date as strings.
+   Trả về một tuple ``(buildno, builddate)`` cho biết số bản build và ngày build của Python dưới dạng chuỗi.
 
 
 .. function:: python_compiler()
 
-   Returns a string identifying the compiler used for compiling Python.
+   Trả về một chuỗi cho biết compiler được sử dụng để biên dịch Python.
 
 
 .. function:: python_branch()
 
-   Returns a string identifying the Python implementation SCM branch.
+   Trả về một chuỗi cho biết branch SCM của Python implementation.
 
 
 .. function:: python_implementation()
 
-   Returns a string identifying the Python implementation. Possible return values
-   are: 'CPython', 'IronPython', 'Jython', 'PyPy'.
+   Trả về một chuỗi cho biết Python implementation. Các giá trị có thể trả về là: 'CPython', 'IronPython', 'Jython', 'PyPy'.
 
 
 .. function:: python_revision()
 
-   Returns a string identifying the Python implementation SCM revision.
+   Trả về một chuỗi cho biết revision SCM của Python implementation.
 
 
 .. function:: python_version()
 
-   Returns the Python version as string ``'major.minor.patchlevel'``.
+   Trả về phiên bản Python dưới dạng chuỗi ``'major.minor.patchlevel'``.
 
-   Note that unlike the Python ``sys.version``, the returned value will always
-   include the patchlevel (it defaults to 0).
+   Lưu ý rằng, không giống ``sys.version`` của Python, giá trị trả về luôn bao gồm patchlevel (mặc định là 0).
 
 
 .. function:: python_version_tuple()
 
-   Returns the Python version as tuple ``(major, minor, patchlevel)`` of strings.
+   Trả về phiên bản Python dưới dạng tuple ``(major, minor, patchlevel)`` gồm các chuỗi.
 
-   Note that unlike the Python ``sys.version``, the returned value will always
-   include the patchlevel (it defaults to ``'0'``).
+   Lưu ý rằng, không giống ``sys.version`` của Python, giá trị trả về luôn bao gồm patchlevel (mặc định là ``'0'``).
 
 
 .. function:: release()
 
-   Returns the system's release, e.g. ``'2.2.0'`` or ``'NT'``. An empty string is
-   returned if the value cannot be determined.
+   Trả về bản phát hành của hệ thống, chẳng hạn như ``'2.2.0'`` hoặc ``'NT'``. Nếu không thể xác định giá trị, một chuỗi rỗng sẽ được trả về.
 
-   On iOS and Android, this is the user-facing OS release. To obtain the
-   Darwin or Linux kernel release, use :func:`os.uname`.
+   Trên iOS và Android, đây là bản phát hành hệ điều hành dành cho người dùng. Để lấy bản phát hành kernel Darwin hoặc Linux, hãy sử dụng :func:`os.uname`.
 
 .. function:: system()
 
-   Returns the system/OS name, such as ``'Linux'``, ``'Darwin'``, ``'Java'``,
-   ``'Windows'``. An empty string is returned if the value cannot be determined.
+   Trả về tên hệ thống/hệ điều hành, chẳng hạn như ``'Linux'``, ``'Darwin'``, ``'Java'``, ``'Windows'``. Nếu không thể xác định giá trị, một chuỗi rỗng sẽ được trả về.
 
-   On iOS and Android, this returns the user-facing OS name (i.e, ``'iOS``,
-   ``'iPadOS'`` or ``'Android'``). To obtain the kernel name (``'Darwin'`` or
-   ``'Linux'``), use :func:`os.uname`.
+   Trên iOS và Android, giá trị này trả về tên hệ điều hành dành cho người dùng (tức là ``'iOS``, ``'iPadOS'`` hoặc ``'Android'``). Để lấy tên kernel (``'Darwin'`` hoặc ``'Linux'``), hãy sử dụng :func:`os.uname`.
 
 .. function:: system_alias(system, release, version)
 
-   Returns ``(system, release, version)`` aliased to common marketing names used
-   for some systems.  It also does some reordering of the information in some cases
-   where it would otherwise cause confusion.
+   Trả về ``(system, release, version)`` được đặt bí danh theo các tên tiếp thị phổ biến được sử dụng cho một số hệ thống. Trong một số trường hợp, hàm cũng sắp xếp lại thông tin để tránh gây nhầm lẫn.
 
 
 .. function:: version()
 
-   Returns the system's release version, e.g. ``'#3 on degas'``. An empty string is
-   returned if the value cannot be determined.
+   Trả về phiên bản phát hành của hệ thống, ví dụ: ``'#3 on degas'``. Trả về một chuỗi rỗng nếu không thể xác định giá trị.
 
 .. function:: uname()
 
-   Fairly portable uname interface. Returns a :func:`~collections.namedtuple`
-   containing six attributes: :attr:`system`, :attr:`node`, :attr:`release`,
-   :attr:`version`, :attr:`machine`, and :attr:`processor`.
+   Giao diện uname tương đối khả chuyển. Trả về một :func:`~collections.namedtuple` chứa sáu thuộc tính: :attr:`system`, :attr:`node`, :attr:`release`,
+   :attr:`version`, :attr:`machine` và :attr:`processor`.
 
-   :attr:`processor` is resolved late, on demand.
+   :attr:`processor` được phân giải trễ, khi có yêu cầu.
 
-   Note: the first two attribute names differ from the names presented by
-   :func:`os.uname`, where they are named :attr:`!sysname` and
+   Lưu ý: tên của hai thuộc tính đầu tiên khác với các tên được trình bày bởi
+   :func:`os.uname`, trong đó chúng được đặt tên là :attr:`!sysname` và
    :attr:`!nodename`.
 
-   Entries which cannot be determined are set to ``''``.
+   Các mục không thể xác định được đặt thành ``''``.
 
    .. versionchanged:: 3.3
-      Result changed from a tuple to a :func:`~collections.namedtuple`.
+      Kết quả đã thay đổi từ một tuple thành một :func:`~collections.namedtuple`.
 
    .. versionchanged:: 3.9
       :attr:`processor` is resolved late instead of immediately.
 
 .. function:: invalidate_caches()
 
-   Clear out the internal cache of information, such as the :func:`uname`.
-   This is typically useful when the platform's :func:`node` is changed
-   by an external process and one needs to retrieve the updated value.
+   Xóa bộ nhớ đệm nội bộ chứa thông tin, chẳng hạn như :func:`uname`. Điều này thường hữu ích khi :func:`node` của nền tảng bị một tiến trình bên ngoài thay đổi và cần lấy giá trị đã cập nhật.
 
    .. versionadded:: 3.14
 
 
-Java platform
+Nền tảng Java
 -------------
 
 
 .. function:: java_ver(release='', vendor='', vminfo=('','',''), osinfo=('','',''))
 
-   Version interface for Jython.
+   Giao diện phiên bản cho Jython.
 
-   Returns a tuple ``(release, vendor, vminfo, osinfo)`` with *vminfo* being a
-   tuple ``(vm_name, vm_release, vm_vendor)`` and *osinfo* being a tuple
-   ``(os_name, os_version, os_arch)``. Values which cannot be determined are set to
-   the defaults given as parameters (which all default to ``''``).
+   Trả về một tuple ``(release, vendor, vminfo, osinfo)`` với *vminfo* là một tuple ``(vm_name, vm_release, vm_vendor)`` và *osinfo* là một tuple ``(os_name, os_version, os_arch)``. Các giá trị không thể xác định được đặt thành các giá trị mặc định được cung cấp dưới dạng tham số (tất cả đều mặc định là ``''``).
 
    .. deprecated-removed:: 3.13 3.15
-      It was largely untested, had a confusing API,
-      and was only useful for Jython support.
+      Nó hầu như chưa được kiểm thử, có API khó hiểu và chỉ hữu ích cho việc hỗ trợ Jython.
 
 
-Windows platform
+Nền tảng Windows
 ----------------
 
 
 .. function:: win32_ver(release='', version='', csd='', ptype='')
 
-   Get additional version information from the Windows Registry and return a tuple
-   ``(release, version, csd, ptype)`` referring to OS release, version number,
-   CSD level (service pack) and OS type (multi/single processor). Values which
-   cannot be determined are set to the defaults given as parameters (which all
-   default to an empty string).
+   Lấy thêm thông tin phiên bản từ Windows Registry và trả về một tuple ``(release, version, csd, ptype)`` chứa bản phát hành hệ điều hành, số phiên bản, cấp độ CSD (service pack) và loại hệ điều hành (đa bộ xử lý/đơn bộ xử lý). Các giá trị không thể xác định sẽ được đặt thành các giá trị mặc định được cung cấp dưới dạng tham số (tất cả đều mặc định là chuỗi rỗng).
 
-   As a hint: *ptype* is ``'Uniprocessor Free'`` on single processor NT machines
-   and ``'Multiprocessor Free'`` on multi processor machines. The ``'Free'`` refers
-   to the OS version being free of debugging code. It could also state ``'Checked'``
-   which means the OS version uses debugging code, i.e. code that checks arguments,
-   ranges, etc.
+   Gợi ý: *ptype* là ``'Uniprocessor Free'`` trên các máy NT dùng một bộ xử lý và là ``'Multiprocessor Free'`` trên các máy dùng nhiều bộ xử lý. ``'Free'`` cho biết phiên bản hệ điều hành không chứa mã gỡ lỗi. Giá trị này cũng có thể là ``'Checked'``, nghĩa là phiên bản hệ điều hành sử dụng mã gỡ lỗi, tức mã kiểm tra các đối số, phạm vi, v.v.
 
 .. function:: win32_edition()
 
-   Returns a string representing the current Windows edition, or ``None`` if the
-   value cannot be determined.  Possible values include but are not limited to
-   ``'Enterprise'``, ``'IoTUAP'``, ``'ServerStandard'``, and ``'nanoserver'``.
+   Trả về một chuỗi biểu thị phiên bản Windows hiện tại hoặc ``None`` nếu không thể xác định giá trị. Các giá trị có thể bao gồm nhưng không giới hạn ở ``'Enterprise'``, ``'IoTUAP'``, ``'ServerStandard'`` và ``'nanoserver'``.
 
    .. versionadded:: 3.8
 
 .. function:: win32_is_iot()
 
-   Return ``True`` if the Windows edition returned by :func:`win32_edition`
-   is recognized as an IoT edition.
+   Trả về ``True`` nếu phiên bản Windows được :func:`win32_edition` trả về được nhận diện là phiên bản IoT.
 
    .. versionadded:: 3.8
 
 
-macOS platform
+Nền tảng macOS
 --------------
 
 .. function:: mac_ver(release='', versioninfo=('','',''), machine='')
 
-   Get macOS version information and return it as tuple ``(release, versioninfo,
-   machine)`` with *versioninfo* being a tuple ``(version, dev_stage,
-   non_release_version)``.
+   Lấy thông tin phiên bản macOS và trả về dưới dạng tuple ``(release, versioninfo, machine)``, trong đó *versioninfo* là một tuple ``(version, dev_stage, non_release_version)``.
 
-   Entries which cannot be determined are set to ``''``.  All tuple entries are
-   strings.
+   Các mục không thể xác định được sẽ được đặt thành ``''``. Tất cả các mục của tuple đều là chuỗi.
 
-iOS platform
+Nền tảng iOS
 ------------
 
 .. function:: ios_ver(system='', release='', model='', is_simulator=False)
 
-   Get iOS version information and return it as a
-   :func:`~collections.namedtuple` with the following attributes:
+   Lấy thông tin phiên bản iOS và trả về dưới dạng một
+   :func:`~collections.namedtuple` với các thuộc tính sau:
 
-   * ``system`` is the OS name; either ``'iOS'`` or ``'iPadOS'``.
-   * ``release`` is the iOS version number as a string (e.g., ``'17.2'``).
-   * ``model`` is the device model identifier; this will be a string like
-     ``'iPhone13,2'`` for a physical device, or ``'iPhone'`` on a simulator.
-   * ``is_simulator`` is a boolean describing if the app is running on a
-     simulator or a physical device.
+   * ``system`` là tên hệ điều hành; có thể là ``'iOS'`` hoặc ``'iPadOS'``.
+   * ``release`` là số phiên bản iOS dưới dạng chuỗi (ví dụ: ``'17.2'``).
+   * ``model`` là mã định danh kiểu thiết bị; đây sẽ là một chuỗi như ``'iPhone13,2'`` đối với thiết bị thật hoặc ``'iPhone'`` trên trình mô phỏng.
+   * ``is_simulator`` là một boolean mô tả liệu ứng dụng đang chạy trên simulator hay thiết bị vật lý.
 
-   Entries which cannot be determined are set to the defaults given as
-   parameters.
+   Các mục không thể xác định sẽ được đặt thành các giá trị mặc định được cung cấp dưới dạng tham số.
 
 
-Unix platforms
---------------
+Các nền tảng Unix
+-----------------
 
 .. function:: libc_ver(executable=sys.executable, lib='', version='', chunksize=16384)
 
-   Tries to determine the libc version against which the file executable (defaults
-   to the Python interpreter) is linked.  Returns a tuple of strings ``(lib,
-   version)`` which default to the given parameters in case the lookup fails.
+   Cố gắng xác định phiên bản libc mà file executable (mặc định là trình thông dịch Python) được liên kết với. Trả về một tuple gồm các chuỗi ``(lib, version)``, mặc định là các tham số đã cho nếu việc tra cứu không thành công.
 
-   Note that this function has intimate knowledge of how different libc versions
-   add symbols to the executable is probably only usable for executables compiled
-   using :program:`gcc`.
+   Lưu ý rằng hàm này hiểu rất rõ cách các phiên bản libc khác nhau thêm symbol vào executable và có lẽ chỉ có thể sử dụng cho các executable được biên dịch bằng :program:`gcc`.
 
-   The file is read and scanned in chunks of *chunksize* bytes.
+   File được đọc và quét theo từng phần có kích thước *chunksize* byte.
 
 
-Linux platforms
----------------
+Các nền tảng Linux
+------------------
 
 .. function:: freedesktop_os_release()
 
-   Get operating system identification from ``os-release`` file and return
-   it as a dict. The ``os-release`` file is a `freedesktop.org standard
-   <https://www.freedesktop.org/software/systemd/man/os-release.html>`_ and
-   is available in most Linux distributions. A noticeable exception is
-   Android and Android-based distributions.
+   Lấy thông tin nhận dạng hệ điều hành từ tệp ``os-release`` và trả về dưới dạng dict. Tệp ``os-release`` là `tiêu chuẩn freedesktop.org <https://www.freedesktop.org/software/systemd/man/os-release.html>`_ và có sẵn trong hầu hết các bản phân phối Linux. Android và các bản phân phối dựa trên Android là ngoại lệ đáng chú ý.
 
-   Raises :exc:`OSError` or subclass when neither ``/etc/os-release`` nor
-   ``/usr/lib/os-release`` can be read.
+   Gây ra :exc:`OSError` hoặc lớp con của nó khi không thể đọc ``/etc/os-release`` và ``/usr/lib/os-release``.
 
-   On success, the function returns a dictionary where keys and values are
-   strings. Values have their special characters like ``"`` and ``$``
-   unquoted. The fields ``NAME``, ``ID``, and ``PRETTY_NAME`` are always
-   defined according to the standard. All other fields are optional. Vendors
-   may include additional fields.
+   Khi thành công, hàm trả về một dictionary trong đó các khóa và giá trị đều là chuỗi. Các ký tự đặc biệt trong giá trị, chẳng hạn như ``"`` và ``$``, không được đặt trong dấu ngoặc kép. Các trường ``NAME``, ``ID`` và ``PRETTY_NAME`` luôn được định nghĩa theo tiêu chuẩn. Tất cả các trường khác là tùy chọn. Nhà cung cấp có thể bổ sung các trường khác.
 
-   Note that fields like ``NAME``, ``VERSION``, and ``VARIANT`` are strings
-   suitable for presentation to users. Programs should use fields like
-   ``ID``, ``ID_LIKE``, ``VERSION_ID``, or ``VARIANT_ID`` to identify
-   Linux distributions.
+   Lưu ý rằng các trường như ``NAME``, ``VERSION`` và ``VARIANT`` là các chuỗi phù hợp để hiển thị cho người dùng. Chương trình nên sử dụng các trường như ``ID``, ``ID_LIKE``, ``VERSION_ID`` hoặc ``VARIANT_ID`` để xác định các bản phân phối Linux.
 
-   Example::
+   Ví dụ::
 
       def get_like_distro():
           info = platform.freedesktop_os_release()
           ids = [info["ID"]]
           if "ID_LIKE" in info:
-              # ids are space separated and ordered by precedence
+              # các id được phân tách bằng dấu cách và sắp xếp theo độ ưu tiên
               ids.extend(info["ID_LIKE"].split())
           return ids
 
    .. versionadded:: 3.10
 
 
-Android platform
+Nền tảng Android
 ----------------
 
 .. function:: android_ver(release="", api_level=0, manufacturer="", \
                           model="", device="", is_emulator=False)
 
-   Get Android device information. Returns a :func:`~collections.namedtuple`
-   with the following attributes. Values which cannot be determined are set to
-   the defaults given as parameters.
+   Lấy thông tin thiết bị Android. Trả về một :func:`~collections.namedtuple` với các thuộc tính sau. Những giá trị không thể xác định được sẽ được đặt thành các giá trị mặc định được cung cấp dưới dạng tham số.
 
-   * ``release`` - Android version, as a string (e.g. ``"14"``).
+   * ``release`` - phiên bản Android, dưới dạng chuỗi (ví dụ: ``"14"``).
 
-   * ``api_level`` - API level of the running device, as an integer (e.g. ``34``
-     for Android 14). To get the API level which Python was built against, see
+   * ``api_level`` - API level của thiết bị đang chạy, dưới dạng số nguyên (ví dụ: ``34`` cho Android 14). Để lấy API level mà Python được build dựa trên đó, hãy xem
      :func:`sys.getandroidapilevel`.
 
-   * ``manufacturer`` - `Manufacturer name
-     <https://developer.android.com/reference/android/os/Build#MANUFACTURER>`__.
+   * ``manufacturer`` - `Tên nhà sản xuất <https://developer.android.com/reference/android/os/Build#MANUFACTURER>`__.
 
-   * ``model`` - `Model name
-     <https://developer.android.com/reference/android/os/Build#MODEL>`__ –
-     typically the marketing name or model number.
+   * ``model`` - `Tên model <https://developer.android.com/reference/android/os/Build#MODEL>`__ – thường là tên thương mại hoặc số model.
 
-   * ``device`` - `Device name
-     <https://developer.android.com/reference/android/os/Build#DEVICE>`__ –
-     typically the model number or a codename.
+   * ``device`` - `Tên thiết bị <https://developer.android.com/reference/android/os/Build#DEVICE>`__ – thường là số model hoặc tên mã.
 
-   * ``is_emulator`` - ``True`` if the device is an emulator; ``False`` if it's
-     a physical device.
+   * ``is_emulator`` - ``True`` nếu thiết bị là emulator; ``False`` nếu đó là thiết bị vật lý.
 
-   Google maintains a `list of known model and device names
-   <https://storage.googleapis.com/play_public/supported_devices.html>`__.
+   Google duy trì `danh sách các tên model và thiết bị đã biết <https://storage.googleapis.com/play_public/supported_devices.html>`__.
 
    .. versionadded:: 3.13
 
 .. _platform-cli:
 
-Command-line usage
-------------------
+Cách sử dụng trên dòng lệnh
+---------------------------
 
-:mod:`!platform` can also be invoked directly using the :option:`-m`
-switch of the interpreter::
+:mod:`!platform` cũng có thể được gọi trực tiếp bằng switch :option:`-m` của interpreter::
 
    python -m platform [--terse] [--nonaliased] [{nonaliased,terse} ...]
 
-The following options are accepted:
+Các tùy chọn sau được chấp nhận:
 
 .. program:: platform
 
 .. option:: --terse
 
-   Print terse information about the platform. This is equivalent to
-   calling :func:`platform.platform` with the *terse* argument set to ``True``.
+   In thông tin ngắn gọn về platform. Tương đương với việc gọi :func:`platform.platform` với đối số *terse* được đặt thành ``True``.
 
 .. option:: --nonaliased
 
-   Print platform information without system/OS name aliasing. This is
-   equivalent to calling :func:`platform.platform` with the *aliased* argument
-   set to ``True``.
+   In thông tin về platform mà không bí danh hóa tên system/OS. Tương đương với việc gọi :func:`platform.platform` với đối số *aliased* được đặt thành ``True``.
 
-You can also pass one or more positional arguments (``terse``, ``nonaliased``)
-to explicitly control the output format. These behave similarly to their
-corresponding options.
+Bạn cũng có thể truyền một hoặc nhiều đối số vị trí (``terse``, ``nonaliased``) để kiểm soát rõ ràng định dạng đầu ra. Các đối số này hoạt động tương tự như những tùy chọn tương ứng.
+
+.. _`freedesktop.org standard`: https://www.freedesktop.org/software/systemd/man/os-release.html

@@ -1,67 +1,41 @@
-:mod:`!queue` --- A synchronized queue class
-============================================
+:mod:`!queue` --- Lớp hàng đợi đồng bộ
+======================================
 
 .. module:: queue
-   :synopsis: A synchronized queue class.
+   :synopsis: Lớp hàng đợi đồng bộ.
 
-**Source code:** :source:`Lib/queue.py`
+**Mã nguồn:** :source:`Lib/queue.py`
 
 --------------
 
-The :mod:`!queue` module implements multi-producer, multi-consumer queues.
-It is especially useful in threaded programming when information must be
-exchanged safely between multiple threads.  The :class:`Queue` class in this
-module implements all the required locking semantics.
+Mô-đun :mod:`!queue` triển khai các hàng đợi đa producer, đa consumer. Mô-đun này đặc biệt hữu ích trong lập trình đa luồng khi thông tin cần được trao đổi an toàn giữa nhiều thread. Lớp :class:`Queue` trong mô-đun này triển khai tất cả ngữ nghĩa khóa cần thiết.
 
-The module implements three types of queue, which differ only in the order in
-which the entries are retrieved.  In a :abbr:`FIFO (first-in, first-out)`
-queue, the first tasks added are the first retrieved.  In a
-:abbr:`LIFO (last-in, first-out)` queue, the most recently added entry is
-the first retrieved (operating like a stack).  With a priority queue,
-the entries are kept sorted (using the :mod:`heapq` module) and the
-lowest valued entry is retrieved first.
+Mô-đun triển khai ba loại hàng đợi, chỉ khác nhau ở thứ tự các mục được lấy ra. Trong hàng đợi :abbr:`FIFO (vào trước, ra trước)`, các tác vụ được thêm vào trước sẽ được lấy ra trước. Trong một
+hàng đợi :abbr:`LIFO (vào sau, ra trước)`, mục được thêm gần đây nhất sẽ được lấy ra trước (hoạt động như một stack). Với hàng đợi ưu tiên, các mục được sắp xếp (bằng mô-đun :mod:`heapq`) và mục có giá trị thấp nhất sẽ được lấy ra trước.
 
-Internally, those three types of queues use locks to temporarily block
-competing threads; however, they are not designed to handle reentrancy
-within a thread.
+Về nội bộ, ba loại hàng đợi này sử dụng các khóa để tạm thời chặn các thread cạnh tranh; tuy nhiên, chúng không được thiết kế để xử lý việc tái nhập trong một thread.
 
-In addition, the module implements a "simple"
-:abbr:`FIFO (first-in, first-out)` queue type, :class:`SimpleQueue`, whose
-specific implementation provides additional guarantees
-in exchange for the smaller functionality.
+Ngoài ra, mô-đun triển khai một "simple"
+:abbr:`FIFO (vào trước, ra trước)` kiểu hàng đợi, :class:`SimpleQueue`, mà phần triển khai cụ thể cung cấp thêm các đảm bảo để đổi lấy ít chức năng hơn.
 
-The :mod:`!queue` module defines the following classes and exceptions:
+Mô-đun :mod:`!queue` định nghĩa các lớp và ngoại lệ sau:
 
 .. class:: Queue(maxsize=0)
 
-   Constructor for a :abbr:`FIFO (first-in, first-out)` queue.  *maxsize* is
-   an integer that sets the upperbound
-   limit on the number of items that can be placed in the queue.  Insertion will
-   block once this size has been reached, until queue items are consumed.  If
-   *maxsize* is less than or equal to zero, the queue size is infinite.
+   Hàm khởi tạo cho một hàng đợi :abbr:`FIFO (vào trước, ra trước)`. *maxsize* là một số nguyên đặt giới hạn trên về số lượng mục có thể được đưa vào hàng đợi. Việc chèn sẽ bị chặn khi đạt đến kích thước này, cho đến khi các mục trong hàng đợi được lấy ra. Nếu *maxsize* nhỏ hơn hoặc bằng không, kích thước hàng đợi là vô hạn.
 
 .. class:: LifoQueue(maxsize=0)
 
-   Constructor for a :abbr:`LIFO (last-in, first-out)` queue.  *maxsize* is
-   an integer that sets the upperbound
-   limit on the number of items that can be placed in the queue.  Insertion will
-   block once this size has been reached, until queue items are consumed.  If
-   *maxsize* is less than or equal to zero, the queue size is infinite.
+   Hàm khởi tạo cho một hàng đợi :abbr:`LIFO (vào sau, ra trước)`. *maxsize* là một số nguyên đặt giới hạn trên về số lượng mục có thể được đưa vào hàng đợi. Việc chèn sẽ bị chặn khi đạt đến kích thước này, cho đến khi các mục trong hàng đợi được lấy ra. Nếu *maxsize* nhỏ hơn hoặc bằng không, kích thước hàng đợi là vô hạn.
 
 
 .. class:: PriorityQueue(maxsize=0)
 
-   Constructor for a priority queue.  *maxsize* is an integer that sets the upperbound
-   limit on the number of items that can be placed in the queue.  Insertion will
-   block once this size has been reached, until queue items are consumed.  If
-   *maxsize* is less than or equal to zero, the queue size is infinite.
+   Hàm khởi tạo cho một hàng đợi ưu tiên. *maxsize* là một số nguyên đặt giới hạn trên về số lượng mục có thể được đưa vào hàng đợi. Việc chèn sẽ bị chặn khi đạt đến kích thước này, cho đến khi các mục trong hàng đợi được lấy ra. Nếu *maxsize* nhỏ hơn hoặc bằng không, kích thước hàng đợi là vô hạn.
 
-   The lowest valued entries are retrieved first (the lowest valued entry is the
-   one that would be returned by ``min(entries)``).  A typical pattern for
-   entries is a tuple in the form: ``(priority_number, data)``.
+   Các mục có giá trị thấp nhất được lấy ra trước (mục có giá trị thấp nhất là mục sẽ được ``min(entries)`` trả về). Một mẫu điển hình cho các mục là một tuple có dạng: ``(priority_number, data)``.
 
-   If the *data* elements are not comparable, the data can be wrapped in a class
-   that ignores the data item and only compares the priority number::
+   Nếu các phần tử *data* không thể so sánh được, có thể bọc dữ liệu trong một class bỏ qua mục dữ liệu và chỉ so sánh số độ ưu tiên::
 
         from dataclasses import dataclass, field
         from typing import Any
@@ -73,140 +47,104 @@ The :mod:`!queue` module defines the following classes and exceptions:
 
 .. class:: SimpleQueue()
 
-   Constructor for an unbounded :abbr:`FIFO (first-in, first-out)` queue.
-   Simple queues lack advanced functionality such as task tracking.
+   Hàm khởi tạo cho một hàng đợi :abbr:`FIFO (vào trước, ra trước)` không giới hạn. Hàng đợi đơn giản không có các chức năng nâng cao như theo dõi tác vụ.
 
-   Simple queues are :ref:`generic <generics>` over the type of their items.
+   Hàng đợi đơn giản là :ref:`generic <generics>` theo kiểu của các mục trong hàng đợi.
 
    .. versionadded:: 3.7
 
 
 .. exception:: Empty
 
-   Exception raised when non-blocking :meth:`~Queue.get` (or
-   :meth:`~Queue.get_nowait`) is called
-   on a :class:`Queue` object which is empty.
+   Ngoại lệ được phát sinh khi gọi :meth:`~Queue.get` không chặn (hoặc
+   :meth:`~Queue.get_nowait`) trên một đối tượng :class:`Queue` đang trống.
 
 
 .. exception:: Full
 
-   Exception raised when non-blocking :meth:`~Queue.put` (or
-   :meth:`~Queue.put_nowait`) is called
-   on a :class:`Queue` object which is full.
+   Ngoại lệ được phát sinh khi gọi :meth:`~Queue.put` không chặn (hoặc
+   :meth:`~Queue.put_nowait`) trên một đối tượng :class:`Queue` đã đầy.
 
 
 .. exception:: ShutDown
 
-   Exception raised when :meth:`~Queue.put` or :meth:`~Queue.get` is called on
-   a :class:`Queue` object which has been shut down.
+   Ngoại lệ được nêu ra khi gọi :meth:`~Queue.put` hoặc :meth:`~Queue.get` trên một đối tượng :class:`Queue` đã bị tắt.
 
    .. versionadded:: 3.13
 
 
 .. _queueobjects:
 
-Queue Objects
--------------
+Đối tượng Queue
+---------------
 
-Queue objects (:class:`Queue`, :class:`LifoQueue`, or :class:`PriorityQueue`)
-provide the public methods described below.
+Các đối tượng Queue (:class:`Queue`, :class:`LifoQueue` hoặc :class:`PriorityQueue`) cung cấp các phương thức công khai được mô tả dưới đây.
 
 
 .. method:: Queue.qsize()
 
-   Return the approximate size of the queue.  Note, qsize() > 0 doesn't
-   guarantee that a subsequent get() will not block, nor will qsize() < maxsize
-   guarantee that put() will not block.
+   Trả về kích thước gần đúng của queue. Lưu ý rằng qsize() > 0 không đảm bảo rằng một lệnh gọi get() tiếp theo sẽ không bị block, cũng như qsize() < maxsize không đảm bảo rằng put() sẽ không bị block.
 
 
 .. method:: Queue.empty()
 
-   Return ``True`` if the queue is empty, ``False`` otherwise.  If empty()
-   returns ``True`` it doesn't guarantee that a subsequent call to put()
-   will not block.  Similarly, if empty() returns ``False`` it doesn't
-   guarantee that a subsequent call to get() will not block.
+   Trả về ``True`` nếu queue trống, nếu không thì trả về ``False``. Nếu empty() trả về ``True``, điều đó không đảm bảo rằng một lệnh gọi put() tiếp theo sẽ không bị block. Tương tự, nếu empty() trả về ``False``, điều đó không đảm bảo rằng một lệnh gọi get() tiếp theo sẽ không bị block.
 
 
 .. method:: Queue.full()
 
-   Return ``True`` if the queue is full, ``False`` otherwise.  If full()
-   returns ``True`` it doesn't guarantee that a subsequent call to get()
-   will not block.  Similarly, if full() returns ``False`` it doesn't
-   guarantee that a subsequent call to put() will not block.
+   Trả về ``True`` nếu queue đầy, nếu không thì trả về ``False``. Nếu full() trả về ``True``, điều đó không đảm bảo rằng một lệnh gọi get() tiếp theo sẽ không bị block. Tương tự, nếu full() trả về ``False``, điều đó không đảm bảo rằng một lệnh gọi put() tiếp theo sẽ không bị block.
 
 
 .. method:: Queue.put(item, block=True, timeout=None)
 
-   Put *item* into the queue.  If optional args *block* is true and *timeout* is
-   ``None`` (the default), block if necessary until a free slot is available.  If
-   *timeout* is a positive number, it blocks at most *timeout* seconds and raises
-   the :exc:`Full` exception if no free slot was available within that time.
-   Otherwise (*block* is false), put an item on the queue if a free slot is
-   immediately available, else raise the :exc:`Full` exception (*timeout* is
-   ignored in that case).
+   Đưa *item* vào queue. Nếu đối số tùy chọn *block* là true và *timeout* là ``None`` (giá trị mặc định), thì block nếu cần cho đến khi có chỗ trống. Nếu *timeout* là một số dương, lệnh này block nhiều nhất *timeout* giây và nêu :exc:`Full` exception nếu không có chỗ trống trong khoảng thời gian đó. Ngược lại (*block* là false), đưa một item vào queue nếu ngay lập tức có chỗ trống; nếu không, nêu :exc:`Full` exception (*timeout* bị bỏ qua trong trường hợp này).
 
-   Raises :exc:`ShutDown` if the queue has been shut down.
+   Phát sinh :exc:`ShutDown` nếu hàng đợi đã bị tắt.
 
 
 .. method:: Queue.put_nowait(item)
 
-   Equivalent to ``put(item, block=False)``.
+   Tương đương với ``put(item, block=False)``.
 
 
 .. method:: Queue.get(block=True, timeout=None)
 
-   Remove and return an item from the queue.  If optional args *block* is true and
-   *timeout* is ``None`` (the default), block if necessary until an item is available.
-   If *timeout* is a positive number, it blocks at most *timeout* seconds and
-   raises the :exc:`Empty` exception if no item was available within that time.
-   Otherwise (*block* is false), return an item if one is immediately available,
-   else raise the :exc:`Empty` exception (*timeout* is ignored in that case).
+   Xóa và trả về một mục khỏi hàng đợi. Nếu đối số tùy chọn *block* là true và *timeout* là ``None`` (mặc định), hãy chờ nếu cần cho đến khi có một mục. Nếu *timeout* là một số dương, thao tác sẽ chờ tối đa *timeout* giây và phát sinh ngoại lệ :exc:`Empty` nếu không có mục nào khả dụng trong khoảng thời gian đó. Ngược lại (*block* là false), trả về một mục nếu có sẵn ngay lập tức; nếu không, phát sinh ngoại lệ :exc:`Empty` (*timeout* sẽ bị bỏ qua trong trường hợp này).
 
-   Prior to 3.0 on POSIX systems, and for all versions on Windows, if
-   *block* is true and *timeout* is ``None``, this operation goes into
-   an uninterruptible wait on an underlying lock.  This means that no exceptions
-   can occur, and in particular a SIGINT will not trigger a :exc:`KeyboardInterrupt`.
+   Trước phiên bản 3.0 trên các hệ thống POSIX và trên Windows ở mọi phiên bản, nếu *block* là true và *timeout* là ``None``, thao tác này sẽ chờ không thể bị ngắt trên một khóa nền tảng. Điều này có nghĩa là không ngoại lệ nào có thể xảy ra, đặc biệt là SIGINT sẽ không kích hoạt :exc:`KeyboardInterrupt`.
 
-   Raises :exc:`ShutDown` if the queue has been shut down and is empty, or if
-   the queue has been shut down immediately.
+   Phát sinh :exc:`ShutDown` nếu hàng đợi đã bị tắt và đang trống, hoặc nếu hàng đợi đã bị tắt ngay lập tức.
 
 
 .. method:: Queue.get_nowait()
 
-   Equivalent to ``get(False)``.
+   Tương đương với ``get(False)``.
 
-Two methods are offered to support tracking whether enqueued tasks have been
-fully processed by daemon consumer threads.
+Có hai phương thức được cung cấp để theo dõi xem các tác vụ đã xếp hàng có được các luồng consumer daemon xử lý hoàn toàn hay chưa.
 
 
 .. method:: Queue.task_done()
 
-   Indicate that a formerly enqueued task is complete.  Used by queue consumer
-   threads.  For each :meth:`get` used to fetch a task, a subsequent call to
-   :meth:`task_done` tells the queue that the processing on the task is complete.
+   Cho biết một tác vụ đã được đưa vào hàng đợi trước đó đã hoàn tất. Được các thread consumer của queue sử dụng. Với mỗi :meth:`get` được sử dụng để lấy một tác vụ, một lần gọi tiếp theo đến
+   :meth:`task_done` cho queue biết rằng quá trình xử lý tác vụ đã hoàn tất.
 
-   If a :meth:`join` is currently blocking, it will resume when all items have been
-   processed (meaning that a :meth:`task_done` call was received for every item
-   that had been :meth:`put` into the queue).
+   Nếu một :meth:`join` hiện đang bị chặn, nó sẽ tiếp tục khi tất cả các mục đã được xử lý (nghĩa là đã nhận được một lần gọi :meth:`task_done` cho mỗi mục đã được :meth:`put` vào queue).
 
-   Raises a :exc:`ValueError` if called more times than there were items placed in
-   the queue.
+   Phát sinh một :exc:`ValueError` nếu được gọi nhiều lần hơn số mục đã được đưa vào queue.
 
 
 .. method:: Queue.join()
 
-   Blocks until all items in the queue have been gotten and processed.
+   Chặn cho đến khi tất cả các mục trong queue được lấy ra và xử lý.
 
-   The count of unfinished tasks goes up whenever an item is added to the queue.
-   The count goes down whenever a consumer thread calls :meth:`task_done` to
-   indicate that the item was retrieved and all work on it is complete.  When the
-   count of unfinished tasks drops to zero, :meth:`join` unblocks.
+   Số lượng tác vụ chưa hoàn tất tăng lên mỗi khi một mục được thêm vào queue. Số lượng này giảm xuống mỗi khi một thread consumer gọi :meth:`task_done` để cho biết rằng mục đó đã được lấy ra và mọi công việc trên mục đó đã hoàn tất. Khi số lượng tác vụ chưa hoàn tất giảm xuống bằng không, :meth:`join` sẽ bỏ chặn.
 
 
-Waiting for task completion
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Chờ tác vụ hoàn tất
+^^^^^^^^^^^^^^^^^^^
 
-Example of how to wait for enqueued tasks to be completed::
+Ví dụ về cách chờ các tác vụ đã xếp hàng hoàn tất::
 
     import threading
     import queue
@@ -220,119 +158,85 @@ Example of how to wait for enqueued tasks to be completed::
             print(f'Finished {item}')
             q.task_done()
 
-    # Turn-on the worker thread.
+    # Bật worker thread.
     threading.Thread(target=worker, daemon=True).start()
 
-    # Send thirty task requests to the worker.
+    # Gửi ba mươi yêu cầu tác vụ đến worker.
     for item in range(30):
         q.put(item)
 
-    # Block until all tasks are done.
+    # Chặn cho đến khi mọi tác vụ hoàn tất.
     q.join()
     print('All work completed')
 
 
-Terminating queues
-^^^^^^^^^^^^^^^^^^
+Kết thúc các hàng đợi
+^^^^^^^^^^^^^^^^^^^^^
 
-When no longer needed, :class:`Queue` objects can be wound down
-until empty or terminated immediately with a hard shutdown.
+Khi không còn cần thiết, các đối tượng :class:`Queue` có thể được giảm dần cho đến khi rỗng hoặc chấm dứt ngay lập tức bằng hard shutdown.
 
 .. method:: Queue.shutdown(immediate=False)
 
-   Put a :class:`Queue` instance into a shutdown mode.
+   Đưa một instance :class:`Queue` vào chế độ shutdown.
 
-   The queue can no longer grow.
-   Future calls to :meth:`~Queue.put` raise :exc:`ShutDown`.
-   Currently blocked callers of :meth:`~Queue.put` will be unblocked
-   and will raise :exc:`ShutDown` in the formerly blocked thread.
+   Hàng đợi không thể phát triển thêm. Các lần gọi :meth:`~Queue.put` trong tương lai sẽ phát sinh :exc:`ShutDown`. Các caller hiện đang bị chặn bởi :meth:`~Queue.put` sẽ được bỏ chặn và phát sinh :exc:`ShutDown` trong thread trước đây bị chặn.
 
-   If *immediate* is false (the default), the queue can be wound
-   down normally with :meth:`~Queue.get` calls to extract tasks
-   that have already been loaded.
+   Nếu *immediate* là false (mặc định), hàng đợi có thể được kết thúc bình thường bằng các lần gọi :meth:`~Queue.get` để lấy ra những task đã được nạp.
 
-   And if :meth:`~Queue.task_done` is called for each remaining task, a
-   pending :meth:`~Queue.join` will be unblocked normally.
+   Và nếu :meth:`~Queue.task_done` được gọi cho từng task còn lại, một :meth:`~Queue.join` đang chờ sẽ được bỏ chặn bình thường.
 
-   Once the queue is empty, future calls to :meth:`~Queue.get` will
-   raise :exc:`ShutDown`.
+   Sau khi hàng đợi rỗng, các lần gọi :meth:`~Queue.get` trong tương lai sẽ phát sinh :exc:`ShutDown`.
 
-   If *immediate* is true, the queue is terminated immediately.
-   The queue is drained to be completely empty and the count
-   of unfinished tasks is reduced by the number of tasks drained.
-   If unfinished tasks is zero, callers of :meth:`~Queue.join`
-   are unblocked.  Also, blocked callers of :meth:`~Queue.get`
-   are unblocked and will raise :exc:`ShutDown` because the
-   queue is empty.
+   Nếu *immediate* là true, hàng đợi sẽ được kết thúc ngay lập tức. Hàng đợi được rút hết để hoàn toàn rỗng và số lượng task chưa hoàn tất được giảm đi bằng số task đã rút. Nếu số task chưa hoàn tất bằng không, các caller của :meth:`~Queue.join` sẽ được bỏ chặn. Ngoài ra, các caller đang bị chặn của :meth:`~Queue.get` cũng sẽ được bỏ chặn và phát sinh :exc:`ShutDown` vì hàng đợi đã rỗng.
 
-   Use caution when using :meth:`~Queue.join` with *immediate* set
-   to true. This unblocks the join even when no work has been done
-   on the tasks, violating the usual invariant for joining a queue.
+   Hãy thận trọng khi sử dụng :meth:`~Queue.join` với *immediate* được đặt thành true. Thao tác này bỏ chặn join ngay cả khi chưa có công việc nào được thực hiện trên các task, vi phạm invariant thông thường khi join một hàng đợi.
 
    .. versionadded:: 3.13
 
 
-SimpleQueue Objects
--------------------
+Các đối tượng SimpleQueue
+-------------------------
 
-:class:`SimpleQueue` objects provide the public methods described below.
+Các đối tượng :class:`SimpleQueue` cung cấp những phương thức công khai được mô tả dưới đây.
 
 .. method:: SimpleQueue.qsize()
 
-   Return the approximate size of the queue.  Note, qsize() > 0 doesn't
-   guarantee that a subsequent get() will not block.
+   Trả về kích thước gần đúng của hàng đợi. Lưu ý, qsize() > 0 không đảm bảo rằng một lệnh gọi get() tiếp theo sẽ không bị chặn.
 
 
 .. method:: SimpleQueue.empty()
 
-   Return ``True`` if the queue is empty, ``False`` otherwise.  If empty()
-   returns ``False`` it doesn't guarantee that a subsequent call to get()
-   will not block.
+   Trả về ``True`` nếu hàng đợi trống, nếu không thì trả về ``False``. Nếu empty() trả về ``False``, điều đó không đảm bảo rằng một lệnh gọi get() tiếp theo sẽ không bị chặn.
 
 
 .. method:: SimpleQueue.put(item, block=True, timeout=None)
 
-   Put *item* into the queue.  The method never blocks and always succeeds
-   (except for potential low-level errors such as failure to allocate memory).
-   The optional args *block* and *timeout* are ignored and only provided
-   for compatibility with :meth:`Queue.put`.
+   Đưa *item* vào hàng đợi. Phương thức này không bao giờ bị chặn và luôn thành công (ngoại trừ các lỗi cấp thấp có thể xảy ra, chẳng hạn như không thể cấp phát bộ nhớ). Các đối số tùy chọn *block* và *timeout* bị bỏ qua và chỉ được cung cấp để tương thích với :meth:`Queue.put`.
 
    .. impl-detail::
-      This method has a C implementation which is reentrant.  That is, a
-      ``put()`` or ``get()`` call can be interrupted by another ``put()``
-      call in the same thread without deadlocking or corrupting internal
-      state inside the queue.  This makes it appropriate for use in
-      destructors such as ``__del__`` methods or :mod:`weakref` callbacks.
+      Phương thức này có một bản triển khai bằng C và có tính reentrant. Nghĩa là một lời gọi ``put()`` hoặc ``get()`` có thể bị gián đoạn bởi một lời gọi ``put()`` khác trong cùng luồng mà không gây deadlock hoặc làm hỏng trạng thái nội bộ bên trong hàng đợi. Điều này khiến phương thức phù hợp để sử dụng trong các hàm hủy như phương thức ``__del__`` hoặc callback :mod:`weakref`.
 
 
 .. method:: SimpleQueue.put_nowait(item)
 
-   Equivalent to ``put(item, block=False)``, provided for compatibility with
+   Tương đương với ``put(item, block=False)``, được cung cấp để tương thích với
    :meth:`Queue.put_nowait`.
 
 
 .. method:: SimpleQueue.get(block=True, timeout=None)
 
-   Remove and return an item from the queue.  If optional args *block* is true and
-   *timeout* is ``None`` (the default), block if necessary until an item is available.
-   If *timeout* is a positive number, it blocks at most *timeout* seconds and
-   raises the :exc:`Empty` exception if no item was available within that time.
-   Otherwise (*block* is false), return an item if one is immediately available,
-   else raise the :exc:`Empty` exception (*timeout* is ignored in that case).
+   Xóa và trả về một mục khỏi hàng đợi. Nếu đối số tùy chọn *block* là true và *timeout* là ``None`` (mặc định), phương thức sẽ chặn nếu cần cho đến khi có một mục. Nếu *timeout* là một số dương, phương thức sẽ chặn nhiều nhất trong *timeout* giây và phát sinh ngoại lệ :exc:`Empty` nếu không có mục nào trong khoảng thời gian đó. Nếu không (*block* là false), trả về một mục nếu có sẵn ngay lập tức; nếu không thì phát sinh ngoại lệ :exc:`Empty` (trong trường hợp đó, *timeout* bị bỏ qua).
 
 
 .. method:: SimpleQueue.get_nowait()
 
-   Equivalent to ``get(False)``.
+   Tương đương với ``get(False)``.
 
 
 .. seealso::
 
-   Class :class:`multiprocessing.Queue`
-      A queue class for use in a multi-processing (rather than multi-threading)
-      context.
+   Lớp :class:`multiprocessing.Queue`
+      Một lớp queue dùng trong ngữ cảnh đa xử lý (thay vì đa luồng).
 
-   :class:`collections.deque` is an alternative implementation of unbounded
-   queues with fast atomic :meth:`~collections.deque.append` and
-   :meth:`~collections.deque.popleft` operations that do not require locking
-   and also support indexing.
+   :class:`collections.deque` là một triển khai thay thế của các queue không giới hạn với các thao tác :meth:`~collections.deque.append` nguyên tử nhanh và
+   các thao tác :meth:`~collections.deque.popleft` không yêu cầu khóa và cũng hỗ trợ lập chỉ mục.

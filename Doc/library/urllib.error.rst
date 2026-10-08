@@ -1,79 +1,66 @@
-:mod:`!urllib.error` --- Exception classes raised by urllib.request
-===================================================================
+:mod:`!urllib.error` --- Các lớp ngoại lệ do urllib.request phát sinh
+=====================================================================
 
 .. module:: urllib.error
-   :synopsis: Exception classes raised by urllib.request.
+   :synopsis: Các lớp ngoại lệ do urllib.request phát sinh.
 
 .. moduleauthor:: Jeremy Hylton <jeremy@alum.mit.edu>
 .. sectionauthor:: Senthil Kumaran <orsenthil@gmail.com>
 
-**Source code:** :source:`Lib/urllib/error.py`
+**Mã nguồn:** :source:`Lib/urllib/error.py`
 
 --------------
 
-The :mod:`!urllib.error` module defines the exception classes for exceptions
-raised by :mod:`urllib.request`.  The base exception class is :exc:`URLError`.
+Module :mod:`!urllib.error` định nghĩa các lớp ngoại lệ cho những ngoại lệ do :mod:`urllib.request` phát sinh. Lớp ngoại lệ cơ sở là :exc:`URLError`.
 
-The following exceptions are raised by :mod:`!urllib.error` as appropriate:
+Sau đây là các ngoại lệ mà :mod:`!urllib.error` phát sinh khi thích hợp:
 
 .. exception:: URLError
 
-   The handlers raise this exception (or derived exceptions) when they run into
-   a problem.  It is a subclass of :exc:`OSError`.
+   Các handler phát sinh ngoại lệ này (hoặc các ngoại lệ dẫn xuất) khi gặp sự cố. Đây là một lớp con của :exc:`OSError`.
 
    .. attribute:: reason
 
-      The reason for this error.  It can be a message string or another
-      exception instance.
+      Lý do gây ra lỗi này. Đó có thể là một chuỗi thông báo hoặc một instance ngoại lệ khác.
 
    .. versionchanged:: 3.3
       :exc:`URLError` used to be a subtype of :exc:`IOError`, which is now an
-      alias of :exc:`OSError`.
+      bí danh của :exc:`OSError`.
 
 
 .. exception:: HTTPError(url, code, msg, hdrs, fp)
 
-   Though being an exception (a subclass of :exc:`URLError`), an
-   :exc:`HTTPError` can also function as a non-exceptional file-like return
-   value (the same thing that :func:`~urllib.request.urlopen` returns).  This
-   is useful when handling exotic HTTP errors, such as requests for
-   authentication.
+   Mặc dù là một exception (lớp con của :exc:`URLError`), một
+   :exc:`HTTPError` cũng có thể hoạt động như một giá trị trả về dạng giống tệp không phải exception (giống với giá trị mà :func:`~urllib.request.urlopen` trả về). Điều này hữu ích khi xử lý các lỗi HTTP đặc biệt, chẳng hạn như các yêu cầu xác thực.
 
    .. attribute:: url
 
-      Contains the request URL.
-      An alias for *filename* attribute.
+      Chứa URL của request. Là bí danh cho thuộc tính *filename*.
 
    .. attribute:: code
 
-      An HTTP status code as defined in :rfc:`2616`.  This numeric value corresponds
-      to a value found in the dictionary of codes as found in
+      Mã trạng thái HTTP như được định nghĩa trong :rfc:`2616`. Giá trị số này tương ứng với một giá trị được tìm thấy trong từ điển mã như được nêu trong
       :attr:`http.server.BaseHTTPRequestHandler.responses`.
 
    .. attribute:: reason
 
-      This is usually a string explaining the reason for this error.
-      An alias for *msg* attribute.
+      Đây thường là một chuỗi giải thích lý do xảy ra lỗi này. Là bí danh cho thuộc tính *msg*.
 
    .. attribute:: headers
 
-      The HTTP response headers for the HTTP request that caused the
-      :exc:`HTTPError`.
-      An alias for *hdrs* attribute.
+      Các HTTP response headers của HTTP request gây ra
+      :exc:`HTTPError`. Bí danh của thuộc tính *hdrs*.
 
       .. versionadded:: 3.4
 
    .. attribute:: fp
 
-      A file-like object where the HTTP error body can be read from.
+      Một đối tượng giống tệp, từ đó có thể đọc nội dung phần thân của lỗi HTTP.
 
 .. exception:: ContentTooShortError(msg, content)
 
-   This exception is raised when the :func:`~urllib.request.urlretrieve`
-   function detects that
-   the amount of the downloaded data is less than the expected amount (given by
-   the *Content-Length* header).
+   Ngoại lệ này được phát sinh khi hàm :func:`~urllib.request.urlretrieve` phát hiện rằng lượng dữ liệu đã tải xuống ít hơn lượng dự kiến (được chỉ định bởi header *Content-Length*).
 
    .. attribute:: content
 
-      The downloaded (and supposedly truncated) data.
+      Dữ liệu đã tải xuống (và được cho là đã bị cắt ngắn).

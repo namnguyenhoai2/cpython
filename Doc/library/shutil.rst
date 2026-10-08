@@ -1,13 +1,13 @@
-:mod:`!shutil` --- High-level file operations
+:mod:`!shutil` --- Các thao tác tệp ở cấp cao
 =============================================
 
 .. module:: shutil
-   :synopsis: High-level file operations, including copying.
+   :synopsis: Các thao tác tệp ở cấp cao, bao gồm sao chép.
 
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 .. partly based on the docstrings
 
-**Source code:** :source:`Lib/shutil.py`
+**Mã nguồn:** :source:`Lib/shutil.py`
 
 .. index::
    single: file; copying
@@ -15,443 +15,283 @@
 
 --------------
 
-The :mod:`!shutil` module offers a number of high-level operations on files and
-collections of files.  In particular, functions are provided  which support file
-copying and removal. For operations on individual files, see also the
-:mod:`os` module.
+Mô-đun :mod:`!shutil` cung cấp một số thao tác ở cấp cao trên các tệp và tập hợp tệp. Cụ thể, mô-đun này cung cấp các hàm hỗ trợ sao chép và xóa tệp. Để thực hiện các thao tác trên từng tệp, hãy xem thêm
+mô-đun :mod:`os`.
 
 .. warning::
 
-   Even the higher-level file copying functions (:func:`shutil.copy`,
-   :func:`shutil.copy2`) cannot copy all file metadata.
+   Ngay cả các hàm sao chép tệp ở cấp cao hơn (:func:`shutil.copy`,
+   :func:`shutil.copy2`) cũng không thể sao chép tất cả metadata của tệp.
 
-   On POSIX platforms, this means that file owner and group are lost as well
-   as ACLs.  On Mac OS, the resource fork and other metadata are not used.
-   This means that resources will be lost and file type and creator codes will
-   not be correct. On Windows, file owners, ACLs and alternate data streams
-   are not copied.
+   Trên các nền tảng POSIX, điều này có nghĩa là thông tin chủ sở hữu và nhóm của tệp cũng như ACL sẽ bị mất. Trên Mac OS, resource fork và các siêu dữ liệu khác không được sử dụng. Điều này có nghĩa là các tài nguyên sẽ bị mất, đồng thời mã loại tệp và mã trình tạo sẽ không chính xác. Trên Windows, chủ sở hữu tệp, ACL và alternate data streams sẽ không được sao chép.
 
 
 .. _file-operations:
 
-Directory and files operations
-------------------------------
+Các thao tác với thư mục và tệp
+-------------------------------
 
 .. function:: copyfileobj(fsrc, fdst[, length])
 
-   Copy the contents of the :term:`file-like object <file object>` *fsrc* to the file-like object *fdst*.
-   The integer *length*, if given, is the buffer size. In particular, a negative
-   *length* value means to copy the data without looping over the source data in
-   chunks; by default the data is read in chunks to avoid uncontrolled memory
-   consumption. Note that if the current file position of the *fsrc* object is not
-   0, only the contents from the current file position to the end of the file will
-   be copied.
+   Sao chép nội dung của :term:`đối tượng giống tệp <file object>` *fsrc* sang đối tượng giống tệp *fdst*. Số nguyên *length*, nếu được cung cấp, là kích thước bộ đệm. Cụ thể, giá trị *length* âm có nghĩa là sao chép dữ liệu mà không lặp qua dữ liệu nguồn theo từng khối; theo mặc định, dữ liệu được đọc theo từng khối để tránh tiêu thụ bộ nhớ không kiểm soát. Lưu ý rằng nếu vị trí tệp hiện tại của đối tượng *fsrc* không phải là 0, chỉ nội dung từ vị trí tệp hiện tại đến cuối tệp mới được sao chép.
 
-   :func:`copyfileobj` will *not* guarantee that the destination stream has
-   been flushed on completion of the copy. If you want to read from the
-   destination at the completion of the copy operation (for example, reading
-   the contents of a temporary file that has been copied from a HTTP stream),
-   you must ensure that you have called :func:`~io.IOBase.flush` or
-   :func:`~io.IOBase.close` on the file-like object before attempting to read
-   the destination file.
+   :func:`copyfileobj` sẽ *không* đảm bảo rằng luồng đích đã được flush khi hoàn tất việc sao chép. Nếu bạn muốn đọc từ đích sau khi hoàn tất thao tác sao chép (ví dụ: đọc nội dung của một tệp tạm thời đã được sao chép từ một HTTP stream), bạn phải đảm bảo rằng mình đã gọi :func:`~io.IOBase.flush` hoặc
+   :func:`~io.IOBase.close` trên đối tượng giống tệp trước khi cố đọc tệp đích.
 
 .. function:: copyfile(src, dst, *, follow_symlinks=True)
 
-   Copy the contents (no metadata) of the file named *src* to a file named
-   *dst* and return *dst* in the most efficient way possible.
-   *src* and *dst* are :term:`path-like objects <path-like object>` or path names given as strings.
+   Sao chép nội dung (không có siêu dữ liệu) của tệp có tên *src* sang tệp có tên *dst* và trả về *dst* theo cách hiệu quả nhất có thể. *src* và *dst* là :term:`đối tượng dạng đường dẫn <path-like object>` hoặc tên đường dẫn được cung cấp dưới dạng chuỗi.
 
-   *dst* must be the complete target file name; look at :func:`~shutil.copy`
-   for a copy that accepts a target directory path.  If *src* and *dst*
-   specify the same file, :exc:`SameFileError` is raised.
+   *dst* phải là tên tệp đích đầy đủ; hãy xem :func:`~shutil.copy` để biết cách sao chép chấp nhận đường dẫn thư mục đích. Nếu *src* và *dst* chỉ đến cùng một tệp, :exc:`SameFileError` sẽ được phát sinh.
 
-   The destination location must be writable; otherwise, an :exc:`OSError`
-   exception will be raised. If *dst* already exists, it will be replaced.
-   Special files such as character or block devices and pipes cannot be
-   copied with this function.
+   Vị trí đích phải có quyền ghi; nếu không, một ngoại lệ :exc:`OSError` sẽ được phát sinh. Nếu *dst* đã tồn tại, nó sẽ bị thay thế. Không thể sao chép các tệp đặc biệt như thiết bị ký tự, thiết bị khối và pipe bằng hàm này.
 
-   If *follow_symlinks* is false and *src* is a symbolic link,
-   a new symbolic link will be created instead of copying the
-   file *src* points to.
+   Nếu *follow_symlinks* là false và *src* là một symbolic link, một symbolic link mới sẽ được tạo thay vì sao chép tệp mà *src* trỏ tới.
 
    .. audit-event:: shutil.copyfile src,dst shutil.copyfile
 
    .. versionchanged:: 3.3
       :exc:`IOError` used to be raised instead of :exc:`OSError`.
-      Added *follow_symlinks* argument.
-      Now returns *dst*.
+      Đã thêm đối số *follow_symlinks*. Hiện trả về *dst*.
 
    .. versionchanged:: 3.4
-      Raise :exc:`SameFileError` instead of :exc:`Error`.  Since the former is
-      a subclass of the latter, this change is backward compatible.
+      Phát sinh :exc:`SameFileError` thay vì :exc:`Error`. Vì loại ngoại lệ trước là lớp con của loại ngoại lệ sau, thay đổi này vẫn tương thích ngược.
 
    .. versionchanged:: 3.8
-      Platform-specific fast-copy syscalls may be used internally in order to
-      copy the file more efficiently. See
-      :ref:`shutil-platform-dependent-efficient-copy-operations` section.
+      Các syscall sao chép nhanh dành riêng cho từng nền tảng có thể được sử dụng nội bộ để sao chép tệp hiệu quả hơn. Xem
+      mục :ref:`shutil-platform-dependent-efficient-copy-operations`.
 
 .. exception:: SpecialFileError
 
-   This exception is raised when :func:`copyfile` or :func:`copytree` attempt
-   to copy a named pipe.
+   Ngoại lệ này được phát sinh khi :func:`copyfile` hoặc :func:`copytree` cố gắng sao chép một named pipe.
 
    .. versionadded:: 2.7
 
 .. exception:: SameFileError
 
-   This exception is raised if source and destination in :func:`copyfile`
-   are the same file.
+   Ngoại lệ này được phát sinh nếu nguồn và đích trong :func:`copyfile` là cùng một tệp.
 
    .. versionadded:: 3.4
 
 
 .. function:: copymode(src, dst, *, follow_symlinks=True)
 
-   Copy the permission bits from *src* to *dst*.  The file contents, owner, and
-   group are unaffected.  *src* and *dst* are :term:`path-like objects <path-like object>` or path names
-   given as strings.
-   If *follow_symlinks* is false, and both *src* and *dst* are symbolic links,
-   :func:`copymode` will attempt to modify the mode of *dst* itself (rather
-   than the file it points to).  This functionality is not available on every
-   platform; please see :func:`copystat` for more information.  If
-   :func:`copymode` cannot modify symbolic links on the local platform, and it
-   is asked to do so, it will do nothing and return.
+   Sao chép các bit quyền từ *src* sang *dst*. Nội dung tệp, chủ sở hữu và nhóm không bị ảnh hưởng. *src* và *dst* là :term:`đối tượng dạng đường dẫn <path-like object>` hoặc tên đường dẫn được cung cấp dưới dạng chuỗi. Nếu *follow_symlinks* là false và cả *src* lẫn *dst* đều là liên kết tượng trưng,
+   :func:`copymode` sẽ cố gắng sửa đổi mode của chính *dst* (thay vì tệp mà nó trỏ tới). Chức năng này không khả dụng trên mọi nền tảng; hãy xem :func:`copystat` để biết thêm thông tin. Nếu
+   :func:`copymode` không thể sửa đổi các liên kết tượng trưng trên nền tảng cục bộ và được yêu cầu thực hiện việc đó, nó sẽ không làm gì và trả về.
 
    .. audit-event:: shutil.copymode src,dst shutil.copymode
 
    .. versionchanged:: 3.3
-      Added *follow_symlinks* argument.
+      Đã thêm đối số *follow_symlinks*.
 
 .. function:: copystat(src, dst, *, follow_symlinks=True)
 
-   Copy the permission bits, last access time, last modification time, and
-   flags from *src* to *dst*.  On Linux, :func:`copystat` also copies the
-   "extended attributes" where possible.  The file contents, owner, and
-   group are unaffected.  *src* and *dst* are :term:`path-like objects <path-like object>` or path
-   names given as strings.
+   Sao chép các bit quyền, thời điểm truy cập gần nhất, thời điểm sửa đổi gần nhất và các cờ từ *src* sang *dst*. Trên Linux, :func:`copystat` cũng sao chép "extended attributes" khi có thể. Nội dung tệp, chủ sở hữu và nhóm không bị ảnh hưởng. *src* và *dst* là :term:`đối tượng dạng đường dẫn <path-like object>` hoặc tên đường dẫn được cung cấp dưới dạng chuỗi.
 
-   If *follow_symlinks* is false, and *src* and *dst* both
-   refer to symbolic links, :func:`copystat` will operate on
-   the symbolic links themselves rather than the files the
-   symbolic links refer to—reading the information from the
-   *src* symbolic link, and writing the information to the
-   *dst* symbolic link.
+   Nếu *follow_symlinks* là false và *src* cùng *dst* đều tham chiếu đến các liên kết tượng trưng, :func:`copystat` sẽ thao tác trên chính các liên kết tượng trưng thay vì các tệp mà chúng trỏ tới—đọc thông tin từ liên kết tượng trưng *src* và ghi thông tin vào liên kết tượng trưng *dst*.
 
    .. note::
 
-      Not all platforms provide the ability to examine and
-      modify symbolic links.  Python itself can tell you what
-      functionality is locally available.
+      Không phải nền tảng nào cũng cung cấp khả năng kiểm tra và sửa đổi symbolic link. Bản thân Python có thể cho bạn biết những chức năng nào hiện có trên hệ thống cục bộ.
 
-      * If ``os.chmod in os.supports_follow_symlinks`` is
-        ``True``, :func:`copystat` can modify the permission
-        bits of a symbolic link.
+      * Nếu ``os.chmod in os.supports_follow_symlinks`` là ``True``, :func:`copystat` có thể sửa đổi các bit quyền của symbolic link.
 
-      * If ``os.utime in os.supports_follow_symlinks`` is
-        ``True``, :func:`copystat` can modify the last access
-        and modification times of a symbolic link.
+      * Nếu ``os.utime in os.supports_follow_symlinks`` là ``True``, :func:`copystat` có thể sửa đổi thời điểm truy cập và sửa đổi lần cuối của symbolic link.
 
-      * If ``os.chflags in os.supports_follow_symlinks`` is
-        ``True``, :func:`copystat` can modify the flags of
-        a symbolic link.  (``os.chflags`` is not available on
-        all platforms.)
+      * Nếu ``os.chflags in os.supports_follow_symlinks`` là ``True``, :func:`copystat` có thể sửa đổi các cờ của symbolic link. (``os.chflags`` không khả dụng trên tất cả các nền tảng.)
 
-      On platforms where some or all of this functionality
-      is unavailable, when asked to modify a symbolic link,
-      :func:`copystat` will copy everything it can.
-      :func:`copystat` never returns failure.
+      Trên những nền tảng không có một phần hoặc toàn bộ chức năng này, khi được yêu cầu sửa đổi một symbolic link,
+      :func:`copystat` sẽ sao chép mọi thứ có thể.
+      :func:`copystat` không bao giờ trả về trạng thái thất bại.
 
-      Please see :data:`os.supports_follow_symlinks`
-      for more information.
+      Vui lòng xem :data:`os.supports_follow_symlinks` để biết thêm thông tin.
 
    .. audit-event:: shutil.copystat src,dst shutil.copystat
 
    .. versionchanged:: 3.3
-      Added *follow_symlinks* argument and support for Linux extended attributes.
+      Đã thêm đối số *follow_symlinks* và hỗ trợ các extended attributes của Linux.
 
 .. function:: copy(src, dst, *, follow_symlinks=True)
 
-   Copies the file *src* to the file or directory *dst*.  *src* and *dst*
-   should be :term:`path-like objects <path-like object>` or strings.  If
-   *dst* specifies a directory, the file will be copied into *dst* using the
-   base filename from *src*. If *dst* specifies a file that already exists,
-   it will be replaced. Returns the path to the newly created file.
+   Sao chép tệp *src* vào tệp hoặc thư mục *dst*.  *src* và *dst* phải là :term:`path-like objects <path-like object>` hoặc chuỗi.  Nếu *dst* chỉ định một thư mục, tệp sẽ được sao chép vào *dst* bằng tên tệp cơ sở từ *src*. Nếu *dst* chỉ định một tệp đã tồn tại, tệp đó sẽ được thay thế. Trả về đường dẫn đến tệp mới được tạo.
 
-   If *follow_symlinks* is false, and *src* is a symbolic link,
-   *dst* will be created as a symbolic link.  If *follow_symlinks*
-   is true and *src* is a symbolic link, *dst* will be a copy of
-   the file *src* refers to.
+   Nếu *follow_symlinks* là false và *src* là một symbolic link, *dst* sẽ được tạo dưới dạng một symbolic link.  Nếu *follow_symlinks* là true và *src* là một symbolic link, *dst* sẽ là bản sao của tệp mà *src* trỏ tới.
 
-   :func:`~shutil.copy` copies the file data and the file's permission
-   mode (see :func:`os.chmod`).  Other metadata, like the
-   file's creation and modification times, is not preserved.
-   To preserve all file metadata from the original, use
-   :func:`~shutil.copy2` instead.
+   :func:`~shutil.copy` sao chép dữ liệu tệp và chế độ quyền của tệp (xem :func:`os.chmod`).  Các siêu dữ liệu khác, chẳng hạn như thời gian tạo và sửa đổi tệp, không được giữ lại. Để giữ lại tất cả siêu dữ liệu tệp từ bản gốc, hãy sử dụng
+   :func:`~shutil.copy2` thay vào đó.
 
    .. audit-event:: shutil.copyfile src,dst shutil.copy
 
    .. audit-event:: shutil.copymode src,dst shutil.copy
 
    .. versionchanged:: 3.3
-      Added *follow_symlinks* argument.
-      Now returns path to the newly created file.
+      Đã thêm đối số *follow_symlinks*. Hiện trả về đường dẫn đến tệp mới được tạo.
 
    .. versionchanged:: 3.8
-      Platform-specific fast-copy syscalls may be used internally in order to
-      copy the file more efficiently. See
-      :ref:`shutil-platform-dependent-efficient-copy-operations` section.
+      Các syscall sao chép nhanh dành riêng cho từng nền tảng có thể được sử dụng nội bộ để sao chép tệp hiệu quả hơn. Xem
+      mục :ref:`shutil-platform-dependent-efficient-copy-operations`.
 
 .. function:: copy2(src, dst, *, follow_symlinks=True)
 
-   Identical to :func:`~shutil.copy` except that :func:`copy2`
-   also attempts to preserve file metadata.
+   Tương tự :func:`~shutil.copy`, ngoại trừ việc :func:`copy2` cũng cố gắng bảo toàn metadata của tệp.
 
-   When *follow_symlinks* is false, and *src* is a symbolic
-   link, :func:`copy2` attempts to copy all metadata from the
-   *src* symbolic link to the newly created *dst* symbolic link.
-   However, this functionality is not available on all platforms.
-   On platforms where some or all of this functionality is
-   unavailable, :func:`copy2` will preserve all the metadata
-   it can; :func:`copy2` never raises an exception because it
-   cannot preserve file metadata.
+   Khi *follow_symlinks* là false và *src* là một symbolic link, :func:`copy2` cố gắng sao chép tất cả metadata từ symbolic link *src* sang symbolic link *dst* mới được tạo. Tuy nhiên, chức năng này không khả dụng trên mọi nền tảng. Trên các nền tảng không hỗ trợ một phần hoặc toàn bộ chức năng này, :func:`copy2` sẽ bảo toàn mọi metadata mà nó có thể; :func:`copy2` không bao giờ đưa ra ngoại lệ chỉ vì không thể bảo toàn metadata của tệp.
 
-   :func:`copy2` uses :func:`copystat` to copy the file metadata.
-   Please see :func:`copystat` for more information
-   about platform support for modifying symbolic link metadata.
+   :func:`copy2` sử dụng :func:`copystat` để sao chép metadata của tệp. Vui lòng xem :func:`copystat` để biết thêm thông tin về hỗ trợ của nền tảng đối với việc sửa đổi metadata của symbolic link.
 
    .. audit-event:: shutil.copyfile src,dst shutil.copy2
 
    .. audit-event:: shutil.copystat src,dst shutil.copy2
 
    .. versionchanged:: 3.3
-      Added *follow_symlinks* argument, try to copy extended
-      file system attributes too (currently Linux only).
-      Now returns path to the newly created file.
+      Đã thêm đối số *follow_symlinks*, đồng thời cố gắng sao chép cả các thuộc tính mở rộng của hệ thống tệp (hiện chỉ hỗ trợ Linux). Hiện trả về đường dẫn đến tệp mới được tạo.
 
    .. versionchanged:: 3.8
-      Platform-specific fast-copy syscalls may be used internally in order to
-      copy the file more efficiently. See
-      :ref:`shutil-platform-dependent-efficient-copy-operations` section.
+      Các syscall sao chép nhanh dành riêng cho từng nền tảng có thể được sử dụng nội bộ để sao chép tệp hiệu quả hơn. Xem
+      mục :ref:`shutil-platform-dependent-efficient-copy-operations`.
 
 .. function:: ignore_patterns(*patterns)
 
-   This factory function creates a function that can be used as a callable for
-   :func:`copytree`\'s *ignore* argument, ignoring files and directories that
-   match one of the glob-style *patterns* provided.  See the example below.
+   Hàm factory này tạo ra một hàm có thể được sử dụng làm callable cho
+   :func:`copytree`\' đối số *ignore*, bỏ qua các tệp và thư mục khớp với một trong các *patterns* kiểu glob được cung cấp. Xem ví dụ bên dưới.
 
 
 .. function:: copytree(src, dst, symlinks=False, ignore=None, \
-              copy_function=copy2, ignore_dangling_symlinks=False, \
-              dirs_exist_ok=False)
+              copy_function=copy2, ignore_dangling_symlinks=False, \ dirs_exist_ok=False)
 
-   Recursively copy an entire directory tree rooted at *src* to a directory
-   named *dst* and return the destination directory.  All intermediate
-   directories needed to contain *dst* will also be created by default.
+   Sao chép đệ quy toàn bộ cây thư mục bắt đầu từ *src* vào một thư mục có tên *dst* và trả về thư mục đích. Theo mặc định, tất cả các thư mục trung gian cần thiết để chứa *dst* cũng sẽ được tạo.
 
-   Permissions and times of directories are copied with :func:`copystat`,
-   individual files are copied using :func:`~shutil.copy2`.
+   Quyền và thời gian của các thư mục được sao chép bằng :func:`copystat`, còn từng tệp được sao chép bằng :func:`~shutil.copy2`.
 
-   If *symlinks* is true, symbolic links in the source tree are represented as
-   symbolic links in the new tree and the metadata of the original links will
-   be copied as far as the platform allows; if false or omitted, the contents
-   and metadata of the linked files are copied to the new tree.
+   Nếu *symlinks* là true, các symbolic link trong cây nguồn sẽ được biểu diễn dưới dạng symbolic link trong cây mới và metadata của các link ban đầu sẽ được sao chép trong phạm vi nền tảng cho phép; nếu là false hoặc bị bỏ qua, nội dung và metadata của các tệp được liên kết sẽ được sao chép vào cây mới.
 
-   When *symlinks* is false, if the file pointed to by the symlink doesn't
-   exist, an exception will be added in the list of errors raised in
-   an :exc:`Error` exception at the end of the copy process.
-   You can set the optional *ignore_dangling_symlinks* flag to true if you
-   want to silence this exception. Notice that this option has no effect
-   on platforms that don't support :func:`os.symlink`.
+   Khi *symlinks* là false, nếu tệp mà symlink trỏ tới không tồn tại, một exception sẽ được thêm vào danh sách các lỗi được nêu trong một :exc:`Error` exception ở cuối quá trình sao chép. Bạn có thể đặt flag tùy chọn *ignore_dangling_symlinks* thành true nếu muốn bỏ qua exception này. Lưu ý rằng tùy chọn này không có tác dụng trên các nền tảng không hỗ trợ :func:`os.symlink`.
 
-   If *ignore* is given, it must be a callable that will receive as its
-   arguments the directory being visited by :func:`copytree`, and a list of its
-   contents, as returned by :func:`os.listdir`.  Since :func:`copytree` is
-   called recursively, the *ignore* callable will be called once for each
-   directory that is copied.  The callable must return a sequence of directory
-   and file names relative to the current directory (i.e. a subset of the items
-   in its second argument); these names will then be ignored in the copy
-   process.  :func:`ignore_patterns` can be used to create such a callable that
-   ignores names based on glob-style patterns.
+   Nếu được cung cấp *ignore*, nó phải là một callable nhận thư mục đang được :func:`copytree` duyệt và danh sách nội dung của thư mục đó, do :func:`os.listdir` trả về, làm các đối số. Vì :func:`copytree` được gọi đệ quy, callable *ignore* sẽ được gọi một lần cho mỗi thư mục được sao chép. Callable này phải trả về một sequence gồm các tên thư mục và tệp tương đối với thư mục hiện tại (tức là một tập con các mục trong đối số thứ hai của nó); sau đó, các tên này sẽ bị bỏ qua trong quá trình sao chép. Có thể sử dụng :func:`ignore_patterns` để tạo một callable như vậy, nhằm bỏ qua các tên dựa trên các mẫu kiểu glob.
 
-   If exception(s) occur, an :exc:`Error` is raised with a list of reasons.
+   Nếu xảy ra exception, một :exc:`Error` sẽ được nêu ra cùng với danh sách các lý do.
 
-   If *copy_function* is given, it must be a callable that will be used to copy
-   each file. It will be called with the source path and the destination path
-   as arguments. By default, :func:`~shutil.copy2` is used, but any function
-   that supports the same signature (like :func:`~shutil.copy`) can be used.
+   Nếu được cung cấp *copy_function*, nó phải là một callable được sử dụng để sao chép từng tệp. Callable này sẽ được gọi với đường dẫn nguồn và đường dẫn đích làm các đối số. Theo mặc định, :func:`~shutil.copy2` được sử dụng, nhưng có thể sử dụng bất kỳ hàm nào hỗ trợ cùng signature (chẳng hạn như :func:`~shutil.copy`).
 
-   If *dirs_exist_ok* is false (the default) and *dst* already exists, a
-   :exc:`FileExistsError` is raised. If *dirs_exist_ok* is true, the copying
-   operation will continue if it encounters existing directories, and files
-   within the *dst* tree will be overwritten by corresponding files from the
-   *src* tree.
+   Nếu *dirs_exist_ok* là false (giá trị mặc định) và *dst* đã tồn tại, một
+   :exc:`FileExistsError` sẽ được nêu ra. Nếu *dirs_exist_ok* là true, thao tác sao chép sẽ tiếp tục nếu gặp các thư mục đã tồn tại, và các tệp trong cây *dst* sẽ bị ghi đè bởi các tệp tương ứng từ cây *src*.
 
    .. audit-event:: shutil.copytree src,dst shutil.copytree
 
    .. versionchanged:: 3.2
-      Added the *copy_function* argument to be able to provide a custom copy
-      function.
-      Added the *ignore_dangling_symlinks* argument to silence dangling symlinks
-      errors when *symlinks* is false.
+      Đã thêm đối số *copy_function* để có thể cung cấp một hàm sao chép tùy chỉnh. Đã thêm đối số *ignore_dangling_symlinks* để bỏ qua lỗi symlink treo khi *symlinks* là false.
 
    .. versionchanged:: 3.3
-      Copy metadata when *symlinks* is false.
-      Now returns *dst*.
+      Sao chép metadata khi *symlinks* là false. Hiện trả về *dst*.
 
    .. versionchanged:: 3.8
-      Platform-specific fast-copy syscalls may be used internally in order to
-      copy the file more efficiently. See
-      :ref:`shutil-platform-dependent-efficient-copy-operations` section.
+      Các syscall sao chép nhanh dành riêng cho từng nền tảng có thể được sử dụng nội bộ để sao chép tệp hiệu quả hơn. Xem
+      mục :ref:`shutil-platform-dependent-efficient-copy-operations`.
 
    .. versionchanged:: 3.8
-      Added the *dirs_exist_ok* parameter.
+      Đã thêm tham số *dirs_exist_ok*.
 
 .. function:: rmtree(path, ignore_errors=False, onerror=None, *, onexc=None, dir_fd=None)
 
    .. index:: single: directory; deleting
 
-   Delete an entire directory tree; *path* must point to a directory (but not a
-   symbolic link to a directory).  If *ignore_errors* is true, errors resulting
-   from failed removals will be ignored; if false or omitted, such errors are
-   handled by calling a handler specified by *onexc* or *onerror* or, if both
-   are omitted, exceptions are propagated to the caller.
+   Xóa toàn bộ cây thư mục; *path* phải trỏ đến một thư mục (nhưng không được là symbolic link trỏ đến thư mục). Nếu *ignore_errors* là true, các lỗi phát sinh từ việc xóa không thành công sẽ bị bỏ qua; nếu là false hoặc bị bỏ qua, các lỗi đó sẽ được xử lý bằng cách gọi handler được chỉ định bởi *onexc* hoặc *onerror*; nếu cả hai đều bị bỏ qua, các exception sẽ được truyền đến caller.
 
-   This function can support :ref:`paths relative to directory descriptors
-   <dir_fd>`.
+   Hàm này hỗ trợ :ref:`các path tương đối với file descriptor của thư mục <dir_fd>`.
 
    .. note::
 
-      On platforms that support the necessary fd-based functions a symlink
-      attack resistant version of :func:`rmtree` is used by default.  On other
-      platforms, the :func:`rmtree` implementation is susceptible to a symlink
-      attack: given proper timing and circumstances, attackers can manipulate
-      symlinks on the filesystem to delete files they wouldn't be able to access
-      otherwise.  Applications can use the :data:`rmtree.avoids_symlink_attacks`
-      function attribute to determine which case applies.
+      Trên các nền tảng hỗ trợ những hàm cần thiết dựa trên fd, một phiên bản chống tấn công symlink của :func:`rmtree` được sử dụng theo mặc định. Trên các nền tảng khác, triển khai :func:`rmtree` dễ bị tấn công symlink: nếu có thời điểm và điều kiện thích hợp, kẻ tấn công có thể thao túng các symlink trên hệ thống tệp để xóa những tệp mà chúng không thể truy cập theo cách khác. Ứng dụng có thể sử dụng thuộc tính hàm :data:`rmtree.avoids_symlink_attacks` để xác định trường hợp nào đang áp dụng.
 
-   If *onexc* is provided, it must be a callable that accepts three parameters:
-   *function*, *path*, and *excinfo*.
+   Nếu *onexc* được cung cấp, nó phải là một callable chấp nhận ba tham số: *function*, *path* và *excinfo*.
 
-   The first parameter, *function*, is the function which raised the exception;
-   it depends on the platform and implementation.  The second parameter,
-   *path*, will be the path name passed to *function*.  The third parameter,
-   *excinfo*, is the exception that was raised. Exceptions raised by *onexc*
-   will not be caught.
+   Tham số đầu tiên, *function*, là hàm đã phát sinh ngoại lệ; hàm này phụ thuộc vào nền tảng và cách triển khai. Tham số thứ hai, *path*, sẽ là tên đường dẫn được truyền cho *function*. Tham số thứ ba, *excinfo*, là ngoại lệ đã phát sinh. Các ngoại lệ do *onexc* phát sinh sẽ không bị bắt.
 
-   The deprecated *onerror* is similar to *onexc*, except that the third
-   parameter it receives is the tuple returned from :func:`sys.exc_info`.
+   *onerror* đã bị ngừng sử dụng tương tự như *onexc*, ngoại trừ việc tham số thứ ba mà nó nhận được là tuple được trả về từ :func:`sys.exc_info`.
 
    .. seealso::
       :ref:`shutil-rmtree-example` for an example of handling the removal
-      of a directory tree that contains read-only files.
+      của một cây thư mục chứa các tệp chỉ đọc.
 
    .. audit-event:: shutil.rmtree path,dir_fd shutil.rmtree
 
    .. versionchanged:: 3.3
-      Added a symlink attack resistant version that is used automatically
-      if platform supports fd-based functions.
+      Đã bổ sung một phiên bản chống tấn công symlink, phiên bản này được tự động sử dụng nếu nền tảng hỗ trợ các hàm dựa trên fd.
 
    .. versionchanged:: 3.8
-      On Windows, will no longer delete the contents of a directory junction
-      before removing the junction.
+      Trên Windows, nội dung của directory junction sẽ không còn bị xóa trước khi junction bị xóa.
 
    .. versionchanged:: 3.11
-      Added the *dir_fd* parameter.
+      Đã bổ sung tham số *dir_fd*.
 
    .. versionchanged:: 3.12
-      Added the *onexc* parameter, deprecated *onerror*.
+      Đã thêm tham số *onexc*, không còn dùng *onerror*.
 
    .. versionchanged:: 3.13
       :func:`!rmtree` now ignores :exc:`FileNotFoundError` exceptions for all
-      but the top-level path.
-      Exceptions other than :exc:`OSError` and subclasses of :exc:`!OSError`
-      are now always propagated to the caller.
+      nhưng là đường dẫn cấp cao nhất. Các ngoại lệ khác với :exc:`OSError` và các lớp con của :exc:`!OSError` giờ đây luôn được truyền tiếp cho caller.
 
    .. attribute:: rmtree.avoids_symlink_attacks
 
-      Indicates whether the current platform and implementation provides a
-      symlink attack resistant version of :func:`rmtree`.  Currently this is
-      only true for platforms supporting fd-based directory access functions.
+      Cho biết liệu platform và implementation hiện tại có cung cấp phiên bản :func:`rmtree` có khả năng chống tấn công symlink hay không. Hiện tại, điều này chỉ đúng với các platform hỗ trợ các hàm truy cập thư mục dựa trên fd.
 
       .. versionadded:: 3.3
 
 
 .. function:: move(src, dst, copy_function=copy2)
 
-   Recursively move a file or directory (*src*) to another location and return
-   the destination.
+   Di chuyển đệ quy một tệp hoặc thư mục (*src*) đến một vị trí khác và trả về đích.
 
-   If *dst* is an existing directory or a symlink to a directory, then *src*
-   is moved inside that directory. The destination path in that directory must
-   not already exist.
+   Nếu *dst* là một thư mục hiện có hoặc một symlink trỏ đến thư mục, thì *src* sẽ được di chuyển vào trong thư mục đó. Đường dẫn đích trong thư mục đó không được tồn tại từ trước.
 
-   If *dst* already exists but is not a directory, it may be overwritten
-   depending on :func:`os.rename` semantics.
+   Nếu *dst* đã tồn tại nhưng không phải là một thư mục, nó có thể bị ghi đè tùy theo ngữ nghĩa của :func:`os.rename`.
 
-   :func:`os.rename` is preferably used internally when *src* and the destination are on
-   the same filesystem. In case :func:`os.rename` fails due to :exc:`OSError`
-   (e.g. the user has write permission to the destination file but not to its parent
-   directory), this method falls back to using *copy_function*, in which case
-   *src* is copied to the destination using *copy_function* and then removed.
+   :func:`os.rename` được ưu tiên sử dụng nội bộ khi *src* và đích nằm trên cùng hệ thống tệp. Trong trường hợp :func:`os.rename` thất bại do :exc:`OSError` (ví dụ: người dùng có quyền ghi vào tệp đích nhưng không có quyền ghi vào thư mục cha), phương thức này chuyển sang sử dụng *copy_function*; khi đó, *src* được sao chép đến đích bằng *copy_function* rồi bị xóa.
 
-   In case of symlinks, a new symlink pointing to the target of *src* will be
-   created in or as the destination, and *src* will be removed.
+   Trong trường hợp là symlink, một symlink mới trỏ đến đích của *src* sẽ được tạo tại đích hoặc được dùng làm đích, và *src* sẽ bị xóa.
 
-   If *copy_function* is given, it must be a callable that takes two arguments,
-   *src* and the destination, and will be used to copy *src* to the destination
-   if :func:`os.rename` cannot be used.  If the source is a directory,
-   :func:`copytree` is called, passing it the *copy_function*. The
-   default *copy_function* is :func:`copy2`.  Using :func:`~shutil.copy` as the
-   *copy_function* allows the move to succeed when it is not possible to also
-   copy the metadata, at the expense of not copying any of the metadata.
+   Nếu được cung cấp *copy_function*, giá trị này phải là một callable nhận hai đối số, *src* và đích, và sẽ được dùng để sao chép *src* đến đích nếu không thể sử dụng :func:`os.rename`. Nếu nguồn là một thư mục,
+   :func:`copytree` được gọi với *copy_function* được truyền vào. Giá trị mặc định của *copy_function* là :func:`copy2`. Sử dụng :func:`~shutil.copy` làm *copy_function* cho phép thao tác di chuyển thành công khi không thể đồng thời sao chép metadata, nhưng đổi lại sẽ không sao chép bất kỳ metadata nào.
 
    .. audit-event:: shutil.move src,dst shutil.move
 
    .. versionchanged:: 3.3
-      Added explicit symlink handling for foreign filesystems, thus adapting
-      it to the behavior of GNU's :program:`mv`.
-      Now returns *dst*.
+      Đã bổ sung xử lý symlink rõ ràng cho các filesystem khác, qua đó điều chỉnh theo hành vi của :program:`mv` của GNU. Hiện trả về *dst*.
 
    .. versionchanged:: 3.5
-      Added the *copy_function* keyword argument.
+      Đã bổ sung đối số từ khóa *copy_function*.
 
    .. versionchanged:: 3.8
-      Platform-specific fast-copy syscalls may be used internally in order to
-      copy the file more efficiently. See
-      :ref:`shutil-platform-dependent-efficient-copy-operations` section.
+      Các syscall sao chép nhanh dành riêng cho từng nền tảng có thể được sử dụng nội bộ để sao chép tệp hiệu quả hơn. Xem
+      mục :ref:`shutil-platform-dependent-efficient-copy-operations`.
 
    .. versionchanged:: 3.9
-      Accepts a :term:`path-like object` for both *src* and *dst*.
+      Chấp nhận một :term:`path-like object` cho cả *src* và *dst*.
 
 .. function:: disk_usage(path)
 
-   Return disk usage statistics about the given path as a :term:`named tuple`
-   with the attributes *total*, *used* and *free*, which are the amount of
-   total, used and free space, in bytes. *path* may be a file or a
-   directory.
+   Trả về thống kê mức sử dụng đĩa của đường dẫn đã cho dưới dạng :term:`named tuple` với các thuộc tính *total*, *used* và *free*, lần lượt là dung lượng tổng, dung lượng đã sử dụng và dung lượng còn trống, tính bằng byte. *path* có thể là một tệp hoặc thư mục.
 
    .. note::
 
-      On Unix filesystems, *path* must point to a path within a **mounted**
-      filesystem partition. On those platforms, CPython doesn't attempt to
-      retrieve disk usage information from non-mounted filesystems.
+      Trên các hệ thống tệp Unix, *path* phải trỏ đến một đường dẫn trong một phân vùng hệ thống tệp **mounted**. Trên các nền tảng đó, CPython không cố gắng lấy thông tin sử dụng đĩa từ các hệ thống tệp chưa được mount.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.8
-     On Windows, *path* can now be a file or directory.
+     Trên Windows, *path* giờ đây có thể là một tệp hoặc thư mục.
 
    .. availability:: Unix, Windows.
 
 .. function:: chown(path, user=None, group=None, *, dir_fd=None, \
                     follow_symlinks=True)
 
-   Change owner *user* and/or *group* of the given *path*.
+   Thay đổi chủ sở hữu *user* và/hoặc *group* của *path* đã cho.
 
-   *user* can be a system user name or a uid; the same applies to *group*. At
-   least one argument is required.
+   *user* có thể là tên người dùng hệ thống hoặc uid; điều tương tự cũng áp dụng cho *group*. Bắt buộc phải cung cấp ít nhất một đối số.
 
-   See also :func:`os.chown`, the underlying function.
+   Xem thêm :func:`os.chown`, hàm nền tảng.
 
    .. audit-event:: shutil.chown path,user,group shutil.chown
 
@@ -460,44 +300,28 @@ Directory and files operations
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.13
-      Added *dir_fd* and *follow_symlinks* parameters.
+      Đã thêm các tham số *dir_fd* và *follow_symlinks*.
 
 
 .. function:: which(cmd, mode=os.F_OK | os.X_OK, path=None)
 
-   Return the path to an executable which would be run if the given *cmd* was
-   called.  If no *cmd* would be called, return ``None``.
+   Trả về đường dẫn đến tệp thực thi sẽ được chạy nếu *cmd* đã cho được gọi. Nếu không có *cmd* nào được gọi, trả về ``None``.
 
-   *mode* is a permission mask passed to :func:`os.access`, by default
-   determining if the file exists and is executable.
+   *mode* là mặt nạ quyền được truyền đến :func:`os.access`, theo mặc định xác định xem tệp có tồn tại và có thể thực thi hay không.
 
-   *path* is a "``PATH`` string" specifying the directories to look in,
-   delimited by :data:`os.pathsep`. When no *path* is specified, the
-   :envvar:`PATH` environment variable is read from :data:`os.environ`,
-   falling back to :data:`os.defpath` if it is not set.
+   *path* là một "``PATH`` chuỗi" chỉ định các thư mục cần tìm, được phân tách bằng :data:`os.pathsep`. Khi không chỉ định *path*, biến
+   :envvar:`PATH` môi trường được đọc từ :data:`os.environ`, dự phòng về :data:`os.defpath` nếu biến này chưa được thiết lập.
 
-   If *cmd* contains a directory component, :func:`!which` only checks the
-   specified path directly and does not search the directories listed in
-   *path* or in the system's :envvar:`PATH` environment variable.
+   Nếu *cmd* chứa một thành phần thư mục, :func:`!which` chỉ kiểm tra trực tiếp đường dẫn được chỉ định và không tìm kiếm các thư mục được liệt kê trong *path* hoặc trong biến môi trường :envvar:`PATH` của hệ thống.
 
-   On Windows, the current directory is prepended to the *path* if *mode* does
-   not include ``os.X_OK``. When the *mode* does include ``os.X_OK``, the
-   Windows API ``NeedCurrentDirectoryForExePathW`` will be consulted to
-   determine if the current directory should be prepended to *path*. To avoid
-   consulting the current working directory for executables: set the environment
-   variable ``NoDefaultCurrentDirectoryInExePath``.
+   Trên Windows, thư mục hiện tại được thêm vào đầu *path* nếu *mode* không bao gồm ``os.X_OK``. Khi *mode* có bao gồm ``os.X_OK``, Windows API ``NeedCurrentDirectoryForExePathW`` sẽ được tham vấn để xác định xem có nên thêm thư mục hiện tại vào đầu *path* hay không. Để tránh tham vấn thư mục làm việc hiện tại khi tìm các tệp thực thi: hãy đặt biến môi trường ``NoDefaultCurrentDirectoryInExePath``.
 
-   Also on Windows, the :envvar:`PATHEXT` environment variable is used to
-   resolve commands that may not already include an extension. For example,
-   if you call ``shutil.which("python")``, :func:`which` will search ``PATHEXT``
-   to know that it should look for ``python.exe`` within the *path*
-   directories. For example, on Windows::
+   Cũng trên Windows, biến môi trường :envvar:`PATHEXT` được dùng để phân giải các lệnh có thể chưa bao gồm phần mở rộng. Ví dụ, nếu bạn gọi ``shutil.which("python")``, :func:`which` sẽ tìm kiếm ``PATHEXT`` để biết rằng nó cần tìm ``python.exe`` trong các thư mục *path*. Ví dụ, trên Windows::
 
       >>> shutil.which("python")
       'C:\\Python33\\python.EXE'
 
-   This is also applied when *cmd* is a path that contains a directory
-   component::
+   Điều này cũng được áp dụng khi *cmd* là một đường dẫn chứa thành phần thư mục::
 
       >>> shutil.which("C:\\Python33\\python")
       'C:\\Python33\\python.EXE'
@@ -505,95 +329,76 @@ Directory and files operations
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.8
-      The :class:`bytes` type is now accepted.  If *cmd* type is
-      :class:`bytes`, the result type is also :class:`bytes`.
+      Kiểu :class:`bytes` hiện được chấp nhận.  Nếu kiểu *cmd* là
+      :class:`bytes`, thì kiểu kết quả cũng là :class:`bytes`.
 
    .. versionchanged:: 3.12
-      On Windows, the current directory is no longer prepended to the search
-      path if *mode* includes ``os.X_OK`` and WinAPI
-      ``NeedCurrentDirectoryForExePathW(cmd)`` is false, else the current
-      directory is prepended even if it is already in the search path;
-      ``PATHEXT`` is used now even when *cmd* includes a directory component
-      or ends with an extension that is in ``PATHEXT``; and filenames that
-      have no extension can now be found.
+      Trên Windows, thư mục hiện tại không còn được thêm vào đầu đường dẫn tìm kiếm nếu *mode* bao gồm ``os.X_OK`` và WinAPI ``NeedCurrentDirectoryForExePathW(cmd)`` là false; nếu không, thư mục hiện tại sẽ được thêm vào đầu ngay cả khi nó đã có trong đường dẫn tìm kiếm; ``PATHEXT`` hiện được sử dụng ngay cả khi *cmd* bao gồm một thành phần thư mục hoặc kết thúc bằng phần mở rộng có trong ``PATHEXT``; và các tên tệp không có phần mở rộng giờ đây có thể được tìm thấy.
 
 .. exception:: Error
 
-   This exception collects exceptions that are raised during a multi-file
-   operation. For :func:`copytree`, the exception argument is a list of 3-tuples
-   (*srcname*, *dstname*, *exception*).
+   Ngoại lệ này tập hợp các ngoại lệ phát sinh trong một thao tác trên nhiều tệp. Đối với :func:`copytree`, đối số ngoại lệ là một danh sách gồm các bộ 3 phần tử (*srcname*, *dstname*, *exception*).
 
 .. _shutil-platform-dependent-efficient-copy-operations:
 
-Platform-dependent efficient copy operations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Các thao tác sao chép hiệu quả phụ thuộc vào nền tảng
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Starting from Python 3.8, all functions involving a file copy
-(:func:`copyfile`, :func:`~shutil.copy`, :func:`copy2`,
-:func:`copytree`, and :func:`move`) may use
-platform-specific "fast-copy" syscalls in order to copy the file more
-efficiently (see :issue:`33671`).
-"fast-copy" means that the copying operation occurs within the kernel, avoiding
-the use of userspace buffers in Python as in "``outfd.write(infd.read())``".
+Bắt đầu từ Python 3.8, tất cả các hàm liên quan đến việc sao chép tệp (:func:`copyfile`, :func:`~shutil.copy`, :func:`copy2`,
+:func:`copytree`, và :func:`move`) có thể sử dụng các system call "fast-copy" dành riêng cho từng nền tảng để sao chép tệp hiệu quả hơn (xem :issue:`33671`). "fast-copy" nghĩa là thao tác sao chép diễn ra bên trong kernel, tránh sử dụng các bộ đệm userspace trong Python như trong "``outfd.write(infd.read())``".
 
-On macOS `fcopyfile`_ is used to copy the file content (not metadata).
+Trên macOS, `fcopyfile`_ được sử dụng để sao chép nội dung tệp (không bao gồm metadata).
 
-On Linux :func:`os.copy_file_range` or :func:`os.sendfile` is used.
+Trên Linux, :func:`os.copy_file_range` hoặc :func:`os.sendfile` được sử dụng.
 
-On Solaris :func:`os.sendfile` is used.
+Trên Solaris, :func:`os.sendfile` được sử dụng.
 
-On Windows :func:`shutil.copyfile` uses a bigger default buffer size (1 MiB
-instead of 64 KiB) and a :func:`memoryview`-based variant of
-:func:`shutil.copyfileobj` is used.
+Trên Windows, :func:`shutil.copyfile` sử dụng kích thước bộ đệm mặc định lớn hơn (1 MiB thay vì 64 KiB) và một biến thể dựa trên :func:`memoryview` của
+:func:`shutil.copyfileobj` được sử dụng.
 
-If the fast-copy operation fails and no data was written in the destination
-file then shutil will silently fall back to less efficient
-:func:`copyfileobj` function internally.
+Nếu thao tác sao chép nhanh không thành công và không có dữ liệu nào được ghi vào tệp đích thì shutil sẽ âm thầm chuyển sang cách kém hiệu quả hơn
+hàm :func:`copyfileobj` ở bên trong.
 
 .. versionchanged:: 3.8
 
 .. versionchanged:: 3.14
-    Solaris now uses :func:`os.sendfile`.
+    Solaris hiện sử dụng :func:`os.sendfile`.
 
 .. versionchanged:: 3.14
-   Copy-on-write or server-side copy may be used internally via
-   :func:`os.copy_file_range` on supported Linux filesystems.
+   Có thể sử dụng tính năng copy-on-write hoặc sao chép phía máy chủ ở bên trong thông qua
+   :func:`os.copy_file_range` trên các hệ thống tệp Linux được hỗ trợ.
 
 .. _shutil-copytree-example:
 
-copytree example
-~~~~~~~~~~~~~~~~
+ví dụ về copytree
+~~~~~~~~~~~~~~~~~
 
-An example that uses the :func:`ignore_patterns` helper::
+Ví dụ sử dụng hàm trợ giúp :func:`ignore_patterns`::
 
    from shutil import copytree, ignore_patterns
 
    copytree(source, destination, ignore=ignore_patterns('*.pyc', 'tmp*'))
 
-This will copy everything except ``.pyc`` files and files or directories whose
-name starts with ``tmp``.
+Thao tác này sẽ sao chép mọi thứ ngoại trừ các tệp ``.pyc`` và các tệp hoặc thư mục có tên bắt đầu bằng ``tmp``.
 
-Another example that uses the *ignore* argument to add a logging call::
+Một ví dụ khác sử dụng đối số *ignore* để thêm một lệnh gọi logging::
 
    from shutil import copytree
    import logging
 
    def _logpath(path, names):
        logging.info('Working in %s', path)
-       return []   # nothing will be ignored
+       return []   # sẽ không bỏ qua gì cả
 
    copytree(source, destination, ignore=_logpath)
 
 
 .. _shutil-rmtree-example:
 
-rmtree example
-~~~~~~~~~~~~~~
+Ví dụ rmtree
+~~~~~~~~~~~~
 
-This example shows how to remove a directory tree on Windows where some
-of the files have their read-only bit set. It uses the onexc callback
-to clear the readonly bit and reattempt the remove. Any subsequent failure
-will propagate. ::
+Ví dụ này cho biết cách xóa một cây thư mục trên Windows khi một số tệp có bit chỉ-đọc được thiết lập. Ví dụ sử dụng callback onexc để xóa bit chỉ-đọc rồi thử lại thao tác xóa. Mọi lỗi tiếp theo sẽ được truyền lên.::
 
     import os, stat
     import shutil
@@ -607,216 +412,157 @@ will propagate. ::
 
 .. _archiving-operations:
 
-Archiving operations
+Các thao tác lưu trữ
 --------------------
 
 .. versionadded:: 3.2
 
 .. versionchanged:: 3.5
-    Added support for the *xztar* format.
+    Đã thêm hỗ trợ cho định dạng *xztar*.
 
 
-High-level utilities to create and read compressed and archived files are also
-provided.  They rely on the :mod:`zipfile` and :mod:`tarfile` modules.
+Cũng cung cấp các tiện ích cấp cao để tạo và đọc các tệp đã nén và lưu trữ. Chúng dựa trên các mô-đun :mod:`zipfile` và :mod:`tarfile`.
 
 .. function:: make_archive(base_name, format, [root_dir, [base_dir, [verbose, [dry_run, [owner, [group, [logger]]]]]]])
 
-   Create an archive file (such as zip or tar) and return its name.
+   Tạo một tệp lưu trữ (chẳng hạn như zip hoặc tar) và trả về tên của tệp đó.
 
-   *base_name* is the name of the file to create, including the path, minus
-   any format-specific extension.
+   *base_name* là tên của tệp cần tạo, bao gồm cả đường dẫn, nhưng không có phần mở rộng dành riêng cho định dạng.
 
-   *format* is the archive format: one of
-   "zip" (if the :mod:`zlib` module is available), "tar", "gztar" (if the
-   :mod:`zlib` module is available), "bztar" (if the :mod:`bz2` module is
-   available), "xztar" (if the :mod:`lzma` module is available), or "zstdtar"
-   (if the :mod:`compression.zstd` module is available).
+   *format* là định dạng lưu trữ: một trong các định dạng "zip" (nếu mô-đun :mod:`zlib` khả dụng), "tar", "gztar" (nếu
+   mô-đun :mod:`zlib` khả dụng), "bztar" (nếu mô-đun :mod:`bz2` khả dụng), "xztar" (nếu mô-đun :mod:`lzma` khả dụng) hoặc "zstdtar" (nếu mô-đun :mod:`compression.zstd` khả dụng).
 
-   *root_dir* is a directory that will be the root directory of the
-   archive, all paths in the archive will be relative to it; for example,
-   we typically chdir into *root_dir* before creating the archive.
+   *root_dir* là một thư mục sẽ trở thành thư mục gốc của tệp lưu trữ; mọi đường dẫn trong tệp lưu trữ sẽ tương đối với thư mục này. Ví dụ: chúng ta thường chdir vào *root_dir* trước khi tạo tệp lưu trữ.
 
-   *base_dir* is the directory where we start archiving from;
-   i.e. *base_dir* will be the common prefix of all files and
-   directories in the archive.  *base_dir* must be given relative
-   to *root_dir*.  See :ref:`shutil-archiving-example-with-basedir` for how to
-   use *base_dir* and *root_dir* together.
+   *base_dir* là thư mục nơi chúng ta bắt đầu lưu trữ; tức là *base_dir* sẽ là tiền tố chung của tất cả các tệp và thư mục trong kho lưu trữ. *base_dir* phải được cung cấp tương đối so với *root_dir*. Xem :ref:`shutil-archiving-example-with-basedir` để biết cách sử dụng *base_dir* và *root_dir* cùng nhau.
 
-   *root_dir* and *base_dir* both default to the current directory.
+   *root_dir* và *base_dir* đều mặc định là thư mục hiện tại.
 
-   If *dry_run* is true, no archive is created, but the operations that would be
-   executed are logged to *logger*.
+   Nếu *dry_run* là true, không có kho lưu trữ nào được tạo, nhưng các thao tác đáng lẽ sẽ được thực hiện sẽ được ghi nhật ký vào *logger*.
 
-   *owner* and *group* are used when creating a tar archive. By default,
-   uses the current owner and group.
+   *owner* và *group* được sử dụng khi tạo kho lưu trữ tar. Theo mặc định, chủ sở hữu và nhóm hiện tại sẽ được sử dụng.
 
-   *logger* must be an object compatible with :pep:`282`, usually an instance of
+   *logger* phải là một đối tượng tương thích với :pep:`282`, thường là một thể hiện của
    :class:`logging.Logger`.
 
-   The *verbose* argument is unused and deprecated.
+   Đối số *verbose* không được sử dụng và đã không còn được khuyến nghị.
 
    .. audit-event:: shutil.make_archive base_name,format,root_dir,base_dir shutil.make_archive
 
    .. note::
 
-      This function is not thread-safe when custom archivers registered
-      with :func:`register_archive_format` do not support the *root_dir*
-      argument.  In this case it
-      temporarily changes the current working directory of the process
-      to *root_dir* to perform archiving.
+      Hàm này không an toàn với thread khi các archiver tùy chỉnh được đăng ký với :func:`register_archive_format` không hỗ trợ đối số *root_dir*. Trong trường hợp này, hàm tạm thời thay đổi thư mục làm việc hiện tại của process thành *root_dir* để thực hiện việc lưu trữ.
 
    .. versionchanged:: 3.8
-      The modern pax (POSIX.1-2001) format is now used instead of
-      the legacy GNU format for archives created with ``format="tar"``.
+      Định dạng pax hiện đại (POSIX.1-2001) hiện được sử dụng thay cho định dạng GNU cũ cho các archive được tạo bằng ``format="tar"``.
 
    .. versionchanged:: 3.10.6
-      This function is now made thread-safe during creation of standard
-      ``.zip`` and tar archives.
+      Hàm này hiện an toàn với thread trong quá trình tạo các archive ``.zip`` và tar tiêu chuẩn.
 
 .. function:: get_archive_formats()
 
-   Return a list of supported formats for archiving.
-   Each element of the returned sequence is a tuple ``(name, description)``.
+   Trả về danh sách các định dạng được hỗ trợ để lưu trữ. Mỗi phần tử trong sequence được trả về là một tuple ``(name, description)``.
 
-   By default :mod:`!shutil` provides these formats:
+   Theo mặc định, :mod:`!shutil` cung cấp các định dạng sau:
 
-   - *zip*: ZIP file (if the :mod:`zlib` module is available).
-   - *tar*: Uncompressed tar file. Uses POSIX.1-2001 pax format for new archives.
-   - *gztar*: gzip'ed tar-file (if the :mod:`zlib` module is available).
-   - *bztar*: bzip2'ed tar-file (if the :mod:`bz2` module is available).
-   - *xztar*: xz'ed tar-file (if the :mod:`lzma` module is available).
-   - *zstdtar*: Zstandard compressed tar-file (if the :mod:`compression.zstd`
-     module is available).
+   - *zip*: Tệp ZIP (nếu module :mod:`zlib` khả dụng).
+   - *tar*: Tệp tar không nén. Sử dụng định dạng pax POSIX.1-2001 cho các archive mới.
+   - *gztar*: Tệp tar được nén bằng gzip (nếu module :mod:`zlib` khả dụng).
+   - *bztar*: tệp tar được nén bằng bzip2 (nếu có module :mod:`bz2`).
+   - *xztar*: tệp tar được nén bằng xz (nếu có module :mod:`lzma`).
+   - *zstdtar*: tệp tar được nén bằng Zstandard (nếu có module :mod:`compression.zstd`).
 
-   You can register new formats or provide your own archiver for any existing
-   formats, by using :func:`register_archive_format`.
+   Bạn có thể đăng ký các định dạng mới hoặc cung cấp archiver của riêng mình cho bất kỳ định dạng hiện có nào bằng cách sử dụng :func:`register_archive_format`.
 
 
 .. function:: register_archive_format(name, function, [extra_args, [description]])
 
-   Register an archiver for the format *name*.
+   Đăng ký một archiver cho định dạng *name*.
 
-   *function* is the callable that will be used to create archives. The callable
-   will receive the *base_name* of the file to create, followed by the
-   *base_dir* (which defaults to :data:`os.curdir`) to start archiving from.
-   Further arguments are passed as keyword arguments: *owner*, *group*,
-   *dry_run* and *logger* (as passed in :func:`make_archive`).
+   *function* là hàm có thể gọi được dùng để tạo các tệp lưu trữ. Hàm này sẽ nhận *base_name* của tệp cần tạo, tiếp theo là *base_dir* (mặc định là :data:`os.curdir`) làm thư mục bắt đầu quá trình lưu trữ. Các đối số tiếp theo được truyền dưới dạng keyword argument: *owner*, *group*, *dry_run* và *logger* (được truyền vào như trong :func:`make_archive`).
 
-   If *function* has the custom attribute ``function.supports_root_dir`` set to ``True``,
-   the *root_dir* argument is passed as a keyword argument.
-   Otherwise the current working directory of the process is temporarily
-   changed to *root_dir* before calling *function*.
-   In this case :func:`make_archive` is not thread-safe.
+   Nếu *function* có thuộc tính tùy chỉnh ``function.supports_root_dir`` được đặt thành ``True``, đối số *root_dir* sẽ được truyền dưới dạng keyword argument. Nếu không, thư mục làm việc hiện tại của tiến trình sẽ tạm thời được đổi thành *root_dir* trước khi gọi *function*. Trong trường hợp này, :func:`make_archive` không an toàn khi sử dụng với nhiều thread.
 
-   If given, *extra_args* is a sequence of ``(name, value)`` pairs that will be
-   used as extra keywords arguments when the archiver callable is used.
+   Nếu được cung cấp, *extra_args* là một chuỗi các cặp ``(name, value)`` sẽ được sử dụng làm các đối số từ khóa bổ sung khi callable archiver được sử dụng.
 
-   *description* is used by :func:`get_archive_formats` which returns the
-   list of archivers.  Defaults to an empty string.
+   *description* được :func:`get_archive_formats` sử dụng để trả về danh sách các archiver. Mặc định là một chuỗi rỗng.
 
    .. versionchanged:: 3.12
-      Added support for functions supporting the *root_dir* argument.
+      Đã bổ sung hỗ trợ cho các hàm hỗ trợ đối số *root_dir*.
 
 
 .. function:: unregister_archive_format(name)
 
-   Remove the archive format *name* from the list of supported formats.
+   Xóa định dạng archive *name* khỏi danh sách các định dạng được hỗ trợ.
 
 
 .. function:: unpack_archive(filename[, extract_dir[, format[, filter]]])
 
-   Unpack an archive. *filename* is the full path of the archive.
+   Giải nén một archive. *filename* là đường dẫn đầy đủ của archive.
 
-   *extract_dir* is the name of the target directory where the archive is
-   unpacked. If not provided, the current working directory is used.
+   *extract_dir* là tên của thư mục đích nơi archive được giải nén. Nếu không được cung cấp, thư mục làm việc hiện tại sẽ được sử dụng.
 
-   *format* is the archive format: one of "zip", "tar", "gztar", "bztar",
-   "xztar", or "zstdtar".  Or any other format registered with
-   :func:`register_unpack_format`.  If not provided, :func:`unpack_archive`
-   will use the archive file name extension and see if an unpacker was
-   registered for that extension.  In case none is found,
-   a :exc:`ValueError` is raised.
+   *format* là định dạng archive: một trong các định dạng "zip", "tar", "gztar", "bztar", "xztar" hoặc "zstdtar". Hoặc bất kỳ định dạng nào khác được đăng ký với
+   :func:`register_unpack_format`. Nếu không được cung cấp, :func:`unpack_archive` sẽ sử dụng phần mở rộng tên tệp lưu trữ và kiểm tra xem có trình giải nén nào được đăng ký cho phần mở rộng đó hay không. Nếu không tìm thấy, một :exc:`ValueError` sẽ được ném ra.
 
-   The keyword-only *filter* argument is passed to the underlying unpacking
-   function. For zip files, *filter* is not accepted.
-   For tar files, it is recommended to use ``'data'`` (default since Python
-   3.14), unless using features specific to tar and UNIX-like filesystems.
-   (See :ref:`tarfile-extraction-filter` for details.)
+   Đối số chỉ dùng cho từ khóa *filter* được truyền đến hàm giải nén bên dưới. Đối với tệp zip, *filter* không được chấp nhận. Đối với tệp tar, bạn nên sử dụng ``'data'`` (mặc định kể từ Python 3.14), trừ khi sử dụng các tính năng dành riêng cho tar và hệ thống tệp tương tự UNIX. (Xem :ref:`tarfile-extraction-filter` để biết chi tiết.)
 
    .. audit-event:: shutil.unpack_archive filename,extract_dir,format shutil.unpack_archive
 
    .. warning::
 
-      Never extract archives from untrusted sources without prior inspection.
-      It is possible that files are created outside of the path specified in
-      the *extract_dir* argument, for example, members that have absolute filenames
-      or filenames with ".." components.
+      Không bao giờ giải nén lưu trữ từ các nguồn không đáng tin cậy mà chưa kiểm tra trước. Có thể các tệp được tạo bên ngoài đường dẫn được chỉ định trong đối số *extract_dir*, chẳng hạn như các thành viên có tên tệp tuyệt đối hoặc tên tệp chứa thành phần "..".
 
-      Since Python 3.14, the defaults for both built-in formats (zip and tar
-      files) will prevent the most dangerous of such security issues,
-      but will not prevent *all* unintended behavior.
-      Read the :ref:`tarfile-further-verification`
-      section for tar-specific details.
+      Kể từ Python 3.14, các giá trị mặc định cho cả hai định dạng tích hợp (tệp zip và tar) sẽ ngăn chặn những vấn đề bảo mật nguy hiểm nhất trong số đó, nhưng sẽ không ngăn chặn *all* hành vi ngoài ý muốn. Đọc phần :ref:`tarfile-further-verification` để biết các chi tiết dành riêng cho tar.
 
    .. versionchanged:: 3.7
-      Accepts a :term:`path-like object` for *filename* and *extract_dir*.
+      Chấp nhận một :term:`path-like object` cho *filename* và *extract_dir*.
 
    .. versionchanged:: 3.12
-      Added the *filter* argument.
+      Đã thêm đối số *filter*.
 
 .. function:: register_unpack_format(name, extensions, function[, extra_args[, description]])
 
-   Registers an unpack format. *name* is the name of the format and
-   *extensions* is a list of extensions corresponding to the format, like
-   ``.zip`` for Zip files.
+   Đăng ký một định dạng giải nén. *name* là tên của định dạng và *extensions* là danh sách các phần mở rộng tương ứng với định dạng đó, chẳng hạn như ``.zip`` đối với các tệp Zip.
 
-   *function* is the callable that will be used to unpack archives. The
-   callable will receive:
+   *function* là hàm có thể gọi sẽ được dùng để giải nén các tệp lưu trữ. Hàm này sẽ nhận:
 
-   - the path of the archive, as a positional argument;
-   - the directory the archive must be extracted to, as a positional argument;
-   - possibly a *filter* keyword argument, if it was given to
+   - đường dẫn của tệp lưu trữ, dưới dạng đối số vị trí;
+   - thư mục mà tệp lưu trữ phải được giải nén vào, dưới dạng đối số vị trí;
+   - có thể là đối số từ khóa *filter*, nếu đối số này được truyền cho
      :func:`unpack_archive`;
-   - additional keyword arguments, specified by *extra_args* as a sequence
-     of ``(name, value)`` tuples.
+   - các đối số từ khóa bổ sung, được chỉ định bởi *extra_args* dưới dạng một chuỗi các tuple ``(name, value)``.
 
-   *description* can be provided to describe the format, and will be returned
-   by the :func:`get_unpack_formats` function.
+   Có thể cung cấp *description* để mô tả định dạng; giá trị này sẽ được hàm :func:`get_unpack_formats` trả về.
 
 
 .. function:: unregister_unpack_format(name)
 
-   Unregister an unpack format. *name* is the name of the format.
+   Hủy đăng ký một định dạng giải nén. *name* là tên của định dạng.
 
 
 .. function:: get_unpack_formats()
 
-   Return a list of all registered formats for unpacking.
-   Each element of the returned sequence is a tuple
-   ``(name, extensions, description)``.
+   Trả về danh sách tất cả các định dạng đã đăng ký để giải nén. Mỗi phần tử trong chuỗi được trả về là một tuple ``(name, extensions, description)``.
 
-   By default :mod:`!shutil` provides these formats:
+   Theo mặc định, :mod:`!shutil` cung cấp các định dạng sau:
 
-   - *zip*: ZIP file (unpacking compressed files works only if the corresponding
-     module is available).
-   - *tar*: uncompressed tar file.
-   - *gztar*: gzip'ed tar-file (if the :mod:`zlib` module is available).
-   - *bztar*: bzip2'ed tar-file (if the :mod:`bz2` module is available).
-   - *xztar*: xz'ed tar-file (if the :mod:`lzma` module is available).
-   - *zstdtar*: Zstandard compressed tar-file (if the :mod:`compression.zstd`
-     module is available).
+   - *zip*: tệp ZIP (chỉ có thể giải nén các tệp nén nếu có mô-đun tương ứng).
+   - *tar*: tệp tar không nén.
+   - *gztar*: Tệp tar được nén bằng gzip (nếu module :mod:`zlib` khả dụng).
+   - *bztar*: tệp tar được nén bằng bzip2 (nếu có module :mod:`bz2`).
+   - *xztar*: tệp tar được nén bằng xz (nếu có module :mod:`lzma`).
+   - *zstdtar*: tệp tar được nén bằng Zstandard (nếu có module :mod:`compression.zstd`).
 
-   You can register new formats or provide your own unpacker for any existing
-   formats, by using :func:`register_unpack_format`.
+   Bạn có thể đăng ký các định dạng mới hoặc cung cấp unpacker của riêng mình cho bất kỳ định dạng hiện có nào bằng cách sử dụng :func:`register_unpack_format`.
 
 
 .. _shutil-archiving-example:
 
-Archiving example
-~~~~~~~~~~~~~~~~~
+Ví dụ về lưu trữ
+~~~~~~~~~~~~~~~~
 
-In this example, we create a gzip'ed tar-file archive containing all files
-found in the :file:`.ssh` directory of the user::
+Trong ví dụ này, chúng ta tạo một archive tar được nén bằng gzip chứa tất cả các tệp được tìm thấy trong thư mục :file:`.ssh` của người dùng::
 
     >>> from shutil import make_archive
     >>> import os
@@ -825,7 +571,7 @@ found in the :file:`.ssh` directory of the user::
     >>> make_archive(archive_name, 'gztar', root_dir)
     '/Users/tarek/myarchive.tar.gz'
 
-The resulting archive contains:
+Archive kết quả chứa:
 
 .. code-block:: shell-session
 
@@ -842,12 +588,10 @@ The resulting archive contains:
 
 .. _shutil-archiving-example-with-basedir:
 
-Archiving example with *base_dir*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Ví dụ về lưu trữ với *base_dir*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In this example, similar to the `one above <shutil-archiving-example_>`_,
-we show how to use :func:`make_archive`, but this time with the usage of
-*base_dir*.  We now have the following directory structure:
+Trong ví dụ này, tương tự như `ví dụ ở trên <shutil-archiving-example_>`_, chúng ta trình bày cách sử dụng :func:`make_archive`, nhưng lần này với việc sử dụng *base_dir*. Bây giờ chúng ta có cấu trúc thư mục sau:
 
 .. code-block:: shell-session
 
@@ -859,8 +603,8 @@ we show how to use :func:`make_archive`, but this time with the usage of
                 └── please_add.txt
             └── do_not_add.txt
 
-In the final archive, :file:`please_add.txt` should be included, but
-:file:`do_not_add.txt` should not.  Therefore we use the following::
+Trong archive cuối cùng, :file:`please_add.txt` phải được bao gồm, nhưng
+:file:`do_not_add.txt` thì không. Vì vậy, chúng ta sử dụng nội dung sau::
 
     >>> from shutil import make_archive
     >>> import os
@@ -873,7 +617,7 @@ In the final archive, :file:`please_add.txt` should be included, but
     ... )
     '/Users/tarek/myarchive.tar'
 
-Listing the files in the resulting archive gives us:
+Liệt kê các tệp trong archive kết quả cho ta:
 
 .. code-block:: shell-session
 
@@ -882,40 +626,32 @@ Listing the files in the resulting archive gives us:
     structure/content/please_add.txt
 
 
-Querying the size of the output terminal
-----------------------------------------
+Truy vấn kích thước của terminal đầu ra
+---------------------------------------
 
 .. function:: get_terminal_size(fallback=(columns, lines))
 
-   Get the size of the terminal window.
+   Lấy kích thước cửa sổ terminal.
 
-   For each of the two dimensions, the environment variable, ``COLUMNS``
-   and ``LINES`` respectively, is checked. If the variable is defined and
-   the value is a positive integer, it is used.
+   Với mỗi trong hai chiều, biến môi trường ``COLUMNS`` và ``LINES`` tương ứng sẽ được kiểm tra. Nếu biến được định nghĩa và giá trị là một số nguyên dương, giá trị đó sẽ được sử dụng.
 
-   When ``COLUMNS`` or ``LINES`` is not defined, which is the common case,
-   the terminal connected to :data:`sys.__stdout__` is queried
-   by invoking :func:`os.get_terminal_size`.
+   Khi ``COLUMNS`` hoặc ``LINES`` chưa được định nghĩa, đây là trường hợp phổ biến, terminal được kết nối với :data:`sys.__stdout__` sẽ được truy vấn bằng cách gọi :func:`os.get_terminal_size`.
 
-   If the terminal size cannot be successfully queried, either because
-   the system doesn't support querying, or because we are not
-   connected to a terminal, the value given in ``fallback`` parameter
-   is used. ``fallback`` defaults to ``(80, 24)`` which is the default
-   size used by many terminal emulators.
+   Nếu không thể truy vấn kích thước terminal thành công, do hệ thống không hỗ trợ truy vấn hoặc chúng ta không kết nối với terminal, thì giá trị được cung cấp trong tham số ``fallback`` sẽ được sử dụng. ``fallback`` mặc định là ``(80, 24)``, đây là kích thước mặc định được nhiều trình mô phỏng terminal sử dụng.
 
-   The value returned is a named tuple of type :class:`os.terminal_size`.
+   Giá trị trả về là một tuple có tên thuộc kiểu :class:`os.terminal_size`.
 
-   See also: The Single UNIX Specification, Version 2,
-   `Other Environment Variables`_.
+   Xem thêm: The Single UNIX Specification, Version 2, `Các biến môi trường khác <Other Environment Variables_>`_.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.11
-      The ``fallback`` values are also used if :func:`os.get_terminal_size`
-      returns zeroes.
+      Các giá trị ``fallback`` cũng được sử dụng nếu :func:`os.get_terminal_size` trả về các số 0.
 
 .. _`fcopyfile`:
    http://www.manpagez.com/man/3/copyfile/
 
 .. _`Other Environment Variables`:
    https://pubs.opengroup.org/onlinepubs/7908799/xbd/envvar.html#tag_002_003
+
+.. _`one above`: shutil-archiving-example_

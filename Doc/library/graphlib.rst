@@ -1,11 +1,11 @@
-:mod:`!graphlib` --- Functionality to operate with graph-like structures
-========================================================================
+:mod:`!graphlib` --- Chức năng làm việc với các cấu trúc dạng đồ thị
+====================================================================
 
 .. module:: graphlib
-   :synopsis: Functionality to operate with graph-like structures
+   :synopsis: Chức năng làm việc với các cấu trúc dạng đồ thị
 
 
-**Source code:** :source:`Lib/graphlib.py`
+**Mã nguồn:** :source:`Lib/graphlib.py`
 
 .. testsetup:: default
 
@@ -17,38 +17,21 @@
 
 .. class:: TopologicalSorter(graph=None)
 
-   Provides functionality to topologically sort a graph of :term:`hashable` nodes.
+   Cung cấp chức năng sắp xếp topo một đồ thị gồm các nút :term:`hashable`.
 
-   A topological order is a linear ordering of the vertices in a graph such that
-   for every directed edge u -> v from vertex u to vertex v, vertex u comes
-   before vertex v in the ordering. For instance, the vertices of the graph may
-   represent tasks to be performed, and the edges may represent constraints that
-   one task must be performed before another; in this example, a topological
-   ordering is just a valid sequence for the tasks. A complete topological
-   ordering is possible if and only if the graph has no directed cycles, that
-   is, if it is a directed acyclic graph.
+   Thứ tự topo là thứ tự tuyến tính của các đỉnh trong một đồ thị sao cho với mọi cạnh có hướng u -> v từ đỉnh u đến đỉnh v, đỉnh u đứng trước đỉnh v trong thứ tự đó. Ví dụ, các đỉnh của đồ thị có thể biểu diễn những tác vụ cần thực hiện, còn các cạnh có thể biểu diễn các ràng buộc rằng một tác vụ phải được thực hiện trước tác vụ khác; trong ví dụ này, thứ tự topo đơn giản là một chuỗi tác vụ hợp lệ. Có thể tạo một thứ tự topo đầy đủ khi và chỉ khi đồ thị không có chu trình có hướng, tức là khi đó là một đồ thị có hướng không chu trình.
 
-   If the optional *graph* argument is provided it must be a dictionary
-   representing a directed acyclic graph where the keys are nodes and the values
-   are iterables of all predecessors of that node in the graph (the nodes that
-   have edges that point to the value in the key). Additional nodes can be added
-   to the graph using the :meth:`~TopologicalSorter.add` method.
+   Nếu cung cấp đối số tùy chọn *graph*, đối số này phải là một dictionary biểu diễn một đồ thị có hướng không chu trình, trong đó các khóa là các nút và các giá trị là các iterable chứa tất cả nút tiền nhiệm của nút đó trong đồ thị (các nút có cạnh trỏ đến giá trị nằm trong khóa). Có thể thêm các nút khác vào đồ thị bằng phương thức :meth:`~TopologicalSorter.add`.
 
-   In the general case, the steps required to perform the sorting of a given
-   graph are as follows:
+   Trong trường hợp tổng quát, các bước cần thực hiện để sắp xếp một đồ thị đã cho như sau:
 
-   * Create an instance of the :class:`TopologicalSorter` with an optional
-     initial graph.
-   * Add additional nodes to the graph.
-   * Call :meth:`~TopologicalSorter.prepare` on the graph.
-   * While :meth:`~TopologicalSorter.is_active` is ``True``, iterate over
-     the nodes returned by :meth:`~TopologicalSorter.get_ready` and
-     process them. Call :meth:`~TopologicalSorter.done` on each node as it
-     finishes processing.
+   * Tạo một thực thể của :class:`TopologicalSorter` với một graph ban đầu tùy chọn.
+   * Thêm các node bổ sung vào graph.
+   * Gọi :meth:`~TopologicalSorter.prepare` trên graph.
+   * Trong khi :meth:`~TopologicalSorter.is_active` là ``True``, lặp qua các node do :meth:`~TopologicalSorter.get_ready` trả về và xử lý chúng. Gọi :meth:`~TopologicalSorter.done` trên mỗi node khi node đó xử lý xong.
 
-   In case just an immediate sorting of the nodes in the graph is required and
-   no parallelism is involved, the convenience method
-   :meth:`TopologicalSorter.static_order` can be used directly:
+   Nếu chỉ cần sắp xếp ngay lập tức các node trong graph và không có xử lý song song, có thể sử dụng trực tiếp phương thức tiện ích
+   :meth:`TopologicalSorter.static_order`:
 
    .. doctest::
 
@@ -57,115 +40,88 @@
        >>> tuple(ts.static_order())
        ('A', 'C', 'B', 'D')
 
-   The class is designed to easily support parallel processing of the nodes as
-   they become ready. For instance::
+   Lớp này được thiết kế để dễ dàng hỗ trợ việc xử lý song song các node ngay khi chúng sẵn sàng. Ví dụ::
 
        topological_sorter = TopologicalSorter()
 
-       # Add nodes to 'topological_sorter'...
+       # Thêm các node vào 'topological_sorter'...
 
        topological_sorter.prepare()
        while topological_sorter.is_active():
            for node in topological_sorter.get_ready():
-               # Worker threads or processes take nodes to work on off the
-               # 'task_queue' queue.
+               # Các worker thread hoặc process lấy các node cần xử lý từ
+               # queue 'task_queue'.
                task_queue.put(node)
 
-           # When the work for a node is done, workers put the node in
-           # 'finalized_tasks_queue' so we can get more nodes to work on.
-           # The definition of 'is_active()' guarantees that, at this point, at
-           # least one node has been placed on 'task_queue' that hasn't yet
-           # been passed to 'done()', so this blocking 'get()' must (eventually)
-           # succeed.  After calling 'done()', we loop back to call 'get_ready()'
-           # again, so put newly freed nodes on 'task_queue' as soon as
-           # logically possible.
+           # Khi hoàn tất công việc với một node, các worker đặt node đó vào
+           # 'finalized_tasks_queue' để chúng ta có thể lấy thêm các node cần xử lý.
+           # Định nghĩa của 'is_active()' đảm bảo rằng tại thời điểm này, ít
+           # nhất một node đã được đặt vào 'task_queue' nhưng vẫn chưa
+           # đã được truyền vào 'done()', vì vậy lệnh 'get()' blocking này cuối cùng phải
+           # thành công. Sau khi gọi 'done()', chúng ta quay lại để gọi 'get_ready()'
+           # một lần nữa, vì vậy hãy đưa các node mới được giải phóng vào 'task_queue' ngay khi
+           # có thể về mặt logic.
            node = finalized_tasks_queue.get()
            topological_sorter.done(node)
 
    .. method:: add(node, *predecessors)
 
-      Add a new node and its predecessors to the graph. Both the *node* and all
-      elements in *predecessors* must be :term:`hashable`.
+      Thêm một nút mới và các nút tiền nhiệm của nó vào đồ thị. Cả *nút* và tất cả các phần tử trong *các nút tiền nhiệm* đều phải là :term:`hashable`.
 
-      If called multiple times with the same node argument, the set of
-      dependencies will be the union of all dependencies passed in.
+      Nếu được gọi nhiều lần với cùng một đối số node, tập dependency sẽ là hợp của tất cả dependency được truyền vào.
 
-      It is possible to add a node with no dependencies (*predecessors* is not
-      provided) or to provide a dependency twice. If a node that has not been
-      provided before is included among *predecessors* it will be automatically
-      added to the graph with no predecessors of its own.
+      Có thể thêm một node không có dependency (không cung cấp *predecessors*) hoặc cung cấp một dependency hai lần. Nếu một node chưa từng được cung cấp trước đó xuất hiện trong *predecessors*, node đó sẽ tự động được thêm vào graph mà không có predecessor nào của riêng nó.
 
-      Raises :exc:`ValueError` if called after :meth:`~TopologicalSorter.prepare`.
+      Đưa ra :exc:`ValueError` nếu được gọi sau :meth:`~TopologicalSorter.prepare`.
 
    .. method:: prepare()
 
-      Mark the graph as finished and check for cycles in the graph. If any cycle
-      is detected, :exc:`CycleError` will be raised, but
-      :meth:`~TopologicalSorter.get_ready` can still be used to obtain as many
-      nodes as possible until cycles block more progress. After a call to this
-      function, the graph cannot be modified, and therefore no more nodes can be
-      added using :meth:`~TopologicalSorter.add`.
+      Đánh dấu đồ thị là đã hoàn tất và kiểm tra các chu kỳ trong đồ thị. Nếu phát hiện bất kỳ chu kỳ nào, :exc:`CycleError` sẽ được đưa ra, nhưng
+      :meth:`~TopologicalSorter.get_ready` vẫn có thể được sử dụng để lấy nhiều node nhất có thể cho đến khi các chu kỳ ngăn cản tiến trình tiếp theo. Sau khi gọi hàm này, đồ thị không thể được sửa đổi, vì vậy không thể thêm node nào nữa bằng :meth:`~TopologicalSorter.add`.
 
-      A :exc:`ValueError` will be raised if the sort has been started by
-      :meth:`~.static_order` or :meth:`~.get_ready`.
+      :exc:`ValueError` sẽ được đưa ra nếu quá trình sắp xếp đã được bắt đầu bởi
+      :meth:`~.static_order` hoặc :meth:`~.get_ready`.
 
       .. versionchanged:: 3.14
 
-         ``prepare()`` can now be called more than once as long as the sort has
-         not started. Previously this raised :exc:`ValueError`.
+         Giờ đây có thể gọi ``prepare()`` nhiều hơn một lần miễn là quá trình sắp xếp chưa bắt đầu. Trước đây, thao tác này sẽ đưa ra :exc:`ValueError`.
 
    .. method:: is_active()
 
-      Returns ``True`` if more progress can be made and ``False`` otherwise.
-      Progress can be made if cycles do not block the resolution and either
-      there are still nodes ready that haven't yet been returned by
-      :meth:`TopologicalSorter.get_ready` or the number of nodes marked
-      :meth:`TopologicalSorter.done` is less than the number that have been
-      returned by :meth:`TopologicalSorter.get_ready`.
+      Trả về ``True`` nếu có thể thực hiện thêm tiến triển và ``False`` trong trường hợp ngược lại. Có thể thực hiện thêm tiến triển nếu các chu kỳ không cản trở việc phân giải và vẫn còn các node sẵn sàng chưa được ``False`` trả về
+      :meth:`TopologicalSorter.get_ready` hoặc số nút được đánh dấu
+      :meth:`TopologicalSorter.done` nhỏ hơn số lượng đã được trả về bởi :meth:`TopologicalSorter.get_ready`.
 
-      The :meth:`~object.__bool__` method of this class defers to
-      this function, so instead of::
+      Phương thức :meth:`~object.__bool__` của lớp này ủy quyền cho hàm này, vì vậy thay vì::
 
           if ts.is_active():
               ...
 
-      it is possible to simply do::
+      chỉ cần thực hiện::
 
           if ts:
               ...
 
-      Raises :exc:`ValueError` if called without calling
-      :meth:`~TopologicalSorter.prepare` previously.
+      Phát sinh :exc:`ValueError` nếu được gọi mà chưa gọi
+      :meth:`~TopologicalSorter.prepare` trước đó.
 
    .. method:: done(*nodes)
 
-      Marks a set of nodes returned by :meth:`TopologicalSorter.get_ready` as
-      processed, unblocking any successor of each node in *nodes* for being
-      returned in the future by a call to :meth:`TopologicalSorter.get_ready`.
+      Đánh dấu một tập hợp các nút được :meth:`TopologicalSorter.get_ready` trả về là đã xử lý, bỏ chặn mọi nút kế nhiệm của từng nút trong *nodes* để chúng được trả về trong tương lai bởi một lệnh gọi tới :meth:`TopologicalSorter.get_ready`.
 
-      Raises :exc:`ValueError` if any node in *nodes* has already been marked as
-      processed by a previous call to this method or if a node was not added to
-      the graph by using :meth:`TopologicalSorter.add`, if called without
-      calling :meth:`~TopologicalSorter.prepare` or if node has not yet been
-      returned by :meth:`~TopologicalSorter.get_ready`.
+      Ném :exc:`ValueError` nếu bất kỳ node nào trong *nodes* đã được đánh dấu là đã xử lý bởi một lần gọi trước đó đến phương thức này, hoặc nếu một node chưa được thêm vào graph bằng cách sử dụng :meth:`TopologicalSorter.add`, nếu được gọi mà không gọi :meth:`~TopologicalSorter.prepare`, hoặc nếu node chưa được :meth:`~TopologicalSorter.get_ready` trả về.
 
    .. method:: get_ready()
 
-      Returns a ``tuple`` with all the nodes that are ready. Initially it
-      returns all nodes with no predecessors, and once those are marked as
-      processed by calling :meth:`TopologicalSorter.done`, further calls will
-      return all new nodes that have all their predecessors already processed.
-      Once no more progress can be made, empty tuples are returned.
+      Trả về một ``tuple`` chứa tất cả các node đã sẵn sàng. Ban đầu, nó trả về tất cả các node không có predecessor, và sau khi các node đó được đánh dấu là đã xử lý bằng cách gọi :meth:`TopologicalSorter.done`, những lần gọi tiếp theo sẽ trả về tất cả các node mới có toàn bộ predecessor đã được xử lý. Khi không thể thực hiện thêm tiến triển nào, các tuple rỗng sẽ được trả về.
 
-      Raises :exc:`ValueError` if called without calling
-      :meth:`~TopologicalSorter.prepare` previously.
+      Phát sinh :exc:`ValueError` nếu được gọi mà chưa gọi
+      :meth:`~TopologicalSorter.prepare` trước đó.
 
    .. method:: static_order()
 
-      Returns an iterator object which will iterate over nodes in a topological
-      order. When using this method, :meth:`~TopologicalSorter.prepare` and
-      :meth:`~TopologicalSorter.done` should not be called. This method is
-      equivalent to::
+      Trả về một đối tượng iterator sẽ lặp qua các node theo thứ tự tô pô. Khi sử dụng phương thức này, không nên gọi :meth:`~TopologicalSorter.prepare` và
+      không nên gọi :meth:`~TopologicalSorter.done`. Phương thức này tương đương với::
 
           def static_order(self):
               self.prepare()
@@ -174,8 +130,7 @@
                   yield from node_group
                   self.done(*node_group)
 
-      The particular order that is returned may depend on the specific order in
-      which the items were inserted in the graph. For example:
+      Thứ tự cụ thể được trả về có thể phụ thuộc vào thứ tự cụ thể mà các mục được chèn vào graph. Ví dụ:
 
       .. doctest::
 
@@ -191,28 +146,21 @@
           >>> print([*ts2.static_order()])
           [0, 2, 1, 3]
 
-      This is due to the fact that "0" and "2" are in the same level in the
-      graph (they would have been returned in the same call to
-      :meth:`~TopologicalSorter.get_ready`) and the order between them is
-      determined by the order of insertion.
+      Điều này là do "0" và "2" nằm cùng một cấp trong đồ thị (chúng sẽ được trả về trong cùng một lần gọi đến
+      :meth:`~TopologicalSorter.get_ready`) và thứ tự giữa chúng được xác định bởi thứ tự chèn.
 
 
-      If any cycle is detected, :exc:`CycleError` will be raised.
+      Nếu phát hiện bất kỳ chu trình nào, :exc:`CycleError` sẽ được raise.
 
    .. versionadded:: 3.9
 
 
-Exceptions
-----------
-The :mod:`!graphlib` module defines the following exception classes:
+Ngoại lệ
+--------
+Module :mod:`!graphlib` định nghĩa các lớp ngoại lệ sau:
 
 .. exception:: CycleError
 
-   Subclass of :exc:`ValueError` raised by :meth:`TopologicalSorter.prepare` if cycles exist
-   in the working graph. If multiple cycles exist, only one undefined choice among them will
-   be reported and included in the exception.
+   Lớp con của :exc:`ValueError`, được :meth:`TopologicalSorter.prepare` raise nếu có chu trình trong đồ thị đang xử lý. Nếu tồn tại nhiều chu trình, chỉ một lựa chọn không xác định trong số đó sẽ được báo cáo và đưa vào ngoại lệ.
 
-   The detected cycle can be accessed via the second element in the :attr:`~BaseException.args`
-   attribute of the exception instance and consists in a list of nodes, such that each node is,
-   in the graph, an immediate predecessor of the next node in the list. In the reported list,
-   the first and the last node will be the same, to make it clear that it is cyclic.
+   Có thể truy cập chu trình được phát hiện thông qua phần tử thứ hai trong thuộc tính :attr:`~BaseException.args` của instance ngoại lệ, và chu trình này gồm một danh sách các node, sao cho mỗi node là predecessor trực tiếp của node tiếp theo trong danh sách ở trong đồ thị. Trong danh sách được báo cáo, node đầu tiên và node cuối cùng sẽ giống nhau, để thể hiện rõ rằng đó là chu trình.

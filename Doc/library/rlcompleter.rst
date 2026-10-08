@@ -1,25 +1,21 @@
-:mod:`!rlcompleter` --- Completion function for GNU readline
-============================================================
+:mod:`!rlcompleter` --- Hàm hoàn tất cho GNU readline
+=====================================================
 
 .. module:: rlcompleter
-   :synopsis: Python identifier completion, suitable for the GNU readline library.
+   :synopsis: Hoàn tất các định danh Python, phù hợp để sử dụng với thư viện GNU readline.
 
 .. sectionauthor:: Moshe Zadka <moshez@zadka.site.co.il>
 
-**Source code:** :source:`Lib/rlcompleter.py`
+**Mã nguồn:** :source:`Lib/rlcompleter.py`
 
 --------------
 
-The :mod:`!rlcompleter` module defines a completion function suitable to be
-passed to :func:`~readline.set_completer` in the :mod:`readline` module.
+Mô-đun :mod:`!rlcompleter` định nghĩa một hàm hoàn tất phù hợp để truyền vào :func:`~readline.set_completer` trong mô-đun :mod:`readline`.
 
-When this module is imported on a Unix platform with the :mod:`readline` module
-available, an instance of the :class:`Completer` class is automatically created
-and its :meth:`~Completer.complete` method is set as the
-:ref:`readline completer <readline-completion>`. The method provides
-completion of valid Python :ref:`identifiers and keywords <identifiers>`.
+Khi mô-đun này được nhập trên nền tảng Unix có mô-đun :mod:`readline` available, một thực thể của lớp :class:`Completer` sẽ tự động được tạo và phương thức :meth:`~Completer.complete` của thực thể đó được đặt làm
+:ref:`trình hoàn tất readline <readline-completion>`. Phương thức này cung cấp tính năng hoàn tất các :ref:`định danh và từ khóa <identifiers>` Python hợp lệ.
 
-Example::
+Ví dụ::
 
    >>> import rlcompleter
    >>> import readline
@@ -30,36 +26,26 @@ Example::
    readline.__name__         readline.parse_and_bind(
    >>> readline.
 
-The :mod:`!rlcompleter` module is designed for use with Python's
-:ref:`interactive mode <tut-interactive>`.  Unless Python is run with the
-:option:`-S` option, the module is automatically imported and configured
-(see :ref:`rlcompleter-config`).
+Mô-đun :mod:`!rlcompleter` được thiết kế để sử dụng với Python's
+:ref:`chế độ tương tác <tut-interactive>`.  Trừ khi Python được chạy với
+:option:`-S` option, mô-đun sẽ được tự động nhập và cấu hình (xem :ref:`rlcompleter-config`).
 
-On platforms without :mod:`readline`, the :class:`Completer` class defined by
-this module can still be used for custom purposes.
+Trên các nền tảng không có :mod:`readline`, lớp :class:`Completer` do mô-đun này định nghĩa vẫn có thể được sử dụng cho các mục đích tùy chỉnh.
 
 
 .. _completer-objects:
 
 .. class:: Completer
 
-   Completer objects have the following method:
+   Các đối tượng Completer có phương thức sau:
 
    .. method:: Completer.complete(text, state)
 
-      Return the next possible completion for *text*.
+      Trả về nội dung hoàn thành khả dĩ tiếp theo cho *văn bản*.
 
-      When called by the :mod:`readline` module, this method is called
-      successively with ``state == 0, 1, 2, ...`` until the method returns
-      ``None``.
+      Khi được mô-đun :mod:`readline` gọi, phương thức này được gọi liên tiếp với ``state == 0, 1, 2, ...`` cho đến khi phương thức trả về ``None``.
 
-      If called for *text* that doesn't include a period character (``'.'``), it will
-      complete from names currently defined in :mod:`__main__`, :mod:`builtins` and
-      keywords (as defined by the :mod:`keyword` module).
+      Nếu được gọi cho *text* không chứa ký tự dấu chấm (``'.'``), hàm này sẽ hoàn tất từ các tên hiện được định nghĩa trong :mod:`__main__`, :mod:`builtins` và các từ khóa (như được định nghĩa bởi mô-đun :mod:`keyword`).
 
-      If called for a dotted name, it will try to evaluate anything without obvious
-      side-effects (functions will not be evaluated, but it can generate calls to
-      :meth:`~object.__getattr__`) up to the last part, and find matches for the
-      rest via the :func:`dir` function.  Any exception raised during the
-      evaluation of the expression is caught, silenced and :const:`None` is
-      returned.
+      Nếu được gọi cho một tên có dấu chấm, hàm này sẽ cố gắng đánh giá mọi thành phần không có tác dụng phụ rõ ràng (các hàm sẽ không được đánh giá, nhưng hàm này có thể tạo ra các lệnh gọi đến
+      :meth:`~object.__getattr__`) cho đến phần cuối cùng, rồi tìm các kết quả khớp cho phần còn lại thông qua hàm :func:`dir`. Mọi ngoại lệ phát sinh trong quá trình đánh giá biểu thức đều được bắt, im lặng xử lý và trả về :const:`None`.

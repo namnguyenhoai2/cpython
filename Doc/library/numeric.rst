@@ -1,18 +1,13 @@
 
 .. _numeric:
 
-********************************
-Numeric and Mathematical Modules
-********************************
+*****************************
+Các Mô-đun Số học và Toán học
+*****************************
 
-The modules described in this chapter provide numeric and math-related functions
-and data types. The :mod:`numbers` module defines an abstract hierarchy of
-numeric types. The :mod:`math` and :mod:`cmath` modules contain various
-mathematical functions for floating-point and complex numbers. The :mod:`decimal`
-module supports exact representations of decimal numbers, using arbitrary precision
-arithmetic.
+Các mô-đun được mô tả trong chương này cung cấp các hàm và kiểu dữ liệu liên quan đến số học và toán học. Mô-đun :mod:`numbers` định nghĩa một hệ phân cấp trừu tượng của các kiểu số. Các mô-đun :mod:`math` và :mod:`cmath` chứa nhiều hàm toán học dành cho số dấu phẩy động và số phức. Mô-đun :mod:`decimal` hỗ trợ các biểu diễn chính xác của số thập phân bằng phép tính độ chính xác tùy ý.
 
-The following modules are documented in this chapter:
+Các mô-đun sau được ghi lại trong chương này:
 
 
 .. toctree::

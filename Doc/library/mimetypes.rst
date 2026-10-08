@@ -1,182 +1,130 @@
-:mod:`!mimetypes` --- Map filenames to MIME types
-=================================================
+:mod:`!mimetypes` --- Ánh xạ tên tệp với kiểu MIME
+==================================================
 
 .. module:: mimetypes
-   :synopsis: Mapping of filename extensions to MIME types.
+   :synopsis: Ánh xạ phần mở rộng tên tệp với kiểu MIME.
 
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 
-**Source code:** :source:`Lib/mimetypes.py`
+**Mã nguồn:** :source:`Lib/mimetypes.py`
 
 .. index:: pair: MIME; content type
 
 --------------
 
-The :mod:`!mimetypes` module converts between a filename or URL and the MIME type
-associated with the filename extension.  Conversions are provided from filename
-to MIME type and from MIME type to filename extension; encodings are not
-supported for the latter conversion.
+Mô-đun :mod:`!mimetypes` chuyển đổi giữa tên tệp hoặc URL và kiểu MIME liên kết với phần mở rộng của tên tệp. Các chuyển đổi được cung cấp từ tên tệp sang kiểu MIME và từ kiểu MIME sang phần mở rộng tên tệp; việc mã hóa không được hỗ trợ cho chuyển đổi sau.
 
-The module provides one class and a number of convenience functions. The
-functions are the normal interface to this module, but some applications may be
-interested in the class as well.
+Mô-đun cung cấp một lớp và một số hàm tiện ích. Các hàm là giao diện thông thường của mô-đun này, nhưng một số ứng dụng cũng có thể quan tâm đến lớp này.
 
-The functions described below provide the primary interface for this module.  If
-the module has not been initialized, they will call :func:`init` if they rely on
-the information :func:`init` sets up.
+Các hàm được mô tả dưới đây cung cấp giao diện chính cho mô-đun này. Nếu mô-đun chưa được khởi tạo, chúng sẽ gọi :func:`init` nếu phụ thuộc vào thông tin mà :func:`init` thiết lập.
 
 
 .. function:: guess_type(url, strict=True)
 
    .. index:: pair: MIME; headers
 
-   Guess the type of a file based on its filename, path or URL, given by *url*.
-   URL can be a string or a :term:`path-like object`.
+   Đoán kiểu của một tệp dựa trên tên tệp, đường dẫn hoặc URL được cung cấp bởi *url*. URL có thể là một chuỗi hoặc một :term:`path-like object`.
 
-   The return value is a tuple ``(type, encoding)`` where *type* is ``None`` if the
-   type can't be guessed (missing or unknown suffix) or a string of the form
-   ``'type/subtype'``, usable for a MIME :mailheader:`content-type` header.
+   Giá trị trả về là một tuple ``(type, encoding)`` trong đó *type* là ``None`` nếu không thể đoán được kiểu (hậu tố bị thiếu hoặc không xác định) hoặc là một chuỗi có dạng ``'type/subtype'``, có thể dùng cho một tiêu đề MIME :mailheader:`content-type` header.
 
-   *encoding* is ``None`` for no encoding or the name of the program used to encode
-   (e.g. :program:`compress` or :program:`gzip`). The encoding is suitable for use
-   as a :mailheader:`Content-Encoding` header, **not** as a
-   :mailheader:`Content-Transfer-Encoding` header. The mappings are table driven.
-   Encoding suffixes are case sensitive; type suffixes are first tried case
-   sensitively, then case insensitively.
+   *encoding* là ``None`` khi không có encoding hoặc là tên của chương trình được dùng để mã hóa (ví dụ: :program:`compress` hoặc :program:`gzip`). encoding phù hợp để dùng làm header :mailheader:`Content-Encoding`, **không** như một
+   :mailheader:`Content-Transfer-Encoding` header. Các ánh xạ được điều khiển bằng bảng. Các hậu tố encoding phân biệt chữ hoa chữ thường; các hậu tố type trước tiên được thử với phân biệt chữ hoa chữ thường, sau đó không phân biệt chữ hoa chữ thường.
 
-   The optional *strict* argument is a flag specifying whether the list of known MIME types
-   is limited to only the official types `registered with IANA
-   <https://www.iana.org/assignments/media-types/media-types.xhtml>`_.
-   However, the behavior of this module also depends on the underlying operating
-   system. Only file types recognized by the OS or explicitly registered with
-   Python's internal database can be identified. When *strict* is ``True`` (the
-   default), only the IANA types are supported; when *strict* is ``False``, some
-   additional non-standard but commonly used MIME types are also recognized.
+   Đối số tùy chọn *strict* là một cờ chỉ định liệu danh sách các MIME type đã biết có bị giới hạn chỉ ở những type chính thức `được IANA đăng ký <https://www.iana.org/assignments/media-types/media-types.xhtml>`_ hay không. Tuy nhiên, hành vi của module này cũng phụ thuộc vào hệ điều hành bên dưới. Chỉ những loại tệp được hệ điều hành nhận diện hoặc được đăng ký rõ ràng với cơ sở dữ liệu nội bộ của Python mới có thể được xác định. Khi *strict* là ``True`` (mặc định), chỉ các type của IANA được hỗ trợ; khi *strict* là ``False``, một số MIME type không tiêu chuẩn nhưng thường được sử dụng cũng được nhận diện.
 
    .. versionchanged:: 3.8
-      Added support for *url* being a :term:`path-like object`.
+      Đã bổ sung hỗ trợ khi *url* là một :term:`path-like object`.
 
    .. soft-deprecated:: 3.13
-      Passing a file path instead of URL.
-      Use :func:`guess_file_type` for this.
+      Truyền đường dẫn tệp thay vì URL. Dùng :func:`guess_file_type` cho việc này.
 
 
 .. function:: guess_file_type(path, *, strict=True)
 
    .. index:: pair: MIME; headers
 
-   Guess the type of a file based on its path, given by *path*.
-   Similar to the :func:`guess_type` function, but accepts a path instead of URL.
-   Path can be a string, a bytes object or a :term:`path-like object`.
+   Đoán type của tệp dựa trên đường dẫn được cung cấp bởi *path*. Tương tự hàm :func:`guess_type`, nhưng chấp nhận đường dẫn thay vì URL. path có thể là một chuỗi, một đối tượng bytes hoặc một :term:`path-like object`.
 
    .. versionadded:: 3.13
 
 
 .. function:: guess_all_extensions(type, strict=True)
 
-   Guess the extensions for a file based on its MIME type, given by *type*. The
-   return value is a list of strings giving all possible filename extensions,
-   including the leading dot (``'.'``).  The extensions are not guaranteed to have
-   been associated with any particular data stream, but would be mapped to the MIME
-   type *type* by :func:`guess_type` and :func:`guess_file_type`.
+   Dự đoán các phần mở rộng của tệp dựa trên kiểu MIME của tệp, được chỉ định bởi *type*. Giá trị trả về là một danh sách các chuỗi chứa tất cả phần mở rộng tên tệp có thể có, bao gồm cả dấu chấm đứng đầu (``'.'``). Các phần mở rộng này không đảm bảo đã được liên kết với bất kỳ luồng dữ liệu cụ thể nào, nhưng sẽ được ánh xạ tới kiểu MIME *type* bởi :func:`guess_type` và :func:`guess_file_type`.
 
-   The optional *strict* argument has the same meaning as with the :func:`guess_type` function.
+   Đối số tùy chọn *strict* có cùng ý nghĩa như đối với hàm :func:`guess_type`.
 
 
 .. function:: guess_extension(type, strict=True)
 
-   Guess the extension for a file based on its MIME type, given by *type*. The
-   return value is a string giving a filename extension, including the leading dot
-   (``'.'``).  The extension is not guaranteed to have been associated with any
-   particular data stream, but would be mapped to the MIME type *type* by
-   :func:`guess_type` and :func:`guess_file_type`.
-   If no extension can be guessed for *type*, ``None`` is returned.
+   Dự đoán phần mở rộng cho một tệp dựa trên kiểu MIME của tệp, được chỉ định bởi *type*. Giá trị trả về là một chuỗi chứa phần mở rộng tên tệp, bao gồm cả dấu chấm đứng đầu (``'.'``). Phần mở rộng này không đảm bảo đã được liên kết với bất kỳ luồng dữ liệu cụ thể nào, nhưng sẽ được ánh xạ tới kiểu MIME *type* bởi
+   :func:`guess_type` và :func:`guess_file_type`. Nếu không thể dự đoán phần mở rộng cho *type*, ``None`` sẽ được trả về.
 
-   The optional *strict* argument has the same meaning as with the :func:`guess_type` function.
+   Đối số tùy chọn *strict* có cùng ý nghĩa như đối với hàm :func:`guess_type`.
 
-Some additional functions and data items are available for controlling the
-behavior of the module.
+Có một số hàm và mục dữ liệu bổ sung để kiểm soát hành vi của module.
 
 
 .. function:: init(files=None)
 
-   Initialize the internal data structures.  If given, *files* must be a sequence
-   of file names which should be used to augment the default type map.  If omitted,
-   the file names to use are taken from :const:`knownfiles`; on Windows, the
-   current registry settings are loaded.  Each file named in *files* or
-   :const:`knownfiles` takes precedence over those named before it.  Calling
-   :func:`init` repeatedly is allowed.
+   Khởi tạo các cấu trúc dữ liệu nội bộ. Nếu được cung cấp, *files* phải là một chuỗi tên tệp được dùng để bổ sung vào ánh xạ kiểu mặc định. Nếu bỏ qua, các tên tệp cần dùng sẽ được lấy từ :const:`knownfiles`; trên Windows, các thiết lập registry hiện tại sẽ được tải. Mỗi tệp được đặt tên trong *files* hoặc
+   :const:`knownfiles` được ưu tiên hơn những đối số được đặt tên trước nó. Việc gọi
+   :func:`init` nhiều lần là được phép.
 
-   Specifying an empty list for *files* will prevent the system defaults from
-   being applied: only the well-known values will be present from a built-in list.
+   Việc chỉ định một danh sách rỗng cho *files* sẽ ngăn không cho các giá trị mặc định của hệ thống được áp dụng: chỉ các giá trị phổ biến mới có trong danh sách dựng sẵn.
 
-   If *files* is ``None`` the internal data structure is completely rebuilt to its
-   initial default value. This is a stable operation and will produce the same results
-   when called multiple times.
+   Nếu *files* là ``None``, cấu trúc dữ liệu nội bộ sẽ được xây dựng lại hoàn toàn về giá trị mặc định ban đầu. Đây là một thao tác ổn định và sẽ cho cùng một kết quả khi được gọi nhiều lần.
 
    .. versionchanged:: 3.2
-      Previously, Windows registry settings were ignored.
+      Trước đây, các thiết lập trong Windows registry bị bỏ qua.
 
 
 .. function:: read_mime_types(file)
 
-   Load the type map given in the file named by *file*, if it exists.  *file*
-   must be a string specifying the name of the file to read.  The type map is
-   returned as a dictionary mapping file extensions, including the leading dot
-   (``'.'``), to strings of the form ``'type/subtype'``.  If the file does not
-   exist or cannot be read, ``None`` is returned.
+   Tải type map được chỉ định trong tệp có tên do *file* cung cấp, nếu tệp đó tồn tại. *file* phải là một chuỗi chỉ định tên tệp cần đọc. Type map được trả về dưới dạng một dictionary ánh xạ các phần mở rộng tệp, bao gồm dấu chấm đứng đầu (``'.'``), tới các chuỗi có dạng ``'type/subtype'``. Nếu tệp không tồn tại hoặc không thể đọc, ``None`` sẽ được trả về.
 
 
 .. function:: add_type(type, ext, strict=True)
 
-   Add a mapping from the MIME type *type* to the extension *ext*. When the
-   extension is already known, the new type will replace the old one. When the type
-   is already known the extension will be added to the list of known extensions.
+   Thêm một ánh xạ từ MIME type *type* tới phần mở rộng *ext*. Khi phần mở rộng đã được biết, type mới sẽ thay thế type cũ. Khi type đã được biết, phần mở rộng sẽ được thêm vào danh sách các phần mở rộng đã biết.
 
-   When *strict* is ``True`` (the default), the mapping will be added to the
-   official MIME types, otherwise to the non-standard ones.
+   Khi *strict* là ``True`` (mặc định), ánh xạ sẽ được thêm vào các kiểu MIME chính thức; nếu không, ánh xạ sẽ được thêm vào các kiểu không chuẩn.
 
 
 .. data:: inited
 
-   Flag indicating whether or not the global data structures have been initialized.
-   This is set to ``True`` by :func:`init`.
+   Cờ cho biết các cấu trúc dữ liệu toàn cục đã được khởi tạo hay chưa. Giá trị này được đặt thành ``True`` bởi :func:`init`.
 
 
 .. data:: knownfiles
 
    .. index:: single: file; mime.types
 
-   List of type map file names commonly installed.  These files are typically named
-   :file:`mime.types` and are installed in different locations by different
-   packages.
+   Danh sách các tên tệp ánh xạ kiểu thường được cài đặt. Các tệp này thường có tên là
+   :file:`mime.types` và được các gói khác nhau cài đặt ở các vị trí khác nhau.
 
 
 .. data:: suffix_map
 
-   Dictionary mapping suffixes to suffixes.  This is used to allow recognition of
-   encoded files for which the encoding and the type are indicated by the same
-   extension.  For example, the :file:`.tgz` extension is mapped to :file:`.tar.gz`
-   to allow the encoding and type to be recognized separately.
+   Từ điển ánh xạ các hậu tố sang các hậu tố. Từ điển này được dùng để nhận dạng các tệp đã mã hóa, trong đó mã hóa và kiểu được biểu thị bằng cùng một phần mở rộng. Ví dụ: phần mở rộng :file:`.tgz` được ánh xạ tới :file:`.tar.gz` để cho phép nhận dạng riêng mã hóa và kiểu.
 
 
 .. data:: encodings_map
 
-   Dictionary mapping filename extensions to encoding types.
+   Từ điển ánh xạ các phần mở rộng tên tệp sang các kiểu mã hóa.
 
 
 .. data:: types_map
 
-   Dictionary mapping filename extensions to MIME types.
+   Từ điển ánh xạ các phần mở rộng tên tệp sang các kiểu MIME.
 
 
 .. data:: common_types
 
-   Dictionary mapping filename extensions to non-standard, but commonly found MIME
-   types.
+   Từ điển ánh xạ phần mở rộng tên tệp với các kiểu MIME không theo chuẩn nhưng thường gặp.
 
 
-An example usage of the module::
+Ví dụ về cách sử dụng mô-đun::
 
    >>> import mimetypes
    >>> mimetypes.init()
@@ -192,177 +140,141 @@ An example usage of the module::
 
 .. _mimetypes-objects:
 
-MimeTypes objects
------------------
+Đối tượng MimeTypes
+-------------------
 
-The :class:`MimeTypes` class may be useful for applications which may want more
-than one MIME-type database; it provides an interface similar to the one of the
-:mod:`!mimetypes` module.
+Lớp :class:`MimeTypes` có thể hữu ích cho các ứng dụng cần nhiều hơn một cơ sở dữ liệu kiểu MIME; lớp này cung cấp một giao diện tương tự giao diện của
+mô-đun :mod:`!mimetypes`.
 
 
 .. class:: MimeTypes(filenames=(), strict=True)
 
-   This class represents a MIME-types database.  By default, it provides access to
-   the same database as the rest of this module. The initial database is created from
-   Python's built-in MIME type tables. It may be extended by loading additional
-   :file:`mime.types`\ -style files into the database using the :meth:`read` or
-   :meth:`readfp` methods.  The mapping dictionaries may also be cleared before
-   loading additional data if the default data is not desired.
+   Lớp này đại diện cho một cơ sở dữ liệu MIME-types. Theo mặc định, lớp này cung cấp quyền truy cập vào cùng cơ sở dữ liệu như phần còn lại của module này. Cơ sở dữ liệu ban đầu được tạo từ các bảng loại MIME tích hợp sẵn của Python. Cơ sở dữ liệu có thể được mở rộng bằng cách tải thêm
+   các tệp theo kiểu :file:`mime.types`\  vào cơ sở dữ liệu bằng cách sử dụng :meth:`read` hoặc
+   các phương thức :meth:`readfp`. Các từ điển ánh xạ cũng có thể được xóa trước khi tải thêm dữ liệu nếu không muốn sử dụng dữ liệu mặc định.
 
-   The optional *filenames* parameter can be used to cause additional files to be
-   loaded "on top" of the default database.
+   Có thể sử dụng tham số tùy chọn *filenames* để tải thêm các tệp "chồng lên" cơ sở dữ liệu mặc định.
 
 
    .. attribute:: MimeTypes.suffix_map
 
-      Dictionary mapping suffixes to suffixes.  This is used to allow recognition of
-      encoded files for which the encoding and the type are indicated by the same
-      extension.  For example, the :file:`.tgz` extension is mapped to :file:`.tar.gz`
-      to allow the encoding and type to be recognized separately.
-      This is initialized with some predefined values.
+      Từ điển ánh xạ các hậu tố sang các hậu tố. Từ điển này được dùng để nhận dạng các tệp đã mã hóa, trong đó mã hóa và kiểu được biểu thị bằng cùng một phần mở rộng. Ví dụ: phần mở rộng :file:`.tgz` được ánh xạ tới :file:`.tar.gz` để cho phép nhận dạng riêng mã hóa và kiểu. Từ điển này được khởi tạo với một số giá trị định sẵn.
 
 
    .. attribute:: MimeTypes.encodings_map
 
-      Dictionary mapping filename extensions to encoding types.
-      This is initialized with some predefined values.
+      Từ điển ánh xạ các phần mở rộng tên tệp tới các kiểu mã hóa. Từ điển này được khởi tạo với một số giá trị định sẵn.
 
 
    .. attribute:: MimeTypes.types_map
 
-      Tuple containing two dictionaries, mapping filename extensions to MIME types:
-      the first dictionary is for the non-standards types and the second one is for
-      the standard types.
-      They are initialized with some predefined values and MIME type
-      information loaded from files specified by the *filenames* argument.
+      Tuple chứa hai từ điển ánh xạ các phần mở rộng tên tệp tới các kiểu MIME: từ điển thứ nhất dành cho các kiểu không theo tiêu chuẩn và từ điển thứ hai dành cho các kiểu tiêu chuẩn. Chúng được khởi tạo với một số giá trị định sẵn và thông tin kiểu MIME được tải từ các tệp được chỉ định bởi đối số *filenames*.
 
 
    .. attribute:: MimeTypes.types_map_inv
 
-      Tuple containing two dictionaries, mapping MIME types to a list of filename
-      extensions: the first dictionary is for the non-standards types and the
-      second one is for the standard types.
-      They are initialized with some predefined values and MIME type
-      information loaded from files specified by the *filenames* argument.
+      Tuple chứa hai từ điển ánh xạ các kiểu MIME tới danh sách phần mở rộng tên tệp: từ điển thứ nhất dành cho các kiểu không theo tiêu chuẩn và từ điển thứ hai dành cho các kiểu tiêu chuẩn. Chúng được khởi tạo với một số giá trị định sẵn và thông tin kiểu MIME được tải từ các tệp được chỉ định bởi đối số *filenames*.
 
 
    .. method:: MimeTypes.guess_extension(type, strict=True)
 
-      Similar to the :func:`guess_extension` function, using the tables stored as part
-      of the object.
+      Tương tự hàm :func:`guess_extension`, sử dụng các bảng được lưu trữ như một phần của đối tượng.
 
 
    .. method:: MimeTypes.guess_type(url, strict=True)
 
-      Similar to the :func:`guess_type` function, using the tables stored as part of
-      the object.
+      Tương tự như hàm :func:`guess_type`, sử dụng các bảng được lưu trữ như một phần của đối tượng.
 
 
    .. method:: MimeTypes.guess_file_type(path, *, strict=True)
 
-      Similar to the :func:`guess_file_type` function, using the tables stored
-      as part of the object.
+      Tương tự như hàm :func:`guess_file_type`, sử dụng các bảng được lưu trữ như một phần của đối tượng.
 
       .. versionadded:: 3.13
 
 
    .. method:: MimeTypes.guess_all_extensions(type, strict=True)
 
-      Similar to the :func:`guess_all_extensions` function, using the tables stored
-      as part of the object.
+      Tương tự như hàm :func:`guess_all_extensions`, sử dụng các bảng được lưu trữ như một phần của đối tượng.
 
 
    .. method:: MimeTypes.read(filename, strict=True)
 
-      Load MIME information from a file named *filename*.  This uses :meth:`readfp` to
-      parse the file.
+      Tải thông tin MIME từ tệp có tên *filename*. Tệp này được phân tích cú pháp bằng :meth:`readfp`.
 
-      If *strict* is ``True``, information will be added to list of standard types,
-      else to the list of non-standard types.
+      Nếu *strict* là ``True``, thông tin sẽ được thêm vào danh sách các loại tiêu chuẩn; nếu không, thông tin sẽ được thêm vào danh sách các loại không tiêu chuẩn.
 
 
    .. method:: MimeTypes.readfp(fp, strict=True)
 
-      Load MIME type information from an open file *fp*.  The file must have the format of
-      the standard :file:`mime.types` files.
+      Tải thông tin loại MIME từ tệp đang mở *fp*. Tệp phải có định dạng của các tệp :file:`mime.types` tiêu chuẩn.
 
-      If *strict* is ``True``, information will be added to the list of standard
-      types, else to the list of non-standard types.
+      Nếu *strict* là ``True``, thông tin sẽ được thêm vào danh sách các loại tiêu chuẩn; nếu không, thông tin sẽ được thêm vào danh sách các loại không tiêu chuẩn.
 
 
    .. method:: MimeTypes.read_windows_registry(strict=True)
 
-      Load MIME type information from the Windows registry.
+      Tải thông tin về MIME type từ Windows registry.
 
       .. availability:: Windows.
 
-      If *strict* is ``True``, information will be added to the list of standard
-      types, else to the list of non-standard types.
+      Nếu *strict* là ``True``, thông tin sẽ được thêm vào danh sách các loại tiêu chuẩn; nếu không, thông tin sẽ được thêm vào danh sách các loại không tiêu chuẩn.
 
       .. versionadded:: 3.2
 
 
    .. method:: MimeTypes.add_type(type, ext, strict=True)
 
-      Add a mapping from the MIME type *type* to the extension *ext*.
-      Valid extensions start with a '.' or are empty. When the
-      extension is already known, the new type will replace the old one. When the type
-      is already known the extension will be added to the list of known extensions.
+      Thêm ánh xạ từ MIME type *type* đến phần mở rộng *ext*. Phần mở rộng hợp lệ bắt đầu bằng '.' hoặc để trống. Khi phần mở rộng đã được biết, type mới sẽ thay thế type cũ. Khi type đã được biết, phần mở rộng sẽ được thêm vào danh sách các phần mở rộng đã biết.
 
-      When *strict* is ``True`` (the default), the mapping will be added to the
-      official MIME types, otherwise to the non-standard ones.
+      Khi *strict* là ``True`` (mặc định), ánh xạ sẽ được thêm vào các MIME type chính thức; nếu không, ánh xạ sẽ được thêm vào các MIME type không theo chuẩn.
 
       .. deprecated-removed:: 3.14 3.16
-         Invalid, undotted extensions will raise a
-         :exc:`ValueError` in Python 3.16.
+         Các phần mở rộng không hợp lệ và không có dấu chấm sẽ gây ra một
+         :exc:`ValueError` trong Python 3.16.
 
 
 .. _mimetypes-cli:
 
-Command-line usage
-------------------
+Cách sử dụng dòng lệnh
+----------------------
 
-The :mod:`!mimetypes` module can be executed as a script from the command line.
+Module :mod:`!mimetypes` có thể được thực thi dưới dạng script từ dòng lệnh.
 
 .. code-block:: sh
 
    python -m mimetypes [-h] [-e] [-l] type [type ...]
 
-The following options are accepted:
+Các tùy chọn sau được chấp nhận:
 
 .. program:: mimetypes
 
 .. cmdoption:: -h
                --help
 
-   Show the help message and exit.
+   Hiển thị thông báo trợ giúp rồi thoát.
 
 .. cmdoption:: -e
                --extension
 
-   Guess extension instead of type.
+   Đoán phần mở rộng thay vì kiểu.
 
 .. cmdoption:: -l
                --lenient
 
-   Additionally search for some common, but non-standard types.
+   Ngoài ra, hãy tìm kiếm một số kiểu phổ biến nhưng không theo chuẩn.
 
-By default the script converts MIME types to file extensions.
-However, if ``--extension`` is specified,
-it converts file extensions to MIME types.
+Theo mặc định, script chuyển đổi các kiểu MIME thành phần mở rộng tệp. Tuy nhiên, nếu chỉ định ``--extension``, script sẽ chuyển đổi các phần mở rộng tệp thành kiểu MIME.
 
-For each ``type`` entry, the script writes a line into the standard output
-stream. If an unknown type occurs, it writes an error message into the
-standard output stream and exits with the return code ``1``.
+Với mỗi mục ``type``, script ghi một dòng vào luồng đầu ra chuẩn. Nếu xuất hiện một kiểu không xác định, script ghi thông báo lỗi vào luồng đầu ra chuẩn và thoát với mã trả về ``1``.
 
 
 .. mimetypes-cli-example:
 
-Command-line example
---------------------
+Ví dụ dòng lệnh
+---------------
 
-Here are some examples of typical usage of the :mod:`!mimetypes` command-line
-interface:
+Sau đây là một số ví dụ về cách sử dụng điển hình giao diện dòng lệnh của lệnh :mod:`!mimetypes`:
 
 .. code-block:: console
 
@@ -410,3 +322,5 @@ interface:
    .aac
    .opus
    error: unknown type audio/future
+
+.. _`registered with IANA`: https://www.iana.org/assignments/media-types/media-types.xhtml

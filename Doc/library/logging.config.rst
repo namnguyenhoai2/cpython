@@ -1,307 +1,184 @@
-:mod:`!logging.config` --- Logging configuration
-================================================
+:mod:`!logging.config` --- Cấu hình logging
+===========================================
 
 .. module:: logging.config
-   :synopsis: Configuration of the logging module.
+   :synopsis: Cấu hình module logging.
 
 .. moduleauthor:: Vinay Sajip <vinay_sajip@red-dove.com>
 .. sectionauthor:: Vinay Sajip <vinay_sajip@red-dove.com>
 
-**Source code:** :source:`Lib/logging/config.py`
+**Mã nguồn:** :source:`Lib/logging/config.py`
 
-.. sidebar:: Important
+.. sidebar:: Quan trọng
 
-   This page contains only reference information. For tutorials,
-   please see
+   Trang này chỉ chứa thông tin tham khảo. Để xem hướng dẫn, vui lòng xem
 
-   * :ref:`Basic Tutorial <logging-basic-tutorial>`
-   * :ref:`Advanced Tutorial <logging-advanced-tutorial>`
-   * :ref:`Logging Cookbook <logging-cookbook>`
+   * :ref:`Hướng dẫn cơ bản <logging-basic-tutorial>`
+   * :ref:`Hướng dẫn nâng cao <logging-advanced-tutorial>`
+   * :ref:`Sổ tay Logging <logging-cookbook>`
 
 --------------
 
-This section describes the API for configuring the logging module.
+Phần này mô tả API để cấu hình module logging.
 
 .. _logging-config-api:
 
-Configuration functions
-^^^^^^^^^^^^^^^^^^^^^^^
+Các hàm cấu hình
+^^^^^^^^^^^^^^^^
 
-The following functions configure the logging module. They are located in the
-:mod:`!logging.config` module.  Their use is optional --- you can configure the
-logging module using these functions or by making calls to the main API (defined
-in :mod:`logging` itself) and defining handlers which are declared either in
-:mod:`logging` or :mod:`logging.handlers`.
+Các hàm sau đây cấu hình module logging. Chúng nằm trong
+:mod:`!logging.config` module. Việc sử dụng chúng là tùy chọn --- bạn có thể cấu hình module logging bằng các hàm này hoặc bằng cách gọi main API (được định nghĩa ngay trong :mod:`logging`) và định nghĩa các handler được khai báo trong
+:mod:`logging` hoặc :mod:`logging.handlers`.
 
 .. function:: dictConfig(config)
 
-   Takes the logging configuration from a dictionary.  The contents of
-   this dictionary are described in :ref:`logging-config-dictschema`
-   below.
+   Lấy cấu hình logging từ một dictionary. Nội dung của dictionary này được mô tả trong :ref:`logging-config-dictschema` bên dưới.
 
-   If an error is encountered during configuration, this function will
-   raise a :exc:`ValueError`, :exc:`TypeError`, :exc:`AttributeError`
-   or :exc:`ImportError` with a suitably descriptive message.  The
-   following is a (possibly incomplete) list of conditions which will
-   raise an error:
+   Nếu gặp lỗi trong quá trình cấu hình, hàm này sẽ ném ra :exc:`ValueError`, :exc:`TypeError`, :exc:`AttributeError` hoặc :exc:`ImportError` cùng với thông báo mô tả phù hợp. Sau đây là danh sách (có thể chưa đầy đủ) các điều kiện sẽ gây ra lỗi:
 
-   * A ``level`` which is not a string or which is a string not
-     corresponding to an actual logging level.
-   * A ``propagate`` value which is not a boolean.
-   * An id which does not have a corresponding destination.
-   * A non-existent handler id found during an incremental call.
-   * An invalid logger name.
-   * Inability to resolve to an internal or external object.
+   * Một ``level`` không phải là chuỗi hoặc là chuỗi không tương ứng với một logging level thực tế.
+   * Một giá trị ``propagate`` không phải là boolean.
+   * Một id không có destination tương ứng.
+   * Tìm thấy handler id không tồn tại trong một incremental call.
+   * Tên logger không hợp lệ.
+   * Không thể phân giải thành một đối tượng nội bộ hoặc bên ngoài.
 
-   Parsing is performed by the :class:`DictConfigurator` class, whose
-   constructor is passed the dictionary used for configuration, and
-   has a :meth:`configure` method.  The :mod:`!logging.config` module
-   has a callable attribute :attr:`dictConfigClass`
-   which is initially set to :class:`DictConfigurator`.
-   You can replace the value of :attr:`dictConfigClass` with a
-   suitable implementation of your own.
+   Việc phân tích cú pháp được thực hiện bởi lớp :class:`DictConfigurator`, hàm khởi tạo của lớp nhận từ điển dùng cho cấu hình và có phương thức :meth:`configure`. Mô-đun :mod:`!logging.config` có thuộc tính có thể gọi :attr:`dictConfigClass`, ban đầu được đặt thành :class:`DictConfigurator`. Bạn có thể thay thế giá trị của :attr:`dictConfigClass` bằng một triển khai phù hợp của riêng mình.
 
-   :func:`dictConfig` calls :attr:`dictConfigClass` passing
-   the specified dictionary, and then calls the :meth:`configure` method on
-   the returned object to put the configuration into effect::
+   :func:`dictConfig` gọi :attr:`dictConfigClass` với từ điển được chỉ định, sau đó gọi phương thức :meth:`configure` trên đối tượng được trả về để áp dụng cấu hình::
 
          def dictConfig(config):
              dictConfigClass(config).configure()
 
-   For example, a subclass of :class:`DictConfigurator` could call
-   ``DictConfigurator.__init__()`` in its own :meth:`__init__`, then
-   set up custom prefixes which would be usable in the subsequent
-   :meth:`configure` call. :attr:`dictConfigClass` would be bound to
-   this new subclass, and then :func:`dictConfig` could be called exactly as
-   in the default, uncustomized state.
+   Ví dụ, một lớp con của :class:`DictConfigurator` có thể gọi ``DictConfigurator.__init__()`` trong :meth:`__init__` của chính nó, sau đó thiết lập các tiền tố tùy chỉnh có thể sử dụng trong lần gọi tiếp theo
+   :meth:`configure`. :attr:`dictConfigClass` sẽ được liên kết với lớp con mới này, sau đó :func:`dictConfig` có thể được gọi chính xác như trong trạng thái mặc định, chưa tùy chỉnh.
 
    .. versionadded:: 3.2
 
 .. function:: fileConfig(fname, defaults=None, disable_existing_loggers=True, encoding=None)
 
-   Reads the logging configuration from a :mod:`configparser`\-format file. The
-   format of the file should be as described in
-   :ref:`logging-config-fileformat`.
-   This function can be called several times from an application, allowing an
-   end user to select from various pre-canned configurations (if the developer
-   provides a mechanism to present the choices and load the chosen
-   configuration).
+   Đọc cấu hình logging từ một tệp :mod:`configparser`\-format. Định dạng của tệp phải được mô tả trong
+   :ref:`logging-config-fileformat`. Hàm này có thể được gọi nhiều lần từ một ứng dụng, cho phép người dùng cuối chọn giữa nhiều cấu hình được chuẩn bị sẵn (nếu developer cung cấp cơ chế để hiển thị các lựa chọn và tải cấu hình đã chọn).
 
-   It will raise :exc:`FileNotFoundError` if the file
-   doesn't exist and :exc:`RuntimeError` if the file is invalid or
-   empty.
+   Hàm sẽ phát sinh :exc:`FileNotFoundError` nếu tệp không tồn tại và :exc:`RuntimeError` nếu tệp không hợp lệ hoặc rỗng.
 
-   :param fname: A filename, or a file-like object, or an instance derived
-                 from :class:`~configparser.RawConfigParser`. If a
-                 :class:`!RawConfigParser`-derived instance is passed, it is used as
-                 is. Otherwise, a :class:`~configparser.ConfigParser` is
-                 instantiated, and the configuration read by it from the
-                 object passed in ``fname``. If that has a :meth:`readline`
-                 method, it is assumed to be a file-like object and read using
-                 :meth:`~configparser.ConfigParser.read_file`; otherwise,
-                 it is assumed to be a filename and passed to
+   :param fname: Một tên tệp, hoặc một đối tượng giống tệp, hoặc một thực thể dẫn xuất từ :class:`~configparser.RawConfigParser`. Nếu một
+                 thực thể dẫn xuất từ :class:`!RawConfigParser` được truyền vào, thực thể đó được sử dụng nguyên trạng. Nếu không, một :class:`~configparser.ConfigParser` được khởi tạo và đọc cấu hình từ đối tượng được truyền vào ``fname``. Nếu đối tượng đó có phương thức :meth:`readline`, đối tượng đó được xem là một đối tượng giống tệp và được đọc bằng
+                 :meth:`~configparser.ConfigParser.read_file`; nếu không, đối tượng đó được xem là một tên tệp và được truyền cho
                  :meth:`~configparser.ConfigParser.read`.
 
 
-   :param defaults: Defaults to be passed to the :class:`!ConfigParser` can be specified
-                    in this argument.
+   :param defaults: Có thể chỉ định các giá trị mặc định được truyền cho :class:`!ConfigParser` trong đối số này.
 
-   :param disable_existing_loggers: If specified as ``False``, loggers which
-                                    exist when this call is made are left
-                                    enabled. The default is ``True`` because this
-                                    enables old behaviour in a
-                                    backward-compatible way. This behaviour is to
-                                    disable any existing non-root loggers unless
-                                    they or their ancestors are explicitly named
-                                    in the logging configuration.
+   :param disable_existing_loggers: Nếu được chỉ định là ``False``, các logger đang tồn tại khi lệnh gọi này được thực hiện sẽ tiếp tục được bật. Mặc định là ``True`` vì điều này bật hành vi cũ theo cách tương thích ngược. Hành vi này là vô hiệu hóa mọi logger hiện có không phải root, trừ khi chúng hoặc các logger tổ tiên của chúng được nêu rõ trong cấu hình logging.
 
-   :param encoding: The encoding used to open file when *fname* is filename.
+   :param encoding: Mã hóa được sử dụng để mở tệp khi *fname* là tên tệp.
 
    .. versionchanged:: 3.4
-      An instance of a subclass of :class:`~configparser.RawConfigParser` is
-      now accepted as a value for ``fname``. This facilitates:
+      Một thực thể của lớp con của :class:`~configparser.RawConfigParser` hiện được chấp nhận làm giá trị cho ``fname``. Điều này hỗ trợ:
 
-      * Use of a configuration file where logging configuration is just part
-        of the overall application configuration.
-      * Use of a configuration read from a file, and then modified by the using
-        application (e.g. based on command-line parameters or other aspects
-        of the runtime environment) before being passed to ``fileConfig``.
+      * Sử dụng tệp cấu hình, trong đó cấu hình logging chỉ là một phần của cấu hình tổng thể của ứng dụng.
+      * Sử dụng cấu hình được đọc từ một tệp, sau đó được ứng dụng sử dụng sửa đổi (ví dụ: dựa trên các tham số dòng lệnh hoặc các khía cạnh khác của môi trường runtime) trước khi truyền cho ``fileConfig``.
 
     .. versionchanged:: 3.10
-       Added the *encoding* parameter.
+       Đã thêm tham số *encoding*.
 
     .. versionchanged:: 3.12
-       An exception will be thrown if the provided file
-       doesn't exist or is invalid or empty.
+       Một exception sẽ được ném ra nếu tệp được cung cấp không tồn tại, không hợp lệ hoặc rỗng.
 
 .. function:: listen(port=DEFAULT_LOGGING_CONFIG_PORT, verify=None)
 
-   Starts up a socket server on the specified port, and listens for new
-   configurations. If no port is specified, the module's default
-   :const:`DEFAULT_LOGGING_CONFIG_PORT` is used. Logging configurations will be
-   sent as a file suitable for processing by :func:`dictConfig` or
-   :func:`fileConfig`. Returns a :class:`~threading.Thread` instance on which
-   you can call :meth:`~threading.Thread.start` to start the server, and which
-   you can :meth:`~threading.Thread.join` when appropriate. To stop the server,
-   call :func:`stopListening`.
+   Khởi động một socket server trên port được chỉ định và lắng nghe các cấu hình mới. Nếu không chỉ định port, giá trị mặc định của module
+   :const:`DEFAULT_LOGGING_CONFIG_PORT` sẽ được sử dụng. Các cấu hình logging sẽ được gửi dưới dạng tệp phù hợp để :func:`dictConfig` hoặc
+   :func:`fileConfig`. Trả về một instance :class:`~threading.Thread`, trên đó bạn có thể gọi :meth:`~threading.Thread.start` để khởi động server và gọi :meth:`~threading.Thread.join` khi thích hợp. Để dừng server, hãy gọi :func:`stopListening`.
 
-   The ``verify`` argument, if specified, should be a callable which should
-   verify whether bytes received across the socket are valid and should be
-   processed. This could be done by encrypting and/or signing what is sent
-   across the socket, such that the ``verify`` callable can perform
-   signature verification and/or decryption. The ``verify`` callable is called
-   with a single argument - the bytes received across the socket - and should
-   return the bytes to be processed, or ``None`` to indicate that the bytes should
-   be discarded. The returned bytes could be the same as the passed in bytes
-   (e.g. when only verification is done), or they could be completely different
-   (perhaps if decryption were performed).
+   Đối số ``verify``, nếu được chỉ định, phải là một callable có nhiệm vụ xác minh xem các byte nhận được qua socket có hợp lệ và cần được xử lý hay không. Có thể thực hiện việc này bằng cách mã hóa và/hoặc ký dữ liệu được gửi qua socket, để callable ``verify`` có thể xác minh chữ ký và/hoặc giải mã. Callable ``verify`` được gọi với một đối số duy nhất—các byte nhận được qua socket—và phải trả về các byte cần xử lý, hoặc ``None`` để cho biết rằng các byte đó cần bị loại bỏ. Các byte được trả về có thể giống với các byte được truyền vào (ví dụ: khi chỉ thực hiện xác minh), hoặc có thể hoàn toàn khác (chẳng hạn nếu đã thực hiện giải mã).
 
-   To send a configuration to the socket, read in the configuration file and
-   send it to the socket as a sequence of bytes preceded by a four-byte length
-   string packed in binary using ``struct.pack('>L', n)``.
+   Để gửi một cấu hình đến socket, hãy đọc tệp cấu hình rồi gửi tệp đó đến socket dưới dạng một chuỗi byte, đứng trước là một chuỗi độ dài bốn byte được đóng gói ở dạng nhị phân bằng ``struct.pack('>L', n)``.
 
    .. _logging-eval-security:
 
    .. note::
 
-      Because portions of the configuration are passed through
-      :func:`eval`, use of this function may open its users to a security risk.
-      While the function only binds to a socket on ``localhost``, and so does
-      not accept connections from remote machines, there are scenarios where
-      untrusted code could be run under the account of the process which calls
-      :func:`listen`. Specifically, if the process calling :func:`listen` runs
-      on a multi-user machine where users cannot trust each other, then a
-      malicious user could arrange to run essentially arbitrary code in a
-      victim user's process, simply by connecting to the victim's
-      :func:`listen` socket and sending a configuration which runs whatever
-      code the attacker wants to have executed in the victim's process. This is
-      especially easy to do if the default port is used, but not hard even if a
-      different port is used. To avoid the risk of this happening, use the
-      ``verify`` argument to :func:`listen` to prevent unrecognised
-      configurations from being applied.
+      Vì một số phần của cấu hình được truyền qua
+      :func:`eval`, việc sử dụng hàm này có thể khiến người dùng đối mặt với rủi ro bảo mật. Mặc dù hàm này chỉ liên kết với một socket trên ``localhost`` nên không chấp nhận kết nối từ các máy từ xa, vẫn có những tình huống trong đó mã không đáng tin cậy có thể được chạy dưới tài khoản của tiến trình gọi
+      :func:`listen`. Cụ thể, nếu tiến trình gọi :func:`listen` chạy trên một máy có nhiều người dùng, nơi những người dùng không thể tin tưởng lẫn nhau, thì một người dùng độc hại có thể sắp xếp để chạy gần như mọi mã tùy ý trong tiến trình của người dùng nạn nhân, chỉ bằng cách kết nối tới
+      :func:`listen` socket của nạn nhân và gửi một cấu hình chạy bất kỳ mã nào mà kẻ tấn công muốn thực thi trong tiến trình của nạn nhân. Điều này đặc biệt dễ thực hiện nếu sử dụng cổng mặc định, nhưng ngay cả khi sử dụng một cổng khác thì cũng không khó. Để tránh rủi ro này, hãy sử dụng đối số ``verify`` của :func:`listen` để ngăn không cho áp dụng các cấu hình không được nhận dạng.
 
    .. versionchanged:: 3.4
-      The ``verify`` argument was added.
+      Đối số ``verify`` đã được thêm vào.
 
    .. note::
 
-      If you want to send configurations to the listener which don't
-      disable existing loggers, you will need to use a JSON format for
-      the configuration, which will use :func:`dictConfig` for configuration.
-      This method allows you to specify ``disable_existing_loggers`` as
-      ``False`` in the configuration you send.
+      Nếu bạn muốn gửi các cấu hình đến listener mà không vô hiệu hóa các logger hiện có, bạn sẽ cần sử dụng định dạng JSON cho cấu hình, trong đó sẽ sử dụng :func:`dictConfig` để cấu hình. Phương thức này cho phép bạn chỉ định ``disable_existing_loggers`` dưới dạng ``False`` trong cấu hình mà bạn gửi.
 
 
 .. function:: stopListening()
 
-   Stops the listening server which was created with a call to :func:`listen`.
-   This is typically called before calling :meth:`join` on the return value from
+   Dừng listening server được tạo bằng lời gọi đến :func:`listen`. Thông thường, hàm này được gọi trước khi gọi :meth:`join` trên giá trị trả về từ
    :func:`listen`.
 
 
-Security considerations
-^^^^^^^^^^^^^^^^^^^^^^^
+Các lưu ý về bảo mật
+^^^^^^^^^^^^^^^^^^^^
 
-The logging configuration functionality tries to offer convenience, and in part this
-is done by offering the ability to convert text in configuration files into Python
-objects used in logging configuration - for example, as described in
-:ref:`logging-config-dict-userdef`. However, these same mechanisms (importing
-callables from user-defined modules and calling them with parameters from the
-configuration) could be used to invoke any code you like, and for this reason you
-should treat configuration files from untrusted sources with *extreme caution* and
-satisfy yourself that nothing bad can happen if you load them, before actually loading
-them.
+Chức năng cấu hình logging cố gắng mang lại sự thuận tiện, và một phần trong đó được thực hiện bằng cách cung cấp khả năng chuyển đổi văn bản trong các tệp cấu hình thành các đối tượng Python được sử dụng trong cấu hình logging - ví dụ như được mô tả trong
+:ref:`logging-config-dict-userdef`. Tuy nhiên, chính những cơ chế này (nhập các callable từ các module do người dùng định nghĩa và gọi chúng với các tham số từ cấu hình) có thể được sử dụng để gọi bất kỳ đoạn mã nào bạn muốn, và vì lý do này, bạn nên xử lý các tệp cấu hình từ các nguồn không đáng tin cậy với *hết sức thận trọng* và tự đảm bảo rằng không thể xảy ra điều gì nguy hiểm nếu bạn tải chúng, trước khi thực sự tải chúng.
 
 
 .. _logging-config-dictschema:
 
-Configuration dictionary schema
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Schema của dictionary cấu hình
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Describing a logging configuration requires listing the various
-objects to create and the connections between them; for example, you
-may create a handler named 'console' and then say that the logger
-named 'startup' will send its messages to the 'console' handler.
-These objects aren't limited to those provided by the :mod:`logging`
-module because you might write your own formatter or handler class.
-The parameters to these classes may also need to include external
-objects such as ``sys.stderr``.  The syntax for describing these
-objects and connections is defined in :ref:`logging-config-dict-connections`
-below.
+Mô tả một cấu hình logging yêu cầu liệt kê các đối tượng khác nhau cần tạo và các kết nối giữa chúng; chẳng hạn, bạn có thể tạo một handler có tên 'console', rồi chỉ định rằng logger có tên 'startup' sẽ gửi các thông điệp của nó đến handler 'console'. Các đối tượng này không bị giới hạn ở những đối tượng do module :mod:`logging` cung cấp, vì bạn có thể tự viết lớp formatter hoặc handler của mình. Các tham số của những lớp này cũng có thể cần bao gồm các đối tượng bên ngoài như ``sys.stderr``. Cú pháp để mô tả các đối tượng và kết nối này được định nghĩa trong :ref:`logging-config-dict-connections` bên dưới.
 
-Dictionary Schema Details
-"""""""""""""""""""""""""
+Chi tiết schema của dictionary
+""""""""""""""""""""""""""""""
 
-The dictionary passed to :func:`dictConfig` must contain the following
-keys:
+Dictionary được truyền vào :func:`dictConfig` phải chứa các khóa sau:
 
-* *version* - to be set to an integer value representing the schema
-  version.  The only valid value at present is 1, but having this key
-  allows the schema to evolve while still preserving backwards
-  compatibility.
+* *version* - được đặt thành một giá trị số nguyên biểu thị phiên bản schema. Hiện tại, giá trị hợp lệ duy nhất là 1, nhưng việc có khóa này cho phép schema phát triển mà vẫn duy trì khả năng tương thích ngược.
 
-All other keys are optional, but if present they will be interpreted
-as described below.  In all cases below where a 'configuring dict' is
-mentioned, it will be checked for the special ``'()'`` key to see if a
-custom instantiation is required.  If so, the mechanism described in
-:ref:`logging-config-dict-userdef` below is used to create an instance;
-otherwise, the context is used to determine what to instantiate.
+Tất cả các khóa khác đều là tùy chọn, nhưng nếu có thì chúng sẽ được diễn giải như mô tả bên dưới. Trong mọi trường hợp bên dưới khi đề cập đến 'dict cấu hình', dict này sẽ được kiểm tra khóa đặc biệt ``'()'`` để xác định xem có cần khởi tạo tùy chỉnh hay không. Nếu có, cơ chế được mô tả trong
+:ref:`logging-config-dict-userdef` bên dưới được dùng để tạo một instance; nếu không, context sẽ được dùng để xác định cần khởi tạo đối tượng nào.
 
 .. _logging-config-dictschema-formatters:
 
-* *formatters* - the corresponding value will be a dict in which each
-  key is a formatter id and each value is a dict describing how to
-  configure the corresponding :class:`~logging.Formatter` instance.
+* *formatters* - giá trị tương ứng sẽ là một dict, trong đó mỗi khóa là một formatter id và mỗi giá trị là một dict mô tả cách cấu hình instance :class:`~logging.Formatter` tương ứng.
 
-  The configuring dict is searched for the following optional keys
-  which correspond to the arguments passed to create a
+  Dict cấu hình sẽ được tìm kiếm các khóa tùy chọn sau đây, tương ứng với các đối số được truyền vào để tạo một
   :class:`~logging.Formatter` object:
 
   * ``format``
   * ``datefmt``
   * ``style``
-  * ``validate`` (since version >=3.8)
-  * ``defaults`` (since version >=3.12)
+  * ``validate`` (kể từ phiên bản >=3.8)
+  * ``defaults`` (kể từ phiên bản >=3.12)
 
-  An optional ``class`` key indicates the name of the formatter's
-  class (as a dotted module and class name).  The instantiation
-  arguments are as for :class:`~logging.Formatter`, thus this key is
-  most useful for instantiating a customised subclass of
-  :class:`~logging.Formatter`.  For example, the alternative class
-  might present exception tracebacks in an expanded or condensed
-  format.  If your formatter requires different or extra configuration
-  keys, you should use :ref:`logging-config-dict-userdef`.
+  Khóa ``class`` tùy chọn cho biết tên class của formatter (dưới dạng tên module và class phân tách bằng dấu chấm). Các đối số khởi tạo giống như đối với :class:`~logging.Formatter`, vì vậy khóa này hữu ích nhất khi khởi tạo một subclass đã tùy chỉnh của
+  :class:`~logging.Formatter`. Ví dụ: class thay thế có thể trình bày traceback của exception ở dạng mở rộng hoặc rút gọn. Nếu formatter của bạn yêu cầu các khóa cấu hình khác hoặc bổ sung, bạn nên sử dụng :ref:`logging-config-dict-userdef`.
 
-* *filters* - the corresponding value will be a dict in which each key
-  is a filter id and each value is a dict describing how to configure
-  the corresponding Filter instance.
+* *filters* - giá trị tương ứng sẽ là một dict, trong đó mỗi khóa là một filter id và mỗi giá trị là một dict mô tả cách cấu hình instance Filter tương ứng.
 
-  The configuring dict is searched for the key ``name`` (defaulting to the
-  empty string) and this is used to construct a :class:`logging.Filter`
-  instance.
+  Dict cấu hình được tìm kiếm khóa ``name`` (mặc định là chuỗi rỗng), và khóa này được dùng để tạo một instance :class:`logging.Filter`.
 
-* *handlers* - the corresponding value will be a dict in which each
-  key is a handler id and each value is a dict describing how to
-  configure the corresponding Handler instance.
+* *handlers* - giá trị tương ứng sẽ là một dict, trong đó mỗi khóa là một ID của handler và mỗi giá trị là một dict mô tả cách cấu hình Handler tương ứng.
 
-  The configuring dict is searched for the following keys:
+  Dict cấu hình được tìm kiếm theo các khóa sau:
 
-  * ``class`` (mandatory).  This is the fully qualified name of the
-    handler class.
+  * ``class`` (bắt buộc). Đây là tên đầy đủ của lớp handler.
 
-  * ``level`` (optional).  The level of the handler.
+  * ``level`` (tùy chọn). Mức của handler.
 
-  * ``formatter`` (optional).  The id of the formatter for this
-    handler.
+  * ``formatter`` (tùy chọn). ID của formatter cho handler này.
 
-  * ``filters`` (optional).  A list of ids of the filters for this
-    handler.
+  * ``filters`` (tùy chọn). Danh sách ID của các filter cho handler này.
 
     .. versionchanged:: 3.11
-       ``filters`` can take filter instances in addition to ids.
+       ``filters`` có thể nhận các instance của filter ngoài các ID.
 
-  All *other* keys are passed through as keyword arguments to the
-  handler's constructor.  For example, given the snippet:
+  Tất cả các khóa *khác* được truyền dưới dạng đối số từ khóa tới hàm khởi tạo của handler. Ví dụ, với đoạn mã:
 
   .. code-block:: yaml
 
@@ -319,162 +196,92 @@ otherwise, the context is used to determine what to instantiate.
           maxBytes: 1024
           backupCount: 3
 
-  the handler with id ``console`` is instantiated as a
-  :class:`logging.StreamHandler`, using ``sys.stdout`` as the underlying
-  stream.  The handler with id ``file`` is instantiated as a
-  :class:`logging.handlers.RotatingFileHandler` with the keyword arguments
-  ``filename='logconfig.log', maxBytes=1024, backupCount=3``.
+  handler có id ``console`` được khởi tạo dưới dạng
+  :class:`logging.StreamHandler`, sử dụng ``sys.stdout`` làm stream nền. Handler có id ``file`` được khởi tạo dưới dạng
+  :class:`logging.handlers.RotatingFileHandler` với các đối số từ khóa ``filename='logconfig.log', maxBytes=1024, backupCount=3``.
 
-* *loggers* - the corresponding value will be a dict in which each key
-  is a logger name and each value is a dict describing how to
-  configure the corresponding Logger instance.
+* *loggers* - giá trị tương ứng sẽ là một dict, trong đó mỗi khóa là tên logger và mỗi giá trị là một dict mô tả cách cấu hình thực thể Logger tương ứng.
 
-  The configuring dict is searched for the following keys:
+  Dict cấu hình được tìm kiếm theo các khóa sau:
 
-  * ``level`` (optional).  The level of the logger.
+  * ``level`` (tùy chọn). Cấp độ của logger.
 
-  * ``propagate`` (optional).  The propagation setting of the logger.
+  * ``propagate`` (tùy chọn).  Cài đặt lan truyền của logger.
 
-  * ``filters`` (optional).  A list of ids of the filters for this
-    logger.
+  * ``filters`` (tùy chọn).  Danh sách ID của các filter cho logger này.
 
     .. versionchanged:: 3.11
-       ``filters`` can take filter instances in addition to ids.
+       ``filters`` có thể nhận các instance của filter ngoài các ID.
 
-  * ``handlers`` (optional).  A list of ids of the handlers for this
-    logger.
+  * ``handlers`` (tùy chọn).  Danh sách ID của các handler cho logger này.
 
-  The specified loggers will be configured according to the level,
-  propagation, filters and handlers specified.
+  Các logger được chỉ định sẽ được cấu hình theo level, propagation, filter và handler được chỉ định.
 
-* *root* - this will be the configuration for the root logger.
-  Processing of the configuration will be as for any logger, except
-  that the ``propagate`` setting will not be applicable.
+* *root* - đây sẽ là cấu hình cho root logger. Việc xử lý cấu hình sẽ giống như đối với mọi logger, ngoại trừ việc cài đặt ``propagate`` sẽ không được áp dụng.
 
-* *incremental* - whether the configuration is to be interpreted as
-  incremental to the existing configuration.  This value defaults to
-  ``False``, which means that the specified configuration replaces the
-  existing configuration with the same semantics as used by the
-  existing :func:`fileConfig` API.
+* *incremental* - cho biết cấu hình có được diễn giải là phần gia tăng so với cấu hình hiện có hay không.  Giá trị này mặc định là ``False``, nghĩa là cấu hình được chỉ định sẽ thay thế cấu hình hiện có với cùng ngữ nghĩa như API :func:`fileConfig` hiện có.
 
-  If the specified value is ``True``, the configuration is processed
-  as described in the section on :ref:`logging-config-dict-incremental`.
+  Nếu giá trị được chỉ định là ``True``, cấu hình sẽ được xử lý như mô tả trong phần về :ref:`logging-config-dict-incremental`.
 
-* *disable_existing_loggers* - whether any existing non-root loggers are
-  to be disabled. This setting mirrors the parameter of the same name in
-  :func:`fileConfig`. If absent, this parameter defaults to ``True``.
-  This value is ignored if *incremental* is ``True``.
+* *disable_existing_loggers* - cho biết có vô hiệu hóa mọi logger hiện có không phải root hay không. Thiết lập này phản ánh tham số cùng tên trong
+  :func:`fileConfig`. Nếu không có, tham số này mặc định là ``True``. Giá trị này bị bỏ qua nếu *incremental* là ``True``.
 
 .. _logging-config-dict-incremental:
 
-Incremental Configuration
-"""""""""""""""""""""""""
+Cấu hình gia tăng
+"""""""""""""""""
 
-It is difficult to provide complete flexibility for incremental
-configuration.  For example, because objects such as filters
-and formatters are anonymous, once a configuration is set up, it is
-not possible to refer to such anonymous objects when augmenting a
-configuration.
+Rất khó cung cấp đầy đủ tính linh hoạt cho cấu hình gia tăng. Ví dụ, vì các đối tượng như filter và formatter là các đối tượng vô danh, sau khi cấu hình được thiết lập, không thể tham chiếu đến những đối tượng vô danh đó khi bổ sung cho cấu hình.
 
-Furthermore, there is not a compelling case for arbitrarily altering
-the object graph of loggers, handlers, filters, formatters at
-run-time, once a configuration is set up; the verbosity of loggers and
-handlers can be controlled just by setting levels (and, in the case of
-loggers, propagation flags).  Changing the object graph arbitrarily in
-a safe way is problematic in a multi-threaded environment; while not
-impossible, the benefits are not worth the complexity it adds to the
-implementation.
+Hơn nữa, sau khi cấu hình được thiết lập, không có lý do thuyết phục để tùy ý thay đổi object graph của logger, handler, filter và formatter trong runtime; có thể kiểm soát mức độ chi tiết của logger và handler chỉ bằng cách thiết lập level (và với logger là các cờ propagation). Việc tùy ý thay đổi object graph theo cách an toàn là một vấn đề phức tạp trong môi trường đa luồng; dù không phải là bất khả thi, lợi ích đạt được không tương xứng với độ phức tạp mà việc này thêm vào phần triển khai.
 
-Thus, when the ``incremental`` key of a configuration dict is present
-and is ``True``, the system will completely ignore any ``formatters`` and
-``filters`` entries, and process only the ``level``
-settings in the ``handlers`` entries, and the ``level`` and
-``propagate`` settings in the ``loggers`` and ``root`` entries.
+Do đó, khi khóa ``incremental`` của một configuration dict hiện diện và có giá trị ``True``, hệ thống sẽ hoàn toàn bỏ qua mọi mục ``formatters`` và ``filters``, chỉ xử lý các thiết lập ``level`` trong các mục ``handlers``, cùng các thiết lập ``level`` và ``propagate`` trong các mục ``loggers`` và ``root``.
 
-Using a value in the configuration dict lets configurations to be sent
-over the wire as pickled dicts to a socket listener. Thus, the logging
-verbosity of a long-running application can be altered over time with
-no need to stop and restart the application.
+Việc sử dụng một giá trị trong configuration dict cho phép gửi các configuration dưới dạng dict đã được pickle qua mạng đến một socket listener. Nhờ đó, mức độ chi tiết của logging trong một ứng dụng chạy lâu dài có thể được thay đổi theo thời gian mà không cần dừng và khởi động lại ứng dụng.
 
 .. _logging-config-dict-connections:
 
-Object connections
-""""""""""""""""""
+Kết nối giữa các đối tượng
+""""""""""""""""""""""""""
 
-The schema describes a set of logging objects - loggers,
-handlers, formatters, filters - which are connected to each other in
-an object graph.  Thus, the schema needs to represent connections
-between the objects.  For example, say that, once configured, a
-particular logger has attached to it a particular handler.  For the
-purposes of this discussion, we can say that the logger represents the
-source, and the handler the destination, of a connection between the
-two.  Of course in the configured objects this is represented by the
-logger holding a reference to the handler.  In the configuration dict,
-this is done by giving each destination object an id which identifies
-it unambiguously, and then using the id in the source object's
-configuration to indicate that a connection exists between the source
-and the destination object with that id.
+Schema mô tả một tập hợp các đối tượng logging - logger, handler, formatter, filter - được kết nối với nhau trong một object graph. Vì vậy, schema cần biểu diễn các kết nối giữa những đối tượng này. Ví dụ, giả sử sau khi được cấu hình, một logger cụ thể được gắn với một handler cụ thể. Trong phạm vi thảo luận này, ta có thể nói logger là nguồn, còn handler là đích của kết nối giữa hai đối tượng. Tất nhiên, trong các đối tượng đã được cấu hình, điều này được biểu diễn bằng việc logger giữ một tham chiếu đến handler. Trong configuration dict, việc này được thực hiện bằng cách cấp cho mỗi đối tượng đích một id để nhận diện đối tượng đó một cách rõ ràng, sau đó sử dụng id này trong cấu hình của đối tượng nguồn để cho biết tồn tại một kết nối giữa đối tượng nguồn và đối tượng đích có id đó.
 
-So, for example, consider the following YAML snippet:
+Ví dụ, hãy xem đoạn YAML sau:
 
 .. code-block:: yaml
 
     formatters:
       brief:
-        # configuration for formatter with id 'brief' goes here
+        # đặt cấu hình cho formatter có id 'brief' tại đây
       precise:
-        # configuration for formatter with id 'precise' goes here
+        # đặt cấu hình cho formatter có id 'precise' tại đây
     handlers:
-      h1: #This is an id
-       # configuration of handler with id 'h1' goes here
+      h1: #Đây là một id
+       # đặt cấu hình của handler có id 'h1' tại đây
        formatter: brief
-      h2: #This is another id
-       # configuration of handler with id 'h2' goes here
+      h2: #Đây là một id khác
+       # đặt cấu hình của handler có id 'h2' tại đây
        formatter: precise
     loggers:
       foo.bar.baz:
-        # other configuration for logger 'foo.bar.baz'
+        # cấu hình khác cho logger 'foo.bar.baz'
         handlers: [h1, h2]
 
-(Note: YAML used here because it's a little more readable than the
-equivalent Python source form for the dictionary.)
+(Lưu ý: YAML được sử dụng ở đây vì dễ đọc hơn một chút so với dạng mã nguồn Python tương đương của dictionary.)
 
-The ids for loggers are the logger names which would be used
-programmatically to obtain a reference to those loggers, e.g.
-``foo.bar.baz``.  The ids for Formatters and Filters can be any string
-value (such as ``brief``, ``precise`` above) and they are transient,
-in that they are only meaningful for processing the configuration
-dictionary and used to determine connections between objects, and are
-not persisted anywhere when the configuration call is complete.
+Các id của logger là tên logger được dùng theo lập trình để lấy tham chiếu đến các logger đó, chẳng hạn như ``foo.bar.baz``. Các id của Formatter và Filter có thể là bất kỳ giá trị chuỗi nào (chẳng hạn như ``brief``, ``precise`` ở trên), và chúng là các giá trị tạm thời, nghĩa là chúng chỉ có ý nghĩa khi xử lý dictionary cấu hình và được dùng để xác định các kết nối giữa các đối tượng; chúng không được lưu ở bất kỳ đâu khi lệnh gọi cấu hình hoàn tất.
 
-The above snippet indicates that logger named ``foo.bar.baz`` should
-have two handlers attached to it, which are described by the handler
-ids ``h1`` and ``h2``. The formatter for ``h1`` is that described by id
-``brief``, and the formatter for ``h2`` is that described by id
-``precise``.
+Đoạn mã trên cho biết logger có tên ``foo.bar.baz`` sẽ có hai handler được gắn vào, được mô tả bằng các id handler ``h1`` và ``h2``. Formatter cho ``h1`` là formatter được mô tả bằng id ``brief``, còn formatter cho ``h2`` là formatter được mô tả bằng id ``precise``.
 
 
 .. _logging-config-dict-userdef:
 
-User-defined objects
-""""""""""""""""""""
+Các đối tượng do người dùng định nghĩa
+""""""""""""""""""""""""""""""""""""""
 
-The schema supports user-defined objects for handlers, filters and
-formatters.  (Loggers do not need to have different types for
-different instances, so there is no support in this configuration
-schema for user-defined logger classes.)
+Schema hỗ trợ các đối tượng do người dùng định nghĩa cho handlers, filters và formatters. (Logger không cần có các kiểu khác nhau cho những instance khác nhau, vì vậy schema cấu hình này không hỗ trợ các lớp logger do người dùng định nghĩa.)
 
-Objects to be configured are described by dictionaries
-which detail their configuration.  In some places, the logging system
-will be able to infer from the context how an object is to be
-instantiated, but when a user-defined object is to be instantiated,
-the system will not know how to do this.  In order to provide complete
-flexibility for user-defined object instantiation, the user needs
-to provide a 'factory' - a callable which is called with a
-configuration dictionary and which returns the instantiated object.
-This is signalled by an absolute import path to the factory being
-made available under the special key ``'()'``.  Here's a concrete
-example:
+Các đối tượng cần cấu hình được mô tả bằng các dictionary nêu chi tiết cấu hình của chúng. Ở một số nơi, hệ thống logging có thể suy ra từ context cách khởi tạo một đối tượng, nhưng khi cần khởi tạo một đối tượng do người dùng định nghĩa, hệ thống sẽ không biết phải làm thế nào. Để cung cấp đầy đủ tính linh hoạt cho việc khởi tạo đối tượng do người dùng định nghĩa, người dùng cần cung cấp một 'factory' - một callable được gọi với một dictionary cấu hình và trả về đối tượng đã khởi tạo. Điều này được chỉ báo bằng một absolute import path tới factory được cung cấp dưới key đặc biệt ``'()'``. Sau đây là một ví dụ cụ thể:
 
 .. code-block:: yaml
 
@@ -490,30 +297,20 @@ example:
           spam: 99.9
           answer: 42
 
-The above YAML snippet defines three formatters.  The first, with id
-``brief``, is a standard :class:`logging.Formatter` instance with the
-specified format string.  The second, with id ``default``, has a
-longer format and also defines the time format explicitly, and will
-result in a :class:`logging.Formatter` initialized with those two format
-strings.  Shown in Python source form, the ``brief`` and ``default``
-formatters have configuration sub-dictionaries::
+Đoạn YAML ở trên định nghĩa ba formatter. Formatter đầu tiên, có id ``brief``, là một instance :class:`logging.Formatter` tiêu chuẩn với format string được chỉ định. Formatter thứ hai, có id ``default``, có format dài hơn và cũng định nghĩa rõ ràng time format, đồng thời sẽ tạo ra một :class:`logging.Formatter` được khởi tạo với hai format string đó. Ở dạng mã nguồn Python, các formatter ``brief`` và ``default`` có các sub-dictionary cấu hình::
 
     {
       'format' : '%(message)s'
     }
 
-and::
+và::
 
     {
       'format' : '%(asctime)s %(levelname)-8s %(name)-15s %(message)s',
       'datefmt' : '%Y-%m-%d %H:%M:%S'
     }
 
-respectively, and as these dictionaries do not contain the special key
-``'()'``, the instantiation is inferred from the context: as a result,
-standard :class:`logging.Formatter` instances are created.  The
-configuration sub-dictionary for the third formatter, with id
-``custom``, is::
+tương ứng, và vì các dictionary này không chứa key đặc biệt ``'()'``, việc khởi tạo được suy ra từ context: do đó, các instance :class:`logging.Formatter` tiêu chuẩn được tạo. Sub-dictionary cấu hình của formatter thứ ba, có id ``custom``, là::
 
   {
     '()' : 'my.package.customFormatterFactory',
@@ -522,36 +319,18 @@ configuration sub-dictionary for the third formatter, with id
     'answer' : 42
   }
 
-and this contains the special key ``'()'``, which means that
-user-defined instantiation is wanted.  In this case, the specified
-factory callable will be used. If it is an actual callable it will be
-used directly - otherwise, if you specify a string (as in the example)
-the actual callable will be located using normal import mechanisms.
-The callable will be called with the **remaining** items in the
-configuration sub-dictionary as keyword arguments.  In the above
-example, the formatter with id ``custom`` will be assumed to be
-returned by the call::
+và sub-dictionary này chứa key đặc biệt ``'()'``, nghĩa là cần khởi tạo do người dùng định nghĩa. Trong trường hợp này, callable factory được chỉ định sẽ được sử dụng. Nếu đó là một callable thực sự, nó sẽ được sử dụng trực tiếp - nếu không, khi bạn chỉ định một string (như trong ví dụ), callable thực sự sẽ được tìm thấy bằng các cơ chế import thông thường. Callable sẽ được gọi với các item **remaining** trong sub-dictionary cấu hình dưới dạng các keyword argument. Trong ví dụ trên, formatter có id ``custom`` sẽ được giả định là giá trị trả về của lời gọi đó::
 
     my.package.customFormatterFactory(bar='baz', spam=99.9, answer=42)
 
-.. warning:: The values for keys such as ``bar``, ``spam`` and ``answer`` in
-   the above example should not be configuration dictionaries or references such
-   as ``cfg://foo`` or ``ext://bar``, because they will not be processed by the
-   configuration machinery, but passed to the callable as-is.
+.. warning:: Các giá trị của những khóa như ``bar``, ``spam`` và ``answer`` trong ví dụ trên không được là các từ điển cấu hình hoặc các tham chiếu như ``cfg://foo`` hay ``ext://bar``, vì chúng sẽ không được cơ chế cấu hình xử lý mà được truyền nguyên trạng cho callable.
 
-The key ``'()'`` has been used as the special key because it is not a
-valid keyword parameter name, and so will not clash with the names of
-the keyword arguments used in the call.  The ``'()'`` also serves as a
-mnemonic that the corresponding value is a callable.
+Khóa ``'()'`` được dùng làm khóa đặc biệt vì đây không phải là tên tham số keyword hợp lệ, nên sẽ không xung đột với tên của các đối số keyword được sử dụng trong lời gọi. ``'()'`` cũng là một gợi nhớ rằng giá trị tương ứng là một callable.
 
 .. versionchanged:: 3.11
-   The ``filters`` member of ``handlers`` and ``loggers`` can take
-   filter instances in addition to ids.
+   Thành viên ``filters`` của ``handlers`` và ``loggers`` có thể nhận các instance của filter ngoài các id.
 
-You can also specify a special key ``'.'`` whose value is a
-mapping of attribute names to values. If found, the specified attributes will
-be set on the user-defined object before it is returned. Thus, with the
-following configuration::
+Bạn cũng có thể chỉ định một khóa đặc biệt ``'.'`` có giá trị là một mapping từ tên thuộc tính đến các giá trị. Nếu tìm thấy, các thuộc tính được chỉ định sẽ được thiết lập trên đối tượng do người dùng định nghĩa trước khi đối tượng này được trả về. Vì vậy, với cấu hình sau đây::
 
     {
       '()' : 'my.package.customFormatterFactory',
@@ -564,105 +343,51 @@ following configuration::
       }
     }
 
-the returned formatter will have attribute ``foo`` set to ``'bar'`` and
-attribute ``baz`` set to ``'bozz'``.
+formatter được trả về sẽ có thuộc tính ``foo`` được thiết lập thành ``'bar'`` và thuộc tính ``baz`` được thiết lập thành ``'bozz'``.
 
-.. warning:: The values for attributes such as ``foo`` and ``baz`` in
-   the above example should not be configuration dictionaries or references such
-   as ``cfg://foo`` or ``ext://bar``, because they will not be processed by the
-   configuration machinery, but set as attribute values as-is.
+.. warning:: Các giá trị của những thuộc tính như ``foo`` và ``baz`` trong ví dụ trên không được là các từ điển cấu hình hoặc các tham chiếu như ``cfg://foo`` hay ``ext://bar``, vì chúng sẽ không được cơ chế cấu hình xử lý mà được thiết lập nguyên trạng làm các giá trị thuộc tính.
 
 
 .. _handler-config-dict-order:
 
-Handler configuration order
-"""""""""""""""""""""""""""
+Thứ tự cấu hình handler
+"""""""""""""""""""""""
 
-Handlers are configured in alphabetical order of their keys, and a configured
-handler replaces the configuration dictionary in (a working copy of) the
-``handlers`` dictionary in the schema. If you use a construct such as
-``cfg://handlers.foo``, then initially ``handlers['foo']`` points to the
-configuration dictionary for the handler named ``foo``, and later (once that
-handler has been configured) it points to the configured handler instance.
-Thus, ``cfg://handlers.foo`` could resolve to either a dictionary or a handler
-instance. In general, it is wise to name handlers in a way such that dependent
-handlers are configured *after* any handlers they depend on; that allows
-something like ``cfg://handlers.foo`` to be used in configuring a handler that
-depends on handler ``foo``. If that dependent handler were named ``bar``,
-problems would result, because the configuration of ``bar`` would be attempted
-before that of ``foo``, and ``foo`` would not yet have been configured.
-However, if the dependent handler were named ``foobar``, it would be configured
-after ``foo``, with the result that ``cfg://handlers.foo`` would resolve to
-configured handler ``foo``, and not its configuration dictionary.
+Các handler được cấu hình theo thứ tự bảng chữ cái của khóa, và một handler đã được cấu hình sẽ thay thế từ điển cấu hình trong (một bản sao đang hoạt động của) từ điển ``handlers`` trong schema. Nếu bạn sử dụng một cấu trúc như ``cfg://handlers.foo``, thì ban đầu ``handlers['foo']`` trỏ đến từ điển cấu hình của handler có tên ``foo``, và sau đó (khi handler đó đã được cấu hình) nó trỏ đến instance handler đã được cấu hình. Do đó, ``cfg://handlers.foo`` có thể phân giải thành một từ điển hoặc một instance handler. Nhìn chung, nên đặt tên các handler sao cho các handler phụ thuộc được cấu hình *after* mọi handler mà chúng phụ thuộc vào; điều đó cho phép sử dụng một cấu trúc như ``cfg://handlers.foo`` khi cấu hình một handler phụ thuộc vào handler ``foo``. Nếu handler phụ thuộc đó được đặt tên là ``bar``, sẽ phát sinh vấn đề, vì việc cấu hình ``bar`` sẽ được thực hiện trước ``foo``, và ``foo`` vẫn chưa được cấu hình. Tuy nhiên, nếu handler phụ thuộc được đặt tên là ``foobar``, nó sẽ được cấu hình sau ``foo``, nhờ đó ``cfg://handlers.foo`` sẽ phân giải thành handler đã được cấu hình ``foo``, chứ không phải từ điển cấu hình của nó.
 
 
 .. _logging-config-dict-externalobj:
 
-Access to external objects
-""""""""""""""""""""""""""
+Truy cập các đối tượng bên ngoài
+""""""""""""""""""""""""""""""""
 
-There are times where a configuration needs to refer to objects
-external to the configuration, for example ``sys.stderr``.  If the
-configuration dict is constructed using Python code, this is
-straightforward, but a problem arises when the configuration is
-provided via a text file (e.g. JSON, YAML).  In a text file, there is
-no standard way to distinguish ``sys.stderr`` from the literal string
-``'sys.stderr'``.  To facilitate this distinction, the configuration
-system looks for certain special prefixes in string values and
-treat them specially.  For example, if the literal string
-``'ext://sys.stderr'`` is provided as a value in the configuration,
-then the ``ext://`` will be stripped off and the remainder of the
-value processed using normal import mechanisms.
+Đôi khi cấu hình cần tham chiếu đến các đối tượng bên ngoài cấu hình, chẳng hạn như ``sys.stderr``. Nếu từ điển cấu hình được tạo bằng mã Python thì việc này rất đơn giản, nhưng vấn đề phát sinh khi cấu hình được cung cấp qua một tệp văn bản (ví dụ: JSON, YAML). Trong tệp văn bản, không có cách tiêu chuẩn nào để phân biệt ``sys.stderr`` với chuỗi ký tự ``'sys.stderr'``. Để hỗ trợ việc phân biệt này, hệ thống cấu hình tìm kiếm một số tiền tố đặc biệt trong các giá trị chuỗi và xử lý chúng theo cách đặc biệt. Ví dụ, nếu chuỗi ký tự ``'ext://sys.stderr'`` được cung cấp làm một giá trị trong cấu hình, thì ``ext://`` sẽ bị loại bỏ và phần giá trị còn lại được xử lý bằng các cơ chế import thông thường.
 
-The handling of such prefixes is done in a way analogous to protocol
-handling: there is a generic mechanism to look for prefixes which
-match the regular expression ``^(?P<prefix>[a-z]+)://(?P<suffix>.*)$``
-whereby, if the ``prefix`` is recognised, the ``suffix`` is processed
-in a prefix-dependent manner and the result of the processing replaces
-the string value.  If the prefix is not recognised, then the string
-value will be left as-is.
+Việc xử lý các tiền tố như vậy được thực hiện tương tự như việc xử lý protocol: có một cơ chế chung để tìm các tiền tố khớp với biểu thức chính quy ``^(?P<prefix>[a-z]+)://(?P<suffix>.*)$``; theo đó, nếu ``prefix`` được nhận diện, thì ``suffix`` được xử lý theo cách phụ thuộc vào tiền tố và kết quả xử lý sẽ thay thế giá trị chuỗi. Nếu tiền tố không được nhận diện, giá trị chuỗi sẽ được giữ nguyên.
 
 
 .. _logging-config-dict-internalobj:
 
-Access to internal objects
-""""""""""""""""""""""""""
+Truy cập các đối tượng bên trong
+""""""""""""""""""""""""""""""""
 
-As well as external objects, there is sometimes also a need to refer
-to objects in the configuration.  This will be done implicitly by the
-configuration system for things that it knows about.  For example, the
-string value ``'DEBUG'`` for a ``level`` in a logger or handler will
-automatically be converted to the value ``logging.DEBUG``, and the
-``handlers``, ``filters`` and ``formatter`` entries will take an
-object id and resolve to the appropriate destination object.
+Bên cạnh các đối tượng bên ngoài, đôi khi cũng cần tham chiếu đến các đối tượng trong cấu hình. Hệ thống cấu hình sẽ tự động thực hiện việc này đối với những đối tượng mà nó biết. Ví dụ, giá trị chuỗi ``'DEBUG'`` của một ``level`` trong logger hoặc handler sẽ tự động được chuyển đổi thành giá trị ``logging.DEBUG``, còn các mục ``handlers``, ``filters`` và ``formatter`` sẽ nhận một object id và phân giải thành đối tượng đích tương ứng.
 
-However, a more generic mechanism is needed for user-defined
-objects which are not known to the :mod:`logging` module.  For
-example, consider :class:`logging.handlers.MemoryHandler`, which takes
-a ``target`` argument which is another handler to delegate to. Since
-the system already knows about this class, then in the configuration,
-the given ``target`` just needs to be the object id of the relevant
-target handler, and the system will resolve to the handler from the
-id.  If, however, a user defines a ``my.package.MyHandler`` which has
-an ``alternate`` handler, the configuration system would not know that
-the ``alternate`` referred to a handler.  To cater for this, a generic
-resolution system allows the user to specify:
+Tuy nhiên, cần có một cơ chế tổng quát hơn cho các đối tượng do người dùng định nghĩa mà module :mod:`logging` không biết. Ví dụ, hãy xem xét :class:`logging.handlers.MemoryHandler`, nhận một đối số ``target`` là một handler khác để ủy quyền xử lý. Vì hệ thống đã biết lớp này, nên trong cấu hình, ``target`` được cung cấp chỉ cần là object id của handler đích tương ứng, và hệ thống sẽ phân giải thành handler từ
+id.  Tuy nhiên, nếu người dùng định nghĩa một ``my.package.MyHandler`` có
+handler ``alternate``, hệ thống cấu hình sẽ không biết rằng ``alternate`` tham chiếu đến một handler. Để đáp ứng trường hợp này, một hệ thống phân giải tổng quát cho phép người dùng chỉ định:
 
 .. code-block:: yaml
 
     handlers:
       file:
-        # configuration of file handler goes here
+        # cấu hình của file handler đặt tại đây
 
       custom:
         (): my.package.MyHandler
         alternate: cfg://handlers.file
 
-The literal string ``'cfg://handlers.file'`` will be resolved in an
-analogous way to strings with the ``ext://`` prefix, but looking
-in the configuration itself rather than the import namespace.  The
-mechanism allows access by dot or by index, in a similar way to
-that provided by ``str.format``.  Thus, given the following snippet:
+Chuỗi ký tự nguyên văn ``'cfg://handlers.file'`` sẽ được phân giải tương tự như các chuỗi có tiền tố ``ext://``, nhưng sẽ tìm trong chính cấu hình thay vì namespace import. Cơ chế này cho phép truy cập bằng dấu chấm hoặc chỉ mục, tương tự như cơ chế do ``str.format`` cung cấp. Vì vậy, với đoạn mã sau:
 
 .. code-block:: yaml
 
@@ -676,66 +401,34 @@ that provided by ``str.format``.  Thus, given the following snippet:
           - dev_team@domain.tld
         subject: Houston, we have a problem.
 
-in the configuration, the string ``'cfg://handlers'`` would resolve to
-the dict with key ``handlers``, the string ``'cfg://handlers.email``
-would resolve to the dict with key ``email`` in the ``handlers`` dict,
-and so on.  The string ``'cfg://handlers.email.toaddrs[1]`` would
-resolve to ``'dev_team@domain.tld'`` and the string
-``'cfg://handlers.email.toaddrs[0]'`` would resolve to the value
-``'support_team@domain.tld'``. The ``subject`` value could be accessed
-using either ``'cfg://handlers.email.subject'`` or, equivalently,
-``'cfg://handlers.email[subject]'``.  The latter form only needs to be
-used if the key contains spaces or non-alphanumeric characters. Please note
-that the characters ``[`` and ``]`` are not allowed in the keys. If an
-index value consists only of decimal digits, access will be attempted
-using the corresponding integer value, falling back to the string
-value if needed.
+trong cấu hình, chuỗi ``'cfg://handlers'`` sẽ được phân giải thành dict có khóa ``handlers``, chuỗi ``'cfg://handlers.email`` sẽ được phân giải thành dict có khóa ``email`` trong dict ``handlers``, và tương tự. Chuỗi ``'cfg://handlers.email.toaddrs[1]`` sẽ được phân giải thành ``'dev_team@domain.tld'`` và chuỗi ``'cfg://handlers.email.toaddrs[0]'`` sẽ được phân giải thành giá trị ``'support_team@domain.tld'``. Có thể truy cập giá trị ``subject`` bằng ``'cfg://handlers.email.subject'`` hoặc tương đương là ``'cfg://handlers.email[subject]'``. Chỉ cần sử dụng dạng sau nếu khóa chứa khoảng trắng hoặc các ký tự không phải chữ và số. Lưu ý rằng các ký tự ``[`` và ``]`` không được phép xuất hiện trong khóa. Nếu một giá trị chỉ mục chỉ gồm các chữ số thập phân, hệ thống sẽ thử truy cập bằng giá trị số nguyên tương ứng, sau đó chuyển sang giá trị chuỗi nếu cần.
 
-Given a string ``cfg://handlers.myhandler.mykey.123``, this will
-resolve to ``config_dict['handlers']['myhandler']['mykey']['123']``.
-If the string is specified as ``cfg://handlers.myhandler.mykey[123]``,
-the system will attempt to retrieve the value from
-``config_dict['handlers']['myhandler']['mykey'][123]``, and fall back
-to ``config_dict['handlers']['myhandler']['mykey']['123']`` if that
-fails.
+Với chuỗi ``cfg://handlers.myhandler.mykey.123``, chuỗi này sẽ được phân giải thành ``config_dict['handlers']['myhandler']['mykey']['123']``. Nếu chuỗi được chỉ định là ``cfg://handlers.myhandler.mykey[123]``, hệ thống sẽ cố lấy giá trị từ ``config_dict['handlers']['myhandler']['mykey'][123]``, và chuyển sang ``config_dict['handlers']['myhandler']['mykey']['123']`` nếu không thành công.
 
 
 .. _logging-import-resolution:
 
-Import resolution and custom importers
-""""""""""""""""""""""""""""""""""""""
+Phân giải import và các importer tùy chỉnh
+""""""""""""""""""""""""""""""""""""""""""
 
-Import resolution, by default, uses the builtin :func:`__import__` function
-to do its importing. You may want to replace this with your own importing
-mechanism: if so, you can replace the :attr:`importer` attribute of the
-:class:`DictConfigurator` or its superclass, the
-:class:`BaseConfigurator` class. However, you need to be
-careful because of the way functions are accessed from classes via
-descriptors. If you are using a Python callable to do your imports, and you
-want to define it at class level rather than instance level, you need to wrap
-it with :func:`staticmethod`. For example::
+Theo mặc định, việc phân giải import sử dụng hàm dựng sẵn :func:`__import__` để thực hiện import. Bạn có thể muốn thay thế hàm này bằng cơ chế import của riêng mình; nếu vậy, bạn có thể thay thế thuộc tính :attr:`importer` của
+:class:`DictConfigurator` hoặc lớp cha của nó, lớp
+:class:`BaseConfigurator` hoặc lớp cha của nó là lớp :class:`BaseConfigurator`. Tuy nhiên, bạn cần cẩn thận vì cách các hàm được truy cập từ lớp thông qua descriptor. Nếu bạn sử dụng một đối tượng callable Python để thực hiện import và muốn định nghĩa nó ở cấp lớp thay vì cấp instance, bạn cần bọc nó bằng :func:`staticmethod`. Ví dụ::
 
    from importlib import import_module
    from logging.config import BaseConfigurator
 
    BaseConfigurator.importer = staticmethod(import_module)
 
-You don't need to wrap with :func:`staticmethod` if you're setting the import
-callable on a configurator *instance*.
+Bạn không cần bọc bằng :func:`staticmethod` nếu đặt callable import trên một *instance* của configurator.
 
 .. _configure-queue:
 
-Configuring QueueHandler and QueueListener
-""""""""""""""""""""""""""""""""""""""""""
+Cấu hình QueueHandler và QueueListener
+""""""""""""""""""""""""""""""""""""""
 
-If you want to configure a :class:`~logging.handlers.QueueHandler`, noting that this
-is normally used in conjunction with a :class:`~logging.handlers.QueueListener`, you
-can configure both together. After the configuration, the ``QueueListener`` instance
-will be available as the :attr:`~logging.handlers.QueueHandler.listener` attribute of
-the created handler, and that in turn will be available to you using
-:func:`~logging.getHandlerByName` and passing the name you have used for the
-``QueueHandler`` in your configuration. The dictionary schema for configuring the pair
-is shown in the example YAML snippet below.
+Nếu bạn muốn cấu hình một :class:`~logging.handlers.QueueHandler`, lưu ý rằng thành phần này thường được sử dụng cùng với một :class:`~logging.handlers.QueueListener`, bạn có thể cấu hình cả hai cùng lúc. Sau khi cấu hình, instance ``QueueListener`` sẽ có sẵn dưới dạng thuộc tính :attr:`~logging.handlers.QueueHandler.listener` của handler được tạo, và đến lượt nó sẽ có sẵn cho bạn bằng cách sử dụng
+:func:`~logging.getHandlerByName` và truyền vào tên bạn đã sử dụng cho ``QueueHandler`` trong cấu hình. Lược đồ dictionary để cấu hình cặp này được trình bày trong đoạn YAML ví dụ bên dưới.
 
 .. code-block:: yaml
 
@@ -749,86 +442,54 @@ is shown in the example YAML snippet below.
           - hand_name_2
           ...
 
-The ``queue`` and ``listener`` keys are optional.
+Các khóa ``queue`` và ``listener`` là tùy chọn.
 
-If the ``queue`` key is present, the corresponding value can be one of the following:
+Nếu có khóa ``queue``, giá trị tương ứng có thể là một trong các loại sau:
 
-* An object implementing the :meth:`Queue.put_nowait <queue.Queue.put_nowait>`
-  and :meth:`Queue.get <queue.Queue.get>` public API. For instance, this may be
-  an actual instance of :class:`queue.Queue` or a subclass thereof, or a proxy
-  obtained by :meth:`multiprocessing.managers.SyncManager.Queue`.
+* Một đối tượng triển khai API công khai :meth:`Queue.put_nowait <queue.Queue.put_nowait>` và :meth:`Queue.get <queue.Queue.get>`. Ví dụ, đây có thể là một thể hiện thực tế của :class:`queue.Queue` hoặc lớp con của nó, hay một proxy nhận được từ :meth:`multiprocessing.managers.SyncManager.Queue`.
 
-  This is of course only possible if you are constructing or modifying
-  the configuration dictionary in code.
+  Tất nhiên, điều này chỉ có thể thực hiện nếu bạn đang tạo hoặc sửa đổi dictionary cấu hình trong code.
 
-* A string that resolves to a callable which, when called with no arguments, returns
-  the queue instance to use. That callable could be a :class:`queue.Queue` subclass
-  or a function which returns a suitable queue instance,
-  such as ``my.module.queue_factory()``.
+* Một chuỗi phân giải thành một callable mà khi được gọi không có đối số sẽ trả về thể hiện queue cần sử dụng. Callable đó có thể là một lớp con của :class:`queue.Queue` hoặc một hàm trả về một thể hiện queue phù hợp, chẳng hạn như ``my.module.queue_factory()``.
 
-* A dict with a ``'()'`` key which is constructed in the usual way as discussed in
-  :ref:`logging-config-dict-userdef`. The result of this construction should be a
-  :class:`queue.Queue` instance.
+* Một dict có khóa ``'()'``, được tạo theo cách thông thường như đã thảo luận trong
+  :ref:`logging-config-dict-userdef`. Kết quả của việc tạo này phải là một
+  instance :class:`queue.Queue`.
 
-If the  ``queue`` key is absent, a standard unbounded :class:`queue.Queue` instance is
-created and used.
+Nếu thiếu khóa ``queue``, một instance :class:`queue.Queue` không giới hạn tiêu chuẩn sẽ được tạo và sử dụng.
 
-If the ``listener`` key is present, the corresponding value can be one of the following:
+Nếu có khóa ``listener``, giá trị tương ứng có thể là một trong các giá trị sau:
 
-* A subclass of :class:`logging.handlers.QueueListener`. This is of course only
-  possible if you are constructing or modifying the configuration dictionary in
-  code.
+* Một lớp con của :class:`logging.handlers.QueueListener`. Tất nhiên, điều này chỉ khả thi nếu bạn đang tạo hoặc sửa đổi dictionary cấu hình trong code.
 
-* A string which resolves to a class which is a subclass of ``QueueListener``, such as
-  ``'my.package.CustomListener'``.
+* Một chuỗi phân giải thành một lớp là lớp con của ``QueueListener``, chẳng hạn như ``'my.package.CustomListener'``.
 
-* A dict with a ``'()'`` key which is constructed in the usual way as discussed in
-  :ref:`logging-config-dict-userdef`. The result of this construction should be a
-  callable with the same signature as the ``QueueListener`` initializer.
+* Một dict có khóa ``'()'``, được tạo theo cách thông thường như đã thảo luận trong
+  :ref:`logging-config-dict-userdef`. Kết quả của việc khởi tạo này phải là một callable có cùng signature với hàm khởi tạo ``QueueListener``.
 
-If the ``listener`` key is absent, :class:`logging.handlers.QueueListener` is used.
+Nếu khóa ``listener`` không tồn tại, :class:`logging.handlers.QueueListener` sẽ được sử dụng.
 
-The values under the ``handlers`` key are the names of other handlers in the
-configuration (not shown in the above snippet) which will be passed to the queue
-listener.
+Các giá trị dưới khóa ``handlers`` là tên của các handler khác trong cấu hình (không hiển thị trong đoạn trích ở trên), những handler này sẽ được truyền cho queue listener.
 
-Any custom queue handler and listener classes will need to be defined with the same
-initialization signatures as :class:`~logging.handlers.QueueHandler` and
+Mọi lớp queue handler và listener tùy chỉnh cần được định nghĩa với cùng các chữ ký khởi tạo như :class:`~logging.handlers.QueueHandler` và
 :class:`~logging.handlers.QueueListener`.
 
 .. versionadded:: 3.12
 
 .. _logging-config-fileformat:
 
-Configuration file format
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Định dạng tệp cấu hình
+^^^^^^^^^^^^^^^^^^^^^^
 
-The configuration file format understood by :func:`fileConfig` is based on
-:mod:`configparser` functionality. The file must contain sections called
-``[loggers]``, ``[handlers]`` and ``[formatters]`` which identify by name the
-entities of each type which are defined in the file. For each such entity, there
-is a separate section which identifies how that entity is configured.  Thus, for
-a logger named ``log01`` in the ``[loggers]`` section, the relevant
-configuration details are held in a section ``[logger_log01]``. Similarly, a
-handler called ``hand01`` in the ``[handlers]`` section will have its
-configuration held in a section called ``[handler_hand01]``, while a formatter
-called ``form01`` in the ``[formatters]`` section will have its configuration
-specified in a section called ``[formatter_form01]``. The root logger
-configuration must be specified in a section called ``[logger_root]``.
+Định dạng tệp cấu hình được :func:`fileConfig` hiểu dựa trên
+chức năng :mod:`configparser`. Tệp phải chứa các phần có tên ``[loggers]``, ``[handlers]`` và ``[formatters]``, dùng để xác định theo tên các thực thể thuộc từng loại được định nghĩa trong tệp. Với mỗi thực thể như vậy, có một phần riêng xác định cách cấu hình thực thể đó. Do đó, đối với logger có tên ``log01`` trong phần ``[loggers]``, các chi tiết cấu hình liên quan được lưu trong phần ``[logger_log01]``. Tương tự, handler có tên ``hand01`` trong phần ``[handlers]`` sẽ có cấu hình được lưu trong phần có tên ``[handler_hand01]``, còn formatter có tên ``form01`` trong phần ``[formatters]`` sẽ có cấu hình được chỉ định trong phần ``[formatter_form01]``. Cấu hình của root logger phải được chỉ định trong phần có tên ``[logger_root]``.
 
 .. note::
 
-   The :func:`fileConfig` API is older than the :func:`dictConfig` API and does
-   not provide functionality to cover certain aspects of logging. For example,
-   you cannot configure :class:`~logging.Filter` objects, which provide for
-   filtering of messages beyond simple integer levels, using :func:`fileConfig`.
-   If you need to have instances of :class:`~logging.Filter` in your logging
-   configuration, you will need to use :func:`dictConfig`. Note that future
-   enhancements to configuration functionality will be added to
-   :func:`dictConfig`, so it's worth considering transitioning to this newer
-   API when it's convenient to do so.
+   API :func:`fileConfig` cũ hơn API :func:`dictConfig` và không cung cấp chức năng để xử lý một số khía cạnh nhất định của việc logging. Ví dụ, bạn không thể cấu hình các đối tượng :class:`~logging.Filter`, vốn cho phép lọc thông báo theo các mức ngoài các mức số nguyên đơn giản, bằng :func:`fileConfig`. Nếu cần có các instance của :class:`~logging.Filter` trong cấu hình logging, bạn sẽ cần sử dụng :func:`dictConfig`. Lưu ý rằng các cải tiến trong tương lai đối với chức năng cấu hình sẽ được bổ sung vào
+   :func:`dictConfig`, vì vậy đáng cân nhắc chuyển sang API mới hơn này khi thuận tiện.
 
-Examples of these sections in the file are given below.
+Dưới đây là các ví dụ về những phần này trong tệp.
 
 .. code-block:: ini
 
@@ -841,8 +502,7 @@ Examples of these sections in the file are given below.
    [formatters]
    keys=form01,form02,form03,form04,form05,form06,form07,form08,form09
 
-The root logger must specify a level and a list of handlers. An example of a
-root logger section is given below.
+Logger gốc phải chỉ định một cấp độ và danh sách các handler. Dưới đây là ví dụ về phần logger gốc.
 
 .. code-block:: ini
 
@@ -850,18 +510,11 @@ root logger section is given below.
    level=NOTSET
    handlers=hand01
 
-The ``level`` entry can be one of ``DEBUG, INFO, WARNING, ERROR, CRITICAL`` or
-``NOTSET``. For the root logger only, ``NOTSET`` means that all messages will be
-logged. Level values are :ref:`evaluated <func-eval>` in the context of the ``logging``
-package's namespace.
+Mục nhập ``level`` có thể là ``DEBUG, INFO, WARNING, ERROR, CRITICAL`` hoặc ``NOTSET``. Chỉ đối với logger gốc, ``NOTSET`` có nghĩa là tất cả thông báo sẽ được ghi lại. Các giá trị cấp độ được :ref:`đánh giá <func-eval>` trong không gian tên của gói ``logging``.
 
-The ``handlers`` entry is a comma-separated list of handler names, which must
-appear in the ``[handlers]`` section. These names must appear in the
-``[handlers]`` section and have corresponding sections in the configuration
-file.
+Mục nhập ``handlers`` là danh sách tên handler được phân tách bằng dấu phẩy; các tên này phải xuất hiện trong phần ``[handlers]``. Những tên này phải xuất hiện trong phần ``[handlers]`` và có các phần tương ứng trong tệp cấu hình.
 
-For loggers other than the root logger, some additional information is required.
-This is illustrated by the following example.
+Đối với các logger khác logger gốc, cần có thêm một số thông tin. Ví dụ sau minh họa điều này.
 
 .. code-block:: ini
 
@@ -871,16 +524,9 @@ This is illustrated by the following example.
    propagate=1
    qualname=compiler.parser
 
-The ``level`` and ``handlers`` entries are interpreted as for the root logger,
-except that if a non-root logger's level is specified as ``NOTSET``, the system
-consults loggers higher up the hierarchy to determine the effective level of the
-logger. The ``propagate`` entry is set to 1 to indicate that messages must
-propagate to handlers higher up the logger hierarchy from this logger, or 0 to
-indicate that messages are **not** propagated to handlers up the hierarchy. The
-``qualname`` entry is the hierarchical channel name of the logger, that is to
-say the name used by the application to get the logger.
+Các mục nhập ``level`` và ``handlers`` được diễn giải như đối với logger gốc, ngoại trừ việc nếu cấp độ của một logger không phải logger gốc được chỉ định là ``NOTSET``, hệ thống sẽ tham khảo các logger ở cấp cao hơn trong hệ thống phân cấp để xác định cấp độ hiệu lực của logger đó. Mục nhập ``propagate`` được đặt thành 1 để cho biết rằng các thông báo phải được truyền đến các handler ở cấp cao hơn trong hệ thống phân cấp logger từ logger này, hoặc thành 0 để cho biết rằng các thông báo **không** được truyền đến các handler ở cấp cao hơn trong hệ thống phân cấp. Mục nhập ``qualname`` là tên kênh phân cấp của logger, tức là tên mà ứng dụng sử dụng để lấy logger.
 
-Sections which specify handler configuration are exemplified by the following.
+Các section chỉ định cấu hình handler được minh họa như sau.
 
 .. code-block:: ini
 
@@ -890,24 +536,13 @@ Sections which specify handler configuration are exemplified by the following.
    formatter=form01
    args=(sys.stdout,)
 
-The ``class`` entry indicates the handler's class (as determined by :func:`eval`
-in the ``logging`` package's namespace). The ``level`` is interpreted as for
-loggers, and ``NOTSET`` is taken to mean 'log everything'.
+Mục ``class`` cho biết class của handler (được xác định bởi :func:`eval` trong namespace của package ``logging``). ``level`` được diễn giải giống như đối với logger, còn ``NOTSET`` được hiểu là “ghi log mọi thứ”.
 
-The ``formatter`` entry indicates the key name of the formatter for this
-handler. If blank, a default formatter (``logging._defaultFormatter``) is used.
-If a name is specified, it must appear in the ``[formatters]`` section and have
-a corresponding section in the configuration file.
+Mục ``formatter`` cho biết tên khóa của formatter cho handler này. Nếu để trống, formatter mặc định (``logging._defaultFormatter``) sẽ được sử dụng. Nếu chỉ định một tên, tên đó phải xuất hiện trong section ``[formatters]`` và có section tương ứng trong tệp cấu hình.
 
-The ``args`` entry, when :ref:`evaluated <func-eval>` in the context of the ``logging``
-package's namespace, is the list of arguments to the constructor for the handler
-class. Refer to the constructors for the relevant handlers, or to the examples
-below, to see how typical entries are constructed. If not provided, it defaults
-to ``()``.
+Mục ``args``, khi :ref:`evaluated <func-eval>` trong ngữ cảnh namespace của package ``logging``, là danh sách các đối số truyền cho constructor của class handler. Hãy tham khảo các constructor của những handler liên quan hoặc các ví dụ bên dưới để xem cách xây dựng các mục điển hình. Nếu không được cung cấp, giá trị mặc định là ``()``.
 
-The optional ``kwargs`` entry, when :ref:`evaluated <func-eval>` in the context of the
-``logging`` package's namespace, is the keyword argument dict to the constructor
-for the handler class. If not provided, it defaults to ``{}``.
+Mục ``kwargs`` tùy chọn, khi :ref:`evaluated <func-eval>` trong ngữ cảnh namespace của package ``logging``, là dict đối số từ khóa truyền cho constructor của class handler. Nếu không được cung cấp, giá trị mặc định là ``{}``.
 
 .. code-block:: ini
 
@@ -962,7 +597,7 @@ for the handler class. If not provided, it defaults to ``{}``.
    args=('localhost:9022', '/log', 'GET')
    kwargs={'secure': True}
 
-Sections which specify formatter configuration are typified by the following.
+Các section chỉ định cấu hình formatter thường có dạng như sau.
 
 .. code-block:: ini
 
@@ -974,27 +609,20 @@ Sections which specify formatter configuration are typified by the following.
    defaults={'customfield': 'defaultvalue'}
    class=logging.Formatter
 
-The arguments for the formatter configuration are the same as the keys
-in the dictionary schema :ref:`formatters section
-<logging-config-dictschema-formatters>`.
+Các đối số cho cấu hình formatter giống với các khóa trong schema từ điển :ref:`formatters section <logging-config-dictschema-formatters>`.
 
-The ``defaults`` entry, when :ref:`evaluated <func-eval>` in the context of
-the ``logging`` package's namespace, is a dictionary of default values for
-custom formatting fields. If not provided, it defaults to ``None``.
+Mục nhập ``defaults``, khi :ref:`được đánh giá <func-eval>` trong ngữ cảnh namespace của package ``logging``, là một dictionary chứa các giá trị mặc định cho những trường định dạng tùy chỉnh. Nếu không được cung cấp, mục này mặc định là ``None``.
 
 
 .. note::
 
-   Due to the use of :func:`eval` as described above, there are
-   potential security risks which result from using the :func:`listen` to send
-   and receive configurations via sockets. The risks are limited to where
-   multiple users with no mutual trust run code on the same machine; see the
-   :func:`listen` documentation for more information.
+   Do sử dụng :func:`eval` như mô tả ở trên, việc sử dụng :func:`listen` để gửi và nhận cấu hình qua socket có thể dẫn đến các rủi ro bảo mật. Các rủi ro này chỉ xảy ra khi nhiều người dùng không tin cậy lẫn nhau chạy code trên cùng một máy; xem
+   tài liệu :func:`listen` để biết thêm thông tin.
 
 .. seealso::
 
-   Module :mod:`logging`
-      API reference for the logging module.
+   Mô-đun :mod:`logging`
+      Tài liệu tham khảo API cho mô-đun logging.
 
-   Module :mod:`logging.handlers`
-      Useful handlers included with the logging module.
+   Mô-đun :mod:`logging.handlers`
+      Các handler hữu ích đi kèm mô-đun logging.

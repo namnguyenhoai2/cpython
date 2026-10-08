@@ -1,10 +1,10 @@
 .. _mswin-specific-services:
 
-****************************
-MS Windows Specific Services
-****************************
+*************************************
+Các dịch vụ dành riêng cho MS Windows
+*************************************
 
-This chapter describes modules that are only available on MS Windows platforms.
+Chương này mô tả các module chỉ khả dụng trên các nền tảng MS Windows.
 
 
 .. toctree::

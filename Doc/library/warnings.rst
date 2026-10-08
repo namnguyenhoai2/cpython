@@ -1,251 +1,173 @@
-:mod:`!warnings` --- Warning control
-====================================
+:mod:`!warnings` --- Kiểm soát cảnh báo
+=======================================
 
 .. module:: warnings
-   :synopsis: Issue warning messages and control their disposition.
+   :synopsis: Phát hành thông báo cảnh báo và kiểm soát cách xử lý chúng.
 
-**Source code:** :source:`Lib/warnings.py`
+**Mã nguồn:** :source:`Lib/warnings.py`
 
 .. index:: single: warnings
 
 --------------
 
-Warning messages are typically issued in situations where it is useful to alert
-the user of some condition in a program, where that condition (normally) doesn't
-warrant raising an exception and terminating the program.  For example, one
-might want to issue a warning when a program uses an obsolete module.
+Thông báo cảnh báo thường được phát hành trong những tình huống mà việc cảnh báo người dùng về một điều kiện nào đó trong chương trình là hữu ích, trong đó điều kiện đó (thông thường) không đến mức cần raise một exception và kết thúc chương trình. Ví dụ, có thể muốn phát hành cảnh báo khi chương trình sử dụng một module đã lỗi thời.
 
-Python programmers issue warnings by calling the :func:`warn` function defined
-in this module.  (C programmers use :c:func:`PyErr_WarnEx`; see
-:ref:`exceptionhandling` for details).
+Lập trình viên Python phát hành cảnh báo bằng cách gọi hàm :func:`warn` được định nghĩa trong module này. (Lập trình viên C sử dụng :c:func:`PyErr_WarnEx`; xem
+:ref:`exceptionhandling` để biết chi tiết).
 
-Warning messages are normally written to :data:`sys.stderr`, but their disposition
-can be changed flexibly, from ignoring all warnings to turning them into
-exceptions.  The disposition of warnings can vary based on the :ref:`warning category
-<warning-categories>`, the text of the warning message, and the source location where it
-is issued.  Repetitions of a particular warning for the same source location are
-typically suppressed.
+Thông báo cảnh báo thường được ghi vào :data:`sys.stderr`, nhưng cách xử lý chúng có thể được thay đổi linh hoạt, từ việc bỏ qua mọi cảnh báo cho đến biến chúng thành các exception. Cách xử lý cảnh báo có thể thay đổi tùy theo :ref:`danh mục cảnh báo <warning-categories>`, nội dung thông báo cảnh báo và vị trí mã nguồn nơi cảnh báo được phát hành. Các lần lặp lại của một cảnh báo cụ thể tại cùng một vị trí mã nguồn thường bị loại bỏ.
 
-There are two stages in warning control: first, each time a warning is issued, a
-determination is made whether a message should be issued or not; next, if a
-message is to be issued, it is formatted and printed using a user-settable hook.
+Việc kiểm soát cảnh báo gồm hai giai đoạn: trước tiên, mỗi khi một cảnh báo được phát hành, hệ thống sẽ xác định có nên phát hành thông báo hay không; tiếp theo, nếu cần phát hành thông báo, thông báo sẽ được định dạng và in ra bằng một hook do người dùng thiết lập.
 
-The determination whether to issue a warning message is controlled by the
-:ref:`warning filter <warning-filter>`, which is a sequence of matching rules and actions. Rules can be
-added to the filter by calling :func:`filterwarnings` and reset to its default
-state by calling :func:`resetwarnings`.
+Việc quyết định có phát hành thông báo cảnh báo hay không được kiểm soát bởi
+:ref:`bộ lọc cảnh báo <warning-filter>`, là một chuỗi các quy tắc so khớp và hành động. Có thể thêm quy tắc vào bộ lọc bằng cách gọi :func:`filterwarnings` và đặt lại bộ lọc về trạng thái mặc định bằng cách gọi :func:`resetwarnings`.
 
-The printing of warning messages is done by calling :func:`showwarning`, which
-may be overridden; the default implementation of this function formats the
-message by calling :func:`formatwarning`, which is also available for use by
-custom implementations.
+Thông báo cảnh báo được in ra bằng cách gọi :func:`showwarning`, hàm này có thể được ghi đè; cách triển khai mặc định của hàm này định dạng thông báo bằng cách gọi :func:`formatwarning`, hàm này cũng có thể được các cách triển khai tùy chỉnh sử dụng.
 
 .. seealso::
    :func:`logging.captureWarnings` allows you to handle all warnings with
-   the standard logging infrastructure.
+   cơ sở hạ tầng logging tiêu chuẩn.
 
 
 .. _warning-categories:
 
-Warning Categories
-------------------
+Các loại cảnh báo
+-----------------
 
-There are a number of built-in exceptions that represent warning categories.
-This categorization is useful to be able to filter out groups of warnings.
+Có một số exception tích hợp sẵn đại diện cho các loại cảnh báo. Việc phân loại này hữu ích khi cần lọc ra các nhóm cảnh báo.
 
-While these are technically
-:ref:`built-in exceptions <warning-categories-as-exceptions>`, they are
-documented here, because conceptually they belong to the warnings mechanism.
+Mặc dù về mặt kỹ thuật là
+:ref:`các ngoại lệ tích hợp sẵn <warning-categories-as-exceptions>`, chúng được trình bày ở đây vì về mặt khái niệm, chúng thuộc về cơ chế cảnh báo.
 
-User code can define additional warning categories by subclassing one of the
-standard warning categories.  A warning category must always be a subclass of
-the :exc:`Warning` class.
+Mã do người dùng viết có thể định nghĩa thêm các danh mục cảnh báo bằng cách tạo lớp con từ một trong các danh mục cảnh báo tiêu chuẩn. Một danh mục cảnh báo luôn phải là lớp con của lớp :exc:`Warning`.
 
-The following warnings category classes are currently defined:
+Hiện các lớp danh mục cảnh báo sau đã được định nghĩa:
 
 .. tabularcolumns:: |l|p{0.6\linewidth}|
 
-+----------------------------------+-----------------------------------------------+
-| Class                            | Description                                   |
-+==================================+===============================================+
-| :exc:`Warning`                   | Base class for warning categories. It is a    |
-|                                  | subclass of :exc:`Exception`.                 |
-+----------------------------------+-----------------------------------------------+
-| :exc:`UserWarning`               | Base class for warnings generated by user     |
-|                                  | code. The default category for :func:`warn`.  |
-+----------------------------------+-----------------------------------------------+
-| :exc:`DeprecationWarning`        | Base class for warnings about deprecated      |
-|                                  | features when those warnings are intended for |
-|                                  | other Python developers (ignored by default,  |
-|                                  | unless triggered by code in ``__main__``).    |
-+----------------------------------+-----------------------------------------------+
-| :exc:`PendingDeprecationWarning` | Base class for warnings about features        |
-|                                  | that will be deprecated in the future         |
-|                                  | (ignored by default).                         |
-+----------------------------------+-----------------------------------------------+
-| :exc:`SyntaxWarning`             | Base class for warnings about dubious syntax  |
-|                                  | (typically emitted when compiling Python      |
-|                                  | source code, and hence may not be suppressed  |
-|                                  | by runtime filters).                          |
-+----------------------------------+-----------------------------------------------+
-| :exc:`RuntimeWarning`            | Base class for warnings about dubious runtime |
-|                                  | behavior.                                     |
-+----------------------------------+-----------------------------------------------+
-| :exc:`FutureWarning`             | Base class for warnings about deprecated      |
-|                                  | features when those warnings are intended for |
-|                                  | end users of applications that are written in |
-|                                  | Python.                                       |
-+----------------------------------+-----------------------------------------------+
-| :exc:`ImportWarning`             | Base class for warnings triggered during      |
-|                                  | the process of importing a module (ignored by |
-|                                  | default).                                     |
-+----------------------------------+-----------------------------------------------+
-| :exc:`UnicodeWarning`            | Base class for warnings related to            |
-|                                  | Unicode.                                      |
-+----------------------------------+-----------------------------------------------+
-| :exc:`EncodingWarning`           | Base class for warnings related to encodings. |
-|                                  | See :ref:`io-encoding-warning` for details.   |
-+----------------------------------+-----------------------------------------------+
-| :exc:`BytesWarning`              | Base class for warnings related to            |
-|                                  | :class:`bytes` and :class:`bytearray`.        |
-+----------------------------------+-----------------------------------------------+
-| :exc:`ResourceWarning`           | Base class for warnings related to            |
-|                                  | resource usage (ignored by default).          |
-+----------------------------------+-----------------------------------------------+
++----------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Lớp                              | Mô tả                                                                                                                                                                                                                  |
++==================================+========================================================================================================================================================================================================================+
+| :exc:`Warning`                   | Lớp cơ sở cho các danh mục cảnh báo. Đây là lớp con của :exc:`Exception`.                                                                                                                                              |
++----------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| :exc:`UserWarning`               | Lớp cơ sở cho các cảnh báo được tạo bởi mã do người dùng viết. Danh mục mặc định cho :func:`warn`.                                                                                                                     |
++----------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| :exc:`DeprecationWarning`        | Lớp cơ sở cho các cảnh báo về những tính năng không còn được khuyến nghị sử dụng khi các cảnh báo đó dành cho những nhà phát triển Python khác (mặc định bị bỏ qua, trừ khi được kích hoạt bởi mã trong ``__main__``). |
++----------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| :exc:`PendingDeprecationWarning` | Lớp cơ sở cho các cảnh báo về những tính năng sẽ không còn được khuyến nghị sử dụng trong tương lai (mặc định bị bỏ qua).                                                                                              |
++----------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| :exc:`SyntaxWarning`             | Lớp cơ sở cho các cảnh báo về cú pháp đáng ngờ (thường được phát ra khi biên dịch mã nguồn Python, do đó có thể không bị loại bỏ bởi các bộ lọc runtime).                                                              |
++----------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| :exc:`RuntimeWarning`            | Lớp cơ sở cho các cảnh báo về hành vi runtime đáng ngờ.                                                                                                                                                                |
++----------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| :exc:`FutureWarning`             | Lớp cơ sở cho các cảnh báo về những tính năng không còn được khuyến nghị sử dụng khi các cảnh báo đó dành cho người dùng cuối của các ứng dụng được viết bằng Python.                                                  |
++----------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| :exc:`ImportWarning`             | Lớp cơ sở cho các cảnh báo được kích hoạt trong quá trình import một module (mặc định bị bỏ qua).                                                                                                                      |
++----------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| :exc:`UnicodeWarning`            | Lớp cơ sở cho các cảnh báo liên quan đến Unicode.                                                                                                                                                                      |
++----------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| :exc:`EncodingWarning`           | Lớp cơ sở cho các cảnh báo liên quan đến encoding. Xem :ref:`io-encoding-warning` để biết chi tiết.                                                                                                                    |
++----------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| :exc:`BytesWarning`              | Lớp cơ sở cho các cảnh báo liên quan đến                                                                                                                                                                               |
+|                                  | :class:`bytes` và :class:`bytearray`.                                                                                                                                                                                  |
++----------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| :exc:`ResourceWarning`           | Lớp cơ sở cho các cảnh báo liên quan đến việc sử dụng tài nguyên (mặc định bị bỏ qua).                                                                                                                                 |
++----------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 .. versionchanged:: 3.7
-   Previously :exc:`DeprecationWarning` and :exc:`FutureWarning` were
-   distinguished based on whether a feature was being removed entirely or
-   changing its behaviour. They are now distinguished based on their
-   intended audience and the way they're handled by the default warnings
-   filters.
+   Trước đây, :exc:`DeprecationWarning` và :exc:`FutureWarning` được phân biệt dựa trên việc một tính năng bị loại bỏ hoàn toàn hay thay đổi hành vi. Hiện nay, chúng được phân biệt dựa trên đối tượng hướng đến và cách chúng được xử lý bởi các bộ lọc cảnh báo mặc định.
 
 
 .. _warning-filter:
 
-The Warnings Filter
--------------------
+Bộ lọc cảnh báo
+---------------
 
-The warnings filter controls whether warnings are ignored, displayed, or turned
-into errors (raising an exception).
+Bộ lọc cảnh báo kiểm soát việc các cảnh báo bị bỏ qua, hiển thị hay chuyển thành lỗi (phát sinh một ngoại lệ).
 
-Conceptually, the warnings filter maintains an ordered list of filter
-specifications; any specific warning is matched against each filter
-specification in the list in turn until a match is found; the filter determines
-the disposition of the match.  Each entry is a tuple of the form (*action*,
-*message*, *category*, *module*, *lineno*), where:
+Về mặt khái niệm, bộ lọc cảnh báo duy trì một danh sách có thứ tự gồm các đặc tả bộ lọc; mỗi cảnh báo cụ thể lần lượt được đối chiếu với từng đặc tả bộ lọc trong danh sách cho đến khi tìm thấy kết quả khớp; bộ lọc xác định cách xử lý kết quả khớp đó. Mỗi mục nhập là một tuple có dạng (*action*, *message*, *category*, *module*, *lineno*), trong đó:
 
-* *action* is one of the following strings:
+* *action* là một trong các chuỗi sau:
 
-  +---------------+----------------------------------------------+
-  | Value         | Disposition                                  |
-  +===============+==============================================+
-  | ``"default"`` | print the first occurrence of matching       |
-  |               | warnings for each location (module +         |
-  |               | line number) where the warning is issued     |
-  +---------------+----------------------------------------------+
-  | ``"error"``   | turn matching warnings into exceptions       |
-  +---------------+----------------------------------------------+
-  | ``"ignore"``  | never print matching warnings                |
-  +---------------+----------------------------------------------+
-  | ``"always"``  | always print matching warnings               |
-  +---------------+----------------------------------------------+
-  | ``"all"``     | alias to "always"                            |
-  +---------------+----------------------------------------------+
-  | ``"module"``  | print the first occurrence of matching       |
-  |               | warnings for each module where the warning   |
-  |               | is issued (regardless of line number)        |
-  +---------------+----------------------------------------------+
-  | ``"once"``    | print only the first occurrence of matching  |
-  |               | warnings, regardless of location             |
-  +---------------+----------------------------------------------+
+  +---------------+-------------------------------------------------------------------------------------------------------------+
+  | Giá trị       | Cách xử lý                                                                                                  |
+  +===============+=============================================================================================================+
+  | ``"default"`` | in lần xuất hiện đầu tiên của các cảnh báo khớp cho mỗi vị trí (module + số dòng) nơi cảnh báo được phát ra |
+  +---------------+-------------------------------------------------------------------------------------------------------------+
+  | ``"error"``   | chuyển các cảnh báo khớp thành ngoại lệ                                                                     |
+  +---------------+-------------------------------------------------------------------------------------------------------------+
+  | ``"ignore"``  | không bao giờ in các cảnh báo khớp                                                                          |
+  +---------------+-------------------------------------------------------------------------------------------------------------+
+  | ``"always"``  | luôn in các cảnh báo khớp                                                                                   |
+  +---------------+-------------------------------------------------------------------------------------------------------------+
+  | ``"all"``     | bí danh của "always"                                                                                        |
+  +---------------+-------------------------------------------------------------------------------------------------------------+
+  | ``"module"``  | in lần xuất hiện đầu tiên của các cảnh báo khớp cho từng module nơi cảnh báo được phát ra (bất kể số dòng)  |
+  +---------------+-------------------------------------------------------------------------------------------------------------+
+  | ``"once"``    | chỉ in lần xuất hiện đầu tiên của các cảnh báo khớp, bất kể vị trí                                          |
+  +---------------+-------------------------------------------------------------------------------------------------------------+
 
-* *message* is a string containing a regular expression that the start of
-  the warning message must match, case-insensitively.  In :option:`-W` and
-  :envvar:`PYTHONWARNINGS`, *message* is a literal string that the start of the
-  warning message must contain (case-insensitively), ignoring any whitespace at
-  the start or end of *message*.
+* *message* là một chuỗi chứa biểu thức chính quy mà phần bắt đầu của thông báo cảnh báo phải khớp, không phân biệt chữ hoa chữ thường. Trong :option:`-W` và
+  :envvar:`PYTHONWARNINGS`, *message* là một chuỗi ký tự nguyên văn mà phần bắt đầu của thông báo cảnh báo phải chứa (không phân biệt chữ hoa chữ thường), đồng thời bỏ qua mọi khoảng trắng ở đầu hoặc cuối của *message*.
 
-* *category* is a class (a subclass of :exc:`Warning`) of which the warning
-  category must be a subclass in order to match.
+* *category* là một lớp (lớp con của :exc:`Warning`) mà loại cảnh báo phải là lớp con của nó để khớp.
 
-* *module* is a string containing a regular expression that the start of the
-  fully qualified module name must match, case-sensitively.  In :option:`-W` and
-  :envvar:`PYTHONWARNINGS`, *module* is a literal string that the
-  fully qualified module name must be equal to (case-sensitively), ignoring any
-  whitespace at the start or end of *module*.
+* *module* là một chuỗi chứa biểu thức chính quy mà phần đầu của tên module đầy đủ phải khớp, có phân biệt chữ hoa chữ thường.  Trong :option:`-W` và
+  :envvar:`PYTHONWARNINGS`, *module* là một chuỗi cố định mà tên module đầy đủ phải bằng với nó (có phân biệt chữ hoa chữ thường), bỏ qua mọi khoảng trắng ở đầu hoặc cuối *module*.
 
-* *lineno* is an integer that the line number where the warning occurred must
-  match, or ``0`` to match all line numbers.
+* *lineno* là một số nguyên mà số dòng nơi cảnh báo xảy ra phải khớp, hoặc ``0`` để khớp với mọi số dòng.
 
-Since the :exc:`Warning` class is derived from the built-in :exc:`Exception`
-class, to turn a warning into an error we simply raise ``category(message)``.
+Vì lớp :exc:`Warning` được dẫn xuất từ lớp tích hợp sẵn :exc:`Exception`, để chuyển một cảnh báo thành lỗi, chúng ta chỉ cần raise ``category(message)``.
 
-If a warning is reported and doesn't match any registered filter then the
-"default" action is applied (hence its name).
+Nếu một cảnh báo được báo cáo và không khớp với bất kỳ bộ lọc nào đã đăng ký, hành động "default" sẽ được áp dụng (do đó có tên như vậy).
 
 
 
 .. _repeated-warning-suppression-criteria:
 
-Repeated Warning Suppression Criteria
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Tiêu chí loại bỏ cảnh báo lặp lại
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The filters that suppress repeated warnings apply the following criteria to determine if a warning is considered a repeat:
+Các bộ lọc dùng để ngăn chặn cảnh báo lặp lại áp dụng các tiêu chí sau để xác định một cảnh báo có được xem là lặp lại hay không:
 
-- ``"default"``: A warning is considered a repeat only if the (*message*, *category*, *module*, *lineno*) are all the same.
-- ``"module"``: A warning is considered a repeat if the (*message*, *category*, *module*) are the same, ignoring the line number.
-- ``"once"``: A warning is considered a repeat if the (*message*, *category*) are the same, ignoring the module and line number.
+- ``"default"``: Một cảnh báo chỉ được xem là lặp lại nếu (*message*, *category*, *module*, *lineno*) đều giống nhau.
+- ``"module"``: Một cảnh báo được xem là lặp lại nếu (*message*, *category*, *module*) giống nhau, không xét số dòng.
+- ``"once"``: Một cảnh báo được xem là lặp lại nếu (*message*, *category*) giống nhau, không xét module và số dòng.
 
 
 .. _describing-warning-filters:
 
-Describing Warning Filters
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Mô tả các bộ lọc cảnh báo
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The warnings filter is initialized by :option:`-W` options passed to the Python
-interpreter command line and the :envvar:`PYTHONWARNINGS` environment variable.
-The interpreter saves the arguments for all supplied entries without
-interpretation in :data:`sys.warnoptions`; the :mod:`!warnings` module parses these
-when it is first imported (invalid options are ignored, after printing a
-message to :data:`sys.stderr`).
+Bộ lọc cảnh báo được khởi tạo bằng các tùy chọn :option:`-W` được truyền trên dòng lệnh của trình thông dịch Python và biến môi trường :envvar:`PYTHONWARNINGS`. Trình thông dịch lưu các đối số của tất cả các mục được cung cấp mà không diễn giải chúng trong :data:`sys.warnoptions`; module :mod:`!warnings` sẽ phân tích cú pháp các đối số này khi được import lần đầu (các tùy chọn không hợp lệ sẽ bị bỏ qua sau khi in thông báo tới :data:`sys.stderr`).
 
-Individual warnings filters are specified as a sequence of fields separated by
-colons::
+Các bộ lọc cảnh báo riêng lẻ được chỉ định dưới dạng một chuỗi các trường được phân tách bằng dấu hai chấm::
 
    action:message:category:module:line
 
-The meaning of each of these fields is as described in :ref:`warning-filter`.
-When listing multiple filters on a single line (as for
-:envvar:`PYTHONWARNINGS`), the individual filters are separated by commas and
-the filters listed later take precedence over those listed before them (as
-they're applied left-to-right, and the most recently applied filters take
-precedence over earlier ones).
+Ý nghĩa của từng trường này được mô tả như trong :ref:`warning-filter`. Khi liệt kê nhiều filter trên một dòng (như trong
+:envvar:`PYTHONWARNINGS`), các filter riêng lẻ được phân tách bằng dấu phẩy và những filter được liệt kê sau sẽ được ưu tiên hơn những filter đứng trước (vì chúng được áp dụng từ trái sang phải, và các filter được áp dụng gần nhất sẽ được ưu tiên hơn các filter trước đó).
 
-Commonly used warning filters apply to either all warnings, warnings in a
-particular category, or warnings raised by particular modules or packages.
-Some examples::
+Các filter cảnh báo thường dùng áp dụng cho tất cả cảnh báo, các cảnh báo thuộc một danh mục cụ thể hoặc các cảnh báo được phát sinh bởi những module hoặc package cụ thể. Một số ví dụ::
 
-   default                      # Show all warnings (even those ignored by default)
-   ignore                       # Ignore all warnings
-   error                        # Convert all warnings to errors
-   error::ResourceWarning       # Treat ResourceWarning messages as errors
-   default::DeprecationWarning  # Show DeprecationWarning messages
-   ignore,default:::mymodule    # Only report warnings triggered by "mymodule"
-   error:::mymodule             # Convert warnings to errors in "mymodule"
+   default                      # Hiển thị tất cả cảnh báo (kể cả những cảnh báo bị bỏ qua theo mặc định)
+   ignore                       # Bỏ qua tất cả cảnh báo
+   error                        # Chuyển tất cả cảnh báo thành lỗi
+   error::ResourceWarning       # Xử lý các thông báo ResourceWarning như lỗi
+   default::DeprecationWarning  # Hiển thị các thông báo DeprecationWarning
+   ignore,default:::mymodule    # Chỉ báo cáo các cảnh báo được kích hoạt bởi "mymodule"
+   error:::mymodule             # Chuyển các cảnh báo thành lỗi trong "mymodule"
 
 
 .. _default-warning-filter:
 
-Default Warning Filter
-~~~~~~~~~~~~~~~~~~~~~~
+Bộ lọc cảnh báo mặc định
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-By default, Python installs several warning filters, which can be overridden by
-the :option:`-W` command-line option, the :envvar:`PYTHONWARNINGS` environment
-variable and calls to :func:`filterwarnings`.
+Theo mặc định, Python cài đặt một số bộ lọc cảnh báo, có thể được ghi đè bằng tùy chọn dòng lệnh :option:`-W`, biến môi trường :envvar:`PYTHONWARNINGS` và các lệnh gọi đến :func:`filterwarnings`.
 
-In regular release builds, the default warning filter has the following entries
-(in order of precedence)::
+Trong các bản dựng phát hành thông thường, bộ lọc cảnh báo mặc định có các mục sau (theo thứ tự ưu tiên)::
 
     default::DeprecationWarning:__main__
     ignore::DeprecationWarning
@@ -253,7 +175,7 @@ In regular release builds, the default warning filter has the following entries
     ignore::ImportWarning
     ignore::ResourceWarning
 
-In a :ref:`debug build <debug-build>`, the list of default warning filters is empty.
+Trong một :ref:`bản dựng debug <debug-build>`, danh sách các bộ lọc cảnh báo mặc định là rỗng.
 
 .. versionchanged:: 3.2
    :exc:`DeprecationWarning` is now ignored by default in addition to
@@ -261,24 +183,19 @@ In a :ref:`debug build <debug-build>`, the list of default warning filters is em
 
 .. versionchanged:: 3.7
   :exc:`DeprecationWarning` is once again shown by default when triggered
-  directly by code in ``__main__``.
+  trực tiếp bằng mã trong ``__main__``.
 
 .. versionchanged:: 3.7
   :exc:`BytesWarning` no longer appears in the default filter list and is
-  instead configured via :data:`sys.warnoptions` when :option:`-b` is specified
-  twice.
+  thay vào đó được cấu hình thông qua :data:`sys.warnoptions` khi :option:`-b` được chỉ định hai lần.
 
 
 .. _warning-disable:
 
-Overriding the default filter
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Ghi đè bộ lọc mặc định
+~~~~~~~~~~~~~~~~~~~~~~
 
-Developers of applications written in Python may wish to hide *all* Python level
-warnings from their users by default, and only display them when running tests
-or otherwise working on the application. The :data:`sys.warnoptions` attribute
-used to pass filter configurations to the interpreter can be used as a marker to
-indicate whether or not warnings should be disabled::
+Các nhà phát triển ứng dụng được viết bằng Python có thể muốn ẩn *tất cả* các cảnh báo ở cấp Python khỏi người dùng theo mặc định và chỉ hiển thị chúng khi chạy các bài kiểm thử hoặc trong quá trình phát triển ứng dụng. Thuộc tính :data:`sys.warnoptions` được dùng để truyền cấu hình bộ lọc cho trình thông dịch có thể được dùng như một dấu hiệu cho biết có nên tắt cảnh báo hay không::
 
     import sys
 
@@ -286,21 +203,16 @@ indicate whether or not warnings should be disabled::
         import warnings
         warnings.simplefilter("ignore")
 
-Developers of test runners for Python code are advised to instead ensure that
-*all* warnings are displayed by default for the code under test, using code
-like::
+Các nhà phát triển test runner cho mã Python được khuyến nghị thay vào đó đảm bảo rằng *tất cả* cảnh báo được hiển thị theo mặc định đối với mã đang được kiểm thử, bằng cách sử dụng mã như sau::
 
     import sys
 
     if not sys.warnoptions:
         import os, warnings
-        warnings.simplefilter("default") # Change the filter in this process
-        os.environ["PYTHONWARNINGS"] = "default" # Also affect subprocesses
+        warnings.simplefilter("default") # Thay đổi bộ lọc trong tiến trình này
+        os.environ["PYTHONWARNINGS"] = "default" # Cũng áp dụng cho các subprocess
 
-Finally, developers of interactive shells that run user code in a namespace
-other than ``__main__`` are advised to ensure that :exc:`DeprecationWarning`
-messages are made visible by default, using code like the following (where
-``user_ns`` is the module used to execute code entered interactively)::
+Cuối cùng, các nhà phát triển interactive shell chạy mã người dùng trong một namespace khác với ``__main__`` được khuyến nghị đảm bảo rằng các thông báo :exc:`DeprecationWarning` được hiển thị theo mặc định, bằng cách sử dụng mã như sau (trong đó ``user_ns`` là module được dùng để thực thi mã được nhập một cách tương tác)::
 
     import warnings
     warnings.filterwarnings("default", category=DeprecationWarning,
@@ -309,13 +221,10 @@ messages are made visible by default, using code like the following (where
 
 .. _warning-suppress:
 
-Temporarily Suppressing Warnings
---------------------------------
+Tạm thời ẩn cảnh báo
+--------------------
 
-If you are using code that you know will raise a warning, such as a deprecated
-function, but do not want to see the warning (even when warnings have been
-explicitly configured via the command line), then it is possible to suppress
-the warning using the :class:`catch_warnings` context manager::
+Nếu bạn đang sử dụng đoạn mã mà mình biết chắc sẽ tạo ra cảnh báo, chẳng hạn như một hàm đã deprecated, nhưng không muốn thấy cảnh báo đó (ngay cả khi các cảnh báo đã được cấu hình rõ ràng thông qua command line), bạn có thể ẩn cảnh báo bằng context manager :class:`catch_warnings`::
 
     import warnings
 
@@ -326,26 +235,18 @@ the warning using the :class:`catch_warnings` context manager::
         warnings.simplefilter("ignore")
         fxn()
 
-While within the context manager all warnings will simply be ignored. This
-allows you to use known-deprecated code without having to see the warning while
-not suppressing the warning for other code that might not be aware of its use
-of deprecated code.
+Trong phạm vi của context manager, mọi cảnh báo sẽ פשוט bị bỏ qua. Điều này cho phép bạn sử dụng mã đã biết là deprecated mà không phải thấy cảnh báo, đồng thời không ẩn cảnh báo đối với những đoạn mã khác có thể không biết rằng mình đang sử dụng mã deprecated.
 
     .. note::
 
-        See :ref:`warning-concurrent-safe` for details on the
-        concurrency-safety of the :class:`catch_warnings` context manager when
-        used in programs using multiple threads or async functions.
+        Xem :ref:`warning-concurrent-safe` để biết chi tiết về tính an toàn đồng thời của context manager :class:`catch_warnings` khi được sử dụng trong các chương trình dùng nhiều thread hoặc async function.
 
 .. _warning-testing:
 
-Testing Warnings
-----------------
+Kiểm thử cảnh báo
+-----------------
 
-To test warnings raised by code, use the :class:`catch_warnings` context
-manager. With it you can temporarily mutate the warnings filter to facilitate
-your testing. For instance, do the following to capture all raised warnings to
-check::
+Để kiểm thử các cảnh báo do mã tạo ra, hãy sử dụng context manager :class:`catch_warnings`. Với context manager này, bạn có thể tạm thời thay đổi bộ lọc cảnh báo để hỗ trợ việc kiểm thử. Ví dụ, hãy thực hiện như sau để thu thập tất cả cảnh báo được tạo ra nhằm kiểm tra::
 
     import warnings
 
@@ -353,100 +254,58 @@ check::
         warnings.warn("deprecated", DeprecationWarning)
 
     with warnings.catch_warnings(record=True) as w:
-        # Cause all warnings to always be triggered.
+        # Khiến mọi cảnh báo luôn được kích hoạt.
         warnings.simplefilter("always")
-        # Trigger a warning.
+        # Kích hoạt một cảnh báo.
         fxn()
-        # Verify some things
+        # Xác minh một số điều
         assert len(w) == 1
         assert issubclass(w[-1].category, DeprecationWarning)
         assert "deprecated" in str(w[-1].message)
 
-One can also cause all warnings to be exceptions by using ``error`` instead of
-``always``. One thing to be aware of is that if a warning has already been
-raised because of a ``once``/``default`` rule, then no matter what filters are
-set the warning will not be seen again unless the warnings registry related to
-the warning has been cleared.
+Cũng có thể khiến mọi cảnh báo trở thành ngoại lệ bằng cách sử dụng ``error`` thay vì ``always``. Một điều cần lưu ý là nếu một cảnh báo đã được đưa ra do quy tắc ``once``/``default``, thì bất kể các bộ lọc được thiết lập như thế nào, cảnh báo sẽ không được thấy lại trừ khi registry cảnh báo liên quan đến cảnh báo đó đã được xóa.
 
-Once the context manager exits, the warnings filter is restored to its state
-when the context was entered. This prevents tests from changing the warnings
-filter in unexpected ways between tests and leading to indeterminate test
-results.
+Sau khi trình quản lý ngữ cảnh kết thúc, bộ lọc cảnh báo được khôi phục về trạng thái tại thời điểm ngữ cảnh được bắt đầu. Điều này ngăn các bài kiểm thử thay đổi bộ lọc cảnh báo theo những cách không mong muốn giữa các bài kiểm thử và dẫn đến kết quả kiểm thử không xác định.
 
     .. note::
 
-        See :ref:`warning-concurrent-safe` for details on the
-        concurrency-safety of the :class:`catch_warnings` context manager when
-        used in programs using multiple threads or async functions.
+        Xem :ref:`warning-concurrent-safe` để biết chi tiết về tính an toàn đối với việc chạy đồng thời của trình quản lý ngữ cảnh :class:`catch_warnings` khi được sử dụng trong các chương trình dùng nhiều thread hoặc các hàm async.
 
-When testing multiple operations that raise the same kind of warning, it
-is important to test them in a manner that confirms each operation is raising
-a new warning (e.g. set warnings to be raised as exceptions and check the
-operations raise exceptions, check that the length of the warning list
-continues to increase after each operation, or else delete the previous
-entries from the warnings list before each new operation).
+Khi kiểm thử nhiều thao tác tạo ra cùng một loại cảnh báo, điều quan trọng là phải kiểm thử chúng theo cách xác nhận mỗi thao tác tạo ra một cảnh báo mới (ví dụ: đặt cảnh báo được tạo ra dưới dạng ngoại lệ và kiểm tra rằng các thao tác tạo ra ngoại lệ, kiểm tra để đảm bảo độ dài của danh sách cảnh báo tiếp tục tăng sau mỗi thao tác, hoặc xóa các mục trước đó khỏi danh sách cảnh báo trước mỗi thao tác mới).
 
 
 .. _warning-ignored:
 
-Updating Code For New Versions of Dependencies
-----------------------------------------------
+Cập nhật mã cho các phiên bản mới của dependencies
+--------------------------------------------------
 
-Warning categories that are primarily of interest to Python developers (rather
-than end users of applications written in Python) are ignored by default.
+Theo mặc định, các danh mục cảnh báo chủ yếu dành cho các nhà phát triển Python (thay vì người dùng cuối của các ứng dụng viết bằng Python) sẽ bị bỏ qua.
 
-Notably, this "ignored by default" list includes :exc:`DeprecationWarning`
-(for every module except ``__main__``), which means developers should make sure
-to test their code with typically ignored warnings made visible in order to
-receive timely notifications of future breaking API changes (whether in the
-standard library or third party packages).
+Đáng chú ý, danh sách "bị bỏ qua theo mặc định" này bao gồm :exc:`DeprecationWarning` (đối với mọi module ngoại trừ ``__main__``), điều đó có nghĩa là các nhà phát triển nên đảm bảo kiểm thử mã của mình với những cảnh báo thường bị bỏ qua được hiển thị, để nhận được thông báo kịp thời về các thay đổi API có thể gây lỗi trong tương lai (dù là trong thư viện chuẩn hay các package bên thứ ba).
 
-In the ideal case, the code will have a suitable test suite, and the test runner
-will take care of implicitly enabling all warnings when running tests
-(the test runner provided by the :mod:`unittest` module does this).
+Trong trường hợp lý tưởng, mã sẽ có một test suite phù hợp và test runner sẽ tự động bật tất cả cảnh báo khi chạy các bài kiểm thử (test runner do module :mod:`unittest` cung cấp thực hiện điều này).
 
-In less ideal cases, applications can be checked for use of deprecated
-interfaces by passing :option:`-Wd <-W>` to the Python interpreter (this is
-shorthand for :option:`!-W default`) or setting ``PYTHONWARNINGS=default`` in
-the environment. This enables default handling for all warnings, including those
-that are ignored by default. To change what action is taken for encountered
-warnings you can change what argument is passed to :option:`-W` (e.g.
-:option:`!-W error`). See the :option:`-W` flag for more details on what is
-possible.
+Trong những trường hợp kém lý tưởng hơn, có thể kiểm tra ứng dụng để phát hiện việc sử dụng các interface đã bị deprecated bằng cách truyền :option:`-Wd <-W>` cho trình thông dịch Python (đây là dạng viết tắt của :option:`!-W default`) hoặc thiết lập ``PYTHONWARNINGS=default`` trong môi trường. Cách này bật cơ chế xử lý mặc định cho tất cả cảnh báo, bao gồm cả những cảnh báo bị bỏ qua theo mặc định. Để thay đổi hành động được thực hiện đối với các cảnh báo gặp phải, bạn có thể thay đổi đối số được truyền cho :option:`-W` (ví dụ:
+:option:`!-W error`). Xem cờ :option:`-W` để biết thêm chi tiết về các tùy chọn có thể sử dụng.
 
 
 .. _warning-functions:
 
-Available Functions
--------------------
+Các hàm khả dụng
+----------------
 
 
 .. function:: warn(message, category=None, stacklevel=1, source=None, *, skip_file_prefixes=())
 
-   Issue a warning, or maybe ignore it or raise an exception.  The *category*
-   argument, if given, must be a :ref:`warning category class <warning-categories>`; it
-   defaults to :exc:`UserWarning`.  Alternatively, *message* can be a :exc:`Warning` instance,
-   in which case *category* will be ignored and ``message.__class__`` will be used.
-   In this case, the message text will be ``str(message)``. This function raises an
-   exception if the particular warning issued is changed into an error by the
-   :ref:`warnings filter <warning-filter>`.  The *stacklevel* argument can be used by wrapper
-   functions written in Python, like this::
+   Phát ra một cảnh báo, hoặc có thể bỏ qua cảnh báo đó hay raise một exception. Đối số *category*, nếu được cung cấp, phải là một :ref:`warning category class <warning-categories>`; mặc định là :exc:`UserWarning`. Ngoài ra, *message* có thể là một :exc:`Warning` instance, trong trường hợp đó *category* sẽ bị bỏ qua và ``message.__class__`` sẽ được sử dụng. Trong trường hợp này, văn bản thông báo sẽ là ``str(message)``. Hàm này raise một exception nếu cảnh báo cụ thể được phát ra bị chuyển thành lỗi bởi
+   :ref:`warnings filter <warning-filter>`. Đối số *stacklevel* có thể được các hàm wrapper viết bằng Python sử dụng, như sau::
 
       def deprecated_api(message):
           warnings.warn(message, DeprecationWarning, stacklevel=2)
 
-   This makes the warning refer to ``deprecated_api``'s caller, rather than to
-   the source of ``deprecated_api`` itself (since the latter would defeat the
-   purpose of the warning message).
+   Điều này khiến cảnh báo đề cập đến trình gọi của ``deprecated_api``, thay vì đến nguồn của chính ``deprecated_api`` (vì cách sau sẽ làm mất mục đích của thông báo cảnh báo).
 
-   The *skip_file_prefixes* keyword argument can be used to indicate which
-   stack frames are ignored when counting stack levels. This can be useful when
-   you want the warning to always appear at call sites outside of a package
-   when a constant *stacklevel* does not fit all call paths or is otherwise
-   challenging to maintain. If supplied, it must be a tuple of strings. When
-   prefixes are supplied, stacklevel is implicitly overridden to be ``max(2,
-   stacklevel)``. To cause a warning to be attributed to the caller from
-   outside of the current package you might write::
+   Đối số từ khóa *skip_file_prefixes* có thể được dùng để chỉ ra những stack frame nào được bỏ qua khi đếm các cấp độ stack. Điều này hữu ích khi bạn muốn cảnh báo luôn xuất hiện tại các vị trí gọi bên ngoài một package, trong trường hợp một *stacklevel* cố định không phù hợp với mọi đường dẫn gọi hoặc khó duy trì theo cách khác. Nếu được cung cấp, đối số này phải là một tuple các chuỗi. Khi cung cấp các tiền tố, stacklevel mặc nhiên bị ghi đè thành ``max(2, stacklevel)``. Để cảnh báo được quy cho trình gọi từ bên ngoài package hiện tại, bạn có thể viết::
 
       # example/lower.py
       _warn_skips = (os.path.dirname(__file__),)
@@ -462,108 +321,71 @@ Available Functions
       def another_way(**kw):
           lower.one_way(**kw)
 
-   This makes the warning refer to both the ``example.lower.one_way()`` and
-   ``example.higher.another_way()`` call sites only from calling code living
-   outside of ``example`` package.
+   Điều này khiến cảnh báo chỉ đề cập đến cả các vị trí gọi ``example.lower.one_way()`` và ``example.higher.another_way()`` từ mã gọi nằm bên ngoài package ``example``.
 
-   *source*, if supplied, is the destroyed object which emitted a
+   *source*, nếu được cung cấp, là đối tượng đã bị hủy và phát ra một
    :exc:`ResourceWarning`.
 
    .. versionchanged:: 3.6
-      Added *source* parameter.
+      Đã thêm tham số *source*.
 
    .. versionchanged:: 3.12
-      Added *skip_file_prefixes*.
+      Đã thêm *skip_file_prefixes*.
 
 
 .. function:: warn_explicit(message, category, filename, lineno, module=None, registry=None, module_globals=None, source=None)
 
-   This is a low-level interface to the functionality of :func:`warn`, passing in
-   explicitly the message, category, filename and line number, and optionally
-   other arguments.
-   *message* must be a string and *category* a subclass of :exc:`Warning` or
-   *message* may be a :exc:`Warning` instance, in which case *category* will be
-   ignored.
+   Đây là giao diện cấp thấp cho chức năng của :func:`warn`, truyền rõ ràng message, category, filename và số dòng, cùng với các đối số khác tùy chọn. *message* phải là một chuỗi và *category* phải là một lớp con của :exc:`Warning` hoặc *message* có thể là một thực thể :exc:`Warning`, trong trường hợp đó *category* sẽ bị bỏ qua.
 
-   *module*, if supplied, should be the module name.
-   If no module is passed, the filename with ``.py`` stripped is used.
+   *module*, nếu được cung cấp, phải là tên module. Nếu không truyền module, filename sau khi loại bỏ ``.py`` sẽ được sử dụng.
 
-   *registry*, if supplied, should be the ``__warningregistry__`` dictionary
-   of the module.
-   If no registry is passed, each warning is treated as the first occurrence,
-   that is, filter actions ``"default"``, ``"module"`` and ``"once"`` are
-   handled as ``"always"``.
+   *registry*, nếu được cung cấp, phải là dictionary ``__warningregistry__`` của module. Nếu không truyền registry, mỗi warning được xử lý như lần xuất hiện đầu tiên; nghĩa là các hành động lọc ``"default"``, ``"module"`` và ``"once"`` được xử lý như ``"always"``.
 
-   *module_globals*, if supplied, should be the global namespace in use by the code
-   for which the warning is issued.  (This argument is used to support displaying
-   source for modules found in zipfiles or other non-filesystem import
-   sources).
+   *module_globals*, nếu được cung cấp, phải là global namespace đang được code sử dụng và là nơi phát ra warning. (Đối số này được dùng để hỗ trợ hiển thị source cho các module được tìm thấy trong zipfile hoặc các nguồn import không thuộc filesystem khác).
 
-   *source*, if supplied, is the destroyed object which emitted a
+   *source*, nếu được cung cấp, là đối tượng đã bị hủy và phát ra một
    :exc:`ResourceWarning`.
 
    .. versionchanged:: 3.6
-      Add the *source* parameter.
+      Thêm tham số *source*.
 
 
 .. function:: showwarning(message, category, filename, lineno, file=None, line=None)
 
-   Write a warning to a file.  The default implementation calls
-   ``formatwarning(message, category, filename, lineno, line)`` and writes the
-   resulting string to *file*, which defaults to :data:`sys.stderr`.  You may replace
-   this function with any callable by assigning to ``warnings.showwarning``.
-   *line* is a line of source code to be included in the warning
-   message; if *line* is not supplied, :func:`showwarning` will
-   try to read the line specified by *filename* and *lineno*.
+   Ghi cảnh báo vào một tệp. Triển khai mặc định gọi ``formatwarning(message, category, filename, lineno, line)`` và ghi chuỗi kết quả vào *file*, với giá trị mặc định là :data:`sys.stderr`. Bạn có thể thay thế hàm này bằng bất kỳ đối tượng callable nào bằng cách gán cho ``warnings.showwarning``. *line* là một dòng mã nguồn được đưa vào thông báo cảnh báo; nếu không cung cấp *line*, :func:`showwarning` sẽ cố đọc dòng được chỉ định bởi *filename* và *lineno*.
 
 
 .. function:: formatwarning(message, category, filename, lineno, line=None)
 
-   Format a warning the standard way.  This returns a string which may contain
-   embedded newlines and ends in a newline.  *line* is a line of source code to
-   be included in the warning message; if *line* is not supplied,
-   :func:`formatwarning` will try to read the line specified by *filename* and
-   *lineno*.
+   Định dạng cảnh báo theo cách chuẩn. Hàm này trả về một chuỗi có thể chứa các ký tự xuống dòng nhúng và kết thúc bằng một ký tự xuống dòng. *line* là một dòng mã nguồn được đưa vào thông báo cảnh báo; nếu không cung cấp *line*,
+   :func:`formatwarning` sẽ cố đọc dòng được chỉ định bởi *filename* và *lineno*.
 
 
 .. function:: filterwarnings(action, message='', category=Warning, module='', lineno=0, append=False)
 
-   Insert an entry into the list of :ref:`warnings filter specifications
-   <warning-filter>`.  The entry is inserted at the front by default; if
-   *append* is true, it is inserted at the end.  This checks the types of the
-   arguments, compiles the *message* and *module* regular expressions, and
-   inserts them as a tuple in the list of warnings filters.  Entries closer to
-   the front of the list override entries later in the list, if both match a
-   particular warning.  Omitted arguments default to a value that matches
-   everything.
+   Chèn một mục vào danh sách :ref:`warnings filter specifications <warning-filter>`. Theo mặc định, mục này được chèn vào đầu danh sách; nếu *append* là true, mục này được chèn vào cuối danh sách. Hàm này kiểm tra kiểu của các đối số, biên dịch các biểu thức chính quy *message* và *module*, rồi chèn chúng dưới dạng một tuple vào danh sách bộ lọc cảnh báo. Các mục ở gần đầu danh sách hơn sẽ ghi đè các mục ở phía sau nếu cả hai cùng khớp với một cảnh báo cụ thể. Các đối số bị bỏ qua sẽ mặc định nhận một giá trị khớp với mọi thứ.
 
 
 .. function:: simplefilter(action, category=Warning, lineno=0, append=False)
 
-   Insert a simple entry into the list of :ref:`warnings filter specifications
-   <warning-filter>`.  The meaning of the function parameters is as for
-   :func:`filterwarnings`, but regular expressions are not needed as the filter
-   inserted always matches any message in any module as long as the category and
-   line number match.
+   Chèn một mục đơn giản vào danh sách :ref:`warnings filter specifications <warning-filter>`. Ý nghĩa của các tham số hàm giống như
+   :func:`filterwarnings`, nhưng không cần biểu thức chính quy vì bộ lọc được chèn luôn khớp với mọi thông báo trong mọi mô-đun, miễn là danh mục và số dòng khớp nhau.
 
 
 .. function:: resetwarnings()
 
-   Reset the warnings filter.  This discards the effect of all previous calls to
-   :func:`filterwarnings`, including that of the :option:`-W` command line options
-   and calls to :func:`simplefilter`.
+   Đặt lại bộ lọc cảnh báo. Thao tác này loại bỏ tác động của mọi lần gọi trước đó đến
+   :func:`filterwarnings`, bao gồm cả tác động của các tùy chọn dòng lệnh :option:`-W` và các lần gọi đến :func:`simplefilter`.
 
 
 .. decorator:: deprecated(message, /, *, category=DeprecationWarning, stacklevel=1)
 
-   Decorator to indicate that a class, function or overload is deprecated.
+   Decorator cho biết một lớp, hàm hoặc overload đã lỗi thời.
 
-   When this decorator is applied to an object,
-   deprecation warnings may be emitted at runtime when the object is used.
-   :term:`static type checkers <static type checker>`
-   will also generate a diagnostic on usage of the deprecated object.
+   Khi decorator này được áp dụng cho một đối tượng, cảnh báo về việc lỗi thời có thể được phát ra tại runtime khi đối tượng đó được sử dụng.
+   :term:`trình kiểm tra kiểu tĩnh <static type checker>` cũng sẽ tạo chẩn đoán khi đối tượng đã lỗi thời được sử dụng.
 
-   Usage::
+   Cách sử dụng::
 
       from warnings import deprecated
       from typing import overload
@@ -582,135 +404,80 @@ Available Functions
       @overload
       def g(x: str) -> int: ...
 
-   The warning specified by *category* will be emitted at runtime
-   on use of deprecated objects. For functions, that happens on calls;
-   for classes, on instantiation and on creation of subclasses.
-   If the *category* is ``None``, no warning is emitted at runtime.
-   The *stacklevel* determines where the
-   warning is emitted. If it is ``1`` (the default), the warning
-   is emitted at the direct caller of the deprecated object; if it
-   is higher, it is emitted further up the stack.
-   Static type checker behavior is not affected by the *category*
-   and *stacklevel* arguments.
+   Cảnh báo được chỉ định bởi *category* sẽ được phát ra trong runtime khi sử dụng các đối tượng đã deprecated. Đối với hàm, điều đó xảy ra khi gọi hàm; đối với lớp, xảy ra khi khởi tạo và khi tạo các lớp con. Nếu *category* là ``None``, sẽ không có cảnh báo nào được phát ra trong runtime. *stacklevel* xác định vị trí phát ra cảnh báo. Nếu giá trị là ``1`` (mặc định), cảnh báo được phát ra tại caller trực tiếp của đối tượng đã deprecated; nếu giá trị cao hơn, cảnh báo được phát ra ở vị trí cao hơn trong stack. Hành vi của static type checker không bị ảnh hưởng bởi các đối số *category* và *stacklevel*.
 
-   The deprecation message passed to the decorator is saved in the
-   ``__deprecated__`` attribute on the decorated object.
-   If applied to an overload, the decorator
-   must be after the :deco:`~typing.overload` decorator
-   for the attribute to exist on the overload as returned by
+   Thông báo deprecation được truyền cho decorator sẽ được lưu trong thuộc tính ``__deprecated__`` trên đối tượng được decorator áp dụng. Nếu được áp dụng cho một overload, decorator phải được đặt sau decorator :deco:`~typing.overload` để thuộc tính này tồn tại trên overload do
    :func:`typing.get_overloads`.
 
    .. versionadded:: 3.13
-      See :pep:`702`.
+      Xem :pep:`702`.
 
 
-Available Context Managers
---------------------------
+Các Context Manager khả dụng
+----------------------------
 
 .. class:: catch_warnings(*, record=False, module=None, action=None, category=Warning, lineno=0, append=False)
 
-    A context manager that copies and, upon exit, restores the warnings filter
-    and the :func:`showwarning` function.
-    If the *record* argument is :const:`False` (the default) the context manager
-    returns :class:`None` on entry. If *record* is :const:`True`, a list is
-    returned that is progressively populated with objects as seen by a custom
-    :func:`showwarning` function (which also suppresses output to ``sys.stderr``).
-    Each object in the list is guaranteed to have the following attributes:
+    Một context manager sao chép và khi thoát sẽ khôi phục bộ lọc warnings và hàm :func:`showwarning`. Nếu đối số *record* là :const:`False` (mặc định), context manager sẽ trả về :class:`None` khi bắt đầu. Nếu *record* là :const:`True`, một danh sách được trả về và liên tục được bổ sung các đối tượng như được nhìn thấy bởi một
+    hàm :func:`showwarning` (đồng thời ngăn đầu ra tới ``sys.stderr``). Mỗi đối tượng trong danh sách được đảm bảo có các thuộc tính sau:
 
-      - ``message``: the warning message (an instance of :exc:`Warning`)
-      - ``category``: the warning category (a subclass of :exc:`Warning`)
-      - ``filename``: the file name where the warning occurred (:class:`str`)
-      - ``lineno``: the line number in the file (:class:`int`)
-      - ``file``: the file object used for output (if any), or ``None``
-      - ``line``: the line of source code (if available), or ``None``
-      - ``source``: the original object that generated the warning (if
-        available), or ``None``
+      - ``message``: thông báo cảnh báo (một thể hiện của :exc:`Warning`)
+      - ``category``: danh mục cảnh báo (một lớp con của :exc:`Warning`)
+      - ``filename``: tên tệp nơi cảnh báo xảy ra (:class:`str`)
+      - ``lineno``: số dòng trong tệp (:class:`int`)
+      - ``file``: đối tượng tệp được dùng để xuất (nếu có), hoặc ``None``
+      - ``line``: dòng mã nguồn (nếu có), hoặc ``None``
+      - ``source``: đối tượng ban đầu tạo ra cảnh báo (nếu có), hoặc ``None``
 
     .. versionchanged:: 3.6
-      The ``source`` attribute was added.
+      Thuộc tính ``source`` đã được thêm.
 
-    The type of these objects is not specified and may change; only the
-    presence of these attributes is guaranteed.
+    Kiểu của các đối tượng này không được chỉ định và có thể thay đổi; chỉ sự hiện diện của các thuộc tính này được đảm bảo.
 
-    The *module* argument takes a module that will be used instead of the
-    module returned when you import :mod:`!warnings` whose filter will be
-    protected. This argument exists primarily for testing the :mod:`!warnings`
-    module itself.
+    Đối số *module* nhận một module sẽ được sử dụng thay cho module được trả về khi bạn import :mod:`!warnings`, là module có filter được bảo vệ. Đối số này chủ yếu tồn tại để kiểm thử chính module :mod:`!warnings`.
 
-    If the *action* argument is not ``None``, the remaining arguments are
-    passed to :func:`simplefilter` as if it were called immediately on
-    entering the context.
+    Nếu đối số *action* không phải là ``None``, các đối số còn lại được truyền cho :func:`simplefilter` như thể nó được gọi ngay khi vào context.
 
-    See :ref:`warning-filter` for the meaning of the *category* and *lineno*
-    parameters.
+    Xem :ref:`warning-filter` để biết ý nghĩa của các tham số *category* và *lineno*.
 
     .. note::
 
-        See :ref:`warning-concurrent-safe` for details on the
-        concurrency-safety of the :class:`catch_warnings` context manager when
-        used in programs using multiple threads or async functions.
+        Xem :ref:`warning-concurrent-safe` để biết chi tiết về tính an toàn khi chạy đồng thời của context manager :class:`catch_warnings` khi được sử dụng trong các chương trình dùng nhiều thread hoặc async function.
 
 
     .. versionchanged:: 3.11
 
-        Added the *action*, *category*, *lineno*, and *append* parameters.
+        Đã thêm các tham số *action*, *category*, *lineno* và *append*.
 
 
 .. _warning-concurrent-safe:
 
-Concurrent safety of Context Managers
--------------------------------------
+Tính an toàn khi chạy đồng thời của Context Managers
+----------------------------------------------------
 
-The behavior of :class:`catch_warnings` context manager depends on the
-:data:`sys.flags.context_aware_warnings` flag.  If the flag is true, the
-context manager behaves in a concurrent-safe fashion and otherwise not.
-Concurrent-safe means that it is both thread-safe and safe to use within
-:ref:`asyncio coroutines <coroutine>` and tasks.  Being thread-safe means
-that behavior is predictable in a multi-threaded program.  The flag defaults
-to true for free-threaded builds and false otherwise.
+Hành vi của trình quản lý ngữ cảnh :class:`catch_warnings` phụ thuộc vào
+:data:`sys.flags.context_aware_warnings` flag. Nếu flag này là true, trình quản lý ngữ cảnh sẽ hoạt động theo cách an toàn khi chạy đồng thời, còn nếu không thì sẽ không như vậy. An toàn khi chạy đồng thời nghĩa là vừa an toàn với thread vừa an toàn khi sử dụng trong
+:ref:`asyncio coroutines <coroutine>` và task. An toàn với thread nghĩa là hành vi có thể dự đoán được trong chương trình đa thread. flag này mặc định là true đối với các bản build free-threaded và false trong các trường hợp khác.
 
-If the :data:`~sys.flags.context_aware_warnings` flag is false, then
-:class:`catch_warnings` will modify the global attributes of the
-:mod:`!warnings` module.  This is not safe if used within a concurrent program
-(using multiple threads or using asyncio coroutines).  For example, if two
-or more threads use the :class:`catch_warnings` class at the same time, the
-behavior is undefined.
+Nếu :data:`~sys.flags.context_aware_warnings` flag là false thì
+:class:`catch_warnings` sẽ sửa đổi các thuộc tính toàn cục của
+:mod:`!warnings` module. Điều này không an toàn khi được sử dụng trong chương trình chạy đồng thời (sử dụng nhiều thread hoặc sử dụng asyncio coroutine). Ví dụ: nếu hai hoặc nhiều thread sử dụng class :class:`catch_warnings` cùng lúc thì hành vi là không xác định.
 
-If the flag is true, :class:`catch_warnings` will not modify global
-attributes and will instead use a :class:`~contextvars.ContextVar` to
-store the newly established warning filtering state.  A context variable
-provides thread-local storage and it makes the use of :class:`catch_warnings`
-thread-safe.
+Nếu flag là true, :class:`catch_warnings` sẽ không sửa đổi các thuộc tính toàn cục mà thay vào đó sẽ sử dụng một :class:`~contextvars.ContextVar` để lưu trữ trạng thái lọc cảnh báo mới được thiết lập. Biến ngữ cảnh cung cấp bộ nhớ lưu trữ cục bộ theo thread và giúp việc sử dụng :class:`catch_warnings` an toàn với thread.
 
-The *record* parameter of the context handler also behaves differently
-depending on the value of the flag.  When *record* is true and the flag is
-false, the context manager works by replacing and then later restoring the
-module's :func:`showwarning` function.  That is not concurrent-safe.
+Tham số *record* của context handler cũng hoạt động khác nhau tùy thuộc vào giá trị của flag. Khi *record* là true còn flag là false, context manager hoạt động bằng cách thay thế rồi sau đó khôi phục hàm :func:`showwarning` của module. Cách này không an toàn khi chạy đồng thời.
 
-When *record* is true and the flag is true, the :func:`showwarning` function
-is not replaced.  Instead, the recording status is indicated by an internal
-property in the context variable.  In this case, the :func:`showwarning`
-function will not be restored when exiting the context handler.
+Khi *record* là true và flag là true, hàm :func:`showwarning` không bị thay thế. Thay vào đó, trạng thái ghi được biểu thị bằng một thuộc tính nội bộ trong biến context. Trong trường hợp này, hàm :func:`showwarning` sẽ không được khôi phục khi thoát khỏi context handler.
 
-The :data:`~sys.flags.context_aware_warnings` flag can be set the :option:`-X
-context_aware_warnings<-X>` command-line option or by the
-:envvar:`PYTHON_CONTEXT_AWARE_WARNINGS` environment variable.
+Có thể đặt flag :data:`~sys.flags.context_aware_warnings` bằng tùy chọn dòng lệnh :option:`-X context_aware_warnings<-X>` hoặc bằng
+biến môi trường :envvar:`PYTHON_CONTEXT_AWARE_WARNINGS`.
 
     .. note::
 
-        It is likely that most programs that desire thread-safe
-        behaviour of the warnings module will also want to set the
-        :data:`~sys.flags.thread_inherit_context` flag to true.  That flag
-        causes threads created by :class:`threading.Thread` to start
-        with a copy of the context variables from the thread starting
-        it.  When true, the context established by :class:`catch_warnings`
-        in one thread will also apply to new threads started by it.  If false,
-        new threads will start with an empty warnings context variable,
-        meaning that any filtering that was established by a
-        :class:`catch_warnings` context manager will no longer be active.
+        Nhiều khả năng hầu hết các chương trình muốn module warnings hoạt động an toàn với thread cũng sẽ muốn đặt flag
+        :data:`~sys.flags.thread_inherit_context` thành true. Flag đó khiến các thread do :class:`threading.Thread` tạo ra bắt đầu với một bản sao các biến context từ thread tạo ra chúng. Khi là true, context được thiết lập bởi :class:`catch_warnings` trong một thread cũng sẽ áp dụng cho các thread mới do thread đó tạo ra. Nếu là false, các thread mới sẽ bắt đầu với một biến context warnings trống, nghĩa là mọi hoạt động lọc được thiết lập bởi một
+        context manager :class:`catch_warnings` sẽ không còn hoạt động.
 
 .. versionchanged:: 3.14
 
-   Added the :data:`sys.flags.context_aware_warnings` flag and the use of a
-   context variable for :class:`catch_warnings` if the flag is true.  Previous
-   versions of Python acted as if the flag was always set to false.
+   Đã thêm cờ :data:`sys.flags.context_aware_warnings` và việc sử dụng một biến ngữ cảnh cho :class:`catch_warnings` nếu cờ này là true. Các phiên bản Python trước đây hoạt động như thể cờ này luôn được đặt thành false.

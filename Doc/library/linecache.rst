@@ -1,74 +1,53 @@
-:mod:`!linecache` --- Random access to text lines
-=================================================
+:mod:`!linecache` --- Truy cập ngẫu nhiên các dòng văn bản
+==========================================================
 
 .. module:: linecache
-   :synopsis: Provides random access to individual lines from text files.
+   :synopsis: Cung cấp quyền truy cập ngẫu nhiên đến từng dòng trong các tệp văn bản.
 
 .. sectionauthor:: Moshe Zadka <moshez@zadka.site.co.il>
 
-**Source code:** :source:`Lib/linecache.py`
+**Mã nguồn:** :source:`Lib/linecache.py`
 
 --------------
 
-The :mod:`!linecache` module allows one to get any line from a Python source file, while
-attempting to optimize internally, using a cache, the common case where many
-lines are read from a single file.  This is used by the :mod:`traceback` module
-to retrieve source lines for inclusion in  the formatted traceback.
+Mô-đun :mod:`!linecache` cho phép lấy bất kỳ dòng nào từ tệp mã nguồn Python, đồng thời cố gắng tối ưu nội bộ bằng cách sử dụng bộ nhớ đệm cho trường hợp phổ biến là đọc nhiều dòng từ cùng một tệp. Mô-đun :mod:`traceback` sử dụng chức năng này để truy xuất các dòng mã nguồn nhằm đưa vào traceback đã được định dạng.
 
-The :func:`tokenize.open` function is used to open files. This
-function uses :func:`tokenize.detect_encoding` to get the encoding of the
-file; in the absence of an encoding token, the file encoding defaults to UTF-8.
+Hàm :func:`tokenize.open` được sử dụng để mở tệp. Hàm này sử dụng :func:`tokenize.detect_encoding` để lấy encoding của tệp; nếu không có token encoding, encoding của tệp mặc định là UTF-8.
 
-The :mod:`!linecache` module defines the following functions:
+Mô-đun :mod:`!linecache` định nghĩa các hàm sau:
 
 
 .. function:: getline(filename, lineno, module_globals=None)
 
-   Get line *lineno* from file named *filename*. This function will never raise an
-   exception --- it will return ``''`` on errors (the terminating newline character
-   will be included for lines that are found).
+   Lấy dòng *lineno* từ tệp có tên *filename*. Hàm này sẽ không bao giờ phát sinh ngoại lệ --- khi gặp lỗi, hàm sẽ trả về ``''`` (ký tự xuống dòng kết thúc sẽ được bao gồm đối với các dòng tìm thấy).
 
    .. index:: triple: module; search; path
 
-   If *filename* indicates a frozen module (starting with ``'<frozen '``), the function
-   will attempt to get the real file name from ``module_globals['__file__']`` if
-   *module_globals* is not ``None``.
+   Nếu *filename* cho biết một frozen module (bắt đầu bằng ``'<frozen '``), hàm sẽ cố gắng lấy tên tệp thực từ ``module_globals['__file__']`` nếu *module_globals* không phải là ``None``.
 
-   If a file named *filename* is not found, the function first checks
-   for a :pep:`302` ``__loader__`` in *module_globals*.
-   If there is such a loader and it defines a ``get_source`` method,
-   then that determines the source lines
-   (if ``get_source()`` returns ``None``, then ``''`` is returned).
-   Finally, if *filename* is a relative filename,
-   it is looked up relative to the entries in the module search path, ``sys.path``.
+   Nếu không tìm thấy tệp có tên *filename*, trước tiên hàm sẽ kiểm tra :pep:`302` ``__loader__`` trong *module_globals*. Nếu có loader như vậy và loader định nghĩa một phương thức ``get_source``, thì phương thức đó sẽ xác định các dòng mã nguồn (nếu ``get_source()`` trả về ``None``, thì ``''`` sẽ được trả về). Cuối cùng, nếu *filename* là tên tệp tương đối, nó sẽ được tìm kiếm tương ứng với các mục trong đường dẫn tìm kiếm module, ``sys.path``.
 
    .. versionchanged:: 3.14
 
-      Support *filename* of frozen modules.
+      Hỗ trợ *filename* của các frozen module.
 
 
 .. function:: clearcache()
 
-   Clear the cache.  Use this function if you no longer need lines from files
-   previously read using :func:`getline`.
+   Xóa cache. Sử dụng hàm này nếu bạn không còn cần các dòng từ những tệp đã được đọc trước đó bằng :func:`getline`.
 
 
 .. function:: checkcache(filename=None)
 
-   Check the cache for validity.  Use this function if files in the cache  may have
-   changed on disk, and you require the updated version.  If *filename* is omitted,
-   it will check all the entries in the cache.
+   Kiểm tra tính hợp lệ của cache. Sử dụng hàm này nếu các tệp trong cache có thể đã thay đổi trên đĩa và bạn cần phiên bản cập nhật. Nếu bỏ qua *filename*, hàm sẽ kiểm tra tất cả các mục trong cache.
 
 .. function:: lazycache(filename, module_globals)
 
-   Capture enough detail about a non-file-based module to permit getting its
-   lines later via :func:`getline` even if *module_globals* is ``None`` in the later
-   call. This avoids doing I/O until a line is actually needed, without having
-   to carry the module globals around indefinitely.
+   Lưu đủ thông tin chi tiết về một module không dựa trên tệp để sau này có thể lấy các dòng của module đó qua :func:`getline`, ngay cả khi *module_globals* là ``None`` trong lần gọi sau. Điều này giúp trì hoãn việc I/O cho đến khi thực sự cần một dòng, mà không phải giữ các biến toàn cục của module vô thời hạn.
 
    .. versionadded:: 3.5
 
-Example::
+Ví dụ::
 
    >>> import linecache
    >>> linecache.getline(linecache.__file__, 8)

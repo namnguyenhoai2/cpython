@@ -1,12 +1,12 @@
-:mod:`!smtplib` --- SMTP protocol client
-========================================
+:mod:`!smtplib` --- Máy khách giao thức SMTP
+============================================
 
 .. module:: smtplib
-   :synopsis: SMTP protocol client (requires sockets).
+   :synopsis: Máy khách giao thức SMTP (yêu cầu sockets).
 
 .. sectionauthor:: Eric S. Raymond <esr@snark.thyrsus.com>
 
-**Source code:** :source:`Lib/smtplib.py`
+**Mã nguồn:** :source:`Lib/smtplib.py`
 
 .. index::
    pair: SMTP; protocol
@@ -14,40 +14,20 @@
 
 --------------
 
-The :mod:`!smtplib` module defines an SMTP client session object that can be used
-to send mail to any internet machine with an SMTP or ESMTP listener daemon.  For
-details of SMTP and ESMTP operation, consult :rfc:`821` (Simple Mail Transfer
-Protocol) and :rfc:`1869` (SMTP Service Extensions).
+Mô-đun :mod:`!smtplib` định nghĩa một đối tượng phiên SMTP client có thể được dùng để gửi thư đến bất kỳ máy nào trên Internet có daemon listener SMTP hoặc ESMTP. Để biết chi tiết về hoạt động của SMTP và ESMTP, hãy tham khảo :rfc:`821` (Simple Mail Transfer Protocol) và :rfc:`1869` (SMTP Service Extensions).
 
 .. include:: ../includes/wasm-notavail.rst
 
 .. class:: SMTP(host='', port=0, local_hostname=None[, timeout], source_address=None)
 
-   An :class:`SMTP` instance encapsulates an SMTP connection.  It has methods
-   that support a full repertoire of SMTP and ESMTP operations. If the optional
-   *host* and *port* parameters are given, the SMTP :meth:`connect` method is
-   called with those parameters during initialization.  If specified,
-   *local_hostname* is used as the FQDN of the local host in the HELO/EHLO
-   command.  Otherwise, the local hostname is found using
-   :func:`socket.getfqdn`.  If the :meth:`connect` call returns anything other
-   than a success code, an :exc:`SMTPConnectError` is raised. The optional
-   *timeout* parameter specifies a timeout in seconds for blocking operations
-   like the connection attempt (if not specified, the global default timeout
-   setting will be used).  If the timeout expires, :exc:`TimeoutError` is
-   raised.  The optional *source_address* parameter allows binding
-   to some specific source address in a machine with multiple network
-   interfaces, and/or to some specific source TCP port. It takes a 2-tuple
-   ``(host, port)``, for the socket to bind to as its source address before
-   connecting. If omitted (or if *host* or *port* are ``''`` and/or ``0``
-   respectively) the OS default behavior will be used.
+   Một thực thể :class:`SMTP` đóng gói một kết nối SMTP. Thực thể này có các phương thức hỗ trợ đầy đủ các thao tác SMTP và ESMTP. Nếu cung cấp các tham số tùy chọn *host* và *port*, phương thức SMTP :meth:`connect` sẽ được gọi với các tham số đó trong quá trình khởi tạo. Nếu được chỉ định, *local_hostname* được dùng làm FQDN của máy cục bộ trong lệnh HELO/EHLO. Nếu không, tên máy cục bộ được tìm bằng cách sử dụng
+   :func:`socket.getfqdn`. Nếu lệnh gọi :meth:`connect` trả về bất kỳ giá trị nào khác mã thành công, một :exc:`SMTPConnectError` sẽ được raised. Tham số tùy chọn *timeout* chỉ định thời gian chờ tính bằng giây cho các thao tác blocking như lần thử kết nối (nếu không chỉ định, thiết lập thời gian chờ mặc định toàn cục sẽ được sử dụng). Nếu thời gian chờ hết hạn, :exc:`TimeoutError` sẽ được raised. Tham số tùy chọn *source_address* cho phép binding với một địa chỉ nguồn cụ thể trên máy có nhiều network interface và/hoặc với một TCP port nguồn cụ thể. Tham số này nhận một tuple 2 phần tử ``(host, port)``, để socket binding với tư cách địa chỉ nguồn trước khi kết nối. Nếu bỏ qua (hoặc nếu *host* hoặc *port* lần lượt là ``''`` và/hoặc ``0``) thì hành vi mặc định của OS sẽ được sử dụng.
 
-   For normal use, you should only require the initialization/connect,
-   :meth:`sendmail`, and :meth:`SMTP.quit` methods.
-   An example is included below.
+   Trong trường hợp sử dụng thông thường, bạn chỉ cần khởi tạo/kết nối,
+   :meth:`sendmail`, và các phương thức :meth:`SMTP.quit`. Bên dưới có một ví dụ.
 
-   The :class:`SMTP` class supports the :keyword:`with` statement.  When used
-   like this, the SMTP ``QUIT`` command is issued automatically when the
-   :keyword:`!with` statement exits.  E.g.::
+   Lớp :class:`SMTP` hỗ trợ câu lệnh :keyword:`with`. Khi được sử dụng như thế này, lệnh SMTP ``QUIT`` sẽ tự động được gửi khi
+   câu lệnh :keyword:`!with` kết thúc. Ví dụ:::
 
     >>> from smtplib import SMTP
     >>> with SMTP("domain.org") as smtp:
@@ -58,537 +38,388 @@ Protocol) and :rfc:`1869` (SMTP Service Extensions).
 
    .. audit-event:: smtplib.send self,data smtplib.SMTP
 
-      All commands will raise an :ref:`auditing event <auditing>`
-      ``smtplib.SMTP.send`` with arguments ``self`` and ``data``,
-      where ``data`` is the bytes about to be sent to the remote host.
+      Tất cả các lệnh sẽ phát sinh một :ref:`sự kiện auditing <auditing>` ``smtplib.SMTP.send`` với các đối số ``self`` và ``data``, trong đó ``data`` là các byte sắp được gửi đến máy chủ từ xa.
 
    .. versionchanged:: 3.3
-      Support for the :keyword:`with` statement was added.
+      Đã bổ sung hỗ trợ cho câu lệnh :keyword:`with`.
 
    .. versionchanged:: 3.3
-      *source_address* argument was added.
+      Đã bổ sung đối số *source_address*.
 
    .. versionadded:: 3.5
-      The SMTPUTF8 extension (:rfc:`6531`) is now supported.
+      Phần mở rộng SMTPUTF8 (:rfc:`6531`) hiện đã được hỗ trợ.
 
    .. versionchanged:: 3.9
-      If the *timeout* parameter is set to be zero, it will raise a
-      :class:`ValueError` to prevent the creation of a non-blocking socket.
+      Nếu tham số *timeout* được đặt bằng không, tham số này sẽ gây ra một
+      :class:`ValueError` để ngăn việc tạo một socket không chặn.
 
 .. class:: SMTP_SSL(host='', port=0, local_hostname=None, * [, timeout], \
                     context=None, source_address=None)
 
-   An :class:`SMTP_SSL` instance behaves exactly the same as instances of
-   :class:`SMTP`. :class:`SMTP_SSL` should be used for situations where SSL is
-   required from the beginning of the connection and using :meth:`~SMTP.starttls`
-   is not appropriate. If *host* is not specified, the local host is used. If
-   *port* is zero, the standard SMTP-over-SSL port (465) is used.  The optional
-   arguments *local_hostname*, *timeout* and *source_address* have the same
-   meaning as they do in the :class:`SMTP` class.  *context*, also optional,
-   can contain a :class:`~ssl.SSLContext` and allows configuring various
-   aspects of the secure connection.  Please read :ref:`ssl-security` for
-   best practices.
+   Một instance :class:`SMTP_SSL` hoạt động hoàn toàn giống như các instance của
+   :class:`SMTP`. :class:`SMTP_SSL` nên được sử dụng trong những trường hợp SSL là bắt buộc ngay từ đầu kết nối và việc sử dụng :meth:`~SMTP.starttls` là không phù hợp. Nếu không chỉ định *host*, máy chủ cục bộ sẽ được sử dụng. Nếu *port* bằng không, cổng SMTP-over-SSL tiêu chuẩn (465) sẽ được sử dụng. Các đối số tùy chọn *local_hostname*, *timeout* và *source_address* có cùng ý nghĩa như trong lớp :class:`SMTP`. *context*, cũng là tùy chọn, có thể chứa một :class:`~ssl.SSLContext` và cho phép cấu hình nhiều khía cạnh của kết nối bảo mật. Vui lòng đọc :ref:`ssl-security` để biết các phương pháp hay nhất.
 
    .. versionchanged:: 3.3
-      *context* was added.
+      Đã bổ sung *context*.
 
    .. versionchanged:: 3.3
-      The *source_address* argument was added.
+      Đã bổ sung đối số *source_address*.
 
    .. versionchanged:: 3.4
-      The class now supports hostname check with
-      :attr:`ssl.SSLContext.check_hostname` and *Server Name Indication* (see
+      Lớp này hiện hỗ trợ kiểm tra hostname bằng
+      :attr:`ssl.SSLContext.check_hostname` và *Server Name Indication* (xem
       :const:`ssl.HAS_SNI`).
 
    .. versionchanged:: 3.9
-      If the *timeout* parameter is set to be zero, it will raise a
-      :class:`ValueError` to prevent the creation of a non-blocking socket
+      Nếu tham số *timeout* được đặt bằng không, tham số này sẽ gây ra một
+      :class:`ValueError` để ngăn việc tạo socket không blocking
 
    .. versionchanged:: 3.12
-      The deprecated *keyfile* and *certfile* parameters have been removed.
+      Các tham số *keyfile* và *certfile* không còn được hỗ trợ đã bị loại bỏ.
 
 .. class:: LMTP(host='', port=LMTP_PORT, local_hostname=None, \
                 source_address=None[, timeout])
 
-   The LMTP protocol, which is very similar to ESMTP, is heavily based on the
-   standard SMTP client. It's common to use Unix sockets for LMTP, so our
-   :meth:`~SMTP.connect` method must support that as well as a regular host:port
-   server. The optional arguments *local_hostname* and *source_address* have the
-   same meaning as they do in the :class:`SMTP` class. To specify a Unix
-   socket, you must use an absolute path for *host*, starting with a '/'.
+   Giao thức LMTP, rất giống ESMTP, phần lớn dựa trên SMTP client tiêu chuẩn. LMTP thường sử dụng Unix socket, vì vậy của chúng tôi
+   Phương thức :meth:`~SMTP.connect` cũng phải hỗ trợ điều đó, ngoài máy chủ host:port thông thường. Các đối số tùy chọn *local_hostname* và *source_address* có cùng ý nghĩa như trong lớp :class:`SMTP`. Để chỉ định Unix socket, bạn phải sử dụng đường dẫn tuyệt đối cho *host*, bắt đầu bằng '/'.
 
-   Authentication is supported, using the regular SMTP mechanism. When using a
-   Unix socket, LMTP generally don't support or require any authentication, but
-   your mileage might vary.
+   Cơ chế xác thực được hỗ trợ bằng cách sử dụng cơ chế SMTP thông thường. Khi sử dụng Unix socket, LMTP thường không hỗ trợ hoặc không yêu cầu xác thực, nhưng điều này có thể khác tùy trường hợp.
 
    .. versionchanged:: 3.9
-      The optional *timeout* parameter was added.
+      Tham số tùy chọn *timeout* đã được bổ sung.
 
 
-A nice selection of exceptions is defined as well:
+Một tập hợp phong phú các exception cũng được định nghĩa:
 
 
 .. exception:: SMTPException
 
-   Subclass of :exc:`OSError` that is the base exception class for all
-   the other exceptions provided by this module.
+   Lớp con của :exc:`OSError`, là lớp exception cơ sở cho tất cả các exception khác do module này cung cấp.
 
    .. versionchanged:: 3.4
-      SMTPException became subclass of :exc:`OSError`
+      SMTPException đã trở thành lớp con của :exc:`OSError`
 
 
 .. exception:: SMTPServerDisconnected
 
-   This exception is raised when the server unexpectedly disconnects, or when an
-   attempt is made to use the :class:`SMTP` instance before connecting it to a
-   server.
+   Exception này được raise khi máy chủ ngắt kết nối đột ngột hoặc khi cố gắng sử dụng instance :class:`SMTP` trước khi kết nối nó với máy chủ.
 
 
 .. exception:: SMTPResponseException
 
-   Base class for all exceptions that include an SMTP error code. These exceptions
-   are generated in some instances when the SMTP server returns an error code.
+   Lớp cơ sở cho tất cả các ngoại lệ bao gồm mã lỗi SMTP. Các ngoại lệ này được tạo ra trong một số trường hợp khi máy chủ SMTP trả về mã lỗi.
 
    .. attribute:: smtp_code
 
-      The error code.
+      Mã lỗi.
 
    .. attribute:: smtp_error
 
-      The error message.
+      Thông báo lỗi.
 
 
 .. exception:: SMTPSenderRefused
 
-   Sender address refused.  In addition to the attributes set by on all
-   :exc:`SMTPResponseException` exceptions, this sets 'sender' to the string that
-   the SMTP server refused.
+   Địa chỉ người gửi bị từ chối. Ngoài các thuộc tính được thiết lập trên tất cả
+   các ngoại lệ :exc:`SMTPResponseException`, thuộc tính này đặt 'sender' thành chuỗi mà máy chủ SMTP đã từ chối.
 
 
 .. exception:: SMTPRecipientsRefused
 
-   All recipient addresses refused.
+   Tất cả địa chỉ người nhận đều bị từ chối.
 
    .. attribute:: recipients
 
-      A dictionary of exactly the same sort as returned
-      by :meth:`SMTP.sendmail` containing the errors for
-      each recipient.
+      Một dictionary có đúng cùng kiểu với dictionary được trả về bởi :meth:`SMTP.sendmail`, chứa các lỗi cho từng người nhận.
 
 
 .. exception:: SMTPDataError
 
-   The SMTP server refused to accept the message data.
+   Máy chủ SMTP từ chối chấp nhận dữ liệu thư.
 
 
 .. exception:: SMTPConnectError
 
-   Error occurred during establishment of a connection  with the server.
+   Đã xảy ra lỗi trong quá trình thiết lập kết nối với máy chủ.
 
 
 .. exception:: SMTPHeloError
 
-   The server refused our ``HELO`` message.
+   Máy chủ từ chối thư ``HELO`` của chúng tôi.
 
 
 .. exception:: SMTPNotSupportedError
 
-    The command or option attempted is not supported by the server.
+    Máy chủ không hỗ trợ lệnh hoặc tùy chọn được yêu cầu.
 
     .. versionadded:: 3.5
 
 
 .. exception:: SMTPAuthenticationError
 
-   SMTP authentication went wrong.  Most probably the server didn't accept the
-   username/password combination provided.
+   Xác thực SMTP không thành công.  Rất có thể máy chủ không chấp nhận tổ hợp tên người dùng/mật khẩu được cung cấp.
 
 
 .. seealso::
 
-   :rfc:`821` - Simple Mail Transfer Protocol
-      Protocol definition for SMTP.  This document covers the model, operating
-      procedure, and protocol details for SMTP.
+   :rfc:`821` - Giao thức truyền thư đơn giản
+      Định nghĩa giao thức SMTP.  Tài liệu này trình bày mô hình, quy trình vận hành và các chi tiết của giao thức SMTP.
 
-   :rfc:`1869` - SMTP Service Extensions
-      Definition of the ESMTP extensions for SMTP.  This describes a framework for
-      extending SMTP with new commands, supporting dynamic discovery of the commands
-      provided by the server, and defines a few additional commands.
+   :rfc:`1869` - Các phần mở rộng dịch vụ SMTP
+      Định nghĩa các phần mở rộng ESMTP cho SMTP. Nội dung này mô tả một framework để mở rộng SMTP bằng các lệnh mới, hỗ trợ tự động phát hiện các lệnh do máy chủ cung cấp và định nghĩa thêm một số lệnh.
 
 
 .. _smtp-objects:
 
-SMTP Objects
-------------
+Các đối tượng SMTP
+------------------
 
-An :class:`SMTP` instance has the following methods:
+Một thực thể :class:`SMTP` có các phương thức sau:
 
 .. method:: SMTP.set_debuglevel(level)
 
-   Set the debug output level.  A value of 1 or ``True`` for *level* results in
-   debug messages for connection and for all messages sent to and received from
-   the server.  A value of 2 for *level* results in these messages being
-   timestamped.
+   Đặt mức độ xuất thông tin gỡ lỗi. Giá trị 1 hoặc ``True`` cho *level* sẽ tạo thông báo gỡ lỗi cho kết nối và cho tất cả thông báo được gửi đến cũng như nhận từ máy chủ. Giá trị 2 cho *level* sẽ khiến các thông báo này được thêm dấu thời gian.
 
-   .. versionchanged:: 3.5 Added debuglevel 2.
+   .. versionchanged:: 3.5 Đã thêm debuglevel 2.
 
 
 .. method:: SMTP.docmd(cmd, args='')
 
-   Send a command *cmd* to the server.  The optional argument *args* is simply
-   concatenated to the command, separated by a space.
+   Gửi lệnh *cmd* đến máy chủ. Đối số tùy chọn *args* chỉ đơn giản được nối vào lệnh, được phân cách bằng một dấu cách.
 
-   This returns a 2-tuple composed of a numeric response code and the actual
-   response line (multiline responses are joined into one long line.)
+   Phương thức này trả về một bộ 2 phần tử gồm mã phản hồi dạng số và dòng phản hồi thực tế (các phản hồi nhiều dòng được nối thành một dòng dài duy nhất.)
 
-   In normal operation it should not be necessary to call this method explicitly.
-   It is used to implement other methods and may be useful for testing private
-   extensions.
+   Trong hoạt động thông thường, bạn không cần gọi phương thức này một cách tường minh. Phương thức này được dùng để triển khai các phương thức khác và có thể hữu ích khi kiểm thử các phần mở rộng riêng tư.
 
-   If the connection to the server is lost while waiting for the reply,
-   :exc:`SMTPServerDisconnected` will be raised.
+   Nếu kết nối với máy chủ bị mất trong khi đang chờ phản hồi,
+   :exc:`SMTPServerDisconnected` sẽ được đưa ra.
 
 
 .. method:: SMTP.connect(host='localhost', port=0)
 
-   Connect to a host on a given port.  The defaults are to connect to the local
-   host at the standard SMTP port (25). If the hostname ends with a colon (``':'``)
-   followed by a number, that suffix will be stripped off and the number
-   interpreted as the port number to use. This method is automatically invoked by
-   the constructor if a host is specified during instantiation.  Returns a
-   2-tuple of the response code and message sent by the server in its
-   connection response.
+   Kết nối với một máy chủ trên cổng đã cho. Mặc định, phương thức này kết nối với máy chủ cục bộ qua cổng SMTP tiêu chuẩn (25). Nếu tên máy chủ kết thúc bằng dấu hai chấm (``':'``) theo sau là một số, phần hậu tố đó sẽ bị loại bỏ và số này được hiểu là số cổng cần sử dụng. Phương thức này được hàm khởi tạo tự động gọi nếu một máy chủ được chỉ định khi khởi tạo. Trả về một bộ 2 phần tử gồm mã phản hồi và thông báo do máy chủ gửi trong phản hồi kết nối.
 
    .. audit-event:: smtplib.connect self,host,port smtplib.SMTP.connect
 
 
 .. method:: SMTP.helo(name='')
 
-   Identify yourself to the SMTP server using ``HELO``.  The hostname argument
-   defaults to the fully qualified domain name of the local host.
-   The message returned by the server is stored as the :attr:`helo_resp` attribute
-   of the object.
+   Xác định danh tính của bạn với máy chủ SMTP bằng ``HELO``. Đối số hostname mặc định là tên miền đầy đủ của máy chủ cục bộ. Thông báo do máy chủ trả về được lưu trong thuộc tính :attr:`helo_resp` của đối tượng.
 
-   In normal operation it should not be necessary to call this method explicitly.
-   It will be implicitly called by the :meth:`sendmail` when necessary.
+   Trong hoạt động thông thường, bạn không cần gọi phương thức này một cách tường minh. Phương thức này sẽ được :meth:`sendmail` gọi ngầm khi cần.
 
 
 .. method:: SMTP.ehlo(name='')
 
-   Identify yourself to an ESMTP server using ``EHLO``.  The hostname argument
-   defaults to the fully qualified domain name of the local host.  Examine the
-   response for ESMTP option and store them for use by :meth:`has_extn`.
-   Also sets several informational attributes: the message returned by
-   the server is stored as the :attr:`ehlo_resp` attribute, :attr:`does_esmtp`
-   is set to ``True`` or ``False`` depending on whether the server supports
-   ESMTP, and :attr:`esmtp_features` will be a dictionary containing the names
-   of the SMTP service extensions this server supports, and their parameters
-   (if any).
+   Xác thực danh tính của bạn với máy chủ ESMTP bằng ``EHLO``. Đối số hostname mặc định là tên miền đủ điều kiện (FQDN) của máy chủ cục bộ. Kiểm tra phản hồi để tìm các tùy chọn ESMTP và lưu chúng để :meth:`has_extn` sử dụng. Đồng thời thiết lập một số thuộc tính thông tin: thông báo do máy chủ trả về được lưu trong thuộc tính :attr:`ehlo_resp`, :attr:`does_esmtp` được đặt thành ``True`` hoặc ``False`` tùy thuộc vào việc máy chủ có hỗ trợ ESMTP hay không, và :attr:`esmtp_features` sẽ là một từ điển chứa tên của các phần mở rộng dịch vụ SMTP mà máy chủ này hỗ trợ cùng với các tham số của chúng (nếu có).
 
-   Unless you wish to use :meth:`has_extn` before sending mail, it should not be
-   necessary to call this method explicitly.  It will be implicitly called by
-   :meth:`sendmail` when necessary.
+   Trừ khi bạn muốn sử dụng :meth:`has_extn` trước khi gửi thư, bạn không cần gọi phương thức này một cách rõ ràng. Phương thức này sẽ được gọi ngầm bởi
+   :meth:`sendmail` khi cần.
 
 .. method:: SMTP.ehlo_or_helo_if_needed()
 
-   This method calls :meth:`ehlo` and/or :meth:`helo` if there has been no
-   previous ``EHLO`` or ``HELO`` command this session.  It tries ESMTP ``EHLO``
-   first.
+   Phương thức này gọi :meth:`ehlo` và/hoặc :meth:`helo` nếu trước đó trong phiên này chưa có lệnh ``EHLO`` hoặc ``HELO``. Trước tiên, phương thức thử ESMTP ``EHLO``.
 
    :exc:`SMTPHeloError`
-     The server didn't reply properly to the ``HELO`` greeting.
+     Máy chủ không phản hồi đúng cách với lời chào ``HELO``.
 
 .. method:: SMTP.has_extn(name)
 
-   Return :const:`True` if *name* is in the set of SMTP service extensions returned
-   by the server, :const:`False` otherwise. Case is ignored.
+   Trả về :const:`True` nếu *name* nằm trong tập các phần mở rộng dịch vụ SMTP do máy chủ trả về; nếu không thì trả về :const:`False`. Không phân biệt chữ hoa chữ thường.
 
 
 .. method:: SMTP.verify(address)
 
-   Check the validity of an address on this server using SMTP ``VRFY``. Returns a
-   tuple consisting of code 250 and a full :rfc:`822` address (including human
-   name) if the user address is valid. Otherwise returns an SMTP error code of 400
-   or greater and an error string.
+   Kiểm tra tính hợp lệ của một địa chỉ trên máy chủ này bằng SMTP ``VRFY``. Trả về một tuple gồm mã 250 và địa chỉ :rfc:`822` đầy đủ (bao gồm tên hiển thị) nếu địa chỉ người dùng hợp lệ. Nếu không, trả về mã lỗi SMTP từ 400 trở lên và một chuỗi lỗi.
 
    .. note::
 
-      Many sites disable SMTP ``VRFY`` in order to foil spammers.
+      Nhiều trang web vô hiệu hóa ``VRFY`` SMTP để ngăn chặn spammer.
 
 
 .. method:: SMTP.login(user, password, *, initial_response_ok=True)
 
-   Log in on an SMTP server that requires authentication. The arguments are the
-   username and the password to authenticate with. If there has been no previous
-   ``EHLO`` or ``HELO`` command this session, this method tries ESMTP ``EHLO``
-   first. This method will return normally if the authentication was successful, or
-   may raise the following exceptions:
+   Đăng nhập vào máy chủ SMTP yêu cầu xác thực. Các đối số là tên người dùng và mật khẩu dùng để xác thực. Nếu trước đó trong phiên này chưa có lệnh ``EHLO`` hoặc ``HELO``, phương thức này trước tiên sẽ thử ESMTP ``EHLO``. Phương thức này sẽ trả về bình thường nếu xác thực thành công hoặc có thể phát sinh các ngoại lệ sau:
 
    :exc:`SMTPHeloError`
-      The server didn't reply properly to the ``HELO`` greeting.
+      Máy chủ không phản hồi đúng cách với lời chào ``HELO``.
 
    :exc:`SMTPAuthenticationError`
-      The server didn't accept the username/password combination.
+      Máy chủ không chấp nhận tổ hợp tên người dùng/mật khẩu.
 
    :exc:`SMTPNotSupportedError`
-      The ``AUTH`` command is not supported by the server.
+      Lệnh ``AUTH`` không được máy chủ hỗ trợ.
 
    :exc:`SMTPException`
-      No suitable authentication method was found.
+      Không tìm thấy phương thức xác thực phù hợp.
 
-   Each of the authentication methods supported by :mod:`!smtplib` are tried in
-   turn if they are advertised as supported by the server.  See :meth:`auth`
-   for a list of supported authentication methods.  *initial_response_ok* is
-   passed through to :meth:`auth`.
+   Mỗi phương thức xác thực được :mod:`!smtplib` hỗ trợ sẽ lần lượt được thử nếu máy chủ thông báo rằng phương thức đó được hỗ trợ. Xem :meth:`auth` để biết danh sách các phương thức xác thực được hỗ trợ. *initial_response_ok* được truyền qua :meth:`auth`.
 
-   Optional keyword argument *initial_response_ok* specifies whether, for
-   authentication methods that support it, an "initial response" as specified
-   in :rfc:`4954` can be sent along with the ``AUTH`` command, rather than
-   requiring a challenge/response.
+   Đối số từ khóa tùy chọn *initial_response_ok* chỉ định liệu, đối với các phương thức xác thực hỗ trợ tính năng này, một "initial response" như được chỉ định trong :rfc:`4954` có thể được gửi cùng với lệnh ``AUTH``, thay vì yêu cầu challenge/response.
 
    .. versionchanged:: 3.5
       :exc:`SMTPNotSupportedError` may be raised, and the
-      *initial_response_ok* parameter was added.
+      Đã thêm tham số *initial_response_ok*.
 
 
 .. method:: SMTP.auth(mechanism, authobject, *, initial_response_ok=True)
 
-   Issue an ``SMTP`` ``AUTH`` command for the specified authentication
-   *mechanism*, and handle the challenge response via *authobject*.
+   Phát hành lệnh ``SMTP`` ``AUTH`` cho *mechanism* xác thực được chỉ định và xử lý challenge response thông qua *authobject*.
 
-   *mechanism* specifies which authentication mechanism is to
-   be used as argument to the ``AUTH`` command; the valid values are
-   those listed in the ``auth`` element of :attr:`esmtp_features`.
+   *mechanism* chỉ định mechanism xác thực được dùng làm đối số cho lệnh ``AUTH``; các giá trị hợp lệ là những giá trị được liệt kê trong phần tử ``auth`` của :attr:`esmtp_features`.
 
-   *authobject* must be a callable object taking an optional single argument::
+   *authobject* phải là một đối tượng callable nhận một đối số đơn tùy chọn::
 
      data = authobject(challenge=None)
 
-   If optional keyword argument *initial_response_ok* is true,
-   ``authobject()`` will be called first with no argument.  It can return the
-   :rfc:`4954` "initial response" ASCII ``str`` which will be encoded and sent with
-   the ``AUTH`` command as below.  If the ``authobject()`` does not support an
-   initial response (e.g. because it requires a challenge), it should return
-   ``None`` when called with ``challenge=None``.  If *initial_response_ok* is
-   false, then ``authobject()`` will not be called first with ``None``.
+   Nếu đối số từ khóa tùy chọn *initial_response_ok* là true, ``authobject()`` sẽ được gọi trước tiên mà không có đối số. Nó có thể trả về
+   :rfc:`4954` "initial response" ASCII ``str``, chuỗi này sẽ được mã hóa và gửi cùng với lệnh ``AUTH`` như bên dưới. Nếu ``authobject()`` không hỗ trợ initial response (ví dụ: vì yêu cầu challenge), nó sẽ trả về ``None`` khi được gọi với ``challenge=None``. Nếu *initial_response_ok* là false, thì ``authobject()`` sẽ không được gọi trước tiên với ``None``.
 
-   If the initial response check returns ``None``, or if *initial_response_ok* is
-   false, ``authobject()`` will be called to process the server's challenge
-   response; the *challenge* argument it is passed will be a ``bytes``.  It
-   should return ASCII ``str`` *data* that will be base64 encoded and sent to the
-   server.
+   Nếu bước kiểm tra phản hồi ban đầu trả về ``None``, hoặc nếu *initial_response_ok* là false, ``authobject()`` sẽ được gọi để xử lý phản hồi thử thách của máy chủ; đối số *challenge* được truyền cho nó sẽ là một ``bytes``. Nó phải trả về dữ liệu ASCII ``str`` *data*, dữ liệu này sẽ được mã hóa base64 và gửi đến máy chủ.
 
-   The ``SMTP`` class provides ``authobjects`` for the ``CRAM-MD5``, ``PLAIN``,
-   and ``LOGIN`` mechanisms; they are named ``SMTP.auth_cram_md5``,
-   ``SMTP.auth_plain``, and ``SMTP.auth_login`` respectively.  They all require
-   that the ``user`` and ``password`` properties of the ``SMTP`` instance are
-   set to appropriate values.
+   Lớp ``SMTP`` cung cấp ``authobjects`` cho các cơ chế ``CRAM-MD5``, ``PLAIN`` và ``LOGIN``; lần lượt chúng được đặt tên là ``SMTP.auth_cram_md5``, ``SMTP.auth_plain`` và ``SMTP.auth_login``. Tất cả đều yêu cầu các thuộc tính ``user`` và ``password`` của thực thể ``SMTP`` được đặt thành các giá trị phù hợp.
 
-   User code does not normally need to call ``auth`` directly, but can instead
-   call the :meth:`login` method, which will try each of the above mechanisms
-   in turn, in the order listed.  ``auth`` is exposed to facilitate the
-   implementation of authentication methods not (or not yet) supported
-   directly by :mod:`!smtplib`.
+   Mã người dùng thường không cần gọi trực tiếp ``auth``, mà có thể gọi phương thức :meth:`login`, phương thức này sẽ lần lượt thử từng cơ chế nêu trên theo thứ tự được liệt kê. ``auth`` được cung cấp để hỗ trợ triển khai các phương thức xác thực chưa được :mod:`!smtplib` hỗ trợ trực tiếp (hoặc chưa được hỗ trợ).
 
    .. versionadded:: 3.5
 
 
 .. method:: SMTP.starttls(*, context=None)
 
-   Put the SMTP connection in TLS (Transport Layer Security) mode.  All SMTP
-   commands that follow will be encrypted.  You should then call :meth:`ehlo`
-   again.
+   Đặt kết nối SMTP vào chế độ TLS (Transport Layer Security). Tất cả lệnh SMTP tiếp theo sẽ được mã hóa. Sau đó, bạn nên gọi lại :meth:`ehlo`.
 
-   If *keyfile* and *certfile* are provided, they are used to create an
+   Nếu cung cấp *keyfile* và *certfile*, chúng sẽ được dùng để tạo một
    :class:`ssl.SSLContext`.
 
-   Optional *context* parameter is an :class:`ssl.SSLContext` object; This is
-   an alternative to using a keyfile and a certfile and if specified both
-   *keyfile* and *certfile* should be ``None``.
+   Tham số *context* tùy chọn là một đối tượng :class:`ssl.SSLContext`; đây là lựa chọn thay thế cho việc sử dụng keyfile và certfile, và nếu được chỉ định thì cả *keyfile* lẫn *certfile* đều phải là ``None``.
 
-   If there has been no previous ``EHLO`` or ``HELO`` command this session,
-   this method tries ESMTP ``EHLO`` first.
+   Nếu trong phiên này chưa có lệnh ``EHLO`` hoặc ``HELO`` nào trước đó, phương thức này trước tiên sẽ thử ESMTP ``EHLO``.
 
    .. versionchanged:: 3.12
-      The deprecated *keyfile* and *certfile* parameters have been removed.
+      Các tham số không còn được khuyến nghị *keyfile* và *certfile* đã bị xóa.
 
    :exc:`SMTPHeloError`
-      The server didn't reply properly to the ``HELO`` greeting.
+      Máy chủ không phản hồi đúng cách với lời chào ``HELO``.
 
    :exc:`SMTPNotSupportedError`
-     The server does not support the STARTTLS extension.
+     Máy chủ không hỗ trợ extension STARTTLS.
 
    :exc:`RuntimeError`
-     SSL/TLS support is not available to your Python interpreter.
+     Trình thông dịch Python của bạn không hỗ trợ SSL/TLS.
 
    .. versionchanged:: 3.3
-      *context* was added.
+      *context* đã được thêm.
 
    .. versionchanged:: 3.4
-      The method now supports hostname check with
-      :attr:`ssl.SSLContext.check_hostname` and *Server Name Indicator* (see
+      Phương thức hiện hỗ trợ kiểm tra hostname với
+      :attr:`ssl.SSLContext.check_hostname` và *Server Name Indicator* (xem
       :const:`~ssl.HAS_SNI`).
 
    .. versionchanged:: 3.5
-      The error raised for lack of STARTTLS support is now the
-      :exc:`SMTPNotSupportedError` subclass instead of the base
+      Lỗi phát sinh do không hỗ trợ STARTTLS hiện giờ là
+      lớp con :exc:`SMTPNotSupportedError` thay vì lớp cơ sở
       :exc:`SMTPException`.
 
 
 .. method:: SMTP.sendmail(from_addr, to_addrs, msg, mail_options=(), rcpt_options=())
 
-   Send mail.  The required arguments are an :rfc:`822` from-address string, a list
-   of :rfc:`822` to-address strings (a bare string will be treated as a list with 1
-   address), and a message string.  The caller may pass a list of ESMTP options
-   (such as ``"8bitmime"``) to be used in ``MAIL FROM`` commands as *mail_options*.
-   ESMTP options (such as ``DSN`` commands) that should be used with all ``RCPT``
-   commands can be passed as *rcpt_options*. Each option should be passed as a string
-   containing the full text of the option, including any potential key
-   (for instance, ``"NOTIFY=SUCCESS,FAILURE"``). (If you need to use different ESMTP
-   options to different recipients you have to use the low-level methods such as
-   :meth:`!mail`, :meth:`!rcpt` and :meth:`!data` to send the message.)
+   Gửi thư. Các đối số bắt buộc là một chuỗi địa chỉ người gửi :rfc:`822`, một danh sách các chuỗi địa chỉ người nhận :rfc:`822` (một chuỗi đơn sẽ được coi là danh sách có 1 địa chỉ), và một chuỗi thông báo. Bên gọi có thể truyền một danh sách các tùy chọn ESMTP (chẳng hạn như ``"8bitmime"``) được sử dụng trong các lệnh ``MAIL FROM`` dưới dạng *mail_options*. Có thể truyền các tùy chọn ESMTP (chẳng hạn như các lệnh ``DSN``) cần được sử dụng với tất cả các lệnh ``RCPT`` dưới dạng *rcpt_options*. Mỗi tùy chọn phải được truyền dưới dạng một chuỗi chứa toàn bộ nội dung của tùy chọn, bao gồm cả khóa nếu có (ví dụ: ``"NOTIFY=SUCCESS,FAILURE"``). (Nếu cần sử dụng các tùy chọn ESMTP khác nhau cho những người nhận khác nhau, bạn phải sử dụng các phương thức cấp thấp như
+   :meth:`!mail`, :meth:`!rcpt` và :meth:`!data` để gửi thông báo.)
 
    .. note::
 
-      The *from_addr* and *to_addrs* parameters are used to construct the message
-      envelope used by the transport agents.  ``sendmail`` does not modify the
-      message headers in any way.
+      Các tham số *from_addr* và *to_addrs* được dùng để tạo phong bì thông báo được các tác nhân truyền tải sử dụng. ``sendmail`` không sửa đổi các tiêu đề thông báo theo bất kỳ cách nào.
 
-   *msg* may be a string containing characters in the ASCII range, or a byte
-   string.  A string is encoded to bytes using the ascii codec, and lone ``\r``
-   and ``\n`` characters are converted to ``\r\n`` characters.  A byte string is
-   not modified.
+   *msg* có thể là một chuỗi chứa các ký tự trong phạm vi ASCII hoặc một chuỗi byte. Chuỗi được mã hóa thành byte bằng codec ascii, và các ký tự ``\r`` và ``\n`` đứng riêng lẻ được chuyển thành các ký tự ``\r\n``. Chuỗi byte không bị sửa đổi.
 
-   If there has been no previous ``EHLO`` or ``HELO`` command this session, this
-   method tries ESMTP ``EHLO`` first. If the server does ESMTP, message size and
-   each of the specified options will be passed to it (if the option is in the
-   feature set the server advertises).  If ``EHLO`` fails, ``HELO`` will be tried
-   and ESMTP options suppressed.
+   Nếu trước đó trong phiên này chưa có lệnh ``EHLO`` hoặc ``HELO``, phương thức này trước tiên sẽ thử ESMTP ``EHLO``. Nếu máy chủ hỗ trợ ESMTP, kích thước thông báo và từng tùy chọn được chỉ định sẽ được truyền cho máy chủ (nếu tùy chọn đó nằm trong tập tính năng mà máy chủ công bố). Nếu ``EHLO`` không thành công, ``HELO`` sẽ được thử và các tùy chọn ESMTP sẽ bị bỏ qua.
 
-   This method will return normally if the mail is accepted for at least one
-   recipient. Otherwise it will raise an exception.  That is, if this method does
-   not raise an exception, then someone should get your mail. If this method does
-   not raise an exception, it returns a dictionary, with one entry for each
-   recipient that was refused.  Each entry contains a tuple of the SMTP error code
-   and the accompanying error message sent by the server.
+   Phương thức này sẽ trả về bình thường nếu thư được chấp nhận cho ít nhất một người nhận. Nếu không, phương thức sẽ phát sinh một ngoại lệ. Điều đó có nghĩa là nếu phương thức này không phát sinh ngoại lệ thì thư của bạn sẽ đến được tay ai đó. Nếu phương thức này không phát sinh ngoại lệ, phương thức sẽ trả về một dictionary, với một mục cho mỗi người nhận bị từ chối. Mỗi mục chứa một tuple gồm mã lỗi SMTP và thông báo lỗi đi kèm do máy chủ gửi.
 
-   If ``SMTPUTF8`` is included in *mail_options*, and the server supports it,
-   *from_addr* and *to_addrs* may contain non-ASCII characters.
+   Nếu ``SMTPUTF8`` được bao gồm trong *mail_options* và máy chủ hỗ trợ tùy chọn này, *from_addr* và *to_addrs* có thể chứa các ký tự không phải ASCII.
 
-   This method may raise the following exceptions:
+   Phương thức này có thể phát sinh các ngoại lệ sau:
 
    :exc:`SMTPRecipientsRefused`
-      All recipients were refused.  Nobody got the mail.
+      Tất cả người nhận đều bị từ chối. Không ai nhận được thư.
 
    :exc:`SMTPHeloError`
-      The server didn't reply properly to the ``HELO`` greeting.
+      Máy chủ không phản hồi đúng cách với lời chào ``HELO``.
 
    :exc:`SMTPSenderRefused`
-      The server didn't accept the *from_addr*.
+      Máy chủ không chấp nhận *from_addr*.
 
    :exc:`SMTPDataError`
-      The server replied with an unexpected error code (other than a refusal of a
-      recipient).
+      Máy chủ phản hồi bằng một mã lỗi không mong đợi (không phải do từ chối người nhận).
 
    :exc:`SMTPNotSupportedError`
-      ``SMTPUTF8`` was given in the *mail_options* but is not supported by the
-      server.
+      ``SMTPUTF8`` được cung cấp trong *mail_options* nhưng máy chủ không hỗ trợ.
 
-   Unless otherwise noted, the connection will be open even after an exception is
-   raised.
+   Trừ khi có ghi chú khác, kết nối sẽ vẫn mở ngay cả sau khi một exception được raised.
 
    .. versionchanged:: 3.2
-      *msg* may be a byte string.
+      *msg* có thể là một chuỗi byte.
 
    .. versionchanged:: 3.5
-      ``SMTPUTF8`` support added, and :exc:`SMTPNotSupportedError` may be
-      raised if ``SMTPUTF8`` is specified but the server does not support it.
+      Đã bổ sung hỗ trợ ``SMTPUTF8``, và có thể raised :exc:`SMTPNotSupportedError` nếu ``SMTPUTF8`` được chỉ định nhưng máy chủ không hỗ trợ.
 
 
 .. method:: SMTP.send_message(msg, from_addr=None, to_addrs=None, \
                               mail_options=(), rcpt_options=())
 
-   This is a convenience method for calling :meth:`sendmail` with the message
-   represented by an :class:`email.message.Message` object.  The arguments have
-   the same meaning as for :meth:`sendmail`, except that *msg* is a ``Message``
-   object.
+   Đây là một phương thức tiện ích để gọi :meth:`sendmail` với thông điệp được biểu diễn bởi một đối tượng :class:`email.message.Message`. Các đối số có ý nghĩa giống như trong :meth:`sendmail`, ngoại trừ việc *msg* là một đối tượng ``Message``.
 
-   If *from_addr* is ``None`` or *to_addrs* is ``None``, ``send_message`` fills
-   those arguments with addresses extracted from the headers of *msg* as
-   specified in :rfc:`5322`\: *from_addr* is set to the :mailheader:`Sender`
-   field if it is present, and otherwise to the :mailheader:`From` field.
-   *to_addrs* combines the values (if any) of the :mailheader:`To`,
-   :mailheader:`Cc`, and :mailheader:`Bcc` fields from *msg*.  If exactly one
-   set of :mailheader:`Resent-*` headers appear in the message, the regular
-   headers are ignored and the :mailheader:`Resent-*` headers are used instead.
-   If the message contains more than one set of :mailheader:`Resent-*` headers,
-   a :exc:`ValueError` is raised, since there is no way to unambiguously detect
-   the most recent set of :mailheader:`Resent-` headers.
+   Nếu *from_addr* là ``None`` hoặc *to_addrs* là ``None``, ``send_message`` sẽ điền các đối số đó bằng những địa chỉ được trích xuất từ các header của *msg* như được chỉ định trong :rfc:`5322`\: *from_addr* được đặt thành trường :mailheader:`Sender` nếu trường này hiện diện, nếu không thì đặt thành trường :mailheader:`From`. *to_addrs* kết hợp các giá trị (nếu có) của :mailheader:`To`,
+   :mailheader:`Cc`, và các trường :mailheader:`Bcc` của *msg*. Nếu trong thư xuất hiện đúng một nhóm tiêu đề :mailheader:`Resent-*`, các tiêu đề thông thường sẽ bị bỏ qua và thay vào đó sử dụng các tiêu đề :mailheader:`Resent-*`. Nếu thư chứa nhiều hơn một nhóm tiêu đề :mailheader:`Resent-*`, một :exc:`ValueError` sẽ được phát sinh vì không có cách nào xác định rõ ràng nhóm tiêu đề :mailheader:`Resent-` mới nhất.
 
-   ``send_message`` serializes *msg* using
-   :class:`~email.generator.BytesGenerator` with ``\r\n`` as the *linesep*, and
-   calls :meth:`sendmail` to transmit the resulting message.  Regardless of the
-   values of *from_addr* and *to_addrs*, ``send_message`` does not transmit any
-   :mailheader:`Bcc` or :mailheader:`Resent-Bcc` headers that may appear
-   in *msg*.  If any of the addresses in *from_addr* and *to_addrs* contain
-   non-ASCII characters and the server does not advertise ``SMTPUTF8`` support,
-   an :exc:`SMTPNotSupportedError` is raised.  Otherwise the ``Message`` is
-   serialized with a clone of its :mod:`~email.policy` with the
-   :attr:`~email.policy.EmailPolicy.utf8` attribute set to ``True``, and
-   ``SMTPUTF8`` and ``BODY=8BITMIME`` are added to *mail_options*.
+   ``send_message`` tuần tự hóa *msg* bằng cách sử dụng
+   :class:`~email.generator.BytesGenerator` với ``\r\n`` làm *linesep*, rồi gọi :meth:`sendmail` để truyền thư thu được. Bất kể giá trị của *from_addr* và *to_addrs* là gì, ``send_message`` không truyền bất kỳ
+   :mailheader:`Bcc` hoặc tiêu đề :mailheader:`Resent-Bcc` nào có thể xuất hiện trong *msg*. Nếu bất kỳ địa chỉ nào trong *from_addr* và *to_addrs* chứa ký tự không phải ASCII và máy chủ không thông báo hỗ trợ ``SMTPUTF8``, một :exc:`SMTPNotSupportedError` sẽ được phát sinh. Nếu không, ``Message`` được tuần tự hóa cùng với một bản sao của :mod:`~email.policy`, trong đó
+   :attr:`~email.policy.EmailPolicy.utf8` thuộc tính được đặt thành ``True``, còn ``SMTPUTF8`` và ``BODY=8BITMIME`` được thêm vào *mail_options*.
 
    .. versionadded:: 3.2
 
    .. versionadded:: 3.5
-      Support for internationalized addresses (``SMTPUTF8``).
+      Hỗ trợ các địa chỉ được quốc tế hóa (``SMTPUTF8``).
 
 
 .. method:: SMTP.quit()
 
-   Terminate the SMTP session and close the connection.  Return the result of
-   the SMTP ``QUIT`` command.
+   Kết thúc phiên SMTP và đóng kết nối. Trả về kết quả của lệnh SMTP ``QUIT``.
 
 
-Low-level methods corresponding to the standard SMTP/ESMTP commands ``HELP``,
-``RSET``, ``NOOP``, ``MAIL``, ``RCPT``, and ``DATA`` are also supported.
-Normally these do not need to be called directly, so they are not documented
-here.  For details, consult the module code.
+Các phương thức cấp thấp tương ứng với các lệnh SMTP/ESMTP tiêu chuẩn ``HELP``, ``RSET``, ``NOOP``, ``MAIL``, ``RCPT`` và ``DATA`` cũng được hỗ trợ. Thông thường, bạn không cần gọi trực tiếp các phương thức này, nên chúng không được ghi lại ở đây. Để biết chi tiết, hãy tham khảo mã nguồn của module.
 
-Additionally, an SMTP instance has the following attributes:
+Ngoài ra, một instance SMTP có các thuộc tính sau:
 
 
 .. attribute:: SMTP.helo_resp
 
-   The response to the ``HELO`` command, see :meth:`helo`.
+   Phản hồi cho lệnh ``HELO``, xem :meth:`helo`.
 
 
 .. attribute:: SMTP.ehlo_resp
 
-   The response to the ``EHLO`` command, see :meth:`ehlo`.
+   Phản hồi cho lệnh ``EHLO``, xem :meth:`ehlo`.
 
 
 .. attribute:: SMTP.does_esmtp
 
-   A boolean value indicating whether the server supports ESMTP, see
+   Một giá trị boolean cho biết máy chủ có hỗ trợ ESMTP hay không, xem
    :meth:`ehlo`.
 
 
 .. attribute:: SMTP.esmtp_features
 
-   A dictionary of the names of SMTP service extensions supported by the server,
-   see :meth:`ehlo`.
+   Một dictionary chứa tên các phần mở rộng dịch vụ SMTP được máy chủ hỗ trợ, xem :meth:`ehlo`.
 
 
 .. _smtp-example:
 
-SMTP Example
-------------
+Ví dụ về SMTP
+-------------
 
-This example prompts the user for addresses needed in the message envelope ('To'
-and 'From' addresses), and the message to be delivered.  Note that the headers
-to be included with the message must be included in the message as entered; this
-example doesn't do any processing of the :rfc:`822` headers.  In particular, the
-'To' and 'From' addresses must be included in the message headers explicitly::
+Ví dụ này yêu cầu người dùng cung cấp các địa chỉ cần thiết trong phong bì thư (địa chỉ 'To' và 'From') cũng như thư cần gửi. Lưu ý rằng các header được đưa vào thư phải được bao gồm trong nội dung thư như đã nhập; ví dụ này không xử lý các header :rfc:`822`. Cụ thể, các địa chỉ 'To' và 'From' phải được đưa rõ ràng vào header của thư::
 
    import smtplib
 
@@ -599,7 +430,7 @@ example doesn't do any processing of the :rfc:`822` headers.  In particular, the
    to_addrs  = prompt("To: ").split()
    print("Enter message, end with ^D (Unix) or ^Z (Windows):")
 
-   # Add the From: and To: headers at the start!
+   # Thêm header From: và To: ở đầu!
    lines = [f"From: {from_addr}", f"To: {', '.join(to_addrs)}", ""]
    while True:
        try:
@@ -619,6 +450,4 @@ example doesn't do any processing of the :rfc:`822` headers.  In particular, the
 
 .. note::
 
-   In general, you will want to use the :mod:`email` package's features to
-   construct an email message, which you can then send
-   via :meth:`~smtplib.SMTP.send_message`; see :ref:`email-examples`.
+   Nhìn chung, bạn sẽ muốn sử dụng các tính năng của package :mod:`email` để tạo một email message, sau đó có thể gửi qua :meth:`~smtplib.SMTP.send_message`; xem :ref:`email-examples`.

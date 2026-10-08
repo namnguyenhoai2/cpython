@@ -1,147 +1,105 @@
-:mod:`!tokenize` --- Tokenizer for Python source
-================================================
+:mod:`!tokenize` --- Tokenizer cho mã nguồn Python
+==================================================
 
 .. module:: tokenize
-   :synopsis: Lexical scanner for Python source code.
+   :synopsis: Bộ quét từ vựng cho mã nguồn Python.
 
 .. moduleauthor:: Ka Ping Yee
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 
-**Source code:** :source:`Lib/tokenize.py`
+**Mã nguồn:** :source:`Lib/tokenize.py`
 
 --------------
 
-The :mod:`!tokenize` module provides a lexical scanner for Python source code,
-implemented in Python.  The scanner in this module returns comments as tokens
-as well, making it useful for implementing "pretty-printers", including
-colorizers for on-screen displays.
+Mô-đun :mod:`!tokenize` cung cấp một bộ quét từ vựng cho mã nguồn Python, được triển khai bằng Python. Bộ quét trong mô-đun này cũng trả về các chú thích dưới dạng token, nhờ đó hữu ích khi triển khai các "pretty-printer", bao gồm cả các bộ tô màu cho nội dung hiển thị trên màn hình.
 
-To simplify token stream handling, all :ref:`operator <operators>` and
-:ref:`delimiter <delimiters>` tokens and :data:`Ellipsis` are returned using
-the generic :data:`~token.OP` token type.  The exact
-type can be determined by checking the ``exact_type`` property on the
-:term:`named tuple` returned from :func:`tokenize.tokenize`.
+Để đơn giản hóa việc xử lý luồng token, tất cả :ref:`operator <operators>` và
+các token :ref:`delimiter <delimiters>` và :data:`Ellipsis` được trả về bằng kiểu token chung :data:`~token.OP`. Có thể xác định kiểu chính xác bằng cách kiểm tra thuộc tính ``exact_type`` trên
+:term:`named tuple` được trả về từ :func:`tokenize.tokenize`.
 
 
 .. warning::
 
-   Note that the functions in this module are only designed to parse
-   syntactically valid Python code (code that does not raise when parsed
-   using :func:`ast.parse`).  The behavior of the functions in this module is
-   **undefined** when providing invalid Python code and it can change at any
-   point.
+   Lưu ý rằng các hàm trong mô-đun này chỉ được thiết kế để phân tích cú pháp mã Python hợp lệ về mặt cú pháp (mã không gây ra lỗi khi được phân tích bằng :func:`ast.parse`). Hành vi của các hàm trong mô-đun này là **không xác định** khi cung cấp mã Python không hợp lệ và có thể thay đổi bất kỳ lúc nào.
 
 Tokenizing Input
 ----------------
 
-The primary entry point is a :term:`generator`:
+Điểm truy cập chính là một :term:`generator`:
 
 .. function:: tokenize(readline)
 
-   The :func:`.tokenize` generator requires one argument, *readline*, which
-   must be a callable object which provides the same interface as the
-   :meth:`io.IOBase.readline` method of file objects.  Each call to the
-   function should return one line of input as bytes.
+   Generator :func:`.tokenize` yêu cầu một đối số là *readline*, đối số này phải là một đối tượng có thể gọi, cung cấp cùng giao diện như
+   phương thức :meth:`io.IOBase.readline` của các đối tượng tệp. Mỗi lần gọi hàm phải trả về một dòng đầu vào dưới dạng bytes.
 
-   The generator produces 5-tuples with these members: the token type; the
-   token string; a 2-tuple ``(srow, scol)`` of ints specifying the row and
-   column where the token begins in the source; a 2-tuple ``(erow, ecol)`` of
-   ints specifying the row and column where the token ends in the source; and
-   the line on which the token was found. The line passed (the last tuple item)
-   is the *physical* line.  The 5 tuple is returned as a :term:`named tuple`
-   with the field names:
-   ``type string start end line``.
+   Generator tạo ra các bộ 5 phần tử với những thành phần sau: kiểu token; chuỗi token; một bộ 2 phần tử ``(srow, scol)`` gồm các số nguyên chỉ định hàng và cột nơi token bắt đầu trong mã nguồn; một bộ 2 phần tử ``(erow, ecol)`` gồm các số nguyên chỉ định hàng và cột nơi token kết thúc trong mã nguồn; và dòng nơi tìm thấy token. Dòng được truyền vào (phần tử cuối cùng của bộ) là dòng *thực tế*. Bộ 5 phần tử được trả về dưới dạng một :term:`named tuple` với các tên trường: ``type string start end line``.
 
-   The returned :term:`named tuple` has an additional property named
-   ``exact_type`` that contains the exact operator type for
-   :data:`~token.OP` tokens.  For all other token types ``exact_type``
-   equals the named tuple ``type`` field.
+   :term:`named tuple` được trả về có thêm một thuộc tính tên là ``exact_type``, chứa kiểu toán tử chính xác cho
+   :data:`~token.OP` token. Đối với tất cả các loại token khác, ``exact_type`` tương ứng với trường ``type`` của named tuple.
 
    .. versionchanged:: 3.1
-      Added support for named tuples.
+      Đã thêm hỗ trợ cho named tuple.
 
    .. versionchanged:: 3.3
-      Added support for ``exact_type``.
+      Đã thêm hỗ trợ cho ``exact_type``.
 
-   :func:`.tokenize` determines the source encoding of the file by looking for a
-   UTF-8 BOM or encoding cookie, according to :pep:`263`.
+   :func:`.tokenize` xác định encoding nguồn của tệp bằng cách tìm BOM UTF-8 hoặc encoding cookie, theo :pep:`263`.
 
 .. function:: generate_tokens(readline)
 
-   Tokenize a source reading unicode strings instead of bytes.
+   Tokenize mã nguồn bằng cách đọc các chuỗi unicode thay vì bytes.
 
-   Like :func:`.tokenize`, the *readline* argument is a callable returning
-   a single line of input. However, :func:`generate_tokens` expects *readline*
-   to return a str object rather than bytes.
+   Giống như :func:`.tokenize`, đối số *readline* là một callable trả về một dòng đầu vào. Tuy nhiên, :func:`generate_tokens` yêu cầu *readline* trả về một đối tượng str thay vì bytes.
 
-   The result is an iterator yielding named tuples, exactly like
-   :func:`.tokenize`. It does not yield an :data:`~token.ENCODING` token.
+   Kết quả là một iterator trả về các named tuple, chính xác như
+   :func:`.tokenize`. Nó không tạo ra token :data:`~token.ENCODING`.
 
-All constants from the :mod:`token` module are also exported from
+Tất cả hằng số từ mô-đun :mod:`token` cũng được xuất từ
 :mod:`!tokenize`.
 
-Another function is provided to reverse the tokenization process. This is
-useful for creating tools that tokenize a script, modify the token stream, and
-write back the modified script.
+Một hàm khác được cung cấp để đảo ngược quá trình tokenization. Điều này hữu ích khi tạo các công cụ tokenization cho một script, sửa đổi token stream rồi ghi lại script đã sửa đổi.
 
 
 .. function:: untokenize(iterable)
 
-    Converts tokens back into Python source code.  The *iterable* must return
-    sequences with at least two elements, the token type and the token string.
-    Any additional sequence elements are ignored.
+    Chuyển các token trở lại mã nguồn Python. *iterable* phải trả về các sequence có ít nhất hai phần tử: kiểu token và chuỗi token. Mọi phần tử bổ sung trong sequence đều bị bỏ qua.
 
-    The result is guaranteed to tokenize back to match the input so that the
-    conversion is lossless and round-trips are assured.  The guarantee applies
-    only to the token type and token string as the spacing between tokens
-    (column positions) may change.
+    Kết quả được đảm bảo sẽ được tokenization lại để khớp với đầu vào, nhờ đó quá trình chuyển đổi không làm mất dữ liệu và việc chuyển đổi hai chiều được đảm bảo. Sự đảm bảo này chỉ áp dụng cho kiểu token và chuỗi token, vì khoảng cách giữa các token (vị trí cột) có thể thay đổi.
 
-    It returns bytes, encoded using the :data:`~token.ENCODING` token, which
-    is the first token sequence output by :func:`.tokenize`. If there is no
-    encoding token in the input, it returns a str instead.
+    Nó trả về bytes, được mã hóa bằng token :data:`~token.ENCODING`, là sequence token đầu tiên do :func:`.tokenize` xuất ra. Nếu đầu vào không có token mã hóa, nó sẽ trả về một str.
 
 
-:func:`.tokenize` needs to detect the encoding of source files it tokenizes. The
-function it uses to do this is available:
+:func:`.tokenize` cần phát hiện encoding của các tệp mã nguồn mà nó tokenization. Hàm được sử dụng để thực hiện việc này hiện có sẵn:
 
 .. function:: detect_encoding(readline)
 
-    The :func:`detect_encoding` function is used to detect the encoding that
-    should be used to decode a Python source file. It requires one argument,
-    readline, in the same way as the :func:`.tokenize` generator.
+    Hàm :func:`detect_encoding` được dùng để phát hiện encoding cần sử dụng nhằm giải mã tệp mã nguồn Python. Hàm này yêu cầu một đối số, readline, giống như generator :func:`.tokenize`.
 
-    It will call readline a maximum of twice, and return the encoding used
-    (as a string) and a list of any lines (not decoded from bytes) it has read
-    in.
+    Hàm sẽ gọi readline tối đa hai lần và trả về encoding được sử dụng (dưới dạng chuỗi) cùng danh sách các dòng (chưa được giải mã từ byte) mà hàm đã đọc.
 
-    It detects the encoding from the presence of a UTF-8 BOM or an encoding
-    cookie as specified in :pep:`263`. If both a BOM and a cookie are present,
-    but disagree, a :exc:`SyntaxError` will be raised. Note that if the BOM is found,
-    ``'utf-8-sig'`` will be returned as an encoding.
+    Hàm phát hiện encoding dựa trên sự hiện diện của BOM UTF-8 hoặc encoding cookie được chỉ định trong :pep:`263`. Nếu cả BOM và cookie đều xuất hiện nhưng không khớp nhau, :exc:`SyntaxError` sẽ được raise. Lưu ý rằng nếu tìm thấy BOM, ``'utf-8-sig'`` sẽ được trả về dưới dạng encoding.
 
-    If no encoding is specified, then the default of ``'utf-8'`` will be
-    returned.
+    Nếu không chỉ định encoding, giá trị mặc định ``'utf-8'`` sẽ được trả về.
 
-    Use :func:`.open` to open Python source files: it uses
-    :func:`detect_encoding` to detect the file encoding.
+    Sử dụng :func:`.open` để mở các tệp mã nguồn Python: hàm này sử dụng
+    :func:`detect_encoding` để phát hiện encoding của tệp.
 
 
 .. function:: open(filename)
 
-   Open a file in read only mode using the encoding detected by
+   Mở tệp ở chế độ chỉ đọc bằng encoding được phát hiện bởi
    :func:`detect_encoding`.
 
    .. versionadded:: 3.2
 
 .. exception:: TokenError
 
-   Raised when either a docstring or expression that may be split over several
-   lines is not completed anywhere in the file, for example::
+   Được phát sinh khi một docstring hoặc biểu thức có thể được tách trên nhiều dòng không được hoàn tất ở bất kỳ đâu trong tệp, ví dụ như::
 
       """Beginning of
       docstring
 
-   or::
+   hoặc::
 
       [1,
        2,
@@ -149,38 +107,35 @@ function it uses to do this is available:
 
 .. _tokenize-cli:
 
-Command-Line Usage
-------------------
+Cách sử dụng dòng lệnh
+----------------------
 
 .. versionadded:: 3.3
 
-The :mod:`!tokenize` module can be executed as a script from the command line.
-It is as simple as:
+Mô-đun :mod:`!tokenize` có thể được thực thi dưới dạng một script từ dòng lệnh. Cách thực hiện rất đơn giản:
 
 .. code-block:: sh
 
    python -m tokenize [-e] [filename.py]
 
-The following options are accepted:
+Các tùy chọn sau được chấp nhận:
 
 .. program:: tokenize
 
 .. option:: -h, --help
 
-   show this help message and exit
+   hiển thị thông báo trợ giúp này rồi thoát
 
 .. option:: -e, --exact
 
-   display token names using the exact type
+   hiển thị tên token bằng kiểu chính xác
 
-If :file:`filename.py` is specified its contents are tokenized to stdout.
-Otherwise, tokenization is performed on stdin.
+Nếu :file:`filename.py` được chỉ định, nội dung của nó sẽ được tokenize ra stdout. Nếu không, việc tokenize sẽ được thực hiện trên stdin.
 
-Examples
-------------------
+Ví dụ
+-----
 
-Example of a script rewriter that transforms float literals into Decimal
-objects::
+Ví dụ về script rewriter chuyển đổi các literal float thành các đối tượng Decimal::
 
     from tokenize import tokenize, untokenize, NUMBER, STRING, NAME, OP
     from io import BytesIO
@@ -208,9 +163,9 @@ objects::
         -3.217160342717258261933904529E-7
         """
         result = []
-        g = tokenize(BytesIO(s.encode('utf-8')).readline)  # tokenize the string
+        g = tokenize(BytesIO(s.encode('utf-8')).readline)  # tokenize chuỗi
         for toknum, tokval, _, _, _ in g:
-            if toknum == NUMBER and '.' in tokval:  # replace NUMBER tokens
+            if toknum == NUMBER and '.' in tokval:  # thay thế các token NUMBER
                 result.extend([
                     (NAME, 'Decimal'),
                     (OP, '('),
@@ -221,16 +176,14 @@ objects::
                 result.append((toknum, tokval))
         return untokenize(result).decode('utf-8')
 
-Example of tokenizing from the command line.  The script::
+Ví dụ về việc tokenize từ command line. Script::
 
     def say_hello():
         print("Hello, World!")
 
     say_hello()
 
-will be tokenized to the following output where the first column is the range
-of the line/column coordinates where the token is found, the second column is
-the name of the token, and the final column is the value of the token (if any)
+sẽ được token hóa thành đầu ra sau đây, trong đó cột đầu tiên là phạm vi tọa độ dòng/cột nơi token được tìm thấy, cột thứ hai là tên của token và cột cuối cùng là giá trị của token (nếu có)
 
 .. code-block:: shell-session
 
@@ -256,7 +209,7 @@ the name of the token, and the final column is the value of the token (if any)
     4,11-4,12:          NEWLINE        '\n'
     5,0-5,0:            ENDMARKER      ''
 
-The exact token type names can be displayed using the :option:`-e` option:
+Có thể hiển thị tên chính xác của loại token bằng tùy chọn :option:`-e`:
 
 .. code-block:: shell-session
 
@@ -282,8 +235,7 @@ The exact token type names can be displayed using the :option:`-e` option:
     4,11-4,12:          NEWLINE        '\n'
     5,0-5,0:            ENDMARKER      ''
 
-Example of tokenizing a file programmatically, reading unicode
-strings instead of bytes with :func:`generate_tokens`::
+Ví dụ về cách token hóa một tệp theo phương thức lập trình, đọc các chuỗi unicode thay vì các byte bằng :func:`generate_tokens`::
 
     import tokenize
 
@@ -292,7 +244,7 @@ strings instead of bytes with :func:`generate_tokens`::
         for token in tokens:
             print(token)
 
-Or reading bytes directly with :func:`.tokenize`::
+Hoặc đọc trực tiếp các byte bằng :func:`.tokenize`::
 
     import tokenize
 

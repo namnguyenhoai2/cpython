@@ -1,15 +1,15 @@
-:mod:`!urllib` --- URL handling modules
+:mod:`!urllib` --- các mô-đun xử lý URL
 =======================================
 
 .. module:: urllib
 
-**Source code:** :source:`Lib/urllib/`
+**Mã nguồn:** :source:`Lib/urllib/`
 
 --------------
 
-``urllib`` is a package that collects several modules for working with URLs:
+``urllib`` là một package tập hợp một số mô-đun để làm việc với URL:
 
-* :mod:`urllib.request` for opening and reading URLs
-* :mod:`urllib.error` containing the exceptions raised by :mod:`urllib.request`
-* :mod:`urllib.parse` for parsing URLs
-* :mod:`urllib.robotparser` for parsing ``robots.txt`` files
+* :mod:`urllib.request` để mở và đọc URL
+* :mod:`urllib.error` chứa các ngoại lệ được :mod:`urllib.request` đưa ra
+* :mod:`urllib.parse` để phân tích cú pháp URL
+* :mod:`urllib.robotparser` để phân tích cú pháp các tệp ``robots.txt``

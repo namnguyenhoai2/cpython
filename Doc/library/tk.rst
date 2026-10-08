@@ -1,8 +1,8 @@
 .. _tkinter:
 
-*********************************
-Graphical user interfaces with Tk
-*********************************
+**********************************
+Giao diện người dùng đồ họa với Tk
+**********************************
 
 .. index::
    single: GUI
@@ -10,23 +10,12 @@ Graphical user interfaces with Tk
    single: Tkinter
    single: Tk
 
-Tk/Tcl has long been an integral part of Python.  It provides a robust and
-platform independent windowing toolkit, that is available to Python programmers
-using the :mod:`tkinter` package, and its extension, the :mod:`tkinter.ttk` module.
+Tk/Tcl từ lâu đã là một phần không thể thiếu của Python. Nó cung cấp một bộ công cụ cửa sổ mạnh mẽ và độc lập với nền tảng, sẵn có cho các lập trình viên Python thông qua package :mod:`tkinter` và module mở rộng :mod:`tkinter.ttk`.
 
-The :mod:`tkinter` package is a thin object-oriented layer on top of Tcl/Tk. To
-use :mod:`tkinter`, you don't need to write Tcl code, but you will need to
-consult the Tk documentation, and occasionally the Tcl documentation.
-:mod:`tkinter` is a set of wrappers that implement the Tk widgets as Python
-classes.
+Package :mod:`tkinter` là một lớp hướng đối tượng mỏng bên trên Tcl/Tk. Để sử dụng :mod:`tkinter`, bạn không cần viết mã Tcl, nhưng sẽ cần tham khảo tài liệu Tk và đôi khi cả tài liệu Tcl.
+:mod:`tkinter` là một tập hợp các wrapper triển khai những widget Tk dưới dạng các lớp Python.
 
-:mod:`tkinter`'s chief virtues are that it is fast, and that it usually comes
-bundled with Python. Although its standard documentation is weak, good
-material is available, which includes: references, tutorials, a book and
-others. :mod:`tkinter` is also famous for having an outdated look and feel,
-which has been vastly improved in Tk 8.5. Nevertheless, there are many other
-GUI libraries that you could be interested in. The Python wiki lists several
-alternative `GUI frameworks and tools <https://wiki.python.org/moin/GuiProgramming>`_.
+Ưu điểm chính của :mod:`tkinter` là tốc độ nhanh và thường được đóng gói sẵn cùng Python. Mặc dù tài liệu chuẩn còn hạn chế, vẫn có nhiều tài liệu hữu ích, bao gồm tài liệu tham khảo, hướng dẫn, sách và nhiều tài liệu khác. :mod:`tkinter` cũng nổi tiếng vì có giao diện và trải nghiệm lỗi thời, nhưng những điểm này đã được cải thiện đáng kể trong Tk 8.5. Tuy vậy, bạn có thể quan tâm đến nhiều thư viện GUI khác. Python wiki liệt kê một số `framework và công cụ GUI thay thế <https://wiki.python.org/moin/GuiProgramming>`_.
 
 .. toctree::
 
@@ -44,3 +33,5 @@ alternative `GUI frameworks and tools <https://wiki.python.org/moin/GuiProgrammi
 .. Other sections I have in mind are
    Tkinter internals
    Freezing Tkinter applications
+
+.. _`GUI frameworks and tools`: https://wiki.python.org/moin/GuiProgramming

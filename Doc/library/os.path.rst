@@ -1,125 +1,90 @@
-:mod:`!os.path` --- Common pathname manipulations
-=================================================
+:mod:`!os.path` --- Các thao tác phổ biến với pathname
+======================================================
 
 .. module:: os.path
-   :synopsis: Operations on pathnames.
+   :synopsis: Các thao tác trên pathname.
 
-**Source code:** :source:`Lib/genericpath.py`, :source:`Lib/posixpath.py` (for POSIX) and
-:source:`Lib/ntpath.py` (for Windows).
+**Mã nguồn:** :source:`Lib/genericpath.py`, :source:`Lib/posixpath.py` (cho POSIX) và
+:source:`Lib/ntpath.py` (cho Windows).
 
 .. index:: single: path; operations
 
 --------------
 
-This module implements some useful functions on pathnames. To read or write
-files see :func:`open`, and for accessing the filesystem see the :mod:`os`
-module. The path parameters can be passed as strings, or bytes, or any object
-implementing the :class:`os.PathLike` protocol.
+Mô-đun này triển khai một số hàm hữu ích trên pathname. Để đọc hoặc ghi tệp, hãy xem :func:`open`, còn để truy cập hệ thống tệp, hãy xem mô-đun :mod:`os`. Các tham số đường dẫn có thể được truyền dưới dạng chuỗi, bytes hoặc bất kỳ đối tượng nào triển khai giao thức :class:`os.PathLike`.
 
-Unlike a Unix shell, Python does not do any *automatic* path expansions.
-Functions such as :func:`expanduser` and :func:`expandvars` can be invoked
-explicitly when an application desires shell-like path expansion.  (See also
-the :mod:`glob` module.)
+Không giống như Unix shell, Python không thực hiện bất kỳ việc mở rộng đường dẫn *tự động* nào. Các hàm như :func:`expanduser` và :func:`expandvars` có thể được gọi một cách rõ ràng khi ứng dụng cần mở rộng đường dẫn giống shell. (Xem thêm mô-đun :mod:`glob`.)
 
 
 .. seealso::
-   The :mod:`pathlib` module offers high-level path objects.
+   Mô-đun :mod:`pathlib` cung cấp các đối tượng đường dẫn cấp cao.
 
 
 .. note::
 
-   All of these functions accept either only bytes or only string objects as
-   their parameters.  The result is an object of the same type, if a path or
-   file name is returned.
+   Tất cả các hàm này chỉ chấp nhận các đối số là đối tượng bytes hoặc chỉ là đối tượng chuỗi. Nếu trả về một đường dẫn hoặc tên tệp, kết quả sẽ là một đối tượng cùng kiểu.
 
 .. note::
 
-   Since different operating systems have different path name conventions, there
-   are several versions of this module in the standard library.  The
-   :mod:`!os.path` module is always the path module suitable for the operating
-   system Python is running on, and therefore usable for local paths.  However,
-   you can also import and use the individual modules if you want to manipulate
-   a path that is *always* in one of the different formats.  They all have the
-   same interface:
+   Vì các hệ điều hành khác nhau có quy ước đặt tên đường dẫn khác nhau nên thư viện chuẩn có một số phiên bản của mô-đun này.
+   :mod:`!os.path` mô-đun luôn là mô-đun đường dẫn phù hợp với hệ điều hành mà Python đang chạy, do đó có thể dùng cho các đường dẫn cục bộ. Tuy nhiên, bạn cũng có thể import và sử dụng từng mô-đun riêng lẻ nếu muốn thao tác với một đường dẫn *luôn* ở một trong các định dạng khác nhau. Tất cả đều có cùng một interface:
 
-   * :mod:`!posixpath` for UNIX-style paths
-   * :mod:`!ntpath` for Windows paths
+   * :mod:`!posixpath` cho các đường dẫn kiểu UNIX
+   * :mod:`!ntpath` cho các đường dẫn Windows
 
 
 .. versionchanged:: 3.8
 
    :func:`exists`, :func:`lexists`, :func:`isdir`, :func:`isfile`,
-   :func:`islink`, and :func:`ismount` now return ``False`` instead of
-   raising an exception for paths that contain characters or bytes
-   unrepresentable at the OS level.
+   :func:`islink` và :func:`ismount` hiện trả về ``False`` thay vì phát sinh ngoại lệ đối với các đường dẫn chứa ký tự hoặc byte không thể biểu diễn ở cấp hệ điều hành.
 
 
 .. function:: abspath(path)
 
-   Return a normalized absolutized version of the pathname *path*. On most
-   platforms, this is equivalent to calling ``normpath(join(os.getcwd(), path))``.
+   Trả về phiên bản tuyệt đối đã chuẩn hóa của tên đường dẫn *path*. Trên hầu hết các nền tảng, kết quả này tương đương với việc gọi ``normpath(join(os.getcwd(), path))``.
 
-   On Windows the path is normalized by the operating system,
-   therefore the result can differ from ``normpath(join(os.getcwd(), path))``.
-   A drive-relative path is resolved against the current directory
-   of the specified drive, and the drive letter is capitalized.
-   Trailing dots and spaces are stripped.
-   For example::
+   Trên Windows, đường dẫn được hệ điều hành chuẩn hóa, do đó kết quả có thể khác với ``normpath(join(os.getcwd(), path))``. Đường dẫn tương đối theo ổ đĩa được phân giải dựa trên thư mục hiện tại của ổ đĩa được chỉ định và ký tự ổ đĩa được viết hoa. Các dấu chấm và khoảng trắng ở cuối sẽ bị loại bỏ. Ví dụ::
 
       >>> os.path.abspath('c:spam')
       'C:\\Temp\\spam'
       >>> os.path.abspath('c:/temp/spam. . .')
       'c:\\temp\\spam'
 
-   .. seealso:: :func:`os.path.join` and :func:`os.path.normpath`.
+   .. seealso:: :func:`os.path.join` và :func:`os.path.normpath`.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: basename(path, /)
 
-   Return the base name of pathname *path*.  This is the second element of the
-   pair returned by passing *path* to the function :func:`split`.  Note that
-   the result of this function is different
-   from the Unix :program:`basename` program; where :program:`basename` for
-   ``'/foo/bar/'`` returns ``'bar'``, the :func:`basename` function returns an
-   empty string (``''``).
+   Trả về tên cơ sở của pathname *path*. Đây là phần tử thứ hai trong cặp được trả về khi truyền *path* cho hàm :func:`split`. Lưu ý rằng kết quả của hàm này khác với chương trình Unix :program:`basename`; trong đó :program:`basename` cho ``'/foo/bar/'`` trả về ``'bar'``, còn hàm :func:`basename` trả về một chuỗi rỗng (``''``).
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: commonpath(paths)
 
-   Return the longest common sub-path of each pathname in the iterable
-   *paths*.  Raise :exc:`ValueError` if *paths* contain both absolute
-   and relative pathnames, if *paths* are on different drives, or
-   if *paths* is empty.  Unlike :func:`commonprefix`, this returns a
-   valid path.
+   Trả về đường dẫn con chung dài nhất của mỗi pathname trong iterable *paths*. Ném :exc:`ValueError` nếu *paths* chứa cả pathname tuyệt đối và tương đối, nếu *paths* nằm trên các ổ đĩa khác nhau hoặc nếu *paths* rỗng. Không giống :func:`commonprefix`, hàm này trả về một đường dẫn hợp lệ.
 
    .. versionadded:: 3.5
 
    .. versionchanged:: 3.6
-      Accepts a sequence of :term:`path-like objects <path-like object>`.
+      Chấp nhận một chuỗi các :term:`path-like objects <path-like object>`.
 
    .. versionchanged:: 3.13
-      Any iterable can now be passed, rather than just sequences.
+      Giờ đây có thể truyền vào bất kỳ iterable nào, thay vì chỉ các sequence.
 
 
 .. function:: commonprefix(list, /)
 
-   Return the longest string prefix (taken character-by-character) that is a
-   prefix of all strings in *list*.  If *list* is empty, return the empty string
-   (``''``).
+   Trả về tiền tố chuỗi dài nhất (được lấy theo từng ký tự) là tiền tố của tất cả các chuỗi trong *list*. Nếu *list* trống, trả về chuỗi rỗng (``''``).
 
    .. warning::
 
-      This function may return invalid paths because it works a
-      character at a time.
-      If you need a **common path prefix**, then the algorithm
-      implemented in this function is not secure. Use
-      :func:`commonpath` for finding a common path prefix.
+      Hàm này có thể trả về các path không hợp lệ vì nó xử lý từng ký tự một. Nếu bạn cần **common path prefix**, thì thuật toán được triển khai trong hàm này không an toàn. Hãy dùng
+      :func:`commonpath` để tìm common path prefix.
 
       ::
 
@@ -130,71 +95,57 @@ the :mod:`glob` module.)
         '/usr'
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: dirname(path, /)
 
-   Return the directory name of pathname *path*.  This is the first element of
-   the pair returned by passing *path* to the function :func:`split`.
+   Trả về tên thư mục của pathname *path*. Đây là phần tử đầu tiên trong cặp được trả về khi truyền *path* vào hàm :func:`split`.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: exists(path)
 
-   Return ``True`` if *path* refers to an existing path or an open
-   file descriptor.  Returns ``False`` for broken symbolic links.  On
-   some platforms, this function may return ``False`` if permission is
-   not granted to execute :func:`os.stat` on the requested file, even
-   if the *path* physically exists.
+   Trả về ``True`` nếu *path* trỏ đến một đường dẫn hiện có hoặc một file descriptor đang mở. Trả về ``False`` đối với các liên kết tượng trưng bị hỏng. Trên một số nền tảng, hàm này có thể trả về ``False`` nếu không được cấp quyền thực thi :func:`os.stat` trên tệp được yêu cầu, ngay cả khi *path* thực sự tồn tại.
 
    .. versionchanged:: 3.3
-      *path* can now be an integer: ``True`` is returned if it is an
-       open file descriptor, ``False`` otherwise.
+      *path* giờ đây có thể là một số nguyên: ``True`` được trả về nếu đó là một
+       file descriptor đang mở, ngược lại là ``False``.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: lexists(path)
 
-   Return ``True`` if *path* refers to an existing path, including
-   broken symbolic links.   Equivalent to :func:`exists` on platforms lacking
+   Trả về ``True`` nếu *path* trỏ đến một đường dẫn hiện có, bao gồm cả các liên kết tượng trưng bị hỏng.   Tương đương với :func:`exists` trên các nền tảng không hỗ trợ
    :func:`os.lstat`.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. index:: single: ~ (tilde); home directory expansion
 
 .. function:: expanduser(path)
 
-   On Unix and Windows, return the argument with an initial component of ``~`` or
-   ``~user`` replaced by that *user*'s home directory.
+   Trên Unix và Windows, trả về đối số với thành phần đầu tiên là ``~`` hoặc ``~user`` được thay thế bằng thư mục chính của *user*.
 
    .. index:: pair: module; pwd
 
-   On Unix, an initial ``~`` is replaced by the environment variable :envvar:`HOME`
-   if it is set; otherwise the current user's home directory is looked up in the
-   password directory through the built-in module :mod:`pwd`. An initial ``~user``
-   is looked up directly in the password directory.
+   Trên Unix, ``~`` ở đầu được thay thế bằng biến môi trường :envvar:`HOME` nếu biến này được thiết lập; nếu không, thư mục chính của người dùng hiện tại được tra cứu trong cơ sở dữ liệu mật khẩu thông qua mô-đun tích hợp :mod:`pwd`. ``~user`` ở đầu được tra cứu trực tiếp trong cơ sở dữ liệu mật khẩu.
 
-   On Windows, :envvar:`USERPROFILE` will be used if set, otherwise a combination
-   of :envvar:`HOMEPATH` and :envvar:`HOMEDRIVE` will be used.  An initial
-   ``~user`` is handled by checking that the last directory component of the current
-   user's home directory matches :envvar:`USERNAME`, and replacing it if so.
+   Trên Windows, :envvar:`USERPROFILE` sẽ được sử dụng nếu được thiết lập; nếu không, kết hợp giữa :envvar:`HOMEPATH` và :envvar:`HOMEDRIVE` sẽ được sử dụng. ``~user`` ở đầu được xử lý bằng cách kiểm tra xem thành phần thư mục cuối cùng trong thư mục chính của người dùng hiện tại có khớp với :envvar:`USERNAME` hay không, rồi thay thế thành phần đó nếu khớp.
 
-   If the expansion fails or if the path does not begin with a tilde, the path is
-   returned unchanged.
+   Nếu việc mở rộng không thành công hoặc đường dẫn không bắt đầu bằng dấu ngã, đường dẫn sẽ được trả về mà không thay đổi.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
    .. versionchanged:: 3.8
-      No longer uses :envvar:`HOME` on Windows.
+      Không còn sử dụng :envvar:`HOME` trên Windows.
 
 .. index::
    single: $ (dollar); environment variables expansion
@@ -202,166 +153,120 @@ the :mod:`glob` module.)
 
 .. function:: expandvars(path)
 
-   Return the argument with environment variables expanded.  Substrings of the form
-   ``$name`` or ``${name}`` are replaced by the value of environment variable
-   *name*.  Malformed variable names and references to non-existing variables are
-   left unchanged.
+   Trả về đối số với các biến môi trường đã được mở rộng. Các chuỗi con có dạng ``$name`` hoặc ``${name}`` được thay thế bằng giá trị của biến môi trường *name*. Tên biến không hợp lệ và các tham chiếu đến biến không tồn tại được giữ nguyên.
 
-   On Windows, ``%name%`` expansions are supported in addition to ``$name`` and
-   ``${name}``.
+   Trên Windows, các phần mở rộng ``%name%`` được hỗ trợ bên cạnh ``$name`` và ``${name}``.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: getatime(path, /)
 
-   Return the time of last access of *path*.  The return value is a floating-point number giving
-   the number of seconds since the epoch (see the  :mod:`time` module).  Raise
-   :exc:`OSError` if the file does not exist or is inaccessible.
+   Trả về thời điểm truy cập gần nhất của *path*. Giá trị trả về là một số dấu phẩy động biểu thị số giây kể từ epoch (xem mô-đun :mod:`time`). Phát sinh
+   :exc:`OSError` nếu tệp không tồn tại hoặc không thể truy cập.
 
 
 .. function:: getmtime(path, /)
 
-   Return the time of last modification of *path*.  The return value is a floating-point number
-   giving the number of seconds since the epoch (see the  :mod:`time` module).
-   Raise :exc:`OSError` if the file does not exist or is inaccessible.
+   Trả về thời điểm sửa đổi gần nhất của *path*. Giá trị trả về là một số dấu phẩy động biểu thị số giây kể từ epoch (xem mô-đun :mod:`time`). Phát sinh :exc:`OSError` nếu tệp không tồn tại hoặc không thể truy cập.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: getctime(path, /)
 
-   Return the system's ctime which, on some systems (like Unix) is the time of the
-   last metadata change, and, on others (like Windows), is the creation time for *path*.
-   The return value is a number giving the number of seconds since the epoch (see
-   the  :mod:`time` module).  Raise :exc:`OSError` if the file does not exist or
-   is inaccessible.
+   Trả về ctime của hệ thống, trên một số hệ thống (như Unix) là thời điểm thay đổi siêu dữ liệu gần nhất, còn trên các hệ thống khác (như Windows) là thời điểm tạo *path*. Giá trị trả về là một số biểu thị số giây kể từ epoch (xem mô-đun :mod:`time`). Phát sinh :exc:`OSError` nếu tệp không tồn tại hoặc không thể truy cập.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: getsize(path, /)
 
-   Return the size, in bytes, of *path*.  Raise :exc:`OSError` if the file does
-   not exist or is inaccessible.
+   Trả về kích thước, tính bằng byte, của *path*. Ném :exc:`OSError` nếu tệp không tồn tại hoặc không thể truy cập.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: isabs(path, /)
 
-   Return ``True`` if *path* is an absolute pathname.  On Unix, that means it
-   begins with a slash, on Windows that it begins with two (back)slashes, or a
-   drive letter, colon, and (back)slash together.
+   Trả về ``True`` nếu *path* là tên đường dẫn tuyệt đối. Trên Unix, điều đó có nghĩa là tên đường dẫn bắt đầu bằng dấu gạch chéo, còn trên Windows, tên đường dẫn bắt đầu bằng hai dấu gạch chéo ngược, hoặc gồm một ký tự ổ đĩa, dấu hai chấm và dấu gạch chéo ngược.
 
    .. seealso:: :func:`abspath`
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
    .. versionchanged:: 3.13
-      On Windows, returns ``False`` if the given path starts with exactly one
-      (back)slash.
+      Trên Windows, trả về ``False`` nếu đường dẫn đã cho bắt đầu bằng chính xác một dấu gạch chéo ngược.
 
 
 .. function:: isfile(path)
 
-   Return ``True`` if *path* is an :func:`existing <exists>` regular file.
-   This follows symbolic links, so both :func:`islink` and :func:`isfile` can
-   be true for the same path.
+   Trả về ``True`` nếu *path* là một :func:`existing <exists>` tệp thông thường. Hàm này đi theo các symbolic link, vì vậy cả :func:`islink` và :func:`isfile` đều có thể đúng với cùng một đường dẫn.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: isdir(path, /)
 
-   Return ``True`` if *path* is an :func:`existing <exists>` directory.  This
-   follows symbolic links, so both :func:`islink` and :func:`isdir` can be true
-   for the same path.
+   Trả về ``True`` nếu *path* là một thư mục :func:`existing <exists>`. Thao tác này lần theo các symbolic link, vì vậy cả :func:`islink` và :func:`isdir` đều có thể đúng với cùng một đường dẫn.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: isjunction(path)
 
-   Return ``True`` if *path* refers to an :func:`existing <lexists>` directory
-   entry that is a junction.  Always return ``False`` if junctions are not
-   supported on the current platform.
+   Trả về ``True`` nếu *path* tham chiếu đến một mục thư mục :func:`existing <lexists>` là junction. Luôn trả về ``False`` nếu nền tảng hiện tại không hỗ trợ junction.
 
    .. versionadded:: 3.12
 
 
 .. function:: islink(path)
 
-   Return ``True`` if *path* refers to an :func:`existing <exists>` directory
-   entry that is a symbolic link.  Always ``False`` if symbolic links are not
-   supported by the Python runtime.
+   Trả về ``True`` nếu *path* tham chiếu đến một mục thư mục :func:`existing <exists>` là symbolic link. Luôn ``False`` nếu Python runtime không hỗ trợ symbolic link.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: ismount(path)
 
-   Return ``True`` if pathname *path* is a :dfn:`mount point`: a point in a
-   file system where a different file system has been mounted.  On POSIX, the
-   function checks whether *path*'s parent, :file:`{path}/..`, is on a different
-   device than *path*, or whether :file:`{path}/..` and *path* point to the same
-   i-node on the same device --- this should detect mount points for all Unix
-   and POSIX variants.  It is not able to reliably detect bind mounts on the
-   same filesystem. On Linux systems, it will always return ``True`` for btrfs
-   subvolumes, even if they aren't mount points. On Windows, a drive letter root
-   and a share UNC are always mount points, and for any other path
-   ``GetVolumePathName`` is called to see if it is different from the input path.
+   Trả về ``True`` nếu pathname *path* là một :dfn:`mount point`: một điểm trong hệ thống tệp nơi một hệ thống tệp khác được mount. Trên POSIX, hàm này kiểm tra xem thư mục cha của *path*, là :file:`{path}/..`, có nằm trên thiết bị khác với *path* hay không, hoặc liệu :file:`{path}/..` và *path* có trỏ đến cùng một i-node trên cùng một thiết bị hay không --- điều này sẽ phát hiện mount point trên mọi biến thể Unix và POSIX. Hàm này không thể phát hiện một cách đáng tin cậy các bind mount trên cùng một hệ thống tệp. Trên các hệ thống Linux, hàm sẽ luôn trả về ``True`` cho các subvolume btrfs, ngay cả khi chúng không phải là mount point. Trên Windows, thư mục gốc của drive letter và một share UNC luôn là mount point; với mọi đường dẫn khác, ``GetVolumePathName`` được gọi để kiểm tra xem nó có khác với đường dẫn đầu vào hay không.
 
    .. versionchanged:: 3.4
-      Added support for detecting non-root mount points on Windows.
+      Đã bổ sung hỗ trợ phát hiện các mount point không phải thư mục gốc trên Windows.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: isdevdrive(path)
 
-   Return ``True`` if pathname *path* is located on a Windows Dev Drive.
-   A Dev Drive is optimized for developer scenarios, and offers faster
-   performance for reading and writing files. It is recommended for use for
-   source code, temporary build directories, package caches, and other
-   IO-intensive operations.
+   Trả về ``True`` nếu pathname *path* nằm trên Windows Dev Drive. Dev Drive được tối ưu hóa cho các tình huống dành cho nhà phát triển và mang lại hiệu suất cao hơn khi đọc và ghi tệp. Dev Drive được khuyến nghị sử dụng cho mã nguồn, thư mục build tạm thời, bộ nhớ đệm package và các thao tác sử dụng nhiều IO khác.
 
-   May raise an error for an invalid path, for example, one without a
-   recognizable drive, but returns ``False`` on platforms that do not support
-   Dev Drives. See `the Windows documentation <https://learn.microsoft.com/windows/dev-drive/>`_
-   for information on enabling and creating Dev Drives.
+   Có thể phát sinh lỗi đối với đường dẫn không hợp lệ, chẳng hạn như đường dẫn không có ổ đĩa được nhận dạng, nhưng trả về ``False`` trên các nền tảng không hỗ trợ Dev Drive. Xem `tài liệu Windows <https://learn.microsoft.com/windows/dev-drive/>`_ để biết thông tin về cách bật và tạo Dev Drive.
 
    .. versionadded:: 3.12
 
    .. versionchanged:: 3.13
-      The function is now available on all platforms, and will always return ``False`` on those that have no support for Dev Drives
+      Hàm này hiện khả dụng trên tất cả các nền tảng và sẽ luôn trả về ``False`` trên những nền tảng không hỗ trợ Dev Drive
 
 
 .. function:: isreserved(path)
 
-   Return ``True`` if *path* is a reserved pathname on the current system.
+   Trả về ``True`` nếu *path* là pathname dành riêng trên hệ thống hiện tại.
 
-   On Windows, reserved filenames include those that end with a space or dot;
-   those that contain colons (i.e. file streams such as "name:stream"),
-   wildcard characters (i.e. ``'*?"<>'``), pipe, or ASCII control characters;
-   as well as DOS device names such as "NUL", "CON", "CONIN$", "CONOUT$",
-   "AUX", "PRN", "COM1", and "LPT1".
+   Trên Windows, các tên tệp dành riêng bao gồm những tên kết thúc bằng dấu cách hoặc dấu chấm; những tên chứa dấu hai chấm (tức là các luồng tệp như "name:stream"), ký tự đại diện (tức là ``'*?"<>'``), ký tự pipe hoặc ký tự điều khiển ASCII; cũng như các tên thiết bị DOS như "NUL", "CON", "CONIN$", "CONOUT$", "AUX", "PRN", "COM1" và "LPT1".
 
    .. note::
 
-      This function approximates rules for reserved paths on most Windows
-      systems. These rules change over time in various Windows releases.
-      This function may be updated in future Python releases as changes to
-      the rules become broadly available.
+      Hàm này mô phỏng các quy tắc dành cho đường dẫn dành riêng trên hầu hết các hệ thống Windows. Các quy tắc này thay đổi theo thời gian trong những bản phát hành Windows khác nhau. Hàm này có thể được cập nhật trong các bản phát hành Python tương lai khi những thay đổi đối với các quy tắc được cung cấp rộng rãi.
 
    .. availability:: Windows.
 
@@ -370,233 +275,164 @@ the :mod:`glob` module.)
 
 .. function:: join(path, /, *paths)
 
-   Join one or more path segments intelligently.  The return value is the
-   concatenation of *path* and all members of *\*paths*, with exactly one
-   directory separator following each non-empty part, except the last. That is,
-   the result will only end in a separator if the last part is either empty or
-   ends in a separator.
+   Nối một hoặc nhiều đoạn đường dẫn một cách hợp lý. Giá trị trả về là phép nối của *path* và tất cả các phần tử của *\*paths*, với chính xác một dấu phân cách thư mục sau mỗi phần không rỗng, ngoại trừ phần cuối. Nghĩa là, kết quả chỉ kết thúc bằng dấu phân cách nếu phần cuối cùng либо rỗng hoặc kết thúc bằng một dấu phân cách.
 
-   If a segment is an absolute path (which on Windows requires both a drive and
-   a root), then all previous segments are ignored and joining continues from the
-   absolute path segment. On Linux, for example::
+   Nếu một đoạn là đường dẫn tuyệt đối (trên Windows cần có cả ổ đĩa và thư mục gốc), thì tất cả các đoạn trước đó sẽ bị bỏ qua và việc nối tiếp tục từ đoạn đường dẫn tuyệt đối. Ví dụ, trên Linux::
 
       >>> os.path.join('/home/foo', 'bar')
       '/home/foo/bar'
       >>> os.path.join('/home/foo', '/home/bar')
       '/home/bar'
 
-   On Windows, the drive is not reset when a rooted path segment (e.g.,
-   ``r'\foo'``) is encountered. If a segment is on a different drive or is an
-   absolute path, all previous segments are ignored and the drive is reset. For
-   example::
+   Trên Windows, ổ đĩa không được đặt lại khi gặp một đoạn đường dẫn có thư mục gốc (ví dụ: ``r'\foo'``). Nếu một đoạn nằm trên ổ đĩa khác hoặc là đường dẫn tuyệt đối, tất cả các đoạn trước đó sẽ bị bỏ qua và ổ đĩa được đặt lại. Ví dụ::
 
       >>> os.path.join('c:\\', 'foo')
       'c:\\foo'
       >>> os.path.join('c:\\foo', 'd:\\bar')
       'd:\\bar'
 
-   Note that since there is a current directory for each drive,
-   ``os.path.join("c:", "foo")`` represents a path relative to the current
-   directory on drive :file:`C:` (:file:`c:foo`), not :file:`c:\\foo`.
+   Lưu ý rằng vì mỗi ổ đĩa có một thư mục hiện tại, ``os.path.join("c:", "foo")`` biểu thị một đường dẫn tương đối so với thư mục hiện tại trên ổ đĩa :file:`C:` (:file:`c:foo`), chứ không phải :file:`c:\\foo`.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object` for *path* and *paths*.
+      Chấp nhận một :term:`path-like object` cho *path* và *paths*.
 
 
 .. function:: normcase(path, /)
 
-   Normalize the case of a pathname.  On Windows, convert all characters in the
-   pathname to lowercase, and also convert forward slashes to backward slashes.
-   On other operating systems, return the path unchanged.
+   Chuẩn hóa kiểu chữ của một đường dẫn. Trên Windows, chuyển tất cả ký tự trong đường dẫn thành chữ thường, đồng thời chuyển dấu gạch chéo xuôi thành dấu gạch chéo ngược. Trên các hệ điều hành khác, trả về đường dẫn không thay đổi.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: normpath(path)
 
-   Normalize a pathname by collapsing redundant separators and up-level
-   references so that ``A//B``, ``A/B/``, ``A/./B`` and ``A/foo/../B`` all
-   become ``A/B``.  This string manipulation may change the meaning of a path
-   that contains symbolic links.  On Windows, it converts forward slashes to
-   backward slashes. To normalize case, use :func:`normcase`.
+   Chuẩn hóa một pathname bằng cách gộp các dấu phân cách dư thừa và các tham chiếu lên cấp trên để ``A//B``, ``A/B/``, ``A/./B`` và ``A/foo/../B`` đều trở thành ``A/B``. Thao tác trên chuỗi này có thể làm thay đổi ý nghĩa của một đường dẫn chứa symbolic link. Trên Windows, hàm chuyển dấu gạch chéo xuôi thành dấu gạch chéo ngược. Để chuẩn hóa chữ hoa chữ thường, hãy sử dụng :func:`normcase`.
 
    .. note::
-      On POSIX systems, in accordance with `IEEE Std 1003.1 2013 Edition; 4.13
-      Pathname Resolution <https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_13>`_,
-      if a pathname begins with exactly two slashes, the first component
-      following the leading characters may be interpreted in an implementation-defined
-      manner, although more than two leading characters shall be treated as a
-      single character.
+      Trên các hệ thống POSIX, theo `Tiêu chuẩn IEEE Std 1003.1, Ấn bản 2013; 4.13 Giải quyết pathname <https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_13>`_, nếu một pathname bắt đầu bằng chính xác hai dấu gạch chéo, thành phần đầu tiên sau các ký tự mở đầu có thể được diễn giải theo cách do từng implementation quy định, mặc dù nhiều hơn hai ký tự mở đầu sẽ được xử lý như một ký tự duy nhất.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: realpath(path, /, *, strict=False)
 
-   Return the canonical path of the specified filename, eliminating any symbolic
-   links encountered in the path (if they are supported by the operating
-   system). On Windows, this function will also resolve MS-DOS (also called 8.3)
-   style names such as ``C:\\PROGRA~1`` to ``C:\\Program Files``.
-   The returned path uses the case reported by the operating system,
-   which can differ from the case of *path*,
-   in particular the drive letter is capitalized.
+   Trả về đường dẫn chuẩn của filename được chỉ định, loại bỏ mọi symbolic link gặp phải trong đường dẫn (nếu hệ điều hành hỗ trợ). Trên Windows, hàm này cũng sẽ phân giải các tên theo kiểu MS-DOS (còn gọi là 8.3), chẳng hạn như ``C:\\PROGRA~1`` thành ``C:\\Program Files``. Đường dẫn trả về sử dụng kiểu chữ do hệ điều hành cung cấp, có thể khác với kiểu chữ của *path*; cụ thể, ký tự ổ đĩa được viết hoa.
 
-   By default, the path is evaluated up to the first component that does not
-   exist, is a symlink loop, or whose evaluation raises :exc:`OSError`.
-   All such components are appended unchanged to the existing part of the path.
+   Theo mặc định, đường dẫn được đánh giá cho đến thành phần đầu tiên không tồn tại, là một vòng lặp symlink hoặc việc đánh giá thành phần đó gây ra :exc:`OSError`. Tất cả các thành phần như vậy được nối nguyên trạng vào phần hiện có của đường dẫn.
 
-   Some errors that are handled this way include "access denied", "not a
-   directory", or "bad argument to internal function". Thus, the
-   resulting path may be missing or inaccessible, may still contain
-   links or loops, and may traverse non-directories.
+   Một số lỗi được xử lý theo cách này bao gồm "access denied", "not a directory" hoặc "bad argument to internal function". Vì vậy, đường dẫn kết quả có thể không tồn tại hoặc không thể truy cập, vẫn có thể chứa link hoặc vòng lặp và có thể đi qua các đối tượng không phải thư mục.
 
-   This behavior can be modified by keyword arguments:
+   Có thể thay đổi hành vi này bằng các keyword argument:
 
-   If *strict* is ``True``, the first error encountered when evaluating the path is
-   re-raised.
-   In particular, :exc:`FileNotFoundError` is raised if *path* does not exist,
-   or another :exc:`OSError` if it is otherwise inaccessible.
+   Nếu *strict* là ``True``, lỗi đầu tiên gặp phải khi đánh giá đường dẫn sẽ được ném lại. Cụ thể, :exc:`FileNotFoundError` sẽ được ném nếu *path* không tồn tại, hoặc một :exc:`OSError` khác nếu đường dẫn không thể truy cập vì lý do khác.
 
-   If *strict* is :py:data:`os.path.ALLOW_MISSING`, errors other than
-   :exc:`FileNotFoundError` are re-raised (as with ``strict=True``).
-   Thus, the returned path will not contain any symbolic links, but the named
-   file and some of its parent directories may be missing.
+   Nếu *strict* là :py:data:`os.path.ALLOW_MISSING`, các lỗi khác ngoài
+   :exc:`FileNotFoundError` sẽ được ném lại (như với ``strict=True``). Do đó, đường dẫn được trả về sẽ không chứa liên kết tượng trưng nào, nhưng tệp được chỉ định và một số thư mục cha của nó có thể không tồn tại.
 
    .. note::
-      This function emulates the operating system's procedure for making a path
-      canonical, which differs slightly between Windows and UNIX with respect
-      to how links and subsequent path components interact.
+      Hàm này mô phỏng quy trình của hệ điều hành để tạo đường dẫn canonical, quy trình này hơi khác nhau giữa Windows và UNIX về cách các liên kết tương tác với các thành phần đường dẫn tiếp theo.
 
-      Operating system APIs make paths canonical as needed, so it's not
-      normally necessary to call this function.
+      Các API của hệ điều hành tạo đường dẫn canonical khi cần, vì vậy thông thường không cần gọi hàm này.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
    .. versionchanged:: 3.8
-      Symbolic links and junctions are now resolved on Windows.
+      Các liên kết tượng trưng và junction hiện được phân giải trên Windows.
 
    .. versionchanged:: 3.10
-      The *strict* parameter was added.
+      Tham số *strict* đã được thêm.
 
    .. versionchanged:: 3.14
-      The :py:data:`~os.path.ALLOW_MISSING` value for the *strict* parameter
-      was added.
+      Giá trị :py:data:`~os.path.ALLOW_MISSING` của tham số *strict* đã được thêm.
 
 .. data:: ALLOW_MISSING
 
-   Special value used for the *strict* argument in :func:`realpath`.
+   Giá trị đặc biệt được sử dụng cho đối số *strict* trong :func:`realpath`.
 
    .. versionadded:: 3.14
 
 .. function:: relpath(path, start=os.curdir)
 
-   Return a relative filepath to *path* either from the current directory or
-   from an optional *start* directory.  This is a path computation:  the
-   filesystem is not accessed to confirm the existence or nature of *path* or
-   *start*.  On Windows, :exc:`ValueError` is raised when *path* and *start*
-   are on different drives.
+   Trả về đường dẫn tệp tương đối đến *path*, tính từ thư mục hiện tại hoặc từ thư mục *start* tùy chọn. Đây là phép tính đường dẫn: hệ thống tệp không được truy cập để xác nhận sự tồn tại hoặc loại của *path* hay *start*. Trên Windows, :exc:`ValueError` được phát sinh khi *path* và *start* nằm trên các ổ đĩa khác nhau.
 
-   *start* defaults to :data:`os.curdir`.
+   *start* mặc định là :data:`os.curdir`.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: samefile(path1, path2, /)
 
-   Return ``True`` if both pathname arguments refer to the same file or directory.
-   This is determined by the device number and i-node number and raises an
-   exception if an :func:`os.stat` call on either pathname fails.
+   Trả về ``True`` nếu cả hai đối số đường dẫn đều trỏ đến cùng một tệp hoặc thư mục. Điều này được xác định bằng số thiết bị và số i-node, đồng thời một ngoại lệ sẽ được phát sinh nếu lệnh gọi :func:`os.stat` trên một trong hai đường dẫn không thành công.
 
    .. versionchanged:: 3.2
-      Added Windows support.
+      Đã bổ sung hỗ trợ Windows.
 
    .. versionchanged:: 3.4
-      Windows now uses the same implementation as all other platforms.
+      Windows hiện sử dụng cùng một triển khai như tất cả các nền tảng khác.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: sameopenfile(fp1, fp2)
 
-   Return ``True`` if the file descriptors *fp1* and *fp2* refer to the same file.
+   Trả về ``True`` nếu các file descriptor *fp1* và *fp2* trỏ đến cùng một tệp.
 
    .. versionchanged:: 3.2
-      Added Windows support.
+      Đã bổ sung hỗ trợ Windows.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: samestat(stat1, stat2, /)
 
-   Return ``True`` if the stat tuples *stat1* and *stat2* refer to the same file.
-   These structures may have been returned by :func:`os.fstat`,
-   :func:`os.lstat`, or :func:`os.stat`.  This function implements the
-   underlying comparison used by :func:`samefile` and :func:`sameopenfile`.
+   Trả về ``True`` nếu các tuple stat *stat1* và *stat2* trỏ đến cùng một tệp. Các cấu trúc này có thể được trả về bởi :func:`os.fstat`,
+   :func:`os.lstat`, hoặc :func:`os.stat`. Hàm này triển khai phép so sánh nền tảng được :func:`samefile` và :func:`sameopenfile` sử dụng.
 
    .. versionchanged:: 3.4
-      Added Windows support.
+      Đã bổ sung hỗ trợ Windows.
 
 
 .. function:: split(path, /)
 
-   Split the pathname *path* into a pair, ``(head, tail)`` where *tail* is the
-   last pathname component and *head* is everything leading up to that.  The
-   *tail* part will never contain a slash; if *path* ends in a slash, *tail*
-   will be empty.  If there is no slash in *path*, *head* will be empty.  If
-   *path* is empty, both *head* and *tail* are empty.  Trailing slashes are
-   stripped from *head* unless it is the root (one or more slashes only).  In
-   all cases, ``join(head, tail)`` returns a path to the same location as *path*
-   (but the strings may differ).  Also see the functions :func:`join`,
-   :func:`dirname` and :func:`basename`.
+   Phân tách pathname *path* thành một cặp, ``(head, tail)`` trong đó *tail* là thành phần pathname cuối cùng còn *head* là mọi phần đứng trước nó. Phần *tail* sẽ không bao giờ chứa dấu gạch chéo; nếu *path* kết thúc bằng dấu gạch chéo, *tail* sẽ rỗng. Nếu không có dấu gạch chéo trong *path*, *head* sẽ rỗng. Nếu *path* rỗng, cả *head* và *tail* đều rỗng. Các dấu gạch chéo ở cuối sẽ bị loại bỏ khỏi *head* trừ khi đó là thư mục gốc (chỉ gồm một hoặc nhiều dấu gạch chéo). Trong mọi trường hợp, ``join(head, tail)`` trả về một đường dẫn đến cùng vị trí với *path* (nhưng các chuỗi có thể khác nhau). Cũng xem các hàm :func:`join`,
+   :func:`dirname` và :func:`basename`.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: splitdrive(path, /)
 
-   Split the pathname *path* into a pair ``(drive, tail)`` where *drive* is either
-   a mount point or the empty string.  On systems which do not use drive
-   specifications, *drive* will always be the empty string.  In all cases, ``drive
-   + tail`` will be the same as *path*.
+   Phân tách pathname *path* thành một cặp ``(drive, tail)`` trong đó *drive* là điểm gắn kết hoặc chuỗi rỗng. Trên các hệ thống không sử dụng đặc tả ổ đĩa, *drive* sẽ luôn là chuỗi rỗng. Trong mọi trường hợp, ``drive
+   + tail`` sẽ giống với *path*.
 
-   On Windows, splits a pathname into drive/UNC sharepoint and relative path.
+   Trên Windows, tách pathname thành drive/UNC sharepoint và relative path.
 
-   If the path contains a drive letter, drive will contain everything
-   up to and including the colon::
+   Nếu path chứa drive letter, drive sẽ chứa mọi thứ cho đến và bao gồm cả dấu hai chấm::
 
       >>> splitdrive("c:/dir")
       ("c:", "/dir")
 
-   If the path contains a UNC path, drive will contain the host name
-   and share::
+   Nếu path chứa UNC path, drive sẽ chứa tên máy chủ và share::
 
       >>> splitdrive("//host/computer/dir")
       ("//host/computer", "/dir")
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: splitroot(path, /)
 
-   Split the pathname *path* into a 3-item tuple ``(drive, root, tail)`` where
-   *drive* is a device name or mount point, *root* is a string of separators
-   after the drive, and *tail* is everything after the root. Any of these
-   items may be the empty string. In all cases, ``drive + root + tail`` will
-   be the same as *path*.
+   Tách pathname *path* thành một tuple gồm 3 phần ``(drive, root, tail)`` trong đó *drive* là tên thiết bị hoặc mount point, *root* là một chuỗi các dấu phân cách sau drive, còn *tail* là mọi thứ sau root. Bất kỳ phần nào trong số này cũng có thể là chuỗi rỗng. Trong mọi trường hợp, ``drive + root + tail`` sẽ giống với *path*.
 
-   On POSIX systems, *drive* is always empty. The *root* may be empty (if *path* is
-   relative), a single forward slash (if *path* is absolute), or two forward slashes
-   (implementation-defined per `IEEE Std 1003.1-2017; 4.13 Pathname Resolution
-   <https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_13>`_.)
-   For example::
+   Trên các hệ thống POSIX, *drive* luôn rỗng. *root* có thể rỗng (nếu *path* là relative), là một dấu gạch chéo xuôi (nếu *path* là absolute), hoặc hai dấu gạch chéo xuôi (do triển khai xác định theo `IEEE Std 1003.1-2017; 4.13 Pathname Resolution <https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_13>`_). Ví dụ::
 
       >>> splitroot('/home/sam')
       ('', '/', 'home/sam')
@@ -605,9 +441,7 @@ the :mod:`glob` module.)
       >>> splitroot('///home/sam')
       ('', '/', '//home/sam')
 
-   On Windows, *drive* may be empty, a drive-letter name, a UNC share, or a device
-   name. The *root* may be empty, a forward slash, or a backward slash. For
-   example::
+   Trên Windows, *drive* có thể rỗng, là tên drive-letter, UNC share hoặc tên thiết bị. *root* có thể rỗng, là dấu gạch chéo xuôi hoặc dấu gạch chéo ngược. Ví dụ::
 
       >>> splitroot('C:/Users/Sam')
       ('C:', '/', 'Users/Sam')
@@ -619,25 +453,21 @@ the :mod:`glob` module.)
 
 .. function:: splitext(path, /)
 
-   Split the pathname *path* into a pair ``(root, ext)``  such that ``root + ext ==
-   path``, and the extension, *ext*, is empty or begins with a period and contains at
-   most one period.
+   Tách pathname *path* thành một cặp ``(root, ext)`` sao cho ``root + ext == path``, còn phần mở rộng *ext* thì rỗng hoặc bắt đầu bằng dấu chấm và chứa nhiều nhất một dấu chấm.
 
-   If the path contains no extension, *ext* will be ``''``::
+   Nếu path không chứa phần mở rộng, *ext* sẽ là ``''``::
 
       >>> splitext('bar')
       ('bar', '')
 
-   If the path contains an extension, then *ext* will be set to this extension,
-   including the leading period. Note that previous periods will be ignored::
+   Nếu path chứa phần mở rộng, *ext* sẽ được đặt thành phần mở rộng này, bao gồm cả dấu chấm ở đầu. Lưu ý rằng các dấu chấm trước đó sẽ bị bỏ qua::
 
       >>> splitext('foo.bar.exe')
       ('foo.bar', '.exe')
       >>> splitext('/foo/bar.exe')
       ('/foo/bar', '.exe')
 
-   Leading periods of the last component of the path are considered to
-   be part of the root::
+   Các dấu chấm ở đầu thành phần cuối cùng của path được xem là một phần của root::
 
       >>> splitext('.cshrc')
       ('.cshrc', '')
@@ -645,10 +475,13 @@ the :mod:`glob` module.)
       ('/foo/....jpg', '')
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. data:: supports_unicode_filenames
 
-   ``True`` if arbitrary Unicode strings can be used as file names (within limitations
-   imposed by the file system).
+   ``True`` nếu có thể sử dụng các chuỗi Unicode tùy ý làm tên tệp (trong các giới hạn do hệ thống tệp áp đặt).
+
+.. _`the Windows documentation`: https://learn.microsoft.com/windows/dev-drive/
+.. _`IEEE Std 1003.1 2013 Edition; 4.13 Pathname Resolution`: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_13
+.. _`IEEE Std 1003.1-2017; 4.13 Pathname Resolution`: https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_13

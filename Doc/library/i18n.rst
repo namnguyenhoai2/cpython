@@ -1,15 +1,12 @@
 .. _i18n:
 
-********************
-Internationalization
-********************
+***********
+Quốc tế hóa
+***********
 
-The modules described in this chapter help you write software that is
-independent of language and locale by providing mechanisms for selecting a
-language to be used in  program messages or by tailoring output to match local
-conventions.
+Các module được mô tả trong chương này giúp bạn viết phần mềm không phụ thuộc vào ngôn ngữ và locale bằng cách cung cấp các cơ chế để chọn ngôn ngữ được sử dụng trong thông báo của chương trình hoặc điều chỉnh đầu ra cho phù hợp với các quy ước địa phương.
 
-The list of modules described in this chapter is:
+Danh sách các module được mô tả trong chương này gồm:
 
 
 .. toctree::

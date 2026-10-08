@@ -1,15 +1,15 @@
-:mod:`!venv` --- Creation of virtual environments
-=================================================
+:mod:`!venv` --- Tạo môi trường ảo
+==================================
 
 .. module:: venv
-   :synopsis: Creation of virtual environments.
+   :synopsis: Tạo môi trường ảo.
 
 .. moduleauthor:: Vinay Sajip <vinay_sajip@yahoo.co.uk>
 .. sectionauthor:: Vinay Sajip <vinay_sajip@yahoo.co.uk>
 
 .. versionadded:: 3.3
 
-**Source code:** :source:`Lib/venv/`
+**Mã nguồn:** :source:`Lib/venv/`
 
 .. index:: pair: Environments; virtual
 
@@ -18,85 +18,59 @@
 .. _venv-def:
 .. _venv-intro:
 
-The :mod:`!venv` module supports creating lightweight "virtual environments",
-each with their own independent set of Python packages installed in
-their :mod:`site` directories.
-A virtual environment is created on top of an existing
-Python installation, known as the virtual environment's "base" Python, and by
-default is isolated from the packages in the base environment,
-so that only those explicitly installed in the virtual environment are
-available. See :ref:`sys-path-init-virtual-environments` and :mod:`site`'s
-:ref:`virtual environments documentation <site-virtual-environments-configuration>`
-for more information.
+Mô-đun :mod:`!venv` hỗ trợ tạo các "môi trường ảo" nhẹ, mỗi môi trường có một tập gói Python độc lập được cài đặt trong các thư mục :mod:`site` của riêng chúng. Một môi trường ảo được tạo dựa trên một bản cài đặt Python hiện có, được gọi là Python "cơ sở" của môi trường ảo, và theo mặc định được tách biệt khỏi các gói trong môi trường cơ sở, vì vậy chỉ những gói được cài đặt rõ ràng trong môi trường ảo mới khả dụng. Xem :ref:`sys-path-init-virtual-environments` và :mod:`site` của
+:ref:`tài liệu về môi trường ảo <site-virtual-environments-configuration>` để biết thêm thông tin.
 
-When used from within a virtual environment, common installation tools such as
-:pypi:`pip` will install Python packages into a virtual environment
-without needing to be told to do so explicitly.
+Khi được sử dụng bên trong một môi trường ảo, các công cụ cài đặt phổ biến như
+:pypi:`pip` sẽ cài đặt các gói Python vào một môi trường ảo mà không cần được yêu cầu thực hiện việc đó một cách rõ ràng.
 
-A virtual environment is (amongst other things):
+Môi trường ảo có những đặc điểm sau (ngoài ra còn có):
 
-* Used to contain a specific Python interpreter and software libraries and
-  binaries which are needed to support a project (library or application). These
-  are by default isolated from software in other virtual environments and Python
-  interpreters and libraries installed in the operating system.
+* Được dùng để chứa một Python interpreter cụ thể cùng các thư viện và binary cần thiết để hỗ trợ một dự án (library hoặc application). Theo mặc định, chúng được cách ly với phần mềm trong các môi trường ảo khác, cũng như với các Python interpreter và thư viện được cài đặt trong hệ điều hành.
 
-* Contained in a directory, conventionally named ``.venv`` or ``venv`` in
-  the project directory, or under a container directory for lots of virtual
-  environments, such as ``~/.virtualenvs``.
+* Được chứa trong một thư mục, theo quy ước được đặt tên là ``.venv`` hoặc ``venv`` trong thư mục dự án, hoặc bên dưới một thư mục chứa nhiều môi trường ảo, chẳng hạn như ``~/.virtualenvs``.
 
-* Not checked into source control systems such as Git.
+* Không được đưa vào các hệ thống quản lý source control như Git.
 
-* Considered as disposable -- it should be simple to delete and recreate it from
-  scratch. You don't place any project code in the environment.
+* Được xem là có thể loại bỏ -- việc xóa và tạo lại từ đầu phải đơn giản. Bạn không đặt bất kỳ code dự án nào trong môi trường này.
 
-* Not considered as movable or copyable -- you just recreate the same
-  environment in the target location.
+* Không được xem là có thể di chuyển hoặc sao chép -- bạn chỉ cần tạo lại cùng một môi trường tại vị trí đích.
 
-See :pep:`405` for more background on Python virtual environments.
+Xem :pep:`405` để biết thêm thông tin cơ bản về các môi trường ảo Python.
 
 .. seealso::
 
-   `Python Packaging User Guide: Creating and using virtual environments
-   <https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#create-and-use-virtual-environments>`__
+   `Hướng dẫn sử dụng Python Packaging: Tạo và sử dụng môi trường ảo <https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/#create-and-use-virtual-environments>`__
 
 .. include:: ../includes/wasm-mobile-notavail.rst
 
-Creating virtual environments
------------------------------
+Tạo môi trường ảo
+-----------------
 
-:ref:`Virtual environments <venv-def>` are created by executing the ``venv``
-module:
+:ref:`Môi trường ảo <venv-def>` được tạo bằng cách thực thi module ``venv``:
 
 .. code-block:: shell
 
     python -m venv /path/to/new/virtual/environment
 
-This creates the target directory (including parent directories as needed)
-and places a :file:`pyvenv.cfg` file in it with a ``home`` key
-pointing to the Python installation from which the command was run.
-It also creates a :file:`bin` (or :file:`Scripts` on Windows) subdirectory
-containing a copy or symlink of the Python executable
-(as appropriate for the platform or arguments used at environment creation time).
-It also creates a :file:`lib/pythonX.Y/site-packages` subdirectory
-(on Windows, this is :file:`Lib\\site-packages`).
-If an existing directory is specified, it will be re-used.
+Thao tác này tạo thư mục đích (bao gồm các thư mục cha nếu cần) và đặt một tệp :file:`pyvenv.cfg` vào đó với khóa ``home`` trỏ đến bản cài đặt Python mà từ đó lệnh được chạy. Thao tác này cũng tạo một thư mục con :file:`bin` (hoặc :file:`Scripts` trên Windows) chứa một bản sao hoặc symlink của tệp thực thi Python (tùy theo nền tảng hoặc các đối số được sử dụng tại thời điểm tạo môi trường). Thao tác này cũng tạo một thư mục con :file:`lib/pythonX.Y/site-packages` (trên Windows, đây là :file:`Lib\\site-packages`). Nếu chỉ định một thư mục hiện có, thư mục đó sẽ được sử dụng lại.
 
 .. versionchanged:: 3.5
-   The use of ``venv`` is now recommended for creating virtual environments.
+   Hiện nay, việc sử dụng ``venv`` được khuyến nghị để tạo môi trường ảo.
 
 .. deprecated-removed:: 3.6 3.8
    :program:`pyvenv` was the recommended tool for creating virtual environments
-   for Python 3.3 and 3.4, and replaced in 3.5 by executing ``venv`` directly.
+   cho Python 3.3 và 3.4, và được thay thế trong 3.5 bằng cách thực thi trực tiếp ``venv``.
 
 .. highlight:: none
 
-On Windows, invoke the ``venv`` command as follows:
+Trên Windows, gọi lệnh ``venv`` như sau:
 
 .. code-block:: ps1con
 
    PS> python -m venv C:\path\to\new\virtual\environment
 
-The command, if run with ``-h``, will show the available options::
+Lệnh này, nếu được chạy với ``-h``, sẽ hiển thị các tùy chọn khả dụng::
 
    usage: venv [-h] [--system-site-packages] [--symlinks | --copies] [--clear]
                [--upgrade] [--without-pip] [--prompt PROMPT] [--upgrade-deps]
@@ -113,117 +87,92 @@ The command, if run with ``-h``, will show the available options::
 
 .. option:: ENV_DIR
 
-   A required argument specifying the directory to create the environment in.
+   Đối số bắt buộc chỉ định thư mục sẽ được dùng để tạo môi trường.
 
 .. option:: --system-site-packages
 
-   Give the virtual environment access to the system site-packages directory.
+   Cho phép môi trường ảo truy cập thư mục site-packages của hệ thống.
 
 .. option:: --symlinks
 
-   Try to use symlinks rather than copies, when symlinks are not the default for the platform.
+   Cố gắng sử dụng symlink thay vì bản sao khi symlink không phải là mặc định trên nền tảng.
 
 .. option:: --copies
 
-   Try to use copies rather than symlinks, even when symlinks are the default for the platform.
+   Cố gắng sử dụng bản sao thay vì symlink, ngay cả khi symlink là mặc định trên nền tảng.
 
 .. option:: --clear
 
-   Delete the contents of the environment directory if it already exists, before environment creation.
+   Xóa nội dung của thư mục môi trường nếu thư mục đó đã tồn tại trước khi tạo môi trường.
 
 .. option:: --upgrade
 
-   Upgrade the environment directory to use this version of Python, assuming Python has been upgraded in-place.
+   Nâng cấp thư mục môi trường để sử dụng phiên bản Python này, với giả định Python đã được nâng cấp tại chỗ.
 
 .. option:: --without-pip
 
-   Skips installing or upgrading pip in the virtual environment (pip is bootstrapped by default).
+   Bỏ qua việc cài đặt hoặc nâng cấp pip trong môi trường ảo (pip được bootstrap theo mặc định).
 
 .. option:: --prompt <PROMPT>
 
-   Provides an alternative prompt prefix for this environment.
+   Cung cấp tiền tố prompt thay thế cho môi trường này.
 
 .. option:: --upgrade-deps
 
-   Upgrade core dependencies (pip) to the latest version in PyPI.
+   Nâng cấp các dependency cốt lõi (pip) lên phiên bản mới nhất trên PyPI.
 
 .. option:: --without-scm-ignore-files
 
-   Skips adding SCM ignore files to the environment directory (Git is supported by default).
+   Bỏ qua việc thêm các tệp ignore của SCM vào thư mục môi trường (Git được hỗ trợ theo mặc định).
 
 
 .. versionchanged:: 3.4
-   Installs pip by default, added the ``--without-pip``  and ``--copies``
-   options.
+   Cài đặt pip theo mặc định, đồng thời bổ sung các tùy chọn ``--without-pip`` và ``--copies``.
 
 .. versionchanged:: 3.4
-   In earlier versions, if the target directory already existed, an error was
-   raised, unless the ``--clear`` or ``--upgrade`` option was provided.
+   Trong các phiên bản trước, nếu thư mục đích đã tồn tại thì sẽ phát sinh lỗi, trừ khi cung cấp tùy chọn ``--clear`` hoặc ``--upgrade``.
 
 .. versionchanged:: 3.9
-   Add ``--upgrade-deps`` option to upgrade pip + setuptools to the latest on PyPI.
+   Thêm tùy chọn ``--upgrade-deps`` để nâng cấp pip + setuptools lên phiên bản mới nhất trên PyPI.
 
 .. versionchanged:: 3.12
 
-   ``setuptools`` is no longer a core venv dependency.
+   ``setuptools`` không còn là dependency cốt lõi của venv.
 
 .. versionchanged:: 3.13
 
-   Added the ``--without-scm-ignore-files`` option.
+   Đã thêm tùy chọn ``--without-scm-ignore-files``.
 .. versionchanged:: 3.13
-   ``venv`` now creates a :file:`.gitignore` file for Git by default.
+   ``venv`` hiện tạo tệp :file:`.gitignore` cho Git theo mặc định.
 
 .. note::
-   While symlinks are supported on Windows, they are not recommended. Of
-   particular note is that double-clicking ``python.exe`` in File Explorer
-   will resolve the symlink eagerly and ignore the virtual environment.
+   Mặc dù symlink được hỗ trợ trên Windows, chúng không được khuyến nghị. Đáng lưu ý là việc nhấp đúp vào ``python.exe`` trong File Explorer sẽ phân giải symlink ngay lập tức và bỏ qua môi trường ảo.
 
 .. note::
-   On Microsoft Windows, it may be required to enable the ``Activate.ps1``
-   script by setting the execution policy for the user. You can do this by
-   issuing the following PowerShell command:
+   Trên Microsoft Windows, bạn có thể cần bật script ``Activate.ps1`` bằng cách đặt execution policy cho người dùng. Bạn có thể thực hiện việc này bằng cách chạy lệnh PowerShell sau:
 
    .. code-block:: powershell
 
       PS C:\> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
-   See `About Execution Policies
-   <https://go.microsoft.com/fwlink/?LinkID=135170>`_
-   for more information.
+   Xem `About Execution Policies <https://go.microsoft.com/fwlink/?LinkID=135170>`_ để biết thêm thông tin.
 
-The created :file:`pyvenv.cfg` file also includes the
-``include-system-site-packages`` key, set to ``true`` if ``venv`` is
-run with the ``--system-site-packages`` option, ``false`` otherwise.
+Tệp :file:`pyvenv.cfg` được tạo cũng bao gồm khóa ``include-system-site-packages``, được đặt thành ``true`` nếu ``venv`` được chạy với tùy chọn ``--system-site-packages``, và ``false`` trong các trường hợp khác.
 
-Unless the ``--without-pip`` option is given, :mod:`ensurepip` will be
-invoked to bootstrap ``pip`` into the virtual environment.
+Trừ khi cung cấp tùy chọn ``--without-pip``, :mod:`ensurepip` sẽ được gọi để khởi tạo ``pip`` trong môi trường ảo.
 
-Multiple paths can be given to ``venv``, in which case an identical virtual
-environment will be created, according to the given options, at each provided
-path.
+Có thể cung cấp nhiều đường dẫn cho ``venv``; khi đó, một môi trường ảo giống hệt nhau sẽ được tạo theo các tùy chọn đã cho tại mỗi đường dẫn được cung cấp.
 
 .. _venv-explanation:
 
-How venvs work
---------------
+Cách venv hoạt động
+-------------------
 
-When a Python interpreter is running from a virtual environment,
-:data:`sys.prefix` and :data:`sys.exec_prefix`
-point to the directories of the virtual environment,
-whereas :data:`sys.base_prefix` and :data:`sys.base_exec_prefix`
-point to those of the base Python used to create the environment.
-It is sufficient to check
-``sys.prefix != sys.base_prefix`` to determine if the current interpreter is
-running from a virtual environment.
+Khi một trình thông dịch Python đang chạy từ môi trường ảo,
+:data:`sys.prefix` và :data:`sys.exec_prefix` trỏ đến các thư mục của môi trường ảo, trong khi :data:`sys.base_prefix` và :data:`sys.base_exec_prefix` trỏ đến các thư mục của Python cơ sở được dùng để tạo môi trường. Chỉ cần kiểm tra ``sys.prefix != sys.base_prefix`` là đủ để xác định trình thông dịch hiện tại có đang chạy từ môi trường ảo hay không.
 
-A virtual environment may be "activated" using a script in its binary directory
-(``bin`` on POSIX; ``Scripts`` on Windows).
-This will prepend that directory to your :envvar:`PATH`, so that running
-:program:`python` will invoke the environment's Python interpreter
-and you can run installed scripts without having to use their full path.
-The invocation of the activation script is platform-specific
-(:samp:`{<venv>}` must be replaced by the path to the directory
-containing the virtual environment):
+Một môi trường ảo có thể được "kích hoạt" bằng một script trong thư mục binary của nó (``bin`` trên POSIX; ``Scripts`` trên Windows). Thao tác này sẽ thêm thư mục đó vào đầu :envvar:`PATH`, để khi chạy
+:program:`python`, trình thông dịch Python của môi trường sẽ được gọi và bạn có thể chạy các script đã cài đặt mà không cần sử dụng đường dẫn đầy đủ của chúng. Cách gọi activation script phụ thuộc vào nền tảng (:samp:`{<venv>}` phải được thay thế bằng đường dẫn đến thư mục chứa môi trường ảo):
 
 +-------------+------------+--------------------------------------------------+
 | Platform    | Shell      | Command to activate virtual environment          |
@@ -245,47 +194,19 @@ containing the virtual environment):
    :program:`fish` and :program:`csh` activation scripts.
 
 .. versionadded:: 3.8
-   PowerShell activation scripts installed under POSIX for PowerShell Core
-   support.
+   Các tập lệnh kích hoạt PowerShell được cài đặt trên POSIX để hỗ trợ PowerShell Core.
 
-You don't specifically *need* to activate a virtual environment,
-as you can just specify the full path to that environment's
-Python interpreter when invoking Python.
-Furthermore, all scripts installed in the environment
-should be runnable without activating it.
+Bạn không nhất thiết *cần* kích hoạt một môi trường ảo, vì bạn chỉ cần chỉ định đường dẫn đầy đủ đến trình thông dịch Python của môi trường đó khi gọi Python. Hơn nữa, tất cả các tập lệnh được cài đặt trong môi trường đều có thể chạy mà không cần kích hoạt môi trường.
 
-In order to achieve this, scripts installed into virtual environments have
-a "shebang" line which points to the environment's Python interpreter,
-:samp:`#!/{<path-to-venv>}/bin/python`.
-This means that the script will run with that interpreter regardless of the
-value of :envvar:`PATH`. On Windows, "shebang" line processing is supported if
-you have the :ref:`launcher` installed. Thus, double-clicking an installed
-script in a Windows Explorer window should run it with the correct interpreter
-without the environment needing to be activated or on the :envvar:`PATH`.
+Để thực hiện điều này, các tập lệnh được cài đặt vào môi trường ảo có một dòng "shebang" trỏ đến trình thông dịch Python của môi trường đó,
+:samp:`#!/{<path-to-venv>}/bin/python`. Điều này có nghĩa là tập lệnh sẽ chạy bằng trình thông dịch đó bất kể giá trị của :envvar:`PATH`. Trên Windows, việc xử lý dòng "shebang" được hỗ trợ nếu bạn đã cài đặt :ref:`launcher`. Do đó, việc nhấp đúp vào một tập lệnh đã cài đặt trong cửa sổ Windows Explorer sẽ chạy tập lệnh đó bằng trình thông dịch chính xác mà không cần kích hoạt môi trường hoặc đưa môi trường vào :envvar:`PATH`.
 
-When a virtual environment has been activated, the :envvar:`!VIRTUAL_ENV`
-environment variable is set to the path of the environment.
-Since explicitly activating a virtual environment is not required to use it,
-:envvar:`!VIRTUAL_ENV` cannot be relied upon to determine
-whether a virtual environment is being used.
+Khi một môi trường ảo được kích hoạt, biến môi trường :envvar:`!VIRTUAL_ENV` được đặt thành đường dẫn của môi trường đó. Vì không bắt buộc phải kích hoạt rõ ràng một môi trường ảo để sử dụng nó,
+không thể dựa vào :envvar:`!VIRTUAL_ENV` để xác định liệu một môi trường ảo có đang được sử dụng hay không.
 
-.. warning:: Because scripts installed in environments should not expect the
-   environment to be activated, their shebang lines contain the absolute paths
-   to their environment's interpreters. Because of this, environments are
-   inherently non-portable, in the general case. You should always have a
-   simple means of recreating an environment (for example, if you have a
-   requirements file ``requirements.txt``, you can invoke ``pip install -r
-   requirements.txt`` using the environment's ``pip`` to install all of the
-   packages needed by the environment). If for any reason you need to move the
-   environment to a new location, you should recreate it at the desired
-   location and delete the one at the old location. If you move an environment
-   because you moved a parent directory of it, you should recreate the
-   environment in its new location. Otherwise, software installed into the
-   environment may not work as expected.
+.. warning:: Vì các tập lệnh được cài đặt trong môi trường không nên giả định rằng môi trường đã được kích hoạt, các dòng shebang của chúng chứa đường dẫn tuyệt đối đến các trình thông dịch trong môi trường. Vì vậy, xét trong trường hợp tổng quát, các môi trường vốn không có tính di động. Bạn luôn nên có một cách đơn giản để tạo lại môi trường (ví dụ: nếu bạn có tệp requirements ``requirements.txt``, bạn có thể gọi ``pip install -r requirements.txt`` bằng ``pip`` của môi trường để cài đặt tất cả các gói mà môi trường cần). Nếu vì bất kỳ lý do nào bạn cần di chuyển môi trường đến một vị trí mới, hãy tạo lại môi trường tại vị trí mong muốn và xóa môi trường ở vị trí cũ. Nếu bạn di chuyển môi trường vì đã di chuyển thư mục cha của nó, hãy tạo lại môi trường ở vị trí mới. Nếu không, phần mềm được cài đặt vào môi trường có thể không hoạt động như mong đợi.
 
-You can deactivate a virtual environment by typing ``deactivate`` in your shell.
-The exact mechanism is platform-specific and is an internal implementation
-detail (typically, a script or shell function will be used).
+Bạn có thể hủy kích hoạt một môi trường ảo bằng cách nhập ``deactivate`` trong shell. Cơ chế chính xác phụ thuộc vào nền tảng và là một chi tiết triển khai nội bộ (thông thường, một script hoặc hàm shell sẽ được sử dụng).
 
 
 .. _venv-api:
@@ -295,72 +216,49 @@ API
 
 .. highlight:: python
 
-The high-level method described above makes use of a simple API which provides
-mechanisms for third-party virtual environment creators to customize environment
-creation according to their needs, the :class:`EnvBuilder` class.
+Phương thức cấp cao được mô tả ở trên sử dụng một API đơn giản, cung cấp các cơ chế để những bên thứ ba tạo môi trường ảo có thể tùy chỉnh việc tạo môi trường theo nhu cầu của họ, thông qua lớp :class:`EnvBuilder`.
 
 .. class:: EnvBuilder(system_site_packages=False, clear=False, \
-                      symlinks=False, upgrade=False, with_pip=False, \
-                      prompt=None, upgrade_deps=False, \
-                      *, scm_ignore_files=frozenset())
+                      symlinks=False, upgrade=False, with_pip=False, \ prompt=None, upgrade_deps=False, \ *, scm_ignore_files=frozenset()
 
-    The :class:`EnvBuilder` class accepts the following keyword arguments on
-    instantiation:
+    Lớp :class:`EnvBuilder` chấp nhận các đối số keyword sau khi khởi tạo:
 
-    * *system_site_packages* -- a boolean value indicating that the system Python
-      site-packages should be available to the environment (defaults to ``False``).
+    * *system_site_packages* -- một giá trị boolean cho biết các site-packages của Python hệ thống có khả dụng trong môi trường hay không (mặc định là ``False``).
 
-    * *clear* -- a boolean value which, if true, will delete the contents of
-      any existing target directory, before creating the environment.
+    * *clear* -- một giá trị boolean mà nếu là true sẽ xóa nội dung của mọi thư mục đích hiện có trước khi tạo môi trường.
 
-    * *symlinks* -- a boolean value indicating whether to attempt to symlink the
-      Python binary rather than copying.
+    * *symlinks* -- một giá trị boolean cho biết có thử tạo symlink cho binary Python thay vì sao chép hay không.
 
-    * *upgrade* -- a boolean value which, if true, will upgrade an existing
-      environment with the running Python - for use when that Python has been
-      upgraded in-place (defaults to ``False``).
+    * *upgrade* -- một giá trị boolean mà nếu là true sẽ nâng cấp một environment hiện có bằng Python đang chạy - dùng khi Python đó đã được nâng cấp tại chỗ (mặc định là ``False``).
 
-    * *with_pip* -- a boolean value which, if true, ensures pip is
-      installed in the virtual environment. This uses :mod:`ensurepip` with
-      the ``--default-pip`` option.
+    * *with_pip* -- một giá trị boolean mà nếu là true sẽ đảm bảo pip được cài đặt trong virtual environment. Tùy chọn này sử dụng :mod:`ensurepip` với tùy chọn ``--default-pip``.
 
-    * *prompt* -- a string to be used after virtual environment is activated
-      (defaults to ``None`` which means directory name of the environment would
-      be used). If the special string ``"."`` is provided, the basename of the
-      current directory is used as the prompt.
+    * *prompt* -- một chuỗi được sử dụng sau khi virtual environment được kích hoạt (mặc định là ``None``, nghĩa là tên thư mục của environment sẽ được sử dụng). Nếu cung cấp chuỗi đặc biệt ``"."``, tên cơ sở của thư mục hiện tại sẽ được sử dụng làm prompt.
 
-    * *upgrade_deps* -- Update the base venv modules to the latest on PyPI
+    * *upgrade_deps* -- Cập nhật các module venv cơ sở lên phiên bản mới nhất trên PyPI
 
-    * *scm_ignore_files* -- Create ignore files based for the specified source
-      control managers (SCM) in the iterable. Support is defined by having a
-      method named ``create_{scm}_ignore_file``. The only value supported by
-      default is ``"git"`` via :meth:`create_git_ignore_file`.
+    * *scm_ignore_files* -- Tạo các tệp ignore dựa trên những source control manager (SCM) được chỉ định trong iterable. Tính năng hỗ trợ được xác định bằng cách có một phương thức tên là ``create_{scm}_ignore_file``. Giá trị duy nhất được hỗ trợ theo mặc định là ``"git"`` thông qua :meth:`create_git_ignore_file`.
 
 
     .. versionchanged:: 3.4
-       Added the ``with_pip`` parameter
+       Đã thêm tham số ``with_pip``
 
     .. versionchanged:: 3.6
-       Added the ``prompt`` parameter
+       Đã thêm tham số ``prompt``
 
     .. versionchanged:: 3.9
-       Added the ``upgrade_deps`` parameter
+       Đã thêm tham số ``upgrade_deps``
 
     .. versionchanged:: 3.13
-       Added the ``scm_ignore_files`` parameter
+       Đã thêm tham số ``scm_ignore_files``
 
-    :class:`EnvBuilder` may be used as a base class.
+    :class:`EnvBuilder` có thể được sử dụng làm lớp cơ sở.
 
     .. method:: create(env_dir)
 
-        Create a virtual environment by specifying the target directory
-        (absolute or relative to the current directory) which is to contain the
-        virtual environment.  The ``create`` method will either create the
-        environment in the specified directory, or raise an appropriate
-        exception.
+        Tạo một môi trường ảo bằng cách chỉ định thư mục đích (đường dẫn tuyệt đối hoặc tương đối so với thư mục hiện tại) để chứa môi trường ảo. Phương thức ``create`` sẽ tạo môi trường trong thư mục được chỉ định hoặc phát sinh ngoại lệ phù hợp.
 
-        The ``create`` method of the :class:`EnvBuilder` class illustrates the
-        hooks available for subclass customization::
+        Phương thức ``create`` của lớp :class:`EnvBuilder` minh họa các hook có sẵn để tùy chỉnh lớp con::
 
             def create(self, env_dir):
                 """
@@ -374,171 +272,125 @@ creation according to their needs, the :class:`EnvBuilder` class.
                 self.setup_scripts(context)
                 self.post_setup(context)
 
-        Each of the methods :meth:`ensure_directories`,
+        Mỗi phương thức :meth:`ensure_directories`,
         :meth:`create_configuration`, :meth:`setup_python`,
-        :meth:`setup_scripts` and :meth:`post_setup` can be overridden.
+        :meth:`setup_scripts` và :meth:`post_setup` có thể được ghi đè.
 
     .. method:: ensure_directories(env_dir)
 
-        Creates the environment directory and all necessary subdirectories that
-        don't already exist, and returns a context object.  This context object
-        is just a holder for attributes (such as paths) for use by the other
-        methods.  If the :class:`EnvBuilder` is created with the arg
-        ``clear=True``, contents of the environment directory will be cleared
-        and then all necessary subdirectories will be recreated.
+        Tạo thư mục environment và tất cả thư mục con cần thiết chưa tồn tại, đồng thời trả về một đối tượng context. Đối tượng context này chỉ là nơi lưu giữ các thuộc tính (chẳng hạn như các đường dẫn) để các phương thức khác sử dụng. Nếu :class:`EnvBuilder` được tạo với đối số ``clear=True``, nội dung của thư mục environment sẽ được xóa, sau đó tất cả thư mục con cần thiết sẽ được tạo lại.
 
-        The returned context object is a :class:`types.SimpleNamespace` with the
-        following attributes:
+        Đối tượng context được trả về là một :class:`types.SimpleNamespace` với các thuộc tính sau:
 
-        * ``env_dir`` - The location of the virtual environment. Used for
-          ``__VENV_DIR__`` in activation scripts (see :meth:`install_scripts`).
+        * ``env_dir`` - Vị trí của virtual environment. Được dùng cho ``__VENV_DIR__`` trong các activation script (xem :meth:`install_scripts`).
 
-        * ``env_name`` - The name of the virtual environment. Used for
-          ``__VENV_NAME__`` in activation scripts (see :meth:`install_scripts`).
+        * ``env_name`` - Tên của virtual environment. Được dùng cho ``__VENV_NAME__`` trong các activation script (xem :meth:`install_scripts`).
 
-        * ``prompt`` - The prompt to be used by the activation scripts. Used for
-          ``__VENV_PROMPT__`` in activation scripts (see :meth:`install_scripts`).
+        * ``prompt`` - Prompt được các activation script sử dụng. Được dùng cho ``__VENV_PROMPT__`` trong các activation script (xem :meth:`install_scripts`).
 
-        * ``executable`` - The underlying Python executable used by the virtual
-          environment. This takes into account the case where a virtual environment
-          is created from another virtual environment.
+        * ``executable`` - Python executable nền tảng được virtual environment sử dụng. Điều này учиты đến trường hợp virtual environment được tạo từ một virtual environment khác.
 
-        * ``inc_path`` - The include path for the virtual environment.
+        * ``inc_path`` - Đường dẫn include cho môi trường ảo.
 
-        * ``lib_path`` - The purelib path for the virtual environment.
+        * ``lib_path`` - Đường dẫn purelib cho môi trường ảo.
 
-        * ``bin_path`` - The script path for the virtual environment.
+        * ``bin_path`` - Đường dẫn script cho môi trường ảo.
 
-        * ``bin_name`` - The name of the script path relative to the virtual
-          environment location. Used for ``__VENV_BIN_NAME__`` in activation
-          scripts (see :meth:`install_scripts`).
+        * ``bin_name`` - Tên của đường dẫn script tương đối so với vị trí môi trường ảo. Được sử dụng cho ``__VENV_BIN_NAME__`` trong các activation script (xem :meth:`install_scripts`).
 
-        * ``env_exe`` - The name of the Python interpreter in the virtual
-          environment. Used for ``__VENV_PYTHON__`` in activation scripts
-          (see :meth:`install_scripts`).
+        * ``env_exe`` - Tên của trình thông dịch Python trong môi trường ảo. Được sử dụng cho ``__VENV_PYTHON__`` trong các activation script (xem :meth:`install_scripts`).
 
-        * ``env_exec_cmd`` - The name of the Python interpreter, taking into
-          account filesystem redirections. This can be used to run Python in
-          the virtual environment.
+        * ``env_exec_cmd`` - Tên của trình thông dịch Python, có tính đến các chuyển hướng của hệ thống tệp. Có thể dùng tên này để chạy Python trong môi trường ảo.
 
 
         .. versionchanged:: 3.11
-           The *venv*
-           :ref:`sysconfig installation scheme <installation_paths>`
-           is used to construct the paths of the created directories.
+           *venv*
+           :ref:`lược đồ cài đặt sysconfig <installation_paths>` được sử dụng để tạo các đường dẫn của những thư mục được tạo.
 
         .. versionchanged:: 3.12
-           The attribute ``lib_path`` was added to the context, and the context
-           object was documented.
+           Thuộc tính ``lib_path`` đã được thêm vào context và đối tượng context đã được ghi tài liệu.
 
     .. method:: create_configuration(context)
 
-        Creates the ``pyvenv.cfg`` configuration file in the environment.
+        Tạo tệp cấu hình ``pyvenv.cfg`` trong environment.
 
     .. method:: setup_python(context)
 
-        Creates a copy or symlink to the Python executable in the environment.
-        On POSIX systems, if a specific executable ``python3.x`` was used,
-        symlinks to ``python`` and ``python3`` will be created pointing to that
-        executable, unless files with those names already exist.
+        Tạo một bản sao hoặc symlink đến Python executable trong environment. Trên các hệ thống POSIX, nếu một executable cụ thể ``python3.x`` được sử dụng, các symlink đến ``python`` và ``python3`` sẽ được tạo và trỏ đến executable đó, trừ khi các tệp có những tên đó đã tồn tại.
 
     .. method:: setup_scripts(context)
 
-        Installs activation scripts appropriate to the platform into the virtual
-        environment.
+        Cài đặt các activation script phù hợp với nền tảng vào virtual environment.
 
     .. method:: upgrade_dependencies(context)
 
-       Upgrades the core venv dependency packages (currently :pypi:`pip`)
-       in the environment. This is done by shelling out to the
-       ``pip`` executable in the environment.
+       Nâng cấp các gói dependency cốt lõi của venv (hiện là :pypi:`pip`) trong environment. Việc này được thực hiện bằng cách gọi executable ``pip`` trong environment từ shell.
 
        .. versionadded:: 3.9
        .. versionchanged:: 3.12
 
-          :pypi:`setuptools` is no longer a core venv dependency.
+          :pypi:`setuptools` không còn là dependency cốt lõi của venv.
 
     .. method:: post_setup(context)
 
-        A placeholder method which can be overridden in third party
-        implementations to pre-install packages in the virtual environment or
-        perform other post-creation steps.
+        Một phương thức giữ chỗ có thể được ghi đè trong các triển khai của bên thứ ba để cài đặt trước các gói vào virtual environment hoặc thực hiện các bước khác sau khi tạo.
 
     .. method:: install_scripts(context, path)
 
-        This method can be
-        called from :meth:`setup_scripts` or :meth:`post_setup` in subclasses to
-        assist in installing custom scripts into the virtual environment.
+        Phương thức này có thể được gọi từ :meth:`setup_scripts` hoặc :meth:`post_setup` trong các lớp con để hỗ trợ cài đặt các script tùy chỉnh vào virtual environment.
 
-        *path* is the path to a directory that should contain subdirectories
-        ``common``, ``posix``, ``nt``; each containing scripts destined for the
-        ``bin`` directory in the environment.  The contents of ``common`` and the
-        directory corresponding to :data:`os.name` are copied after some text
-        replacement of placeholders:
+        *path* là đường dẫn đến một thư mục chứa các thư mục con ``common``, ``posix``, ``nt``; mỗi thư mục chứa các script dành cho thư mục ``bin`` trong environment. Nội dung của ``common`` và thư mục tương ứng với :data:`os.name` được sao chép sau khi thực hiện một số thay thế văn bản cho các placeholder:
 
-        * ``__VENV_DIR__`` is replaced with the absolute path of the environment
-          directory.
+        * ``__VENV_DIR__`` được thay thế bằng đường dẫn tuyệt đối của thư mục environment.
 
-        * ``__VENV_NAME__`` is replaced with the environment name (final path
-          segment of environment directory).
+        * ``__VENV_NAME__`` được thay thế bằng tên environment (phần đường dẫn cuối cùng của thư mục environment).
 
-        * ``__VENV_PROMPT__`` is replaced with the prompt (the environment
-          name surrounded by parentheses and with a following space)
+        * ``__VENV_PROMPT__`` được thay thế bằng prompt (tên environment được đặt trong dấu ngoặc đơn và theo sau là một khoảng trắng).
 
-        * ``__VENV_BIN_NAME__`` is replaced with the name of the bin directory
-          (either ``bin`` or ``Scripts``).
+        * ``__VENV_BIN_NAME__`` được thay thế bằng tên của thư mục bin (either ``bin`` hoặc ``Scripts``).
 
-        * ``__VENV_PYTHON__`` is replaced with the absolute path of the
-          environment's executable.
+        * ``__VENV_PYTHON__`` được thay thế bằng đường dẫn tuyệt đối của tệp thực thi trong môi trường.
 
-        The directories are allowed to exist (for when an existing environment
-        is being upgraded).
+        Các thư mục được phép tồn tại (trong trường hợp một môi trường hiện có đang được nâng cấp).
 
     .. method:: create_git_ignore_file(context)
 
-       Creates a ``.gitignore`` file within the virtual environment that causes
-       the entire directory to be ignored by the Git source control manager.
+       Tạo một tệp ``.gitignore`` בתוך môi trường ảo, khiến toàn bộ thư mục bị trình quản lý kiểm soát mã nguồn Git bỏ qua.
 
        .. versionadded:: 3.13
 
     .. versionchanged:: 3.7.2
-       Windows now uses redirector scripts for ``python[w].exe`` instead of
-       copying the actual binaries. In 3.7.2 only :meth:`setup_python` does
-       nothing unless running from a build in the source tree.
+       Windows hiện sử dụng các script redirector cho ``python[w].exe`` thay vì sao chép các tệp nhị phân thực tế. Trong 3.7.2, chỉ :meth:`setup_python` không thực hiện gì trừ khi chạy từ một bản build trong cây mã nguồn.
 
     .. versionchanged:: 3.7.3
-       Windows copies the redirector scripts as part of :meth:`setup_python`
-       instead of :meth:`setup_scripts`. This was not the case in 3.7.2.
-       When using symlinks, the original executables will be linked.
+       Windows sao chép các script redirector như một phần của :meth:`setup_python` thay vì :meth:`setup_scripts`. Điều này không đúng trong 3.7.2. Khi sử dụng symlink, các tệp thực thi gốc sẽ được liên kết.
 
-There is also a module-level convenience function:
+Ngoài ra còn có một hàm tiện ích ở cấp module:
 
 .. function:: create(env_dir, system_site_packages=False, clear=False, \
-                     symlinks=False, with_pip=False, prompt=None, \
-                     upgrade_deps=False, *, scm_ignore_files=frozenset())
+                     symlinks=False, with_pip=False, prompt=None, \ upgrade_deps=False, *, scm_ignore_files=frozenset()
 
-    Create an :class:`EnvBuilder` with the given keyword arguments, and call its
-    :meth:`~EnvBuilder.create` method with the *env_dir* argument.
+    Tạo một :class:`EnvBuilder` với các đối số từ khóa đã cho và gọi
+    phương thức :meth:`~EnvBuilder.create` với đối số *env_dir*.
 
     .. versionadded:: 3.3
 
     .. versionchanged:: 3.4
-       Added the *with_pip* parameter
+       Đã thêm tham số *with_pip*
 
     .. versionchanged:: 3.6
-       Added the *prompt* parameter
+       Đã thêm tham số *prompt*
 
     .. versionchanged:: 3.9
-       Added the *upgrade_deps* parameter
+       Đã thêm tham số *upgrade_deps*
 
     .. versionchanged:: 3.13
-       Added the *scm_ignore_files* parameter
+       Đã thêm tham số *scm_ignore_files*
 
-An example of extending ``EnvBuilder``
---------------------------------------
+Ví dụ về việc mở rộng ``EnvBuilder``
+------------------------------------
 
-The following script shows how to extend :class:`EnvBuilder` by implementing a
-subclass which installs setuptools and pip into a created virtual environment::
+Script sau đây minh họa cách mở rộng :class:`EnvBuilder` bằng cách triển khai một lớp con để cài đặt setuptools và pip vào virtual environment được tạo::
 
     import os
     import os.path
@@ -591,7 +443,7 @@ subclass which installs setuptools and pip into a created virtual environment::
             os.environ['VIRTUAL_ENV'] = context.env_dir
             if not self.nodist:
                 self.install_setuptools(context)
-            # Can't install pip without setuptools
+            # Không thể cài đặt pip nếu không có setuptools
             if not self.nopip and not self.nodist:
                 self.install_pip(context)
 
@@ -620,7 +472,7 @@ subclass which installs setuptools and pip into a created virtual environment::
             fn = os.path.split(path)[-1]
             binpath = context.bin_path
             distpath = os.path.join(binpath, fn)
-            # Download script into the virtual environment's binaries folder
+            # Tải script vào thư mục binaries của virtual environment
             urlretrieve(url, distpath)
             progress = self.progress
             if self.verbose:
@@ -632,7 +484,7 @@ subclass which installs setuptools and pip into a created virtual environment::
             else:
                 sys.stderr.write('Installing %s ...%s' % (name, term))
                 sys.stderr.flush()
-            # Install in the virtual environment
+            # Cài đặt trong virtual environment
             args = [context.env_exe, fn]
             p = Popen(args, stdout=PIPE, stderr=PIPE, cwd=binpath)
             t1 = Thread(target=self.reader, args=(p.stdout, 'stdout'))
@@ -646,7 +498,7 @@ subclass which installs setuptools and pip into a created virtual environment::
                 progress('done.', 'main')
             else:
                 sys.stderr.write('done.\n')
-            # Clean up - no longer needed
+            # Dọn dẹp - không còn cần thiết nữa
             os.unlink(distpath)
 
         def install_setuptools(self, context):
@@ -658,7 +510,7 @@ subclass which installs setuptools and pip into a created virtual environment::
             """
             url = "https://bootstrap.pypa.io/ez_setup.py"
             self.install_script(context, 'setuptools', url)
-            # clear up the setuptools archive which gets downloaded
+            # xóa archive setuptools đã được tải xuống
             pred = lambda o: o.startswith('setuptools-') and o.endswith('.tar.gz')
             files = filter(pred, os.listdir(context.bin_path))
             for f in files:
@@ -748,5 +600,7 @@ subclass which installs setuptools and pip into a created virtual environment::
         sys.exit(rc)
 
 
-This script is also available for download `online
-<https://gist.github.com/vsajip/4673395>`_.
+Script này cũng có sẵn để tải xuống `trực tuyến <https://gist.github.com/vsajip/4673395>`_.
+
+.. _`About Execution Policies`: https://go.microsoft.com/fwlink/?LinkID=135170
+.. _`online`: https://gist.github.com/vsajip/4673395

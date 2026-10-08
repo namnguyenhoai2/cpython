@@ -1,97 +1,65 @@
-:mod:`!pty` --- Pseudo-terminal utilities
-=========================================
+:mod:`!pty` --- Tiện ích pseudo-terminal
+========================================
 
 .. module:: pty
-   :synopsis: Pseudo-Terminal Handling for Unix.
+   :synopsis: Xử lý pseudo-terminal cho Unix.
 
 .. moduleauthor:: Steen Lumholt
 .. sectionauthor:: Moshe Zadka <moshez@zadka.site.co.il>
 
-**Source code:** :source:`Lib/pty.py`
+**Mã nguồn:** :source:`Lib/pty.py`
 
 --------------
 
-The :mod:`!pty` module defines operations for handling the pseudo-terminal
-concept: starting another process and being able to write to and read from its
-controlling terminal programmatically.
+Mô-đun :mod:`!pty` định nghĩa các thao tác để xử lý khái niệm pseudo-terminal: khởi động một tiến trình khác và cho phép ghi vào cũng như đọc từ terminal điều khiển của tiến trình đó bằng chương trình.
 
 .. availability:: Unix.
 
-Pseudo-terminal handling is highly platform dependent. This code is mainly
-tested on Linux, FreeBSD, and macOS (it is supposed to work on other POSIX
-platforms but it's not been thoroughly tested).
+Việc xử lý pseudo-terminal phụ thuộc nhiều vào nền tảng. Mã này chủ yếu được kiểm thử trên Linux, FreeBSD và macOS (được cho là sẽ hoạt động trên các nền tảng POSIX khác, nhưng chưa được kiểm thử kỹ lưỡng).
 
-The :mod:`!pty` module defines the following functions:
+Mô-đun :mod:`!pty` định nghĩa các hàm sau:
 
 
 .. function:: fork()
 
-   Fork. Connect the child's controlling terminal to a pseudo-terminal. Return
-   value is ``(pid, fd)``. Note that the child  gets *pid* 0, and the *fd* is
-   *invalid*. The parent's return value is the *pid* of the child, and *fd* is a
-   file descriptor connected to the child's controlling terminal (and also to the
-   child's standard input and output).
+   Fork. Kết nối terminal điều khiển của tiến trình con với một pseudo-terminal. Giá trị trả về là ``(pid, fd)``. Lưu ý rằng tiến trình con nhận được *pid* bằng 0, và *fd* là *không hợp lệ*. Giá trị trả về của tiến trình cha là *pid* của tiến trình con, còn *fd* là một file descriptor được kết nối với terminal điều khiển của tiến trình con (đồng thời với đầu vào và đầu ra tiêu chuẩn của tiến trình con).
 
-   .. warning:: On macOS the use of this function is unsafe when mixed with using
-      higher-level system APIs, and that includes using :mod:`urllib.request`.
+   .. warning:: Trên macOS, việc sử dụng hàm này là không an toàn khi kết hợp với các system API cấp cao hơn, bao gồm cả việc sử dụng :mod:`urllib.request`.
 
 
 .. function:: openpty()
 
-   Open a new pseudo-terminal pair, using :func:`os.openpty` if possible, or
-   emulation code for generic Unix systems. Return a pair of file descriptors
-   ``(master, slave)``, for the master and the slave end, respectively.
+   Mở một cặp pseudo-terminal mới, sử dụng :func:`os.openpty` nếu có thể, hoặc sử dụng mã mô phỏng cho các hệ thống Unix nói chung. Trả về một cặp file descriptor ``(master, slave)``, lần lượt dành cho đầu master và đầu slave.
 
 
 .. function:: spawn(argv[, master_read[, stdin_read]])
 
-   Spawn a process, and connect its controlling terminal with the current
-   process's standard io. This is often used to baffle programs which insist on
-   reading from the controlling terminal. It is expected that the process
-   spawned behind the pty will eventually terminate, and when it does *spawn*
-   will return.
+   Tạo một process và kết nối terminal điều khiển của process đó với standard I/O của process hiện tại. Cách này thường được dùng để làm rối các chương trình nhất quyết đọc từ terminal điều khiển. Process được tạo phía sau pty được kỳ vọng sẽ kết thúc, và khi process đó kết thúc, *spawn* sẽ trả về.
 
-   A loop copies STDIN of the current process to the child and data received
-   from the child to STDOUT of the current process. It is not signaled to the
-   child if STDIN of the current process closes down.
+   Một vòng lặp sao chép STDIN của process hiện tại đến child và dữ liệu nhận được từ child đến STDOUT của process hiện tại. Child sẽ không được thông báo nếu STDIN của process hiện tại đóng.
 
-   The functions *master_read* and *stdin_read* are passed a file descriptor
-   which they should read from, and they should always return a byte string. In
-   order to force spawn to return before the child process exits an
-   empty byte array should be returned to signal end of file.
+   Các hàm *master_read* và *stdin_read* được truyền vào một file descriptor mà chúng phải đọc, và luôn phải trả về một chuỗi byte. Để buộc spawn trả về trước khi child process thoát, cần trả về một mảng byte rỗng nhằm báo hiệu kết thúc file.
 
-   The default implementation for both functions will read and return up to 1024
-   bytes each time the function is called. The *master_read* callback is passed
-   the pseudoterminal’s master file descriptor to read output from the child
-   process, and *stdin_read* is passed file descriptor 0, to read from the
-   parent process's standard input.
+   Triển khai mặc định cho cả hai hàm sẽ đọc và trả về tối đa 1024 byte mỗi lần hàm được gọi. Callback *master_read* được truyền file descriptor master của pseudo-terminal để đọc output từ child process, còn *stdin_read* được truyền file descriptor 0 để đọc từ standard input của parent process.
 
-   Returning an empty byte string from either callback is interpreted as an
-   end-of-file (EOF) condition, and that callback will not be called after
-   that. If *stdin_read* signals EOF the controlling terminal can no longer
-   communicate with the parent process OR the child process. Unless the child
-   process will quit without any input, *spawn* will then loop forever. If
-   *master_read* signals EOF the same behavior results (on linux at least).
+   Việc trả về một chuỗi byte rỗng từ một trong hai callback được hiểu là điều kiện kết thúc file (EOF), và callback đó sẽ không được gọi sau đó. Nếu *stdin_read* báo hiệu EOF, terminal điều khiển không còn có thể giao tiếp với parent process HOẶC child process. Trừ khi child process sẽ thoát mà không cần input, *spawn* sẽ lặp vô hạn. Nếu *master_read* báo hiệu EOF, hành vi tương tự cũng xảy ra (ít nhất là trên Linux).
 
-   Return the exit status value from :func:`os.waitpid` on the child process.
+   Trả về giá trị trạng thái thoát từ :func:`os.waitpid` của tiến trình con.
 
-   :func:`os.waitstatus_to_exitcode` can be used to convert the exit status into
-   an exit code.
+   Có thể dùng :func:`os.waitstatus_to_exitcode` để chuyển đổi trạng thái thoát thành mã thoát.
 
    .. audit-event:: pty.spawn argv pty.spawn
 
    .. versionchanged:: 3.4
       :func:`spawn` now returns the status value from :func:`os.waitpid`
-      on the child process.
+      của tiến trình con.
 
-Example
--------
+Ví dụ
+-----
 
 .. sectionauthor:: Steen Lumholt
 
-The following program acts like the Unix command :manpage:`script(1)`, using a
-pseudo-terminal to record all input and output of a terminal session in a
-"typescript". ::
+Chương trình sau đây hoạt động như lệnh Unix :manpage:`script(1)`, sử dụng pseudo-terminal để ghi lại toàn bộ dữ liệu đầu vào và đầu ra của một phiên terminal vào một "typescript".::
 
     import argparse
     import os

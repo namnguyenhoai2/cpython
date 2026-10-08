@@ -1,100 +1,60 @@
-:mod:`!subprocess` --- Subprocess management
-============================================
+:mod:`!subprocess` --- Quản lý tiến trình con
+=============================================
 
 .. module:: subprocess
-   :synopsis: Subprocess management.
+   :synopsis: Quản lý tiến trình con.
 
 .. moduleauthor:: Peter Åstrand <astrand@lysator.liu.se>
 .. sectionauthor:: Peter Åstrand <astrand@lysator.liu.se>
 
-**Source code:** :source:`Lib/subprocess.py`
+**Mã nguồn:** :source:`Lib/subprocess.py`
 
 --------------
 
-The :mod:`!subprocess` module allows you to spawn new processes, connect to their
-input/output/error pipes, and obtain their return codes.  This module intends to
-replace several older modules and functions::
+Module :mod:`!subprocess` cho phép bạn tạo các tiến trình mới, kết nối với các pipe đầu vào/đầu ra/lỗi của chúng và nhận mã trả về. Module này nhằm thay thế một số module và hàm cũ hơn::
 
    os.system
    os.spawn*
 
-Information about how the :mod:`!subprocess` module can be used to replace these
-modules and functions can be found in the following sections.
+Bạn có thể tìm thấy thông tin về cách sử dụng module :mod:`!subprocess` để thay thế các module và hàm này trong các phần sau.
 
 .. seealso::
 
-   :pep:`324` -- PEP proposing the subprocess module
+   :pep:`324` -- PEP đề xuất module subprocess
 
 .. include:: ../includes/wasm-mobile-notavail.rst
 
-Using the :mod:`!subprocess` Module
------------------------------------
+Sử dụng module :mod:`!subprocess`
+---------------------------------
 
-The recommended approach to invoking subprocesses is to use the :func:`run`
-function for all use cases it can handle. For more advanced use cases, the
-underlying :class:`Popen` interface can be used directly.
+Cách tiếp cận được khuyến nghị để gọi các subprocess là sử dụng hàm :func:`run` cho mọi trường hợp mà hàm này có thể xử lý. Với các trường hợp nâng cao hơn, có thể sử dụng trực tiếp interface :class:`Popen` bên dưới.
 
 
 .. function:: run(args, *, stdin=None, input=None, stdout=None, stderr=None,\
-                  capture_output=False, shell=False, cwd=None, timeout=None, \
-                  check=False, encoding=None, errors=None, text=None, env=None, \
-                  universal_newlines=None, **other_popen_kwargs)
+                  capture_output=False, shell=False, cwd=None, timeout=None, \ check=False, encoding=None, errors=None, text=None, env=None, \ universal_newlines=None, ****other_popen_kwargs)
 
-   Run the command described by *args*.  Wait for command to complete, then
-   return a :class:`CompletedProcess` instance.
+   Chạy lệnh được mô tả bởi *args*. Chờ lệnh hoàn tất, sau đó trả về một instance :class:`CompletedProcess`.
 
-   The arguments shown above are merely the most common ones, described below
-   in :ref:`frequently-used-arguments` (hence the use of keyword-only notation
-   in the abbreviated signature). The full function signature is largely the
-   same as that of the :class:`Popen` constructor - most of the arguments to
-   this function are passed through to that interface. (*timeout*,  *input*,
-   *check*, and *capture_output* are not.)
+   Các đối số được trình bày ở trên chỉ là những đối số phổ biến nhất, được mô tả bên dưới trong :ref:`frequently-used-arguments` (do đó mới sử dụng ký hiệu chỉ dành cho keyword trong chữ ký rút gọn). Chữ ký đầy đủ của hàm phần lớn giống với chữ ký của constructor :class:`Popen` - hầu hết đối số của hàm này được truyền tiếp đến interface đó. (*timeout*, *input*, *check* và *capture_output* thì không.)
 
-   If *capture_output* is true, stdout and stderr will be captured.
-   When used, the internal :class:`Popen` object is automatically created with
-   *stdout* and *stderr* both set to :data:`~subprocess.PIPE`.
-   The *stdout* and *stderr* arguments may not be supplied at the same time as *capture_output*.
-   If you wish to capture and combine both streams into one,
-   set *stdout* to :data:`~subprocess.PIPE`
-   and *stderr* to :data:`~subprocess.STDOUT`,
-   instead of using *capture_output*.
+   Nếu *capture_output* là true, stdout và stderr sẽ được capture. Khi sử dụng tùy chọn này, đối tượng :class:`Popen` nội bộ sẽ tự động được tạo với *stdout* và *stderr* đều được đặt thành :data:`~subprocess.PIPE`. Không được cung cấp các đối số *stdout* và *stderr* đồng thời với *capture_output*. Nếu muốn capture và kết hợp cả hai stream thành một, hãy đặt *stdout* thành :data:`~subprocess.PIPE` và *stderr* thành :data:`~subprocess.STDOUT`, thay vì sử dụng *capture_output*.
 
-   A *timeout* may be specified in seconds, it is internally passed on to
-   :meth:`Popen.communicate`. If the timeout expires, the child process will be
-   killed and waited for. The :exc:`TimeoutExpired` exception will be
-   re-raised after the child process has terminated. The initial process
-   creation itself cannot be interrupted on many platform APIs so you are not
-   guaranteed to see a timeout exception until at least after however long
-   process creation takes.
+   Có thể chỉ định *timeout* tính bằng giây; giá trị này được truyền nội bộ cho
+   :meth:`Popen.communicate`. Nếu hết thời gian chờ, tiến trình con sẽ bị kết thúc và được chờ xử lý. Ngoại lệ :exc:`TimeoutExpired` sẽ được ném lại sau khi tiến trình con đã kết thúc. Bản thân việc tạo tiến trình ban đầu không thể bị gián đoạn trên nhiều API nền tảng, vì vậy không đảm bảo rằng bạn sẽ thấy ngoại lệ timeout cho đến ít nhất sau khoảng thời gian cần để tạo tiến trình.
 
-   The *input* argument is passed to :meth:`Popen.communicate` and thus to the
-   subprocess's stdin.  If used it must be a byte sequence, or a string if
-   *encoding* or *errors* is specified or *text* is true.  When
-   used, the internal :class:`Popen` object is automatically created with
-   *stdin* set to :data:`~subprocess.PIPE`,
-   and the *stdin* argument may not be used as well.
+   Đối số *input* được truyền đến :meth:`Popen.communicate` và do đó đến stdin của subprocess. Nếu được sử dụng, đối số này phải là một chuỗi byte hoặc một chuỗi nếu *encoding* hoặc *errors* được chỉ định, hoặc *text* là true. Khi được sử dụng, đối tượng :class:`Popen` nội bộ sẽ tự động được tạo với *stdin* được đặt thành :data:`~subprocess.PIPE`, và không được đồng thời sử dụng đối số *stdin*.
 
-   If *check* is true, and the process exits with a non-zero exit code, a
-   :exc:`CalledProcessError` exception will be raised. Attributes of that
-   exception hold the arguments, the exit code, and stdout and stderr if they
-   were captured.
+   Nếu *check* là true và quy trình kết thúc với mã thoát khác 0, một
+   :exc:`CalledProcessError` exception sẽ được phát sinh. Các thuộc tính của exception đó chứa các đối số, mã thoát, stdout và stderr nếu chúng được capture.
 
-   If *encoding* or *errors* are specified, or *text* is true,
-   file objects for stdin, stdout and stderr are opened in text mode using the
-   specified *encoding* and *errors* or the :class:`io.TextIOWrapper` default.
-   The *universal_newlines* argument is equivalent  to *text* and is provided
-   for backwards compatibility. By default, file objects are opened in binary mode.
+   Nếu *encoding* hoặc *errors* được chỉ định, hoặc *text* là true, các file object cho stdin, stdout và stderr sẽ được mở ở chế độ text bằng *encoding* và *errors* được chỉ định hoặc giá trị mặc định :class:`io.TextIOWrapper`. Đối số *universal_newlines* tương đương với *text* và được cung cấp để tương thích ngược. Theo mặc định, các file object được mở ở chế độ binary.
 
-   If *env* is not ``None``, it must be a mapping that defines the environment
-   variables for the new process; these are used instead of the default
-   behavior of inheriting the current process' environment. It is passed
-   directly to :class:`Popen`. This mapping can be str to str on any platform
-   or bytes to bytes on POSIX platforms much like :data:`os.environ` or
+   Nếu *env* không phải là ``None``, nó phải là một mapping xác định các biến môi trường cho quy trình mới; các biến này được sử dụng thay cho hành vi mặc định là kế thừa môi trường của quy trình hiện tại. Mapping này được truyền trực tiếp đến :class:`Popen`. Mapping này có thể là str thành str trên mọi nền tảng hoặc bytes thành bytes trên các nền tảng POSIX, tương tự như :data:`os.environ` hoặc
    :data:`os.environb`.
 
-   Examples::
+   Các ví dụ::
 
-      >>> subprocess.run(["ls", "-l"])  # doesn't capture output
+      >>> subprocess.run(["ls", "-l"])  # không capture output
       CompletedProcess(args=['ls', '-l'], returncode=0)
 
       >>> subprocess.run("exit 1", shell=True, check=True)
@@ -110,307 +70,212 @@ underlying :class:`Popen` interface can be used directly.
 
    .. versionchanged:: 3.6
 
-      Added *encoding* and *errors* parameters
+      Đã thêm các tham số *encoding* và *errors*
 
    .. versionchanged:: 3.7
 
-      Added the *text* parameter, as a more understandable alias of *universal_newlines*.
-      Added the *capture_output* parameter.
+      Đã thêm tham số *text*, làm bí danh dễ hiểu hơn cho *universal_newlines*. Đã thêm tham số *capture_output*.
 
    .. versionchanged:: 3.12
 
-      Changed Windows shell search order for ``shell=True``. The current
-      directory and ``%PATH%`` are replaced with ``%COMSPEC%`` and
-      ``%SystemRoot%\System32\cmd.exe``. As a result, dropping a
-      malicious program named ``cmd.exe`` into a current directory no
-      longer works.
+      Đã thay đổi thứ tự tìm kiếm shell trên Windows cho ``shell=True``. Thư mục hiện tại và ``%PATH%`` được thay thế bằng ``%COMSPEC%`` và ``%SystemRoot%\System32\cmd.exe``. Do đó, việc đặt một chương trình độc hại có tên ``cmd.exe`` vào thư mục hiện tại sẽ không còn hiệu quả.
 
 .. class:: CompletedProcess
 
-   The return value from :func:`run`, representing a process that has finished.
+   Giá trị trả về từ :func:`run`, đại diện cho một process đã kết thúc.
 
    .. attribute:: args
 
-      The arguments used to launch the process. This may be a list or a string.
+      Các đối số được sử dụng để khởi chạy process. Đây có thể là một danh sách hoặc một chuỗi.
 
    .. attribute:: returncode
 
-      Exit status of the child process. Typically, an exit status of 0 indicates
-      that it ran successfully.
+      Trạng thái thoát của tiến trình con. Thông thường, trạng thái thoát bằng 0 cho biết tiến trình đã chạy thành công.
 
-      A negative value ``-N`` indicates that the child was terminated by signal
-      ``N`` (POSIX only).
+      Một giá trị âm ``-N`` cho biết tiến trình con đã bị kết thúc bởi signal ``N`` (chỉ dành cho POSIX).
 
    .. attribute:: stdout
 
-      Captured stdout from the child process. A bytes sequence, or a string if
-      :func:`run` was called with an encoding, errors, or text=True.
-      ``None`` if stdout was not captured.
+      stdout được ghi lại từ tiến trình con. Một chuỗi byte hoặc một chuỗi nếu
+      :func:`run` được gọi với encoding, errors hoặc text=True. ``None`` nếu stdout không được ghi lại.
 
-      If you ran the process with ``stderr=subprocess.STDOUT``, stdout and
-      stderr will be combined in this attribute, and :attr:`stderr` will be
-      ``None``.
+      Nếu bạn chạy tiến trình với ``stderr=subprocess.STDOUT``, stdout và stderr sẽ được kết hợp trong thuộc tính này, và :attr:`stderr` sẽ là ``None``.
 
    .. attribute:: stderr
 
-      Captured stderr from the child process. A bytes sequence, or a string if
-      :func:`run` was called with an encoding, errors, or text=True.
-      ``None`` if stderr was not captured.
+      stderr được ghi lại từ tiến trình con. Một chuỗi byte hoặc một chuỗi nếu
+      :func:`run` được gọi với encoding, errors hoặc text=True. ``None`` nếu stderr không được ghi lại.
 
    .. method:: check_returncode()
 
-      If :attr:`returncode` is non-zero, raise a :exc:`CalledProcessError`.
+      Nếu :attr:`returncode` khác không, hãy raise một :exc:`CalledProcessError`.
 
    .. versionadded:: 3.5
 
 .. data:: DEVNULL
 
-   Special value that can be used as the *stdin*, *stdout* or *stderr* argument
-   to :class:`Popen` and indicates that the special file :data:`os.devnull`
-   will be used.
+   Giá trị đặc biệt có thể được dùng làm đối số *stdin*, *stdout* hoặc *stderr* cho :class:`Popen`, cho biết rằng tệp đặc biệt :data:`os.devnull` sẽ được sử dụng.
 
    .. versionadded:: 3.3
 
 
 .. data:: PIPE
 
-   Special value that can be used as the *stdin*, *stdout* or *stderr* argument
-   to :class:`Popen` and indicates that a pipe to the standard stream should be
-   opened.  Most useful with :meth:`Popen.communicate`.
+   Giá trị đặc biệt có thể được dùng làm đối số *stdin*, *stdout* hoặc *stderr* cho :class:`Popen`, cho biết rằng cần mở một pipe đến stream chuẩn. Hữu ích nhất khi dùng với :meth:`Popen.communicate`.
 
 
 .. data:: STDOUT
 
-   Special value that can be used as the *stderr* argument to :class:`Popen` and
-   indicates that standard error should go into the same handle as standard
-   output.
+   Giá trị đặc biệt có thể được dùng làm đối số *stderr* cho :class:`Popen`, cho biết rằng standard error sẽ được chuyển vào cùng handle với standard output.
 
 
 .. exception:: SubprocessError
 
-    Base class for all other exceptions from this module.
+    Lớp cơ sở cho tất cả các exception khác từ module này.
 
     .. versionadded:: 3.3
 
 
 .. exception:: TimeoutExpired
 
-    Subclass of :exc:`SubprocessError`, raised when a timeout expires
-    while waiting for a child process.
+    Lớp con của :exc:`SubprocessError`, được phát sinh khi hết thời gian chờ trong lúc đợi một tiến trình con.
 
     .. attribute:: cmd
 
-        Command that was used to spawn the child process.
+        Lệnh được dùng để khởi chạy tiến trình con.
 
     .. attribute:: timeout
 
-        Timeout in seconds.
+        Thời gian chờ tính bằng giây.
 
     .. attribute:: output
 
-        Output of the child process if it was captured by :func:`run` or
-        :func:`check_output`.  Otherwise, ``None``.  This is always
-        :class:`bytes` when any output was captured regardless of the
-        ``text=True`` setting.  It may remain ``None`` instead of ``b''``
-        when no output was observed.
+        Đầu ra của tiến trình con nếu được thu thập bởi :func:`run` hoặc
+        :func:`check_output`.  Nếu không, ``None``.  Điều này luôn
+        :class:`bytes` khi bất kỳ đầu ra nào được thu thập, bất kể thiết lập ``text=True``.  Nó có thể vẫn là ``None`` thay vì ``b''`` khi không quan sát thấy đầu ra nào.
 
     .. attribute:: stdout
 
-        Alias for output, for symmetry with :attr:`stderr`.
+        Bí danh cho output, để đối xứng với :attr:`stderr`.
 
     .. attribute:: stderr
 
-        Stderr output of the child process if it was captured by :func:`run`.
-        Otherwise, ``None``.  This is always :class:`bytes` when stderr output
-        was captured regardless of the ``text=True`` setting.  It may remain
-        ``None`` instead of ``b''`` when no stderr output was observed.
+        Đầu ra stderr của tiến trình con nếu được thu thập bởi :func:`run`. Nếu không, ``None``.  Đây luôn là :class:`bytes` khi đầu ra stderr được thu thập, bất kể thiết lập ``text=True``.  Nó có thể vẫn là ``None`` thay vì ``b''`` khi không quan sát thấy đầu ra stderr nào.
 
     .. versionadded:: 3.3
 
     .. versionchanged:: 3.5
-        *stdout* and *stderr* attributes added
+        *stdout* và *stderr* các thuộc tính được thêm vào
 
 .. exception:: CalledProcessError
 
-    Subclass of :exc:`SubprocessError`, raised when a process run by
-    :func:`check_call`, :func:`check_output`, or :func:`run` (with ``check=True``)
-    returns a non-zero exit status.
+    Lớp con của :exc:`SubprocessError`, được nâng lên khi một tiến trình do
+    :func:`check_call`, :func:`check_output`, hoặc :func:`run` (với ``check=True``) trả về trạng thái thoát khác không.
 
 
     .. attribute:: returncode
 
-        Exit status of the child process, an integer.  If the process
-        exited due to a signal, this will be the negative signal number.
+        Trạng thái thoát của tiến trình con, là một số nguyên. Nếu tiến trình thoát do một tín hiệu, giá trị này sẽ là số tín hiệu âm.
 
     .. attribute:: cmd
 
-        Command that was used to spawn the child process.
+        Lệnh được dùng để khởi chạy tiến trình con.
 
     .. attribute:: output
 
-        Output of the child process if it was captured by :func:`run` or
-        :func:`check_output`.  Otherwise, ``None``.
+        Đầu ra của tiến trình con nếu được thu thập bởi :func:`run` hoặc
+        :func:`check_output`. Nếu không, ``None``.
 
     .. attribute:: stdout
 
-        Alias for output, for symmetry with :attr:`stderr`.
+        Bí danh cho output, để đối xứng với :attr:`stderr`.
 
     .. attribute:: stderr
 
-        Stderr output of the child process if it was captured by :func:`run`.
-        Otherwise, ``None``.
+        Đầu ra stderr của tiến trình con nếu được ghi lại bởi :func:`run`. Nếu không, ``None``.
 
     .. versionchanged:: 3.5
-        *stdout* and *stderr* attributes added
+        *stdout* và *stderr* các thuộc tính được thêm vào
 
 
 .. _frequently-used-arguments:
 
-Frequently Used Arguments
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Các đối số thường dùng
+^^^^^^^^^^^^^^^^^^^^^^
 
-To support a wide variety of use cases, the :class:`Popen` constructor (and
-the convenience functions) accept a large number of optional arguments. For
-most typical use cases, many of these arguments can be safely left at their
-default values. The arguments that are most commonly needed are:
+Để hỗ trợ nhiều trường hợp sử dụng khác nhau, hàm khởi tạo :class:`Popen` (và các hàm tiện ích) chấp nhận một số lượng lớn đối số tùy chọn. Trong hầu hết các trường hợp sử dụng thông thường, bạn có thể an toàn để nhiều đối số trong số này ở giá trị mặc định. Các đối số thường cần dùng nhất là:
 
-   *args* is required for all calls and should be a string, or a sequence of
-   program arguments. Providing a sequence of arguments is generally
-   preferred, as it allows the module to take care of any required escaping
-   and quoting of arguments (e.g. to permit spaces in file names). If passing
-   a single string, either *shell* must be :const:`True` (see below) or else
-   the string must simply name the program to be executed without specifying
-   any arguments.
+   *args* là bắt buộc trong mọi lệnh gọi và phải là một chuỗi hoặc một chuỗi các đối số chương trình. Thông thường, nên cung cấp một chuỗi các đối số vì điều này cho phép module tự xử lý việc escape và trích dẫn cần thiết cho các đối số (ví dụ: để cho phép có khoảng trắng trong tên tệp). Nếu truyền một chuỗi đơn, *shell* phải là :const:`True` (xem bên dưới), nếu không thì chuỗi đó chỉ được chứa tên chương trình cần thực thi mà không chỉ định bất kỳ đối số nào.
 
-   *stdin*, *stdout* and *stderr* specify the executed program's standard input,
-   standard output and standard error file handles, respectively.  Valid values
-   are ``None``, :data:`PIPE`, :data:`DEVNULL`, an existing file descriptor (a
-   positive integer), and an existing :term:`file object` with a valid file
-   descriptor.  With the default settings of ``None``, no redirection will
-   occur.  :data:`PIPE` indicates that a new pipe to the child should be
-   created.  :data:`DEVNULL` indicates that the special file :data:`os.devnull`
-   will be used.  Additionally, *stderr* can be :data:`STDOUT`, which indicates
-   that the stderr data from the child process should be captured into the same
-   file handle as for *stdout*.
+   *stdin*, *stdout* và *stderr* lần lượt chỉ định các handle tệp cho đầu vào chuẩn, đầu ra chuẩn và lỗi chuẩn của chương trình được thực thi. Các giá trị hợp lệ là ``None``, :data:`PIPE`, :data:`DEVNULL`, một file descriptor hiện có (một số nguyên dương) và một :term:`file object` hiện có với file descriptor hợp lệ. Với cài đặt mặc định của ``None``, sẽ không có chuyển hướng nào xảy ra. :data:`PIPE` cho biết cần tạo một pipe mới đến tiến trình con. :data:`DEVNULL` cho biết tệp đặc biệt :data:`os.devnull` sẽ được sử dụng. Ngoài ra, *stderr* có thể là :data:`STDOUT`, cho biết dữ liệu stderr từ tiến trình con sẽ được thu vào cùng handle tệp với *stdout*.
 
    .. index::
       single: universal newlines; subprocess module
 
-   If *encoding* or *errors* are specified, or *text* (also known as
-   *universal_newlines*) is true,
-   the file objects *stdin*, *stdout* and *stderr* will be opened in text
-   mode using the *encoding* and *errors* specified in the call or the
-   defaults for :class:`io.TextIOWrapper`.
+   Nếu chỉ định *encoding* hoặc *errors*, hoặc *text* (còn được gọi là *universal_newlines*) là true, các đối tượng tệp *stdin*, *stdout* và *stderr* sẽ được mở ở chế độ văn bản bằng *encoding* và *errors* được chỉ định trong lệnh gọi hoặc bằng các giá trị mặc định của :class:`io.TextIOWrapper`.
 
-   For *stdin*, line ending characters ``'\n'`` in the input will be converted
-   to the default line separator :data:`os.linesep`. For *stdout* and *stderr*,
-   all line endings in the output will be converted to ``'\n'``.  For more
-   information see the documentation of the :class:`io.TextIOWrapper` class
-   when the *newline* argument to its constructor is ``None``.
+   Đối với *stdin*, các ký tự kết thúc dòng ``'\n'`` trong đầu vào sẽ được chuyển đổi thành dấu phân cách dòng mặc định :data:`os.linesep`. Đối với *stdout* và *stderr*, mọi ký tự kết thúc dòng trong đầu ra sẽ được chuyển đổi thành ``'\n'``. Để biết thêm thông tin, hãy xem tài liệu về lớp :class:`io.TextIOWrapper` khi đối số *newline* trong hàm khởi tạo của lớp này là ``None``.
 
-   If text mode is not used, *stdin*, *stdout* and *stderr* will be opened as
-   binary streams. No encoding or line ending conversion is performed.
+   Nếu không sử dụng chế độ văn bản, *stdin*, *stdout* và *stderr* sẽ được mở dưới dạng các luồng nhị phân. Không thực hiện chuyển đổi encoding hoặc ký tự kết thúc dòng.
 
    .. versionchanged:: 3.6
-      Added the *encoding* and *errors* parameters.
+      Đã thêm các tham số *encoding* và *errors*.
 
    .. versionchanged:: 3.7
-      Added the *text* parameter as an alias for *universal_newlines*.
+      Đã thêm tham số *text* làm bí danh cho *universal_newlines*.
 
    .. note::
 
-      The newlines attribute of the file objects :attr:`Popen.stdin`,
-      :attr:`Popen.stdout` and :attr:`Popen.stderr` are not updated by
-      the :meth:`Popen.communicate` method.
+      Thuộc tính newlines của các đối tượng tệp :attr:`Popen.stdin`,
+      :attr:`Popen.stdout` và :attr:`Popen.stderr` không được cập nhật bởi phương thức :meth:`Popen.communicate`.
 
-   If *shell* is ``True``, the specified command will be executed through
-   the shell.  This can be useful if you are using Python primarily for the
-   enhanced control flow it offers over most system shells and still want
-   convenient access to other shell features such as shell pipes, filename
-   wildcards, environment variable expansion, and expansion of ``~`` to a
-   user's home directory.  However, note that Python itself offers
-   implementations of many shell-like features (in particular, :mod:`glob`,
+   Nếu *shell* là ``True``, lệnh được chỉ định sẽ được thực thi thông qua shell. Điều này có thể hữu ích nếu bạn chủ yếu sử dụng Python vì khả năng kiểm soát luồng thực thi nâng cao hơn hầu hết các shell hệ thống, nhưng vẫn muốn truy cập thuận tiện vào các tính năng shell khác như pipe shell, ký tự đại diện cho tên tệp, mở rộng biến môi trường và mở rộng ``~`` thành thư mục chính của người dùng. Tuy nhiên, lưu ý rằng bản thân Python cung cấp các triển khai của nhiều tính năng giống shell (đặc biệt là :mod:`glob`,
    :mod:`fnmatch`, :func:`os.walk`, :func:`os.path.expandvars`,
-   :func:`os.path.expanduser`, and :mod:`shutil`).
+   :func:`os.path.expanduser`, và :mod:`shutil`).
 
    .. versionchanged:: 3.3
-      When *universal_newlines* is ``True``, the class uses the encoding
-      :func:`locale.getpreferredencoding(False) <locale.getpreferredencoding>`
-      instead of ``locale.getpreferredencoding()``.  See the
-      :class:`io.TextIOWrapper` class for more information on this change.
+      Khi *universal_newlines* là ``True``, lớp này sử dụng encoding
+      :func:`locale.getpreferredencoding(False) <locale.getpreferredencoding>` thay cho ``locale.getpreferredencoding()``. Xem
+      lớp :class:`io.TextIOWrapper` để biết thêm thông tin về thay đổi này.
 
    .. note::
 
-      Read the `Security Considerations`_ section before using ``shell=True``.
+      Đọc phần `Security Considerations <Security Considerations_>`_ trước khi sử dụng ``shell=True``.
 
-These options, along with all of the other options, are described in more
-detail in the :class:`Popen` constructor documentation.
+Các tùy chọn này, cùng với tất cả các tùy chọn khác, được mô tả chi tiết hơn trong tài liệu về hàm khởi tạo :class:`Popen`.
 
 
-Popen Constructor
-^^^^^^^^^^^^^^^^^
+Hàm khởi tạo Popen
+^^^^^^^^^^^^^^^^^^
 
-The underlying process creation and management in this module is handled by
-the :class:`Popen` class. It offers a lot of flexibility so that developers
-are able to handle the less common cases not covered by the convenience
-functions.
+Việc tạo và quản lý tiến trình bên dưới trong module này do lớp :class:`Popen` đảm nhiệm. Lớp này cung cấp nhiều khả năng tùy chỉnh, giúp các developer xử lý những trường hợp ít phổ biến hơn mà các hàm tiện ích không hỗ trợ.
 
 
 .. class:: Popen(args, bufsize=-1, executable=None, stdin=None, stdout=None, \
-                 stderr=None, preexec_fn=None, close_fds=True, shell=False, \
-                 cwd=None, env=None, universal_newlines=None, \
-                 startupinfo=None, creationflags=0, restore_signals=True, \
-                 start_new_session=False, pass_fds=(), *, group=None, \
-                 extra_groups=None, user=None, umask=-1, \
-                 encoding=None, errors=None, text=None, pipesize=-1, \
-                 process_group=None)
+                 stderr=None, preexec_fn=None, close_fds=True, shell=False, \ cwd=None, env=None, universal_newlines=None, \ startupinfo=None, creationflags=0, restore_signals=True, \ start_new_session=False, pass_fds=(), *, group=None, \ extra_groups=None, user=None, umask=-1, \ encoding=None, errors=None, text=None, pipesize=-1, \ process_group=None)
 
-   Execute a child program in a new process.  On POSIX, the class uses
-   :meth:`os.execvpe`-like behavior to execute the child program.  On Windows,
-   the class uses the Windows ``CreateProcess()`` function.  The arguments to
-   :class:`Popen` are as follows.
+   Thực thi một chương trình con trong một tiến trình mới. Trên POSIX, lớp này sử dụng
+   :meth:`os.execvpe` để thực thi chương trình con. Trên Windows, lớp này sử dụng hàm Windows ``CreateProcess()``. Các đối số của
+   :class:`Popen` như sau.
 
-   *args* should be a sequence of program arguments or else a single string
-   or :term:`path-like object`.
-   By default, the program to execute is the first item in *args* if *args* is
-   a sequence.  If *args* is a string, the interpretation is
-   platform-dependent and described below.  See the *shell* and *executable*
-   arguments for additional differences from the default behavior.  Unless
-   otherwise stated, it is recommended to pass *args* as a sequence.
+   *args* phải là một sequence gồm các đối số của chương trình hoặc một chuỗi đơn hay :term:`path-like object`. Theo mặc định, chương trình được thực thi là mục đầu tiên trong *args* nếu *args* là một sequence. Nếu *args* là một chuỗi, cách diễn giải sẽ phụ thuộc vào nền tảng và được mô tả bên dưới. Xem các đối số *shell* và *executable* để biết thêm những khác biệt so với hành vi mặc định. Trừ khi có quy định khác, nên truyền *args* dưới dạng một sequence.
 
    .. warning::
 
-      For maximum reliability, use a fully qualified path for the executable.
-      To search for an unqualified name on :envvar:`PATH`, use
-      :meth:`shutil.which`. On all platforms, passing :data:`sys.executable`
-      is the recommended way to launch the current Python interpreter again,
-      and use the ``-m`` command-line format to launch an installed module.
+      Để đạt độ tin cậy tối đa, hãy sử dụng đường dẫn đầy đủ đến executable. Để tìm kiếm một tên không đầy đủ trên :envvar:`PATH`, hãy sử dụng
+      :meth:`shutil.which`. Trên tất cả các nền tảng, truyền :data:`sys.executable` là cách được khuyến nghị để khởi chạy lại trình thông dịch Python hiện tại, và sử dụng định dạng dòng lệnh ``-m`` để khởi chạy một module đã cài đặt.
 
-      Resolving the path of *executable* (or the first item of *args*) is
-      platform dependent. For POSIX, see :meth:`os.execvpe`, and note that
-      when resolving or searching for the executable path, *cwd* overrides the
-      current working directory and *env* can override the ``PATH``
-      environment variable. For Windows, see the documentation of the
-      ``lpApplicationName`` and ``lpCommandLine`` parameters of WinAPI
-      ``CreateProcess``, and note that when resolving or searching for the
-      executable path with ``shell=False``, *cwd* does not override the
-      current working directory and *env* cannot override the ``PATH``
-      environment variable. Using a full path avoids all of these variations.
+      Việc phân giải đường dẫn của *executable* (hoặc mục đầu tiên của *args*) phụ thuộc vào nền tảng. Đối với POSIX, hãy xem :meth:`os.execvpe`, đồng thời lưu ý rằng khi phân giải hoặc tìm kiếm đường dẫn đến executable, *cwd* sẽ ghi đè thư mục làm việc hiện tại và *env* có thể ghi đè biến môi trường ``PATH``. Đối với Windows, hãy xem tài liệu về các tham số ``lpApplicationName`` và ``lpCommandLine`` của WinAPI ``CreateProcess``, đồng thời lưu ý rằng khi phân giải hoặc tìm kiếm đường dẫn đến executable với ``shell=False``, *cwd* không ghi đè thư mục làm việc hiện tại và *env* không thể ghi đè biến môi trường ``PATH``. Việc sử dụng đường dẫn đầy đủ sẽ tránh được tất cả những khác biệt này.
 
-   An example of passing some arguments to an external program
-   as a sequence is::
+   Ví dụ về cách truyền một số đối số cho chương trình bên ngoài dưới dạng một chuỗi là::
 
      Popen(["/usr/bin/git", "commit", "-m", "Fixes a bug."])
 
-   On POSIX, if *args* is a string, the string is interpreted as the name or
-   path of the program to execute.  However, this can only be done if not
-   passing arguments to the program.
+   Trên POSIX, nếu *args* là một chuỗi, chuỗi đó được hiểu là tên hoặc đường dẫn của chương trình cần thực thi. Tuy nhiên, chỉ có thể làm như vậy khi không truyền đối số cho chương trình.
 
    .. note::
 
-      It may not be obvious how to break a shell command into a sequence of arguments,
-      especially in complex cases. :meth:`shlex.split` can illustrate how to
-      determine the correct tokenization for *args*::
+      Có thể không dễ nhận ra cách tách một lệnh shell thành một chuỗi đối số, đặc biệt trong các trường hợp phức tạp. :meth:`shlex.split` có thể minh họa cách xác định việc tokenization chính xác cho *args*::
 
          >>> import shlex, subprocess
          >>> command_line = input()
@@ -418,263 +283,162 @@ functions.
          >>> args = shlex.split(command_line)
          >>> print(args)
          ['/bin/vikings', '-input', 'eggs.txt', '-output', 'spam spam.txt', '-cmd', "echo '$MONEY'"]
-         >>> p = subprocess.Popen(args) # Success!
+         >>> p = subprocess.Popen(args) # Thành công!
 
-      Note in particular that options (such as *-input*) and arguments (such
-      as *eggs.txt*) that are separated by whitespace in the shell go in separate
-      list elements, while arguments that need quoting or backslash escaping when
-      used in the shell (such as filenames containing spaces or the *echo* command
-      shown above) are single list elements.
+      Lưu ý cụ thể rằng các tùy chọn (chẳng hạn như *-input*) và các đối số (chẳng hạn như *eggs.txt*) được phân tách bằng khoảng trắng trong shell sẽ nằm trong các phần tử danh sách riêng biệt, trong khi các đối số cần được đặt trong dấu ngoặc kép hoặc escape bằng dấu gạch chéo ngược khi được sử dụng trong shell (chẳng hạn như tên tệp chứa khoảng trắng hoặc lệnh *echo* được hiển thị ở trên) sẽ là các phần tử danh sách đơn.
 
-   On Windows, if *args* is a sequence, it will be converted to a string in a
-   manner described in :ref:`converting-argument-sequence`.  This is because
-   the underlying ``CreateProcess()`` operates on strings.
+   Trên Windows, nếu *args* là một chuỗi, nó sẽ được chuyển đổi thành một chuỗi theo cách được mô tả trong :ref:`converting-argument-sequence`. Điều này là do ``CreateProcess()`` bên dưới hoạt động trên các chuỗi.
 
    .. versionchanged:: 3.6
-      *args* parameter accepts a :term:`path-like object` if *shell* is
-      ``False`` and a sequence containing path-like objects on POSIX.
+      Tham số *args* chấp nhận một :term:`path-like object` nếu *shell* là ``False`` và một chuỗi chứa các đối tượng dạng đường dẫn trên POSIX.
 
    .. versionchanged:: 3.8
-      *args* parameter accepts a :term:`path-like object` if *shell* is
-      ``False`` and a sequence containing bytes and path-like objects
-      on Windows.
+      Tham số *args* chấp nhận một :term:`path-like object` nếu *shell* là ``False`` và một sequence chứa các đối tượng bytes và path-like trên Windows.
 
-   The *shell* argument (which defaults to ``False``) specifies whether to use
-   the shell as the program to execute.  If *shell* is ``True``, it is
-   recommended to pass *args* as a string rather than as a sequence.
+   Đối số *shell* (mặc định là ``False``) chỉ định có sử dụng shell làm chương trình cần thực thi hay không. Nếu *shell* là ``True``, bạn nên truyền *args* dưới dạng chuỗi thay vì sequence.
 
-   On POSIX with ``shell=True``, the shell defaults to :file:`/bin/sh`.  If
-   *args* is a string, the string specifies the command
-   to execute through the shell.  This means that the string must be
-   formatted exactly as it would be when typed at the shell prompt.  This
-   includes, for example, quoting or backslash escaping filenames with spaces in
-   them.  If *args* is a sequence, the first item specifies the command string, and
-   any additional items will be treated as additional arguments to the shell
-   itself.  That is to say, :class:`Popen` does the equivalent of::
+   Trên POSIX với ``shell=True``, shell mặc định là :file:`/bin/sh`. Nếu *args* là một chuỗi, chuỗi đó chỉ định lệnh cần thực thi thông qua shell. Điều này có nghĩa là chuỗi phải được định dạng chính xác như khi bạn nhập tại dấu nhắc shell. Ví dụ, điều này bao gồm việc đặt trong dấu ngoặc kép hoặc escape bằng dấu gạch chéo ngược đối với các tên tệp chứa khoảng trắng. Nếu *args* là một sequence, phần tử đầu tiên chỉ định chuỗi lệnh, còn mọi phần tử bổ sung sẽ được xử lý như các đối số bổ sung cho chính shell. Nói cách khác, :class:`Popen` thực hiện tương đương với::
 
       Popen(['/bin/sh', '-c', args[0], args[1], ...])
 
-   On Windows with ``shell=True``, the :envvar:`COMSPEC` environment variable
-   specifies the default shell.  The only time you need to specify
-   ``shell=True`` on Windows is when the command you wish to execute is built
-   into the shell (e.g. :command:`dir` or :command:`copy`).  You do not need
-   ``shell=True`` to run a batch file or console-based executable.
+   Trên Windows với ``shell=True``, biến môi trường :envvar:`COMSPEC` chỉ định shell mặc định. Trường hợp duy nhất bạn cần chỉ định ``shell=True`` trên Windows là khi lệnh bạn muốn thực thi được tích hợp trong shell (ví dụ: :command:`dir` hoặc :command:`copy`). Bạn không cần ``shell=True`` để chạy tệp batch hoặc tệp thực thi dựa trên console.
 
    .. note::
 
-      Read the `Security Considerations`_ section before using ``shell=True``.
+      Đọc phần `Security Considerations <Security Considerations_>`_ trước khi sử dụng ``shell=True``.
 
-   *bufsize* will be supplied as the corresponding argument to the
-   :func:`open` function when creating the stdin/stdout/stderr pipe
-   file objects:
+   *bufsize* sẽ được cung cấp làm đối số tương ứng cho
+   :func:`open` function khi tạo các đối tượng tệp pipe stdin/stdout/stderr:
 
-   - ``0`` means unbuffered (read and write are one
-     system call and can return short)
-   - ``1`` means line buffered
-     (only usable if ``text=True`` or ``universal_newlines=True``)
-   - any other positive value means use a buffer of approximately that
-     size
-   - negative bufsize (the default) means the system default of
-     io.DEFAULT_BUFFER_SIZE will be used.
+   - ``0`` có nghĩa là không đệm (việc đọc và ghi nằm trong một system call và có thể trả về dữ liệu ngắn)
+   - ``1`` có nghĩa là đệm theo dòng (chỉ có thể sử dụng nếu ``text=True`` hoặc ``universal_newlines=True``)
+   - bất kỳ giá trị dương nào khác có nghĩa là sử dụng bộ đệm có kích thước xấp xỉ giá trị đó
+   - bufsize âm (mặc định) có nghĩa là hệ thống sẽ sử dụng giá trị mặc định của io.DEFAULT_BUFFER_SIZE.
 
    .. versionchanged:: 3.3.1
-      *bufsize* now defaults to -1 to enable buffering by default to match the
-      behavior that most code expects.  In versions prior to Python 3.2.4 and
-      3.3.1 it incorrectly defaulted to ``0`` which was unbuffered
-      and allowed short reads.  This was unintentional and did not match the
-      behavior of Python 2 as most code expected.
+      *bufsize* hiện mặc định là -1 để bật buffering theo mặc định, phù hợp với hành vi mà hầu hết mã nguồn mong đợi. Trong các phiên bản trước Python 3.2.4 và 3.3.1, giá trị này không chính xác được mặc định là ``0``, tức là không đệm và cho phép các lần đọc ngắn. Đây là hành vi ngoài ý muốn và không phù hợp với hành vi của Python 2 như hầu hết mã nguồn mong đợi.
 
-   The *executable* argument specifies a replacement program to execute.   It
-   is very seldom needed.  When ``shell=False``, *executable* replaces the
-   program to execute specified by *args*.  However, the original *args* is
-   still passed to the program.  Most programs treat the program specified
-   by *args* as the command name, which can then be different from the program
-   actually executed.  On POSIX, the *args* name
-   becomes the display name for the executable in utilities such as
-   :program:`ps`.  If ``shell=True``, on POSIX the *executable* argument
-   specifies a replacement shell for the default :file:`/bin/sh`.
+   Đối số *executable* chỉ định một chương trình thay thế để thực thi. Đối số này rất hiếm khi cần thiết. Khi ``shell=False``, *executable* sẽ thay thế chương trình cần thực thi được chỉ định bởi *args*. Tuy nhiên, *args* ban đầu vẫn được truyền cho chương trình. Hầu hết chương trình coi chương trình được chỉ định bởi *args* là tên lệnh, và tên này có thể khác với chương trình thực sự được thực thi. Trên POSIX, tên *args* trở thành tên hiển thị của executable trong các tiện ích như
+   :program:`ps`. Nếu ``shell=True``, trên POSIX, đối số *executable* chỉ định một shell thay thế cho :file:`/bin/sh` mặc định.
 
    .. versionchanged:: 3.6
-      *executable* parameter accepts a :term:`path-like object` on POSIX.
+      Tham số *executable* chấp nhận một :term:`path-like object` trên POSIX.
 
    .. versionchanged:: 3.8
-      *executable* parameter accepts a bytes and :term:`path-like object`
-      on Windows.
+      Tham số *executable* chấp nhận một bytes và :term:`path-like object` trên Windows.
 
    .. versionchanged:: 3.12
 
-      Changed Windows shell search order for ``shell=True``. The current
-      directory and ``%PATH%`` are replaced with ``%COMSPEC%`` and
-      ``%SystemRoot%\System32\cmd.exe``. As a result, dropping a
-      malicious program named ``cmd.exe`` into a current directory no
-      longer works.
+      Đã thay đổi thứ tự tìm kiếm shell của Windows cho ``shell=True``. Thư mục hiện tại và ``%PATH%`` được thay thế bằng ``%COMSPEC%`` và ``%SystemRoot%\System32\cmd.exe``. Do đó, việc đặt một chương trình độc hại có tên ``cmd.exe`` vào thư mục hiện tại sẽ không còn hiệu quả.
 
-   *stdin*, *stdout* and *stderr* specify the executed program's standard input,
-   standard output and standard error file handles, respectively.  Valid values
-   are ``None``, :data:`PIPE`, :data:`DEVNULL`, an existing file descriptor (a
-   positive integer), and an existing :term:`file object` with a valid file
-   descriptor.  With the default settings of ``None``, no redirection will
-   occur.  :data:`PIPE` indicates that a new pipe to the child should be
-   created.  :data:`DEVNULL` indicates that the special file :data:`os.devnull`
-   will be used.  Additionally, *stderr* can be :data:`STDOUT`, which indicates
-   that the stderr data from the applications should be captured into the same
-   file handle as for *stdout*.
+   *stdin*, *stdout* và *stderr* lần lượt chỉ định các handle tệp cho standard input, standard output và standard error của chương trình được thực thi. Các giá trị hợp lệ là ``None``, :data:`PIPE`, :data:`DEVNULL`, một file descriptor hiện có (một số nguyên dương) và một :term:`file object` hiện có với file descriptor hợp lệ. Với cài đặt mặc định của ``None``, sẽ không xảy ra chuyển hướng nào. :data:`PIPE` cho biết cần tạo một pipe mới tới tiến trình con. :data:`DEVNULL` cho biết sẽ sử dụng tệp đặc biệt :data:`os.devnull`. Ngoài ra, *stderr* có thể là :data:`STDOUT`, cho biết dữ liệu stderr từ các ứng dụng sẽ được thu thập vào cùng handle tệp như *stdout*.
 
-   If *preexec_fn* is set to a callable object, this object will be called in the
-   child process just before the child is executed.
-   (POSIX only)
+   Nếu *preexec_fn* được đặt thành một đối tượng callable, đối tượng này sẽ được gọi trong tiến trình con ngay trước khi tiến trình con được thực thi. (Chỉ POSIX)
 
    .. warning::
 
-      The *preexec_fn* parameter is NOT SAFE to use in the presence of threads
-      in your application.  The child process could deadlock before exec is
-      called.
+      Tham số *preexec_fn* KHÔNG AN TOÀN khi sử dụng trong ứng dụng có thread. Tiến trình con có thể bị deadlock trước khi exec được gọi.
 
    .. note::
 
-      If you need to modify the environment for the child use the *env*
-      parameter rather than doing it in a *preexec_fn*.
-      The *start_new_session* and *process_group* parameters should take the place of
-      code using *preexec_fn* to call :func:`os.setsid` or :func:`os.setpgid` in the child.
+      Nếu cần sửa đổi môi trường cho tiến trình con, hãy sử dụng tham số *env* thay vì thực hiện việc đó trong *preexec_fn*. Các tham số *start_new_session* và *process_group* nên thay thế cho mã sử dụng *preexec_fn* để gọi :func:`os.setsid` hoặc :func:`os.setpgid` trong tiến trình con.
 
    .. versionchanged:: 3.8
 
-      The *preexec_fn* parameter is no longer supported in subinterpreters.
-      The use of the parameter in a subinterpreter raises
-      :exc:`RuntimeError`. The new restriction may affect applications that
-      are deployed in mod_wsgi, uWSGI, and other embedded environments.
+      Tham số *preexec_fn* không còn được hỗ trợ trong các subinterpreter. Việc sử dụng tham số này trong một subinterpreter sẽ gây ra
+      :exc:`RuntimeError`. Hạn chế mới này có thể ảnh hưởng đến các ứng dụng được triển khai trong mod_wsgi, uWSGI và các môi trường nhúng khác.
 
-   If *close_fds* is true, all file descriptors except ``0``, ``1`` and
-   ``2`` will be closed before the child process is executed.  Otherwise
-   when *close_fds* is false, file descriptors obey their inheritable flag
-   as described in :ref:`fd_inheritance`.
+   Nếu *close_fds* là true, tất cả file descriptor ngoại trừ ``0``, ``1`` và ``2`` sẽ bị đóng trước khi tiến trình con được thực thi. Ngược lại, khi *close_fds* là false, các file descriptor sẽ tuân theo cờ inheritable của chúng như được mô tả trong :ref:`fd_inheritance`.
 
-   On Windows, if *close_fds* is true then no handles will be inherited by the
-   child process unless explicitly passed in the ``handle_list`` element of
-   :attr:`STARTUPINFO.lpAttributeList`, or by standard handle redirection.
+   Trên Windows, nếu *close_fds* là true thì không handle nào được kế thừa bởi tiến trình con, trừ khi được truyền rõ ràng trong phần tử ``handle_list`` của
+   :attr:`STARTUPINFO.lpAttributeList`, hoặc thông qua việc chuyển hướng standard handle.
 
    .. versionchanged:: 3.2
-      The default for *close_fds* was changed from :const:`False` to
-      what is described above.
+      Giá trị mặc định của *close_fds* đã được thay đổi từ :const:`False` thành giá trị được mô tả ở trên.
 
    .. versionchanged:: 3.7
-      On Windows the default for *close_fds* was changed from :const:`False` to
-      :const:`True` when redirecting the standard handles. It's now possible to
-      set *close_fds* to :const:`True` when redirecting the standard handles.
+      Trên Windows, giá trị mặc định của *close_fds* đã được thay đổi từ :const:`False` thành
+      :const:`True` khi chuyển hướng các handle chuẩn. Giờ đây có thể đặt *close_fds* thành :const:`True` khi chuyển hướng các handle chuẩn.
 
-   *pass_fds* is an optional sequence of file descriptors to keep open
-   between the parent and child.  Providing any *pass_fds* forces
-   *close_fds* to be :const:`True`.  (POSIX only)
+   *pass_fds* là một chuỗi tùy chọn gồm các mô tả tệp cần được giữ mở giữa tiến trình cha và tiến trình con. Việc cung cấp bất kỳ *pass_fds* nào sẽ buộc *close_fds* có giá trị là :const:`True`. (Chỉ POSIX)
 
    .. versionchanged:: 3.2
-      The *pass_fds* parameter was added.
+      Tham số *pass_fds* đã được thêm vào.
 
-   If *cwd* is not ``None``, the function changes the working directory to
-   *cwd* before executing the child.  *cwd* can be a string, bytes or
-   :term:`path-like <path-like object>` object.  On POSIX, the function
-   looks for *executable* (or for the first item in *args*) relative to *cwd*
-   if the executable path is a relative path.
+   Nếu *cwd* không phải là ``None``, hàm sẽ đổi thư mục làm việc thành *cwd* trước khi thực thi tiến trình con. *cwd* có thể là một chuỗi, bytes hoặc
+   :term:`path-like <path-like object>` object. Trên POSIX, hàm sẽ tìm *executable* (hoặc mục đầu tiên trong *args*) tương đối với *cwd* nếu đường dẫn đến executable là đường dẫn tương đối.
 
    .. versionchanged:: 3.6
-      *cwd* parameter accepts a :term:`path-like object` on POSIX.
+      Tham số *cwd* chấp nhận một :term:`path-like object` trên POSIX.
 
    .. versionchanged:: 3.7
-      *cwd* parameter accepts a :term:`path-like object` on Windows.
+      Tham số *cwd* chấp nhận một :term:`path-like object` trên Windows.
 
    .. versionchanged:: 3.8
-      *cwd* parameter accepts a bytes object on Windows.
+      Tham số *cwd* chấp nhận một đối tượng bytes trên Windows.
 
-   If *restore_signals* is true (the default) all signals that Python has set to
-   SIG_IGN are restored to SIG_DFL in the child process before the exec.
-   Currently this includes the SIGPIPE, SIGXFZ and SIGXFSZ signals.
-   (POSIX only)
+   Nếu *restore_signals* là true (mặc định), tất cả các signal mà Python đã đặt thành SIG_IGN sẽ được khôi phục về SIG_DFL trong tiến trình con trước khi thực hiện exec. Hiện tại, các signal này bao gồm SIGPIPE, SIGXFZ và SIGXFSZ. (Chỉ dành cho POSIX)
 
    .. versionchanged:: 3.2
-      *restore_signals* was added.
+      *restore_signals* đã được thêm.
 
-   If *start_new_session* is true the ``setsid()`` system call will be made in the
-   child process prior to the execution of the subprocess.
+   Nếu *start_new_session* là true, lệnh gọi hệ thống ``setsid()`` sẽ được thực hiện trong tiến trình con trước khi thực thi subprocess.
 
    .. availability:: POSIX
    .. versionchanged:: 3.2
-      *start_new_session* was added.
+      *start_new_session* đã được thêm.
 
-   If *process_group* is a non-negative integer, the ``setpgid(0, value)`` system call will
-   be made in the child process prior to the execution of the subprocess.
+   Nếu *process_group* là một số nguyên không âm, lệnh gọi hệ thống ``setpgid(0, value)`` sẽ được thực hiện trong tiến trình con trước khi thực thi subprocess.
 
    .. availability:: POSIX
    .. versionchanged:: 3.11
-      *process_group* was added.
+      *process_group* đã được thêm.
 
-   If *group* is not ``None``, the setregid() system call will be made in the
-   child process prior to the execution of the subprocess. If the provided
-   value is a string, it will be looked up via :func:`grp.getgrnam` and
-   the value in ``gr_gid`` will be used. If the value is an integer, it
-   will be passed verbatim. (POSIX only)
+   Nếu *group* không phải là ``None``, lệnh gọi hệ thống setregid() sẽ được thực hiện trong tiến trình con trước khi thực thi subprocess. Nếu giá trị được cung cấp là một chuỗi, giá trị đó sẽ được tra cứu thông qua :func:`grp.getgrnam` và giá trị trong ``gr_gid`` sẽ được sử dụng. Nếu giá trị là một số nguyên, giá trị đó sẽ được truyền nguyên vẹn. (Chỉ dành cho POSIX)
 
    .. availability:: POSIX
    .. versionadded:: 3.9
 
-   If *extra_groups* is not ``None``, the setgroups() system call will be
-   made in the child process prior to the execution of the subprocess.
-   Strings provided in *extra_groups* will be looked up via
-   :func:`grp.getgrnam` and the values in ``gr_gid`` will be used.
-   Integer values will be passed verbatim. (POSIX only)
+   Nếu *extra_groups* không phải là ``None``, lệnh gọi hệ thống setgroups() sẽ được thực hiện trong tiến trình con trước khi thực thi subprocess. Các chuỗi được cung cấp trong *extra_groups* sẽ được tra cứu thông qua
+   :func:`grp.getgrnam` và các giá trị trong ``gr_gid`` sẽ được sử dụng. Các giá trị số nguyên sẽ được truyền nguyên vẹn. (Chỉ dành cho POSIX)
 
    .. availability:: POSIX
    .. versionadded:: 3.9
 
-   If *user* is not ``None``, the setreuid() system call will be made in the
-   child process prior to the execution of the subprocess. If the provided
-   value is a string, it will be looked up via :func:`pwd.getpwnam` and
-   the value in ``pw_uid`` will be used. If the value is an integer, it will
-   be passed verbatim. (POSIX only)
+   Nếu *user* không phải là ``None``, lệnh gọi hệ thống setreuid() sẽ được thực hiện trong tiến trình con trước khi thực thi subprocess. Nếu giá trị được cung cấp là một chuỗi, giá trị đó sẽ được tra cứu thông qua :func:`pwd.getpwnam` và giá trị trong ``pw_uid`` sẽ được sử dụng. Nếu giá trị là một số nguyên, giá trị đó sẽ được truyền nguyên vẹn. (Chỉ dành cho POSIX)
 
    .. note::
 
-      Specifying *user* will not drop existing supplementary group memberships!
-      The caller must also pass ``extra_groups=()`` to reduce the group membership
-      of the child process for security purposes.
+      Việc chỉ định *user* sẽ không loại bỏ các thành viên nhóm bổ sung hiện có! Caller cũng phải truyền ``extra_groups=()`` để giảm các thành viên nhóm của tiến trình con vì mục đích bảo mật.
 
    .. availability:: POSIX
    .. versionadded:: 3.9
 
-   If *umask* is not negative, the umask() system call will be made in the
-   child process prior to the execution of the subprocess.
+   Nếu *umask* không âm, lệnh gọi hệ thống umask() sẽ được thực hiện trong tiến trình con trước khi thực thi subprocess.
 
    .. availability:: POSIX
    .. versionadded:: 3.9
 
-   If *env* is not ``None``, it must be a mapping that defines the environment
-   variables for the new process; these are used instead of the default
-   behavior of inheriting the current process' environment. This mapping can be
-   str to str on any platform or bytes to bytes on POSIX platforms much like
-   :data:`os.environ` or :data:`os.environb`.
+   Nếu *env* không phải là ``None``, nó phải là một ánh xạ xác định các biến môi trường cho tiến trình mới; các biến này được sử dụng thay cho hành vi mặc định là kế thừa môi trường của tiến trình hiện tại. Ánh xạ này có thể là str sang str trên mọi nền tảng hoặc bytes sang bytes trên các nền tảng POSIX, tương tự như
+   :data:`os.environ` hoặc :data:`os.environb`.
 
    .. note::
 
-      If specified, *env* must provide any variables required for the program to
-      execute.  On Windows, in order to run a `side-by-side assembly`_ the
-      specified *env* **must** include a valid ``%SystemRoot%``.
+      Nếu được chỉ định, *env* phải cung cấp mọi biến cần thiết để chương trình thực thi. Trên Windows, để chạy một `side-by-side assembly <side-by-side assembly_>`_, *env* được chỉ định **phải** bao gồm một ``%SystemRoot%`` hợp lệ.
 
    .. _side-by-side assembly: https://en.wikipedia.org/wiki/Side-by-Side_Assembly
 
-   If *encoding* or *errors* are specified, or *text* is true, the file objects
-   *stdin*, *stdout* and *stderr* are opened in text mode with the specified
-   *encoding* and *errors*, as described above in :ref:`frequently-used-arguments`.
-   The *universal_newlines* argument is equivalent  to *text* and is provided
-   for backwards compatibility. By default, file objects are opened in binary mode.
+   Nếu *encoding* hoặc *errors* được chỉ định, hoặc *text* là true, các đối tượng tệp *stdin*, *stdout* và *stderr* được mở ở chế độ văn bản với *encoding* và *errors* đã chỉ định, như mô tả ở trên trong :ref:`frequently-used-arguments`. Đối số *universal_newlines* tương đương với *text* và được cung cấp để duy trì khả năng tương thích ngược. Theo mặc định, các đối tượng tệp được mở ở chế độ nhị phân.
 
    .. versionadded:: 3.6
-      *encoding* and *errors* were added.
+      *encoding* và *errors* đã được thêm vào.
 
    .. versionadded:: 3.7
-      *text* was added as a more readable alias for *universal_newlines*.
+      *text* được thêm vào như một bí danh dễ đọc hơn cho *universal_newlines*.
 
-   If given, *startupinfo* will be a :class:`STARTUPINFO` object, which is
-   passed to the underlying ``CreateProcess`` function.
+   Nếu được cung cấp, *startupinfo* sẽ là một đối tượng :class:`STARTUPINFO`, được truyền cho hàm ``CreateProcess`` bên dưới.
 
-   If given, *creationflags*, can be one or more of the following flags:
+   Nếu được cung cấp, *creationflags* có thể là một hoặc nhiều cờ sau:
 
    * :data:`CREATE_NEW_CONSOLE`
    * :data:`CREATE_NEW_PROCESS_GROUP`
@@ -689,161 +453,112 @@ functions.
    * :data:`CREATE_DEFAULT_ERROR_MODE`
    * :data:`CREATE_BREAKAWAY_FROM_JOB`
 
-   *pipesize* can be used to change the size of the pipe when
-   :data:`PIPE` is used for *stdin*, *stdout* or *stderr*. The size of the pipe
-   is only changed on platforms that support this (only Linux at this time of
-   writing). Other platforms will ignore this parameter.
+   *pipesize* có thể được sử dụng để thay đổi kích thước của pipe khi
+   :data:`PIPE` được sử dụng cho *stdin*, *stdout* hoặc *stderr*. Kích thước của pipe chỉ được thay đổi trên các nền tảng hỗ trợ tính năng này (tại thời điểm viết tài liệu này, chỉ có Linux). Các nền tảng khác sẽ bỏ qua tham số này.
 
    .. versionchanged:: 3.10
-      Added the *pipesize* parameter.
+      Đã thêm tham số *pipesize*.
 
-   Popen objects are supported as context managers via the :keyword:`with` statement:
-   on exit, standard file descriptors are closed, and the process is waited for.
-   ::
+   Các đối tượng Popen được hỗ trợ dưới dạng context manager thông qua câu lệnh :keyword:`with`:
+   khi thoát, các bộ mô tả tệp tiêu chuẩn sẽ được đóng và tiến trình sẽ được chờ xử lý.
+   ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       with Popen(["ifconfig"], stdout=PIPE) as proc:
           log.write(proc.stdout.read())
 
    .. audit-event:: subprocess.Popen executable,args,cwd,env subprocess.Popen
 
-      Popen and the other functions in this module that use it raise an
-      :ref:`auditing event <auditing>` ``subprocess.Popen`` with arguments
-      ``executable``, ``args``, ``cwd``, and ``env``. The value for ``args``
-      may be a single string or a list of strings, depending on platform.
+      Popen và các hàm khác trong mô-đun này sử dụng nó sẽ phát sinh một
+      :ref:`sự kiện auditing <auditing>` ``subprocess.Popen`` với các đối số ``executable``, ``args``, ``cwd`` và ``env``. Giá trị của ``args`` có thể là một chuỗi hoặc một danh sách chuỗi, tùy thuộc vào nền tảng.
 
    .. versionchanged:: 3.2
-      Added context manager support.
+      Đã bổ sung hỗ trợ context manager.
 
    .. versionchanged:: 3.6
-      Popen destructor now emits a :exc:`ResourceWarning` warning if the child
-      process is still running.
+      Bộ hủy Popen hiện phát ra :exc:`ResourceWarning` cảnh báo nếu tiến trình con vẫn đang chạy.
 
    .. versionchanged:: 3.8
-      Popen can use :func:`os.posix_spawn` in some cases for better
-      performance. On Windows Subsystem for Linux and QEMU User Emulation,
-      Popen constructor using :func:`os.posix_spawn` no longer raise an
-      exception on errors like missing program, but the child process fails
-      with a non-zero :attr:`~Popen.returncode`.
+      Trong một số trường hợp, Popen có thể sử dụng :func:`os.posix_spawn` để cải thiện hiệu suất. Trên Windows Subsystem for Linux và QEMU User Emulation, hàm khởi tạo Popen sử dụng :func:`os.posix_spawn` không còn phát sinh ngoại lệ đối với các lỗi như thiếu chương trình, nhưng tiến trình con sẽ kết thúc với :attr:`~Popen.returncode` khác không.
 
 
-Exceptions
-^^^^^^^^^^
+Ngoại lệ
+^^^^^^^^
 
-Exceptions raised in the child process, before the new program has started to
-execute, will be re-raised in the parent.
+Các ngoại lệ phát sinh trong tiến trình con, trước khi chương trình mới bắt đầu thực thi, sẽ được ném lại trong tiến trình cha.
 
-The most common exception raised is :exc:`OSError`.  This occurs, for example,
-when trying to execute a non-existent file.  Applications should prepare for
-:exc:`OSError` exceptions. Note that, when ``shell=True``, :exc:`OSError`
-will be raised by the child only if the selected shell itself was not found.
-To determine if the shell failed to find the requested application, it is
-necessary to check the return code or output from the subprocess.
+Ngoại lệ phổ biến nhất được phát sinh là :exc:`OSError`. Điều này xảy ra, chẳng hạn, khi cố thực thi một tệp không tồn tại. Ứng dụng nên chuẩn bị cho
+các ngoại lệ :exc:`OSError`. Lưu ý rằng khi ``shell=True``, :exc:`OSError` sẽ chỉ được tiến trình con phát sinh nếu chính shell được chọn không được tìm thấy. Để xác định liệu shell có không tìm thấy ứng dụng được yêu cầu hay không, cần kiểm tra mã trả về hoặc đầu ra từ subprocess.
 
-A :exc:`ValueError` will be raised if :class:`Popen` is called with invalid
-arguments.
+Một :exc:`ValueError` sẽ được phát sinh nếu :class:`Popen` được gọi với các đối số không hợp lệ.
 
-:func:`check_call` and :func:`check_output` will raise
-:exc:`CalledProcessError` if the called process returns a non-zero return
-code.
+:func:`check_call` và :func:`check_output` sẽ phát sinh
+:exc:`CalledProcessError` nếu tiến trình được gọi trả về mã trả về khác không.
 
-All of the functions and methods that accept a *timeout* parameter, such as
-:func:`run` and :meth:`Popen.communicate` will raise :exc:`TimeoutExpired` if
-the timeout expires before the process exits.
+Tất cả các hàm và phương thức chấp nhận tham số *timeout*, chẳng hạn như
+:func:`run` và :meth:`Popen.communicate` sẽ phát sinh :exc:`TimeoutExpired` nếu thời gian chờ hết trước khi tiến trình kết thúc.
 
-Exceptions defined in this module all inherit from :exc:`SubprocessError`.
+Các ngoại lệ được định nghĩa trong mô-đun này đều kế thừa từ :exc:`SubprocessError`.
 
 .. versionadded:: 3.3
-   The :exc:`SubprocessError` base class was added.
+   Lớp cơ sở :exc:`SubprocessError` đã được thêm vào.
 
 .. _subprocess-security:
 
-Security Considerations
+.. _`Security Considerations`:
+
+Các cân nhắc về bảo mật
 -----------------------
 
-Unlike some other popen functions, this library will not
-implicitly choose to call a system shell.  This means that all characters,
-including shell metacharacters, can safely be passed to child processes.
-If the shell is invoked explicitly, via ``shell=True``, it is the application's
-responsibility to ensure that all whitespace and metacharacters are
-quoted appropriately to avoid
-`shell injection <https://en.wikipedia.org/wiki/Shell_injection#Shell_injection>`_
-vulnerabilities. On :ref:`some platforms <shlex-quote-warning>`, it is possible
-to use :func:`shlex.quote` for this escaping.
+Không giống một số hàm popen khác, thư viện này sẽ không ngầm quyết định gọi system shell. Điều này có nghĩa là mọi ký tự, bao gồm cả shell metacharacter, đều có thể được truyền an toàn đến các tiến trình con. Nếu shell được gọi một cách rõ ràng thông qua ``shell=True``, ứng dụng có trách nhiệm đảm bảo rằng mọi khoảng trắng và metacharacter đều được đặt trong dấu ngoặc thích hợp để tránh các lỗ hổng `shell injection <https://en.wikipedia.org/wiki/Shell_injection#Shell_injection>`_. Trên :ref:`một số nền tảng <shlex-quote-warning>`, có thể sử dụng :func:`shlex.quote` để thực hiện việc escape này.
 
-On Windows, batch files (:file:`*.bat` or :file:`*.cmd`) may be launched by the
-operating system in a system shell regardless of the arguments passed to this
-library. This could result in arguments being parsed according to shell rules,
-but without any escaping added by Python. If you are intentionally launching a
-batch file with arguments from untrusted sources, consider passing
-``shell=True`` to allow Python to escape special characters. See :gh:`114539`
-for additional discussion.
+Trên Windows, các tệp batch (:file:`*.bat` hoặc :file:`*.cmd`) có thể được hệ điều hành khởi chạy trong system shell bất kể các đối số được truyền đến thư viện này. Điều này có thể khiến các đối số được phân tích theo quy tắc của shell, nhưng không có bất kỳ thao tác escape nào do Python thêm vào. Nếu bạn cố ý khởi chạy một tệp batch với các đối số từ các nguồn không đáng tin cậy, hãy cân nhắc truyền ``shell=True`` để cho phép Python escape các ký tự đặc biệt. Xem :gh:`114539` để biết thêm thảo luận.
 
 
-Popen Objects
--------------
+Các đối tượng Popen
+-------------------
 
-Instances of the :class:`Popen` class have the following methods:
+Các instance của lớp :class:`Popen` có những phương thức sau:
 
 
 .. method:: Popen.poll()
 
-   Check if child process has terminated.  Set and return
-   :attr:`~Popen.returncode` attribute. Otherwise, returns ``None``.
+   Kiểm tra xem tiến trình con đã kết thúc chưa. Đặt và trả về
+   :attr:`~Popen.returncode` thuộc tính. Nếu không, trả về ``None``.
 
 
 .. method:: Popen.wait(timeout=None)
 
-   Wait for child process to terminate.  Set and return
-   :attr:`~Popen.returncode` attribute.
+   Chờ tiến trình con kết thúc. Đặt và trả về
+   :attr:`~Popen.returncode` thuộc tính.
 
-   If the process does not terminate after *timeout* seconds, raise a
-   :exc:`TimeoutExpired` exception.  It is safe to catch this exception and
-   retry the wait.
-
-   .. note::
-
-      This will deadlock when using ``stdout=PIPE`` or ``stderr=PIPE``
-      and the child process generates enough output to a pipe such that
-      it blocks waiting for the OS pipe buffer to accept more data.
-      Use :meth:`Popen.communicate` when using pipes to avoid that.
+   Nếu tiến trình không kết thúc sau *timeout* giây, phát sinh một
+   :exc:`TimeoutExpired` exception. Bạn có thể an toàn bắt exception này và thử lại thao tác chờ.
 
    .. note::
 
-      When the ``timeout`` parameter is not ``None``, then (on POSIX) the
-      function is implemented using a busy loop (non-blocking call and short
-      sleeps). Use the :mod:`asyncio` module for an asynchronous wait: see
+      Điều này sẽ gây deadlock khi sử dụng ``stdout=PIPE`` hoặc ``stderr=PIPE`` và tiến trình con tạo ra đủ dữ liệu đầu ra vào một pipe khiến tiến trình bị chặn trong khi chờ bộ đệm pipe của OS tiếp nhận thêm dữ liệu. Hãy sử dụng :meth:`Popen.communicate` khi dùng pipe để tránh điều đó.
+
+   .. note::
+
+      Khi tham số ``timeout`` không phải là ``None``, thì (trên POSIX) hàm được triển khai bằng một vòng lặp bận (lời gọi không chặn và các lần ngủ ngắn). Hãy sử dụng module :mod:`asyncio` để chờ bất đồng bộ: xem
       :class:`asyncio.create_subprocess_exec`.
 
    .. versionchanged:: 3.3
-      *timeout* was added.
+      *timeout* đã được thêm vào.
 
 .. method:: Popen.communicate(input=None, timeout=None)
 
-   Interact with process: Send data to stdin.  Read data from stdout and stderr,
-   until end-of-file is reached.  Wait for process to terminate and set the
-   :attr:`~Popen.returncode` attribute.  The optional *input* argument should be
-   data to be sent to the child process, or ``None``, if no data should be sent
-   to the child.  If streams were opened in text mode, *input* must be a string.
-   Otherwise, it must be bytes.
+   Tương tác với tiến trình: Gửi dữ liệu vào stdin. Đọc dữ liệu từ stdout và stderr cho đến khi gặp cuối tệp. Chờ tiến trình kết thúc và đặt
+   :attr:`~Popen.returncode` thuộc tính. Đối số *input* tùy chọn phải là dữ liệu sẽ được gửi đến tiến trình con hoặc ``None`` nếu không có dữ liệu nào được gửi đến tiến trình con. Nếu các stream được mở ở chế độ văn bản, *input* phải là một chuỗi. Nếu không, nó phải là bytes.
 
-   :meth:`communicate` returns a tuple ``(stdout_data, stderr_data)``.
-   The data will be strings if streams were opened in text mode; otherwise,
-   bytes.
+   :meth:`communicate` trả về một tuple ``(stdout_data, stderr_data)``. Dữ liệu sẽ là các chuỗi nếu các stream được mở ở chế độ văn bản; nếu không, sẽ là bytes.
 
-   Note that if you want to send data to the process's stdin, you need to create
-   the Popen object with ``stdin=PIPE``.  Similarly, to get anything other than
-   ``None`` in the result tuple, you need to give ``stdout=PIPE`` and/or
-   ``stderr=PIPE`` too.
+   Lưu ý rằng nếu muốn gửi dữ liệu vào stdin của tiến trình, bạn cần tạo đối tượng Popen với ``stdin=PIPE``. Tương tự, để nhận được bất kỳ giá trị nào khác ngoài ``None`` trong tuple kết quả, bạn cũng cần cung cấp ``stdout=PIPE`` và/hoặc ``stderr=PIPE``.
 
-   If the process does not terminate after *timeout* seconds, a
-   :exc:`TimeoutExpired` exception will be raised.  Catching this exception and
-   retrying communication will not lose any output.  Supplying *input* to a
-   subsequent post-timeout :meth:`communicate` call is in undefined behavior
-   and may become an error in the future.
+   Nếu tiến trình không kết thúc sau *timeout* giây, một
+   Ngoại lệ :exc:`TimeoutExpired` sẽ được phát sinh. Việc bắt ngoại lệ này và thử lại quá trình giao tiếp sẽ không làm mất bất kỳ đầu ra nào. Việc cung cấp *input* cho một lần gọi :meth:`communicate` tiếp theo sau khi timeout sẽ dẫn đến hành vi không xác định và có thể trở thành lỗi trong tương lai.
 
-   The child process is not killed if the timeout expires, so in order to
-   cleanup properly a well-behaved application should kill the child process and
-   finish communication::
+   Tiến trình con không bị kết thúc nếu timeout hết hạn, vì vậy để dọn dẹp đúng cách, một ứng dụng hoạt động đúng nên kết thúc tiến trình con và hoàn tất việc giao tiếp::
 
       proc = subprocess.Popen(...)
       try:
@@ -852,463 +567,333 @@ Instances of the :class:`Popen` class have the following methods:
           proc.kill()
           outs, errs = proc.communicate()
 
-   After a call to :meth:`~Popen.communicate` raises :exc:`TimeoutExpired`, do
-   not call :meth:`~Popen.wait`. Use an additional :meth:`~Popen.communicate`
-   call to finish handling pipes and populate the :attr:`~Popen.returncode`
-   attribute.
+   Sau khi một lần gọi :meth:`~Popen.communicate` phát sinh :exc:`TimeoutExpired`, không gọi :meth:`~Popen.wait`. Sử dụng thêm một lần gọi :meth:`~Popen.communicate` để hoàn tất việc xử lý các pipe và điền thuộc tính :attr:`~Popen.returncode`.
 
    .. note::
 
-      The data read is buffered in memory, so do not use this method if the data
-      size is large or unlimited.
+      Dữ liệu được đọc sẽ được đệm trong bộ nhớ, vì vậy không sử dụng phương thức này nếu kích thước dữ liệu lớn hoặc không giới hạn.
 
    .. versionchanged:: 3.3
-      *timeout* was added.
+      *timeout* đã được thêm vào.
 
 
 .. method:: Popen.send_signal(signal)
 
-   Sends the signal *signal* to the child.
+   Gửi tín hiệu *signal* đến tiến trình con.
 
-   Do nothing if the process completed.
+   Không làm gì nếu tiến trình đã hoàn tất.
 
    .. note::
 
-      On Windows, SIGTERM is an alias for :meth:`terminate`. CTRL_C_EVENT and
-      CTRL_BREAK_EVENT can be sent to processes started with a *creationflags*
-      parameter which includes ``CREATE_NEW_PROCESS_GROUP``.
+      Trên Windows, SIGTERM là bí danh của :meth:`terminate`. CTRL_C_EVENT và CTRL_BREAK_EVENT có thể được gửi đến các tiến trình được khởi chạy với tham số *creationflags* có chứa ``CREATE_NEW_PROCESS_GROUP``.
 
 
 .. method:: Popen.terminate()
 
-   Stop the child. On POSIX OSs the method sends :py:const:`~signal.SIGTERM` to the
-   child. On Windows the Win32 API function :c:func:`!TerminateProcess` is called
-   to stop the child.
+   Dừng tiến trình con. Trên các hệ điều hành POSIX, phương thức này gửi :py:const:`~signal.SIGTERM` đến tiến trình con. Trên Windows, hàm API Win32 :c:func:`!TerminateProcess` được gọi để dừng tiến trình con.
 
 
 .. method:: Popen.kill()
 
-   Kills the child. On POSIX OSs the function sends SIGKILL to the child.
-   On Windows :meth:`kill` is an alias for :meth:`terminate`.
+   Buộc dừng tiến trình con. Trên các hệ điều hành POSIX, hàm này gửi SIGKILL đến tiến trình con. Trên Windows, :meth:`kill` là bí danh của :meth:`terminate`.
 
 
-The following attributes are also set by the class for you to access.
-Reassigning them to new values is unsupported:
+Lớp cũng thiết lập các thuộc tính sau để bạn truy cập. Không hỗ trợ việc gán lại chúng bằng các giá trị mới:
 
 .. attribute:: Popen.args
 
-   The *args* argument as it was passed to :class:`Popen` -- a
-   sequence of program arguments or else a single string.
+   Đối số *args* như được truyền vào :class:`Popen` — một chuỗi các đối số chương trình hoặc một chuỗi đơn.
 
    .. versionadded:: 3.3
 
 .. attribute:: Popen.stdin
 
-   If the *stdin* argument was :data:`PIPE`, this attribute is a writeable
-   stream object as returned by :func:`open`. If the *encoding* or *errors*
-   arguments were specified or the *text* or *universal_newlines* argument
-   was ``True``, the stream is a text stream, otherwise it is a byte stream.
-   If the *stdin* argument was not :data:`PIPE`, this attribute is ``None``.
+   Nếu đối số *stdin* là :data:`PIPE`, thuộc tính này là một đối tượng stream có thể ghi do :func:`open` trả về. Nếu đã chỉ định các đối số *encoding* hoặc *errors*, hoặc đối số *text* hoặc *universal_newlines* là ``True``, stream này là text stream; nếu không, đây là byte stream. Nếu đối số *stdin* không phải là :data:`PIPE`, thuộc tính này là ``None``.
 
 
 .. attribute:: Popen.stdout
 
-   If the *stdout* argument was :data:`PIPE`, this attribute is a readable
-   stream object as returned by :func:`open`. Reading from the stream provides
-   output from the child process. If the *encoding* or *errors* arguments were
-   specified or the *text* or *universal_newlines* argument was ``True``, the
-   stream is a text stream, otherwise it is a byte stream. If the *stdout*
-   argument was not :data:`PIPE`, this attribute is ``None``.
+   Nếu đối số *stdout* là :data:`PIPE`, thuộc tính này là một đối tượng stream có thể đọc do :func:`open` trả về. Việc đọc stream này cung cấp đầu ra từ tiến trình con. Nếu đã chỉ định các đối số *encoding* hoặc *errors*, hoặc đối số *text* hoặc *universal_newlines* là ``True``, stream này là text stream; nếu không, đây là byte stream. Nếu đối số *stdout* không phải là :data:`PIPE`, thuộc tính này là ``None``.
 
 
 .. attribute:: Popen.stderr
 
-   If the *stderr* argument was :data:`PIPE`, this attribute is a readable
-   stream object as returned by :func:`open`. Reading from the stream provides
-   error output from the child process. If the *encoding* or *errors* arguments
-   were specified or the *text* or *universal_newlines* argument was ``True``, the
-   stream is a text stream, otherwise it is a byte stream. If the *stderr* argument
-   was not :data:`PIPE`, this attribute is ``None``.
+   Nếu đối số *stderr* là :data:`PIPE`, thuộc tính này là một đối tượng luồng có thể đọc được do :func:`open` trả về. Việc đọc từ luồng cung cấp đầu ra lỗi từ tiến trình con. Nếu đã chỉ định các đối số *encoding* hoặc *errors*, hay đối số *text* hoặc *universal_newlines* là ``True``, thì luồng là luồng văn bản; nếu không, đó là luồng byte. Nếu đối số *stderr* không phải là :data:`PIPE`, thuộc tính này là ``None``.
 
 .. warning::
 
-   Use :meth:`~Popen.communicate` rather than :attr:`.stdin.write <Popen.stdin>`,
-   :attr:`.stdout.read <Popen.stdout>` or :attr:`.stderr.read <Popen.stderr>` to avoid
-   deadlocks due to any of the other OS pipe buffers filling up and blocking the
-   child process.
+   Sử dụng :meth:`~Popen.communicate` thay vì :attr:`.stdin.write <Popen.stdin>`,
+   :attr:`.stdout.read <Popen.stdout>` hoặc :attr:`.stderr.read <Popen.stderr>` để tránh deadlock do bất kỳ bộ đệm pipe OS nào khác bị đầy và chặn tiến trình con.
 
 
 .. attribute:: Popen.pid
 
-   The process ID of the child process.
+   ID tiến trình của tiến trình con.
 
-   Note that if you set the *shell* argument to ``True``, this is the process ID
-   of the spawned shell.
+   Lưu ý rằng nếu bạn đặt đối số *shell* thành ``True``, đây là ID tiến trình của shell đã được tạo.
 
 
 .. attribute:: Popen.returncode
 
-   The child return code. Initially ``None``, :attr:`returncode` is set by
-   a call to the :meth:`poll`, :meth:`wait`, or :meth:`communicate` methods
-   if they detect that the process has terminated.
+   Mã trả về của tiến trình con. Ban đầu là ``None``, :attr:`returncode` được đặt bằng một lệnh gọi đến phương thức :meth:`poll`, :meth:`wait` hoặc :meth:`communicate` nếu chúng phát hiện tiến trình đã kết thúc.
 
-   A ``None`` value indicates that the process hadn't yet terminated at the
-   time of the last method call.
+   Giá trị ``None`` cho biết tiến trình vẫn chưa kết thúc tại thời điểm gọi phương thức gần nhất.
 
-   A negative value ``-N`` indicates that the child was terminated by signal
-   ``N`` (POSIX only).
+   Giá trị âm ``-N`` cho biết tiến trình con đã bị kết thúc bởi tín hiệu ``N`` (chỉ dành cho POSIX).
 
-   When ``shell=True``, the return code reflects the exit status of the shell
-   itself (e.g. ``/bin/sh``), which may map signals to codes such as
-   ``128+N``. See the documentation of the shell (for example, the Bash
-   manual's Exit Status) for details.
+   Khi ``shell=True``, mã trả về phản ánh trạng thái thoát của chính shell (ví dụ: ``/bin/sh``), trạng thái này có thể ánh xạ các tín hiệu thành những mã như ``128+N``. Xem tài liệu của shell (chẳng hạn như mục Exit Status trong hướng dẫn sử dụng Bash) để biết chi tiết.
 
 
-Windows Popen Helpers
----------------------
+Các trình trợ giúp Popen trên Windows
+-------------------------------------
 
-The :class:`STARTUPINFO` class and following constants are only available
-on Windows.
+Lớp :class:`STARTUPINFO` và các hằng số sau chỉ khả dụng trên Windows.
 
 .. class:: STARTUPINFO(*, dwFlags=0, hStdInput=None, hStdOutput=None, \
                        hStdError=None, wShowWindow=0, lpAttributeList=None)
 
-   Partial support of the Windows
-   `STARTUPINFO <https://msdn.microsoft.com/en-us/library/ms686331(v=vs.85).aspx>`__
-   structure is used for :class:`Popen` creation.  The following attributes can
-   be set by passing them as keyword-only arguments.
+   Một phần hỗ trợ cho cấu trúc `STARTUPINFO <https://msdn.microsoft.com/en-us/library/ms686331(v=vs.85).aspx>`__ của Windows được sử dụng để tạo :class:`Popen`. Có thể thiết lập các thuộc tính sau bằng cách truyền chúng dưới dạng đối số chỉ dùng từ khóa.
 
    .. versionchanged:: 3.7
-      Keyword-only argument support was added.
+      Đã bổ sung hỗ trợ cho các đối số chỉ dùng từ khóa.
 
    .. attribute:: dwFlags
 
-      A bit field that determines whether certain :class:`STARTUPINFO`
-      attributes are used when the process creates a window. ::
+      Một trường bit xác định liệu một số thuộc tính :class:`STARTUPINFO` nhất định có được sử dụng khi tiến trình tạo một cửa sổ hay không.::
 
          si = subprocess.STARTUPINFO()
          si.dwFlags = subprocess.STARTF_USESTDHANDLES | subprocess.STARTF_USESHOWWINDOW
 
    .. attribute:: hStdInput
 
-      If :attr:`dwFlags` specifies :data:`STARTF_USESTDHANDLES`, this attribute
-      is the standard input handle for the process. If
-      :data:`STARTF_USESTDHANDLES` is not specified, the default for standard
-      input is the keyboard buffer.
+      Nếu :attr:`dwFlags` chỉ định :data:`STARTF_USESTDHANDLES`, thuộc tính này là handle đầu vào chuẩn của tiến trình. Nếu
+      :data:`STARTF_USESTDHANDLES` không được chỉ định, mặc định cho đầu vào chuẩn là bộ đệm bàn phím.
 
    .. attribute:: hStdOutput
 
-      If :attr:`dwFlags` specifies :data:`STARTF_USESTDHANDLES`, this attribute
-      is the standard output handle for the process. Otherwise, this attribute
-      is ignored and the default for standard output is the console window's
-      buffer.
+      Nếu :attr:`dwFlags` chỉ định :data:`STARTF_USESTDHANDLES`, thuộc tính này là handle đầu ra chuẩn của tiến trình. Nếu không, thuộc tính này bị bỏ qua và mặc định cho đầu ra chuẩn là bộ đệm của cửa sổ console.
 
    .. attribute:: hStdError
 
-      If :attr:`dwFlags` specifies :data:`STARTF_USESTDHANDLES`, this attribute
-      is the standard error handle for the process. Otherwise, this attribute is
-      ignored and the default for standard error is the console window's buffer.
+      Nếu :attr:`dwFlags` chỉ định :data:`STARTF_USESTDHANDLES`, thuộc tính này là handle lỗi chuẩn của tiến trình. Nếu không, thuộc tính này bị bỏ qua và mặc định cho lỗi chuẩn là bộ đệm của cửa sổ console.
 
    .. attribute:: wShowWindow
 
-      If :attr:`dwFlags` specifies :data:`STARTF_USESHOWWINDOW`, this attribute
-      can be any of the values that can be specified in the ``nCmdShow``
-      parameter for the
-      `ShowWindow <https://msdn.microsoft.com/en-us/library/ms633548(v=vs.85).aspx>`__
-      function, except for ``SW_SHOWDEFAULT``. Otherwise, this attribute is
-      ignored.
+      Nếu :attr:`dwFlags` chỉ định :data:`STARTF_USESHOWWINDOW`, thuộc tính này có thể là bất kỳ giá trị nào có thể được chỉ định trong tham số ``nCmdShow`` cho hàm `ShowWindow <https://msdn.microsoft.com/en-us/library/ms633548(v=vs.85).aspx>`__, ngoại trừ ``SW_SHOWDEFAULT``. Nếu không, thuộc tính này bị bỏ qua.
 
-      :data:`SW_HIDE` is provided for this attribute. It is used when
-      :class:`Popen` is called with ``shell=True``.
+      :data:`SW_HIDE` được cung cấp cho thuộc tính này. Nó được sử dụng khi
+      :class:`Popen` được gọi với ``shell=True``.
 
    .. attribute:: lpAttributeList
 
-      A dictionary of additional attributes for process creation as given in
-      ``STARTUPINFOEX``, see
-      `UpdateProcThreadAttribute <https://msdn.microsoft.com/en-us/library/windows/desktop/ms686880(v=vs.85).aspx>`__.
+      Một dictionary gồm các thuộc tính bổ sung để tạo process như được cung cấp trong ``STARTUPINFOEX``, xem `UpdateProcThreadAttribute <https://msdn.microsoft.com/en-us/library/windows/desktop/ms686880(v=vs.85).aspx>`__.
 
-      Supported attributes:
+      Các thuộc tính được hỗ trợ:
 
       **handle_list**
-         Sequence of handles that will be inherited. *close_fds* must be true if
-         non-empty.
+         Chuỗi các handle sẽ được kế thừa. *close_fds* phải là true nếu chuỗi không rỗng.
 
-         The handles must be temporarily made inheritable by
-         :func:`os.set_handle_inheritable` when passed to the :class:`Popen`
-         constructor, else :class:`OSError` will be raised with Windows error
-         ``ERROR_INVALID_PARAMETER`` (87).
+         Các handle phải tạm thời được đặt ở trạng thái có thể kế thừa bằng
+         :func:`os.set_handle_inheritable` khi được truyền vào constructor :class:`Popen`, nếu không :class:`OSError` sẽ được raise với lỗi Windows ``ERROR_INVALID_PARAMETER`` (87).
 
          .. warning::
 
-            In a multithreaded process, use caution to avoid leaking handles
-            that are marked inheritable when combining this feature with
-            concurrent calls to other process creation functions that inherit
-            all handles such as :func:`os.system`.  This also applies to
-            standard handle redirection, which temporarily creates inheritable
-            handles.
+            Trong một tiến trình đa luồng, hãy thận trọng để tránh làm rò rỉ các handle được đánh dấu là có thể kế thừa khi kết hợp tính năng này với các lệnh gọi đồng thời đến những hàm tạo tiến trình khác kế thừa tất cả handle, chẳng hạn như :func:`os.system`. Điều này cũng áp dụng cho việc chuyển hướng handle chuẩn, vốn tạm thời tạo ra các handle có thể kế thừa.
 
       .. versionadded:: 3.7
 
-Windows Constants
-^^^^^^^^^^^^^^^^^
+Hằng số Windows
+^^^^^^^^^^^^^^^
 
-The :mod:`!subprocess` module exposes the following constants.
+Mô-đun :mod:`!subprocess` cung cấp các hằng số sau.
 
 .. data:: STD_INPUT_HANDLE
 
-   The standard input device. Initially, this is the console input buffer,
-   ``CONIN$``.
+   Thiết bị đầu vào chuẩn. Ban đầu, đây là bộ đệm đầu vào của console, ``CONIN$``.
 
 .. data:: STD_OUTPUT_HANDLE
 
-   The standard output device. Initially, this is the active console screen
-   buffer, ``CONOUT$``.
+   Thiết bị đầu ra chuẩn. Ban đầu, đây là bộ đệm màn hình console đang hoạt động, ``CONOUT$``.
 
 .. data:: STD_ERROR_HANDLE
 
-   The standard error device. Initially, this is the active console screen
-   buffer, ``CONOUT$``.
+   Thiết bị lỗi chuẩn. Ban đầu, đây là bộ đệm màn hình console đang hoạt động, ``CONOUT$``.
 
 .. data:: SW_HIDE
 
-   Hides the window. Another window will be activated.
+   Ẩn cửa sổ. Một cửa sổ khác sẽ được kích hoạt.
 
 .. data:: STARTF_USESTDHANDLES
 
-   Specifies that the :attr:`STARTUPINFO.hStdInput`,
-   :attr:`STARTUPINFO.hStdOutput`, and :attr:`STARTUPINFO.hStdError` attributes
-   contain additional information.
+   Chỉ định rằng :attr:`STARTUPINFO.hStdInput`,
+   :attr:`STARTUPINFO.hStdOutput`, và các thuộc tính :attr:`STARTUPINFO.hStdError` chứa thông tin bổ sung.
 
 .. data:: STARTF_USESHOWWINDOW
 
-   Specifies that the :attr:`STARTUPINFO.wShowWindow` attribute contains
-   additional information.
+   Chỉ định rằng thuộc tính :attr:`STARTUPINFO.wShowWindow` chứa thông tin bổ sung.
 
 .. data:: STARTF_FORCEONFEEDBACK
 
-   A :attr:`STARTUPINFO.dwFlags` parameter to specify that the
-   *Working in Background* mouse cursor will be displayed while a
-   process is launching. This is the default behavior for GUI
-   processes.
+   Một tham số :attr:`STARTUPINFO.dwFlags` để chỉ định rằng con trỏ chuột *Working in Background* sẽ được hiển thị trong khi một tiến trình đang khởi chạy. Đây là hành vi mặc định đối với các tiến trình GUI.
 
    .. versionadded:: 3.13
 
 .. data:: STARTF_FORCEOFFFEEDBACK
 
-   A :attr:`STARTUPINFO.dwFlags` parameter to specify that the mouse
-   cursor will not be changed when launching a process.
+   Một tham số :attr:`STARTUPINFO.dwFlags` để chỉ định rằng con trỏ chuột sẽ không thay đổi khi khởi chạy một tiến trình.
 
    .. versionadded:: 3.13
 
 .. data:: CREATE_NEW_CONSOLE
 
-   The new process has a new console, instead of inheriting its parent's
-   console (the default).
+   Tiến trình mới có một console mới, thay vì kế thừa console của tiến trình cha (mặc định).
 
 .. data:: CREATE_NEW_PROCESS_GROUP
 
-   A :class:`Popen` ``creationflags`` parameter to specify that a new process
-   group will be created. This flag is necessary for using :func:`os.kill`
-   on the subprocess.
+   Một tham số :class:`Popen` ``creationflags`` để chỉ định rằng một nhóm tiến trình mới sẽ được tạo. Cờ này cần thiết để sử dụng :func:`os.kill` trên subprocess.
 
-   This flag is ignored if :data:`CREATE_NEW_CONSOLE` is specified.
+   Cờ này bị bỏ qua nếu :data:`CREATE_NEW_CONSOLE` được chỉ định.
 
 .. data:: ABOVE_NORMAL_PRIORITY_CLASS
 
-   A :class:`Popen` ``creationflags`` parameter to specify that a new process
-   will have an above average priority.
+   Tham số :class:`Popen` ``creationflags`` để chỉ định rằng một tiến trình mới sẽ có mức độ ưu tiên cao hơn mức trung bình.
 
    .. versionadded:: 3.7
 
 .. data:: BELOW_NORMAL_PRIORITY_CLASS
 
-   A :class:`Popen` ``creationflags`` parameter to specify that a new process
-   will have a below average priority.
+   Tham số :class:`Popen` ``creationflags`` để chỉ định rằng một tiến trình mới sẽ có mức độ ưu tiên thấp hơn mức trung bình.
 
    .. versionadded:: 3.7
 
 .. data:: HIGH_PRIORITY_CLASS
 
-   A :class:`Popen` ``creationflags`` parameter to specify that a new process
-   will have a high priority.
+   Tham số :class:`Popen` ``creationflags`` để chỉ định rằng một tiến trình mới sẽ có mức độ ưu tiên cao.
 
    .. versionadded:: 3.7
 
 .. data:: IDLE_PRIORITY_CLASS
 
-   A :class:`Popen` ``creationflags`` parameter to specify that a new process
-   will have an idle (lowest) priority.
+   Tham số :class:`Popen` ``creationflags`` để chỉ định rằng một tiến trình mới sẽ có mức độ ưu tiên nhàn rỗi (thấp nhất).
 
    .. versionadded:: 3.7
 
 .. data:: NORMAL_PRIORITY_CLASS
 
-   A :class:`Popen` ``creationflags`` parameter to specify that a new process
-   will have a normal priority. (default)
+   Tham số :class:`Popen` ``creationflags`` để chỉ định rằng một tiến trình mới sẽ có mức độ ưu tiên bình thường. (mặc định)
 
    .. versionadded:: 3.7
 
 .. data:: REALTIME_PRIORITY_CLASS
 
-   A :class:`Popen` ``creationflags`` parameter to specify that a new process
-   will have realtime priority.
-   You should almost never use REALTIME_PRIORITY_CLASS, because this interrupts
-   system threads that manage mouse input, keyboard input, and background disk
-   flushing. This class can be appropriate for applications that "talk" directly
-   to hardware or that perform brief tasks that should have limited interruptions.
+   Tham số :class:`Popen` ``creationflags`` để chỉ định rằng một tiến trình mới sẽ có mức độ ưu tiên realtime. Bạn hầu như không bao giờ nên sử dụng REALTIME_PRIORITY_CLASS, vì điều này làm gián đoạn các system thread quản lý thao tác nhập từ chuột, thao tác nhập từ bàn phím và việc flush đĩa trong nền. Class này có thể phù hợp với các ứng dụng "giao tiếp" trực tiếp với phần cứng hoặc thực hiện các tác vụ ngắn cần bị gián đoạn ở mức tối thiểu.
 
    .. versionadded:: 3.7
 
 .. data:: CREATE_NO_WINDOW
 
-   A :class:`Popen` ``creationflags`` parameter to specify that a new process
-   will not create a window.
+   Một tham số :class:`Popen` ``creationflags`` để chỉ định rằng một process mới sẽ không tạo cửa sổ.
 
    .. versionadded:: 3.7
 
 .. data:: DETACHED_PROCESS
 
-   A :class:`Popen` ``creationflags`` parameter to specify that a new process
-   will not inherit its parent's console.
-   This value cannot be used with CREATE_NEW_CONSOLE.
+   Một tham số :class:`Popen` ``creationflags`` để chỉ định rằng một process mới sẽ không kế thừa console của process cha. Không thể sử dụng giá trị này cùng với CREATE_NEW_CONSOLE.
 
    .. versionadded:: 3.7
 
 .. data:: CREATE_DEFAULT_ERROR_MODE
 
-   A :class:`Popen` ``creationflags`` parameter to specify that a new process
-   does not inherit the error mode of the calling process. Instead, the new
-   process gets the default error mode.
-   This feature is particularly useful for multithreaded shell applications
-   that run with hard errors disabled.
+   Một tham số :class:`Popen` ``creationflags`` để chỉ định rằng một process mới không kế thừa error mode của process gọi. Thay vào đó, process mới sẽ nhận error mode mặc định. Tính năng này đặc biệt hữu ích cho các ứng dụng shell đa luồng chạy khi hard errors bị vô hiệu hóa.
 
    .. versionadded:: 3.7
 
 .. data:: CREATE_BREAKAWAY_FROM_JOB
 
-   A :class:`Popen` ``creationflags`` parameter to specify that a new process
-   is not associated with the job.
+   Một tham số :class:`Popen` ``creationflags`` để chỉ định rằng một process mới không được liên kết với job.
 
    .. versionadded:: 3.7
 
 .. _call-function-trio:
 
-Older high-level API
---------------------
+API cấp cao cũ
+--------------
 
-Prior to Python 3.5, these three functions comprised the high level API to
-subprocess. You can now use :func:`run` in many cases, but lots of existing code
-calls these functions.
+Trước Python 3.5, ba hàm này cấu thành API cấp cao cho subprocess. Hiện nay, trong nhiều trường hợp, bạn có thể sử dụng :func:`run`, nhưng rất nhiều mã hiện có vẫn gọi các hàm này.
 
 .. function:: call(args, *, stdin=None, stdout=None, stderr=None, \
-                   shell=False, cwd=None, timeout=None, **other_popen_kwargs)
+                   shell=False, cwd=None, timeout=None, ****other_popen_kwargs)
 
-   Run the command described by *args*.  Wait for command to complete, then
-   return the :attr:`~Popen.returncode` attribute.
+   Chạy lệnh được mô tả bởi *args*. Chờ lệnh hoàn tất, sau đó trả về thuộc tính :attr:`~Popen.returncode`.
 
-   Code needing to capture stdout or stderr should use :func:`run` instead::
+   Mã cần thu thập stdout hoặc stderr nên sử dụng :func:`run` thay thế::
 
        run(...).returncode
 
-   To suppress stdout or stderr, supply a value of :data:`DEVNULL`.
+   Để loại bỏ stdout hoặc stderr, hãy cung cấp giá trị :data:`DEVNULL`.
 
-   The arguments shown above are merely some common ones.
-   The full function signature is the
-   same as that of the :class:`Popen` constructor - this function passes all
-   supplied arguments other than *timeout* directly through to that interface.
+   Các đối số được trình bày ở trên chỉ là một số đối số thường dùng. Chữ ký hàm đầy đủ giống với chữ ký của hàm khởi tạo :class:`Popen` - hàm này truyền trực tiếp tất cả đối số được cung cấp, ngoại trừ *timeout*, đến interface đó.
 
    .. note::
 
-      Do not use ``stdout=PIPE`` or ``stderr=PIPE`` with this
-      function.  The child process will block if it generates enough
-      output to a pipe to fill up the OS pipe buffer as the pipes are
-      not being read from.
+      Không sử dụng ``stdout=PIPE`` hoặc ``stderr=PIPE`` với hàm này. Tiến trình con sẽ bị chặn nếu tạo đủ đầu ra vào một pipe để lấp đầy bộ đệm pipe của hệ điều hành, vì các pipe không được đọc.
 
    .. versionchanged:: 3.3
-      *timeout* was added.
+      Đã thêm *timeout*.
 
    .. versionchanged:: 3.12
 
-      Changed Windows shell search order for ``shell=True``. The current
-      directory and ``%PATH%`` are replaced with ``%COMSPEC%`` and
-      ``%SystemRoot%\System32\cmd.exe``. As a result, dropping a
-      malicious program named ``cmd.exe`` into a current directory no
-      longer works.
+      Đã thay đổi thứ tự tìm kiếm shell của Windows cho ``shell=True``. Thư mục hiện tại và ``%PATH%`` được thay thế bằng ``%COMSPEC%`` và ``%SystemRoot%\System32\cmd.exe``. Do đó, việc đặt một chương trình độc hại có tên ``cmd.exe`` vào thư mục hiện tại sẽ không còn hiệu quả.
 
 .. function:: check_call(args, *, stdin=None, stdout=None, stderr=None, \
-                         shell=False, cwd=None, timeout=None, \
-                         **other_popen_kwargs)
+                         shell=False, cwd=None, timeout=None, \ ****other_popen_kwargs)
 
-   Run command with arguments.  Wait for command to complete. If the return
-   code was zero then return, otherwise raise :exc:`CalledProcessError`. The
-   :exc:`CalledProcessError` object will have the return code in the
-   :attr:`~CalledProcessError.returncode` attribute.
-   If :func:`check_call` was unable to start the process it will propagate the exception
-   that was raised.
+   Chạy lệnh với các đối số. Chờ lệnh hoàn tất. Nếu mã trả về bằng không thì trả về, nếu không thì raise :exc:`CalledProcessError`. Phương thức
+   :exc:`CalledProcessError` sẽ có mã trả về trong thuộc tính
+   :attr:`~CalledProcessError.returncode`. Nếu :func:`check_call` không thể khởi động tiến trình, nó sẽ truyền tiếp ngoại lệ đã được raised.
 
-   Code needing to capture stdout or stderr should use :func:`run` instead::
+   Mã cần thu thập stdout hoặc stderr nên sử dụng :func:`run` thay thế::
 
        run(..., check=True)
 
-   To suppress stdout or stderr, supply a value of :data:`DEVNULL`.
+   Để loại bỏ stdout hoặc stderr, hãy cung cấp giá trị :data:`DEVNULL`.
 
-   The arguments shown above are merely some common ones.
-   The full function signature is the
-   same as that of the :class:`Popen` constructor - this function passes all
-   supplied arguments other than *timeout* directly through to that interface.
+   Các đối số được trình bày ở trên chỉ là một số đối số thường dùng. Chữ ký hàm đầy đủ giống với chữ ký của hàm khởi tạo :class:`Popen` - hàm này truyền trực tiếp tất cả đối số được cung cấp, ngoại trừ *timeout*, đến interface đó.
 
    .. note::
 
-      Do not use ``stdout=PIPE`` or ``stderr=PIPE`` with this
-      function.  The child process will block if it generates enough
-      output to a pipe to fill up the OS pipe buffer as the pipes are
-      not being read from.
+      Không sử dụng ``stdout=PIPE`` hoặc ``stderr=PIPE`` với hàm này. Tiến trình con sẽ bị chặn nếu tạo đủ đầu ra vào một pipe để lấp đầy bộ đệm pipe của hệ điều hành, vì các pipe không được đọc.
 
    .. versionchanged:: 3.3
-      *timeout* was added.
+      Đã thêm *timeout*.
 
    .. versionchanged:: 3.12
 
-      Changed Windows shell search order for ``shell=True``. The current
-      directory and ``%PATH%`` are replaced with ``%COMSPEC%`` and
-      ``%SystemRoot%\System32\cmd.exe``. As a result, dropping a
-      malicious program named ``cmd.exe`` into a current directory no
-      longer works.
+      Đã thay đổi thứ tự tìm kiếm shell của Windows cho ``shell=True``. Thư mục hiện tại và ``%PATH%`` được thay thế bằng ``%COMSPEC%`` và ``%SystemRoot%\System32\cmd.exe``. Do đó, việc đặt một chương trình độc hại có tên ``cmd.exe`` vào thư mục hiện tại sẽ không còn hiệu quả.
 
 
 .. function:: check_output(args, *, stdin=None, stderr=None, shell=False, \
-                           cwd=None, encoding=None, errors=None, \
-                           universal_newlines=None, timeout=None, text=None, \
-                           **other_popen_kwargs)
+                           cwd=None, encoding=None, errors=None, \ universal_newlines=None, timeout=None, text=None, \ ****other_popen_kwargs)
 
-   Run command with arguments and return its output.
+   Chạy lệnh với các đối số và trả về đầu ra của lệnh.
 
-   If the return code was non-zero it raises a :exc:`CalledProcessError`. The
-   :exc:`CalledProcessError` object will have the return code in the
-   :attr:`~CalledProcessError.returncode` attribute and any output in the
-   :attr:`~CalledProcessError.output` attribute.
+   Nếu mã trả về khác 0, hàm sẽ raise một :exc:`CalledProcessError`.
+   :exc:`CalledProcessError` sẽ có mã trả về trong thuộc tính
+   thuộc tính :attr:`~CalledProcessError.returncode` và mọi đầu ra trong
+   thuộc tính :attr:`~CalledProcessError.output`.
 
-   This is equivalent to::
+   Điều này tương đương với::
 
        run(..., check=True, stdout=PIPE).stdout
 
-   The arguments shown above are merely some common ones.
-   The full function signature is largely the same as that of :func:`run` -
-   most arguments are passed directly through to that interface.
-   One API deviation from :func:`run` behavior exists: passing ``input=None``
-   will behave the same as ``input=b''`` (or ``input=''``, depending on other
-   arguments) rather than using the parent's standard input file handle.
+   Các đối số được trình bày ở trên chỉ là một số đối số thường dùng. Chữ ký đầy đủ của hàm phần lớn giống với chữ ký của :func:`run` - hầu hết các đối số được truyền trực tiếp đến giao diện đó. Có một điểm khác biệt về API so với hành vi của :func:`run`: truyền ``input=None`` sẽ hoạt động giống như ``input=b''`` (hoặc ``input=''``, tùy thuộc vào các đối số khác) thay vì sử dụng handle tệp đầu vào tiêu chuẩn của tiến trình cha.
 
-   By default, this function will return the data as encoded bytes. The actual
-   encoding of the output data may depend on the command being invoked, so the
-   decoding to text will often need to be handled at the application level.
+   Theo mặc định, hàm này sẽ trả về dữ liệu dưới dạng các byte đã mã hóa. Kiểu mã hóa thực tế của dữ liệu đầu ra có thể phụ thuộc vào lệnh được gọi, vì vậy việc giải mã thành văn bản thường cần được xử lý ở cấp ứng dụng.
 
-   This behaviour may be overridden by setting *text*, *encoding*, *errors*,
-   or *universal_newlines* to ``True`` as described in
-   :ref:`frequently-used-arguments` and :func:`run`.
+   Có thể ghi đè hành vi này bằng cách đặt *text*, *encoding*, *errors*, hoặc *universal_newlines* thành ``True`` như được mô tả trong
+   :ref:`frequently-used-arguments` và :func:`run`.
 
-   To also capture standard error in the result, use
-   ``stderr=subprocess.STDOUT``::
+   Để cũng thu thập standard error trong kết quả, hãy sử dụng ``stderr=subprocess.STDOUT``::
 
       >>> subprocess.check_output(
       ...     "ls non_existent_file; exit 0",
@@ -1319,108 +904,96 @@ calls these functions.
    .. versionadded:: 3.1
 
    .. versionchanged:: 3.3
-      *timeout* was added.
+      Đã thêm *timeout*.
 
    .. versionchanged:: 3.4
-      Support for the *input* keyword argument was added.
+      Đã bổ sung hỗ trợ cho đối số từ khóa *input*.
 
    .. versionchanged:: 3.6
-      *encoding* and *errors* were added.  See :func:`run` for details.
+      Đã bổ sung *encoding* và *errors*. Xem :func:`run` để biết chi tiết.
 
    .. versionadded:: 3.7
-      *text* was added as a more readable alias for *universal_newlines*.
+      *text* được bổ sung dưới dạng bí danh dễ đọc hơn cho *universal_newlines*.
 
    .. versionchanged:: 3.12
 
-      Changed Windows shell search order for ``shell=True``. The current
-      directory and ``%PATH%`` are replaced with ``%COMSPEC%`` and
-      ``%SystemRoot%\System32\cmd.exe``. As a result, dropping a
-      malicious program named ``cmd.exe`` into a current directory no
-      longer works.
+      Đã thay đổi thứ tự tìm kiếm shell của Windows cho ``shell=True``. Thư mục hiện tại và ``%PATH%`` được thay thế bằng ``%COMSPEC%`` và ``%SystemRoot%\System32\cmd.exe``. Do đó, việc đặt một chương trình độc hại có tên ``cmd.exe`` vào thư mục hiện tại sẽ không còn hiệu quả.
 
 
 .. _subprocess-replacements:
 
-Replacing Older Functions with the :mod:`!subprocess` Module
-------------------------------------------------------------
+Thay thế các hàm cũ bằng mô-đun :mod:`!subprocess`
+--------------------------------------------------
 
-In this section, "a becomes b" means that b can be used as a replacement for a.
+Trong phần này, "a trở thành b" có nghĩa là có thể dùng b để thay thế cho a.
 
 .. note::
 
-   All "a" functions in this section fail (more or less) silently if the
-   executed program cannot be found; the "b" replacements raise :exc:`OSError`
-   instead.
+   Tất cả các hàm "a" trong phần này đều (ít nhiều) âm thầm thất bại nếu không tìm thấy chương trình được thực thi; thay vào đó, các hàm "b" sẽ raise :exc:`OSError`.
 
-   In addition, the replacements using :func:`check_output` will fail with a
-   :exc:`CalledProcessError` if the requested operation produces a non-zero
-   return code. The output is still available as the
-   :attr:`~CalledProcessError.output` attribute of the raised exception.
+   Ngoài ra, các hàm thay thế sử dụng :func:`check_output` sẽ thất bại với một
+   :exc:`CalledProcessError` nếu thao tác được yêu cầu tạo ra mã trả về khác không. Kết quả vẫn có sẵn dưới dạng thuộc tính
+   :attr:`~CalledProcessError.output` của exception được raise.
 
-In the following examples, we assume that the relevant functions have already
-been imported from the :mod:`!subprocess` module.
+Trong các ví dụ sau, giả sử rằng các hàm liên quan đã được import từ module :mod:`!subprocess`.
 
 
-Replacing :program:`/bin/sh` shell command substitution
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Thay thế việc thay thế lệnh shell :program:`/bin/sh`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
    output=$(mycmd myarg)
 
-becomes::
+trở thành::
 
    output = check_output(["mycmd", "myarg"])
 
-Replacing shell pipeline
-^^^^^^^^^^^^^^^^^^^^^^^^
+Thay thế pipeline của shell
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
    output=$(dmesg | grep hda)
 
-becomes::
+trở thành::
 
    p1 = Popen(["dmesg"], stdout=PIPE)
    p2 = Popen(["grep", "hda"], stdin=p1.stdout, stdout=PIPE)
-   p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
+   p1.stdout.close()  # Cho phép p1 nhận SIGPIPE nếu p2 thoát.
    output = p2.communicate()[0]
 
-The ``p1.stdout.close()`` call after starting the p2 is important in order for
-p1 to receive a SIGPIPE if p2 exits before p1.
+Lệnh gọi ``p1.stdout.close()`` sau khi khởi động p2 rất quan trọng để p1 nhận SIGPIPE nếu p2 thoát trước p1.
 
-Alternatively, for trusted input, the shell's own pipeline support may still
-be used directly:
+Ngoài ra, với đầu vào đáng tin cậy, bạn vẫn có thể sử dụng trực tiếp tính năng pipeline của shell:
 
 .. code-block:: bash
 
    output=$(dmesg | grep hda)
 
-becomes::
+trở thành::
 
    output = check_output("dmesg | grep hda", shell=True)
 
 
-Replacing :func:`os.system`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Thay thế :func:`os.system`
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
    sts = os.system("mycmd" + " myarg")
-   # becomes
+   # trở thành
    retcode = call("mycmd" + " myarg", shell=True)
 
-Notes:
+Lưu ý:
 
-* Calling the program through the shell is usually not required.
-* The :func:`call` return value is encoded differently to that of
+* Thông thường không cần gọi chương trình thông qua shell.
+* Giá trị trả về của :func:`call` được mã hóa khác với giá trị của
   :func:`os.system`.
 
-* The :func:`os.system` function ignores SIGINT and SIGQUIT signals while
-  the command is running, but the caller must do this separately when
-  using the :mod:`!subprocess` module.
+* Hàm :func:`os.system` bỏ qua các tín hiệu SIGINT và SIGQUIT trong khi lệnh đang chạy, nhưng người gọi phải tự thực hiện điều này khi sử dụng module :mod:`!subprocess`.
 
-A more realistic example would look like this::
+Một ví dụ thực tế hơn sẽ trông như sau::
 
    try:
        retcode = call("mycmd" + " myarg", shell=True)
@@ -1432,28 +1005,28 @@ A more realistic example would look like this::
        print("Execution failed:", e, file=sys.stderr)
 
 
-Replacing the :func:`os.spawn <os.spawnl>` family
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Thay thế họ :func:`os.spawn <os.spawnl>`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-P_NOWAIT example::
+Ví dụ về P_NOWAIT::
 
    pid = os.spawnlp(os.P_NOWAIT, "/bin/mycmd", "mycmd", "myarg")
    ==>
    pid = Popen(["/bin/mycmd", "myarg"]).pid
 
-P_WAIT example::
+Ví dụ về P_WAIT::
 
    retcode = os.spawnlp(os.P_WAIT, "/bin/mycmd", "mycmd", "myarg")
    ==>
    retcode = call(["/bin/mycmd", "myarg"])
 
-Vector example::
+Ví dụ về vector::
 
    os.spawnvp(os.P_NOWAIT, path, args)
    ==>
    Popen([path] + args[1:])
 
-Environment example::
+Ví dụ về môi trường::
 
    os.spawnlpe(os.P_NOWAIT, "/bin/mycmd", "mycmd", "myarg", env)
    ==>
@@ -1461,10 +1034,10 @@ Environment example::
 
 
 
-Replacing :func:`os.popen`
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Thay thế :func:`os.popen`
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Return code handling translates as follows::
+Xử lý mã trả về được chuyển đổi như sau::
 
    pipe = os.popen(cmd, 'w')
    ...
@@ -1479,26 +1052,18 @@ Return code handling translates as follows::
        print("There were some errors")
 
 
-Legacy Shell Invocation Functions
----------------------------------
+Các hàm gọi Shell kế thừa
+-------------------------
 
-This module also provides the following legacy functions from the 2.x
-``commands`` module. These operations implicitly invoke the system shell and
-none of the guarantees described above regarding security and exception
-handling consistency are valid for these functions.
+Mô-đun này cũng cung cấp các hàm kế thừa sau đây từ mô-đun ``commands`` phiên bản 2.x. Các thao tác này ngầm gọi system shell, vì vậy không có bảo đảm nào được mô tả ở trên về tính bảo mật và tính nhất quán trong xử lý ngoại lệ áp dụng cho các hàm này.
 
 .. function:: getstatusoutput(cmd, *, encoding=None, errors=None)
 
-   Return ``(exitcode, output)`` of executing *cmd* in a shell.
+   Trả về ``(exitcode, output)`` của việc thực thi *cmd* trong shell.
 
-   Execute the string *cmd* in a shell with :func:`check_output` and
-   return a 2-tuple ``(exitcode, output)``.
-   *encoding* and *errors* are used to decode output;
-   see the notes on :ref:`frequently-used-arguments` for more details.
+   Thực thi chuỗi *cmd* trong shell với :func:`check_output` và trả về một tuple 2 phần tử ``(exitcode, output)``. *encoding* và *errors* được dùng để giải mã đầu ra; xem các ghi chú về :ref:`frequently-used-arguments` để biết thêm chi tiết.
 
-   A trailing newline is stripped from the output.
-   The exit code for the command can be interpreted as the return code
-   of subprocess.  Example::
+   Ký tự xuống dòng ở cuối được loại bỏ khỏi đầu ra. Mã thoát của lệnh có thể được diễn giải là mã trả về của subprocess.  Ví dụ::
 
       >>> subprocess.getstatusoutput('ls /bin/ls')
       (0, '/bin/ls')
@@ -1512,21 +1077,19 @@ handling consistency are valid for these functions.
    .. availability:: Unix, Windows.
 
    .. versionchanged:: 3.3.4
-      Windows support was added.
+      Đã bổ sung hỗ trợ Windows.
 
-      The function now returns (exitcode, output) instead of (status, output)
-      as it did in Python 3.3.3 and earlier.  exitcode has the same value as
+      Hàm hiện trả về (exitcode, output) thay vì (status, output) như trong Python 3.3.3 và các phiên bản cũ hơn.  exitcode có cùng giá trị với
       :attr:`~Popen.returncode`.
 
    .. versionchanged:: 3.11
-      Added the *encoding* and *errors* parameters.
+      Đã thêm các tham số *encoding* và *errors*.
 
 .. function:: getoutput(cmd, *, encoding=None, errors=None)
 
-   Return output (stdout and stderr) of executing *cmd* in a shell.
+   Trả về đầu ra (stdout và stderr) của việc thực thi *cmd* trong shell.
 
-   Like :func:`getstatusoutput`, except the exit code is ignored and the return
-   value is a string containing the command's output.  Example::
+   Tương tự như :func:`getstatusoutput`, ngoại trừ mã thoát bị bỏ qua và giá trị trả về là một chuỗi chứa đầu ra của lệnh. Ví dụ::
 
       >>> subprocess.getoutput('ls /bin/ls')
       '/bin/ls'
@@ -1534,89 +1097,66 @@ handling consistency are valid for these functions.
    .. availability:: Unix, Windows.
 
    .. versionchanged:: 3.3.4
-      Windows support added
+      Đã thêm hỗ trợ Windows
 
    .. versionchanged:: 3.11
-      Added the *encoding* and *errors* parameters.
+      Đã thêm các tham số *encoding* và *errors*.
 
 
-Notes
------
+Ghi chú
+-------
 
 .. _subprocess-timeout-behavior:
 
-Timeout Behavior
-^^^^^^^^^^^^^^^^
+Hành vi khi hết thời gian chờ
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When using the ``timeout`` parameter in functions like :func:`run`,
-:meth:`Popen.wait`, or :meth:`Popen.communicate`,
-users should be aware of the following behaviors:
+Khi sử dụng tham số ``timeout`` trong các hàm như :func:`run`,
+:meth:`Popen.wait`, hoặc :meth:`Popen.communicate`, người dùng nên lưu ý các hành vi sau:
 
-1. **Process Creation Delay**: The initial process creation itself cannot be interrupted
-   on many platform APIs. This means that even when specifying a timeout, you are not
-   guaranteed to see a timeout exception until at least after however long process
-   creation takes.
+1. **Độ trễ khi tạo process**: Bản thân việc tạo process ban đầu không thể bị ngắt trên nhiều API nền tảng. Điều này có nghĩa là ngay cả khi chỉ định timeout, bạn cũng không được đảm bảo sẽ nhận được ngoại lệ timeout cho đến ít nhất là sau khoảng thời gian cần để tạo process.
 
-2. **Extremely Small Timeout Values**: Setting very small timeout values (such as a few
-   milliseconds) may result in almost immediate :exc:`TimeoutExpired` exceptions because
-   process creation and system scheduling inherently require time.
+2. **Giá trị timeout cực nhỏ**: Việc đặt giá trị timeout rất nhỏ (chẳng hạn vài mili giây) có thể dẫn đến các ngoại lệ :exc:`TimeoutExpired` gần như ngay lập tức, vì việc tạo process và lập lịch hệ thống vốn cần có thời gian.
 
 .. _converting-argument-sequence:
 
-Converting an argument sequence to a string on Windows
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Chuyển đổi chuỗi đối số thành một chuỗi trên Windows
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-On Windows, an *args* sequence is converted to a string that can be parsed
-using the following rules (which correspond to the rules used by the MS C
-runtime):
+Trên Windows, một chuỗi *args* được chuyển đổi thành một chuỗi có thể được phân tích theo các quy tắc sau (tương ứng với các quy tắc được MS C runtime sử dụng):
 
-1. Arguments are delimited by white space, which is either a
-   space or a tab.
+1. Các đối số được phân tách bằng khoảng trắng, có thể là dấu cách hoặc tab.
 
-2. A string surrounded by double quotation marks is
-   interpreted as a single argument, regardless of white space
-   contained within.  A quoted string can be embedded in an
-   argument.
+2. Một chuỗi được bao quanh bởi dấu ngoặc kép được hiểu là một đối số duy nhất, bất kể khoảng trắng bên trong chuỗi. Một chuỗi được đặt trong dấu ngoặc kép có thể được nhúng trong một đối số.
 
-3. A double quotation mark preceded by a backslash is
-   interpreted as a literal double quotation mark.
+3. Dấu ngoặc kép được đặt trước bởi dấu gạch chéo ngược được hiểu là một dấu ngoặc kép theo nghĩa đen.
 
-4. Backslashes are interpreted literally, unless they
-   immediately precede a double quotation mark.
+4. Các dấu gạch chéo ngược được hiểu theo nghĩa đen, trừ khi chúng đứng ngay trước một dấu ngoặc kép.
 
-5. If backslashes immediately precede a double quotation mark,
-   every pair of backslashes is interpreted as a literal
-   backslash.  If the number of backslashes is odd, the last
-   backslash escapes the next double quotation mark as
-   described in rule 3.
+5. Nếu các dấu gạch chéo ngược đứng ngay trước một dấu ngoặc kép, mỗi cặp dấu gạch chéo ngược được hiểu là một dấu gạch chéo ngược theo nghĩa đen. Nếu số lượng dấu gạch chéo ngược là số lẻ, dấu gạch chéo ngược cuối cùng sẽ escape dấu ngoặc kép tiếp theo như được mô tả trong quy tắc 3.
 
 
 .. seealso::
 
    :mod:`shlex`
-      Module which provides function to parse and escape command lines.
+      Module cung cấp các hàm để phân tích cú pháp và escape command line.
 
 
 .. _disable_posix_spawn:
 
-Disable use of ``posix_spawn()``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Tắt việc sử dụng ``posix_spawn()``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-On Linux, :mod:`!subprocess` defaults to using the ``vfork()`` system call
-internally when it is safe to do so rather than ``fork()``. This greatly
-improves performance.
+Trên Linux, :mod:`!subprocess` mặc định sử dụng nội bộ system call ``vfork()`` khi có thể thực hiện an toàn, thay vì ``fork()``. Điều này cải thiện đáng kể hiệu suất.
 
 ::
 
-   subprocess._USE_POSIX_SPAWN = False  # See CPython issue gh-NNNNNN.
+   subprocess._USE_POSIX_SPAWN = False  # Xem issue gh-NNNNNN của CPython.
 
-It is safe to set this to false on any Python version. It will have no
-effect on older or newer versions where unsupported. Do not assume the attribute
-is available to read. Despite the name, a true value does not indicate the
-corresponding function will be used, only that it may be.
+Bạn có thể an toàn đặt giá trị này thành false trên mọi phiên bản Python. Trên các phiên bản cũ hơn hoặc mới hơn, nơi thuộc tính này không được hỗ trợ, việc đặt giá trị sẽ không có tác dụng. Đừng mặc định rằng bạn có thể đọc thuộc tính này. Dù tên gọi là như vậy, giá trị true không cho biết hàm tương ứng sẽ được sử dụng, mà chỉ cho biết hàm đó có thể được sử dụng.
 
-Please file issues any time you have to use these private knobs with a way to
-reproduce the issue you were seeing. Link to that issue from a comment in your
-code.
+Vui lòng tạo issue mỗi khi bạn phải sử dụng các tùy chọn private này, đồng thời cung cấp cách tái hiện vấn đề đã gặp. Liên kết đến issue đó trong một comment trong mã của bạn.
 
 .. versionadded:: 3.8 ``_USE_POSIX_SPAWN``
+
+.. _`shell injection`: https://en.wikipedia.org/wiki/Shell_injection#Shell_injection

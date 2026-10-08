@@ -1,72 +1,53 @@
-:mod:`!getpass` --- Portable password input
-===========================================
+:mod:`!getpass` --- Nhập mật khẩu portable
+==========================================
 
 .. module:: getpass
-   :synopsis: Portable reading of passwords and retrieval of the userid.
+   :synopsis: Đọc mật khẩu portable và truy xuất userid.
 
 .. moduleauthor:: Piers Lauder <piers@cs.su.oz.au>
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 .. Windows (& Mac?) support by Guido van Rossum.
 
-**Source code:** :source:`Lib/getpass.py`
+**Mã nguồn:** :source:`Lib/getpass.py`
 
 --------------
 
 .. include:: ../includes/wasm-notavail.rst
 
-The :mod:`!getpass` module provides two functions:
+Module :mod:`!getpass` cung cấp hai hàm:
 
 .. function:: getpass(prompt='Password: ', stream=None, *, echo_char=None)
 
-   Prompt the user for a password without echoing.  The user is prompted using
-   the string *prompt*, which defaults to ``'Password: '``.  On Unix, the
-   prompt is written to the file-like object *stream* using the replace error
-   handler if needed.  *stream* defaults to the controlling terminal
-   (:file:`/dev/tty`) or if that is unavailable to ``sys.stderr`` (this
-   argument is ignored on Windows).
+   Nhắc người dùng nhập mật khẩu mà không hiển thị ký tự. Người dùng được nhắc bằng chuỗi *prompt*, mặc định là ``'Password: '``. Trên Unix, lời nhắc được ghi vào đối tượng giống tệp *stream* bằng trình xử lý lỗi replace nếu cần. *stream* mặc định là terminal điều khiển (:file:`/dev/tty`) hoặc nếu terminal đó không khả dụng thì là ``sys.stderr`` (đối số này bị bỏ qua trên Windows).
 
-   The *echo_char* argument controls how user input is displayed while typing.
-   If *echo_char* is ``None`` (default), input remains hidden. Otherwise,
-   *echo_char* must be a single printable ASCII character and each
-   typed character is replaced by it. For example, ``echo_char='*'`` will
-   display asterisks instead of the actual input.
+   Đối số *echo_char* kiểm soát cách hiển thị dữ liệu nhập của người dùng trong khi gõ. Nếu *echo_char* là ``None`` (mặc định), dữ liệu nhập vẫn được ẩn. Nếu không, *echo_char* phải là một ký tự ASCII có thể in duy nhất và mỗi ký tự được gõ sẽ được thay thế bằng ký tự đó. Ví dụ, ``echo_char='*'`` sẽ hiển thị các dấu hoa thị thay vì dữ liệu nhập thực tế.
 
-   If echo free input is unavailable getpass() falls back to printing
-   a warning message to *stream* and reading from ``sys.stdin`` and
-   issuing a :exc:`GetPassWarning`.
+   Nếu không thể nhập mà không hiển thị ký tự, getpass() sẽ chuyển sang in thông báo cảnh báo vào *stream*, đọc từ ``sys.stdin`` và phát ra một :exc:`GetPassWarning`.
 
    .. note::
-      If you call getpass from within IDLE, the input may be done in the
-      terminal you launched IDLE from rather than the idle window itself.
+      Nếu bạn gọi getpass từ bên trong IDLE, dữ liệu nhập có thể được thực hiện trong terminal nơi bạn đã khởi chạy IDLE thay vì trong chính cửa sổ IDLE.
 
    .. note::
-      On Unix systems, when *echo_char* is set, the terminal will be
-      configured to operate in
-      :manpage:`noncanonical mode <termios(3)#Canonical_and_noncanonical_mode>`.
-      In particular, this means that line editing shortcuts such as
-      :kbd:`Ctrl+U` will not work and may insert unexpected characters into
-      the input.
+      Trên các hệ thống Unix, khi *echo_char* được đặt, terminal sẽ được cấu hình để hoạt động ở
+      :manpage:`noncanonical mode <termios(3)#Canonical_and_noncanonical_mode>`. Cụ thể, điều này có nghĩa là các phím tắt chỉnh sửa dòng như
+      :kbd:`Ctrl+U` sẽ không hoạt động và có thể chèn các ký tự không mong muốn vào dữ liệu nhập.
 
    .. versionchanged:: 3.14
-      Added the *echo_char* parameter for keyboard feedback.
+      Đã thêm tham số *echo_char* để cung cấp phản hồi từ bàn phím.
 
 .. exception:: GetPassWarning
 
-   A :exc:`UserWarning` subclass issued when password input may be echoed.
+   Một :exc:`UserWarning` subclass được phát sinh khi dữ liệu nhập mật khẩu có thể được hiển thị lại.
 
 
 .. function:: getuser()
 
-   Return the "login name" of the user.
+   Trả về "tên đăng nhập" của người dùng.
 
-   This function checks the environment variables :envvar:`LOGNAME`,
-   :envvar:`USER`, :envvar:`!LNAME` and :envvar:`USERNAME`, in order, and
-   returns the value of the first one which is set to a non-empty string.  If
-   none are set, the login name from the password database is returned on
-   systems which support the :mod:`pwd` module, otherwise, an :exc:`OSError`
-   is raised.
+   Hàm này kiểm tra các biến môi trường :envvar:`LOGNAME`,
+   :envvar:`USER`, :envvar:`!LNAME` và :envvar:`USERNAME`, theo thứ tự, rồi trả về giá trị của biến đầu tiên được đặt thành một chuỗi không rỗng. Nếu không biến nào được đặt, tên đăng nhập từ cơ sở dữ liệu mật khẩu sẽ được trả về trên các hệ thống hỗ trợ mô-đun :mod:`pwd`; nếu không, một :exc:`OSError` sẽ được phát sinh.
 
-   In general, this function should be preferred over :func:`os.getlogin`.
+   Nhìn chung, nên ưu tiên sử dụng hàm này thay cho :func:`os.getlogin`.
 
    .. versionchanged:: 3.13
-      Previously, various exceptions beyond just :exc:`OSError` were raised.
+      Trước đây, nhiều exception khác ngoài :exc:`OSError` cũng được phát sinh.

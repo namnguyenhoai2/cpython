@@ -1,414 +1,289 @@
-:mod:`!xml.dom` --- The Document Object Model API
-=================================================
+:mod:`!xml.dom` --- API Mô hình Đối tượng Tài liệu
+==================================================
 
 .. module:: xml.dom
-   :synopsis: Document Object Model API for Python.
+   :synopsis: API Mô hình Đối tượng Tài liệu cho Python.
 
 .. sectionauthor:: Paul Prescod <paul@prescod.net>
 .. sectionauthor:: Martin v. Löwis <martin@v.loewis.de>
 
-**Source code:** :source:`Lib/xml/dom/__init__.py`
+**Mã nguồn:** :source:`Lib/xml/dom/__init__.py`
 
 --------------
 
-The Document Object Model, or "DOM," is a cross-language API from the World Wide
-Web Consortium (W3C) for accessing and modifying XML documents.  A DOM
-implementation presents an XML document as a tree structure, or allows client
-code to build such a structure from scratch.  It then gives access to the
-structure through a set of objects which provided well-known interfaces.
+Mô hình Đối tượng Tài liệu, hay "DOM", là một API đa ngôn ngữ do World Wide Web Consortium (W3C) cung cấp để truy cập và sửa đổi các tài liệu XML. Một triển khai DOM biểu diễn tài liệu XML dưới dạng cấu trúc cây, hoặc cho phép mã client xây dựng một cấu trúc như vậy từ đầu. Sau đó, nó cung cấp quyền truy cập vào cấu trúc thông qua một tập hợp các đối tượng có những giao diện được biết đến rộng rãi.
 
-The DOM is extremely useful for random-access applications.  SAX only allows you
-a view of one bit of the document at a time.  If you are looking at one SAX
-element, you have no access to another.  If you are looking at a text node, you
-have no access to a containing element. When you write a SAX application, you
-need to keep track of your program's position in the document somewhere in your
-own code.  SAX does not do it for you.  Also, if you need to look ahead in the
-XML document, you are just out of luck.
+DOM cực kỳ hữu ích cho các ứng dụng cần truy cập ngẫu nhiên. SAX chỉ cho phép bạn xem từng phần của tài liệu tại một thời điểm. Nếu bạn đang xem một phần tử SAX, bạn không thể truy cập phần tử khác. Nếu bạn đang xem một nút văn bản, bạn không thể truy cập phần tử chứa nó. Khi viết một ứng dụng SAX, bạn cần tự theo dõi vị trí của chương trình trong tài liệu ở đâu đó trong mã của mình. SAX không làm việc đó thay bạn. Ngoài ra, nếu cần xem trước trong tài liệu XML, bạn hoàn toàn không thể thực hiện điều đó.
 
-Some applications are simply impossible in an event driven model with no access
-to a tree.  Of course you could build some sort of tree yourself in SAX events,
-but the DOM allows you to avoid writing that code.  The DOM is a standard tree
-representation for XML data.
+Một số ứng dụng đơn giản là không thể thực hiện trong mô hình hướng sự kiện nếu không có quyền truy cập vào một cây. Tất nhiên, bạn có thể tự xây dựng một dạng cây nào đó từ các sự kiện SAX, nhưng DOM cho phép bạn tránh phải viết mã đó. DOM là một biểu diễn cây tiêu chuẩn cho dữ liệu XML.
 
-The Document Object Model is being defined by the W3C in stages, or "levels" in
-their terminology.  The Python mapping of the API is substantially based on the
-DOM Level 2 recommendation.
+Mô hình Đối tượng Tài liệu đang được W3C định nghĩa theo từng giai đoạn, hay "level" theo thuật ngữ của họ. Phần ánh xạ API sang Python chủ yếu dựa trên khuyến nghị DOM Level 2.
 
-DOM applications typically start by parsing some XML into a DOM.  How this is
-accomplished is not covered at all by DOM Level 1, and Level 2 provides only
-limited improvements: There is a :class:`DOMImplementation` object class which
-provides access to :class:`Document` creation methods, but no way to access an
-XML reader/parser/Document builder in an implementation-independent way. There
-is also no well-defined way to access these methods without an existing
-:class:`Document` object.  In Python, each DOM implementation will provide a
-function :func:`getDOMImplementation`. DOM Level 3 adds a Load/Store
-specification, which defines an interface to the reader, but this is not yet
-available in the Python standard library.
+Các ứng dụng DOM thường bắt đầu bằng cách phân tích một XML thành DOM. Cách thực hiện việc này hoàn toàn không được đề cập trong DOM Level 1, còn Level 2 chỉ cung cấp một số cải tiến hạn chế: Có một lớp đối tượng :class:`DOMImplementation` cung cấp quyền truy cập vào các phương thức tạo :class:`Document`, nhưng không có cách nào để truy cập XML reader/parser/Document builder theo cách độc lập với việc triển khai. Ngoài ra, cũng không có cách được định nghĩa rõ ràng để truy cập các phương thức này nếu không có sẵn một
+đối tượng :class:`Document`. Trong Python, mỗi triển khai DOM sẽ cung cấp một hàm :func:`getDOMImplementation`. DOM Level 3 bổ sung đặc tả Load/Store, trong đó định nghĩa một giao diện cho reader, nhưng giao diện này hiện chưa có trong thư viện chuẩn Python.
 
-Once you have a DOM document object, you can access the parts of your XML
-document through its properties and methods.  These properties are defined in
-the DOM specification; this portion of the reference manual describes the
-interpretation of the specification in Python.
+Sau khi có đối tượng tài liệu DOM, bạn có thể truy cập các phần của tài liệu XML thông qua các thuộc tính và phương thức của đối tượng đó. Các thuộc tính này được định nghĩa trong đặc tả DOM; phần này của tài liệu tham khảo mô tả cách diễn giải đặc tả trong Python.
 
-The specification provided by the W3C defines the DOM API for Java, ECMAScript,
-and OMG IDL.  The Python mapping defined here is based in large part on the IDL
-version of the specification, but strict compliance is not required (though
-implementations are free to support the strict mapping from IDL).  See section
-:ref:`dom-conformance` for a detailed discussion of mapping requirements.
+Đặc tả do W3C cung cấp định nghĩa API DOM cho Java, ECMAScript và OMG IDL. Phép ánh xạ sang Python được định nghĩa ở đây phần lớn dựa trên phiên bản IDL của đặc tả, nhưng không bắt buộc phải tuân thủ nghiêm ngặt (dù các triển khai được tự do hỗ trợ phép ánh xạ nghiêm ngặt từ IDL). Xem phần
+:ref:`dom-conformance` để biết thảo luận chi tiết về các yêu cầu ánh xạ.
 
 
 .. seealso::
 
-   `Document Object Model (DOM) Level 2 Specification <https://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113/>`_
-      The W3C recommendation upon which the Python DOM API is based.
+   `Đặc tả Document Object Model (DOM) Level 2 <https://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113/>`_
+      Khuyến nghị của W3C làm nền tảng cho API DOM của Python.
 
-   `Document Object Model (DOM) Level 1 Specification <https://www.w3.org/TR/REC-DOM-Level-1/>`_
-      The W3C recommendation for the DOM supported by :mod:`xml.dom.minidom`.
+   `Đặc tả Document Object Model (DOM) Cấp độ 1 <https://www.w3.org/TR/REC-DOM-Level-1/>`_
+      Khuyến nghị của W3C về DOM được :mod:`xml.dom.minidom` hỗ trợ.
 
-   `Python Language Mapping Specification <https://www.omg.org/spec/PYTH/1.2/PDF>`_
-      This specifies the mapping from OMG IDL to Python.
+   `Đặc tả ánh xạ ngôn ngữ Python <https://www.omg.org/spec/PYTH/1.2/PDF>`_
+      Tài liệu này quy định ánh xạ từ OMG IDL sang Python.
 
 
-Module Contents
+Nội dung mô-đun
 ---------------
 
-The :mod:`!xml.dom` contains the following functions:
+:mod:`!xml.dom` chứa các hàm sau:
 
 
 .. function:: registerDOMImplementation(name, factory)
 
-   Register the *factory* function with the name *name*.  The factory function
-   should return an object which implements the :class:`DOMImplementation`
-   interface.  The factory function can return the same object every time, or a new
-   one for each call, as appropriate for the specific implementation (e.g. if that
-   implementation supports some customization).
+   Đăng ký hàm *factory* với tên *name*. Hàm factory phải trả về một đối tượng triển khai giao diện :class:`DOMImplementation`. Hàm factory có thể trả về cùng một đối tượng trong mọi lần gọi hoặc một đối tượng mới cho mỗi lần gọi, tùy theo yêu cầu của triển khai cụ thể (ví dụ: nếu triển khai đó hỗ trợ một số tùy chỉnh).
 
 
 .. function:: getDOMImplementation(name=None, features=())
 
-   Return a suitable DOM implementation. The *name* is either well-known, the
-   module name of a DOM implementation, or ``None``. If it is not ``None``, imports
-   the corresponding module and returns a :class:`DOMImplementation` object if the
-   import succeeds.  If no name is given, and if the environment variable
-   :envvar:`!PYTHON_DOM` is set, this variable is used to find the implementation.
-   The only well-known name in the standard library is ``'minidom'``,
-   for :mod:`xml.dom.minidom`.
+   Trả về một triển khai DOM phù hợp. *name* có thể là tên đã biết, tên mô-đun của một triển khai DOM hoặc ``None``. Nếu không phải ``None``, hàm sẽ import mô-đun tương ứng và trả về một đối tượng :class:`DOMImplementation` nếu import thành công. Nếu không cung cấp tên và biến môi trường
+   :envvar:`!PYTHON_DOM` được thiết lập, biến này sẽ được dùng để tìm triển khai. Tên duy nhất đã biết trong standard library là ``'minidom'``, dành cho :mod:`xml.dom.minidom`.
 
-   If name is not given, this examines the available implementations to find one
-   with the required feature set.  If no implementation can be found, raise an
-   :exc:`ImportError`.  The features list must be a sequence of ``(feature,
-   version)`` pairs which are passed to the :meth:`~DOMImplementation.hasFeature`
-   method on available :class:`DOMImplementation` objects.
+   Nếu không cung cấp name, hàm này sẽ kiểm tra các triển khai hiện có để tìm một triển khai có tập tính năng bắt buộc. Nếu không tìm thấy triển khai nào, hãy raise một
+   :exc:`ImportError`. Danh sách tính năng phải là một dãy các cặp ``(feature, version)``, được truyền vào phương thức :meth:`~DOMImplementation.hasFeature` trên các đối tượng :class:`DOMImplementation` hiện có.
 
-Some convenience constants are also provided:
+Một số hằng số tiện ích cũng được cung cấp:
 
 
 .. data:: EMPTY_NAMESPACE
 
-   The value used to indicate that no namespace is associated with a node in the
-   DOM.  This is typically found as the :attr:`~Node.namespaceURI` of a node, or
-   used as the *namespaceURI* parameter to a namespaces-specific method.
+   Giá trị dùng để biểu thị rằng không có namespace nào được liên kết với một node trong DOM. Giá trị này thường được tìm thấy dưới dạng :attr:`~Node.namespaceURI` của một node hoặc được dùng làm tham số *namespaceURI* cho một phương thức dành riêng cho namespace.
 
 
 .. data:: XML_NAMESPACE
 
-   The namespace URI associated with the reserved prefix ``xml``, as defined by
-   `Namespaces in XML <https://www.w3.org/TR/REC-xml-names/>`_ (section 4).
+   URI namespace được liên kết với tiền tố dành riêng ``xml``, như được định nghĩa trong `Namespaces in XML <https://www.w3.org/TR/REC-xml-names/>`_ (mục 4).
 
 
 .. data:: XMLNS_NAMESPACE
 
-   The namespace URI for namespace declarations, as defined by `Document Object
-   Model (DOM) Level 2 Core Specification
-   <https://www.w3.org/TR/DOM-Level-2-Core/core.html>`_ (section 1.1.8).
+   URI không gian tên dùng cho các khai báo không gian tên, như được định nghĩa trong `Đặc tả DOM (Document Object Model) Level 2 Core <https://www.w3.org/TR/DOM-Level-2-Core/core.html>`_ (mục 1.1.8).
 
 
 .. data:: XHTML_NAMESPACE
 
-   The URI of the XHTML namespace as defined by `XHTML 1.0: The Extensible
-   HyperText Markup Language <https://www.w3.org/TR/xhtml1/>`_ (section 3.1.1).
+   URI của không gian tên XHTML như được định nghĩa trong `XHTML 1.0: Ngôn ngữ đánh dấu siêu văn bản mở rộng <https://www.w3.org/TR/xhtml1/>`_ (mục 3.1.1).
 
 
-In addition, :mod:`!xml.dom` contains a base :class:`Node` class and the DOM
-exception classes.  The :class:`Node` class provided by this module does not
-implement any of the methods or attributes defined by the DOM specification;
-concrete DOM implementations must provide those.  The :class:`Node` class
-provided as part of this module does provide the constants used for the
-:attr:`~Node.nodeType` attribute on concrete :class:`Node` objects; they are located
-within the class rather than at the module level to conform with the DOM
-specifications.
+Ngoài ra, :mod:`!xml.dom` còn chứa một lớp :class:`Node` cơ sở và các lớp ngoại lệ DOM. Lớp :class:`Node` do mô-đun này cung cấp không triển khai bất kỳ phương thức hoặc thuộc tính nào được định nghĩa bởi đặc tả DOM; các triển khai DOM cụ thể phải cung cấp những thành phần đó. Lớp :class:`Node` được cung cấp trong mô-đun này cũng cung cấp các hằng số được dùng cho
+thuộc tính :attr:`~Node.nodeType` trên các đối tượng :class:`Node` cụ thể; chúng nằm trong lớp thay vì ở cấp mô-đun để phù hợp với các đặc tả DOM.
 
 .. Should the Node documentation go here?
 
 
 .. _dom-objects:
 
-Objects in the DOM
-------------------
+Các đối tượng trong DOM
+-----------------------
 
-The definitive documentation for the DOM is the DOM specification from the W3C.
+Tài liệu chính thức và đầy đủ về DOM là đặc tả DOM của W3C.
 
-The names documented in this section are DOM interfaces.
-With the exception of :class:`Node` and the exception classes,
-they are not provided by the :mod:`!xml.dom` module itself,
-but by concrete DOM implementations, such as :mod:`xml.dom.minidom`.
+Các tên được ghi lại trong phần này là các giao diện DOM. Ngoại trừ :class:`Node` và các lớp ngoại lệ, chúng không được cung cấp bởi chính mô-đun :mod:`!xml.dom`, mà bởi các triển khai DOM cụ thể, chẳng hạn như :mod:`xml.dom.minidom`.
 
-Note that DOM attributes may also be manipulated as nodes instead of as simple
-strings.  It is fairly rare that you must do this, however, so this usage is not
-yet documented.
+Lưu ý rằng các thuộc tính DOM cũng có thể được thao tác dưới dạng các node thay vì các chuỗi đơn giản. Tuy nhiên, trường hợp này khá hiếm, vì vậy cách sử dụng này hiện chưa được ghi lại.
 
-+--------------------------------+-----------------------------------+---------------------------------+
-| Interface                      | Section                           | Purpose                         |
-+================================+===================================+=================================+
-| :class:`DOMImplementation`     | :ref:`dom-implementation-objects` | Interface to the underlying     |
-|                                |                                   | implementation.                 |
-+--------------------------------+-----------------------------------+---------------------------------+
-| :class:`Node`                  | :ref:`dom-node-objects`           | Base interface for most objects |
-|                                |                                   | in a document.                  |
-+--------------------------------+-----------------------------------+---------------------------------+
-| :class:`NodeList`              | :ref:`dom-nodelist-objects`       | Interface for a sequence of     |
-|                                |                                   | nodes.                          |
-+--------------------------------+-----------------------------------+---------------------------------+
-| :class:`DocumentType`          | :ref:`dom-documenttype-objects`   | Information about the           |
-|                                |                                   | declarations needed to process  |
-|                                |                                   | a document.                     |
-+--------------------------------+-----------------------------------+---------------------------------+
-| :class:`Document`              | :ref:`dom-document-objects`       | Object which represents an      |
-|                                |                                   | entire document.                |
-+--------------------------------+-----------------------------------+---------------------------------+
-| :class:`Element`               | :ref:`dom-element-objects`        | Element nodes in the document   |
-|                                |                                   | hierarchy.                      |
-+--------------------------------+-----------------------------------+---------------------------------+
-| :class:`Attr`                  | :ref:`dom-attr-objects`           | Attribute value nodes on        |
-|                                |                                   | element nodes.                  |
-+--------------------------------+-----------------------------------+---------------------------------+
-| :class:`Comment`               | :ref:`dom-comment-objects`        | Representation of comments in   |
-|                                |                                   | the source document.            |
-+--------------------------------+-----------------------------------+---------------------------------+
-| :class:`Text`                  | :ref:`dom-text-objects`           | Nodes containing textual        |
-|                                |                                   | content from the document.      |
-+--------------------------------+-----------------------------------+---------------------------------+
-| :class:`ProcessingInstruction` | :ref:`dom-pi-objects`             | Processing instruction          |
-|                                |                                   | representation.                 |
-+--------------------------------+-----------------------------------+---------------------------------+
++--------------------------------+-----------------------------------+------------------------------------------------------------+
+| Giao diện                      | Phần                              | Mục đích                                                   |
++================================+===================================+============================================================+
+| :class:`DOMImplementation`     | :ref:`dom-implementation-objects` | Giao diện với phần triển khai bên dưới.                    |
++--------------------------------+-----------------------------------+------------------------------------------------------------+
+| :class:`Node`                  | :ref:`dom-node-objects`           | Giao diện cơ sở cho hầu hết các đối tượng trong tài liệu.  |
++--------------------------------+-----------------------------------+------------------------------------------------------------+
+| :class:`NodeList`              | :ref:`dom-nodelist-objects`       | Giao diện cho một chuỗi các node.                          |
++--------------------------------+-----------------------------------+------------------------------------------------------------+
+| :class:`DocumentType`          | :ref:`dom-documenttype-objects`   | Thông tin về các khai báo cần thiết để xử lý một tài liệu. |
++--------------------------------+-----------------------------------+------------------------------------------------------------+
+| :class:`Document`              | :ref:`dom-document-objects`       | Đối tượng đại diện cho toàn bộ tài liệu.                   |
++--------------------------------+-----------------------------------+------------------------------------------------------------+
+| :class:`Element`               | :ref:`dom-element-objects`        | Các nút phần tử trong hệ thống phân cấp của tài liệu.      |
++--------------------------------+-----------------------------------+------------------------------------------------------------+
+| :class:`Attr`                  | :ref:`dom-attr-objects`           | Các nút giá trị thuộc tính trên các nút phần tử.           |
++--------------------------------+-----------------------------------+------------------------------------------------------------+
+| :class:`Comment`               | :ref:`dom-comment-objects`        | Biểu diễn các chú thích trong tài liệu nguồn.              |
++--------------------------------+-----------------------------------+------------------------------------------------------------+
+| :class:`Text`                  | :ref:`dom-text-objects`           | Các nút chứa nội dung văn bản từ tài liệu.                 |
++--------------------------------+-----------------------------------+------------------------------------------------------------+
+| :class:`ProcessingInstruction` | :ref:`dom-pi-objects`             | Biểu diễn chỉ thị xử lý.                                   |
++--------------------------------+-----------------------------------+------------------------------------------------------------+
 
-An additional section describes the exceptions defined for working with the DOM
-in Python.
+Một phần bổ sung mô tả các ngoại lệ được định nghĩa khi làm việc với DOM trong Python.
 
 
 .. _dom-implementation-objects:
 
-DOMImplementation Objects
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Các đối tượng DOMImplementation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. class:: DOMImplementation
    :no-typesetting:
 
-The :class:`DOMImplementation` interface provides a way for applications to
-determine the availability of particular features in the DOM they are using.
-DOM Level 2 added the ability to create new :class:`Document` and
-:class:`DocumentType` objects using the :class:`DOMImplementation` as well.
+Giao diện :class:`DOMImplementation` cung cấp một cách để các ứng dụng xác định tính khả dụng của các tính năng cụ thể trong DOM mà chúng đang sử dụng. DOM Level 2 bổ sung khả năng tạo :class:`Document` mới và
+các đối tượng :class:`DocumentType` cũng sử dụng :class:`DOMImplementation`.
 
 
 .. method:: DOMImplementation.hasFeature(feature, version)
 
-   Return ``True`` if the feature identified by the pair of strings *feature* and
-   *version* is implemented.
+   Trả về ``True`` nếu tính năng được xác định bởi cặp chuỗi *feature* và *version* đã được triển khai.
 
 
 .. method:: DOMImplementation.createDocument(namespaceUri, qualifiedName, doctype)
 
-   Return a new :class:`Document` object (the root of the DOM), with a child
-   :class:`Element` object having the given *namespaceUri* and *qualifiedName*. The
-   *doctype* must be a :class:`DocumentType` object created by
-   :meth:`createDocumentType`, or ``None``. In the Python DOM API, the first two
-   arguments can also be ``None`` in order to indicate that no :class:`Element`
-   child is to be created.
+   Trả về một đối tượng :class:`Document` mới (gốc của DOM), có một đối tượng con
+   :class:`Element` với *namespaceUri* và *qualifiedName* đã cho. *doctype* phải là một đối tượng :class:`DocumentType` được tạo bởi
+   :meth:`createDocumentType`, hoặc ``None``. Trong Python DOM API, hai đối số đầu tiên cũng có thể là ``None`` để cho biết rằng không tạo :class:`Element` nào.
 
 
 .. method:: DOMImplementation.createDocumentType(qualifiedName, publicId, systemId)
 
-   Return a new :class:`DocumentType` object that encapsulates the given
-   *qualifiedName*, *publicId*, and *systemId* strings, representing the
-   information contained in an XML document type declaration.
+   Trả về một đối tượng :class:`DocumentType` mới đóng gói các chuỗi *qualifiedName*, *publicId* và *systemId* đã cho, biểu thị thông tin có trong khai báo kiểu tài liệu XML.
 
 
 .. _dom-node-objects:
 
-Node Objects
-^^^^^^^^^^^^
+Đối tượng Node
+^^^^^^^^^^^^^^
 
 .. class:: Node
    :no-typesetting:
 
-All of the components of an XML document are subclasses of :class:`Node`.
+Tất cả các thành phần của một tài liệu XML đều là các lớp con của :class:`Node`.
 
-Only nodes of the following types can have children,
-and only children of the listed types:
+Chỉ các node thuộc những kiểu sau đây mới có thể có node con, và node con chỉ có thể thuộc những kiểu được liệt kê:
 
 :class:`Document`
-   at most one :class:`Element`, at most one :class:`DocumentType`,
-   :class:`ProcessingInstruction` and :class:`Comment`
+   nhiều nhất một :class:`Element`, nhiều nhất một :class:`DocumentType`,
+   :class:`ProcessingInstruction` và :class:`Comment`
 
-:class:`DocumentFragment` and :class:`Element`
+:class:`DocumentFragment` và :class:`Element`
    :class:`Element`, :class:`Text`, :class:`CDATASection`,
-   :class:`ProcessingInstruction` and :class:`Comment`
+   :class:`ProcessingInstruction` và :class:`Comment`
 
 :class:`Attr`
    :class:`Text`
 
-Nodes of other types cannot have children.
-Inserting a child of a not allowed type raises :exc:`HierarchyRequestErr`.
+Các node thuộc những kiểu khác không thể có node con. Việc chèn một node con thuộc kiểu không được phép sẽ gây ra :exc:`HierarchyRequestErr`.
 
 
 .. attribute:: Node.nodeType
 
-   An integer representing the node type.  Symbolic constants for the types are on
-   the :class:`Node` object.
-   This is a read-only attribute.
+   Một số nguyên biểu thị kiểu của node. Các hằng số ký hiệu cho các kiểu nằm trên đối tượng :class:`Node`. Đây là thuộc tính chỉ đọc.
 
 
 .. data:: Node.ELEMENT_NODE
-          Node.ATTRIBUTE_NODE
-          Node.TEXT_NODE
-          Node.CDATA_SECTION_NODE
-          Node.ENTITY_REFERENCE_NODE
-          Node.ENTITY_NODE
-          Node.PROCESSING_INSTRUCTION_NODE
-          Node.COMMENT_NODE
-          Node.DOCUMENT_NODE
-          Node.DOCUMENT_TYPE_NODE
-          Node.DOCUMENT_FRAGMENT_NODE
-          Node.NOTATION_NODE
+          Node.ATTRIBUTE_NODE Node.TEXT_NODE Node.CDATA_SECTION_NODE Node.ENTITY_REFERENCE_NODE Node.ENTITY_NODE Node.PROCESSING_INSTRUCTION_NODE Node.COMMENT_NODE Node.DOCUMENT_NODE Node.DOCUMENT_TYPE_NODE Node.DOCUMENT_FRAGMENT_NODE Node.NOTATION_NODE
 
-   Integer constants for the possible values
-   of the :attr:`~Node.nodeType` attribute.
+   Các hằng số nguyên cho những giá trị có thể có của thuộc tính :attr:`~Node.nodeType`.
 
 
 .. attribute:: Node.parentNode
 
-   The parent of the current node, or ``None`` for the document node. The value is
-   always a :class:`Node` object or ``None``.  For :class:`Element` nodes, this
-   will be the parent element, except for the root element, in which case it will
-   be the :class:`Document` object. For :class:`Attr` nodes, this is always
-   ``None``. This is a read-only attribute.
+   Node cha của node hiện tại hoặc ``None`` đối với node tài liệu. Giá trị luôn là đối tượng :class:`Node` hoặc ``None``. Đối với các node :class:`Element`, đây sẽ là phần tử cha, ngoại trừ phần tử gốc; trong trường hợp đó, đây sẽ là đối tượng :class:`Document`. Đối với các node :class:`Attr`, giá trị này luôn là ``None``. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: Node.attributes
 
-   A :class:`NamedNodeMap` of attribute objects.  Only elements have actual values
-   for this; others provide ``None`` for this attribute. This is a read-only
-   attribute.
+   Một :class:`NamedNodeMap` các đối tượng thuộc tính. Chỉ các element mới có giá trị thực cho thuộc tính này; các đối tượng khác cung cấp ``None`` cho thuộc tính này. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: Node.previousSibling
 
-   The node that immediately precedes this one with the same parent.  For
-   instance the element with an end-tag that comes just before the *self*
-   element's start-tag.  Of course, XML documents are made up of more than just
-   elements so the previous sibling could be text, a comment, or something else.
-   If this node is the first child of the parent, this attribute will be
-   ``None``. This is a read-only attribute.
+   Node ngay trước node này và có cùng parent. Ví dụ: element có end-tag nằm ngay trước start-tag của element *self*. Dĩ nhiên, tài liệu XML không chỉ gồm các element, vì vậy sibling trước đó có thể là văn bản, comment hoặc một thành phần khác. Nếu node này là child đầu tiên của parent, thuộc tính này sẽ là ``None``. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: Node.nextSibling
 
-   The node that immediately follows this one with the same parent.  See also
-   :attr:`previousSibling`.  If this is the last child of the parent, this
-   attribute will be ``None``. This is a read-only attribute.
+   Node ngay sau node này và có cùng parent. Xem thêm
+   :attr:`previousSibling`. Nếu đây là child cuối cùng của parent, thuộc tính này sẽ là ``None``. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: Node.childNodes
 
-   A :class:`NodeList` of the children of this node.
-   If the node has no children, the list is empty.
-   This is a read-only attribute.
+   Một :class:`NodeList` các child của node này. Nếu node không có child, danh sách sẽ trống. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: Node.firstChild
 
-   The first child of the node, if there are any, or ``None``. This is a read-only
-   attribute.
+   Child đầu tiên của node, nếu có, hoặc ``None``. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: Node.lastChild
 
-   The last child of the node, if there are any, or ``None``. This is a read-only
-   attribute.
+   Child cuối cùng của node, nếu có, hoặc ``None``. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: Node.localName
 
-   The part of the :attr:`~Element.tagName` following the colon if there is one,
-   else the entire :attr:`~Element.tagName`.  The value is a string.
+   Phần của :attr:`~Element.tagName` nằm sau dấu hai chấm nếu có, nếu không thì là toàn bộ :attr:`~Element.tagName`. Giá trị là một chuỗi.
 
 
 .. attribute:: Node.prefix
 
-   The part of the :attr:`~Element.tagName` preceding the colon if there is one,
-   else the empty string.  The value is a string, or ``None``.
+   Phần của :attr:`~Element.tagName` nằm trước dấu hai chấm nếu có, nếu không thì là chuỗi rỗng. Giá trị là một chuỗi hoặc ``None``.
 
 
 .. attribute:: Node.namespaceURI
 
-   The namespace associated with the element name.  This will be a string or
-   ``None``.  This is a read-only attribute.
+   Không gian tên liên kết với tên phần tử. Đây sẽ là một chuỗi hoặc ``None``. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: Node.ownerDocument
 
-   The :class:`Document` object to which this node belongs, or ``None``
-   for a document itself.
-   This is a read-only attribute.
+   Đối tượng :class:`Document` mà node này thuộc về, hoặc ``None`` nếu bản thân nó là một tài liệu. Đây là thuộc tính chỉ đọc.
 
 
 .. method:: Node.isSupported(feature, version)
 
-   Return whether the DOM implementation supports a particular *feature*,
-   as :meth:`DOMImplementation.hasFeature` does.
+   Trả về liệu cài đặt DOM có hỗ trợ *feature* cụ thể hay không, như :meth:`DOMImplementation.hasFeature` thực hiện.
 
 
 .. method:: Node.setUserData(key, data, handler)
 
-   Associate *data* with *key* on this node and return the data previously
-   associated with *key*, or ``None``.
-   If *data* is ``None``, the association is removed.
-   *handler* is called when the node is cloned, imported, renamed or deleted;
-   pass ``None`` if no notification is needed.
+   Liên kết *data* với *key* trên node này và trả về dữ liệu trước đó được liên kết với *key*, hoặc ``None``. Nếu *data* là ``None``, liên kết sẽ bị xóa. *handler* được gọi khi node được sao chép, nhập, đổi tên hoặc xóa; truyền ``None`` nếu không cần thông báo.
 
 
 .. method:: Node.getUserData(key)
 
-   Return the data associated with *key* on this node
-   by :meth:`~Node.setUserData`, or ``None``.
+   Trả về dữ liệu được liên kết với *key* trên node này bằng :meth:`~Node.setUserData`, hoặc ``None``.
 
 
 .. attribute:: Node.nodeName
 
-   The name of this node, depending on its type; see the table below.
-   You can always get the information you would get here from another
-   property such as the :attr:`~Element.tagName` property for elements or the
-   :attr:`~Attr.name` property for attributes.
-   This is a read-only attribute.
+   Tên của node này, tùy thuộc vào kiểu của nó; xem bảng bên dưới. Bạn luôn có thể lấy thông tin mà bạn nhận được ở đây từ một thuộc tính khác, chẳng hạn như thuộc tính :attr:`~Element.tagName` dành cho các phần tử hoặc
+   :attr:`~Attr.name` dành cho các thuộc tính. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: Node.nodeValue
 
-   The value of this node, depending on its type; see the table below.
-   The value is a string or ``None``.
+   Giá trị của node này, tùy thuộc vào kiểu của nó; xem bảng bên dưới. Giá trị là một chuỗi hoặc ``None``.
 
 
-The values of :attr:`~Node.nodeName` and :attr:`~Node.nodeValue`
-for each node type are:
+Các giá trị của :attr:`~Node.nodeName` và :attr:`~Node.nodeValue` đối với từng kiểu node là:
 
 +--------------------------------+---------------------------------------+-------------------------------------+
-| Node type                      | nodeName                              | nodeValue                           |
+| Kiểu node                      | nodeName                              | nodeValue                           |
 +================================+=======================================+=====================================+
 | :class:`Attr`                  | :attr:`~Attr.name`                    | :attr:`~Attr.value`                 |
 +--------------------------------+---------------------------------------+-------------------------------------+
-| :class:`CDATASection`          | ``'#cdata-section'``                  | the content                         |
+| :class:`CDATASection`          | ``'#cdata-section'``                  | nội dung                            |
 +--------------------------------+---------------------------------------+-------------------------------------+
-| :class:`Comment`               | ``'#comment'``                        | the content                         |
+| :class:`Comment`               | ``'#comment'``                        | nội dung                            |
 +--------------------------------+---------------------------------------+-------------------------------------+
 | :class:`Document`              | ``'#document'``                       | ``None``                            |
 +--------------------------------+---------------------------------------+-------------------------------------+
@@ -418,674 +293,542 @@ for each node type are:
 +--------------------------------+---------------------------------------+-------------------------------------+
 | :class:`Element`               | :attr:`~Element.tagName`              | ``None``                            |
 +--------------------------------+---------------------------------------+-------------------------------------+
-| :class:`Entity`                | the name of the entity                | ``None``                            |
+| :class:`Entity`                | tên của thực thể                      | ``None``                            |
 +--------------------------------+---------------------------------------+-------------------------------------+
-| :class:`Notation`              | the name of the notation              | ``None``                            |
+| :class:`Notation`              | tên của ký hiệu                       | ``None``                            |
 +--------------------------------+---------------------------------------+-------------------------------------+
 | :class:`ProcessingInstruction` | :attr:`~ProcessingInstruction.target` | :attr:`~ProcessingInstruction.data` |
 +--------------------------------+---------------------------------------+-------------------------------------+
-| :class:`Text`                  | ``'#text'``                           | the content                         |
+| :class:`Text`                  | ``'#text'``                           | nội dung                            |
 +--------------------------------+---------------------------------------+-------------------------------------+
 
 .. method:: Node.hasAttributes()
 
-   Return ``True`` if the node has any attributes.
+   Trả về ``True`` nếu nút có bất kỳ thuộc tính nào.
 
 
 .. method:: Node.hasChildNodes()
 
-   Return ``True`` if the node has any child nodes.
+   Trả về ``True`` nếu nút có bất kỳ nút con nào.
 
 
 .. method:: Node.isSameNode(other)
 
-   Return ``True`` if *other* refers to the same node as this node. This is especially
-   useful for DOM implementations which use any sort of proxy architecture (because
-   more than one object can refer to the same node).
+   Trả về ``True`` nếu *other* tham chiếu đến cùng node với node này. Điều này đặc biệt hữu ích cho các triển khai DOM sử dụng bất kỳ dạng kiến trúc proxy nào (vì nhiều object có thể tham chiếu đến cùng một node).
 
    .. note::
 
-      This is based on a proposed DOM Level 3 API which is still in the "working
-      draft" stage, but this particular interface appears uncontroversial.  Changes
-      from the W3C will not necessarily affect this method in the Python DOM interface
-      (though any new W3C API for this would also be supported).
+      Điều này dựa trên một DOM Level 3 API được đề xuất, hiện vẫn đang ở giai đoạn "working draft", nhưng interface cụ thể này dường như không gây tranh cãi. Các thay đổi từ W3C không nhất thiết ảnh hưởng đến method này trong Python DOM interface (mặc dù mọi W3C API mới cho mục đích này cũng sẽ được hỗ trợ).
 
 
 .. method:: Node.appendChild(newChild)
 
-   Add a new child node to this node at the end of the list of
-   children, returning *newChild*. If the node was already in
-   the tree, it is removed first.
+   Thêm một child node mới vào node này ở cuối danh sách các node con, trả về *newChild*. Nếu node này đã nằm trong cây, trước tiên nó sẽ được xóa khỏi cây.
 
 
 .. method:: Node.insertBefore(newChild, refChild)
 
-   Insert a new child node before an existing child.  It must be the case that
-   *refChild* is a child of this node; if not, :exc:`NotFoundErr` is raised.
-   *newChild* is returned. If *refChild* is ``None``, it inserts *newChild* at the
-   end of the children's list.
+   Chèn một child node mới trước một child node hiện có. *refChild* phải là một child của node này; nếu không, :exc:`NotFoundErr` sẽ được raise. *newChild* được trả về. Nếu *refChild* là ``None``, *newChild* sẽ được chèn vào cuối danh sách các child.
 
 
 .. method:: Node.removeChild(oldChild)
 
-   Remove a child node.  *oldChild* must be a child of this node; if not,
-   :exc:`NotFoundErr` is raised.  *oldChild* is returned on success.  If *oldChild*
-   will not be used further, its :meth:`~xml.dom.minidom.Node.unlink` method
-   should be called.
+   Xóa một child node. *oldChild* phải là một child của node này; nếu không,
+   :exc:`NotFoundErr` sẽ được raise. Khi thành công, *oldChild* được trả về. Nếu *oldChild* không còn được sử dụng, nên gọi method :meth:`~xml.dom.minidom.Node.unlink` của nó.
 
 
 .. method:: Node.replaceChild(newChild, oldChild)
 
-   Replace an existing node with a new node. It must be the case that  *oldChild*
-   is a child of this node; if not, :exc:`NotFoundErr` is raised.
+   Thay thế một node hiện có bằng một node mới. *oldChild* phải là một child của node này; nếu không, :exc:`NotFoundErr` sẽ được raise.
 
 
 .. method:: Node.normalize()
 
-   Join adjacent text nodes so that all stretches of text are stored as single
-   :class:`Text` instances.  This simplifies processing text from a DOM tree for
-   many applications.
+   Gộp các nút văn bản liền kề để mọi đoạn văn bản được lưu dưới dạng một
+   :class:`Text` duy nhất. Điều này giúp đơn giản hóa việc xử lý văn bản từ cây DOM cho nhiều ứng dụng.
 
 
 .. method:: Node.cloneNode(deep)
 
-   Clone this node.  Setting *deep* means to clone all child nodes as well.  This
-   returns the clone.
+   Sao chép nút này. Đặt *deep* có nghĩa là cũng sao chép tất cả các nút con. Thao tác này trả về bản sao.
 
 
 .. _dom-nodelist-objects:
 
-NodeList Objects
-^^^^^^^^^^^^^^^^
+Đối tượng NodeList
+^^^^^^^^^^^^^^^^^^
 
 .. class:: NodeList
    :no-typesetting:
 
-A :class:`NodeList` represents a sequence of nodes.  These objects are used in
-two ways in the DOM Core recommendation:  an :class:`Element` object provides
-one as its list of child nodes, and the :meth:`~Element.getElementsByTagName`
-and :meth:`~Element.getElementsByTagNameNS` methods of :class:`Node` return
-objects with this interface to represent query results.
+Một :class:`NodeList` biểu diễn một chuỗi các nút. Các đối tượng này được sử dụng theo hai cách trong khuyến nghị DOM Core: một đối tượng :class:`Element` cung cấp một đối tượng như danh sách các nút con của nó, còn các phương thức :meth:`~Element.getElementsByTagName` và :meth:`~Element.getElementsByTagNameNS` của :class:`Node` trả về các đối tượng có giao diện này để biểu diễn kết quả truy vấn.
 
-:class:`NodeList` does *not* inherit from :class:`Node`.
+:class:`NodeList` *không* kế thừa từ :class:`Node`.
 
-The DOM Level 2 recommendation defines one method and one attribute for these
-objects:
+Khuyến nghị DOM Level 2 định nghĩa một phương thức và một thuộc tính cho các đối tượng này:
 
 
 .. method:: NodeList.item(i)
 
-   Return the *i*'th item from the sequence,
-   or ``None`` if *i* is out of range.
-   Negative indices are not supported.
+   Trả về phần tử thứ *i* trong dãy, hoặc ``None`` nếu *i* nằm ngoài phạm vi. Không hỗ trợ chỉ mục âm.
 
 
 .. attribute:: NodeList.length
 
-   The number of nodes in the sequence.
+   Số lượng node trong dãy.
 
-In addition, the Python DOM interface requires that some additional support is
-provided to allow :class:`NodeList` objects to be used as Python sequences.  All
-:class:`NodeList` implementations must include support for
-:meth:`~object.__len__` and
-:meth:`~object.__getitem__`; this allows iteration over the :class:`NodeList` in
-:keyword:`for` statements and proper support for the :func:`len` built-in
-function.
+Ngoài ra, giao diện DOM của Python yêu cầu cung cấp một số hỗ trợ bổ sung để cho phép các đối tượng :class:`NodeList` được sử dụng như các dãy Python. Tất cả
+Các triển khai :class:`NodeList` phải hỗ trợ
+:meth:`~object.__len__` và
+:meth:`~object.__getitem__`; điều này cho phép lặp qua :class:`NodeList` trong
+các câu lệnh :keyword:`for` và hỗ trợ chính xác cho hàm dựng sẵn :func:`len`.
 
-If a DOM implementation supports modification of the document, the
-:class:`NodeList` implementation must also support the
-:meth:`~object.__setitem__` and :meth:`~object.__delitem__` methods.
+Nếu một triển khai DOM hỗ trợ sửa đổi tài liệu thì triển khai
+:class:`NodeList` cũng phải hỗ trợ
+các phương thức :meth:`~object.__setitem__` và :meth:`~object.__delitem__`.
 
 
 .. _dom-documenttype-objects:
 
-DocumentType Objects
-^^^^^^^^^^^^^^^^^^^^
+Đối tượng DocumentType
+^^^^^^^^^^^^^^^^^^^^^^
 
 .. class:: DocumentType
    :no-typesetting:
 
-Information about the notations and entities declared by a document (including
-the external subset if the parser uses it and can provide the information) is
-available from a :class:`DocumentType` object.  The :class:`DocumentType` for a
-document is available from the :class:`Document` object's :attr:`~Document.doctype`
-attribute; if there is no ``DOCTYPE`` declaration for the document, the
-document's :attr:`~Document.doctype` attribute will be set to ``None`` instead of an
-instance of this interface.
+Thông tin về các notation và entity được khai báo bởi một tài liệu (bao gồm cả external subset nếu parser sử dụng nó và có thể cung cấp thông tin này) có sẵn từ một đối tượng :class:`DocumentType`. :class:`DocumentType` của một tài liệu có sẵn từ thuộc tính :attr:`~Document.doctype` của đối tượng :class:`Document`; nếu tài liệu không có khai báo ``DOCTYPE``, thuộc tính :attr:`~Document.doctype` của tài liệu sẽ được đặt thành ``None`` thay vì một instance của interface này.
 
-:class:`DocumentType` is a specialization of :class:`Node`, and adds the
-following attributes:
+:class:`DocumentType` là một specialization của :class:`Node` và bổ sung các thuộc tính sau:
 
 
 .. attribute:: DocumentType.publicId
 
-   The public identifier for the external subset of the document type definition,
-   or ``None`` if the ``DOCTYPE`` declaration does not specify it.
+   Định danh public cho external subset của định nghĩa kiểu tài liệu, hoặc ``None`` nếu khai báo ``DOCTYPE`` không chỉ định định danh đó.
 
 
 .. attribute:: DocumentType.systemId
 
-   The system identifier, a URI, for the external subset of the document type
-   definition, or ``None`` if the ``DOCTYPE`` declaration does not specify it.
+   Mã định danh hệ thống, một URI, cho tập con bên ngoài của định nghĩa kiểu tài liệu, hoặc ``None`` nếu khai báo ``DOCTYPE`` không chỉ định mã này.
 
 
 .. attribute:: DocumentType.internalSubset
 
-   A string giving the complete internal subset from the document. This does not
-   include the brackets which enclose the subset.  If the document has no internal
-   subset, this should be ``None``.
+   Một chuỗi cung cấp đầy đủ tập con bên trong của tài liệu. Chuỗi này không bao gồm các dấu ngoặc bao quanh tập con. Nếu tài liệu không có tập con bên trong, giá trị này phải là ``None``.
 
 
 .. attribute:: DocumentType.name
 
-   The name of the root element as given in the ``DOCTYPE`` declaration, if
-   present.
+   Tên của phần tử gốc như được chỉ định trong khai báo ``DOCTYPE``, nếu có.
 
 
 .. attribute:: DocumentType.entities
 
-   This is a :class:`NamedNodeMap` of :class:`Entity` nodes
-   giving the definitions of external entities.
-   For entity names defined more than once, only the first definition is provided
-   (others are ignored as required by the XML recommendation).  This may be
-   ``None`` if the information is not provided by the parser, or if no entities are
-   defined.
+   Đây là một :class:`NamedNodeMap` gồm các nút :class:`Entity` cung cấp định nghĩa của các thực thể bên ngoài. Đối với những tên thực thể được định nghĩa nhiều lần, chỉ cung cấp định nghĩa đầu tiên (các định nghĩa khác bị bỏ qua theo yêu cầu của khuyến nghị XML). Giá trị này có thể là ``None`` nếu trình phân tích cú pháp không cung cấp thông tin hoặc nếu không có thực thể nào được định nghĩa.
 
 
 .. attribute:: DocumentType.notations
 
-   This is a :class:`NamedNodeMap` of :class:`Notation` nodes
-   giving the definitions of notations. For
-   notation names defined more than once, only the first definition is provided
-   (others are ignored as required by the XML recommendation).  This may be
-   ``None`` if the information is not provided by the parser, or if no notations
-   are defined.
+   Đây là một :class:`NamedNodeMap` gồm các nút :class:`Notation` cung cấp định nghĩa của các ký hiệu. Đối với những tên ký hiệu được định nghĩa nhiều lần, chỉ cung cấp định nghĩa đầu tiên (các định nghĩa khác bị bỏ qua theo yêu cầu của khuyến nghị XML). Giá trị này có thể là ``None`` nếu trình phân tích cú pháp không cung cấp thông tin hoặc nếu không có ký hiệu nào được định nghĩa.
 
 
 .. _dom-document-objects:
 
-Document Objects
-^^^^^^^^^^^^^^^^
+Đối tượng Document
+^^^^^^^^^^^^^^^^^^
 
 .. class:: Document
    :no-typesetting:
 
-A :class:`Document` represents an entire XML document, including its constituent
-elements, attributes, processing instructions, comments etc.  Remember that it
-inherits properties from :class:`Node`.
+Một :class:`Document` đại diện cho toàn bộ tài liệu XML, bao gồm các phần tử, thuộc tính, chỉ thị xử lý, chú thích cấu thành tài liệu, v.v. Hãy nhớ rằng nó kế thừa các thuộc tính từ :class:`Node`.
 
 
 .. attribute:: Document.documentElement
 
-   The one and only root element of the document.
+   Phần tử gốc duy nhất của tài liệu.
 
 
 .. attribute:: Document.doctype
 
-   The :class:`DocumentType` node of the document, or ``None``.
-   This is a read-only attribute.
+   Nút :class:`DocumentType` của tài liệu hoặc ``None``. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: Document.implementation
 
-   The :class:`DOMImplementation` object which created this document.
-   This is a read-only attribute.
+   Đối tượng :class:`DOMImplementation` đã tạo tài liệu này. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: Document.strictErrorChecking
 
-   Whether error checking is enforced.
+   Có bắt buộc kiểm tra lỗi hay không.
 
 
 .. attribute:: Document.documentURI
 
-   The location of the document, or ``None`` if it is unknown.
+   Vị trí của tài liệu hoặc ``None`` nếu không xác định được.
 
 
 .. method:: Document.createDocumentFragment()
 
-   Create and return an empty :class:`DocumentFragment` node.
+   Tạo và trả về một nút :class:`DocumentFragment` trống.
 
 
 .. method:: Document.createCDATASection(data)
 
-   Create and return a :class:`CDATASection` node containing *data*.
+   Tạo và trả về một nút :class:`CDATASection` chứa *data*.
 
 
 .. method:: Document.importNode(importedNode, deep)
 
-   Return a copy of *importedNode* which belongs to this document.
-   The original node is not removed from its document.
-   If *deep* is true, the descendants of the node are copied too.
+   Trả về một bản sao của *importedNode* thuộc về tài liệu này. Node ban đầu không bị xóa khỏi tài liệu của nó. Nếu *deep* là true, các node con của node đó cũng được sao chép.
 
 
 .. method:: Document.createElement(tagName)
 
-   Create and return a new element node.  The element is not inserted into the
-   document when it is created.  You need to explicitly insert it with one of the
-   other methods such as :meth:`~Node.insertBefore` or :meth:`~Node.appendChild`.
+   Tạo và trả về một element node mới. Element này không được chèn vào tài liệu khi được tạo. Bạn cần chèn rõ ràng bằng một trong các phương thức khác, chẳng hạn như :meth:`~Node.insertBefore` hoặc :meth:`~Node.appendChild`.
 
 
 .. method:: Document.createElementNS(namespaceURI, tagName)
 
-   Create and return a new element with a namespace.  The *tagName* may have a
-   prefix.  The element is not inserted into the document when it is created.  You
-   need to explicitly insert it with one of the other methods such as
-   :meth:`~Node.insertBefore` or :meth:`~Node.appendChild`.
+   Tạo và trả về một element mới có namespace. *tagName* có thể có một prefix. Element này không được chèn vào tài liệu khi được tạo. Bạn cần chèn rõ ràng bằng một trong các phương thức khác, chẳng hạn như
+   :meth:`~Node.insertBefore` hoặc :meth:`~Node.appendChild`.
 
 
 .. method:: Document.createTextNode(data)
 
-   Create and return a text node containing the data passed as a parameter.  As
-   with the other creation methods, this one does not insert the node into the
-   tree.
+   Tạo và trả về một text node chứa dữ liệu được truyền dưới dạng tham số. Cũng như các phương thức tạo khác, phương thức này không chèn node vào cây.
 
 
 .. method:: Document.createComment(data)
 
-   Create and return a comment node containing the data passed as a parameter.  As
-   with the other creation methods, this one does not insert the node into the
-   tree.
+   Tạo và trả về một comment node chứa dữ liệu được truyền dưới dạng tham số. Cũng như các phương thức tạo khác, phương thức này không chèn node vào cây.
 
 
 .. method:: Document.createProcessingInstruction(target, data)
 
-   Create and return a processing instruction node containing the *target* and
-   *data* passed as parameters.  As with the other creation methods, this one does
-   not insert the node into the tree.
+   Tạo và trả về một processing instruction node chứa *target* và *data* được truyền dưới dạng tham số. Cũng như các phương thức tạo khác, phương thức này không chèn node vào cây.
 
 
 .. method:: Document.createAttribute(name)
 
-   Create and return an attribute node.  This method does not associate the
-   attribute node with any particular element.  You must use
-   :meth:`~Element.setAttributeNode` on the appropriate :class:`Element` object
-   to use the newly created attribute instance.
+   Tạo và trả về một nút thuộc tính. Phương thức này không liên kết nút thuộc tính với bất kỳ phần tử cụ thể nào. Bạn phải sử dụng
+   :meth:`~Element.setAttributeNode` trên đối tượng :class:`Element` thích hợp để sử dụng thực thể thuộc tính vừa tạo.
 
 
 .. method:: Document.createAttributeNS(namespaceURI, qualifiedName)
 
-   Create and return an attribute node with a namespace.  The *tagName* may have a
-   prefix.  This method does not associate the attribute node with any particular
-   element.  You must use :meth:`~Element.setAttributeNode` on the appropriate
-   :class:`Element` object to use the newly created attribute instance.
+   Tạo và trả về một nút thuộc tính có namespace. *tagName* có thể có tiền tố. Phương thức này không liên kết nút thuộc tính với bất kỳ phần tử cụ thể nào. Bạn phải sử dụng :meth:`~Element.setAttributeNode` trên đối tượng thích hợp
+   :class:`Element` để sử dụng thực thể thuộc tính vừa tạo.
 
 
 .. method:: Document.getElementById(id)
 
-   Return the element with the given ID, or ``None``.
-   Only attributes declared as being of type ID in the DTD
-   or by :meth:`Element.setIdAttribute` are searched.
+   Trả về phần tử có ID đã cho hoặc ``None``. Chỉ các thuộc tính được khai báo có kiểu ID trong DTD hoặc bởi :meth:`Element.setIdAttribute` mới được tìm kiếm.
 
 
 .. method:: Document.getElementsByTagName(tagName)
 
-   Search for all descendants (direct children, children's children, etc.) with a
-   particular element type name.
+   Tìm kiếm tất cả các hậu duệ (con trực tiếp, con của các con, v.v.) có tên kiểu phần tử cụ thể.
 
 
 .. method:: Document.getElementsByTagNameNS(namespaceURI, localName)
 
-   Search for all descendants (direct children, children's children, etc.) with a
-   particular namespace URI and localname.  The localname is the part of the
-   namespace after the prefix.
+   Tìm kiếm tất cả các hậu duệ (con trực tiếp, con của các con, v.v.) có URI namespace và localname cụ thể. localname là phần namespace nằm sau tiền tố.
 
 
 .. method:: Document.renameNode(n, namespaceURI, name)
 
-   Rename the element or attribute node *n*
-   and return it.
-   *namespaceURI* is the new namespace URI, or
-   :data:`~xml.dom.EMPTY_NAMESPACE` if the node does not belong to a namespace.
-   *name* is the new qualified name.
+   Đổi tên nút phần tử hoặc thuộc tính *n* rồi trả về nút đó. *namespaceURI* là URI không gian tên mới, hoặc
+   :data:`~xml.dom.EMPTY_NAMESPACE` nếu nút không thuộc không gian tên nào. *name* là tên đủ điều kiện mới.
 
-   Raise :exc:`WrongDocumentErr` if *n* was created by another document,
-   and :exc:`NotSupportedErr` if it is neither an element nor an attribute.
+   Phát sinh :exc:`WrongDocumentErr` nếu *n* được tạo bởi một tài liệu khác, và :exc:`NotSupportedErr` nếu nó không phải là phần tử cũng không phải là thuộc tính.
 
 
 .. _dom-element-objects:
 
-Element Objects
-^^^^^^^^^^^^^^^
+Đối tượng phần tử
+^^^^^^^^^^^^^^^^^
 
 .. class:: Element
    :no-typesetting:
 
-:class:`Element` is a subclass of :class:`Node`, so inherits all the attributes
-of that class.
+:class:`Element` là một lớp con của :class:`Node`, vì vậy kế thừa tất cả các thuộc tính của lớp đó.
 
 
 .. attribute:: Element.tagName
 
-   The element type name.  In a namespace-using document it may have colons in it.
-   The value is a string.
+   Tên kiểu của phần tử. Trong một tài liệu sử dụng không gian tên, tên này có thể chứa dấu hai chấm. Giá trị là một chuỗi.
 
 
 .. method:: Element.setIdAttribute(name)
 
-   Declare that the attribute *name* is of type ID,
-   so that the element is found by :meth:`Document.getElementById`.
-   Raise :exc:`NotFoundErr` if the element has no such attribute.
+   Khai báo rằng thuộc tính *name* có kiểu ID, để phần tử được tìm thấy bằng :meth:`Document.getElementById`. Phát sinh :exc:`NotFoundErr` nếu phần tử không có thuộc tính như vậy.
 
 
 .. method:: Element.setIdAttributeNS(namespaceURI, localName)
 
-   The same as :meth:`~Element.setIdAttribute`,
-   but for an attribute specified by its namespace URI and local name.
+   Giống như :meth:`~Element.setIdAttribute`, nhưng áp dụng cho một thuộc tính được chỉ định bằng URI không gian tên và tên cục bộ của thuộc tính đó.
 
 
 .. method:: Element.setIdAttributeNode(idAttr)
 
-   The same as :meth:`~Element.setIdAttribute`,
-   but for an already retrieved attribute node.
+   Giống như :meth:`~Element.setIdAttribute`, nhưng áp dụng cho một nút thuộc tính đã được lấy.
 
 
 .. method:: Element.getElementsByTagName(tagName)
 
-   Same as equivalent method in the :class:`Document` class.
+   Giống như phương thức tương đương trong lớp :class:`Document`.
 
 
 .. method:: Element.getElementsByTagNameNS(namespaceURI, localName)
 
-   Same as equivalent method in the :class:`Document` class.
+   Giống như phương thức tương đương trong lớp :class:`Document`.
 
 
 .. method:: Element.hasAttribute(name)
 
-   Return ``True`` if the element has an attribute named by *name*.
+   Trả về ``True`` nếu phần tử có một thuộc tính được đặt tên bởi *name*.
 
 
 .. method:: Element.hasAttributeNS(namespaceURI, localName)
 
-   Return ``True`` if the element has an attribute named by *namespaceURI* and
-   *localName*.
+   Trả về ``True`` nếu phần tử có một thuộc tính được đặt tên bởi *namespaceURI* và *localName*.
 
 
 .. method:: Element.getAttribute(name)
 
-   Return the value of the attribute named by *name* as a string. If no such
-   attribute exists, an empty string is returned, as if the attribute had no value.
+   Trả về giá trị của thuộc tính được đặt tên bởi *name* dưới dạng chuỗi. Nếu không tồn tại thuộc tính như vậy, một chuỗi rỗng sẽ được trả về, như thể thuộc tính đó không có giá trị.
 
 
 .. method:: Element.getAttributeNode(attrname)
 
-   Return the :class:`Attr` node for the attribute named by *attrname*.
+   Trả về nút :class:`Attr` cho thuộc tính có tên được chỉ định bởi *attrname*.
 
 
 .. method:: Element.getAttributeNS(namespaceURI, localName)
 
-   Return the value of the attribute named by *namespaceURI* and *localName* as a
-   string. If no such attribute exists, an empty string is returned, as if the
-   attribute had no value.
+   Trả về giá trị của thuộc tính có tên được chỉ định bởi *namespaceURI* và *localName* dưới dạng chuỗi. Nếu không có thuộc tính như vậy, một chuỗi rỗng được trả về, như thể thuộc tính đó không có giá trị.
 
 
 .. method:: Element.getAttributeNodeNS(namespaceURI, localName)
 
-   Return an attribute value as a node, given a *namespaceURI* and *localName*.
+   Trả về giá trị thuộc tính dưới dạng nút, với *namespaceURI* và *localName*.
 
 
 .. method:: Element.removeAttribute(name)
 
-   Remove an attribute by name.
+   Xóa một thuộc tính theo tên.
 
 
 .. method:: Element.removeAttributeNode(oldAttr)
 
-   Remove and return *oldAttr* from the attribute list, if present. If *oldAttr* is
-   not present, :exc:`NotFoundErr` is raised.
+   Xóa và trả về *oldAttr* khỏi danh sách thuộc tính, nếu có. Nếu *oldAttr* không có, :exc:`NotFoundErr` sẽ được phát sinh.
 
 
 .. method:: Element.removeAttributeNS(namespaceURI, localName)
 
-   Remove an attribute by name.  Note that it uses a localName, not a qname.
+   Xóa một thuộc tính theo tên. Lưu ý rằng thao tác này sử dụng localName, không phải qname.
 
 
 .. method:: Element.setAttribute(name, value)
 
-   Set an attribute value from a string.
+   Đặt giá trị thuộc tính từ một chuỗi.
 
 
 .. method:: Element.setAttributeNode(newAttr)
 
-   Add a new attribute node to the element, replacing an existing attribute if
-   necessary if the :attr:`~Attr.name` attribute matches.  If a replacement
-   occurs, the old attribute node will be returned.  If *newAttr* is already in use,
-   :exc:`InuseAttributeErr` will be raised.
+   Thêm một nút thuộc tính mới vào element, thay thế một thuộc tính hiện có nếu cần nếu thuộc tính :attr:`~Attr.name` khớp. Nếu xảy ra việc thay thế, nút thuộc tính cũ sẽ được trả về. Nếu *newAttr* đã được sử dụng,
+   :exc:`InuseAttributeErr` sẽ được ném ra.
 
 
 .. method:: Element.setAttributeNodeNS(newAttr)
 
-   Add a new attribute node to the element, replacing an existing attribute if
-   necessary if the :attr:`~Node.namespaceURI` and :attr:`~Attr.localName`
-   attributes match.  If a replacement occurs, the old attribute node will be
-   returned.  If *newAttr* is already in use, :exc:`InuseAttributeErr` will be
-   raised.
+   Thêm một nút thuộc tính mới vào element, thay thế một thuộc tính hiện có nếu cần nếu các thuộc tính :attr:`~Node.namespaceURI` và :attr:`~Attr.localName` khớp. Nếu xảy ra việc thay thế, nút thuộc tính cũ sẽ được trả về. Nếu *newAttr* đã được sử dụng, :exc:`InuseAttributeErr` sẽ được ném ra.
 
 
 .. method:: Element.setAttributeNS(namespaceURI, qname, value)
 
-   Set an attribute value from a string, given a *namespaceURI* and a *qname*.
-   Note that a qname is the whole attribute name.  This is different than above.
+   Đặt giá trị thuộc tính từ một chuỗi, với *namespaceURI* và *qname*. Lưu ý rằng qname là toàn bộ tên thuộc tính. Điều này khác với phần trên.
 
 
 .. _dom-attr-objects:
 
-Attr Objects
-^^^^^^^^^^^^
+Đối tượng Attr
+^^^^^^^^^^^^^^
 
 .. class:: Attr
    :no-typesetting:
 
-:class:`Attr` inherits from :class:`Node`, so inherits all its attributes.
+:class:`Attr` kế thừa từ :class:`Node`, vì vậy kế thừa tất cả các thuộc tính của nó.
 
-Attribute nodes are not part of the document tree.
-They are contained in the :attr:`~Node.attributes` map of an element,
-not in its children,
-and their :attr:`~Node.parentNode`, :attr:`~Node.previousSibling`
-and :attr:`~Node.nextSibling` are always ``None``.
+Các nút thuộc tính không thuộc cây tài liệu. Chúng được chứa trong map :attr:`~Node.attributes` của một element, không phải trong các children của nó, và :attr:`~Node.parentNode`, :attr:`~Node.previousSibling` và :attr:`~Node.nextSibling` của chúng luôn là ``None``.
 
 
 .. attribute:: Attr.name
 
-   The attribute name.
-   In a namespace-using document it may include a colon.
+   Tên thuộc tính. Trong tài liệu sử dụng namespace, tên này có thể bao gồm dấu hai chấm.
 
 
 .. attribute:: Attr.localName
 
-   The part of the name following the colon if there is one, else the
-   entire name.
-   This is a read-only attribute.
+   Phần tên nằm sau dấu hai chấm nếu có, nếu không thì là toàn bộ tên. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: Attr.prefix
 
-   The part of the name preceding the colon if there is one, else the
-   empty string.
+   Phần tên nằm trước dấu hai chấm nếu có, nếu không thì là chuỗi rỗng.
 
 
 .. attribute:: Attr.isId
 
-   Whether this attribute is of type ID,
-   either because it is declared as such in the DTD
-   or because :meth:`Element.setIdAttribute` was used.
-   This is a read-only attribute.
+   Cho biết thuộc tính này có kiểu ID hay không, do được khai báo như vậy trong DTD hoặc do :meth:`Element.setIdAttribute` được sử dụng. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: Attr.ownerElement
 
-   The :class:`Element` node to which this attribute belongs,
-   or ``None`` if it is not used.
-   This is a read-only attribute.
+   Nút :class:`Element` mà thuộc tính này thuộc về, hoặc ``None`` nếu thuộc tính này không được sử dụng. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: Attr.specified
 
-   Whether the value of the attribute was explicitly set in the document,
-   as opposed to being defaulted from the DTD.
-   This is a read-only attribute.
+   Cho biết giá trị của thuộc tính có được thiết lập rõ ràng trong tài liệu hay không, thay vì được lấy giá trị mặc định từ DTD. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: Attr.value
 
-   The text value of the attribute.  This is a synonym for the
-   :attr:`~Node.nodeValue` attribute.
+   Giá trị văn bản của thuộc tính. Đây là từ đồng nghĩa với
+   thuộc tính :attr:`~Node.nodeValue`.
 
 
 .. _dom-attributelist-objects:
 
-NamedNodeMap Objects
-^^^^^^^^^^^^^^^^^^^^
+Đối tượng NamedNodeMap
+^^^^^^^^^^^^^^^^^^^^^^
 
 .. class:: NamedNodeMap
    :no-typesetting:
 
-:class:`NamedNodeMap` does *not* inherit from :class:`Node`.
+:class:`NamedNodeMap` *không* kế thừa từ :class:`Node`.
 
 
 .. attribute:: NamedNodeMap.length
 
-   The length of the attribute list.
+   Độ dài của danh sách thuộc tính.
 
 
 .. method:: NamedNodeMap.item(index)
 
-   Return an attribute with a particular index.  The order you get the attributes
-   in is arbitrary but will be consistent for the life of a DOM.  Each item is an
-   attribute node.  Get its value with the :attr:`~Attr.value` attribute.
+   Trả về một thuộc tính tại một chỉ mục cụ thể. Thứ tự nhận được các thuộc tính là tùy ý nhưng sẽ nhất quán trong suốt vòng đời của một DOM. Mỗi mục là một nút thuộc tính. Lấy giá trị của nó bằng thuộc tính :attr:`~Attr.value`.
 
 
 .. method:: NamedNodeMap.getNamedItem(name)
 
-   Return the node with the given :attr:`~Attr.name`,
-   or ``None`` if there is no such node.
+   Trả về nút có :attr:`~Attr.name` đã cho hoặc ``None`` nếu không có nút như vậy.
 
 
 .. method:: NamedNodeMap.getNamedItemNS(namespaceURI, localName)
 
-   Return the node with the given namespace URI and local name,
-   or ``None`` if there is no such node.
+   Trả về nút có URI namespace và tên cục bộ đã cho hoặc ``None`` nếu không có nút như vậy.
 
 
 .. method:: NamedNodeMap.setNamedItem(node)
 
-   Add *node* to the map, using its :attr:`~Attr.name` as the key.
-   Return the node which it replaces, or ``None`` if it replaces no node.
+   Thêm *node* vào map, sử dụng :attr:`~Attr.name` của nó làm khóa. Trả về node mà nó thay thế, hoặc ``None`` nếu nó không thay thế node nào.
 
 
 .. method:: NamedNodeMap.setNamedItemNS(node)
 
-   Add *node* to the map,
-   using its namespace URI and local name as the key.
-   Return the node which it replaces, or ``None`` if it replaces no node.
+   Thêm *node* vào map, sử dụng URI namespace và tên cục bộ của nó làm khóa. Trả về node mà nó thay thế, hoặc ``None`` nếu nó không thay thế node nào.
 
 
 .. method:: NamedNodeMap.removeNamedItem(name)
 
-   Remove and return the node with the given :attr:`~Attr.name`.
-   Raise :exc:`NotFoundErr` if there is no such node.
+   Xóa và trả về node có :attr:`~Attr.name` đã cho. Phát sinh :exc:`NotFoundErr` nếu không có node như vậy.
 
 
 .. method:: NamedNodeMap.removeNamedItemNS(namespaceURI, localName)
 
-   Remove and return the node with the given namespace URI and local name.
-   Raise :exc:`NotFoundErr` if there is no such node.
+   Xóa và trả về node có URI namespace và tên cục bộ đã cho. Phát sinh :exc:`NotFoundErr` nếu không có node như vậy.
 
-You can also use the standardized :meth:`!getAttribute\*` family of methods
-on the :class:`Element` objects.
+Bạn cũng có thể sử dụng nhóm phương thức :meth:`!getAttribute\*` được chuẩn hóa trên các đối tượng :class:`Element`.
 
 
 .. _dom-documentfragment-objects:
 
-DocumentFragment Objects
-^^^^^^^^^^^^^^^^^^^^^^^^
+Đối tượng DocumentFragment
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. class:: DocumentFragment
    :no-typesetting:
 
-:class:`DocumentFragment` is a lightweight container of nodes.
-It is a subclass of :class:`Node`.
-When it is inserted into the document tree,
-its children are inserted instead of it,
-and it becomes empty.
+:class:`DocumentFragment` là một vùng chứa node nhẹ. Đây là lớp con của :class:`Node`. Khi được chèn vào cây tài liệu, các node con của nó sẽ được chèn thay cho nó, và nó trở nên rỗng.
 
 
 .. _dom-characterdata-objects:
 
-CharacterData Objects
-^^^^^^^^^^^^^^^^^^^^^
+Đối tượng CharacterData
+^^^^^^^^^^^^^^^^^^^^^^^
 
 .. class:: CharacterData
    :no-typesetting:
 
-:class:`CharacterData` represents text-like data in the XML document.
-It is a subclass of :class:`Node`, and the base class
-of :class:`Text`, :class:`CDATASection` and :class:`Comment`.
-Such nodes cannot have child nodes.
+:class:`CharacterData` đại diện cho dữ liệu dạng văn bản trong tài liệu XML. Đây là một lớp con của :class:`Node`, đồng thời là lớp cơ sở của :class:`Text`, :class:`CDATASection` và :class:`Comment`. Các nút này không thể có nút con.
 
 
 .. attribute:: CharacterData.data
 
-   The content of the node as a string.
+   Nội dung của nút dưới dạng chuỗi.
 
 
 .. attribute:: CharacterData.length
 
-   The number of characters in :attr:`~CharacterData.data`.
-   This is a read-only attribute.
+   Số ký tự trong :attr:`~CharacterData.data`. Đây là thuộc tính chỉ đọc.
 
 
 .. method:: CharacterData.substringData(offset, count)
 
-   Return the substring of :attr:`~CharacterData.data`
-   of *count* characters starting at *offset*.
+   Trả về chuỗi con của :attr:`~CharacterData.data` gồm *count* ký tự, bắt đầu tại *offset*.
 
 
 .. method:: CharacterData.appendData(arg)
 
-   Append the string *arg* to :attr:`~CharacterData.data`.
+   Nối chuỗi *arg* vào :attr:`~CharacterData.data`.
 
 
 .. method:: CharacterData.insertData(offset, arg)
 
-   Insert the string *arg* into :attr:`~CharacterData.data` at *offset*.
+   Chèn chuỗi *arg* vào :attr:`~CharacterData.data` tại *offset*.
 
 
 .. method:: CharacterData.deleteData(offset, count)
 
-   Remove *count* characters from :attr:`~CharacterData.data`
-   starting at *offset*.
+   Xóa *count* ký tự khỏi :attr:`~CharacterData.data`, bắt đầu từ *offset*.
 
 
 .. method:: CharacterData.replaceData(offset, count, arg)
 
-   Replace *count* characters of :attr:`~CharacterData.data`
-   starting at *offset* with the string *arg*.
+   Thay thế *count* ký tự của :attr:`~CharacterData.data`, bắt đầu từ *offset*, bằng chuỗi *arg*.
 
 
 .. _dom-comment-objects:
 
-Comment Objects
-^^^^^^^^^^^^^^^
+Đối tượng Comment
+^^^^^^^^^^^^^^^^^
 
 .. class:: Comment
    :no-typesetting:
 
-:class:`Comment` represents a comment in the XML document.
-It is a subclass of :class:`CharacterData`.
+:class:`Comment` biểu diễn một comment trong tài liệu XML. Đây là lớp con của :class:`CharacterData`.
 
 
 .. attribute:: Comment.data
 
-   The content of the comment as a string.  The attribute contains all characters
-   between the leading ``<!-``\ ``-`` and trailing ``-``\ ``->``, but does not
-   include them.
+   Nội dung của comment dưới dạng chuỗi. Thuộc tính này chứa tất cả các ký tự nằm giữa ``<!-``\ ``-`` ở đầu và ``-``\ ``->`` ở cuối, nhưng không bao gồm các ký tự đó.
 
 
 .. _dom-text-objects:
 
-Text and CDATASection Objects
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Đối tượng Text và CDATASection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. class:: Text
    :no-typesetting:
@@ -1093,271 +836,209 @@ Text and CDATASection Objects
 .. class:: CDATASection
    :no-typesetting:
 
-The :class:`Text` interface represents text in the XML document.  If the parser
-and DOM implementation support the DOM's XML extension, portions of the text
-enclosed in CDATA marked sections are stored in :class:`CDATASection` objects.
-These two interfaces are identical, but provide different values for the
-:attr:`~Node.nodeType` attribute.
+Giao diện :class:`Text` biểu diễn văn bản trong tài liệu XML. Nếu parser và phần triển khai DOM hỗ trợ phần mở rộng XML của DOM, các phần văn bản được bao quanh bởi các vùng được đánh dấu là CDATA sẽ được lưu trong các đối tượng :class:`CDATASection`. Hai giao diện này giống hệt nhau, nhưng cung cấp các giá trị khác nhau cho
+Thuộc tính :attr:`~Node.nodeType`.
 
-:class:`Text` extends the :class:`CharacterData` interface,
-and :class:`CDATASection` extends :class:`Text`.
+:class:`Text` kế thừa giao diện :class:`CharacterData`, còn :class:`CDATASection` kế thừa :class:`Text`.
 
 
 .. attribute:: Text.data
 
-   The content of the text node as a string.
+   Nội dung của nút văn bản dưới dạng chuỗi.
 
 
 .. attribute:: Text.wholeText
 
-   The text of all :class:`Text` nodes logically adjacent to this node,
-   concatenated in document order.
-   This is a read-only attribute.
+   Văn bản của tất cả các nút :class:`Text` kề về mặt logic với nút này, được nối theo thứ tự tài liệu. Đây là thuộc tính chỉ đọc.
 
 
 .. method:: Text.replaceWholeText(content)
 
-   Replace the text of all :class:`Text` nodes logically adjacent
-   to this node with *content*, removing the other nodes.
-   Return this node, or ``None`` if *content* is empty.
+   Thay thế văn bản của tất cả các nút :class:`Text` kề về mặt logic với nút này bằng *content*, đồng thời xóa các nút còn lại. Trả về nút này hoặc ``None`` nếu *content* trống.
 
 
 .. method:: Text.splitText(offset)
 
-   Split this node into two nodes at *offset*,
-   keeping the first part in this node
-   and returning a new sibling node with the rest.
+   Tách nút này thành hai nút tại *offset*, giữ phần đầu trong nút này và trả về một nút anh em mới chứa phần còn lại.
 
 .. note::
 
-   The use of a :class:`CDATASection` node does not indicate that the node
-   represents a complete CDATA marked section, only that the content of the node
-   was part of a CDATA section.  A single CDATA section may be represented by more
-   than one node in the document tree.  There is no way to determine whether two
-   adjacent :class:`CDATASection` nodes represent different CDATA marked sections.
+   Việc sử dụng một nút :class:`CDATASection` không cho biết nút đó đại diện cho một phần CDATA được đánh dấu hoàn chỉnh, mà chỉ cho biết nội dung của nút là một phần của một CDATA section. Một CDATA section đơn lẻ có thể được biểu diễn bởi nhiều hơn một nút trong cây tài liệu. Không có cách nào xác định liệu hai nút :class:`CDATASection` kề nhau có đại diện cho các CDATA section được đánh dấu khác nhau hay không.
 
 
 .. _dom-pi-objects:
 
-ProcessingInstruction Objects
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Đối tượng ProcessingInstruction
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. class:: ProcessingInstruction
    :no-typesetting:
 
-Represents a processing instruction in the XML document; this inherits from the
-:class:`Node` interface and cannot have child nodes.
+Đại diện cho một processing instruction trong tài liệu XML; đối tượng này kế thừa từ
+:class:`Node` interface và không thể có node con.
 
 
 .. attribute:: ProcessingInstruction.target
 
-   The content of the processing instruction up to the first whitespace character.
-   This is a read-only attribute.
+   Nội dung của processing instruction cho đến ký tự khoảng trắng đầu tiên. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: ProcessingInstruction.data
 
-   The content of the processing instruction following the first whitespace
-   character.
+   Nội dung của processing instruction sau ký tự khoảng trắng đầu tiên.
 
 
 .. _dom-entity-objects:
 
-Entity Objects
-^^^^^^^^^^^^^^
+Đối tượng Entity
+^^^^^^^^^^^^^^^^
 
 .. class:: Entity
    :no-typesetting:
 
-:class:`Entity` represents a parsed or unparsed entity declared in the DTD.
-It is a subclass of :class:`Node`.
-Entity nodes are contained in :attr:`DocumentType.entities`
-and cannot be inserted into the document tree.
-The name of the entity is its :attr:`~Node.nodeName`.
+:class:`Entity` đại diện cho một entity đã được phân tích cú pháp hoặc chưa được phân tích cú pháp được khai báo trong DTD. Đây là một lớp con của :class:`Node`. Các node Entity được chứa trong :attr:`DocumentType.entities` và không thể được chèn vào cây tài liệu. Tên của entity là :attr:`~Node.nodeName`.
 
 
 .. attribute:: Entity.publicId
 
-   The public identifier of the entity,
-   or ``None`` if it is not specified.
-   This is a read-only attribute.
+   Định danh công khai của entity, hoặc ``None`` nếu không được chỉ định. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: Entity.systemId
 
-   The system identifier of the entity,
-   or ``None`` if it is not specified.
-   This is a read-only attribute.
+   Định danh hệ thống của entity, hoặc ``None`` nếu không được chỉ định. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: Entity.notationName
 
-   The name of the notation for an unparsed entity,
-   or ``None`` for a parsed entity.
-   This is a read-only attribute.
+   Tên của notation dành cho entity chưa được phân tích, hoặc ``None`` đối với entity đã được phân tích. Đây là thuộc tính chỉ đọc.
 
 
 .. _dom-notation-objects:
 
-Notation Objects
-^^^^^^^^^^^^^^^^
+Đối tượng Notation
+^^^^^^^^^^^^^^^^^^
 
 .. class:: Notation
    :no-typesetting:
 
-:class:`Notation` represents a notation declared in the DTD.
-It is a subclass of :class:`Node` and cannot have child nodes.
-Notation nodes are contained in :attr:`DocumentType.notations`
-and cannot be inserted into the document tree.
-The name of the notation is its :attr:`~Node.nodeName`.
+:class:`Notation` đại diện cho một notation được khai báo trong DTD. Đây là một lớp con của :class:`Node` và không thể có các nút con. Các nút notation được chứa trong :attr:`DocumentType.notations` và không thể được chèn vào cây tài liệu. Tên của notation là :attr:`~Node.nodeName`.
 
 
 .. attribute:: Notation.publicId
 
-   The public identifier of the notation,
-   or ``None`` if it is not specified.
-   This is a read-only attribute.
+   Định danh công khai của notation, hoặc ``None`` nếu không được chỉ định. Đây là thuộc tính chỉ đọc.
 
 
 .. attribute:: Notation.systemId
 
-   The system identifier of the notation,
-   or ``None`` if it is not specified.
-   This is a read-only attribute.
+   Định danh hệ thống của notation, hoặc ``None`` nếu không được chỉ định. Đây là thuộc tính chỉ đọc.
 
 
 .. _dom-exceptions:
 
-Exceptions
-^^^^^^^^^^
+Ngoại lệ
+^^^^^^^^
 
-The DOM Level 2 recommendation defines a single exception, :exc:`DOMException`,
-and a number of constants that allow applications to determine what sort of
-error occurred. :exc:`DOMException` instances carry a :attr:`code` attribute
-that provides the appropriate value for the specific exception.
+Khuyến nghị DOM Level 2 định nghĩa một ngoại lệ duy nhất, :exc:`DOMException`, cùng một số hằng số cho phép các ứng dụng xác định loại lỗi đã xảy ra. Các thực thể :exc:`DOMException` mang một thuộc tính :attr:`code` cung cấp giá trị thích hợp cho ngoại lệ cụ thể đó.
 
-The Python DOM interface provides the constants, but also expands the set of
-exceptions so that a specific exception exists for each of the exception codes
-defined by the DOM.  The implementations must raise the appropriate specific
-exception, each of which carries the appropriate value for the :attr:`code`
-attribute.
+Giao diện DOM của Python cung cấp các hằng số, nhưng cũng mở rộng tập hợp ngoại lệ để tồn tại một ngoại lệ cụ thể cho mỗi mã ngoại lệ được DOM định nghĩa. Các implementation phải raise ngoại lệ cụ thể thích hợp, mỗi ngoại lệ đều mang giá trị thích hợp cho thuộc tính :attr:`code`.
 
 
 .. exception:: DOMException
 
-   Base exception class used for all specific DOM exceptions.  This exception class
-   cannot be directly instantiated.
+   Lớp ngoại lệ cơ sở được dùng cho tất cả các ngoại lệ DOM cụ thể. Không thể khởi tạo trực tiếp lớp ngoại lệ này.
 
 
 .. exception:: DomstringSizeErr
 
-   Raised when a specified range of text does not fit into a string. This is not
-   known to be used in the Python DOM implementations, but may be received from DOM
-   implementations not written in Python.
+   Được raise khi một phạm vi văn bản được chỉ định không thể chứa trong một chuỗi. Không được biết là ngoại lệ này có được dùng trong các implementation DOM của Python hay không, nhưng có thể nhận được từ các implementation DOM không được viết bằng Python.
 
 
 .. exception:: HierarchyRequestErr
 
-   Raised when an attempt is made to insert a node where the node type is not
-   allowed.
+   Được raise khi cố gắng chèn một node vào vị trí không cho phép kiểu node đó.
 
 
 .. exception:: IndexSizeErr
 
-   Raised when an index or size parameter to a method is negative or exceeds the
-   allowed values.
+   Được raise khi tham số chỉ mục hoặc kích thước của một method là số âm hoặc vượt quá các giá trị được phép.
 
 
 .. exception:: InuseAttributeErr
 
-   Raised when an attempt is made to insert an :class:`Attr` node that is already
-   present elsewhere in the document.
+   Được phát sinh khi cố gắng chèn một nút :class:`Attr` đã tồn tại ở nơi khác trong tài liệu.
 
 
 .. exception:: InvalidAccessErr
 
-   Raised if a parameter or an operation is not supported on the underlying object.
+   Được phát sinh nếu một tham số hoặc một thao tác không được hỗ trợ trên đối tượng bên dưới.
 
 
 .. exception:: InvalidCharacterErr
 
-   This exception is raised when a string parameter contains a character that is
-   not permitted in the context it's being used in by the XML 1.0 recommendation.
-   For example, attempting to create an :class:`Element` node with a space in the
-   element type name will cause this error to be raised.
+   Ngoại lệ này được phát sinh khi một tham số chuỗi chứa ký tự không được phép trong ngữ cảnh sử dụng theo khuyến nghị XML 1.0. Ví dụ, cố gắng tạo một nút :class:`Element` với dấu cách trong tên kiểu phần tử sẽ khiến lỗi này được phát sinh.
 
 
 .. exception:: InvalidModificationErr
 
-   Raised when an attempt is made to modify the type of a node.
+   Được phát sinh khi cố gắng sửa đổi kiểu của một nút.
 
 
 .. exception:: InvalidStateErr
 
-   Raised when an attempt is made to use an object that is not defined or is no
-   longer usable.
+   Được phát sinh khi cố gắng sử dụng một đối tượng chưa được định nghĩa hoặc không còn có thể sử dụng.
 
 
 .. exception:: NamespaceErr
 
-   If an attempt is made to change any object in a way that is not permitted with
-   regard to the `Namespaces in XML <https://www.w3.org/TR/REC-xml-names/>`_
-   recommendation, this exception is raised.
+   Nếu cố gắng thay đổi bất kỳ đối tượng nào theo cách không được phép liên quan đến khuyến nghị `Namespaces in XML <https://www.w3.org/TR/REC-xml-names/>`_, ngoại lệ này sẽ được phát sinh.
 
 
 .. exception:: NotFoundErr
 
-   Exception when a node does not exist in the referenced context.  For example,
-   :meth:`NamedNodeMap.removeNamedItem` will raise this if the node passed in does
-   not exist in the map.
+   Ngoại lệ khi một nút không tồn tại trong ngữ cảnh được tham chiếu.  Ví dụ,
+   :meth:`NamedNodeMap.removeNamedItem` sẽ đưa ra ngoại lệ này nếu node được truyền vào không tồn tại trong map.
 
 
 .. exception:: NotSupportedErr
 
-   Raised when the implementation does not support the requested type of object or
-   operation.
+   Được đưa ra khi implementation không hỗ trợ kiểu object hoặc operation được yêu cầu.
 
 
 .. exception:: NoDataAllowedErr
 
-   This is raised if data is specified for a node which does not support data.
+   Ngoại lệ này được đưa ra nếu dữ liệu được chỉ định cho một node không hỗ trợ dữ liệu.
 
    .. XXX  a better explanation is needed!
 
 
 .. exception:: NoModificationAllowedErr
 
-   Raised on attempts to modify an object where modifications are not allowed (such
-   as for read-only nodes).
+   Được đưa ra khi cố gắng sửa đổi một object mà không cho phép sửa đổi (chẳng hạn như các node chỉ đọc).
 
 
 .. exception:: SyntaxErr
 
-   Raised when an invalid or illegal string is specified.
+   Được đưa ra khi một chuỗi không hợp lệ hoặc bị cấm được chỉ định.
 
    .. XXX  how is this different from InvalidCharacterErr?
 
 
 .. exception:: ValidationErr
 
-   Raised when an operation would make the document invalid
-   with respect to partial validity.
-   This is not known to be used in the Python DOM implementations,
-   but may be received from DOM implementations not written in Python.
+   Được đưa ra khi một operation khiến tài liệu không hợp lệ theo quy tắc về tính hợp lệ từng phần. Hiện chưa biết các implementation Python DOM có sử dụng ngoại lệ này hay không, nhưng có thể nhận được ngoại lệ này từ các implementation DOM không được viết bằng Python.
 
 
 .. exception:: WrongDocumentErr
 
-   Raised when a node is inserted in a different document than it currently belongs
-   to, and the implementation does not support migrating the node from one document
-   to the other.
+   Được đưa ra khi một node được chèn vào một tài liệu khác với tài liệu mà node hiện thuộc về, và implementation không hỗ trợ di chuyển node từ tài liệu này sang tài liệu kia.
 
 
-The exception codes defined in the DOM recommendation map to the exceptions
-described above according to this table:
+Các mã ngoại lệ được định nghĩa trong khuyến nghị DOM ánh xạ tới các ngoại lệ được mô tả ở trên theo bảng này:
 
 +---------------------------------------+---------------------------------+
-| Constant                              | Exception                       |
+| Hằng số                               | Ngoại lệ                        |
 +=======================================+=================================+
 | .. data:: DOMSTRING_SIZE_ERR          | :exc:`DomstringSizeErr`         |
 +---------------------------------------+---------------------------------+
@@ -1395,73 +1076,57 @@ described above according to this table:
 
 .. _dom-conformance:
 
-Conformance
------------
+Tính tuân thủ
+-------------
 
-This section describes the conformance requirements and relationships between
-the Python DOM API, the W3C DOM recommendations, and the OMG IDL mapping for
-Python.
+Phần này mô tả các yêu cầu về tính tuân thủ và mối quan hệ giữa Python DOM API, các khuyến nghị W3C DOM và ánh xạ OMG IDL cho Python.
 
 
 .. _dom-type-mapping:
 
-Type Mapping
-^^^^^^^^^^^^
+Ánh xạ kiểu
+^^^^^^^^^^^
 
-The IDL types used in the DOM specification are mapped to Python types
-according to the following table.
+Các kiểu IDL được sử dụng trong đặc tả DOM được ánh xạ tới các kiểu Python theo bảng sau.
 
-+------------------+-------------------------------------------+
-| IDL Type         | Python Type                               |
-+==================+===========================================+
-| ``boolean``      | ``bool`` or ``int``                       |
-+------------------+-------------------------------------------+
-| ``int``          | ``int``                                   |
-+------------------+-------------------------------------------+
-| ``long int``     | ``int``                                   |
-+------------------+-------------------------------------------+
-| ``unsigned int`` | ``int``                                   |
-+------------------+-------------------------------------------+
-| ``DOMString``    | ``str`` or ``bytes``                      |
-+------------------+-------------------------------------------+
-| ``null``         | ``None``                                  |
-+------------------+-------------------------------------------+
++------------------+------------------------+
+| Kiểu IDL         | Kiểu Python            |
++==================+========================+
+| ``boolean``      | ``bool`` hoặc ``int``  |
++------------------+------------------------+
+| ``int``          | ``int``                |
++------------------+------------------------+
+| ``long int``     | ``int``                |
++------------------+------------------------+
+| ``unsigned int`` | ``int``                |
++------------------+------------------------+
+| ``DOMString``    | ``str`` hoặc ``bytes`` |
++------------------+------------------------+
+| ``null``         | ``None``               |
++------------------+------------------------+
 
 .. _dom-accessor-methods:
 
-Accessor Methods
-^^^^^^^^^^^^^^^^
+Các phương thức accessor
+^^^^^^^^^^^^^^^^^^^^^^^^
 
-The mapping from OMG IDL to Python defines accessor functions for IDL
-``attribute`` declarations in much the way the Java mapping does.
-Mapping the IDL declarations ::
+Ánh xạ từ OMG IDL sang Python định nghĩa các hàm accessor cho các khai báo ``attribute`` của IDL, tương tự như ánh xạ Java. Việc ánh xạ các khai báo IDL::
 
    readonly attribute string someValue;
             attribute string anotherValue;
 
-yields three accessor functions:  a "get" method for :attr:`!someValue`
-(:meth:`!_get_someValue`), and "get" and "set" methods for :attr:`!anotherValue`
-(:meth:`!_get_anotherValue` and :meth:`!_set_anotherValue`).  The mapping, in
-particular, does not require that the IDL attributes are accessible as normal
-Python attributes:  ``object.someValue`` is *not* required to work, and may
-raise an :exc:`AttributeError`.
+tạo ra ba hàm accessor: một phương thức "get" cho :attr:`!someValue` (:meth:`!_get_someValue`), và các phương thức "get" và "set" cho :attr:`!anotherValue` (:meth:`!_get_anotherValue` và :meth:`!_set_anotherValue`). Cụ thể, ánh xạ này không yêu cầu các thuộc tính IDL phải có thể truy cập như các thuộc tính Python thông thường: ``object.someValue`` *không* bắt buộc phải hoạt động và có thể gây ra một :exc:`AttributeError`.
 
-The Python DOM API, however, *does* require that normal attribute access work.
-This means that the typical surrogates generated by Python IDL compilers are not
-likely to work, and wrapper objects may be needed on the client if the DOM
-objects are accessed via CORBA. While this does require some additional
-consideration for CORBA DOM clients, the implementers with experience using DOM
-over CORBA from Python do not consider this a problem.  Attributes that are
-declared ``readonly`` may not restrict write access in all DOM
-implementations.
+Tuy nhiên, Python DOM API *có* yêu cầu việc truy cập thuộc tính thông thường phải hoạt động. Điều này có nghĩa là các surrogate điển hình được tạo bởi trình biên dịch Python IDL khó có khả năng hoạt động, và có thể cần các đối tượng wrapper ở phía client nếu các đối tượng DOM được truy cập qua CORBA. Mặc dù điều này đòi hỏi các client CORBA DOM phải cân nhắc thêm, những người triển khai có kinh nghiệm sử dụng DOM qua CORBA từ Python không xem đây là vấn đề. Các thuộc tính được khai báo ``readonly`` có thể không hạn chế quyền ghi trong mọi triển khai DOM.
 
-In the Python DOM API, accessor functions are not required.  If provided, they
-should take the form defined by the Python IDL mapping, but these methods are
-considered unnecessary since the attributes are accessible directly from Python.
-"Set" accessors should never be provided for ``readonly`` attributes.
+Trong Python DOM API, không bắt buộc phải có các hàm accessor. Nếu được cung cấp, chúng phải có dạng được định nghĩa bởi ánh xạ Python IDL, nhưng các phương thức này được xem là không cần thiết vì có thể truy cập trực tiếp các thuộc tính từ Python. Không bao giờ được cung cấp các accessor "Set" cho các thuộc tính ``readonly``.
 
-The IDL definitions do not fully embody the requirements of the W3C DOM API,
-such as the notion of certain objects, such as the return value of
-:meth:`~Element.getElementsByTagName`, being "live".  The Python DOM API does
-not require implementations to enforce such requirements.
+Các định nghĩa IDL không thể hiện đầy đủ những yêu cầu của W3C DOM API, chẳng hạn như khái niệm một số đối tượng nhất định, ví dụ như giá trị trả về của
+:meth:`~Element.getElementsByTagName`, là "live". Python DOM API không yêu cầu các triển khai phải thực thi những yêu cầu như vậy.
 
+.. _`Document Object Model (DOM) Level 2 Specification`: https://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113/
+.. _`Document Object Model (DOM) Level 1 Specification`: https://www.w3.org/TR/REC-DOM-Level-1/
+.. _`Python Language Mapping Specification`: https://www.omg.org/spec/PYTH/1.2/PDF
+.. _`Namespaces in XML`: https://www.w3.org/TR/REC-xml-names/
+.. _`Document Object Model (DOM) Level 2 Core Specification`: https://www.w3.org/TR/DOM-Level-2-Core/core.html
+.. _`XHTML 1.0: The Extensible HyperText Markup Language`: https://www.w3.org/TR/xhtml1/

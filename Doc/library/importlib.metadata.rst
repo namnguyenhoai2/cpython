@@ -1,73 +1,42 @@
 .. _using:
 
-========================================================
-:mod:`!importlib.metadata` -- Accessing package metadata
-========================================================
+===========================================================
+:mod:`!importlib.metadata` -- Truy cập metadata của package
+===========================================================
 
 .. module:: importlib.metadata
-   :synopsis: Accessing package metadata
+   :synopsis: Truy cập metadata của package
 
 .. versionadded:: 3.8
 .. versionchanged:: 3.10
-   ``importlib.metadata`` is no longer provisional.
+   ``importlib.metadata`` không còn là thử nghiệm.
 
-**Source code:** :source:`Lib/importlib/metadata/__init__.py`
+**Mã nguồn:** :source:`Lib/importlib/metadata/__init__.py`
 
-``importlib.metadata`` is a library that provides access to
-the metadata of an installed `Distribution Package <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_,
-such as its entry points
-or its top-level names (`Import Package <https://packaging.python.org/en/latest/glossary/#term-Import-Package>`_\s, modules, if any).
-Built in part on Python's import system, this library
-provides the entry point and metadata APIs that were previously
-exposed by the now-removed ``pkg_resources`` package. Along with
-:mod:`importlib.resources`, it supersedes ``pkg_resources``.
+``importlib.metadata`` là một thư viện cung cấp quyền truy cập vào metadata của một `Distribution Package <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_ đã cài đặt, chẳng hạn như các entry point hoặc tên cấp cao nhất của nó (`Import Package <https://packaging.python.org/en/latest/glossary/#term-Import-Package>`_\s, các module nếu có). Được xây dựng một phần dựa trên hệ thống import của Python, thư viện này cung cấp các API về entry point và metadata trước đây được cung cấp bởi package ``pkg_resources`` đã bị loại bỏ. Cùng với
+:mod:`importlib.resources`, thư viện này thay thế ``pkg_resources``.
 
-``importlib.metadata`` operates on third-party *distribution packages*
-installed into Python's ``site-packages`` directory via tools such as
-:pypi:`pip`.
-Specifically, it works with distributions with discoverable
-``dist-info`` or ``egg-info`` directories,
-and metadata defined by the `Core metadata specifications <https://packaging.python.org/en/latest/specifications/core-metadata/#core-metadata>`_.
+``importlib.metadata`` hoạt động trên các *distribution packages* của bên thứ ba được cài đặt vào thư mục ``site-packages`` của Python bằng các công cụ như
+:pypi:`pip`. Cụ thể, nó hoạt động với các distribution có thư mục ``dist-info`` hoặc ``egg-info`` có thể phát hiện được, cùng metadata được định nghĩa bởi `các đặc tả Core metadata <https://packaging.python.org/en/latest/specifications/core-metadata/#core-metadata>`_.
 
 .. important::
 
-   These are *not* necessarily equivalent to or correspond 1:1 with
-   the top-level *import package* names
-   that can be imported inside Python code.
-   One *distribution package* can contain multiple *import packages*
-   (and single modules),
-   and one top-level *import package*
-   may map to multiple *distribution packages*
-   if it is a namespace package.
-   You can use :ref:`packages_distributions() <package-distributions>`
-   to get a mapping between them.
+   Các distribution này *không* nhất thiết tương đương hoặc tương ứng 1:1 với tên *import package* cấp cao nhất có thể được import bên trong mã Python. Một *distribution package* có thể chứa nhiều *import package* (và các module đơn lẻ), còn một *import package* cấp cao nhất có thể ánh xạ tới nhiều *distribution package* nếu đó là namespace package. Bạn có thể sử dụng :ref:`packages_distributions() <package-distributions>` để lấy ánh xạ giữa chúng.
 
-By default, distribution metadata can live on the file system
-or in zip archives on
-:data:`sys.path`. Through an extension mechanism, the metadata can live almost
-anywhere.
+Theo mặc định, metadata của distribution có thể nằm trên hệ thống tệp hoặc trong các kho lưu trữ zip trên
+:data:`sys.path`. Thông qua một cơ chế mở rộng, metadata có thể nằm ở hầu như bất kỳ đâu.
 
 
 .. seealso::
 
    https://importlib-metadata.readthedocs.io/
-      The documentation for ``importlib_metadata``, which supplies a
-      backport of ``importlib.metadata``.
-      This includes an `API reference
-      <https://importlib-metadata.readthedocs.io/en/latest/api.html>`__
-      for this module's classes and functions,
-      as well as a `migration guide
-      <https://importlib-metadata.readthedocs.io/en/latest/migration.html>`__
-      for existing users of ``pkg_resources``.
+      Tài liệu dành cho ``importlib_metadata``, cung cấp bản backport của ``importlib.metadata``. Tài liệu này bao gồm `tài liệu tham chiếu API <https://importlib-metadata.readthedocs.io/en/latest/api.html>`__ cho các lớp và hàm của module này, cũng như `hướng dẫn chuyển đổi <https://importlib-metadata.readthedocs.io/en/latest/migration.html>`__ dành cho những người dùng hiện tại của ``pkg_resources``.
 
 
-Overview
-========
+Tổng quan
+=========
 
-Let's say you wanted to get the version string for a
-`Distribution Package <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_ you've installed
-using ``pip``. We start by creating a virtual environment and installing
-something into it:
+Giả sử bạn muốn lấy chuỗi phiên bản của một `Distribution Package <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_ mà bạn đã cài đặt bằng ``pip``. Trước tiên, chúng ta tạo một môi trường ảo và cài đặt một gói vào đó:
 
 .. code-block:: shell-session
 
@@ -75,7 +44,7 @@ something into it:
     $ source example/bin/activate
     (example) $ python -m pip install wheel
 
-You can get the version string for ``wheel`` by running the following:
+Bạn có thể lấy chuỗi phiên bản của ``wheel`` bằng cách chạy lệnh sau:
 
 .. code-block:: pycon
 
@@ -84,32 +53,28 @@ You can get the version string for ``wheel`` by running the following:
     >>> version('wheel')  # doctest: +SKIP
     '0.32.3'
 
-You can also get a collection of entry points selectable by properties of the EntryPoint (typically 'group' or 'name'), such as
-``console_scripts``, ``distutils.commands`` and others. Each group contains a
-collection of :ref:`EntryPoint <entry-points>` objects.
+Bạn cũng có thể lấy một tập hợp các entry point có thể được chọn theo các thuộc tính của EntryPoint (thường là 'group' hoặc 'name'), chẳng hạn như ``console_scripts``, ``distutils.commands`` và các entry point khác. Mỗi group chứa một tập hợp các đối tượng :ref:`EntryPoint <entry-points>`.
 
-You can get the :ref:`metadata for a distribution <metadata>`::
+Bạn có thể lấy :ref:`siêu dữ liệu của một bản phân phối <metadata>`::
 
     >>> from importlib.metadata import metadata  # doctest: +SKIP
     >>> list(metadata('wheel'))  # doctest: +SKIP
     ['Metadata-Version', 'Name', 'Version', 'Summary', 'Home-page', 'Author', 'Author-email', 'Maintainer', 'Maintainer-email', 'License', 'Project-URL', 'Project-URL', 'Project-URL', 'Keywords', 'Platform', 'Classifier', 'Classifier', 'Classifier', 'Classifier', 'Classifier', 'Classifier', 'Classifier', 'Classifier', 'Classifier', 'Classifier', 'Classifier', 'Classifier', 'Requires-Python', 'Provides-Extra', 'Requires-Dist', 'Requires-Dist']
 
-You can also get a :ref:`distribution's version number <version>`, list its
-:ref:`constituent files <files>`, and get a list of the distribution's
+Bạn cũng có thể lấy số phiên bản của một :ref:`bản phân phối <version>`, liệt kê các
+:ref:`tệp cấu thành <files>`, và lấy danh sách các thành phần của bản phân phối
 :ref:`requirements`.
 
 
 .. exception:: PackageNotFoundError
 
-   Subclass of :class:`ModuleNotFoundError` raised by several functions in this
-   module when queried for a distribution package which is not installed in the
-   current Python environment.
+   Lớp con của :class:`ModuleNotFoundError` được một số hàm trong mô-đun này đưa ra khi truy vấn một gói phân phối chưa được cài đặt trong môi trường Python hiện tại.
 
 
-Functional API
-==============
+API hàm
+=======
 
-This package provides the following functionality via its public API.
+Gói này cung cấp các chức năng sau thông qua API công khai.
 
 
 .. _entry-points:
@@ -119,67 +84,52 @@ Entry points
 
 .. function:: entry_points(**select_params)
 
-   Returns a :class:`EntryPoints` instance describing entry points for the
-   current environment. Any given keyword parameters are passed to the
-   :meth:`!select` method for comparison to the attributes of
-   the individual entry point definitions.
+   Trả về một thực thể :class:`EntryPoints` mô tả các entry point cho môi trường hiện tại. Mọi tham số từ khóa được cung cấp đều được truyền cho
+   phương thức :meth:`!select` để so sánh với các thuộc tính của từng định nghĩa entry point.
 
-   Note: it is not currently possible to query for entry points based on
-   their :attr:`!EntryPoint.dist` attribute (as different :class:`!Distribution`
-   instances do not currently compare equal, even if they have the same attributes)
+   Lưu ý: hiện không thể truy vấn entry point dựa trên thuộc tính :attr:`!EntryPoint.dist` của chúng (vì các instance :class:`!Distribution` khác nhau hiện không so sánh bằng nhau, ngay cả khi chúng có cùng các thuộc tính)
 
 .. class:: EntryPoints
 
-   Details of a collection of installed entry points.
+   Thông tin chi tiết về một tập hợp entry point đã cài đặt.
 
-   Also provides a ``.groups`` attribute that reports all identified entry
-   point groups, and a ``.names`` attribute that reports all identified entry
-   point names.
+   Cũng cung cấp thuộc tính ``.groups`` báo cáo tất cả các nhóm entry point được xác định, và thuộc tính ``.names`` báo cáo tất cả tên entry point được xác định.
 
 .. class:: EntryPoint
 
-   Details of an installed entry point.
+   Thông tin chi tiết về một entry point đã cài đặt.
 
-   Each :class:`!EntryPoint` instance has ``.name``, ``.group``, and ``.value``
-   attributes and a ``.load()`` method to resolve the value. There are also
-   ``.module``, ``.attr``, and ``.extras`` attributes for getting the
-   components of the ``.value`` attribute, and ``.dist`` for obtaining
-   information regarding the distribution package that provides the entry point.
+   Mỗi instance :class:`!EntryPoint` có các thuộc tính ``.name``, ``.group`` và ``.value``, cùng phương thức ``.load()`` để phân giải giá trị. Ngoài ra còn có các thuộc tính ``.module``, ``.attr`` và ``.extras`` để lấy các thành phần của thuộc tính ``.value``, cùng ``.dist`` để lấy thông tin về distribution package cung cấp entry point.
 
-Query all entry points::
+Truy vấn tất cả entry point::
 
     >>> eps = entry_points()  # doctest: +SKIP
 
-The :func:`!entry_points` function returns a :class:`!EntryPoints` object,
-a collection of all :class:`!EntryPoint` objects with ``names`` and ``groups``
-attributes for convenience::
+Hàm :func:`!entry_points` trả về một đối tượng :class:`!EntryPoints`, một tập hợp gồm tất cả các đối tượng :class:`!EntryPoint` có các thuộc tính ``names`` và ``groups`` để thuận tiện::
 
     >>> sorted(eps.groups)  # doctest: +SKIP
     ['console_scripts', 'distutils.commands', 'distutils.setup_keywords', 'egg_info.writers', 'setuptools.installation']
 
-:class:`!EntryPoints` has a :meth:`!select` method to select entry points
-matching specific properties. Select entry points in the
-``console_scripts`` group::
+:class:`!EntryPoints` có một phương thức :meth:`!select` để chọn các entry point khớp với những thuộc tính cụ thể. Chọn các entry point trong nhóm ``console_scripts``::
 
     >>> scripts = eps.select(group='console_scripts')  # doctest: +SKIP
 
-Equivalently, since :func:`!entry_points` passes keyword arguments
-through to select::
+Tương đương, vì :func:`!entry_points` truyền các đối số từ khóa cho select::
 
     >>> scripts = entry_points(group='console_scripts')  # doctest: +SKIP
 
-Pick out a specific script named "wheel" (found in the wheel project)::
+Chọn một script cụ thể có tên "wheel" (có trong dự án wheel)::
 
     >>> 'wheel' in scripts.names  # doctest: +SKIP
     True
     >>> wheel = scripts['wheel']  # doctest: +SKIP
 
-Equivalently, query for that entry point during selection::
+Tương đương, hãy truy vấn điểm vào đó trong quá trình chọn::
 
     >>> (wheel,) = entry_points(group='console_scripts', name='wheel')  # doctest: +SKIP
     >>> (wheel,) = entry_points().select(group='console_scripts', name='wheel')  # doctest: +SKIP
 
-Inspect the resolved entry point::
+Kiểm tra điểm vào đã được phân giải::
 
     >>> wheel  # doctest: +SKIP
     EntryPoint(name='wheel', value='wheel.cli:main', group='console_scripts')
@@ -193,90 +143,66 @@ Inspect the resolved entry point::
     >>> main  # doctest: +SKIP
     <function main at 0x103528488>
 
-The ``group`` and ``name`` are arbitrary values defined by the package author
-and usually a client will wish to resolve all entry points for a particular
-group. Read `the setuptools docs
-<https://setuptools.pypa.io/en/latest/userguide/entry_point.html>`_
-for more information on entry points, their definition, and usage.
+``group`` và ``name`` là các giá trị tùy ý do tác giả package định nghĩa và thông thường client sẽ muốn resolve tất cả entry points cho một nhóm cụ thể. Đọc `tài liệu setuptools <https://setuptools.pypa.io/en/latest/userguide/entry_point.html>`_ để biết thêm thông tin về entry points, cách định nghĩa và cách sử dụng chúng.
 
 .. versionchanged:: 3.12
-   The "selectable" entry points were introduced in ``importlib_metadata``
-   3.6 and Python 3.10. Prior to those changes, ``entry_points`` accepted
-   no parameters and always returned a dictionary of entry points, keyed
-   by group. With ``importlib_metadata`` 5.0 and Python 3.12,
-   ``entry_points`` always returns an ``EntryPoints`` object. See
-   :pypi:`backports.entry_points_selectable`
-   for compatibility options.
+   Các entry point "selectable" được giới thiệu trong ``importlib_metadata`` 3.6 và Python 3.10. Trước những thay đổi đó, ``entry_points`` không chấp nhận tham số nào và luôn trả về một từ điển các entry point, được lập chỉ mục theo group. Với ``importlib_metadata`` 5.0 và Python 3.12, ``entry_points`` luôn trả về một đối tượng ``EntryPoints``. Xem
+   :pypi:`backports.entry_points_selectable` để biết các tùy chọn tương thích.
 
 .. versionchanged:: 3.13
-   ``EntryPoint`` objects no longer present a tuple-like interface
-   (:meth:`~object.__getitem__`).
+   Các đối tượng ``EntryPoint`` không còn cung cấp giao diện giống tuple (:meth:`~object.__getitem__`).
 
 .. _metadata:
 
-Distribution metadata
----------------------
+Siêu dữ liệu bản phân phối
+--------------------------
 
 .. function:: metadata(distribution_name)
 
-   Return the distribution metadata corresponding to the named
-   distribution package as a :class:`PackageMetadata` instance.
+   Trả về siêu dữ liệu bản phân phối tương ứng với gói bản phân phối được đặt tên dưới dạng một thực thể :class:`PackageMetadata`.
 
-   Raises :exc:`PackageNotFoundError` if the named distribution
-   package is not installed in the current Python environment.
+   Phát sinh :exc:`PackageNotFoundError` nếu gói bản phân phối được đặt tên chưa được cài đặt trong môi trường Python hiện tại.
 
 .. class:: PackageMetadata
 
-   A concrete implementation of the
-   `PackageMetadata protocol <https://importlib-metadata.readthedocs.io/en/latest/api.html#importlib_metadata.PackageMetadata>`_.
+   Một triển khai cụ thể của giao thức `PackageMetadata protocol <https://importlib-metadata.readthedocs.io/en/latest/api.html#importlib_metadata.PackageMetadata>`_.
 
-   In addition to providing the defined protocol methods and attributes, subscripting
-   the instance is equivalent to calling the :meth:`!get` method.
+   Ngoài việc cung cấp các phương thức và thuộc tính giao thức đã định nghĩa, sử dụng phép lập chỉ mục trên instance tương đương với việc gọi phương thức :meth:`!get`.
 
-Every `Distribution Package <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_
-includes some metadata, which you can extract using the :func:`!metadata` function::
+Mỗi `Distribution Package <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_ đều bao gồm một số metadata mà bạn có thể trích xuất bằng hàm :func:`!metadata`::
 
     >>> wheel_metadata = metadata('wheel')  # doctest: +SKIP
 
-The keys of the returned data structure name the metadata keywords, and
-the values are returned unparsed from the distribution metadata::
+Các khóa của cấu trúc dữ liệu được trả về là tên của các từ khóa metadata, còn các giá trị được trả về ở dạng chưa phân tích cú pháp từ metadata của distribution::
 
     >>> wheel_metadata['Requires-Python']  # doctest: +SKIP
     '>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*'
 
-:class:`PackageMetadata` also presents a :attr:`!json` attribute that returns
-all the metadata in a JSON-compatible form per :PEP:`566`::
+:class:`PackageMetadata` cũng cung cấp một thuộc tính :attr:`!json` trả về toàn bộ metadata ở dạng tương thích với JSON theo :PEP:`566`::
 
     >>> wheel_metadata.json['requires_python']
     '>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*'
 
-The full set of available metadata is not described here.
-See the PyPA `Core metadata specification <https://packaging.python.org/en/latest/specifications/core-metadata/#core-metadata>`_ for additional details.
+Toàn bộ metadata hiện có không được mô tả ở đây. Hãy xem `Core metadata specification <https://packaging.python.org/en/latest/specifications/core-metadata/#core-metadata>`_ của PyPA để biết thêm chi tiết.
 
 .. versionchanged:: 3.10
-   The ``Description`` is now included in the metadata when presented
-   through the payload. Line continuation characters have been removed.
+   ``Description`` hiện được đưa vào metadata khi được trình bày qua payload. Các ký tự tiếp tục dòng đã được loại bỏ.
 
-   The ``json`` attribute was added.
+   Thuộc tính ``json`` đã được thêm vào.
 
 
 .. _version:
 
-Distribution versions
----------------------
+Các phiên bản distribution
+--------------------------
 
 .. function:: version(distribution_name)
 
-   Return the installed distribution package
-   `version <https://packaging.python.org/en/latest/specifications/core-metadata/#version>`__
-   for the named distribution package.
+   Trả về `version <https://packaging.python.org/en/latest/specifications/core-metadata/#version>`__ của distribution package đã cài đặt có tên được chỉ định.
 
-   Raises :exc:`PackageNotFoundError` if the named distribution
-   package is not installed in the current Python environment.
+   Phát sinh :exc:`PackageNotFoundError` nếu distribution package có tên được chỉ định chưa được cài đặt trong Python environment hiện tại.
 
-The :func:`!version` function is the quickest way to get a
-`Distribution Package <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_'s version
-number, as a string::
+Hàm :func:`!version` là cách nhanh nhất để lấy số phiên bản của `Distribution Package <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_ dưới dạng chuỗi::
 
     >>> version('wheel')  # doctest: +SKIP
     '0.32.3'
@@ -284,31 +210,22 @@ number, as a string::
 
 .. _files:
 
-Distribution files
-------------------
+Các tệp của gói phân phối
+-------------------------
 
 .. function:: files(distribution_name)
 
-   Return the full set of files contained within the named
-   distribution package.
+   Trả về toàn bộ tập hợp tệp có trong gói phân phối được chỉ định.
 
-   Raises :exc:`PackageNotFoundError` if the named distribution
-   package is not installed in the current Python environment.
+   Phát sinh :exc:`PackageNotFoundError` nếu gói phân phối được chỉ định chưa được cài đặt trong môi trường Python hiện tại.
 
-   Returns :const:`None` if the distribution is found but the installation
-   database records reporting the files associated with the distribution package
-   are missing.
+   Trả về :const:`None` nếu tìm thấy gói phân phối nhưng thiếu các bản ghi trong cơ sở dữ liệu cài đặt dùng để báo cáo những tệp liên kết với gói phân phối.
 
 .. class:: PackagePath
 
-    A :class:`pathlib.PurePath` derived object with additional ``dist``,
-    ``size``, and ``hash`` properties corresponding to the distribution
-    package's installation metadata for that file.
+    Một đối tượng dẫn xuất từ :class:`pathlib.PurePath` với các thuộc tính ``dist``, ``size`` và ``hash`` bổ sung, tương ứng với siêu dữ liệu cài đặt của gói phân phối cho tệp đó.
 
-The :func:`!files` function takes a
-`Distribution Package <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_
-name and returns all of the files installed by this distribution. Each file is reported
-as a :class:`PackagePath` instance. For example::
+Hàm :func:`!files` nhận tên của `Distribution Package <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_ và trả về tất cả các tệp được bản phân phối này cài đặt. Mỗi tệp được báo cáo dưới dạng một thực thể :class:`PackagePath`. Ví dụ::
 
     >>> util = [p for p in files('wheel') if 'util.py' in str(p)][0]  # doctest: +SKIP
     >>> util  # doctest: +SKIP
@@ -320,7 +237,7 @@ as a :class:`PackagePath` instance. For example::
     >>> util.hash  # doctest: +SKIP
     <FileHash mode: sha256 value: bYkw5oMccfazVCoYQwKkkemoVyMAFoR34mmKBx8R1NI>
 
-Once you have the file, you can also read its contents::
+Sau khi có tệp, bạn cũng có thể đọc nội dung của tệp::
 
     >>> print(util.read_text())  # doctest: +SKIP
     import base64
@@ -331,36 +248,26 @@ Once you have the file, you can also read its contents::
             return s.encode('utf-8')
         return s
 
-You can also use the :meth:`!locate` method to get the absolute
-path to the file::
+Bạn cũng có thể sử dụng phương thức :meth:`!locate` để lấy đường dẫn tuyệt đối đến tệp::
 
     >>> util.locate()  # doctest: +SKIP
     PosixPath('/home/gustav/example/lib/site-packages/wheel/util.py')
 
-In the case where the metadata file listing files
-(``RECORD`` or ``SOURCES.txt``) is missing, :func:`!files` will
-return :const:`None`. The caller may wish to wrap calls to
-:func:`!files` in `always_iterable
-<https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.always_iterable>`_
-or otherwise guard against this condition if the target
-distribution is not known to have the metadata present.
+Trong trường hợp tệp metadata liệt kê các tệp (``RECORD`` hoặc ``SOURCES.txt``) bị thiếu, :func:`!files` sẽ trả về :const:`None`. Người gọi có thể muốn bọc các lệnh gọi đến
+:func:`!files` trong `always_iterable <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.always_iterable>`_ hoặc bằng cách khác kiểm tra điều kiện này nếu không biết chắc bản phân phối đích có metadata hay không.
 
 .. _requirements:
 
-Distribution requirements
--------------------------
+Các yêu cầu của bản phân phối
+-----------------------------
 
 .. function:: requires(distribution_name)
 
-   Return the declared dependency specifiers for the named
-   distribution package.
+   Trả về các bộ chỉ định dependency đã khai báo cho gói distribution có tên đã cho.
 
-   Raises :exc:`PackageNotFoundError` if the named distribution
-   package is not installed in the current Python environment.
+   Gây ra :exc:`PackageNotFoundError` nếu gói distribution có tên đã cho chưa được cài đặt trong môi trường Python hiện tại.
 
-To get the full set of requirements for a `Distribution Package <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_,
-use the :func:`!requires`
-function::
+Để lấy toàn bộ tập hợp các yêu cầu cho một `Distribution Package <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_, hãy sử dụng hàm :func:`!requires`::
 
     >>> requires('wheel')  # doctest: +SKIP
     ["pytest (>=3.0.0) ; extra == 'test'", "pytest-cov ; extra == 'test'"]
@@ -369,131 +276,93 @@ function::
 .. _package-distributions:
 .. _import-distribution-package-mapping:
 
-Mapping import to distribution packages
----------------------------------------
+Ánh xạ import tới các gói phân phối
+-----------------------------------
 
 .. function:: packages_distributions()
 
-   Return a mapping from the top level module and import package
-   names found via :data:`sys.meta_path` to the names of the distribution
-   packages (if any) that provide the corresponding files.
+   Trả về một ánh xạ từ tên module cấp cao nhất và tên import package được tìm thấy thông qua :data:`sys.meta_path` tới tên của các gói phân phối (nếu có) cung cấp những tệp tương ứng.
 
-   To allow for namespace packages (which may have members provided by
-   multiple distribution packages), each top level import name maps to a
-   list of distribution names rather than mapping directly to a single name.
+   Để hỗ trợ các namespace package (có thể có thành viên do nhiều gói phân phối cung cấp), mỗi tên import cấp cao nhất được ánh xạ tới một danh sách tên distribution thay vì ánh xạ trực tiếp tới một tên duy nhất.
 
-A convenience method to resolve the `Distribution Package <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_
-name (or names, in the case of a namespace package)
-that provide each importable top-level
-Python module or `Import Package <https://packaging.python.org/en/latest/glossary/#term-Import-Package>`_::
+Một phương thức tiện ích để phân giải tên `Gói phân phối <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_ (hoặc các tên, trong trường hợp là namespace package) cung cấp từng module Python cấp cao nhất có thể import hoặc `Gói import <https://packaging.python.org/en/latest/glossary/#term-Import-Package>`_::
 
     >>> packages_distributions()
     {'importlib_metadata': ['importlib-metadata'], 'yaml': ['PyYAML'], 'jaraco': ['jaraco.classes', 'jaraco.functools'], ...}
 
-Some editable installs, `do not supply top-level names
-<https://github.com/pypa/packaging-problems/issues/609>`_, and thus this
-function is not reliable with such installs.
+Một số bản cài đặt editable, `không cung cấp tên cấp cao nhất <https://github.com/pypa/packaging-problems/issues/609>`_, vì vậy hàm này không đáng tin cậy với những bản cài đặt như vậy.
 
 .. versionadded:: 3.10
 
 .. _distributions:
 
-Distributions
-=============
+Các bản phân phối
+=================
 
 .. function:: distribution(distribution_name)
 
-   Return a :class:`Distribution` instance describing the named
-   distribution package.
+   Trả về một instance :class:`Distribution` mô tả package distribution được chỉ định.
 
-   Raises :exc:`PackageNotFoundError` if the named distribution
-   package is not installed in the current Python environment.
+   Phát sinh :exc:`PackageNotFoundError` nếu package distribution được chỉ định chưa được cài đặt trong môi trường Python hiện tại.
 
 .. class:: Distribution
 
-   Details of an installed distribution package.
+   Thông tin chi tiết về package distribution đã cài đặt.
 
-   Note: different :class:`!Distribution` instances do not currently compare
-   equal, even if they relate to the same installed distribution and
-   accordingly have the same attributes.
+   Lưu ý: các instance :class:`!Distribution` khác nhau hiện không được so sánh là bằng nhau, ngay cả khi chúng liên quan đến cùng một distribution đã cài đặt và do đó có cùng các thuộc tính.
 
-While the module level API described above is the most common and convenient usage,
-you can get all of that information from the :class:`!Distribution` class.
-:class:`!Distribution` is an abstract object that represents the metadata for
-a Python `Distribution Package <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_.
-You can get the concrete :class:`!Distribution` subclass instance for an installed
-distribution package by calling the :func:`distribution` function::
+Mặc dù API cấp module được mô tả ở trên là cách sử dụng phổ biến và thuận tiện nhất, bạn có thể lấy toàn bộ thông tin đó từ class :class:`!Distribution`.
+:class:`!Distribution` là một đối tượng trừu tượng đại diện cho metadata của một `Distribution Package <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_ Python. Bạn có thể lấy instance của subclass :class:`!Distribution` cụ thể cho một package distribution đã cài đặt bằng cách gọi hàm :func:`distribution`::
 
     >>> from importlib.metadata import distribution  # doctest: +SKIP
     >>> dist = distribution('wheel')  # doctest: +SKIP
     >>> type(dist)  # doctest: +SKIP
     <class 'importlib.metadata.PathDistribution'>
 
-Thus, an alternative way to get the version number is through the
+Do đó, một cách khác để lấy số phiên bản là thông qua
 :class:`!Distribution` instance::
 
     >>> dist.version  # doctest: +SKIP
     '0.32.3'
 
-There are all kinds of additional metadata available on :class:`!Distribution`
-instances::
+Có đủ loại siêu dữ liệu bổ sung trên :class:`!Distribution` instance::
 
     >>> dist.metadata['Requires-Python']  # doctest: +SKIP
     '>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*'
     >>> dist.metadata['License']  # doctest: +SKIP
     'MIT'
 
-For editable packages, an ``origin`` property may present :pep:`610`
-metadata::
+Đối với các package có thể chỉnh sửa, một thuộc tính ``origin`` có thể cung cấp metadata :pep:`610`::
 
     >>> dist.origin.url
     'file:///path/to/wheel-0.32.3.editable-py3-none-any.whl'
 
-The full set of available metadata is not described here.
-See the PyPA `Core metadata specification <https://packaging.python.org/en/latest/specifications/core-metadata/#core-metadata>`_ for additional details.
+Bộ metadata đầy đủ hiện có không được mô tả ở đây. Xem `Đặc tả metadata cốt lõi <https://packaging.python.org/en/latest/specifications/core-metadata/#core-metadata>`_ của PyPA để biết thêm chi tiết.
 
 .. versionadded:: 3.13
-   The ``.origin`` property was added.
+   Thuộc tính ``.origin`` đã được thêm.
 
-Distribution Discovery
+Khám phá bản phân phối
 ======================
 
-By default, this package provides built-in support for discovery of metadata
-for file system and zip file `Distribution Package <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_\s.
-This metadata finder search defaults to ``sys.path``, but varies slightly in how it interprets those values from how other import machinery does. In particular:
+Theo mặc định, package này tích hợp sẵn khả năng khám phá metadata cho hệ thống tệp và `Gói phân phối <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_\s tệp zip. Trình tìm metadata này mặc định tìm kiếm trong ``sys.path``, nhưng cách diễn giải các giá trị đó hơi khác so với các cơ chế import khác. Cụ thể:
 
-- ``importlib.metadata`` does not honor :class:`bytes` objects on ``sys.path``.
-- ``importlib.metadata`` will incidentally honor :py:class:`pathlib.Path` objects on ``sys.path`` even though such values will be ignored for imports.
+- ``importlib.metadata`` không tuân theo các đối tượng :class:`bytes` trên ``sys.path``.
+- ``importlib.metadata`` cũng sẽ tình cờ tôn trọng các đối tượng :py:class:`pathlib.Path` trên ``sys.path``, mặc dù những giá trị như vậy sẽ bị bỏ qua khi import.
 
 
-Implementing Custom Providers
-=============================
+Triển khai Providers tùy chỉnh
+==============================
 
-``importlib.metadata`` address two API surfaces, one for *consumers*
-and another for *providers*. Most users are consumers, consuming
-metadata provided by the packages. There are other use-cases, however,
-where users wish to expose metadata through some other mechanism,
-such as alongside a custom importer. Such a use case calls for a
-*custom provider*.
+``importlib.metadata`` cung cấp hai API surface, một dành cho *consumers* và một dành cho *providers*. Hầu hết người dùng là consumers, sử dụng metadata do các package cung cấp. Tuy nhiên, có những trường hợp sử dụng khác mà người dùng muốn cung cấp metadata thông qua một cơ chế khác, chẳng hạn như đi kèm với một importer tùy chỉnh. Trường hợp sử dụng như vậy cần đến một *custom provider*.
 
-Because `Distribution Package <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_ metadata
-is not available through :data:`sys.path` searches, or
-package loaders directly,
-the metadata for a distribution is found through import
-system :ref:`finders <finders-and-loaders>`. To find a distribution package's metadata,
-``importlib.metadata`` queries the list of :term:`meta path finders <meta path finder>` on
+Vì metadata của `Distribution Package <https://packaging.python.org/en/latest/glossary/#term-Distribution-Package>`_ không khả dụng trực tiếp thông qua các phép :data:`sys.path` tìm kiếm hoặc các package loader, metadata của một distribution được tìm thấy thông qua các :ref:`finder <finders-and-loaders>` của hệ thống import. Để tìm metadata của một distribution package, ``importlib.metadata`` truy vấn danh sách các :term:`meta path finder <meta path finder>` trên
 :data:`sys.meta_path`.
 
-The implementation has hooks integrated into the ``PathFinder``,
-serving metadata for distribution packages found on the file system.
+Phần triển khai có các hook được tích hợp vào ``PathFinder``, cung cấp metadata cho các distribution package được tìm thấy trên hệ thống tệp.
 
-The abstract class :py:class:`importlib.abc.MetaPathFinder` defines the
-interface expected of finders by Python's import system.
-``importlib.metadata`` extends this protocol by looking for an optional
-``find_distributions`` callable on the finders from
-:data:`sys.meta_path` and presents this extended interface as the
-``DistributionFinder`` abstract base class, which defines this abstract
-method::
+Lớp trừu tượng :py:class:`importlib.abc.MetaPathFinder` định nghĩa interface mà các finder của hệ thống import của Python phải tuân theo. ``importlib.metadata`` mở rộng protocol này bằng cách tìm một ``find_distributions`` callable tùy chọn trên các finder từ
+:data:`sys.meta_path` và cung cấp interface mở rộng này dưới dạng lớp cơ sở trừu tượng ``DistributionFinder``, trong đó định nghĩa phương thức trừu tượng này::
 
     @abc.abstractmethod
     def find_distributions(context=DistributionFinder.Context()) -> Iterable[Distribution]:
@@ -501,20 +370,14 @@ method::
         loading the metadata for packages for the indicated ``context``.
         """
 
-The ``DistributionFinder.Context`` object provides ``.path`` and ``.name``
-properties indicating the path to search and name to match and may
-supply other relevant context sought by the consumer.
+Đối tượng ``DistributionFinder.Context`` cung cấp các thuộc tính ``.path`` và ``.name``, cho biết đường dẫn cần tìm kiếm và tên cần khớp, đồng thời có thể cung cấp ngữ cảnh liên quan khác mà bên sử dụng cần.
 
-In practice, to support finding distribution package
-metadata in locations other than the file system, subclass
-``Distribution`` and implement the abstract methods. Then from
-a custom finder, return instances of this derived ``Distribution`` in the
-``find_distributions()`` method.
+Trên thực tế, để hỗ trợ việc tìm metadata của distribution package ở những vị trí khác ngoài hệ thống tệp, hãy phân lớp ``Distribution`` và triển khai các phương thức abstract. Sau đó, từ một custom finder, hãy trả về các thực thể của ``Distribution`` dẫn xuất này trong phương thức ``find_distributions()``.
 
-Example
--------
+Ví dụ
+-----
 
-Imagine a custom finder that loads Python modules from a database::
+Hãy tưởng tượng một custom finder tải các Python module từ cơ sở dữ liệu::
 
     class DatabaseImporter(importlib.abc.MetaPathFinder):
         def __init__(self, db):
@@ -525,10 +388,7 @@ Imagine a custom finder that loads Python modules from a database::
 
     sys.meta_path.append(DatabaseImporter(connect_db(...)))
 
-That importer now presumably provides importable modules from a
-database, but it provides no metadata or entry points. For this
-custom importer to provide metadata, it would also need to implement
-``DistributionFinder``::
+Khi đó, importer này có lẽ đã cung cấp các module có thể import từ cơ sở dữ liệu, nhưng chưa cung cấp metadata hoặc entry point nào. Để custom importer này cung cấp metadata, nó cũng cần triển khai ``DistributionFinder``::
 
     from importlib.metadata import DistributionFinder
 
@@ -540,24 +400,11 @@ custom importer to provide metadata, it would also need to implement
             for dist_record in self.db.query_distributions(query):
                 yield DatabaseDistribution(dist_record)
 
-In this way, ``query_distributions`` would return records for
-each distribution served by the database matching the query. For
-example, if ``requests-1.0`` is in the database, ``find_distributions``
-would yield a ``DatabaseDistribution`` for ``Context(name='requests')``
-or ``Context(name=None)``.
+Theo cách này, ``query_distributions`` sẽ trả về các bản ghi cho từng distribution do cơ sở dữ liệu cung cấp và khớp với truy vấn. Ví dụ, nếu ``requests-1.0`` có trong cơ sở dữ liệu, ``find_distributions`` sẽ tạo ra một ``DatabaseDistribution`` cho ``Context(name='requests')`` hoặc ``Context(name=None)``.
 
-For the sake of simplicity, this example ignores ``context.path``\. The
-``path`` attribute defaults to ``sys.path`` and is the set of import paths to
-be considered in the search. A ``DatabaseImporter`` could potentially function
-without any concern for a search path. Assuming the importer does no
-partitioning, the "path" would be irrelevant. In order to illustrate the
-purpose of ``path``, the example would need to illustrate a more complex
-``DatabaseImporter`` whose behavior varied depending on
-``sys.path``/``PYTHONPATH``. In that case, the ``find_distributions`` should
-honor the ``context.path`` and only yield ``Distribution``\ s pertinent to that
-path.
+Để đơn giản, ví dụ này bỏ qua ``context.path``\. Thuộc tính ``path`` mặc định là ``sys.path`` và là tập hợp các đường dẫn import được xem xét trong quá trình tìm kiếm. Một ``DatabaseImporter`` về lý thuyết có thể hoạt động mà không cần quan tâm đến đường dẫn tìm kiếm. Giả sử importer không phân vùng, thì "path" sẽ không liên quan. Để minh họa mục đích của ``path``, ví dụ này cần minh họa một ``DatabaseImporter`` phức tạp hơn, với hành vi thay đổi tùy theo ``sys.path``/``PYTHONPATH``. Trong trường hợp đó, ``find_distributions`` phải tuân theo ``context.path`` và chỉ tạo ra các ``Distribution``\ s phù hợp với đường dẫn đó.
 
-``DatabaseDistribution``, then, would look something like::
+``DatabaseDistribution``, khi đó, sẽ có dạng như sau::
 
     class DatabaseDistribution(importlib.metadata.Distribution):
         def __init__(self, record):
@@ -579,11 +426,15 @@ path.
         def locate_file(self, path):
             raise RuntimeError("This distribution has no file system")
 
-This basic implementation should provide metadata and entry points for
-packages served by the ``DatabaseImporter``, assuming that the
-``record`` supplies suitable ``.name``, ``.version``, and
-``.entry_points`` attributes.
+Bản triển khai cơ bản này sẽ cung cấp metadata và các entry point cho những package được ``DatabaseImporter`` cung cấp, với điều kiện ``record`` cung cấp các thuộc tính ``.name``, ``.version`` và ``.entry_points`` phù hợp.
 
-The ``DatabaseDistribution`` may also provide other metadata files, like
-``RECORD`` (required for ``Distribution.files``) or override the
-implementation of ``Distribution.files``. See the source for more inspiration.
+``DatabaseDistribution`` cũng có thể cung cấp các tệp metadata khác, chẳng hạn như ``RECORD`` (bắt buộc đối với ``Distribution.files``) hoặc ghi đè triển khai của ``Distribution.files``. Hãy xem mã nguồn để có thêm ý tưởng.
+
+.. _`Distribution Package`: https://packaging.python.org/en/latest/glossary/#term-Distribution-Package
+.. _`Import Package`: https://packaging.python.org/en/latest/glossary/#term-Import-Package
+.. _`Core metadata specifications`: https://packaging.python.org/en/latest/specifications/core-metadata/#core-metadata
+.. _`the setuptools docs`: https://setuptools.pypa.io/en/latest/userguide/entry_point.html
+.. _`PackageMetadata protocol`: https://importlib-metadata.readthedocs.io/en/latest/api.html#importlib_metadata.PackageMetadata
+.. _`Core metadata specification`: https://packaging.python.org/en/latest/specifications/core-metadata/#core-metadata
+.. _`always_iterable`: https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.always_iterable
+.. _`do not supply top-level names`: https://github.com/pypa/packaging-problems/issues/609

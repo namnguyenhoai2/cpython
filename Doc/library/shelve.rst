@@ -1,58 +1,38 @@
-:mod:`!shelve` --- Python object persistence
-============================================
+:mod:`!shelve` --- Lưu trữ đối tượng Python
+===========================================
 
 .. module:: shelve
-   :synopsis: Python object persistence.
+   :synopsis: Lưu trữ đối tượng Python.
 
-**Source code:** :source:`Lib/shelve.py`
+**Mã nguồn:** :source:`Lib/shelve.py`
 
 .. index:: pair: module; pickle
 
 --------------
 
-A "shelf" is a persistent, dictionary-like object.  The difference with "dbm"
-databases is that the values (not the keys!) in a shelf can be essentially
-arbitrary Python objects --- anything that the :mod:`pickle` module can handle.
-This includes most class instances, recursive data types, and objects containing
-lots of shared  sub-objects.  The keys are ordinary strings.
+“Shelf” là một đối tượng giống dictionary có khả năng lưu trữ bền vững. Điểm khác biệt so với các cơ sở dữ liệu “dbm” là các giá trị (không phải các khóa!) trong shelf về cơ bản có thể là những đối tượng Python tùy ý --- bất kỳ đối tượng nào mà module :mod:`pickle` có thể xử lý. Điều này bao gồm hầu hết các thể hiện lớp, các kiểu dữ liệu đệ quy và các đối tượng chứa nhiều đối tượng con được dùng chung. Các khóa là những chuỗi thông thường.
 
 
 .. function:: open(filename, flag='c', protocol=None, writeback=False)
 
-   Open a persistent dictionary.  The filename specified is the base filename for
-   the underlying database.  As a side-effect, an extension may be added to the
-   filename and more than one file may be created.  By default, the underlying
-   database file is opened for reading and writing.  The optional *flag* parameter
-   has the same interpretation as the *flag* parameter of :func:`dbm.open`.
+   Mở một dictionary có khả năng lưu trữ bền vững. Tên tệp được chỉ định là tên tệp cơ sở cho cơ sở dữ liệu bên dưới. Do tác dụng phụ, một phần mở rộng có thể được thêm vào tên tệp và có thể tạo nhiều hơn một tệp. Theo mặc định, tệp cơ sở dữ liệu bên dưới được mở để đọc và ghi. Tham số tùy chọn *flag* có cùng cách diễn giải với tham số *flag* của :func:`dbm.open`.
 
-   By default, pickles created with :const:`pickle.DEFAULT_PROTOCOL` are used
-   to serialize values.  The version of the pickle protocol can be specified
-   with the *protocol* parameter.
+   Theo mặc định, các pickle được tạo bằng :const:`pickle.DEFAULT_PROTOCOL` sẽ được dùng để tuần tự hóa các giá trị. Có thể chỉ định phiên bản của giao thức pickle bằng tham số *protocol*.
 
-   Because of Python semantics, a shelf cannot know when a mutable
-   persistent-dictionary entry is modified.  By default modified objects are
-   written *only* when assigned to the shelf (see :ref:`shelve-example`).  If the
-   optional *writeback* parameter is set to ``True``, all entries accessed are also
-   cached in memory, and written back on :meth:`~Shelf.sync` and
-   :meth:`~Shelf.close`; this can make it handier to mutate mutable entries in
-   the persistent dictionary, but, if many entries are accessed, it can consume
-   vast amounts of memory for the cache, and it can make the close operation
-   very slow since all accessed entries are written back (there is no way to
-   determine which accessed entries are mutable, nor which ones were actually
-   mutated).
+   Do ngữ nghĩa của Python, shelf không thể biết khi nào một mục từ điển bền vững có thể thay đổi bị sửa đổi. Theo mặc định, các đối tượng đã sửa đổi *chỉ* được ghi khi được gán vào shelf (xem :ref:`shelve-example`). Nếu tham số tùy chọn *writeback* được đặt thành ``True``, tất cả các mục đã truy cập cũng được lưu vào bộ nhớ đệm và được ghi trở lại khi :meth:`~Shelf.sync` và
+   :meth:`~Shelf.close`; điều này có thể giúp việc thay đổi các mục có thể thay đổi trong persistent dictionary thuận tiện hơn, nhưng nếu truy cập nhiều mục, nó có thể tiêu tốn lượng bộ nhớ khổng lồ cho cache, đồng thời khiến thao tác đóng trở nên rất chậm vì tất cả các mục đã truy cập đều được ghi trở lại (không có cách nào xác định mục nào trong số các mục đã truy cập là có thể thay đổi, cũng như mục nào thực sự đã bị thay đổi).
 
    .. versionchanged:: 3.10
       :const:`pickle.DEFAULT_PROTOCOL` is now used as the default pickle
-      protocol.
+      giao thức.
 
    .. versionchanged:: 3.11
-      Accepts :term:`path-like object` for filename.
+      Chấp nhận :term:`path-like object` cho filename.
 
    .. note::
 
-      Do not rely on the shelf being closed automatically; always call
-      :meth:`~Shelf.close` explicitly when you don't need it any more, or
-      use :func:`shelve.open` as a context manager::
+      Không nên dựa vào việc shelf sẽ tự động được đóng; hãy luôn gọi
+      :meth:`~Shelf.close` một cách rõ ràng khi bạn không còn cần đến nó nữa, hoặc sử dụng :func:`shelve.open` làm context manager::
 
           with shelve.open('spam') as db:
               db['eggs'] = 'eggs'
@@ -61,163 +41,121 @@ lots of shared  sub-objects.  The keys are ordinary strings.
 
 .. warning::
 
-   Because the :mod:`!shelve` module is backed by :mod:`pickle`, it is insecure
-   to load a shelf from an untrusted source.  Like with pickle, loading a shelf
-   can execute arbitrary code.
+   Vì module :mod:`!shelve` được xây dựng trên :mod:`pickle`, việc tải shelf từ một nguồn không đáng tin cậy là không an toàn. Giống như với pickle, việc tải shelf có thể thực thi mã tùy ý.
 
-Shelf objects support most of the methods and operations supported by dictionaries
-(except copying, constructors and operators ``|`` and ``|=``).  This eases the
-transition from dictionary based scripts to those requiring persistent storage.
+Các đối tượng Shelf hỗ trợ hầu hết các phương thức và thao tác được dictionary hỗ trợ (ngoại trừ việc sao chép, các hàm tạo và các toán tử ``|`` và ``|=``). Điều này giúp quá trình chuyển đổi từ các script dựa trên dictionary sang những script yêu cầu lưu trữ bền vững trở nên dễ dàng hơn.
 
-Two additional methods are supported:
+Hai phương thức bổ sung được hỗ trợ:
 
 .. method:: Shelf.sync()
 
-   Write back all entries in the cache if the shelf was opened with *writeback*
-   set to :const:`True`.  Also empty the cache and synchronize the persistent
-   dictionary on disk, if feasible.  This is called automatically when the shelf
-   is closed with :meth:`close`.
+   Ghi lại tất cả các mục trong cache nếu shelf được mở với *writeback* được đặt thành :const:`True`. Đồng thời xóa cache và đồng bộ từ điển persistent trên đĩa, nếu có thể. Việc này được tự động thực hiện khi shelf được đóng bằng :meth:`close`.
 
 .. method:: Shelf.close()
 
-   Synchronize and close the persistent *dict* object.  Operations on a closed
-   shelf will fail with a :exc:`ValueError`.
+   Đồng bộ và đóng đối tượng *dict* persistent. Các thao tác trên shelf đã đóng sẽ thất bại với một :exc:`ValueError`.
 
 
 .. seealso::
 
-   `Persistent dictionary recipe <https://code.activestate.com/recipes/576642-persistent-dict-with-multiple-standard-file-format/>`_
-   with widely supported storage formats and having the speed of native
-   dictionaries.
+   `Công thức từ điển persistent <https://code.activestate.com/recipes/576642-persistent-dict-with-multiple-standard-file-format/>`_ với các định dạng lưu trữ được hỗ trợ rộng rãi và tốc độ tương đương từ điển native.
 
 
-Restrictions
-------------
+Các hạn chế
+-----------
 
 .. index::
    pair: module; dbm.ndbm
    pair: module; dbm.gnu
 
-* The choice of which database package will be used (such as :mod:`dbm.ndbm` or
-  :mod:`dbm.gnu`) depends on which interface is available.  Therefore it is not
-  safe to open the database directly using :mod:`dbm`.  The database is also
-  (unfortunately) subject to the limitations of :mod:`dbm`, if it is used ---
-  this means that (the pickled representation of) the objects stored in the
-  database should be fairly small, and in rare cases key collisions may cause
-  the database to refuse updates.
+* Việc chọn gói cơ sở dữ liệu nào sẽ được sử dụng (chẳng hạn như :mod:`dbm.ndbm` hoặc
+  :mod:`dbm.gnu`) phụ thuộc vào interface nào khả dụng. Vì vậy, không an toàn khi mở cơ sở dữ liệu trực tiếp bằng :mod:`dbm`. Cơ sở dữ liệu cũng (không may) chịu các hạn chế của :mod:`dbm`, nếu được sử dụng --- điều này có nghĩa là biểu diễn (đã pickle) của các đối tượng được lưu trong cơ sở dữ liệu nên khá nhỏ, và trong một số trường hợp hiếm gặp, các va chạm khóa có thể khiến cơ sở dữ liệu từ chối cập nhật.
 
-* The :mod:`!shelve` module does not support *concurrent* read/write access to
-  shelved objects.  (Multiple simultaneous read accesses are safe.)  When a
-  program has a shelf open for writing, no other program should have it open for
-  reading or writing.  Unix file locking can be used to solve this, but this
-  differs across Unix versions and requires knowledge about the database
-  implementation used.
+* Mô-đun :mod:`!shelve` không hỗ trợ quyền truy cập đọc/ghi *đồng thời* vào các đối tượng được lưu trong shelf. (Nhiều quyền truy cập đọc đồng thời là an toàn.) Khi một chương trình đang mở một shelf để ghi, không chương trình nào khác được mở shelf đó để đọc hoặc ghi. Có thể sử dụng khóa tệp Unix để giải quyết vấn đề này, nhưng cách này khác nhau giữa các phiên bản Unix và yêu cầu hiểu biết về phần triển khai cơ sở dữ liệu được sử dụng.
 
-* On macOS :mod:`dbm.ndbm` can silently corrupt the database file on updates,
-  which can cause hard crashes when trying to read from the database.
+* Trên macOS, :mod:`dbm.ndbm` có thể âm thầm làm hỏng tệp cơ sở dữ liệu khi cập nhật, điều này có thể gây ra lỗi nghiêm trọng khi cố đọc từ cơ sở dữ liệu.
 
 
 .. class:: Shelf(dict, protocol=None, writeback=False, keyencoding='utf-8')
 
-   A subclass of :class:`collections.abc.MutableMapping` which stores pickled
-   values in the *dict* object.
+   Một lớp con của :class:`collections.abc.MutableMapping` dùng để lưu các giá trị đã pickle trong đối tượng *dict*.
 
-   By default, pickles created with :const:`pickle.DEFAULT_PROTOCOL` are used
-   to serialize values.  The version of the pickle protocol can be specified
-   with the *protocol* parameter.  See the :mod:`pickle` documentation for a
-   discussion of the pickle protocols.
+   Theo mặc định, các pickle được tạo bằng :const:`pickle.DEFAULT_PROTOCOL` được dùng để tuần tự hóa các giá trị. Có thể chỉ định phiên bản của giao thức pickle bằng tham số *protocol*. Xem tài liệu :mod:`pickle` để biết thông tin về các giao thức pickle.
 
-   If the *writeback* parameter is ``True``, the object will hold a cache of all
-   entries accessed and write them back to the *dict* at sync and close times.
-   This allows natural operations on mutable entries, but can consume much more
-   memory and make sync and close take a long time.
+   Nếu tham số *writeback* là ``True``, đối tượng sẽ lưu bộ nhớ đệm chứa tất cả các mục đã truy cập và ghi chúng trở lại *dict* khi đồng bộ hóa và đóng. Điều này cho phép thực hiện các thao tác tự nhiên trên các mục có thể thay đổi, nhưng có thể tiêu tốn nhiều bộ nhớ hơn đáng kể và khiến việc đồng bộ hóa và đóng mất nhiều thời gian.
 
-   The *keyencoding* parameter is the encoding used to encode keys before they
-   are used with the underlying dict.
+   Tham số *keyencoding* là encoding được dùng để mã hóa các khóa trước khi sử dụng chúng với dict bên dưới.
 
-   A :class:`Shelf` object can also be used as a context manager, in which
-   case it will be automatically closed when the :keyword:`with` block ends.
+   Một đối tượng :class:`Shelf` cũng có thể được sử dụng như một context manager; trong trường hợp đó, đối tượng sẽ tự động được đóng khi khối :keyword:`with` kết thúc.
 
    .. versionchanged:: 3.2
-      Added the *keyencoding* parameter; previously, keys were always encoded in
-      UTF-8.
+      Đã thêm tham số *keyencoding*; trước đây, các khóa luôn được mã hóa bằng UTF-8.
 
    .. versionchanged:: 3.4
-      Added context manager support.
+      Đã thêm hỗ trợ context manager.
 
    .. versionchanged:: 3.10
       :const:`pickle.DEFAULT_PROTOCOL` is now used as the default pickle
-      protocol.
+      giao thức.
 
 
 .. class:: BsdDbShelf(dict, protocol=None, writeback=False, keyencoding='utf-8')
 
-   A subclass of :class:`Shelf` which exposes :meth:`!first`, :meth:`!next`,
-   :meth:`!previous`, :meth:`!last` and :meth:`!set_location` methods.
-   These are available
-   in the third-party :mod:`!bsddb` module from `pybsddb
-   <https://www.jcea.es/programacion/pybsddb.htm>`_ but not in other database
-   modules.  The *dict* object passed to the constructor must support those
-   methods.  This is generally accomplished by calling one of
-   :func:`!bsddb.hashopen`, :func:`!bsddb.btopen` or :func:`!bsddb.rnopen`.  The
-   optional *protocol*, *writeback*, and *keyencoding* parameters have the same
-   interpretation as for the :class:`Shelf` class.
+   Một lớp con của :class:`Shelf` cung cấp các phương thức :meth:`!first`, :meth:`!next`,
+   :meth:`!previous`, :meth:`!last` và :meth:`!set_location`. Các phương thức này có trong mô-đun :mod:`!bsddb` bên thứ ba từ `pybsddb <https://www.jcea.es/programacion/pybsddb.htm>`_, nhưng không có trong các mô-đun cơ sở dữ liệu khác. Đối tượng *dict* được truyền vào hàm khởi tạo phải hỗ trợ các phương thức đó. Điều này thường được thực hiện bằng cách gọi một trong
+   :func:`!bsddb.hashopen`, :func:`!bsddb.btopen` hoặc :func:`!bsddb.rnopen`. Các tham số tùy chọn *protocol*, *writeback* và *keyencoding* có cách diễn giải giống như đối với lớp :class:`Shelf`.
 
 
 .. class:: DbfilenameShelf(filename, flag='c', protocol=None, writeback=False)
 
-   A subclass of :class:`Shelf` which accepts a *filename* instead of a dict-like
-   object.  The underlying file will be opened using :func:`dbm.open`.  By
-   default, the file will be created and opened for both read and write.  The
-   optional *flag* parameter has the same interpretation as for the :func:`.open`
-   function.  The optional *protocol* and *writeback* parameters have the same
-   interpretation as for the :class:`Shelf` class.
+   Một lớp con của :class:`Shelf` chấp nhận *filename* thay vì một đối tượng giống dict. Tệp bên dưới sẽ được mở bằng :func:`dbm.open`. Theo mặc định, tệp sẽ được tạo và mở để đọc và ghi. Tham số tùy chọn *flag* có cách diễn giải giống như đối với hàm :func:`.open`. Các tham số tùy chọn *protocol* và *writeback* có cách diễn giải giống như đối với lớp :class:`Shelf`.
 
 
 .. _shelve-example:
 
-Example
--------
+Ví dụ
+-----
 
-To summarize the interface (``key`` is a string, ``data`` is an arbitrary
-object)::
+Tóm tắt interface (``key`` là một chuỗi, ``data`` là một đối tượng tùy ý)::
 
    import shelve
 
-   d = shelve.open(filename)  # open -- file may get suffix added by low-level
-                              # library
+   d = shelve.open(filename)  # mở -- tệp có thể được tầng thấp thêm hậu tố
+                              # thư viện
 
-   d[key] = data              # store data at key (overwrites old data if
-                              # using an existing key)
-   data = d[key]              # retrieve a COPY of data at key (raise KeyError
+   d[key] = data              # lưu dữ liệu tại khóa (ghi đè dữ liệu cũ nếu
+                              # sử dụng một khóa hiện có)
+   data = d[key]              # lấy một BẢN SAO của dữ liệu tại khóa (phát sinh KeyError
                               # if no such key)
-   del d[key]                 # delete data stored at key (raises KeyError
+   del d[key]                 # xóa dữ liệu được lưu tại key (gây ra KeyError
                               # if no such key)
 
-   flag = key in d            # true if the key exists
-   klist = list(d.keys())     # a list of all existing keys (slow!)
+   flag = key in d            # true nếu key tồn tại
+   klist = list(d.keys())     # danh sách tất cả các key hiện có (chậm!)
 
-   # as d was opened WITHOUT writeback=True, beware:
-   d['xx'] = [0, 1, 2]        # this works as expected, but...
-   d['xx'].append(3)          # *this doesn't!* -- d['xx'] is STILL [0, 1, 2]!
+   # vì d được mở mà KHÔNG có writeback=True, hãy lưu ý:
+   d['xx'] = [0, 1, 2]        # điều này hoạt động như mong đợi, nhưng...
+   d['xx'].append(3)          # *điều này không hoạt động!* -- d['xx'] VẪN là [0, 1, 2]!
 
-   # having opened d without writeback=True, you need to code carefully:
-   temp = d['xx']             # extracts the copy
-   temp.append(5)             # mutates the copy
-   d['xx'] = temp             # stores the copy right back, to persist it
+   # sau khi mở d mà không có writeback=True, bạn cần viết code cẩn thận:
+   temp = d['xx']             # trích xuất bản sao
+   temp.append(5)             # sửa đổi bản sao
+   d['xx'] = temp             # lưu bản sao trở lại để duy trì các thay đổi
 
-   # or, d=shelve.open(filename,writeback=True) would let you just code
-   # d['xx'].append(5) and have it work as expected, BUT it would also
-   # consume more memory and make the d.close() operation slower.
+   # hoặc, d=shelve.open(filename,writeback=True) sẽ cho phép bạn chỉ cần viết mã
+   # d['xx'].append(5) và nó sẽ hoạt động như mong đợi, NHƯNG nó cũng sẽ
+   # tốn nhiều bộ nhớ hơn và khiến thao tác d.close() chậm hơn.
 
-   d.close()                  # close it
+   d.close()                  # đóng nó
 
 
 .. seealso::
 
-   Module :mod:`dbm`
-      Generic interface to ``dbm``-style databases.
+   Mô-đun :mod:`dbm`
+      Giao diện chung cho các cơ sở dữ liệu kiểu ``dbm``.
 
-   Module :mod:`pickle`
-      Object serialization used by :mod:`!shelve`.
+   Mô-đun :mod:`pickle`
+      Tuần tự hóa đối tượng được :mod:`!shelve` sử dụng.
 
+.. _`Persistent dictionary recipe`: https://code.activestate.com/recipes/576642-persistent-dict-with-multiple-standard-file-format/
+.. _`pybsddb`: https://www.jcea.es/programacion/pybsddb.htm

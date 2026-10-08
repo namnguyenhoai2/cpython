@@ -1,66 +1,54 @@
-:mod:`!tkinter.dnd` --- Drag and drop support
-=============================================
+:mod:`!tkinter.dnd` --- Hỗ trợ kéo và thả
+=========================================
 
 .. module:: tkinter.dnd
-   :synopsis: Tkinter drag-and-drop interface
+   :synopsis: Giao diện kéo và thả của Tkinter
 
-**Source code:** :source:`Lib/tkinter/dnd.py`
+**Mã nguồn:** :source:`Lib/tkinter/dnd.py`
 
 --------------
 
-.. note:: This is experimental and due to be deprecated when it is replaced
-   with the Tk DND.
+.. note:: Tính năng này đang trong giai đoạn thử nghiệm và dự kiến sẽ bị loại bỏ khi được thay thế bằng Tk DND.
 
-The :mod:`!tkinter.dnd` module provides drag-and-drop support for objects within
-a single application, within the same window or between windows. To enable an
-object to be dragged, you must create an event binding for it that starts the
-drag-and-drop process. Typically, you bind a ButtonPress event to a callback
-function that you write (see :ref:`Bindings-and-Events`). The function should
-call :func:`dnd_start`, where *source* is the object to be dragged, and *event*
-is the event that invoked the call (the argument to your callback function).
+Module :mod:`!tkinter.dnd` cung cấp hỗ trợ kéo và thả cho các đối tượng trong cùng một ứng dụng, trong cùng một cửa sổ hoặc giữa các cửa sổ. Để cho phép kéo một đối tượng, bạn phải tạo một event binding cho đối tượng đó để bắt đầu quy trình kéo và thả. Thông thường, bạn liên kết một sự kiện ButtonPress với một callback function do bạn viết (xem :ref:`Bindings-and-Events`). Hàm này cần gọi :func:`dnd_start`, trong đó *source* là đối tượng sẽ được kéo, còn *event* là sự kiện đã gọi hàm đó (đối số của callback function).
 
-Selection of a target object occurs as follows:
+Việc chọn một đối tượng đích diễn ra như sau:
 
-#. Top-down search of the area under the mouse for a target widget:
+#. Tìm kiếm từ trên xuống trong vùng bên dưới con trỏ chuột để tìm một widget đích:
 
-   * the target widget should have a callable *dnd_accept* attribute;
-   * if *dnd_accept* is not present or returns ``None``,
-     the search moves to the parent widget;
-   * if no target widget is found, the target object is ``None``.
+   * widget đích phải có thuộc tính *dnd_accept* có thể gọi được;
+   * nếu *dnd_accept* không tồn tại hoặc trả về ``None``, việc tìm kiếm sẽ chuyển sang widget cha;
+   * nếu không tìm thấy widget đích, đối tượng đích là ``None``.
 
-#. Call to ``<old_target>.dnd_leave(source, event)``.
-#. Call to ``<new_target>.dnd_enter(source, event)``.
-#. Call to ``<target>.dnd_commit(source, event)`` to notify of the drop.
-#. Call to ``<source>.dnd_end(target, event)`` to signal the end of drag-and-drop.
+#. Gọi ``<old_target>.dnd_leave(source, event)``.
+#. Gọi ``<new_target>.dnd_enter(source, event)``.
+#. Gọi ``<target>.dnd_commit(source, event)`` để thông báo về thao tác thả.
+#. Gọi ``<source>.dnd_end(target, event)`` để báo hiệu kết thúc thao tác kéo và thả.
 
 
 .. class:: DndHandler(source, event)
 
-   The *DndHandler* class handles drag-and-drop events tracking Motion and
-   ButtonRelease events on the root of the event widget.
+   Lớp *DndHandler* xử lý các sự kiện kéo và thả bằng cách theo dõi các sự kiện Motion và ButtonRelease trên phần tử gốc của widget sự kiện.
 
    .. method:: cancel(event=None)
 
-      Cancel the drag-and-drop process.
+      Hủy quá trình kéo và thả.
 
    .. method:: finish(event, commit=0)
 
-      Execute end of drag-and-drop functions.
+      Thực thi các hàm kết thúc thao tác kéo và thả.
 
    .. method:: on_motion(event)
 
-      Inspect area below mouse for target objects while a drag
-      is performed.
+      Kiểm tra vùng bên dưới chuột để tìm các đối tượng đích trong khi thực hiện thao tác kéo.
 
    .. method:: on_release(event)
 
-      Signal end of drag when the release pattern is triggered.
+      Báo hiệu kết thúc thao tác kéo khi mẫu release được kích hoạt.
 
 .. function:: dnd_start(source, event)
 
-   Factory function for the drag-and-drop process.
-   Return the :class:`DndHandler` instance managing the drag, or ``None`` if a
-   drag could not be started.
+   Hàm factory cho quá trình kéo và thả. Trả về instance :class:`DndHandler` quản lý thao tác kéo hoặc ``None`` nếu không thể bắt đầu thao tác kéo.
 
 .. seealso::
 

@@ -1,10 +1,10 @@
-:mod:`!http` --- HTTP modules
-=============================
+:mod:`!http` --- Các mô-đun HTTP
+================================
 
 .. module:: http
-   :synopsis: HTTP status codes and messages
+   :synopsis: Mã trạng thái và thông báo HTTP
 
-**Source code:** :source:`Lib/http/__init__.py`
+**Mã nguồn:** :source:`Lib/http/__init__.py`
 
 .. index::
    pair: HTTP; protocol
@@ -12,26 +12,23 @@
 
 --------------
 
-:mod:`!http` is a package that collects several modules for working with the
-HyperText Transfer Protocol:
+:mod:`!http` là một gói tập hợp một số mô-đun để làm việc với HyperText Transfer Protocol:
 
-* :mod:`http.client` is a low-level HTTP protocol client; for high-level URL
-  opening use :mod:`urllib.request`
-* :mod:`http.server` contains basic HTTP server classes based on :mod:`socketserver`
-* :mod:`http.cookies` has utilities for implementing state management with cookies
-* :mod:`http.cookiejar` provides persistence of cookies
+* :mod:`http.client` là một HTTP protocol client cấp thấp; để mở URL ở cấp cao hơn, hãy sử dụng :mod:`urllib.request`
+* :mod:`http.server` chứa các lớp HTTP server cơ bản dựa trên :mod:`socketserver`
+* :mod:`http.cookies` cung cấp các tiện ích để triển khai quản lý trạng thái bằng cookie
+* :mod:`http.cookiejar` cung cấp khả năng lưu trữ cookie
 
 
-The :mod:`!http` module also defines the following enums that help you work with http related code:
+Module :mod:`!http` cũng định nghĩa các enum sau đây để giúp bạn làm việc với mã liên quan đến HTTP:
 
 .. class:: HTTPStatus
 
    .. versionadded:: 3.5
 
-   A subclass of :class:`enum.IntEnum` that defines a set of HTTP status codes,
-   reason phrases and long descriptions written in English.
+   Một lớp con của :class:`enum.IntEnum` định nghĩa một tập hợp các mã trạng thái HTTP, các cụm từ giải thích và phần mô tả dài bằng tiếng Anh.
 
-   Usage::
+   Cách sử dụng::
 
       >>> from http import HTTPStatus
       >>> HTTPStatus.OK
@@ -49,117 +46,175 @@ The :mod:`!http` module also defines the following enums that help you work with
 
 .. _http-status-codes:
 
-HTTP status codes
------------------
+Mã trạng thái HTTP
+------------------
 
-Supported,
-`IANA-registered status codes <https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml>`_
-available in :class:`http.HTTPStatus` are:
+Các mã trạng thái được hỗ trợ, `được IANA đăng ký <https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml>`_ có trong :class:`http.HTTPStatus` là:
 
-======= =================================== ==================================================================
-Code    Enum Name                           Details
-======= =================================== ==================================================================
-``100`` ``CONTINUE``                        HTTP Semantics :rfc:`9110`, Section 15.2.1
-``101`` ``SWITCHING_PROTOCOLS``             HTTP Semantics :rfc:`9110`, Section 15.2.2
-``102`` ``PROCESSING``                      WebDAV :rfc:`2518`, Section 10.1
-``103`` ``EARLY_HINTS``                     An HTTP Status Code for Indicating Hints :rfc:`8297`
-``200`` ``OK``                              HTTP Semantics :rfc:`9110`, Section 15.3.1
-``201`` ``CREATED``                         HTTP Semantics :rfc:`9110`, Section 15.3.2
-``202`` ``ACCEPTED``                        HTTP Semantics :rfc:`9110`, Section 15.3.3
-``203`` ``NON_AUTHORITATIVE_INFORMATION``   HTTP Semantics :rfc:`9110`, Section 15.3.4
-``204`` ``NO_CONTENT``                      HTTP Semantics :rfc:`9110`, Section 15.3.5
-``205`` ``RESET_CONTENT``                   HTTP Semantics :rfc:`9110`, Section 15.3.6
-``206`` ``PARTIAL_CONTENT``                 HTTP Semantics :rfc:`9110`, Section 15.3.7
-``207`` ``MULTI_STATUS``                    WebDAV :rfc:`4918`, Section 11.1
-``208`` ``ALREADY_REPORTED``                WebDAV Binding Extensions :rfc:`5842`, Section 7.1 (Experimental)
-``226`` ``IM_USED``                         Delta Encoding in HTTP :rfc:`3229`, Section 10.4.1
-``300`` ``MULTIPLE_CHOICES``                HTTP Semantics :rfc:`9110`, Section 15.4.1
-``301`` ``MOVED_PERMANENTLY``               HTTP Semantics :rfc:`9110`, Section 15.4.2
-``302`` ``FOUND``                           HTTP Semantics :rfc:`9110`, Section 15.4.3
-``303`` ``SEE_OTHER``                       HTTP Semantics :rfc:`9110`, Section 15.4.4
-``304`` ``NOT_MODIFIED``                    HTTP Semantics :rfc:`9110`, Section 15.4.5
-``305`` ``USE_PROXY``                       HTTP Semantics :rfc:`9110`, Section 15.4.6
-``307`` ``TEMPORARY_REDIRECT``              HTTP Semantics :rfc:`9110`, Section 15.4.8
-``308`` ``PERMANENT_REDIRECT``              HTTP Semantics :rfc:`9110`, Section 15.4.9
-``400`` ``BAD_REQUEST``                     HTTP Semantics :rfc:`9110`, Section 15.5.1
-``401`` ``UNAUTHORIZED``                    HTTP Semantics :rfc:`9110`, Section 15.5.2
-``402`` ``PAYMENT_REQUIRED``                HTTP Semantics :rfc:`9110`, Section 15.5.3
-``403`` ``FORBIDDEN``                       HTTP Semantics :rfc:`9110`, Section 15.5.4
-``404`` ``NOT_FOUND``                       HTTP Semantics :rfc:`9110`, Section 15.5.5
-``405`` ``METHOD_NOT_ALLOWED``              HTTP Semantics :rfc:`9110`, Section 15.5.6
-``406`` ``NOT_ACCEPTABLE``                  HTTP Semantics :rfc:`9110`, Section 15.5.7
-``407`` ``PROXY_AUTHENTICATION_REQUIRED``   HTTP Semantics :rfc:`9110`, Section 15.5.8
-``408`` ``REQUEST_TIMEOUT``                 HTTP Semantics :rfc:`9110`, Section 15.5.9
-``409`` ``CONFLICT``                        HTTP Semantics :rfc:`9110`, Section 15.5.10
-``410`` ``GONE``                            HTTP Semantics :rfc:`9110`, Section 15.5.11
-``411`` ``LENGTH_REQUIRED``                 HTTP Semantics :rfc:`9110`, Section 15.5.12
-``412`` ``PRECONDITION_FAILED``             HTTP Semantics :rfc:`9110`, Section 15.5.13
-``413`` ``CONTENT_TOO_LARGE``               HTTP Semantics :rfc:`9110`, Section 15.5.14
-``414`` ``URI_TOO_LONG``                    HTTP Semantics :rfc:`9110`, Section 15.5.15
-``415`` ``UNSUPPORTED_MEDIA_TYPE``          HTTP Semantics :rfc:`9110`, Section 15.5.16
-``416`` ``RANGE_NOT_SATISFIABLE``           HTTP Semantics :rfc:`9110`, Section 15.5.17
-``417`` ``EXPECTATION_FAILED``              HTTP Semantics :rfc:`9110`, Section 15.5.18
-``418`` ``IM_A_TEAPOT``                     HTCPCP/1.0 :rfc:`2324`, Section 2.3.2
-``421`` ``MISDIRECTED_REQUEST``             HTTP Semantics :rfc:`9110`, Section 15.5.20
-``422`` ``UNPROCESSABLE_CONTENT``           HTTP Semantics :rfc:`9110`, Section 15.5.21
-``423`` ``LOCKED``                          WebDAV :rfc:`4918`, Section 11.3
-``424`` ``FAILED_DEPENDENCY``               WebDAV :rfc:`4918`, Section 11.4
-``425`` ``TOO_EARLY``                       Using Early Data in HTTP :rfc:`8470`
-``426`` ``UPGRADE_REQUIRED``                HTTP Semantics :rfc:`9110`, Section 15.5.22
-``428`` ``PRECONDITION_REQUIRED``           Additional HTTP Status Codes :rfc:`6585`
-``429`` ``TOO_MANY_REQUESTS``               Additional HTTP Status Codes :rfc:`6585`
-``431`` ``REQUEST_HEADER_FIELDS_TOO_LARGE`` Additional HTTP Status Codes :rfc:`6585`
-``451`` ``UNAVAILABLE_FOR_LEGAL_REASONS``   An HTTP Status Code to Report Legal Obstacles :rfc:`7725`
-``500`` ``INTERNAL_SERVER_ERROR``           HTTP Semantics :rfc:`9110`, Section 15.6.1
-``501`` ``NOT_IMPLEMENTED``                 HTTP Semantics :rfc:`9110`, Section 15.6.2
-``502`` ``BAD_GATEWAY``                     HTTP Semantics :rfc:`9110`, Section 15.6.3
-``503`` ``SERVICE_UNAVAILABLE``             HTTP Semantics :rfc:`9110`, Section 15.6.4
-``504`` ``GATEWAY_TIMEOUT``                 HTTP Semantics :rfc:`9110`, Section 15.6.5
-``505`` ``HTTP_VERSION_NOT_SUPPORTED``      HTTP Semantics :rfc:`9110`, Section 15.6.6
-``506`` ``VARIANT_ALSO_NEGOTIATES``         Transparent Content Negotiation in HTTP :rfc:`2295`, Section 8.1 (Experimental)
-``507`` ``INSUFFICIENT_STORAGE``            WebDAV :rfc:`4918`, Section 11.5
-``508`` ``LOOP_DETECTED``                   WebDAV Binding Extensions :rfc:`5842`, Section 7.2 (Experimental)
-``510`` ``NOT_EXTENDED``                    An HTTP Extension Framework :rfc:`2774`, Section 7 (Experimental)
-``511`` ``NETWORK_AUTHENTICATION_REQUIRED`` Additional HTTP Status Codes :rfc:`6585`, Section 6
-======= =================================== ==================================================================
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| Mã      | Tên Enum                            | Chi tiết                                                                      |
++=========+=====================================+===============================================================================+
+| ``100`` | ``CONTINUE``                        | HTTP Semantics :rfc:`9110`, Mục 15.2.1                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``101`` | ``SWITCHING_PROTOCOLS``             | HTTP Semantics :rfc:`9110`, Mục 15.2.2                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``102`` | ``PROCESSING``                      | WebDAV :rfc:`2518`, Mục 10.1                                                  |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``103`` | ``EARLY_HINTS``                     | Mã trạng thái HTTP để chỉ báo gợi ý :rfc:`8297`                               |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``200`` | ``OK``                              | HTTP Semantics :rfc:`9110`, Mục 15.3.1                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``201`` | ``CREATED``                         | HTTP Semantics :rfc:`9110`, Mục 15.3.2                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``202`` | ``ACCEPTED``                        | HTTP Semantics :rfc:`9110`, Mục 15.3.3                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``203`` | ``NON_AUTHORITATIVE_INFORMATION``   | HTTP Semantics :rfc:`9110`, Mục 15.3.4                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``204`` | ``NO_CONTENT``                      | HTTP Semantics :rfc:`9110`, Mục 15.3.5                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``205`` | ``RESET_CONTENT``                   | HTTP Semantics :rfc:`9110`, Mục 15.3.6                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``206`` | ``PARTIAL_CONTENT``                 | HTTP Semantics :rfc:`9110`, Mục 15.3.7                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``207`` | ``MULTI_STATUS``                    | WebDAV :rfc:`4918`, Mục 11.1                                                  |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``208`` | ``ALREADY_REPORTED``                | Các phần mở rộng liên kết WebDAV :rfc:`5842`, Mục 7.1 (Thực nghiệm)           |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``226`` | ``IM_USED``                         | Mã hóa delta trong HTTP :rfc:`3229`, Mục 10.4.1                               |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``300`` | ``MULTIPLE_CHOICES``                | Ngữ nghĩa HTTP :rfc:`9110`, Mục 15.4.1                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``301`` | ``MOVED_PERMANENTLY``               | Ngữ nghĩa HTTP :rfc:`9110`, Mục 15.4.2                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``302`` | ``FOUND``                           | Ngữ nghĩa HTTP :rfc:`9110`, Mục 15.4.3                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``303`` | ``SEE_OTHER``                       | Ngữ nghĩa HTTP :rfc:`9110`, Mục 15.4.4                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``304`` | ``NOT_MODIFIED``                    | Ngữ nghĩa HTTP :rfc:`9110`, Mục 15.4.5                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``305`` | ``USE_PROXY``                       | HTTP Semantics :rfc:`9110`, Mục 15.4.6                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``307`` | ``TEMPORARY_REDIRECT``              | HTTP Semantics :rfc:`9110`, Mục 15.4.8                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``308`` | ``PERMANENT_REDIRECT``              | HTTP Semantics :rfc:`9110`, Mục 15.4.9                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``400`` | ``BAD_REQUEST``                     | HTTP Semantics :rfc:`9110`, Mục 15.5.1                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``401`` | ``UNAUTHORIZED``                    | HTTP Semantics :rfc:`9110`, Mục 15.5.2                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``402`` | ``PAYMENT_REQUIRED``                | HTTP Semantics :rfc:`9110`, Mục 15.5.3                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``403`` | ``FORBIDDEN``                       | HTTP Semantics :rfc:`9110`, Mục 15.5.4                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``404`` | ``NOT_FOUND``                       | HTTP Semantics :rfc:`9110`, Mục 15.5.5                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``405`` | ``METHOD_NOT_ALLOWED``              | HTTP Semantics :rfc:`9110`, Mục 15.5.6                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``406`` | ``NOT_ACCEPTABLE``                  | HTTP Semantics :rfc:`9110`, Mục 15.5.7                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``407`` | ``PROXY_AUTHENTICATION_REQUIRED``   | HTTP Semantics :rfc:`9110`, Mục 15.5.8                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``408`` | ``REQUEST_TIMEOUT``                 | HTTP Semantics :rfc:`9110`, Mục 15.5.9                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``409`` | ``CONFLICT``                        | HTTP Semantics :rfc:`9110`, Mục 15.5.10                                       |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``410`` | ``GONE``                            | HTTP Semantics :rfc:`9110`, Mục 15.5.11                                       |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``411`` | ``LENGTH_REQUIRED``                 | HTTP Semantics :rfc:`9110`, Mục 15.5.12                                       |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``412`` | ``PRECONDITION_FAILED``             | HTTP Semantics :rfc:`9110`, Mục 15.5.13                                       |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``413`` | ``CONTENT_TOO_LARGE``               | HTTP Semantics :rfc:`9110`, Mục 15.5.14                                       |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``414`` | ``URI_TOO_LONG``                    | HTTP Semantics :rfc:`9110`, Mục 15.5.15                                       |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``415`` | ``UNSUPPORTED_MEDIA_TYPE``          | HTTP Semantics :rfc:`9110`, Mục 15.5.16                                       |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``416`` | ``RANGE_NOT_SATISFIABLE``           | HTTP Semantics :rfc:`9110`, Mục 15.5.17                                       |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``417`` | ``EXPECTATION_FAILED``              | HTTP Semantics :rfc:`9110`, Mục 15.5.18                                       |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``418`` | ``IM_A_TEAPOT``                     | HTCPCP/1.0 :rfc:`2324`, Mục 2.3.2                                             |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``421`` | ``MISDIRECTED_REQUEST``             | HTTP Semantics :rfc:`9110`, Mục 15.5.20                                       |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``422`` | ``UNPROCESSABLE_CONTENT``           | HTTP Semantics :rfc:`9110`, Mục 15.5.21                                       |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``423`` | ``LOCKED``                          | WebDAV :rfc:`4918`, Mục 11.3                                                  |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``424`` | ``FAILED_DEPENDENCY``               | WebDAV :rfc:`4918`, Mục 11.4                                                  |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``425`` | ``TOO_EARLY``                       | Sử dụng Early Data trong HTTP :rfc:`8470`                                     |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``426`` | ``UPGRADE_REQUIRED``                | HTTP Semantics :rfc:`9110`, Mục 15.5.22                                       |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``428`` | ``PRECONDITION_REQUIRED``           | Các mã trạng thái HTTP bổ sung :rfc:`6585`                                    |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``429`` | ``TOO_MANY_REQUESTS``               | Các mã trạng thái HTTP bổ sung :rfc:`6585`                                    |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``431`` | ``REQUEST_HEADER_FIELDS_TOO_LARGE`` | Các mã trạng thái HTTP bổ sung :rfc:`6585`                                    |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``451`` | ``UNAVAILABLE_FOR_LEGAL_REASONS``   | Mã trạng thái HTTP để báo cáo các trở ngại pháp lý :rfc:`7725`                |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``500`` | ``INTERNAL_SERVER_ERROR``           | HTTP Semantics :rfc:`9110`, Mục 15.6.1                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``501`` | ``NOT_IMPLEMENTED``                 | HTTP Semantics :rfc:`9110`, Mục 15.6.2                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``502`` | ``BAD_GATEWAY``                     | HTTP Semantics :rfc:`9110`, Mục 15.6.3                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``503`` | ``SERVICE_UNAVAILABLE``             | Ngữ nghĩa HTTP :rfc:`9110`, Mục 15.6.4                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``504`` | ``GATEWAY_TIMEOUT``                 | Ngữ nghĩa HTTP :rfc:`9110`, Mục 15.6.5                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``505`` | ``HTTP_VERSION_NOT_SUPPORTED``      | Ngữ nghĩa HTTP :rfc:`9110`, Mục 15.6.6                                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``506`` | ``VARIANT_ALSO_NEGOTIATES``         | Thương lượng nội dung trong suốt trong HTTP :rfc:`2295`, Mục 8.1 (Thử nghiệm) |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``507`` | ``INSUFFICIENT_STORAGE``            | WebDAV :rfc:`4918`, Mục 11.5                                                  |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``508`` | ``LOOP_DETECTED``                   | Phần mở rộng liên kết WebDAV :rfc:`5842`, Mục 7.2 (Thử nghiệm)                |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``510`` | ``NOT_EXTENDED``                    | Một khung mở rộng HTTP :rfc:`2774`, Mục 7 (Thử nghiệm)                        |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
+| ``511`` | ``NETWORK_AUTHENTICATION_REQUIRED`` | Các mã trạng thái HTTP bổ sung :rfc:`6585`, Phần 6                            |
++---------+-------------------------------------+-------------------------------------------------------------------------------+
 
-In order to preserve backwards compatibility, enum values are also present
-in the :mod:`http.client` module in the form of constants. The enum name is
-equal to the constant name (i.e. ``http.HTTPStatus.OK`` is also available as
-``http.client.OK``).
+Để duy trì khả năng tương thích ngược, các giá trị enum cũng có trong module :mod:`http.client` dưới dạng các hằng số. Tên enum giống với tên hằng số (tức là ``http.HTTPStatus.OK`` cũng có sẵn dưới dạng ``http.client.OK``).
 
 .. versionchanged:: 3.7
-   Added ``421 MISDIRECTED_REQUEST`` status code.
+   Đã thêm mã trạng thái ``421 MISDIRECTED_REQUEST``.
 
 .. versionadded:: 3.8
-   Added ``451 UNAVAILABLE_FOR_LEGAL_REASONS`` status code.
+   Đã thêm mã trạng thái ``451 UNAVAILABLE_FOR_LEGAL_REASONS``.
 
 .. versionadded:: 3.9
-   Added ``103 EARLY_HINTS``, ``418 IM_A_TEAPOT`` and ``425 TOO_EARLY`` status codes.
+   Đã thêm các mã trạng thái ``103 EARLY_HINTS``, ``418 IM_A_TEAPOT`` và ``425 TOO_EARLY``.
 
 .. versionchanged:: 3.13
-   Implemented RFC9110 naming for status constants. Old constant names are preserved for
-   backwards compatibility: ``413 REQUEST_ENTITY_TOO_LARGE``, ``414 REQUEST_URI_TOO_LONG``,
-   ``416 REQUESTED_RANGE_NOT_SATISFIABLE`` and ``422 UNPROCESSABLE_ENTITY``.
+   Đã triển khai cách đặt tên theo RFC9110 cho các hằng số trạng thái. Các tên hằng số cũ được giữ lại để duy trì khả năng tương thích ngược: ``413 REQUEST_ENTITY_TOO_LARGE``, ``414 REQUEST_URI_TOO_LONG``, ``416 REQUESTED_RANGE_NOT_SATISFIABLE`` và ``422 UNPROCESSABLE_ENTITY``.
 
-HTTP status category
---------------------
+Danh mục trạng thái HTTP
+------------------------
 
 .. versionadded:: 3.12
 
-The enum values have several properties to indicate the HTTP status category:
+Các giá trị enum có một số thuộc tính để cho biết nhóm trạng thái HTTP:
 
-==================== ======================== ======================================
-Property             Indicates that           Details
-==================== ======================== ======================================
-``is_informational`` ``100 <= status <= 199`` HTTP Semantics :rfc:`9110`, Section 15
-``is_success``       ``200 <= status <= 299`` HTTP Semantics :rfc:`9110`, Section 15
-``is_redirection``   ``300 <= status <= 399`` HTTP Semantics :rfc:`9110`, Section 15
-``is_client_error``  ``400 <= status <= 499`` HTTP Semantics :rfc:`9110`, Section 15
-``is_server_error``  ``500 <= status <= 599`` HTTP Semantics :rfc:`9110`, Section 15
-==================== ======================== ======================================
++----------------------+--------------------------+------------------------------------+
+| Thuộc tính           | Cho biết rằng            | Chi tiết                           |
++======================+==========================+====================================+
+| ``is_informational`` | ``100 <= status <= 199`` | HTTP Semantics :rfc:`9110`, Mục 15 |
++----------------------+--------------------------+------------------------------------+
+| ``is_success``       | ``200 <= status <= 299`` | HTTP Semantics :rfc:`9110`, Mục 15 |
++----------------------+--------------------------+------------------------------------+
+| ``is_redirection``   | ``300 <= status <= 399`` | HTTP Semantics :rfc:`9110`, Mục 15 |
++----------------------+--------------------------+------------------------------------+
+| ``is_client_error``  | ``400 <= status <= 499`` | HTTP Semantics :rfc:`9110`, Mục 15 |
++----------------------+--------------------------+------------------------------------+
+| ``is_server_error``  | ``500 <= status <= 599`` | HTTP Semantics :rfc:`9110`, Mục 15 |
++----------------------+--------------------------+------------------------------------+
 
-   Usage::
+   Cách sử dụng::
 
       >>> from http import HTTPStatus
       >>> HTTPStatus.OK.is_success
@@ -171,9 +226,9 @@ Property             Indicates that           Details
 
    .. versionadded:: 3.11
 
-   A subclass of :class:`enum.StrEnum` that defines a set of HTTP methods and descriptions written in English.
+   Một lớp con của :class:`enum.StrEnum` xác định một tập hợp các phương thức HTTP và phần mô tả được viết bằng tiếng Anh.
 
-   Usage::
+   Cách sử dụng::
 
       >>> from http import HTTPMethod
       >>>
@@ -198,23 +253,32 @@ Property             Indicates that           Details
 
 .. _http-methods:
 
-HTTP methods
------------------
+Các phương thức HTTP
+--------------------
 
-Supported,
-`IANA-registered methods <https://www.iana.org/assignments/http-methods/http-methods.xhtml>`_
-available in :class:`http.HTTPMethod` are:
+Các phương thức được hỗ trợ, `IANA-registered methods <https://www.iana.org/assignments/http-methods/http-methods.xhtml>`_ có sẵn trong :class:`http.HTTPMethod` là:
 
-=========== =================================== ==================================================================
-Method      Enum Name                           Details
-=========== =================================== ==================================================================
-``GET``     ``GET``                             HTTP Semantics :rfc:`9110`, Section 9.3.1
-``HEAD``    ``HEAD``                            HTTP Semantics :rfc:`9110`, Section 9.3.2
-``POST``    ``POST``                            HTTP Semantics :rfc:`9110`, Section 9.3.3
-``PUT``     ``PUT``                             HTTP Semantics :rfc:`9110`, Section 9.3.4
-``DELETE``  ``DELETE``                          HTTP Semantics :rfc:`9110`, Section 9.3.5
-``CONNECT`` ``CONNECT``                         HTTP Semantics :rfc:`9110`, Section 9.3.6
-``OPTIONS`` ``OPTIONS``                         HTTP Semantics :rfc:`9110`, Section 9.3.7
-``TRACE``   ``TRACE``                           HTTP Semantics :rfc:`9110`, Section 9.3.8
-``PATCH``   ``PATCH``                           HTTP/1.1 :rfc:`5789`
-=========== =================================== ==================================================================
++-------------+-------------+---------------------------------------+
+| Phương thức | Tên Enum    | Chi tiết                              |
++=============+=============+=======================================+
+| ``GET``     | ``GET``     | HTTP Semantics :rfc:`9110`, Mục 9.3.1 |
++-------------+-------------+---------------------------------------+
+| ``HEAD``    | ``HEAD``    | HTTP Semantics :rfc:`9110`, Mục 9.3.2 |
++-------------+-------------+---------------------------------------+
+| ``POST``    | ``POST``    | HTTP Semantics :rfc:`9110`, Mục 9.3.3 |
++-------------+-------------+---------------------------------------+
+| ``PUT``     | ``PUT``     | HTTP Semantics :rfc:`9110`, Mục 9.3.4 |
++-------------+-------------+---------------------------------------+
+| ``DELETE``  | ``DELETE``  | HTTP Semantics :rfc:`9110`, Mục 9.3.5 |
++-------------+-------------+---------------------------------------+
+| ``CONNECT`` | ``CONNECT`` | HTTP Semantics :rfc:`9110`, Mục 9.3.6 |
++-------------+-------------+---------------------------------------+
+| ``OPTIONS`` | ``OPTIONS`` | HTTP Semantics :rfc:`9110`, Mục 9.3.7 |
++-------------+-------------+---------------------------------------+
+| ``TRACE``   | ``TRACE``   | HTTP Semantics :rfc:`9110`, Mục 9.3.8 |
++-------------+-------------+---------------------------------------+
+| ``PATCH``   | ``PATCH``   | HTTP/1.1 :rfc:`5789`                  |
++-------------+-------------+---------------------------------------+
+
+.. _`IANA-registered status codes`: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+.. _`IANA-registered methods`: https://www.iana.org/assignments/http-methods/http-methods.xhtml

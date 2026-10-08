@@ -2,12 +2,11 @@
 
 .. _removed:
 
-***************
-Removed Modules
-***************
+************************
+Các mô-đun đã bị loại bỏ
+************************
 
-The modules described in this chapter have been removed from the Python
-standard library.  They are documented here to help people find replacements.
+Các mô-đun được mô tả trong chương này đã bị loại bỏ khỏi thư viện chuẩn Python. Chúng được ghi lại tại đây để giúp mọi người tìm các phần thay thế.
 
 
 .. toctree::

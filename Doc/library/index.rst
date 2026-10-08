@@ -1,38 +1,18 @@
 .. _library-index:
 
-###############################
-  The Python standard library
-###############################
+#####################
+Thư viện chuẩn Python
+#####################
 
-This library reference manual describes the standard library
-distributed with Python. It also describes some of the optional
-components that are commonly included in Python distributions.
+Tài liệu tham khảo về thư viện này mô tả thư viện chuẩn được phân phối cùng Python. Tài liệu cũng mô tả một số thành phần tùy chọn thường được tích hợp trong các bản phân phối Python.
 
-Elsewhere, :ref:`reference-index` describes the exact syntax and
-semantics of the Python language, and :ref:`builtins-index` describes
-the built-in functions.
+Ở nơi khác, :ref:`reference-index` mô tả cú pháp và ngữ nghĩa chính xác của ngôn ngữ Python, còn :ref:`builtins-index` mô tả các hàm tích hợp sẵn.
 
-Python's standard library is extensive, offering a wide range of
-facilities as indicated by the long table of contents listed below. The
-library contains built-in modules (written in C) that provide access to
-system functionality such as file I/O that would otherwise be
-inaccessible to Python programmers, as well as modules written in Python
-that provide standardized solutions for many problems that occur in
-everyday programming. Some of these modules are explicitly designed to
-encourage and enhance the portability of Python programs by abstracting
-away platform-specifics into platform-neutral APIs.
+Thư viện chuẩn của Python rất phong phú, cung cấp nhiều loại tiện ích như được thể hiện trong mục lục dài bên dưới. Thư viện này chứa các mô-đun tích hợp sẵn (được viết bằng C) cung cấp quyền truy cập vào các chức năng của hệ thống, chẳng hạn như I/O tệp vốn không thể truy cập được đối với lập trình viên Python theo cách khác, cũng như các mô-đun được viết bằng Python, cung cấp các giải pháp được chuẩn hóa cho nhiều vấn đề thường gặp trong lập trình hằng ngày. Một số mô-đun được thiết kế rõ ràng để khuyến khích và tăng cường tính khả chuyển của các chương trình Python bằng cách trừu tượng hóa các đặc thù dành riêng cho nền tảng thành các API trung lập với nền tảng.
 
-The Python installers for the Windows platform usually include
-the entire standard library and often also include many additional
-components. For Unix-like operating systems Python is normally provided
-as a collection of packages, so it may be necessary to use the packaging
-tools provided with the operating system to obtain some or all of the
-optional components.
+Các trình cài đặt Python dành cho nền tảng Windows thường bao gồm toàn bộ thư viện chuẩn và thường cũng bao gồm nhiều thành phần bổ sung. Đối với các hệ điều hành giống Unix, Python thường được cung cấp dưới dạng một tập hợp các gói, vì vậy có thể cần sử dụng các công cụ quản lý gói do hệ điều hành cung cấp để có được một phần hoặc toàn bộ các thành phần tùy chọn.
 
-In addition to the standard library, there is an active collection of
-hundreds of thousands of components (from individual programs and modules to
-packages and entire application development frameworks), available from
-the `Python Package Index <https://pypi.org>`_.
+Ngoài thư viện chuẩn, còn có một tập hợp đang hoạt động gồm hàng trăm nghìn thành phần (từ các chương trình và mô-đun riêng lẻ đến các gói và toàn bộ framework phát triển ứng dụng), có sẵn trên `Python Package Index <https://pypi.org>`_.
 
 .. We don't use :numbered: option for the TOC below as it enforces
    numbered sections for the entire stdlib docs.  If desired,
@@ -75,3 +55,5 @@ the `Python Package Index <https://pypi.org>`_.
    superseded.rst
    removed.rst
    security_warnings.rst
+
+.. _`Python Package Index`: https://pypi.org

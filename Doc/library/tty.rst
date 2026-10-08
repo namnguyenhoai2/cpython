@@ -1,81 +1,69 @@
-:mod:`!tty` --- Terminal control functions
-==========================================
+:mod:`!tty` --- Các hàm điều khiển terminal
+===========================================
 
 .. module:: tty
-   :synopsis: Utility functions that perform common terminal control operations.
+   :synopsis: Các hàm tiện ích thực hiện những thao tác điều khiển terminal phổ biến.
 
 .. moduleauthor:: Steen Lumholt
 .. sectionauthor:: Moshe Zadka <moshez@zadka.site.co.il>
 
-**Source code:** :source:`Lib/tty.py`
+**Mã nguồn:** :source:`Lib/tty.py`
 
 --------------
 
-The :mod:`!tty` module defines functions for putting the tty into cbreak and raw
-modes.
+Module :mod:`!tty` định nghĩa các hàm để đưa tty vào chế độ cbreak và raw.
 
 .. availability:: Unix.
 
-Because it requires the :mod:`termios` module, it will work only on Unix.
+Vì yêu cầu module :mod:`termios`, module này chỉ hoạt động trên Unix.
 
-The :mod:`!tty` module defines the following functions:
+Module :mod:`!tty` định nghĩa các hàm sau:
 
 
 .. function:: cfmakeraw(mode)
 
-   Convert the tty attribute list *mode*, which is a list like the one returned
-   by :func:`termios.tcgetattr`, to that of a tty in raw mode.
+   Chuyển đổi danh sách thuộc tính tty *mode*, là một danh sách giống danh sách được :func:`termios.tcgetattr` trả về, thành danh sách thuộc tính của tty ở chế độ raw.
 
    .. versionadded:: 3.12
 
 
 .. function:: cfmakecbreak(mode)
 
-   Convert the tty attribute list *mode*, which is a list like the one returned
-   by :func:`termios.tcgetattr`, to that of a tty in cbreak mode.
+   Chuyển đổi danh sách thuộc tính tty *mode*, là một danh sách tương tự như danh sách được trả về bởi :func:`termios.tcgetattr`, thành danh sách thuộc tính của tty ở chế độ cbreak.
 
-   This clears the ``ECHO`` and ``ICANON`` local mode flags in *mode* as well
-   as setting the minimum input to 1 byte with no delay.
+   Thao tác này xóa các cờ chế độ cục bộ ``ECHO`` và ``ICANON`` trong *mode*, đồng thời đặt dữ liệu đầu vào tối thiểu là 1 byte và không có độ trễ.
 
    .. versionadded:: 3.12
 
    .. versionchanged:: 3.12.2
-      The ``ICRNL`` flag is no longer cleared. This matches Linux and macOS
-      ``stty cbreak`` behavior and what :func:`setcbreak` historically did.
+      Cờ ``ICRNL`` không còn bị xóa nữa. Điều này khớp với hành vi ``stty cbreak`` trên Linux và macOS, cũng như hành vi trước đây của :func:`setcbreak`.
 
 
 .. function:: setraw(fd, when=termios.TCSAFLUSH)
 
-   Change the mode of the file descriptor *fd* to raw. If *when* is omitted, it
-   defaults to :const:`termios.TCSAFLUSH`, and is passed to
-   :func:`termios.tcsetattr`. The return value of :func:`termios.tcgetattr`
-   is saved before setting *fd* to raw mode; this value is returned.
+   Thay đổi chế độ của bộ mô tả tệp *fd* thành raw. Nếu *when* bị bỏ qua, giá trị mặc định là :const:`termios.TCSAFLUSH` và được truyền cho
+   :func:`termios.tcsetattr`. Giá trị trả về của :func:`termios.tcgetattr` được lưu trước khi đặt *fd* thành chế độ raw; giá trị này sẽ được trả về.
 
    .. versionchanged:: 3.12
-      The return value is now the original tty attributes, instead of ``None``.
+      Giờ đây, giá trị trả về là các thuộc tính tty ban đầu, thay vì ``None``.
 
 
 .. function:: setcbreak(fd, when=termios.TCSAFLUSH)
 
-   Change the mode of file descriptor *fd* to cbreak. If *when* is omitted, it
-   defaults to :const:`termios.TCSAFLUSH`, and is passed to
-   :func:`termios.tcsetattr`. The return value of :func:`termios.tcgetattr`
-   is saved before setting *fd* to cbreak mode; this value is returned.
+   Thay đổi chế độ của bộ mô tả tệp *fd* thành cbreak. Nếu *when* bị bỏ qua, giá trị mặc định là :const:`termios.TCSAFLUSH` và được truyền cho
+   :func:`termios.tcsetattr`. Giá trị trả về của :func:`termios.tcgetattr` được lưu trước khi đặt *fd* sang chế độ cbreak; giá trị này được trả về.
 
-   This clears the ``ECHO`` and ``ICANON`` local mode flags as well as setting
-   the minimum input to 1 byte with no delay.
+   Thao tác này xóa các cờ chế độ cục bộ ``ECHO`` và ``ICANON``, đồng thời đặt dữ liệu đầu vào tối thiểu là 1 byte mà không có độ trễ.
 
    .. versionchanged:: 3.12
-      The return value is now the original tty attributes, instead of ``None``.
+      Giờ đây, giá trị trả về là các thuộc tính tty ban đầu, thay vì ``None``.
 
    .. versionchanged:: 3.12.2
-      The ``ICRNL`` flag is no longer cleared. This restores the behavior
-      of Python 3.11 and earlier as well as matching what Linux, macOS, & BSDs
-      describe in their ``stty(1)`` man pages regarding cbreak mode.
+      Cờ ``ICRNL`` không còn bị xóa. Điều này khôi phục hành vi của Python 3.11 trở về trước, đồng thời phù hợp với mô tả trong các trang hướng dẫn man ``stty(1)`` của Linux, macOS và BSD về chế độ cbreak.
 
 
 .. seealso::
 
-   Module :mod:`termios`
-      Low-level terminal control interface.
+   Mô-đun :mod:`termios`
+      Giao diện điều khiển terminal cấp thấp.
 

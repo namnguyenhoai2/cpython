@@ -1,39 +1,26 @@
-:mod:`!netrc` --- netrc file processing
-=======================================
+:mod:`!netrc` --- xử lý tệp netrc
+=================================
 
 .. module:: netrc
-   :synopsis: Loading of .netrc files.
+   :synopsis: Tải các tệp .netrc.
 
 .. moduleauthor:: Eric S. Raymond <esr@snark.thyrsus.com>
 .. sectionauthor:: Eric S. Raymond <esr@snark.thyrsus.com>
 
-**Source code:** :source:`Lib/netrc.py`
+**Mã nguồn:** :source:`Lib/netrc.py`
 
 --------------
 
-The :class:`~netrc.netrc` class parses and encapsulates the netrc file format used by
-the Unix :program:`ftp` program and other FTP clients.
+Lớp :class:`~netrc.netrc` phân tích cú pháp và đóng gói định dạng tệp netrc được chương trình Unix :program:`ftp` và các FTP client khác sử dụng.
 
 
 .. class:: netrc([file])
 
-   A :class:`~netrc.netrc` instance or subclass instance encapsulates data from  a netrc
-   file.  The initialization argument, if present, specifies the file to parse.  If
-   no argument is given, the file :file:`.netrc` in the user's home directory --
-   as determined by :func:`os.path.expanduser` -- will be read.  Otherwise,
-   a :exc:`FileNotFoundError` exception will be raised.
-   Parse errors will raise :exc:`NetrcParseError` with diagnostic
-   information including the file name, line number, and terminating token.
+   Một đối tượng :class:`~netrc.netrc` hoặc đối tượng lớp con đóng gói dữ liệu từ một tệp netrc. Đối số khởi tạo, nếu có, chỉ định tệp cần phân tích cú pháp. Nếu không cung cấp đối số, tệp :file:`.netrc` trong thư mục chính của người dùng -- được xác định bởi :func:`os.path.expanduser` -- sẽ được đọc. Nếu không, một ngoại lệ :exc:`FileNotFoundError` sẽ được phát sinh. Lỗi phân tích cú pháp sẽ phát sinh :exc:`NetrcParseError` cùng thông tin chẩn đoán, bao gồm tên tệp, số dòng và token kết thúc.
 
-   If no argument is specified on a POSIX system, the presence of passwords in
-   the :file:`.netrc` file will raise a :exc:`NetrcParseError` if the file
-   ownership or permissions are insecure (owned by a user other than the user
-   running the process, or accessible for read or write by any other user).
-   This implements security behavior equivalent to that of ftp and other
-   programs that use :file:`.netrc`. Such security checks are not available
-   on platforms that do not support :func:`os.getuid`.
+   Nếu không chỉ định đối số trên hệ thống POSIX, việc có mật khẩu trong tệp :file:`.netrc` sẽ phát sinh một :exc:`NetrcParseError` nếu quyền sở hữu hoặc quyền truy cập của tệp không an toàn (do người dùng khác với người đang chạy process sở hữu, hoặc bất kỳ người dùng nào khác có quyền đọc hoặc ghi). Cơ chế này triển khai hành vi bảo mật tương đương với ftp và các chương trình khác sử dụng :file:`.netrc`. Những kiểm tra bảo mật này không khả dụng trên các nền tảng không hỗ trợ :func:`os.getuid`.
 
-   .. versionchanged:: 3.4 Added the POSIX permission check.
+   .. versionchanged:: 3.4 Đã bổ sung kiểm tra quyền POSIX.
 
    .. versionchanged:: 3.7
       :func:`os.path.expanduser` is used to find the location of the
@@ -41,62 +28,51 @@ the Unix :program:`ftp` program and other FTP clients.
 
    .. versionchanged:: 3.10
       :class:`netrc` try UTF-8 encoding before using locale specific
-      encoding.
-      The entry in the netrc file no longer needs to contain all tokens.  The missing
-      tokens' value default to an empty string.  All the tokens and their values now
-      can contain arbitrary characters, like whitespace and non-ASCII characters.
-      If the login name is anonymous, it won't trigger the security check.
+      encoding. Mục nhập trong tệp netrc không còn cần chứa tất cả các token. Giá trị của các token bị thiếu mặc định là chuỗi rỗng. Tất cả các token và giá trị của chúng giờ đây có thể chứa các ký tự tùy ý, chẳng hạn như khoảng trắng và ký tự không phải ASCII. Nếu tên đăng nhập là anonymous, tên này sẽ không kích hoạt bước kiểm tra bảo mật.
 
 
 .. exception:: NetrcParseError
 
-   Exception raised by the :class:`~netrc.netrc` class when syntactical errors are
-   encountered in source text.  Instances of this exception provide three
-   interesting attributes:
+   Ngoại lệ do lớp :class:`~netrc.netrc` phát sinh khi phát hiện lỗi cú pháp trong văn bản nguồn. Các thực thể của ngoại lệ này cung cấp ba thuộc tính đáng chú ý:
 
    .. attribute:: msg
 
-      Textual explanation of the error.
+      Mô tả bằng văn bản về lỗi.
 
    .. attribute:: filename
 
-      The name of the source file.
+      Tên của tệp nguồn.
 
    .. attribute:: lineno
 
-      The line number on which the error was found.
+      Số dòng tại đó phát hiện lỗi.
 
 
 .. _netrc-objects:
 
-netrc Objects
--------------
+Các đối tượng netrc
+-------------------
 
-A :class:`~netrc.netrc` instance has the following methods:
+Một thực thể :class:`~netrc.netrc` có các phương thức sau:
 
 
 .. method:: netrc.authenticators(host)
 
-   Return a 3-tuple ``(login, account, password)`` of authenticators for *host*.
-   If the netrc file did not contain an entry for the given host, return the tuple
-   associated with the 'default' entry.  If neither matching host nor default entry
-   is available, return ``None``.
+   Trả về một bộ 3 phần tử ``(login, account, password)`` gồm thông tin xác thực cho *host*. Nếu tệp netrc không chứa mục nhập cho host đã cho, trả về bộ tuple tương ứng với mục nhập 'default'. Nếu không có host phù hợp hoặc mục nhập default, trả về ``None``.
 
 
 .. method:: netrc.__repr__()
 
-   Dump the class data as a string in the format of a netrc file. (This discards
-   comments and may reorder the entries.)
+   Kết xuất dữ liệu của lớp thành một chuỗi theo định dạng của tệp netrc. (Thao tác này sẽ loại bỏ các chú thích và có thể sắp xếp lại các mục nhập.)
 
-Instances of :class:`~netrc.netrc` have public instance variables:
+Các thực thể của :class:`~netrc.netrc` có các biến thực thể công khai sau:
 
 
 .. attribute:: netrc.hosts
 
-   Dictionary mapping host names to ``(login, account, password)`` tuples.  The
-   'default' entry, if any, is represented as a pseudo-host by that name.
+   Từ điển ánh xạ tên host tới các tuple ``(login, account, password)``. Mục nhập 'default', nếu có, được biểu diễn dưới dạng một pseudo-host có tên đó.
 
 
 .. attribute:: netrc.macros
 
-   Dictionary mapping macro names to string lists.
+   Từ điển ánh xạ tên macro tới các danh sách chuỗi.

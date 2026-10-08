@@ -1,70 +1,52 @@
 .. _profile:
 
-********************
-The Python Profilers
-********************
+************************************
+Các trình phân tích hiệu năng Python
+************************************
 
-**Source code:** :source:`Lib/profile.py` and :source:`Lib/pstats.py`
+**Mã nguồn:** :source:`Lib/profile.py` và :source:`Lib/pstats.py`
 
 --------------
 
 .. _profiler-introduction:
 
-Introduction to the profilers
-=============================
+Giới thiệu về các trình phân tích hiệu năng
+===========================================
 
 .. index::
    single: deterministic profiling
    single: profiling, deterministic
 
-:mod:`cProfile` and :mod:`profile` provide :dfn:`deterministic profiling` of
-Python programs. A :dfn:`profile` is a set of statistics that describes how
-often and for how long various parts of the program executed. These statistics
-can be formatted into reports via the :mod:`pstats` module.
+:mod:`cProfile` và :mod:`profile` cung cấp khả năng :dfn:`phân tích hiệu năng xác định` cho các chương trình Python. Một :dfn:`bản phân tích hiệu năng` là một tập hợp các số liệu thống kê mô tả tần suất và khoảng thời gian thực thi của các phần khác nhau trong chương trình. Các số liệu thống kê này có thể được định dạng thành báo cáo thông qua mô-đun :mod:`pstats`.
 
-The Python standard library provides two different implementations of the same
-profiling interface:
+Thư viện chuẩn Python cung cấp hai cách triển khai khác nhau của cùng một giao diện phân tích hiệu năng:
 
-1. :mod:`cProfile` is recommended for most users; it's a C extension with
-   reasonable overhead that makes it suitable for profiling long-running
-   programs.  Based on :mod:`lsprof`, contributed by Brett Rosen and Ted
-   Czotter.
+1. :mod:`cProfile` được khuyến nghị cho hầu hết người dùng; đây là một phần mở rộng C có mức overhead hợp lý, phù hợp để phân tích hiệu năng các chương trình chạy trong thời gian dài. Dựa trên :mod:`lsprof`, do Brett Rosen và Ted Czotter đóng góp.
 
-2. :mod:`profile`, a pure Python module whose interface is imitated by
-   :mod:`cProfile`, but which adds significant overhead to profiled programs.
-   If you're trying to extend the profiler in some way, the task might be easier
-   with this module.  Originally designed and written by Jim Roskind.
+2. :mod:`profile`, một mô-đun Python thuần túy có giao diện được mô phỏng bởi
+   :mod:`cProfile`, nhưng module này làm tăng đáng kể overhead cho các chương trình được profile. Nếu bạn đang cố gắng mở rộng profiler theo một cách nào đó, công việc có thể dễ dàng hơn với module này. Ban đầu được Jim Roskind thiết kế và viết.
 
 .. note::
 
-   The profiler modules are designed to provide an execution profile for a given
-   program, not for benchmarking purposes (for that, there is :mod:`timeit` for
-   reasonably accurate results).  This particularly applies to benchmarking
-   Python code against C code: the profilers introduce overhead for Python code,
-   but not for C-level functions, and so the C code would seem faster than any
-   Python one.
+   Các module profiler được thiết kế để cung cấp profile thực thi cho một chương trình cụ thể, không nhằm mục đích benchmark (với mục đích đó, có :mod:`timeit` để cho kết quả tương đối chính xác). Điều này đặc biệt áp dụng khi benchmark mã Python với mã C: profiler tạo overhead cho mã Python nhưng không tạo overhead cho các hàm ở cấp C, vì vậy mã C có vẻ nhanh hơn bất kỳ mã Python nào.
 
 
 .. _profile-instant:
 
-Instant User's Manual
-=====================
+Hướng dẫn sử dụng nhanh
+=======================
 
-This section is provided for users that "don't want to read the manual." It
-provides a very brief overview, and allows a user to rapidly perform profiling
-on an existing application.
+Phần này dành cho những người dùng "không muốn đọc hướng dẫn sử dụng". Phần này cung cấp cái nhìn tổng quan rất ngắn gọn và cho phép người dùng nhanh chóng thực hiện profiling trên một ứng dụng hiện có.
 
-To profile a function that takes a single argument, you can do::
+Để profile một hàm nhận một đối số, bạn có thể thực hiện như sau::
 
    import cProfile
    import re
    cProfile.run('re.compile("foo|bar")')
 
-(Use :mod:`profile` instead of :mod:`cProfile` if the latter is not available on
-your system.)
+(Sử dụng :mod:`profile` thay cho :mod:`cProfile` nếu thành phần sau không khả dụng trên hệ thống của bạn.)
 
-The above action would run :func:`re.compile` and print profile results like
-the following::
+Thao tác trên sẽ chạy :func:`re.compile` và in ra kết quả profile như sau::
 
          214 function calls (207 primitive calls) in 0.002 seconds
 
@@ -80,190 +62,142 @@ the following::
         1    0.000    0.000    0.000    0.000 _compiler.py:598(_code)
         1    0.000    0.000    0.000    0.000 _parser.py:435(_parse_sub)
 
-The first line indicates that 214 calls were monitored.  Of those calls, 207
-were :dfn:`primitive`, meaning that the call was not induced via recursion. The
-next line: ``Ordered by: cumulative time`` indicates the output is sorted
-by the ``cumtime`` values. The column headings include:
+Dòng đầu tiên cho biết 214 lần gọi đã được giám sát. Trong số đó, 207 lần gọi là :dfn:`nguyên thủy`, nghĩa là lần gọi đó không được tạo ra thông qua đệ quy. Dòng tiếp theo: ``Ordered by: cumulative time`` cho biết đầu ra được sắp xếp theo các giá trị ``cumtime``. Tiêu đề các cột bao gồm:
 
 ncalls
-   for the number of calls.
+   cho số lần gọi.
 
 tottime
-   for the total time spent in the given function (and excluding time made in
-   calls to sub-functions)
+   cho tổng thời gian dành cho hàm đã cho (không tính thời gian thực hiện các lệnh gọi đến những hàm con)
 
 percall
-   is the quotient of ``tottime`` divided by ``ncalls``
+   là thương của ``tottime`` chia cho ``ncalls``
 
 cumtime
-   is the cumulative time spent in this and all subfunctions (from invocation
-   till exit). This figure is accurate *even* for recursive functions.
+   là tổng thời gian đã dành cho hàm này và tất cả các hàm con (từ khi được gọi cho đến khi thoát). Giá trị này chính xác *ngay cả* đối với các hàm đệ quy.
 
 percall
-   is the quotient of ``cumtime`` divided by primitive calls
+   là thương của ``cumtime`` chia cho số lần gọi nguyên thủy
 
 filename:lineno(function)
-   provides the respective data of each function
+   cung cấp dữ liệu tương ứng của từng hàm
 
-When there are two numbers in the first column (for example ``3/1``), it means
-that the function recursed.  The second value is the number of primitive calls
-and the former is the total number of calls.  Note that when the function does
-not recurse, these two values are the same, and only the single figure is
-printed.
+Khi có hai số trong cột đầu tiên (ví dụ ``3/1``), điều đó có nghĩa là hàm đã đệ quy. Giá trị thứ hai là số lần gọi nguyên thủy, còn giá trị thứ nhất là tổng số lần gọi. Lưu ý rằng khi hàm không đệ quy, hai giá trị này giống nhau và chỉ một giá trị duy nhất được in ra.
 
-Instead of printing the output at the end of the profile run, you can save the
-results to a file by specifying a filename to the :func:`run` function::
+Thay vì in kết quả ở cuối lần chạy profiling, bạn có thể lưu kết quả vào một tệp bằng cách chỉ định tên tệp cho hàm :func:`run`::
 
    import cProfile
    import re
    cProfile.run('re.compile("foo|bar")', 'restats')
 
-The :class:`pstats.Stats` class reads profile results from a file and formats
-them in various ways.
+Lớp :class:`pstats.Stats` đọc kết quả profiling từ một tệp và định dạng chúng theo nhiều cách khác nhau.
 
 .. _profile-cli:
 
 .. program:: cProfile
 
-The files :mod:`cProfile` and :mod:`profile` can also be invoked as a script to
-profile another script.  For example::
+Các tệp :mod:`cProfile` và :mod:`profile` cũng có thể được gọi như một script để thực hiện profiling cho một script khác. Ví dụ::
 
    python -m cProfile [-o output_file] [-s sort_order] (-m module | myscript.py)
 
 .. option:: -o <output_file>
 
-   Writes the profile results to a file instead of to stdout.
+   Ghi kết quả profiling vào một tệp thay vì stdout.
 
 .. option:: -s <sort_order>
 
-   Specifies one of the :func:`~pstats.Stats.sort_stats` sort values
-   to sort the output by.
-   This only applies when :option:`-o <cProfile -o>` is not supplied.
+   Chỉ định một trong các giá trị sắp xếp của :func:`~pstats.Stats.sort_stats` để sắp xếp đầu ra theo đó. Điều này chỉ áp dụng khi không cung cấp :option:`-o <cProfile -o>`.
 
 .. option:: -m <module>
 
-   Specifies that a module is being profiled instead of a script.
+   Chỉ định rằng một module đang được profiling thay vì một script.
 
    .. versionadded:: 3.7
-      Added the ``-m`` option to :mod:`cProfile`.
+      Đã thêm tùy chọn ``-m`` vào :mod:`cProfile`.
 
    .. versionadded:: 3.8
-      Added the ``-m`` option to :mod:`profile`.
+      Đã thêm tùy chọn ``-m`` vào :mod:`profile`.
 
-The :mod:`pstats` module's :class:`~pstats.Stats` class has a variety of methods
-for manipulating and printing the data saved into a profile results file::
+Lớp :class:`~pstats.Stats` của module :mod:`pstats` có nhiều phương thức để thao tác và in dữ liệu được lưu trong tệp kết quả profile::
 
    import pstats
    from pstats import SortKey
    p = pstats.Stats('restats')
    p.strip_dirs().sort_stats(-1).print_stats()
 
-The :meth:`~pstats.Stats.strip_dirs` method removed the extraneous path from all
-the module names. The :meth:`~pstats.Stats.sort_stats` method sorted all the
-entries according to the standard module/line/name string that is printed. The
-:meth:`~pstats.Stats.print_stats` method printed out all the statistics.  You
-might try the following sort calls::
+Phương thức :meth:`~pstats.Stats.strip_dirs` đã loại bỏ phần đường dẫn thừa khỏi tất cả tên module. Phương thức :meth:`~pstats.Stats.sort_stats` đã sắp xếp tất cả các mục theo chuỗi module/line/name tiêu chuẩn được in ra. Phương thức
+:meth:`~pstats.Stats.print_stats` đã in ra tất cả thống kê. Bạn có thể thử các lệnh gọi sort sau đây::
 
    p.sort_stats(SortKey.NAME)
    p.print_stats()
 
-The first call will actually sort the list by function name, and the second call
-will print out the statistics.  The following are some interesting calls to
-experiment with::
+Lệnh gọi đầu tiên sẽ thực sự sắp xếp danh sách theo tên hàm, còn lệnh gọi thứ hai sẽ in ra các thống kê. Sau đây là một số lệnh gọi thú vị để bạn thử nghiệm::
 
    p.sort_stats(SortKey.CUMULATIVE).print_stats(10)
 
-This sorts the profile by cumulative time in a function, and then only prints
-the ten most significant lines.  If you want to understand what algorithms are
-taking time, the above line is what you would use.
+Lệnh này sắp xếp profile theo thời gian tích lũy trong một hàm, sau đó chỉ in mười dòng quan trọng nhất. Nếu bạn muốn hiểu những thuật toán nào đang tốn thời gian, bạn sẽ sử dụng dòng trên.
 
-If you were looking to see what functions were looping a lot, and taking a lot
-of time, you would do::
+Nếu bạn muốn xem những hàm nào đang lặp nhiều và tốn nhiều thời gian, bạn sẽ thực hiện::
 
    p.sort_stats(SortKey.TIME).print_stats(10)
 
-to sort according to time spent within each function, and then print the
-statistics for the top ten functions.
+để sắp xếp theo thời gian dành cho mỗi hàm, sau đó in thống kê của mười hàm đứng đầu.
 
-You might also try::
+Bạn cũng có thể thử::
 
    p.sort_stats(SortKey.FILENAME).print_stats('__init__')
 
-This will sort all the statistics by file name, and then print out statistics
-for only the class init methods (since they are spelled with ``__init__`` in
-them).  As one final example, you could try::
+Lệnh này sẽ sắp xếp tất cả thống kê theo tên tệp, sau đó chỉ in thống kê của các phương thức khởi tạo của lớp (vì tên của chúng có ``__init__``). Cuối cùng, bạn có thể thử::
 
    p.sort_stats(SortKey.TIME, SortKey.CUMULATIVE).print_stats(.5, 'init')
 
-This line sorts statistics with a primary key of time, and a secondary key of
-cumulative time, and then prints out some of the statistics. To be specific, the
-list is first culled down to 50% (re: ``.5``) of its original size, then only
-lines containing ``init`` are maintained, and that sub-sub-list is printed.
+Dòng lệnh này sắp xếp thống kê với khóa chính là thời gian và khóa phụ là thời gian tích lũy, sau đó in ra một phần thống kê. Cụ thể, trước tiên danh sách được rút gọn xuống còn 50% (liên quan đến ``.5``) kích thước ban đầu, rồi chỉ giữ lại các dòng chứa ``init``, và in danh sách con đó.
 
-If you wondered what functions called the above functions, you could now (``p``
-is still sorted according to the last criteria) do::
+Nếu bạn muốn biết những hàm nào đã gọi các hàm trên, giờ đây bạn có thể thực hiện (``p`` vẫn được sắp xếp theo tiêu chí trước đó)::
 
    p.print_callers(.5, 'init')
 
-and you would get a list of callers for each of the listed functions.
+và bạn sẽ nhận được danh sách các hàm gọi cho từng hàm được liệt kê.
 
-If you want more functionality, you're going to have to read the manual, or
-guess what the following functions do::
+Nếu muốn có thêm chức năng, bạn sẽ phải đọc hướng dẫn sử dụng hoặc đoán xem các hàm sau đây thực hiện điều gì::
 
    p.print_callees()
    p.add('restats')
 
-Invoked as a script, the :mod:`pstats` module is a statistics browser for
-reading and examining profile dumps.  It has a simple line-oriented interface
-(implemented using :mod:`cmd`) and interactive help.
+Khi được gọi như một script, module :mod:`pstats` là một trình duyệt thống kê dùng để đọc và kiểm tra các bản dump profile. Module này có giao diện đơn giản theo từng dòng (được triển khai bằng :mod:`cmd`) và trợ giúp tương tác.
 
-:mod:`profile` and :mod:`!cProfile` Module Reference
+Tham chiếu module :mod:`profile` và :mod:`!cProfile`
 ====================================================
 
 .. module:: cProfile
 .. module:: profile
-   :synopsis: Python source profiler.
+   :synopsis: Trình profiler mã nguồn Python.
 
-Both the :mod:`profile` and :mod:`!cProfile` modules provide the following
-functions:
+Cả hai module :mod:`profile` và :mod:`!cProfile` đều cung cấp các hàm sau:
 
 .. function:: run(command, filename=None, sort=-1)
 
-   This function takes a single argument that can be passed to the :func:`exec`
-   function, and an optional file name.  In all cases this routine executes::
+   Hàm này nhận một đối số duy nhất có thể được truyền cho hàm :func:`exec`, cùng với một tên tệp tùy chọn. Trong mọi trường hợp, thủ tục này thực thi::
 
       exec(command, __main__.__dict__, __main__.__dict__)
 
-   and gathers profiling statistics from the execution. If no file name is
-   present, then this function automatically creates a :class:`~pstats.Stats`
-   instance and prints a simple profiling report. If the sort value is specified,
-   it is passed to this :class:`~pstats.Stats` instance to control how the
-   results are sorted.
+   và thu thập các thống kê profiling từ quá trình thực thi. Nếu không có tên tệp, hàm này sẽ tự động tạo một instance :class:`~pstats.Stats` và in một báo cáo profiling đơn giản. Nếu giá trị sort được chỉ định, giá trị đó sẽ được truyền cho instance :class:`~pstats.Stats` này để kiểm soát cách sắp xếp kết quả.
 
 .. function:: runctx(command, globals, locals, filename=None, sort=-1)
 
-   This function is similar to :func:`run`, with added arguments to supply the
-   globals and locals mappings for the *command* string. This routine
-   executes::
+   Hàm này tương tự như :func:`run`, với các đối số bổ sung để cung cấp các ánh xạ globals và locals cho chuỗi *command*. Thủ tục này thực thi::
 
       exec(command, globals, locals)
 
-   and gathers profiling statistics as in the :func:`run` function above.
+   và thu thập các số liệu thống kê profiling như trong hàm :func:`run` ở trên.
 
 .. class:: Profile(timer=None, timeunit=0.0, subcalls=True, builtins=True)
 
-   This class is normally only used if more precise control over profiling is
-   needed than what the :func:`cProfile.run` function provides.
+   Lớp này thường chỉ được sử dụng khi cần kiểm soát profiling chính xác hơn so với khả năng mà hàm :func:`cProfile.run` cung cấp.
 
-   A custom timer can be supplied for measuring how long code takes to run via
-   the *timer* argument. This must be a function that returns a single number
-   representing the current time. If the number is an integer, the *timeunit*
-   specifies a multiplier that specifies the duration of each unit of time. For
-   example, if the timer returns times measured in thousands of seconds, the
-   time unit would be ``.001``.
+   Có thể cung cấp một timer tùy chỉnh để đo thời gian chạy của mã thông qua đối số *timer*. Đây phải là một hàm trả về một số duy nhất biểu thị thời gian hiện tại. Nếu số đó là một số nguyên, *timeunit* chỉ định một hệ số nhân xác định thời lượng của mỗi đơn vị thời gian. Ví dụ, nếu timer trả về thời gian được đo bằng hàng nghìn giây, đơn vị thời gian sẽ là ``.001``.
 
-   Directly using the :class:`Profile` class allows formatting profile results
-   without writing the profile data to a file::
+   Việc sử dụng trực tiếp lớp :class:`Profile` cho phép định dạng kết quả profile mà không cần ghi dữ liệu profile vào tệp::
 
       import cProfile, pstats, io
       from pstats import SortKey
@@ -277,8 +211,7 @@ functions:
       ps.print_stats()
       print(s.getvalue())
 
-   The :class:`Profile` class can also be used as a context manager (supported
-   only in :mod:`!cProfile` module. see :ref:`typecontextmanager`)::
+   Lớp :class:`Profile` cũng có thể được sử dụng như một context manager (chỉ được hỗ trợ trong module :mod:`!cProfile`. xem :ref:`typecontextmanager`)՝::
 
       import cProfile
 
@@ -288,198 +221,136 @@ functions:
           pr.print_stats()
 
    .. versionchanged:: 3.8
-      Added context manager support.
+      Đã bổ sung hỗ trợ context manager.
 
    .. method:: enable()
 
-      Start collecting profiling data. Only in :mod:`!cProfile`.
+      Bắt đầu thu thập dữ liệu profiling. Chỉ có trong :mod:`!cProfile`.
 
    .. method:: disable()
 
-      Stop collecting profiling data. Only in :mod:`!cProfile`.
+      Dừng thu thập dữ liệu profiling. Chỉ có trong :mod:`!cProfile`.
 
    .. method:: create_stats()
 
-      Stop collecting profiling data and record the results internally
-      as the current profile.
+      Dừng thu thập dữ liệu profiling và ghi lại kết quả nội bộ dưới dạng profile hiện tại.
 
    .. method:: print_stats(sort=-1)
 
-      Create a :class:`~pstats.Stats` object based on the current
-      profile and print the results to stdout.
+      Tạo một đối tượng :class:`~pstats.Stats` dựa trên profile hiện tại và in kết quả ra stdout.
 
-      The *sort* parameter specifies the sorting order of the displayed
-      statistics. It accepts a single key or a tuple of keys to enable
-      multi-level sorting, as in :func:`Stats.sort_stats <pstats.Stats.sort_stats>`.
+      Tham số *sort* chỉ định thứ tự sắp xếp của các thống kê được hiển thị. Tham số này chấp nhận một khóa duy nhất hoặc một tuple gồm các khóa để bật tính năng sắp xếp nhiều cấp, như trong :func:`Stats.sort_stats <pstats.Stats.sort_stats>`.
 
       .. versionadded:: 3.13
          :meth:`~Profile.print_stats` now accepts a tuple of keys.
 
    .. method:: dump_stats(filename)
 
-      Write the results of the current profile to *filename*.
+      Ghi kết quả của profile hiện tại vào *filename*.
 
    .. method:: run(cmd)
 
-      Profile the cmd via :func:`exec`.
+      Lập hồ sơ cmd bằng :func:`exec`.
 
    .. method:: runctx(cmd, globals, locals)
 
-      Profile the cmd via :func:`exec` with the specified global and
-      local environment.
+      Lập hồ sơ cmd bằng :func:`exec` với môi trường toàn cục và cục bộ được chỉ định.
 
    .. method:: runcall(func, /, *args, **kwargs)
 
-      Profile ``func(*args, **kwargs)``
+      Lập hồ sơ ``func(*args, **kwargs)``
 
-Note that profiling will only work if the called command/function actually
-returns.  If the interpreter is terminated (e.g. via a :func:`sys.exit` call
-during the called command/function execution) no profiling results will be
-printed.
+Lưu ý rằng việc lập hồ sơ chỉ hoạt động nếu command/function được gọi thực sự trả về. Nếu trình thông dịch bị chấm dứt (ví dụ: thông qua một lệnh gọi :func:`sys.exit` trong quá trình thực thi command/function được gọi), sẽ không có kết quả lập hồ sơ nào được in ra.
 
 .. _profile-stats:
 
-The :class:`Stats` Class
-========================
+Lớp :class:`Stats`
+==================
 
-Analysis of the profiler data is done using the :class:`~pstats.Stats` class.
+Việc phân tích dữ liệu của profiler được thực hiện bằng lớp :class:`~pstats.Stats`.
 
 .. module:: pstats
-   :synopsis: Statistics object for use with the profiler.
+   :synopsis: Đối tượng thống kê để sử dụng với profiler.
 
 .. class:: Stats(*filenames or profile, stream=sys.stdout)
 
-   This class constructor creates an instance of a "statistics object" from a
-   *filename* (or list of filenames) or from a :class:`Profile` instance. Output
-   will be printed to the stream specified by *stream*.
+   Constructor của lớp này tạo một instance của "đối tượng statistics" từ *filename* (hoặc danh sách tên tệp) hoặc từ một instance :class:`Profile`. Kết quả sẽ được in ra stream được chỉ định bởi *stream*.
 
-   The file selected by the above constructor must have been created by the
-   corresponding version of :mod:`profile` or :mod:`cProfile`.  To be specific,
-   there is *no* file compatibility guaranteed with future versions of this
-   profiler, and there is no compatibility with files produced by other
-   profilers, or the same profiler run on a different operating system.  If
-   several files are provided, all the statistics for identical functions will
-   be coalesced, so that an overall view of several processes can be considered
-   in a single report.  If additional files need to be combined with data in an
-   existing :class:`~pstats.Stats` object, the :meth:`~pstats.Stats.add` method
-   can be used.
+   Tệp được chọn bởi constructor ở trên phải được tạo bởi phiên bản tương ứng của :mod:`profile` hoặc :mod:`cProfile`. Cụ thể, không có *no* khả năng tương thích tệp nào được đảm bảo với các phiên bản tương lai của profiler này, và cũng không có khả năng tương thích với các tệp do profiler khác tạo ra hoặc do cùng profiler chạy trên một hệ điều hành khác tạo ra. Nếu cung cấp nhiều tệp, tất cả statistics của các function giống nhau sẽ được gộp lại, để có thể xem xét tổng thể nhiều process trong một report. Nếu cần kết hợp các tệp bổ sung với dữ liệu trong một đối tượng :class:`~pstats.Stats` hiện có, có thể sử dụng method :meth:`~pstats.Stats.add`.
 
-   Instead of reading the profile data from a file, a :class:`cProfile.Profile`
-   or :class:`profile.Profile` object can be used as the profile data source.
+   Thay vì đọc dữ liệu profile từ một tệp, có thể sử dụng một đối tượng :class:`cProfile.Profile` hoặc :class:`profile.Profile` làm nguồn dữ liệu profile.
 
-   :class:`Stats` objects have the following methods:
+   Các đối tượng :class:`Stats` có những method sau:
 
    .. method:: strip_dirs()
 
-      This method for the :class:`Stats` class removes all leading path
-      information from file names.  It is very useful in reducing the size of
-      the printout to fit within (close to) 80 columns.  This method modifies
-      the object, and the stripped information is lost.  After performing a
-      strip operation, the object is considered to have its entries in a
-      "random" order, as it was just after object initialization and loading.
-      If :meth:`~pstats.Stats.strip_dirs` causes two function names to be
-      indistinguishable (they are on the same line of the same filename, and
-      have the same function name), then the statistics for these two entries
-      are accumulated into a single entry.
+      Method này của lớp :class:`Stats` loại bỏ toàn bộ thông tin đường dẫn ở đầu tên tệp. Method này rất hữu ích để giảm kích thước kết quả in ra sao cho vừa trong khoảng (gần) 80 cột. Method này sửa đổi đối tượng và thông tin đã loại bỏ sẽ bị mất. Sau khi thực hiện thao tác loại bỏ, đối tượng được xem là có các entry theo thứ tự "ngẫu nhiên", giống như ngay sau khi khởi tạo và tải đối tượng. Nếu :meth:`~pstats.Stats.strip_dirs` khiến hai tên function không thể phân biệt được (chúng nằm trên cùng một dòng của cùng một tên tệp và có cùng tên function), statistics của hai entry này sẽ được cộng dồn thành một entry duy nhất.
 
 
    .. method:: add(*filenames)
 
-      This method of the :class:`Stats` class accumulates additional profiling
-      information into the current profiling object.  Its arguments should refer
-      to filenames created by the corresponding version of :func:`profile.run`
-      or :func:`cProfile.run`. Statistics for identically named (re: file, line,
-      name) functions are automatically accumulated into single function
-      statistics.
+      Method này của lớp :class:`Stats` cộng dồn thêm thông tin profiling vào đối tượng profiling hiện tại. Các đối số của method phải tham chiếu đến những tên tệp được tạo bởi phiên bản tương ứng của :func:`profile.run` hoặc :func:`cProfile.run`. Statistics của các function có tên giống hệt nhau (xét theo tệp, dòng, tên) sẽ tự động được cộng dồn thành statistics của một function duy nhất.
 
 
    .. method:: dump_stats(filename)
 
-      Save the data loaded into the :class:`Stats` object to a file named
-      *filename*.  The file is created if it does not exist, and is overwritten
-      if it already exists.  This is equivalent to the method of the same name
-      on the :class:`profile.Profile` and :class:`cProfile.Profile` classes.
+      Lưu dữ liệu đã tải vào đối tượng :class:`Stats` vào tệp có tên *filename*. Tệp sẽ được tạo nếu chưa tồn tại và bị ghi đè nếu đã tồn tại. Điều này tương đương với method cùng tên trên các lớp :class:`profile.Profile` và :class:`cProfile.Profile`.
 
 
    .. method:: sort_stats(*keys)
 
-      This method modifies the :class:`Stats` object by sorting it according to
-      the supplied criteria.  The argument can be either a string or a SortKey
-      enum identifying the basis of a sort (example: ``'time'``, ``'name'``,
-      ``SortKey.TIME`` or ``SortKey.NAME``). The SortKey enums argument have
-      advantage over the string argument in that it is more robust and less
-      error prone.
+      Phương thức này sửa đổi đối tượng :class:`Stats` bằng cách sắp xếp đối tượng đó theo các tiêu chí được cung cấp. Đối số có thể là một chuỗi hoặc một enum SortKey xác định cơ sở sắp xếp (ví dụ: ``'time'``, ``'name'``, ``SortKey.TIME`` hoặc ``SortKey.NAME``). Đối số enum SortKey có ưu điểm hơn đối số chuỗi vì mạnh mẽ hơn và ít dễ gây lỗi hơn.
 
-      When more than one key is provided, then additional keys are used as
-      secondary criteria when there is equality in all keys selected before
-      them.  For example, ``sort_stats(SortKey.NAME, SortKey.FILE)`` will sort
-      all the entries according to their function name, and resolve all ties
-      (identical function names) by sorting by file name.
+      Khi có nhiều khóa được cung cấp, các khóa bổ sung sẽ được dùng làm tiêu chí phụ khi tất cả các khóa được chọn trước đó đều có giá trị bằng nhau. Ví dụ: ``sort_stats(SortKey.NAME, SortKey.FILE)`` sẽ sắp xếp tất cả các mục theo tên hàm, rồi phân giải các trường hợp hòa (tên hàm giống nhau) bằng cách sắp xếp theo tên tệp.
 
-      For the string argument, abbreviations can be used for any key names, as
-      long as the abbreviation is unambiguous.
+      Đối với đối số chuỗi, có thể sử dụng dạng viết tắt cho bất kỳ tên khóa nào, miễn là dạng viết tắt đó không gây mơ hồ.
 
-      The following are the valid string and SortKey:
+      Sau đây là các chuỗi và SortKey hợp lệ:
 
-      +------------------+---------------------+----------------------+
-      | Valid String Arg | Valid enum Arg      | Meaning              |
-      +==================+=====================+======================+
-      | ``'calls'``      | SortKey.CALLS       | call count           |
-      +------------------+---------------------+----------------------+
-      | ``'cumulative'`` | SortKey.CUMULATIVE  | cumulative time      |
-      +------------------+---------------------+----------------------+
-      | ``'cumtime'``    | N/A                 | cumulative time      |
-      +------------------+---------------------+----------------------+
-      | ``'file'``       | N/A                 | file name            |
-      +------------------+---------------------+----------------------+
-      | ``'filename'``   | SortKey.FILENAME    | file name            |
-      +------------------+---------------------+----------------------+
-      | ``'module'``     | N/A                 | file name            |
-      +------------------+---------------------+----------------------+
-      | ``'ncalls'``     | N/A                 | call count           |
-      +------------------+---------------------+----------------------+
-      | ``'pcalls'``     | SortKey.PCALLS      | primitive call count |
-      +------------------+---------------------+----------------------+
-      | ``'line'``       | SortKey.LINE        | line number          |
-      +------------------+---------------------+----------------------+
-      | ``'name'``       | SortKey.NAME        | function name        |
-      +------------------+---------------------+----------------------+
-      | ``'nfl'``        | SortKey.NFL         | name/file/line       |
-      +------------------+---------------------+----------------------+
-      | ``'stdname'``    | SortKey.STDNAME     | standard name        |
-      +------------------+---------------------+----------------------+
-      | ``'time'``       | SortKey.TIME        | internal time        |
-      +------------------+---------------------+----------------------+
-      | ``'tottime'``    | N/A                 | internal time        |
-      +------------------+---------------------+----------------------+
+      +---------------------+--------------------+----------------------+
+      | Đối số chuỗi hợp lệ | Đối số enum hợp lệ | Ý nghĩa              |
+      +=====================+====================+======================+
+      | ``'calls'``         | SortKey.CALLS      | số lần gọi           |
+      +---------------------+--------------------+----------------------+
+      | ``'cumulative'``    | SortKey.CUMULATIVE | thời gian tích lũy   |
+      +---------------------+--------------------+----------------------+
+      | ``'cumtime'``       | N/A                | thời gian tích lũy   |
+      +---------------------+--------------------+----------------------+
+      | ``'file'``          | N/A                | tên tệp              |
+      +---------------------+--------------------+----------------------+
+      | ``'filename'``      | SortKey.FILENAME   | tên tệp              |
+      +---------------------+--------------------+----------------------+
+      | ``'module'``        | N/A                | tên tệp              |
+      +---------------------+--------------------+----------------------+
+      | ``'ncalls'``        | N/A                | số lần gọi           |
+      +---------------------+--------------------+----------------------+
+      | ``'pcalls'``        | SortKey.PCALLS     | số lần gọi primitive |
+      +---------------------+--------------------+----------------------+
+      | ``'line'``          | SortKey.LINE       | số dòng              |
+      +---------------------+--------------------+----------------------+
+      | ``'name'``          | SortKey.NAME       | tên hàm              |
+      +---------------------+--------------------+----------------------+
+      | ``'nfl'``           | SortKey.NFL        | name/file/line       |
+      +---------------------+--------------------+----------------------+
+      | ``'stdname'``       | SortKey.STDNAME    | tên chuẩn            |
+      +---------------------+--------------------+----------------------+
+      | ``'time'``          | SortKey.TIME       | thời gian nội bộ     |
+      +---------------------+--------------------+----------------------+
+      | ``'tottime'``       | N/A                | thời gian nội bộ     |
+      +---------------------+--------------------+----------------------+
 
-      Note that all sorts on statistics are in descending order (placing most
-      time consuming items first), where as name, file, and line number searches
-      are in ascending order (alphabetical). The subtle distinction between
-      ``SortKey.NFL`` and ``SortKey.STDNAME`` is that the standard name is a
-      sort of the name as printed, which means that the embedded line numbers
-      get compared in an odd way.  For example, lines 3, 20, and 40 would (if
-      the file names were the same) appear in the string order 20, 3 and 40.
-      In contrast, ``SortKey.NFL`` does a numeric compare of the line numbers.
-      In fact, ``sort_stats(SortKey.NFL)`` is the same as
-      ``sort_stats(SortKey.NAME, SortKey.FILENAME, SortKey.LINE)``.
+      Lưu ý rằng mọi phép sắp xếp theo thống kê đều theo thứ tự giảm dần (đặt các mục tốn nhiều thời gian nhất lên trước), trong khi các phép tìm kiếm theo tên, tệp và số dòng lại theo thứ tự tăng dần (theo bảng chữ cái). Điểm khác biệt tinh tế giữa ``SortKey.NFL`` và ``SortKey.STDNAME`` là tên chuẩn là phép sắp xếp tên theo cách được in ra, nghĩa là các số dòng nằm trong đó được so sánh theo một cách khá bất thường. Ví dụ, các dòng 3, 20 và 40 sẽ (nếu tên tệp giống nhau) xuất hiện theo thứ tự chuỗi là 20, 3 và 40. Ngược lại, ``SortKey.NFL`` thực hiện so sánh số đối với các số dòng. Thực tế, ``sort_stats(SortKey.NFL)`` giống với ``sort_stats(SortKey.NAME, SortKey.FILENAME, SortKey.LINE)``.
 
-      For backward-compatibility reasons, the numeric arguments ``-1``, ``0``,
-      ``1``, and ``2`` are permitted.  They are interpreted as ``'stdname'``,
-      ``'calls'``, ``'time'``, and ``'cumulative'`` respectively.  If this old
-      style format (numeric) is used, only one sort key (the numeric key) will
-      be used, and additional arguments will be silently ignored.
+      Vì lý do tương thích ngược, các đối số số ``-1``, ``0``, ``1`` và ``2`` được cho phép. Chúng lần lượt được diễn giải thành ``'stdname'``, ``'calls'``, ``'time'`` và ``'cumulative'``. Nếu sử dụng định dạng kiểu cũ này (dạng số), chỉ một khóa sắp xếp (khóa dạng số) sẽ được sử dụng, còn các đối số bổ sung sẽ bị bỏ qua một cách im lặng.
 
       .. For compatibility with the old profiler.
 
       .. versionadded:: 3.7
-         Added the SortKey enum.
+         Đã thêm enum SortKey.
 
    .. method:: reverse_order()
 
-      This method for the :class:`Stats` class reverses the ordering of the
-      basic list within the object.  Note that by default ascending vs
-      descending order is properly selected based on the sort key of choice.
+      Phương thức này dành cho lớp :class:`Stats` sẽ đảo ngược thứ tự của danh sách cơ bản bên trong đối tượng. Lưu ý rằng theo mặc định, thứ tự tăng dần hay giảm dần được chọn chính xác dựa trên khóa sắp xếp được chọn.
 
       .. This method is provided primarily for compatibility with the old
          profiler.
@@ -487,150 +358,75 @@ Analysis of the profiler data is done using the :class:`~pstats.Stats` class.
 
    .. method:: print_stats(*restrictions)
 
-      This method for the :class:`Stats` class prints out a report as described
-      in the :func:`profile.run` definition.
+      Phương thức này dành cho lớp :class:`Stats` sẽ in ra một báo cáo như được mô tả trong định nghĩa :func:`profile.run`.
 
-      The order of the printing is based on the last
-      :meth:`~pstats.Stats.sort_stats` operation done on the object (subject to
-      caveats in :meth:`~pstats.Stats.add` and
+      Thứ tự in ra dựa trên lần cuối
+      thực hiện thao tác :meth:`~pstats.Stats.sort_stats` trên đối tượng (tuân theo các lưu ý trong :meth:`~pstats.Stats.add` và
       :meth:`~pstats.Stats.strip_dirs`).
 
-      The arguments provided (if any) can be used to limit the list down to the
-      significant entries.  Initially, the list is taken to be the complete set
-      of profiled functions.  Each restriction is either an integer (to select a
-      count of lines), or a decimal fraction between 0.0 and 1.0 inclusive (to
-      select a percentage of lines), or a string that will be interpreted as a
-      regular expression (to pattern match the standard name that is printed).
-      If several restrictions are provided, then they are applied sequentially.
-      For example::
+      Các đối số được cung cấp (nếu có) có thể được dùng để giới hạn danh sách chỉ còn các mục đáng chú ý. Ban đầu, danh sách được xem là toàn bộ tập hợp các hàm đã được lập hồ sơ. Mỗi điều kiện giới hạn либо là một số nguyên (để chọn số dòng), либо là một phân số thập phân trong khoảng từ 0.0 đến 1.0 (bao gồm cả hai đầu mút) (để chọn phần trăm số dòng), либо là một chuỗi được diễn giải như một biểu thức chính quy (để khớp mẫu với tên chuẩn được in ra). Nếu cung cấp nhiều điều kiện giới hạn, chúng sẽ được áp dụng tuần tự. Ví dụ::
 
          print_stats(.1, 'foo:')
 
-      would first limit the printing to first 10% of list, and then only print
-      functions that were part of filename :file:`.\*foo:`.  In contrast, the
-      command::
+      sẽ trước tiên giới hạn việc in ra 10% đầu tiên của danh sách, sau đó chỉ in các hàm thuộc tệp :file:`.\*foo:`. Ngược lại, lệnh::
 
          print_stats('foo:', .1)
 
-      would limit the list to all functions having file names :file:`.\*foo:`,
-      and then proceed to only print the first 10% of them.
+      sẽ giới hạn danh sách còn tất cả các hàm có tên tệp là :file:`.\*foo:`, sau đó chỉ in 10% đầu tiên trong số đó.
 
 
    .. method:: print_callers(*restrictions)
 
-      This method for the :class:`Stats` class prints a list of all functions
-      that called each function in the profiled database.  The ordering is
-      identical to that provided by :meth:`~pstats.Stats.print_stats`, and the
-      definition of the restricting argument is also identical.  Each caller is
-      reported on its own line.  The format differs slightly depending on the
-      profiler that produced the stats:
+      Phương thức này của lớp :class:`Stats` in ra danh sách tất cả các hàm đã gọi từng hàm trong cơ sở dữ liệu được lập hồ sơ. Thứ tự giống hệt thứ tự do :meth:`~pstats.Stats.print_stats` cung cấp và định nghĩa của đối số giới hạn cũng giống hệt. Mỗi caller được báo cáo trên một dòng riêng. Định dạng hơi khác nhau tùy theo profiler đã tạo ra các thống kê:
 
-      * With :mod:`profile`, a number is shown in parentheses after each caller
-        to show how many times this specific call was made.  For convenience, a
-        second non-parenthesized number repeats the cumulative time spent in the
-        function at the right.
+      * Với :mod:`profile`, một số được hiển thị trong dấu ngoặc đơn sau mỗi caller để cho biết số lần thực hiện lệnh gọi cụ thể này. Để thuận tiện, một số thứ hai không nằm trong dấu ngoặc đơn lặp lại thời gian tích lũy đã dành cho hàm ở bên phải.
 
-      * With :mod:`cProfile`, each caller is preceded by three numbers: the
-        number of times this specific call was made, and the total and
-        cumulative times spent in the current function while it was invoked by
-        this specific caller.
+      * Với :mod:`cProfile`, trước mỗi caller là ba số: số lần thực hiện lệnh gọi cụ thể này, cùng với thời gian tổng và thời gian tích lũy đã dành cho hàm hiện tại trong khi hàm này được caller cụ thể đó gọi.
 
 
    .. method:: print_callees(*restrictions)
 
-      This method for the :class:`Stats` class prints a list of all function
-      that were called by the indicated function.  Aside from this reversal of
-      direction of calls (re: called vs was called by), the arguments and
-      ordering are identical to the :meth:`~pstats.Stats.print_callers` method.
+      Phương thức này của lớp :class:`Stats` in ra danh sách tất cả các hàm được gọi bởi hàm được chỉ định. Ngoài việc đảo ngược hướng của các lệnh gọi (về việc được gọi so với được hàm nào đó gọi), các đối số và thứ tự giống hệt phương thức :meth:`~pstats.Stats.print_callers`.
 
 
    .. method:: get_stats_profile()
 
-      This method returns an instance of StatsProfile, which contains a mapping
-      of function names to instances of FunctionProfile. Each FunctionProfile
-      instance holds information related to the function's profile such as how
-      long the function took to run, how many times it was called, etc...
+      Phương thức này trả về một thực thể StatsProfile, chứa ánh xạ từ tên hàm đến các thực thể FunctionProfile. Mỗi thực thể FunctionProfile lưu giữ thông tin liên quan đến profile của hàm, chẳng hạn như thời gian hàm chạy, số lần hàm được gọi, v.v...
 
       .. versionadded:: 3.9
-         Added the following dataclasses: StatsProfile, FunctionProfile.
-         Added the following function: get_stats_profile.
+         Đã thêm các dataclass sau: StatsProfile, FunctionProfile. Đã thêm hàm sau: get_stats_profile.
 
 .. _deterministic-profiling:
 
-What Is Deterministic Profiling?
-================================
+Profiling xác định là gì?
+=========================
 
-:dfn:`Deterministic profiling` is meant to reflect the fact that all *function
-call*, *function return*, and *exception* events are monitored, and precise
-timings are made for the intervals between these events (during which time the
-user's code is executing).  In contrast, :dfn:`statistical profiling` (which is
-not done by this module) randomly samples the effective instruction pointer, and
-deduces where time is being spent.  The latter technique traditionally involves
-less overhead (as the code does not need to be instrumented), but provides only
-relative indications of where time is being spent.
+:dfn:`Profiling xác định` nhằm phản ánh thực tế rằng mọi sự kiện *lời gọi hàm*, *hàm trả về* và *ngoại lệ* đều được giám sát, đồng thời thời gian chính xác được đo cho các khoảng giữa những sự kiện này (trong thời gian đó mã của người dùng đang được thực thi). Ngược lại, :dfn:`profiling thống kê` (không được thực hiện bởi module này) lấy mẫu ngẫu nhiên con trỏ lệnh hiệu dụng và suy ra thời gian đang được tiêu tốn ở đâu. Kỹ thuật sau thường có overhead thấp hơn (vì mã không cần được instrument), nhưng chỉ cung cấp các chỉ dấu tương đối về nơi thời gian đang được tiêu tốn.
 
-In Python, since there is an interpreter active during execution, the presence
-of instrumented code is not required in order to do deterministic profiling.
-Python automatically provides a :dfn:`hook` (optional callback) for each event.
-In addition, the interpreted nature of Python tends to add so much overhead to
-execution, that deterministic profiling tends to only add small processing
-overhead in typical applications.  The result is that deterministic profiling is
-not that expensive, yet provides extensive run time statistics about the
-execution of a Python program.
+Trong Python, vì có một interpreter đang hoạt động trong quá trình thực thi, không cần có mã được instrument để thực hiện profiling xác định. Python tự động cung cấp một :dfn:`hook` (callback tùy chọn) cho mỗi sự kiện. Ngoài ra, bản chất thông dịch của Python có xu hướng tạo thêm nhiều overhead cho quá trình thực thi, nên profiling xác định thường chỉ làm tăng một lượng nhỏ overhead xử lý trong các ứng dụng điển hình. Kết quả là profiling xác định không quá tốn kém, nhưng cung cấp số liệu thống kê thời gian chạy phong phú về quá trình thực thi của chương trình Python.
 
-Call count statistics can be used to identify bugs in code (surprising counts),
-and to identify possible inline-expansion points (high call counts).  Internal
-time statistics can be used to identify "hot loops" that should be carefully
-optimized.  Cumulative time statistics should be used to identify high level
-errors in the selection of algorithms.  Note that the unusual handling of
-cumulative times in this profiler allows statistics for recursive
-implementations of algorithms to be directly compared to iterative
-implementations.
+Số liệu thống kê về số lần gọi có thể được dùng để xác định lỗi trong mã (số lần gọi bất ngờ) và xác định các điểm có khả năng inline expansion (số lần gọi cao). Số liệu thống kê về thời gian nội tại có thể được dùng để xác định các "vòng lặp nóng" cần được tối ưu hóa cẩn thận. Nên dùng số liệu thống kê về thời gian tích lũy để xác định các lỗi ở cấp độ cao trong việc lựa chọn thuật toán. Lưu ý rằng cách profiler này xử lý khác thường thời gian tích lũy cho phép so sánh trực tiếp số liệu thống kê của các triển khai thuật toán đệ quy với các triển khai lặp.
 
 
 .. _profile-limitations:
 
-Limitations
+Các hạn chế
 ===========
 
-One limitation has to do with accuracy of timing information. There is a
-fundamental problem with deterministic profilers involving accuracy.  The most
-obvious restriction is that the underlying "clock" is only ticking at a rate
-(typically) of about .001 seconds.  Hence no measurements will be more accurate
-than the underlying clock.  If enough measurements are taken, then the "error"
-will tend to average out. Unfortunately, removing this first error induces a
-second source of error.
+Một hạn chế liên quan đến độ chính xác của thông tin định thời. Các deterministic profiler có một vấn đề cơ bản liên quan đến độ chính xác. Hạn chế rõ ràng nhất là "đồng hồ" nền chỉ (thông thường) chạy với tốc độ khoảng .001 giây. Vì vậy, không phép đo nào có thể chính xác hơn đồng hồ nền. Nếu thực hiện đủ nhiều phép đo, thì "sai số" sẽ có xu hướng được trung bình hóa. Đáng tiếc là việc loại bỏ sai số đầu tiên này lại tạo ra một nguồn sai số thứ hai.
 
-The second problem is that it "takes a while" from when an event is dispatched
-until the profiler's call to get the time actually *gets* the state of the
-clock.  Similarly, there is a certain lag when exiting the profiler event
-handler from the time that the clock's value was obtained (and then squirreled
-away), until the user's code is once again executing.  As a result, functions
-that are called many times, or call many functions, will typically accumulate
-this error. The error that accumulates in this fashion is typically less than
-the accuracy of the clock (less than one clock tick), but it *can* accumulate
-and become very significant.
+Vấn đề thứ hai là từ khi một sự kiện được dispatch cho đến khi lời gọi get time của profiler thực sự *lấy* trạng thái của đồng hồ thì "mất một khoảng thời gian". Tương tự, có một độ trễ nhất định khi thoát khỏi event handler của profiler, tính từ lúc nhận được giá trị của đồng hồ (rồi lưu tạm giá trị đó) cho đến khi code của người dùng thực thi trở lại. Do đó, các hàm được gọi nhiều lần hoặc gọi nhiều hàm thường sẽ tích lũy sai số này. Sai số tích lũy theo cách này thường nhỏ hơn độ chính xác của đồng hồ (nhỏ hơn một nhịp đồng hồ), nhưng nó *có thể* tích lũy và trở nên rất đáng kể.
 
-The problem is more important with :mod:`profile` than with the lower-overhead
-:mod:`cProfile`.  For this reason, :mod:`profile` provides a means of
-calibrating itself for a given platform so that this error can be
-probabilistically (on the average) removed. After the profiler is calibrated, it
-will be more accurate (in a least square sense), but it will sometimes produce
-negative numbers (when call counts are exceptionally low, and the gods of
-probability work against you :-). )  Do *not* be alarmed by negative numbers in
-the profile.  They should *only* appear if you have calibrated your profiler,
-and the results are actually better than without calibration.
+Vấn đề này quan trọng hơn với :mod:`profile` so với thành phần có overhead thấp hơn
+:mod:`cProfile`. Vì lý do này, :mod:`profile` cung cấp một cách để tự hiệu chuẩn cho một nền tảng nhất định, nhờ đó sai số này có thể được loại bỏ theo xác suất (trung bình). Sau khi profiler được hiệu chuẩn, nó sẽ chính xác hơn (theo nghĩa bình phương tối thiểu), nhưng đôi khi sẽ tạo ra các số âm (khi số lần gọi đặc biệt thấp và các vị thần xác suất chống lại bạn :-). ) Đừng *lo* lắng trước các số âm trong profile. Chúng *chỉ* xuất hiện nếu bạn đã hiệu chuẩn profiler, và kết quả thực sự tốt hơn so với khi không hiệu chuẩn.
 
 
 .. _profile-calibration:
 
-Calibration
-===========
+Hiệu chuẩn
+==========
 
-The profiler of the :mod:`profile` module subtracts a constant from each event
-handling time to compensate for the overhead of calling the time function, and
-socking away the results.  By default, the constant is 0. The following
-procedure can be used to obtain a better constant for a given platform (see
+Profiler của module :mod:`profile` trừ một hằng số khỏi thời gian xử lý mỗi sự kiện để bù cho overhead của việc gọi hàm lấy thời gian và lưu lại kết quả. Theo mặc định, hằng số này là 0. Có thể sử dụng quy trình sau để lấy một hằng số tốt hơn cho một nền tảng nhất định (xem
 :ref:`profile-limitations`). ::
 
    import profile
@@ -638,78 +434,48 @@ procedure can be used to obtain a better constant for a given platform (see
    for i in range(5):
        print(pr.calibrate(10000))
 
-The method executes the number of Python calls given by the argument, directly
-and again under the profiler, measuring the time for both. It then computes the
-hidden overhead per profiler event, and returns that as a float.  For example,
-on a 1.8Ghz Intel Core i5 running macOS, and using Python's time.process_time() as
-the timer, the magical number is about 4.04e-6.
+Phương thức này thực hiện số lần gọi Python được chỉ định bởi đối số, trực tiếp và một lần nữa dưới profiler, đồng thời đo thời gian cho cả hai trường hợp. Sau đó, phương thức tính toán overhead ẩn trên mỗi sự kiện của profiler và trả về giá trị đó dưới dạng float. Ví dụ, trên máy Intel Core i5 1.8Ghz chạy macOS và sử dụng time.process_time() của Python làm bộ định thời, con số kỳ diệu này vào khoảng 4.04e-6.
 
-The object of this exercise is to get a fairly consistent result. If your
-computer is *very* fast, or your timer function has poor resolution, you might
-have to pass 100000, or even 1000000, to get consistent results.
+Mục tiêu của bài tập này là thu được một kết quả tương đối nhất quán. Nếu máy tính của bạn *rất* nhanh hoặc hàm timer của bạn có độ phân giải kém, bạn có thể phải truyền 100000 hoặc thậm chí 1000000 để thu được kết quả nhất quán.
 
-When you have a consistent answer, there are three ways you can use it::
+Khi đã có một kết quả nhất quán, bạn có thể sử dụng kết quả đó theo ba cách::
 
    import profile
 
-   # 1. Apply computed bias to all Profile instances created hereafter.
+   # 1. Áp dụng độ lệch đã tính toán cho tất cả các instance Profile được tạo sau đó.
    profile.Profile.bias = your_computed_bias
 
-   # 2. Apply computed bias to a specific Profile instance.
+   # 2. Áp dụng độ lệch đã tính toán cho một instance Profile cụ thể.
    pr = profile.Profile()
    pr.bias = your_computed_bias
 
-   # 3. Specify computed bias in instance constructor.
+   # 3. Chỉ định độ lệch đã tính toán trong constructor của instance.
    pr = profile.Profile(bias=your_computed_bias)
 
-If you have a choice, you are better off choosing a smaller constant, and then
-your results will "less often" show up as negative in profile statistics.
+Nếu có thể lựa chọn, bạn nên chọn một hằng số nhỏ hơn, khi đó kết quả của bạn sẽ "ít thường xuyên hơn" xuất hiện dưới dạng số âm trong thống kê profile.
 
 .. _profile-timers:
 
-Using a custom timer
-====================
+Sử dụng timer tùy chỉnh
+=======================
 
-If you want to change how current time is determined (for example, to force use
-of wall-clock time or elapsed process time), pass the timing function you want
-to the :class:`Profile` class constructor::
+Nếu bạn muốn thay đổi cách xác định thời gian hiện tại (chẳng hạn như buộc sử dụng thời gian theo đồng hồ thực hoặc thời gian đã trôi qua của tiến trình), hãy truyền hàm định thời gian bạn muốn vào hàm khởi tạo lớp :class:`Profile`::
 
     pr = profile.Profile(your_time_func)
 
-The resulting profiler will then call ``your_time_func``. Depending on whether
-you are using :class:`profile.Profile` or :class:`cProfile.Profile`,
-``your_time_func``'s return value will be interpreted differently:
+Profiler kết quả sau đó sẽ gọi ``your_time_func``. Tùy thuộc vào việc bạn đang sử dụng :class:`profile.Profile` hay :class:`cProfile.Profile`, giá trị trả về của ``your_time_func`` sẽ được diễn giải khác nhau:
 
 :class:`profile.Profile`
-   ``your_time_func`` should return a single number, or a list of numbers whose
-   sum is the current time (like what :func:`os.times` returns).  If the
-   function returns a single time number, or the list of returned numbers has
-   length 2, then you will get an especially fast version of the dispatch
-   routine.
+   ``your_time_func`` phải trả về một số duy nhất hoặc một danh sách các số có tổng bằng thời gian hiện tại (tương tự giá trị :func:`os.times` trả về). Nếu hàm trả về một số thời gian duy nhất hoặc danh sách các số trả về có độ dài là 2, bạn sẽ nhận được một phiên bản đặc biệt nhanh của routine dispatch.
 
-   Be warned that you should calibrate the profiler class for the timer function
-   that you choose (see :ref:`profile-calibration`).  For most machines, a timer
-   that returns a lone integer value will provide the best results in terms of
-   low overhead during profiling.  (:func:`os.times` is *pretty* bad, as it
-   returns a tuple of floating-point values).  If you want to substitute a
-   better timer in the cleanest fashion, derive a class and hardwire a
-   replacement dispatch method that best handles your timer call, along with the
-   appropriate calibration constant.
+   Lưu ý rằng bạn nên hiệu chỉnh lớp profiler cho hàm định thời gian mà bạn chọn (xem :ref:`profile-calibration`). Đối với hầu hết máy tính, bộ định thời trả về một giá trị số nguyên đơn sẽ cho kết quả tốt nhất về mức overhead thấp trong quá trình profiling. (:func:`os.times` *khá* tệ, vì nó trả về một tuple gồm các giá trị số thực). Nếu muốn thay thế bằng một bộ định thời tốt hơn theo cách gọn gàng nhất, hãy tạo một lớp dẫn xuất và cố định một phương thức dispatch thay thế xử lý tốt nhất lệnh gọi bộ định thời của bạn, cùng với hằng số hiệu chỉnh phù hợp.
 
 :class:`cProfile.Profile`
-   ``your_time_func`` should return a single number.  If it returns integers,
-   you can also invoke the class constructor with a second argument specifying
-   the real duration of one unit of time.  For example, if
-   ``your_integer_time_func`` returns times measured in thousands of seconds,
-   you would construct the :class:`Profile` instance as follows::
+   ``your_time_func`` phải trả về một số duy nhất. Nếu trả về các số nguyên, bạn cũng có thể gọi hàm khởi tạo lớp với đối số thứ hai chỉ định thời lượng thực của một đơn vị thời gian. Ví dụ: nếu ``your_integer_time_func`` trả về thời gian được đo bằng phần nghìn giây, bạn sẽ khởi tạo instance :class:`Profile` như sau::
 
       pr = cProfile.Profile(your_integer_time_func, 0.001)
 
-   As the :class:`cProfile.Profile` class cannot be calibrated, custom timer
-   functions should be used with care and should be as fast as possible.  For
-   the best results with a custom timer, it might be necessary to hard-code it
-   in the C source of the internal :mod:`!_lsprof` module.
+   Vì lớp :class:`cProfile.Profile` không thể được hiệu chỉnh, các hàm định thời gian tùy chỉnh nên được sử dụng cẩn thận và phải nhanh nhất có thể. Để đạt kết quả tốt nhất với bộ định thời tùy chỉnh, có thể cần hard-code nó trong mã nguồn C của module nội bộ :mod:`!_lsprof`.
 
-Python 3.3 adds several new functions in :mod:`time` that can be used to make
-precise measurements of process or wall-clock time. For example, see
+Python 3.3 bổ sung một số hàm mới trong :mod:`time`, có thể được dùng để thực hiện các phép đo chính xác về thời gian của tiến trình hoặc thời gian theo đồng hồ thực. Ví dụ, hãy xem
 :func:`time.perf_counter`.

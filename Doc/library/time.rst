@@ -1,167 +1,122 @@
-:mod:`!time` --- Time access and conversions
-============================================
+:mod:`!time` --- Truy cập thời gian và chuyển đổi
+=================================================
 
 .. module:: time
-   :synopsis: Time access and conversions.
+   :synopsis: Truy cập thời gian và chuyển đổi.
 
 --------------
 
-This module provides various time-related functions. For related
-functionality, see also the :mod:`datetime` and :mod:`calendar` modules.
+Mô-đun này cung cấp nhiều hàm liên quan đến thời gian. Để biết các chức năng liên quan, hãy xem thêm các mô-đun :mod:`datetime` và :mod:`calendar`.
 
-Although this module is always available,
-not all functions are available on all platforms.  Most of the functions
-defined in this module call platform C library functions with the same name.  It
-may sometimes be helpful to consult the platform documentation, because the
-semantics of these functions varies among platforms.
+Mặc dù mô-đun này luôn khả dụng, không phải tất cả các hàm đều khả dụng trên mọi nền tảng. Hầu hết các hàm được định nghĩa trong mô-đun này đều gọi các hàm thư viện C của nền tảng có cùng tên. Đôi khi, việc tham khảo tài liệu của nền tảng có thể hữu ích, vì ngữ nghĩa của các hàm này khác nhau giữa các nền tảng.
 
-An explanation of some terminology and conventions is in order.
+Sau đây là phần giải thích một số thuật ngữ và quy ước.
 
 .. _epoch:
 
 .. index:: single: epoch
 
-* The :dfn:`epoch` is the point where the time starts, the return value of
-  ``time.gmtime(0)``. It is January 1, 1970, 00:00:00 (UTC) on all platforms.
+* :dfn:`Kỷ nguyên` là thời điểm bắt đầu tính thời gian, tức giá trị trả về của ``time.gmtime(0)``. Trên mọi nền tảng, đó là ngày 1 tháng 1 năm 1970, 00:00:00 (UTC).
 
 .. _leap seconds: https://en.wikipedia.org/wiki/Leap_second
 
 .. index:: seconds since the epoch
 
-* The term :dfn:`seconds since the epoch` refers to the total number
-  of elapsed seconds since the epoch, typically excluding
-  `leap seconds`_.  Leap seconds are excluded from this total on all
-  POSIX-compliant platforms.
+* Thuật ngữ :dfn:`số giây kể từ kỷ nguyên` đề cập đến tổng số giây đã trôi qua kể từ kỷ nguyên, thường không bao gồm `giây nhuận <leap seconds_>`_. Giây nhuận được loại trừ khỏi tổng số này trên mọi nền tảng tuân thủ POSIX.
 
 .. index:: single: Year 2038
 
-* The functions in this module may not handle dates and times before the epoch_ or
-  far in the future.  The cut-off point in the future is determined by the C
-  library; for 32-bit systems, it is typically in 2038.
+* Các hàm trong mô-đun này có thể không xử lý được ngày và giờ trước epoch_ hoặc quá xa trong tương lai. Mốc giới hạn trong tương lai do thư viện C xác định; đối với các hệ thống 32-bit, mốc này thường là năm 2038.
 
 .. index::
    single: 2-digit years
 
-* Function :func:`strptime` can parse 2-digit years when given ``%y`` format
-  code. When 2-digit years are parsed, they are converted according to the POSIX
-  and ISO C standards: values 69--99 are mapped to 1969--1999, and values 0--68
-  are mapped to 2000--2068.
+* Hàm :func:`strptime` có thể phân tích cú pháp năm gồm 2 chữ số khi được cung cấp mã định dạng ``%y``. Khi năm gồm 2 chữ số được phân tích cú pháp, chúng được chuyển đổi theo các tiêu chuẩn POSIX và ISO C: các giá trị 69--99 được ánh xạ thành 1969--1999, còn các giá trị 0--68 được ánh xạ thành 2000--2068.
 
 .. index::
    single: UTC
    single: Coordinated Universal Time
    single: Greenwich Mean Time
 
-* UTC is `Coordinated Universal Time`_ and superseded `Greenwich Mean Time`_ or
-  GMT as the basis of international timekeeping. The acronym UTC is not a
-  mistake but conforms to an earlier, language-agnostic naming scheme for time
-  standards such as UT0, UT1, and UT2.
+* UTC là `Giờ Phối hợp Quốc tế <Coordinated Universal Time_>`_ và đã thay thế `Giờ Greenwich <Greenwich Mean Time_>`_ hay GMT làm cơ sở cho việc đo thời gian quốc tế. Từ viết tắt UTC không phải là một lỗi mà tuân theo một quy ước đặt tên không phụ thuộc ngôn ngữ có từ trước dành cho các tiêu chuẩn thời gian như UT0, UT1 và UT2.
 
 .. _Coordinated Universal Time: https://en.wikipedia.org/wiki/Coordinated_Universal_Time
 .. _Greenwich Mean Time: https://en.wikipedia.org/wiki/Greenwich_Mean_Time
 
 .. index:: single: Daylight Saving Time
 
-* DST is Daylight Saving Time, an adjustment of the timezone by (usually) one
-  hour during part of the year.  DST rules are magic (determined by local law) and
-  can change from year to year.  The C library has a table containing the local
-  rules (often it is read from a system file for flexibility) and is the only
-  source of True Wisdom in this respect.
+* DST là Giờ Mùa hè, tức việc điều chỉnh múi giờ (thường) thêm một giờ trong một khoảng thời gian của năm. Các quy tắc DST rất đặc thù (do luật địa phương quy định) và có thể thay đổi theo từng năm. Thư viện C có một bảng chứa các quy tắc địa phương (thường được đọc từ một tệp hệ thống để tăng tính linh hoạt) và là nguồn duy nhất của Chân lý Tuyệt đối về vấn đề này.
 
-* The precision of the various real-time functions may be less than suggested by
-  the units in which their value or argument is expressed. E.g. on most Unix
-  systems, the clock "ticks" only 50 or 100 times a second.
+* Độ chính xác của nhiều hàm thời gian thực có thể thấp hơn mức được gợi ý bởi các đơn vị dùng để biểu diễn giá trị hoặc đối số của chúng. Ví dụ: trên hầu hết các hệ thống Unix, đồng hồ chỉ “nhịp” 50 hoặc 100 lần mỗi giây.
 
-* On the other hand, the precision of :func:`.time` and :func:`sleep` is better
-  than their Unix equivalents: times are expressed as floating-point numbers,
-  :func:`.time` returns the most accurate time available (using Unix
-  :c:func:`!gettimeofday` where available), and :func:`sleep` will accept a time
-  with a nonzero fraction (Unix :c:func:`!select` is used to implement this, where
-  available).
+* Mặt khác, độ chính xác của :func:`.time` và :func:`sleep` tốt hơn các phiên bản tương đương trên Unix: thời gian được biểu diễn dưới dạng số dấu phẩy động,
+  :func:`.time` trả về thời gian chính xác nhất hiện có (sử dụng Unix
+  :c:func:`!gettimeofday` khi khả dụng), và :func:`sleep` sẽ chấp nhận thời gian có phần lẻ khác 0 (Unix :c:func:`!select` được dùng để triển khai điều này, khi khả dụng).
 
-* The time value as returned by :func:`gmtime`, :func:`localtime`, and
-  :func:`strptime`, and accepted by :func:`asctime`, :func:`mktime` and
-  :func:`strftime`, is a sequence of 9 integers.  The return values of
-  :func:`gmtime`, :func:`localtime`, and :func:`strptime` also offer attribute
-  names for individual fields.
+* Giá trị thời gian được trả về bởi :func:`gmtime`, :func:`localtime`, và
+  :func:`strptime`, và được chấp nhận bởi :func:`asctime`, :func:`mktime` và
+  :func:`strftime`, là một dãy gồm 9 số nguyên. Các giá trị trả về của
+  :func:`gmtime`, :func:`localtime`, và :func:`strptime` cũng cung cấp tên thuộc tính cho từng trường riêng lẻ.
 
-  See :class:`struct_time` for a description of these objects.
+  Xem :class:`struct_time` để biết mô tả về các đối tượng này.
 
   .. versionchanged:: 3.3
-     The :class:`struct_time` type was extended to provide
-     the :attr:`~struct_time.tm_gmtoff` and :attr:`~struct_time.tm_zone`
-     attributes when platform supports corresponding
-     ``struct tm`` members.
+     Kiểu :class:`struct_time` đã được mở rộng để cung cấp các thuộc tính :attr:`~struct_time.tm_gmtoff` và :attr:`~struct_time.tm_zone` khi nền tảng hỗ trợ các thành viên ``struct tm`` tương ứng.
 
   .. versionchanged:: 3.6
-     The :class:`struct_time` attributes
-     :attr:`~struct_time.tm_gmtoff` and :attr:`~struct_time.tm_zone`
-     are now available on all platforms.
+     Các thuộc tính :class:`struct_time`
+     :attr:`~struct_time.tm_gmtoff` và :attr:`~struct_time.tm_zone` hiện có trên mọi nền tảng.
 
-* Use the following functions to convert between time representations:
+* Sử dụng các hàm sau để chuyển đổi giữa các biểu diễn thời gian:
 
-  +-------------------------+-------------------------+-------------------------+
-  | From                    | To                      | Use                     |
-  +=========================+=========================+=========================+
-  | seconds since the epoch | :class:`struct_time` in | :func:`gmtime`          |
-  |                         | UTC                     |                         |
-  +-------------------------+-------------------------+-------------------------+
-  | seconds since the epoch | :class:`struct_time` in | :func:`localtime`       |
-  |                         | local time              |                         |
-  +-------------------------+-------------------------+-------------------------+
-  | :class:`struct_time` in | seconds since the epoch | :func:`calendar.timegm` |
-  | UTC                     |                         |                         |
-  +-------------------------+-------------------------+-------------------------+
-  | :class:`struct_time` in | seconds since the epoch | :func:`mktime`          |
-  | local time              |                         |                         |
-  +-------------------------+-------------------------+-------------------------+
+  +------------------------------------------+------------------------------------------+-------------------------+
+  | Từ                                       | Sang                                     | Sử dụng                 |
+  +==========================================+==========================================+=========================+
+  | số giây kể từ epoch                      | :class:`struct_time` theo UTC            | :func:`gmtime`          |
+  +------------------------------------------+------------------------------------------+-------------------------+
+  | số giây kể từ epoch                      | :class:`struct_time` theo giờ địa phương | :func:`localtime`       |
+  +------------------------------------------+------------------------------------------+-------------------------+
+  | :class:`struct_time` theo UTC            | số giây kể từ epoch                      | :func:`calendar.timegm` |
+  +------------------------------------------+------------------------------------------+-------------------------+
+  | :class:`struct_time` theo giờ địa phương | số giây kể từ epoch                      | :func:`mktime`          |
+  +------------------------------------------+------------------------------------------+-------------------------+
 
 
 .. _time-functions:
 
-Functions
----------
+Các hàm
+-------
 
 .. function:: asctime([time_tuple])
 
-   Convert a tuple or :class:`struct_time` representing a time as returned by
-   :func:`gmtime` or :func:`localtime` to a string of the following
-   form: ``'Sun Jun 20 23:21:05 1993'``. The day field is two characters long
-   and is space padded if the day is a single digit,
-   for example: ``'Wed Jun  9 04:26:40 1993'``.
+   Chuyển đổi một tuple hoặc :class:`struct_time` đại diện cho thời gian như được trả về bởi
+   :func:`gmtime` hoặc :func:`localtime` thành một chuỗi có dạng sau: ``'Sun Jun 20 23:21:05 1993'``. Trường ngày dài hai ký tự và được đệm bằng khoảng trắng nếu ngày có một chữ số, ví dụ: ``'Wed Jun  9 04:26:40 1993'``.
 
-   If *time_tuple* is not provided,
-   the current time as returned by :func:`localtime` is used.
-   Locale information is not used by :func:`asctime`.
+   Nếu *time_tuple* không được cung cấp, thời gian hiện tại do :func:`localtime` trả về sẽ được sử dụng. Thông tin locale không được sử dụng bởi :func:`asctime`.
 
    .. note::
 
-      Unlike the C function of the same name, :func:`asctime` does not add a
-      trailing newline.
+      Không giống hàm C cùng tên, :func:`asctime` không thêm ký tự xuống dòng ở cuối.
 
 .. function:: pthread_getcpuclockid(thread_id, /)
 
-   Return the *clk_id* of the thread-specific CPU-time clock for the specified *thread_id*.
+   Trả về *clk_id* của đồng hồ đo thời gian CPU dành riêng cho thread của *thread_id* đã chỉ định.
 
-   Use :func:`threading.get_ident` or the :attr:`~threading.Thread.ident`
-   attribute of :class:`threading.Thread` objects to get a suitable value
-   for *thread_id*.
+   Sử dụng :func:`threading.get_ident` hoặc thuộc tính :attr:`~threading.Thread.ident` của các đối tượng :class:`threading.Thread` để lấy giá trị phù hợp cho *thread_id*.
 
    .. warning::
-      Passing an invalid or expired *thread_id* may result in
-      undefined behavior, such as segmentation fault.
+      Việc truyền *thread_id* không hợp lệ hoặc đã hết hạn có thể dẫn đến hành vi không xác định, chẳng hạn như lỗi segmentation fault.
 
    .. availability:: Unix
 
-      See the man page for :manpage:`pthread_getcpuclockid(3)` for
-      further information.
+      Xem trang man của :manpage:`pthread_getcpuclockid(3)` để biết thêm thông tin.
 
    .. versionadded:: 3.7
 
 .. function:: clock_getres(clk_id, /)
 
-   Return the resolution (precision) of the specified clock *clk_id*.  Refer to
-   :ref:`time-clock-id-constants` for a list of accepted values for *clk_id*.
+   Trả về độ phân giải (độ chính xác) của clock được chỉ định *clk_id*.  Tham khảo
+   :ref:`time-clock-id-constants` để xem danh sách các giá trị được chấp nhận cho *clk_id*.
 
    .. availability:: Unix.
 
@@ -170,11 +125,11 @@ Functions
 
 .. function:: clock_gettime(clk_id, /) -> float
 
-   Return the time of the specified clock *clk_id*.  Refer to
-   :ref:`time-clock-id-constants` for a list of accepted values for *clk_id*.
+   Trả về thời gian của clock được chỉ định *clk_id*.  Tham khảo
+   :ref:`time-clock-id-constants` để xem danh sách các giá trị được chấp nhận cho *clk_id*.
 
-   Use :func:`clock_gettime_ns` to avoid the precision loss caused by the
-   :class:`float` type.
+   Sử dụng :func:`clock_gettime_ns` để tránh mất độ chính xác do
+   kiểu :class:`float`.
 
    .. availability:: Unix.
 
@@ -183,7 +138,7 @@ Functions
 
 .. function:: clock_gettime_ns(clk_id, /) -> int
 
-   Similar to :func:`clock_gettime` but return time as nanoseconds.
+   Tương tự như :func:`clock_gettime` nhưng trả về thời gian dưới dạng nanosecond.
 
    .. availability:: Unix.
 
@@ -192,11 +147,11 @@ Functions
 
 .. function:: clock_settime(clk_id, time: float, /)
 
-   Set the time of the specified clock *clk_id*.  Currently,
-   :data:`CLOCK_REALTIME` is the only accepted value for *clk_id*.
+   Đặt thời gian của clock được chỉ định *clk_id*. Hiện tại,
+   :data:`CLOCK_REALTIME` là giá trị duy nhất được chấp nhận cho *clk_id*.
 
-   Use :func:`clock_settime_ns` to avoid the precision loss caused by the
-   :class:`float` type.
+   Sử dụng :func:`clock_settime_ns` để tránh mất độ chính xác do kiểu
+   :class:`float` gây ra.
 
    .. availability:: Unix, not Android, not iOS.
 
@@ -205,7 +160,7 @@ Functions
 
 .. function:: clock_settime_ns(clk_id, time: int, /)
 
-   Similar to :func:`clock_settime` but set time with nanoseconds.
+   Tương tự như :func:`clock_settime` nhưng đặt thời gian bằng nanosecond.
 
    .. availability:: Unix, not Android, not iOS.
 
@@ -214,22 +169,15 @@ Functions
 
 .. function:: ctime(seconds=None, /)
 
-   Convert a time expressed in seconds since the epoch_ to a string of a form:
-   ``'Sun Jun 20 23:21:05 1993'`` representing local time. The day field
-   is two characters long and is space padded if the day is a single digit,
-   for example: ``'Wed Jun  9 04:26:40 1993'``.
+   Chuyển đổi thời gian được biểu diễn bằng số giây kể từ epoch_ thành một chuỗi có dạng: ``'Sun Jun 20 23:21:05 1993'``, biểu thị giờ địa phương. Trường ngày có độ dài hai ký tự và được đệm bằng dấu cách nếu ngày chỉ có một chữ số, ví dụ: ``'Wed Jun  9 04:26:40 1993'``.
 
-   If *seconds* is not provided or :const:`None`, the current time as
-   returned by :func:`.time` is used. ``ctime(seconds)`` is equivalent to
-   ``asctime(localtime(seconds))``. Locale information is not used by
+   Nếu *giây* không được cung cấp hoặc :const:`None`, thời gian hiện tại do :func:`.time` trả về sẽ được sử dụng. ``ctime(seconds)`` tương đương với ``asctime(localtime(seconds))``. Thông tin về locale không được sử dụng bởi
    :func:`ctime`.
 
 
 .. function:: get_clock_info(name, /)
 
-   Get information on the specified clock as a namespace object.
-   Supported clock names and the corresponding functions to read their value
-   are:
+   Lấy thông tin về clock được chỉ định dưới dạng một namespace object. Các tên clock được hỗ trợ và các hàm tương ứng để đọc giá trị của chúng là:
 
    * ``'monotonic'``: :func:`time.monotonic`
    * ``'perf_counter'``: :func:`time.perf_counter`
@@ -237,87 +185,65 @@ Functions
    * ``'thread_time'``: :func:`time.thread_time`
    * ``'time'``: :func:`time.time`
 
-   The result has the following attributes:
+   Kết quả có các thuộc tính sau:
 
-   - *adjustable*: ``True`` if the clock can be set to jump forward or backward
-     in time, ``False`` otherwise. Does not refer to gradual NTP rate adjustments.
-   - *implementation*: The name of the underlying C function used to get
-     the clock value.  Refer to :ref:`time-clock-id-constants` for possible values.
-   - *monotonic*: ``True`` if the clock cannot go backward,
-     ``False`` otherwise
-   - *resolution*: The resolution of the clock in seconds (:class:`float`)
+   - *adjustable*: ``True`` nếu clock có thể được đặt để nhảy tiến hoặc lùi theo thời gian, nếu không thì là ``False``. Không đề cập đến các điều chỉnh tốc độ NTP dần dần.
+   - *implementation*: Tên của hàm C bên dưới được sử dụng để lấy giá trị của clock. Tham khảo :ref:`time-clock-id-constants` để biết các giá trị có thể có.
+   - *monotonic*: ``True`` nếu clock không thể chạy lùi, nếu không thì là ``False``
+   - *resolution*: Độ phân giải của đồng hồ tính bằng giây (:class:`float`)
 
    .. versionadded:: 3.3
 
 
 .. function:: gmtime(seconds=None, /)
 
-   Convert a time expressed in seconds since the epoch_ to a :class:`struct_time` in
-   UTC in which the dst flag is always zero.  If *seconds* is not provided or
-   :const:`None`, the current time as returned by :func:`.time` is used.  Fractions
-   of a second are ignored.  See above for a description of the
-   :class:`struct_time` object. See :func:`calendar.timegm` for the inverse of this
-   function.
+   Chuyển đổi thời gian được biểu diễn bằng số giây kể từ epoch_ thành một :class:`struct_time` theo UTC, trong đó cờ dst luôn bằng không. Nếu *seconds* không được cung cấp hoặc
+   :const:`None`, thời gian hiện tại do :func:`.time` trả về sẽ được sử dụng. Phần lẻ của giây bị bỏ qua. Xem phần trên để biết mô tả về đối tượng
+   :class:`struct_time`. Xem :func:`calendar.timegm` để biết hàm đảo ngược của hàm này.
 
 
 .. function:: localtime(seconds=None, /)
 
-   Like :func:`gmtime` but converts to local time.
-   If *seconds* is not provided or :const:`None`,
-   the current time as returned by :func:`.time` is used.
-   The dst flag is set to ``1`` when DST applies to the given time.
+   Tương tự :func:`gmtime` nhưng chuyển đổi sang giờ địa phương. Nếu *seconds* không được cung cấp hoặc :const:`None`, thời gian hiện tại do :func:`.time` trả về sẽ được sử dụng. Cờ dst được đặt thành ``1`` khi DST áp dụng cho thời gian đã cho.
 
-   :func:`localtime` may raise :exc:`OverflowError`, if the timestamp is
-   outside the range of values supported by the platform C :c:func:`localtime`
-   or :c:func:`gmtime` functions, and :exc:`OSError` on :c:func:`localtime` or
-   :c:func:`gmtime` failure. It's common for this to be restricted to years
-   between 1970 and 2038.
+   :func:`localtime` có thể phát sinh :exc:`OverflowError` nếu dấu thời gian nằm ngoài phạm vi giá trị được các hàm :c:func:`localtime` hoặc :c:func:`gmtime` trong C của nền tảng hỗ trợ, và :exc:`OSError` trên :c:func:`localtime` hoặc
+   :c:func:`gmtime` không thành công. Thông thường, phạm vi này bị giới hạn trong các năm từ 1970 đến 2038.
 
 
 .. function:: mktime(time_tuple, /)
 
-   This is the inverse function of :func:`localtime`.  Its argument is the
-   :class:`struct_time` or full 9-tuple (since the dst flag is needed; use ``-1``
-   as the dst flag if it is unknown) which expresses the time in *local* time, not
-   UTC.  It returns a floating-point number, for compatibility with :func:`.time`.
-   If the input value cannot be represented as a valid time, either
-   :exc:`OverflowError` or :exc:`ValueError` will be raised (which depends on
-   whether the invalid value is caught by Python or the underlying C libraries).
-   The earliest date for which it can generate a time is platform-dependent.
+   Đây là hàm ngược của :func:`localtime`. Đối số của hàm là
+   :class:`struct_time` hoặc bộ 9 phần tử đầy đủ (vì cần cờ dst; sử dụng ``-1`` làm cờ dst nếu không xác định), biểu thị thời gian theo *local* chứ không phải UTC. Hàm trả về một số dấu phẩy động để tương thích với :func:`.time`. Nếu giá trị đầu vào không thể được biểu diễn dưới dạng thời gian hợp lệ, một trong hai lỗi sau sẽ được phát sinh:
+   :exc:`OverflowError` hoặc :exc:`ValueError` sẽ được phát sinh (điều này phụ thuộc vào việc giá trị không hợp lệ bị Python hay các thư viện C bên dưới bắt giữ). Ngày sớm nhất mà hàm có thể tạo ra thời gian phụ thuộc vào nền tảng.
 
 
 .. function:: monotonic() -> float
 
-   Return the value (in fractional seconds) of a monotonic clock, i.e. a clock
-   that cannot go backwards.  The clock is not affected by system clock updates.
-   The reference point of the returned value is undefined, so that only the
-   difference between the results of two calls is valid.
+   Trả về giá trị (tính bằng giây phân số) của một đồng hồ đơn điệu (monotonic), tức là một đồng hồ không thể chạy lùi. Đồng hồ này không bị ảnh hưởng bởi các cập nhật đồng hồ hệ thống. Điểm tham chiếu của giá trị được trả về không được xác định, vì vậy chỉ hiệu giữa kết quả của hai lần gọi mới có giá trị.
 
-   Clock:
+   Đồng hồ:
 
-   * On Windows, call ``QueryPerformanceCounter()`` and
-     ``QueryPerformanceFrequency()``.
-   * On macOS, call ``mach_absolute_time()`` and ``mach_timebase_info()``.
-   * On HP-UX, call ``gethrtime()``.
-   * Call ``clock_gettime(CLOCK_HIGHRES)`` if available.
-   * Otherwise, call ``clock_gettime(CLOCK_MONOTONIC)``.
+   * Trên Windows, gọi ``QueryPerformanceCounter()`` và ``QueryPerformanceFrequency()``.
+   * Trên macOS, gọi ``mach_absolute_time()`` và ``mach_timebase_info()``.
+   * Trên HP-UX, gọi ``gethrtime()``.
+   * Gọi ``clock_gettime(CLOCK_HIGHRES)`` nếu có.
+   * Nếu không, gọi ``clock_gettime(CLOCK_MONOTONIC)``.
 
-   Use :func:`monotonic_ns` to avoid the precision loss caused by the
-   :class:`float` type.
+   Sử dụng :func:`monotonic_ns` để tránh mất độ chính xác do
+   :class:`float` gây ra.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.5
-      The function is now always available and the clock is now the same for
-      all processes.
+      Hiện hàm này luôn khả dụng và đồng hồ hiện giống nhau đối với tất cả các tiến trình.
 
    .. versionchanged:: 3.10
-      On macOS, the clock is now the same for all processes.
+      Trên macOS, đồng hồ hiện giống nhau đối với tất cả các tiến trình.
 
 
 .. function:: monotonic_ns() -> int
 
-   Similar to :func:`monotonic`, but return time as nanoseconds.
+   Tương tự như :func:`monotonic`, nhưng trả về thời gian dưới dạng nanosecond.
 
    .. versionadded:: 3.7
 
@@ -326,33 +252,27 @@ Functions
    .. index::
       single: benchmarking
 
-   Return the value (in fractional seconds) of a performance counter, i.e. a
-   clock with the highest available resolution to measure a short duration.  It
-   does include time elapsed during sleep. The clock is the same for all
-   processes. The reference
-   point of the returned value is undefined, so that only the difference between
-   the results of two calls is valid.
+   Trả về giá trị (tính bằng giây phân số) của performance counter, tức là một clock có độ phân giải cao nhất hiện có để đo một khoảng thời gian ngắn. Clock này bao gồm cả thời gian đã trôi qua trong khi sleep. Clock này giống nhau đối với mọi process. Điểm tham chiếu của giá trị được trả về không được xác định, vì vậy chỉ hiệu của kết quả từ hai lần gọi mới hợp lệ.
 
    .. impl-detail::
 
-      On CPython, use the same clock as :func:`time.monotonic` and is a
-      monotonic clock, i.e. a clock that cannot go backwards.
+      Trên CPython, sử dụng cùng clock với :func:`time.monotonic` và đây là monotonic clock, tức là clock không thể chạy ngược.
 
-   Use :func:`perf_counter_ns` to avoid the precision loss caused by the
-   :class:`float` type.
+   Sử dụng :func:`perf_counter_ns` để tránh mất độ chính xác do
+   :class:`float` gây ra.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.10
-      On Windows, the clock is now the same for all processes.
+      Trên Windows, clock hiện giống nhau đối với mọi process.
 
    .. versionchanged:: 3.13
-      Use the same clock as :func:`time.monotonic`.
+      Sử dụng cùng clock với :func:`time.monotonic`.
 
 
 .. function:: perf_counter_ns() -> int
 
-   Similar to :func:`perf_counter`, but return time as nanoseconds.
+   Tương tự như :func:`perf_counter`, nhưng trả về thời gian theo đơn vị nanôgiây.
 
    .. versionadded:: 3.7
 
@@ -364,233 +284,154 @@ Functions
       single: processor time
       single: benchmarking
 
-   Return the value (in fractional seconds) of the sum of the system and user
-   CPU time of the current process.  It does not include time elapsed during
-   sleep.  It is process-wide by definition.  The reference point of the
-   returned value is undefined, so that only the difference between the results
-   of two calls is valid.
+   Trả về giá trị (tính theo giây phân số) của tổng thời gian CPU của hệ thống và người dùng cho tiến trình hiện tại. Giá trị này không bao gồm thời gian đã trôi qua trong khi ngủ. Theo định nghĩa, đây là thời gian trên toàn tiến trình. Mốc tham chiếu của giá trị được trả về là không xác định, vì vậy chỉ hiệu giữa kết quả của hai lần gọi mới có giá trị.
 
-   Use :func:`process_time_ns` to avoid the precision loss caused by the
-   :class:`float` type.
+   Sử dụng :func:`process_time_ns` để tránh mất độ chính xác do
+   :class:`float` gây ra.
 
    .. versionadded:: 3.3
 
 .. function:: process_time_ns() -> int
 
-   Similar to :func:`process_time` but return time as nanoseconds.
+   Tương tự như :func:`process_time` nhưng trả về thời gian theo đơn vị nanôgiây.
 
    .. versionadded:: 3.7
 
 .. function:: sleep(seconds, /)
 
-   Suspend execution of the calling thread for the given number of seconds.
-   The argument may be a floating-point number to indicate a more precise sleep
-   time.
+   Tạm dừng việc thực thi của thread đang gọi trong số giây đã cho. Đối số có thể là một số dấu phẩy động để biểu thị thời gian ngủ chính xác hơn.
 
-   If the sleep is interrupted by a signal and no exception is raised by the
-   signal handler, the sleep is restarted with a recomputed timeout.
+   Nếu việc ngủ bị gián đoạn bởi một signal và signal handler không phát sinh ngoại lệ, thao tác ngủ sẽ được khởi động lại với thời gian chờ được tính lại.
 
-   The suspension time may be longer than requested by an arbitrary amount,
-   because of the scheduling of other activity in the system.
+   Thời gian tạm dừng có thể dài hơn thời gian được yêu cầu một khoảng tùy ý, do lịch thực thi của các hoạt động khác trong hệ thống.
 
-   .. rubric:: Windows implementation
+   .. rubric:: Triển khai trên Windows
 
-   On Windows, if *seconds* is zero,
-   the thread relinquishes the remainder of its time slice
-   to any other thread that is ready to run.
-   If there are no other threads ready to run,
-   the function returns immediately, and the thread continues execution.
-   On Windows 10 and newer the implementation uses
-   a `high-resolution timer
-   <https://learn.microsoft.com/windows/win32/api/synchapi/nf-synchapi-createwaitabletimerexw>`_
-   which provides resolution of 100 nanoseconds.
-   If *seconds* is zero, ``Sleep(0)`` is used.
+   Trên Windows, nếu *seconds* bằng 0, thread sẽ nhường phần thời gian còn lại của lát thời gian cho bất kỳ thread nào khác đang sẵn sàng chạy. Nếu không có thread nào khác sẵn sàng chạy, hàm sẽ trả về ngay lập tức và thread tiếp tục thực thi. Trên Windows 10 trở lên, việc triển khai sử dụng `bộ hẹn giờ độ phân giải cao <https://learn.microsoft.com/windows/win32/api/synchapi/nf-synchapi-createwaitabletimerexw>`_, cung cấp độ phân giải 100 nanosecond. Nếu *seconds* bằng 0, ``Sleep(0)`` sẽ được sử dụng.
 
-   .. rubric:: Unix implementation
+   .. rubric:: Triển khai trên Unix
 
-   * Use ``clock_nanosleep()`` if available (resolution: 1 nanosecond);
-   * Or use ``nanosleep()`` if available (resolution: 1 nanosecond);
-   * Or use ``select()`` (resolution: 1 microsecond).
+   * Sử dụng ``clock_nanosleep()`` nếu có (độ phân giải: 1 nanosecond);
+   * Hoặc sử dụng ``nanosleep()`` nếu có (độ phân giải: 1 nanosecond);
+   * Hoặc sử dụng ``select()`` (độ phân giải: 1 microsecond).
 
    .. note::
 
-      To emulate a "no-op", use :keyword:`pass` instead of ``time.sleep(0)``.
+      Để mô phỏng một "no-op", hãy sử dụng :keyword:`pass` thay vì ``time.sleep(0)``.
 
-      To voluntarily relinquish the CPU, specify a real-time :ref:`scheduling
-      policy <os-scheduling-policy>` and use :func:`os.sched_yield` instead.
+      Để tự nguyện nhường CPU, hãy chỉ định :ref:`chính sách lập lịch thời gian thực <os-scheduling-policy>` và sử dụng :func:`os.sched_yield` thay vào đó.
 
    .. audit-event:: time.sleep seconds
 
    .. versionchanged:: 3.5
-      The function now sleeps at least *seconds*
-      even if the sleep is interrupted by a signal,
-      except if the signal handler raises an exception
-      (see :pep:`475` for the rationale).
+      Hàm hiện ngủ ít nhất *giây* ngay cả khi việc ngủ bị gián đoạn bởi một tín hiệu, trừ khi trình xử lý tín hiệu ném ra một ngoại lệ (xem :pep:`475` để biết lý do).
 
    .. versionchanged:: 3.11
-      On Unix, the ``clock_nanosleep()`` and ``nanosleep()`` functions are now
-      used if available. On Windows, a waitable timer is now used.
+      Trên Unix, các hàm ``clock_nanosleep()`` và ``nanosleep()`` hiện được sử dụng nếu có sẵn. Trên Windows, hiện sử dụng một bộ hẹn giờ có thể chờ.
 
    .. versionchanged:: 3.13
-      Raises an auditing event.
+      Phát sinh một sự kiện kiểm tra.
 
 .. index::
    single: % (percent); datetime format
 
 .. function:: strftime(format[, time_tuple])
 
-   Convert a tuple or :class:`struct_time` representing a time as returned by
-   :func:`gmtime` or :func:`localtime` to a string as specified by the *format*
-   argument.  If *time_tuple* is not provided, the current time as returned by
-   :func:`localtime` is used.  *format* must be a string.  :exc:`ValueError` is
-   raised if any field in *time_tuple* is outside of the allowed range.
+   Chuyển đổi một tuple hoặc :class:`struct_time` đại diện cho thời gian như được trả về bởi
+   :func:`gmtime` hoặc :func:`localtime` thành một chuỗi như được chỉ định bởi đối số *định dạng*. Nếu *bộ_tuple_thời_gian* không được cung cấp, thời gian hiện tại như được trả về bởi
+   :func:`localtime` được sử dụng. *format* phải là một chuỗi. :exc:`ValueError` được phát sinh nếu bất kỳ trường nào trong *time_tuple* nằm ngoài phạm vi cho phép.
 
-   0 is a legal argument for any position in the time tuple; if it is normally
-   illegal the value is forced to a correct one.
+   0 là một đối số hợp lệ cho mọi vị trí trong time tuple; nếu bình thường không hợp lệ, giá trị sẽ được ép về giá trị đúng.
 
-   The following directives can be embedded in the *format* string. They are shown
-   without the optional field width and precision specification, and are replaced
-   by the indicated characters in the :func:`strftime` result:
+   Các directive sau đây có thể được nhúng trong chuỗi *format*. Chúng được hiển thị mà không có phần đặc tả tùy chọn về độ rộng trường và độ chính xác, đồng thời được thay thế bằng các ký tự được chỉ định trong kết quả :func:`strftime`:
 
-   +-----------+------------------------------------------------+-------+
-   | Directive | Meaning                                        | Notes |
-   +===========+================================================+=======+
-   | ``%a``    | Locale's abbreviated weekday name.             |       |
-   |           |                                                |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%A``    | Locale's full weekday name.                    |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%b``    | Locale's abbreviated month name.               |       |
-   |           |                                                |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%B``    | Locale's full month name.                      |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%c``    | Locale's appropriate date and time             |       |
-   |           | representation.                                |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%d``    | Day of the month as a decimal number [01,31].  |       |
-   |           |                                                |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%f``    | Microseconds as a decimal number               | \(1)  |
-   |           |    [000000,999999].                            |       |
-   |           |                                                |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%H``    | Hour (24-hour clock) as a decimal number       |       |
-   |           | [00,23].                                       |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%I``    | Hour (12-hour clock) as a decimal number       |       |
-   |           | [01,12].                                       |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%j``    | Day of the year as a decimal number [001,366]. |       |
-   |           |                                                |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%m``    | Month as a decimal number [01,12].             |       |
-   |           |                                                |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%M``    | Minute as a decimal number [00,59].            |       |
-   |           |                                                |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%p``    | Locale's equivalent of either AM or PM.        | \(2)  |
-   |           |                                                |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%S``    | Second as a decimal number [00,61].            | \(3)  |
-   |           |                                                |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%U``    | Week number of the year (Sunday as the first   | \(4)  |
-   |           | day of the week) as a decimal number [00,53].  |       |
-   |           | All days in a new year preceding the first     |       |
-   |           | Sunday are considered to be in week 0.         |       |
-   |           |                                                |       |
-   |           |                                                |       |
-   |           |                                                |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%u``    | Day of the week (Monday is 1; Sunday is 7)     |       |
-   |           | as a decimal number [1, 7].                    |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%w``    | Weekday as a decimal number [0(Sunday),6].     |       |
-   |           |                                                |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%W``    | Week number of the year (Monday as the first   | \(4)  |
-   |           | day of the week) as a decimal number [00,53].  |       |
-   |           | All days in a new year preceding the first     |       |
-   |           | Monday are considered to be in week 0.         |       |
-   |           |                                                |       |
-   |           |                                                |       |
-   |           |                                                |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%x``    | Locale's appropriate date representation.      |       |
-   |           |                                                |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%X``    | Locale's appropriate time representation.      |       |
-   |           |                                                |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%y``    | Year without century as a decimal number       |       |
-   |           | [00,99].                                       |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%Y``    | Year with century as a decimal number.         |       |
-   |           |                                                |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%z``    | Time zone offset indicating a positive or      |       |
-   |           | negative time difference from UTC/GMT of the   |       |
-   |           | form +HHMM or -HHMM, where H represents decimal|       |
-   |           | hour digits and M represents decimal minute    |       |
-   |           | digits [-23:59, +23:59]. [1]_                  |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%Z``    | Time zone name (no characters if no time zone  |       |
-   |           | exists). Deprecated. [1]_                      |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%G``    | ISO 8601 year (similar to ``%Y`` but follows   |       |
-   |           | the rules for the ISO 8601 calendar year).     |       |
-   |           | The year starts with the week that contains    |       |
-   |           | the first Thursday of the calendar year.       |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%V``    | ISO 8601 week number (as a decimal number      |       |
-   |           | [01,53]). The first week of the year is the    |       |
-   |           | one that contains the first Thursday of the    |       |
-   |           | year. Weeks start on Monday.                   |       |
-   +-----------+------------------------------------------------+-------+
-   | ``%%``    | A literal ``'%'`` character.                   |       |
-   +-----------+------------------------------------------------+-------+
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | Directive | Ý nghĩa                                                                                                                                                                                                                   | Ghi chú |
+   +===========+===========================================================================================================================================================================================================================+=========+
+   | ``%a``    | Tên viết tắt của ngày trong tuần theo locale.                                                                                                                                                                             |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%A``    | Tên đầy đủ của ngày trong tuần theo locale.                                                                                                                                                                               |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%b``    | Tên viết tắt của tháng theo locale.                                                                                                                                                                                       |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%B``    | Tên đầy đủ của tháng theo locale.                                                                                                                                                                                         |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%c``    | Cách biểu diễn ngày và giờ phù hợp theo locale.                                                                                                                                                                           |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%d``    | Ngày trong tháng dưới dạng số thập phân [01,31].                                                                                                                                                                          |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%f``    | Microsecond dưới dạng số thập phân                                                                                                                                                                                        | \(1)    |
+   |           |    [000000,999999].                                                                                                                                                                                                       |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%H``    | Giờ (đồng hồ 24 giờ) dưới dạng số thập phân [00,23].                                                                                                                                                                      |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%I``    | Giờ (đồng hồ 12 giờ) dưới dạng số thập phân [01,12].                                                                                                                                                                      |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%j``    | Ngày trong năm dưới dạng số thập phân [001,366].                                                                                                                                                                          |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%m``    | Tháng dưới dạng số thập phân [01,12].                                                                                                                                                                                     |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%M``    | Phút dưới dạng số thập phân [00,59].                                                                                                                                                                                      |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%p``    | Giá trị tương đương với AM hoặc PM trong locale.                                                                                                                                                                          | \(2)    |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%S``    | Giây dưới dạng số thập phân [00,61].                                                                                                                                                                                      | \(3)    |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%U``    | Số tuần trong năm (Chủ nhật là ngày đầu tuần) dưới dạng số thập phân [00,53]. Tất cả các ngày đầu năm trước Chủ nhật đầu tiên được coi là thuộc tuần 0.                                                                   | \(4)    |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%u``    | Ngày trong tuần (Thứ Hai là 1; Chủ Nhật là 7) dưới dạng số thập phân [1, 7].                                                                                                                                              |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%w``    | Ngày trong tuần dưới dạng số thập phân [0(Chủ Nhật),6].                                                                                                                                                                   |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%W``    | Số tuần trong năm (Thứ Hai là ngày đầu tiên trong tuần) dưới dạng số thập phân [00,53]. Tất cả các ngày trong năm mới trước Thứ Hai đầu tiên được xem là thuộc tuần 0.                                                    | \(4)    |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%x``    | Biểu diễn ngày phù hợp với locale.                                                                                                                                                                                        |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%X``    | Biểu diễn thời gian phù hợp với locale.                                                                                                                                                                                   |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%y``    | Năm không có thế kỷ dưới dạng số thập phân [00,99].                                                                                                                                                                       |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%Y``    | Năm có thế kỷ dưới dạng số thập phân.                                                                                                                                                                                     |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%z``    | Độ lệch múi giờ cho biết chênh lệch thời gian dương hoặc âm so với UTC/GMT, có dạng +HHMM hoặc -HHMM, trong đó H biểu thị các chữ số của giờ thập phân và M biểu thị các chữ số của phút thập phân [-23:59, +23:59]. [1]_ |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%Z``    | Tên múi giờ (không có ký tự nào nếu không tồn tại múi giờ). Đã lỗi thời. [1]_                                                                                                                                             |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%G``    | Năm ISO 8601 (tương tự ``%Y`` nhưng tuân theo các quy tắc của năm theo lịch ISO 8601). Năm bắt đầu từ tuần chứa thứ Năm đầu tiên của năm dương lịch.                                                                      |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%V``    | Số tuần ISO 8601 (dưới dạng số thập phân [01,53]). Tuần đầu tiên của năm là tuần chứa thứ Năm đầu tiên của năm. Các tuần bắt đầu từ thứ Hai.                                                                              |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
+   | ``%%``    | Một ký tự ``'%'`` theo nghĩa đen.                                                                                                                                                                                         |         |
+   +-----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+
 
-   Notes:
+   Lưu ý:
 
    (1)
-       The ``%f`` format directive only applies to :func:`strptime`,
-       not to :func:`strftime`. However, see also :meth:`datetime.datetime.strptime` and
-       :meth:`datetime.datetime.strftime` where the ``%f`` format directive
-       :ref:`applies to microseconds <format-codes>`.
+       Chỉ thị định dạng ``%f`` chỉ áp dụng cho :func:`strptime`, không áp dụng cho :func:`strftime`. Tuy nhiên, hãy xem thêm :meth:`datetime.datetime.strptime` và
+       :meth:`datetime.datetime.strftime` trong đó chỉ thị định dạng ``%f``
+       :ref:`áp dụng cho microsecond <format-codes>`.
 
    (2)
-      When used with the :func:`strptime` function, the ``%p`` directive only affects
-      the output hour field if the ``%I`` directive is used to parse the hour.
+      Khi được sử dụng với hàm :func:`strptime`, chỉ thị ``%p`` chỉ ảnh hưởng đến trường giờ của đầu ra nếu chỉ thị ``%I`` được sử dụng để phân tích cú pháp giờ.
 
    .. _leap-second:
 
    (3)
-      The range really is ``0`` to ``61``; value ``60`` is valid in
-      timestamps representing `leap seconds`_ and value ``61`` is supported
-      for historical reasons.
+      Phạm vi thực sự là từ ``0`` đến ``61``; giá trị ``60`` hợp lệ trong các timestamp biểu thị `giây nhuận <leap seconds_>`_ và giá trị ``61`` được hỗ trợ vì lý do lịch sử.
 
    (4)
-      When used with the :func:`strptime` function, ``%U`` and ``%W`` are only used in
-      calculations when the day of the week and the year are specified.
+      Khi được sử dụng với hàm :func:`strptime`, ``%U`` và ``%W`` chỉ được dùng trong các phép tính khi ngày trong tuần và năm được chỉ định.
 
-   Here is an example, a format for dates compatible with that specified  in the
-   :rfc:`5322` Internet email standard.  [1]_ ::
+   Dưới đây là một ví dụ, một định dạng ngày tháng tương thích với định dạng được chỉ định trong
+   :rfc:`5322` tiêu chuẩn email Internet.  [1]_::
 
       >>> from time import gmtime, strftime
       >>> strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
       'Thu, 28 Jun 2001 14:17:15 +0000'
 
-   Additional directives may be supported on certain platforms, but only the
-   ones listed here have a meaning standardized by ANSI C.  To see the full set
-   of format codes supported on your platform, consult the :manpage:`strftime(3)`
-   documentation.
+   Một số chỉ thị bổ sung có thể được hỗ trợ trên một số nền tảng nhất định, nhưng chỉ những chỉ thị được liệt kê ở đây mới có ý nghĩa được ANSI C chuẩn hóa. Để xem toàn bộ tập mã định dạng được nền tảng của bạn hỗ trợ, hãy tham khảo tài liệu :manpage:`strftime(3)`.
 
-   On some platforms, an optional field width and precision specification can
-   immediately follow the initial ``'%'`` of a directive in the following order;
-   this is also not portable. The field width is normally 2 except for ``%j`` where
-   it is 3.
+   Trên một số nền tảng, đặc tả độ rộng trường và độ chính xác tùy chọn có thể ngay lập tức theo sau ``'%'`` ban đầu của một chỉ thị theo thứ tự sau; điều này cũng không portable. Độ rộng trường thường là 2, ngoại trừ ``%j`` là 3.
 
 
 .. index::
@@ -598,145 +439,114 @@ Functions
 
 .. function:: strptime(string[, format])
 
-   Parse a string representing a time according to a format.  The return value
-   is a :class:`struct_time` as returned by :func:`gmtime` or
+   Phân tích một chuỗi biểu diễn thời gian theo một định dạng. Giá trị trả về là một :class:`struct_time` được trả về bởi :func:`gmtime` hoặc
    :func:`localtime`.
 
-   The *format* parameter uses the same directives as those used by
-   :func:`strftime`; it defaults to ``"%a %b %d %H:%M:%S %Y"`` which matches the
-   formatting returned by :func:`ctime`. If *string* cannot be parsed according
-   to *format*, or if it has excess data after parsing, :exc:`ValueError` is
-   raised. The default values used to fill in any missing data when more
-   accurate values cannot be inferred are ``(1900, 1, 1, 0, 0, 0, 0, 1, -1)``.
-   Both *string* and *format* must be strings.
+   Tham số *format* sử dụng cùng các chỉ thị như các chỉ thị được dùng bởi
+   :func:`strftime`; giá trị mặc định là ``"%a %b %d %H:%M:%S %Y"``, khớp với định dạng được trả về bởi :func:`ctime`. Nếu không thể phân tích *string* theo *format*, hoặc nếu còn dữ liệu thừa sau khi phân tích, :exc:`ValueError` sẽ được phát sinh. Các giá trị mặc định được dùng để điền vào mọi dữ liệu còn thiếu khi không thể suy ra các giá trị chính xác hơn là ``(1900, 1, 1, 0, 0, 0, 0, 1, -1)``. Cả *string* và *format* đều phải là các chuỗi.
 
-   For example:
+   Ví dụ:
 
       >>> import time
       >>> time.strptime("30 Nov 00", "%d %b %y")   # doctest: +NORMALIZE_WHITESPACE
       time.struct_time(tm_year=2000, tm_mon=11, tm_mday=30, tm_hour=0, tm_min=0,
                        tm_sec=0, tm_wday=3, tm_yday=335, tm_isdst=-1)
 
-   Support for the ``%Z`` directive is based on the values contained in ``tzname``
-   and whether ``daylight`` is true.  Because of this, it is platform-specific
-   except for recognizing UTC and GMT which are always known (and are considered to
-   be non-daylight savings timezones).
+   Việc hỗ trợ chỉ thị ``%Z`` dựa trên các giá trị có trong ``tzname`` và việc ``daylight`` có phải là true hay không. Vì vậy, tính năng này phụ thuộc vào nền tảng, ngoại trừ việc nhận dạng UTC và GMT, vốn luôn được biết đến (và được xem là các múi giờ không áp dụng giờ mùa hè).
 
-   Only the directives specified in the documentation are supported.  Because
-   ``strftime()`` is implemented per platform it can sometimes offer more
-   directives than those listed.  But ``strptime()`` is independent of any platform
-   and thus does not necessarily support all directives available that are not
-   documented as supported.
+   Chỉ các chỉ thị được nêu trong tài liệu mới được hỗ trợ. Vì ``strftime()`` được triển khai riêng theo từng nền tảng nên đôi khi có thể cung cấp nhiều chỉ thị hơn danh sách đã nêu. Tuy nhiên, ``strptime()`` không phụ thuộc vào nền tảng nào, vì vậy không nhất thiết hỗ trợ tất cả các chỉ thị hiện có nhưng không được tài liệu ghi rõ là được hỗ trợ.
 
 
 .. class:: struct_time
 
-   The type of the time value sequence returned by :func:`gmtime`,
-   :func:`localtime`, and :func:`strptime`.  It is an object with a :term:`named
-   tuple` interface: values can be accessed by index and by attribute name.  The
-   following values are present:
+   Kiểu của chuỗi giá trị thời gian được :func:`gmtime` trả về,
+   :func:`localtime`, và :func:`strptime`. Đây là một đối tượng có giao diện :term:`named tuple`: các giá trị có thể được truy cập theo chỉ mục và theo tên thuộc tính. Các giá trị sau đây hiện diện:
 
    .. list-table::
 
-      * - Index
-        - Attribute
-        - Values
+      * - Chỉ mục
+        - Thuộc tính
+        - Giá trị
 
       * - 0
         - .. attribute:: tm_year
-        - (for example, 1993)
+        - (ví dụ: 1993)
 
       * - 1
         - .. attribute:: tm_mon
-        - range [1, 12]
+        - phạm vi [1, 12]
 
       * - 2
         - .. attribute:: tm_mday
-        - range [1, 31]
+        - phạm vi [1, 31]
 
       * - 3
         - .. attribute:: tm_hour
-        - range [0, 23]
+        - phạm vi [0, 23]
 
       * - 4
         - .. attribute:: tm_min
-        - range [0, 59]
+        - phạm vi [0, 59]
 
       * - 5
         - .. attribute:: tm_sec
-        - range [0, 61]; see :ref:`Note (2) <leap-second>` in :func:`strftime`
+        - phạm vi [0, 61]; xem :ref:`Ghi chú (2) <leap-second>` trong :func:`strftime`
 
       * - 6
         - .. attribute:: tm_wday
-        - range [0, 6]; Monday is 0
+        - phạm vi [0, 6]; Thứ Hai là 0
 
       * - 7
         - .. attribute:: tm_yday
-        - range [1, 366]
+        - phạm vi [1, 366]
 
       * - 8
         - .. attribute:: tm_isdst
-        - 0, 1 or -1; see below
+        - 0, 1 hoặc -1; xem bên dưới
 
       * - N/A
         - .. attribute:: tm_zone
-        - abbreviation of timezone name
+        - viết tắt của tên múi giờ
 
       * - N/A
         - .. attribute:: tm_gmtoff
-        - offset east of UTC in seconds
+        - độ lệch về phía đông UTC tính bằng giây
 
-   Note that unlike the C structure, the month value is a range of [1, 12], not
-   [0, 11].
+   Lưu ý rằng không giống như cấu trúc C, giá trị tháng nằm trong phạm vi [1, 12], không phải [0, 11].
 
-   In calls to :func:`mktime`, :attr:`tm_isdst` may be set to 1 when daylight
-   savings time is in effect, and 0 when it is not.  A value of -1 indicates that
-   this is not known, and will usually result in the correct state being filled in.
+   Trong các lệnh gọi đến :func:`mktime`, :attr:`tm_isdst` có thể được đặt thành 1 khi đang áp dụng giờ mùa hè và thành 0 khi không áp dụng. Giá trị -1 cho biết thông tin này chưa được xác định và thường sẽ dẫn đến việc điền đúng trạng thái.
 
-   When a tuple with an incorrect length is passed to a function expecting a
-   :class:`struct_time`, or having elements of the wrong type, a
-   :exc:`TypeError` is raised.
+   Khi một tuple có độ dài không đúng được truyền cho một hàm yêu cầu một
+   :class:`struct_time`, hoặc có các phần tử sai kiểu, thì một
+   :exc:`TypeError` sẽ được phát sinh.
 
 .. function:: time() -> float
 
-   Return the time in seconds since the epoch_ as a floating-point
-   number. The handling of `leap seconds`_ is platform dependent.
-   On Windows and most Unix systems, the leap seconds are not counted towards
-   the time in seconds since the epoch_. This is commonly referred to as `Unix
-   time <https://en.wikipedia.org/wiki/Unix_time>`_.
+   Trả về thời gian tính bằng giây kể từ epoch_ dưới dạng một số dấu phẩy động. Cách xử lý `leap seconds <leap seconds_>`_ phụ thuộc vào nền tảng. Trên Windows và hầu hết các hệ thống Unix, các giây nhuận không được tính vào thời gian tính bằng giây kể từ epoch_. Giá trị này thường được gọi là `Unix time <https://en.wikipedia.org/wiki/Unix_time>`_.
 
-   Note that even though the time is always returned as a floating-point
-   number, not all systems provide time with a better precision than 1 second.
-   While this function normally returns non-decreasing values, it can return a
-   lower value than a previous call if the system clock has been set back
-   between the two calls.
+   Lưu ý rằng mặc dù thời gian luôn được trả về dưới dạng số dấu phẩy động, không phải hệ thống nào cũng cung cấp thời gian với độ chính xác cao hơn 1 giây. Mặc dù hàm này thường trả về các giá trị không giảm, nó có thể trả về giá trị thấp hơn một lần gọi trước đó nếu đồng hồ hệ thống đã được chỉnh lùi trong khoảng thời gian giữa hai lần gọi.
 
-   The number returned by :func:`.time` may be converted into a more common
-   time format (i.e. year, month, day, hour, etc...) in UTC by passing it to
-   :func:`gmtime` function or in local time by passing it to the
-   :func:`localtime` function. In both cases a
-   :class:`struct_time` object is returned, from which the components
-   of the calendar date may be accessed as attributes.
+   Số được :func:`.time` trả về có thể được chuyển đổi thành định dạng thời gian phổ biến hơn (tức là năm, tháng, ngày, giờ, v.v...) theo UTC bằng cách truyền nó cho
+   hàm :func:`gmtime` hoặc theo giờ địa phương bằng cách truyền nó cho
+   hàm :func:`localtime`. Trong cả hai trường hợp, một
+   đối tượng :class:`struct_time` được trả về, từ đó có thể truy cập các thành phần của ngày theo lịch dưới dạng các thuộc tính.
 
-   Clock:
+   Đồng hồ:
 
-   * On Windows, call ``GetSystemTimePreciseAsFileTime()``.
-   * Call ``clock_gettime(CLOCK_REALTIME)`` if available.
-   * Otherwise, call ``gettimeofday()``.
+   * Trên Windows, hãy gọi ``GetSystemTimePreciseAsFileTime()``.
+   * Hãy gọi ``clock_gettime(CLOCK_REALTIME)`` nếu có sẵn.
+   * Nếu không, hãy gọi ``gettimeofday()``.
 
-   Use :func:`time_ns` to avoid the precision loss caused by the :class:`float`
-   type.
+   Sử dụng :func:`time_ns` để tránh mất độ chính xác do kiểu :class:`float` gây ra.
 
 .. versionchanged:: 3.13
 
-   On Windows, calls ``GetSystemTimePreciseAsFileTime()`` instead of
-   ``GetSystemTimeAsFileTime()``.
+   Trên Windows, gọi ``GetSystemTimePreciseAsFileTime()`` thay vì ``GetSystemTimeAsFileTime()``.
 
 
 .. function:: time_ns() -> int
 
-   Similar to :func:`~time.time` but returns time as an integer number of
-   nanoseconds since the epoch_.
+   Tương tự như :func:`~time.time` nhưng trả về thời gian dưới dạng số nguyên tính bằng nanosecond kể từ epoch_.
 
    .. versionadded:: 3.7
 
@@ -748,87 +558,63 @@ Functions
       single: processor time
       single: benchmarking
 
-   Return the value (in fractional seconds) of the sum of the system and user
-   CPU time of the current thread.  It does not include time elapsed during
-   sleep.  It is thread-specific by definition.  The reference point of the
-   returned value is undefined, so that only the difference between the results
-   of two calls in the same thread is valid.
+   Trả về giá trị (tính bằng giây phân số) của tổng thời gian CPU hệ thống và CPU người dùng của thread hiện tại. Giá trị này không bao gồm thời gian đã trôi qua trong khi ngủ. Theo định nghĩa, giá trị này dành riêng cho thread. Mốc tham chiếu của giá trị được trả về không được xác định, vì vậy chỉ hiệu giữa kết quả của hai lần gọi trong cùng một thread mới có giá trị.
 
-   Use :func:`thread_time_ns` to avoid the precision loss caused by the
-   :class:`float` type.
+   Sử dụng :func:`thread_time_ns` để tránh mất độ chính xác do
+   :class:`float` gây ra.
 
    .. availability::  Linux, Unix, Windows.
 
-      Unix systems supporting ``CLOCK_THREAD_CPUTIME_ID``.
+      Các hệ thống Unix hỗ trợ ``CLOCK_THREAD_CPUTIME_ID``.
 
    .. versionadded:: 3.7
 
 
 .. function:: thread_time_ns() -> int
 
-   Similar to :func:`thread_time` but return time as nanoseconds.
+   Tương tự như :func:`thread_time` nhưng trả về thời gian dưới dạng nanosecond.
 
    .. versionadded:: 3.7
 
 
 .. function:: tzset()
 
-   Reset the time conversion rules used by the library routines. The environment
-   variable :envvar:`TZ` specifies how this is done. It will also set the variables
-   ``tzname`` (from the :envvar:`TZ` environment variable), ``timezone`` (non-DST
-   seconds West of UTC), ``altzone`` (DST seconds west of UTC) and ``daylight``
-   (to 0 if this timezone does not have any daylight saving time rules, or to
-   nonzero if there is a time, past, present or future when daylight saving time
-   applies).
+   Đặt lại các quy tắc chuyển đổi thời gian được các routine của thư viện sử dụng. Biến môi trường :envvar:`TZ` chỉ định cách thực hiện việc này. Biến này cũng sẽ thiết lập các biến ``tzname`` (từ biến môi trường :envvar:`TZ`), ``timezone`` (số giây không theo DST ở phía Tây UTC), ``altzone`` (số giây theo DST ở phía Tây UTC) và ``daylight`` (bằng 0 nếu múi giờ này không có bất kỳ quy tắc giờ mùa hè nào, hoặc khác 0 nếu có một thời điểm trong quá khứ, hiện tại hoặc tương lai mà giờ mùa hè được áp dụng).
 
    .. availability:: Unix.
 
    .. note::
 
-      Although in many cases, changing the :envvar:`TZ` environment variable may
-      affect the output of functions like :func:`localtime` without calling
-      :func:`tzset`, this behavior should not be relied on.
+      Mặc dù trong nhiều trường hợp, việc thay đổi biến môi trường :envvar:`TZ` có thể ảnh hưởng đến đầu ra của các hàm như :func:`localtime` mà không gọi
+      :func:`tzset`, không nên dựa vào hành vi này.
 
-      The :envvar:`TZ` environment variable should contain no whitespace.
+      Biến môi trường :envvar:`TZ` không được chứa khoảng trắng.
 
-   The standard format of the :envvar:`TZ` environment variable is (whitespace
-   added for clarity)::
+   Định dạng chuẩn của biến môi trường :envvar:`TZ` là (thêm khoảng trắng để dễ hiểu)::
 
       std offset [dst [offset [,start[/time], end[/time]]]]
 
-   Where the components are:
+   Các thành phần là:
 
-   ``std`` and ``dst``
-      Three or more alphanumerics giving the timezone abbreviations. These will be
-      propagated into time.tzname
+   ``std`` và ``dst``
+      Ba hoặc nhiều ký tự chữ và số dùng để chỉ các chữ viết tắt múi giờ. Các ký tự này sẽ được truyền vào time.tzname
 
    ``offset``
-      The offset has the form: ``± hh[:mm[:ss]]``. This indicates the value
-      added the local time to arrive at UTC.  If preceded by a '-', the timezone
-      is east of the Prime Meridian; otherwise, it is west. If no offset follows
-      dst, summer time is assumed to be one hour ahead of standard time.
+      Độ lệch có dạng: ``± hh[:mm[:ss]]``. Giá trị này cho biết lượng cần cộng vào giờ địa phương để có được UTC. Nếu có dấu '-' đứng trước, múi giờ nằm về phía đông Kinh tuyến gốc; nếu không, nó nằm về phía tây. Nếu không có độ lệch sau dst, giờ mùa hè được giả định là sớm hơn giờ tiêu chuẩn một giờ.
 
    ``start[/time], end[/time]``
-      Indicates when to change to and back from DST. The format of the
-      start and end dates are one of the following:
+      Cho biết thời điểm chuyển sang và chuyển về từ DST. Định dạng của ngày bắt đầu và ngày kết thúc là một trong các dạng sau:
 
       :samp:`J{n}`
-         The Julian day *n* (1 <= *n* <= 365). Leap days are not counted, so in
-         all years February 28 is day 59 and March 1 is day 60.
+         Ngày Julian *n* (1 <= *n* <= 365). Ngày nhuận không được tính, vì vậy trong mọi năm, ngày 28 tháng 2 là ngày 59 và ngày 1 tháng 3 là ngày 60.
 
       :samp:`{n}`
-         The zero-based Julian day (0 <= *n* <= 365). Leap days are counted, and
-         it is possible to refer to February 29.
+         Ngày Julian bắt đầu từ 0 (0 <= *n* <= 365). Ngày nhuận được tính, nên có thể tham chiếu đến ngày 29 tháng 2.
 
       :samp:`M{m}.{n}.{d}`
-         The *d*'th day (0 <= *d* <= 6) of week *n* of month *m* of the year (1
-         <= *n* <= 5, 1 <= *m* <= 12, where week 5 means "the last *d* day in
-         month *m*" which may occur in either the fourth or the fifth
-         week). Week 1 is the first week in which the *d*'th day occurs. Day
-         zero is a Sunday.
+         Ngày thứ *d* (0 <= *d* <= 6) trong tuần *n* của tháng *m* trong năm (1 <= *n* <= 5, 1 <= *m* <= 12, trong đó tuần 5 nghĩa là "ngày *d* cuối cùng trong tháng *m*", có thể rơi vào tuần thứ tư hoặc thứ năm). Tuần 1 là tuần đầu tiên trong đó ngày thứ *d* xuất hiện. Ngày 0 là Chủ nhật.
 
-      ``time`` has the same format as ``offset`` except that no leading sign
-      ('-' or '+') is allowed. The default, if time is not given, is 02:00:00.
+      ``time`` có cùng định dạng với ``offset``, ngoại trừ việc không cho phép dấu đứng đầu ('-' hoặc '+'). Giá trị mặc định, nếu không cung cấp thời gian, là 02:00:00.
 
    ::
 
@@ -841,13 +627,8 @@ Functions
       >>> time.strftime('%X %x %Z')
       '16:08:12 05/08/03 AEST'
 
-   On many Unix systems (including \*BSD, Linux, Solaris, and Darwin), it is more
-   convenient to use the system's zoneinfo (:manpage:`tzfile(5)`)  database to
-   specify the timezone rules. To do this, set the  :envvar:`TZ` environment
-   variable to the path of the required timezone  datafile, relative to the root of
-   the systems 'zoneinfo' timezone database, usually located at
-   :file:`/usr/share/zoneinfo`. For example,  ``'US/Eastern'``,
-   ``'Australia/Melbourne'``, ``'Egypt'`` or  ``'Europe/Amsterdam'``. ::
+   Trên nhiều hệ thống Unix (bao gồm \*BSD, Linux, Solaris và Darwin), việc sử dụng cơ sở dữ liệu zoneinfo (:manpage:`tzfile(5)`) của hệ thống để chỉ định các quy tắc múi giờ sẽ thuận tiện hơn. Để thực hiện việc này, hãy đặt biến môi trường :envvar:`TZ` thành đường dẫn đến tệp dữ liệu múi giờ cần thiết, tính tương đối từ thư mục gốc của cơ sở dữ liệu múi giờ 'zoneinfo' của hệ thống, thường nằm tại
+   :file:`/usr/share/zoneinfo`. Ví dụ: ``'US/Eastern'``, ``'Australia/Melbourne'``, ``'Egypt'`` hoặc ``'Europe/Amsterdam'``.::
 
       >>> os.environ['TZ'] = 'US/Eastern'
       >>> time.tzset()
@@ -861,21 +642,17 @@ Functions
 
 .. _time-clock-id-constants:
 
-Clock ID Constants
-------------------
+Hằng số Clock ID
+----------------
 
-These constants are used as parameters for :func:`clock_getres` and
+Các hằng số này được dùng làm tham số cho :func:`clock_getres` và
 :func:`clock_gettime`.
 
 .. data:: CLOCK_BOOTTIME
 
-   Identical to :data:`CLOCK_MONOTONIC`, except it also includes any time that
-   the system is suspended.
+   Giống hệt :data:`CLOCK_MONOTONIC`, ngoại trừ việc nó cũng bao gồm mọi khoảng thời gian hệ thống bị tạm ngừng.
 
-   This allows applications to get a suspend-aware monotonic  clock  without
-   having to deal with the complications of :data:`CLOCK_REALTIME`, which may
-   have  discontinuities if the time is changed using ``settimeofday()`` or
-   similar.
+   Điều này cho phép các ứng dụng lấy một monotonic clock có nhận biết trạng thái tạm ngừng mà không phải xử lý các vấn đề phức tạp của :data:`CLOCK_REALTIME`, vốn có thể bị gián đoạn nếu thời gian được thay đổi bằng ``settimeofday()`` hoặc tương tự.
 
    .. availability:: Linux >= 2.6.39.
 
@@ -884,9 +661,7 @@ These constants are used as parameters for :func:`clock_getres` and
 
 .. data:: CLOCK_HIGHRES
 
-   The Solaris OS has a ``CLOCK_HIGHRES`` timer that attempts to use an optimal
-   hardware source, and may give close to nanosecond resolution.
-   ``CLOCK_HIGHRES`` is the nonadjustable, high-resolution clock.
+   Hệ điều hành Solaris có bộ hẹn giờ ``CLOCK_HIGHRES`` cố gắng sử dụng nguồn phần cứng tối ưu và có thể cung cấp độ phân giải gần đến nano giây. ``CLOCK_HIGHRES`` là đồng hồ có độ phân giải cao không thể điều chỉnh.
 
    .. availability:: Solaris.
 
@@ -895,8 +670,7 @@ These constants are used as parameters for :func:`clock_getres` and
 
 .. data:: CLOCK_MONOTONIC
 
-   Clock that cannot be set and represents monotonic time since some unspecified
-   starting point.
+   Đồng hồ không thể thiết lập và biểu thị thời gian đơn điệu kể từ một thời điểm bắt đầu không xác định.
 
    .. availability:: Unix.
 
@@ -905,8 +679,7 @@ These constants are used as parameters for :func:`clock_getres` and
 
 .. data:: CLOCK_MONOTONIC_RAW
 
-   Similar to :data:`CLOCK_MONOTONIC`, but provides access to a raw
-   hardware-based time that is not subject to NTP adjustments.
+   Tương tự như :data:`CLOCK_MONOTONIC`, nhưng cho phép truy cập thời gian thô dựa trên phần cứng, không chịu ảnh hưởng của các điều chỉnh NTP.
 
    .. availability:: Linux >= 2.6.28, macOS >= 10.12.
 
@@ -914,8 +687,7 @@ These constants are used as parameters for :func:`clock_getres` and
 
 .. data:: CLOCK_MONOTONIC_RAW_APPROX
 
-   Similar to :data:`CLOCK_MONOTONIC_RAW`, but reads a value cached by
-   the system at context switch and hence has less accuracy.
+   Tương tự như :data:`CLOCK_MONOTONIC_RAW`, nhưng đọc giá trị được hệ thống lưu vào bộ nhớ đệm khi chuyển ngữ cảnh, nên có độ chính xác thấp hơn.
 
    .. availability:: macOS >= 10.12.
 
@@ -924,7 +696,7 @@ These constants are used as parameters for :func:`clock_getres` and
 
 .. data:: CLOCK_PROCESS_CPUTIME_ID
 
-   High-resolution per-process timer from the CPU.
+   Bộ hẹn giờ độ phân giải cao theo từng process từ CPU.
 
    .. availability:: Unix.
 
@@ -933,7 +705,7 @@ These constants are used as parameters for :func:`clock_getres` and
 
 .. data:: CLOCK_PROF
 
-   High-resolution per-process timer from the CPU.
+   Bộ hẹn giờ độ phân giải cao theo từng process từ CPU.
 
    .. availability:: FreeBSD, NetBSD >= 7, OpenBSD.
 
@@ -941,10 +713,9 @@ These constants are used as parameters for :func:`clock_getres` and
 
 .. data:: CLOCK_TAI
 
-   `International Atomic Time <https://www.nist.gov/pml/time-and-frequency-division/how-utcnist-related-coordinated-universal-time-utc-international>`_
+   `Giờ nguyên tử quốc tế <https://www.nist.gov/pml/time-and-frequency-division/how-utcnist-related-coordinated-universal-time-utc-international>`_
 
-   The system must have a current leap second table in order for this to give
-   the correct answer.  PTP or NTP software can maintain a leap second table.
+   Hệ thống phải có bảng giây nhuận hiện tại để câu lệnh này trả về kết quả chính xác. Phần mềm PTP hoặc NTP có thể duy trì bảng giây nhuận.
 
    .. availability:: Linux.
 
@@ -952,7 +723,7 @@ These constants are used as parameters for :func:`clock_getres` and
 
 .. data:: CLOCK_THREAD_CPUTIME_ID
 
-   Thread-specific CPU-time clock.
+   Đồng hồ thời gian CPU dành riêng cho từng thread.
 
    .. availability::  Unix.
 
@@ -961,9 +732,7 @@ These constants are used as parameters for :func:`clock_getres` and
 
 .. data:: CLOCK_UPTIME
 
-   Time whose absolute value is the time the system has been running and not
-   suspended, providing accurate uptime measurement, both absolute and
-   interval.
+   Thời gian có giá trị tuyệt đối là khoảng thời gian hệ thống đã chạy mà không bị tạm dừng, cung cấp phép đo uptime chính xác, cả tuyệt đối lẫn theo khoảng thời gian.
 
    .. availability:: FreeBSD, OpenBSD >= 5.5.
 
@@ -972,9 +741,7 @@ These constants are used as parameters for :func:`clock_getres` and
 
 .. data:: CLOCK_UPTIME_RAW
 
-   Clock that increments monotonically, tracking the time since an arbitrary
-   point, unaffected by frequency or time adjustments and not incremented while
-   the system is asleep.
+   Đồng hồ tăng đơn điệu, theo dõi thời gian kể từ một thời điểm tùy ý, không bị ảnh hưởng bởi việc điều chỉnh tần số hoặc thời gian và không tăng khi hệ thống ở trạng thái ngủ.
 
    .. availability:: macOS >= 10.12.
 
@@ -982,21 +749,19 @@ These constants are used as parameters for :func:`clock_getres` and
 
 .. data:: CLOCK_UPTIME_RAW_APPROX
 
-   Like :data:`CLOCK_UPTIME_RAW`, but the value is cached by the system
-   at context switches and therefore has less accuracy.
+   Giống như :data:`CLOCK_UPTIME_RAW`, nhưng giá trị được hệ thống lưu vào bộ nhớ đệm khi chuyển đổi ngữ cảnh và do đó kém chính xác hơn.
 
    .. availability:: macOS >= 10.12.
 
    .. versionadded:: 3.13
 
-The following constant is the only parameter that can be sent to
+Hằng số sau đây là tham số duy nhất có thể được truyền tới
 :func:`clock_settime`.
 
 
 .. data:: CLOCK_REALTIME
 
-   Real-time clock.  Setting this clock requires appropriate privileges.
-   The clock is the same for all processes.
+   Đồng hồ thời gian thực. Việc thiết lập đồng hồ này yêu cầu các đặc quyền phù hợp. Đồng hồ này giống nhau đối với tất cả các process.
 
    .. availability:: Unix.
 
@@ -1005,58 +770,46 @@ The following constant is the only parameter that can be sent to
 
 .. _time-timezone-constants:
 
-Timezone Constants
--------------------
+Hằng số múi giờ
+---------------
 
 .. data:: altzone
 
-   The offset of the local DST timezone, in seconds west of UTC, if one is defined.
-   This is negative if the local DST timezone is east of UTC (as in Western Europe,
-   including the UK).  Only use this if ``daylight`` is nonzero.  See note below.
+   Độ lệch của múi giờ DST cục bộ, tính bằng số giây về phía tây so với UTC, nếu được xác định. Giá trị này là số âm nếu múi giờ DST cục bộ nằm về phía đông so với UTC (như ở Tây Âu, bao gồm cả Vương quốc Anh). Chỉ sử dụng giá trị này nếu ``daylight`` khác không. Xem lưu ý bên dưới.
 
 .. data:: daylight
 
-   Nonzero if a DST timezone is defined.  See note below.
+   Khác không nếu múi giờ DST được xác định. Xem lưu ý bên dưới.
 
 .. data:: timezone
 
-   The offset of the local (non-DST) timezone, in seconds west of UTC (negative in
-   most of Western Europe, positive in the US, zero in the UK).  See note below.
+   Độ lệch của múi giờ cục bộ (không phải DST), tính bằng số giây về phía tây so với UTC (âm ở hầu hết Tây Âu, dương ở Hoa Kỳ, bằng không ở Vương quốc Anh). Xem lưu ý bên dưới.
 
 .. data:: tzname
 
-   A tuple of two strings: the first is the name of the local non-DST timezone, the
-   second is the name of the local DST timezone.  If no DST timezone is defined,
-   the second string should not be used.  See note below.
+   Một tuple gồm hai chuỗi: chuỗi thứ nhất là tên của múi giờ cục bộ không phải DST, chuỗi thứ hai là tên của múi giờ DST cục bộ. Nếu không xác định múi giờ DST, không nên sử dụng chuỗi thứ hai. Xem lưu ý bên dưới.
 
 .. note::
 
-   For the above Timezone constants (:data:`altzone`, :data:`daylight`, :data:`timezone`,
-   and :data:`tzname`), the value is determined by the timezone rules in effect
-   at module load time or the last time :func:`tzset` is called and may be incorrect
-   for times in the past.  It is recommended to use the :attr:`~struct_time.tm_gmtoff` and
-   :attr:`~struct_time.tm_zone` results from :func:`localtime` to obtain timezone information.
+   Đối với các hằng số Múi giờ ở trên (:data:`altzone`, :data:`daylight`, :data:`timezone` và :data:`tzname`), giá trị được xác định bởi các quy tắc múi giờ có hiệu lực tại thời điểm tải module hoặc lần gần nhất :func:`tzset` được gọi và có thể không chính xác đối với các thời điểm trong quá khứ. Bạn nên sử dụng :attr:`~struct_time.tm_gmtoff` và
+   :attr:`~struct_time.tm_zone` kết quả từ :func:`localtime` để lấy thông tin múi giờ.
 
 
 .. seealso::
 
-   Module :mod:`datetime`
-      More object-oriented interface to dates and times.
+   Mô-đun :mod:`datetime`
+      Giao diện hướng đối tượng hơn dành cho ngày và giờ.
 
-   Module :mod:`locale`
-      Internationalization services.  The locale setting affects the interpretation
-      of many format specifiers in :func:`strftime` and :func:`strptime`.
+   Mô-đun :mod:`locale`
+      Các dịch vụ quốc tế hóa. Thiết lập locale ảnh hưởng đến cách diễn giải nhiều định dạng trong :func:`strftime` và :func:`strptime`.
 
-   Module :mod:`calendar`
-      General calendar-related functions.   :func:`~calendar.timegm` is the
-      inverse of :func:`gmtime` from this module.
+   Mô-đun :mod:`calendar`
+      Các hàm liên quan đến lịch nói chung. :func:`~calendar.timegm` là hàm nghịch đảo của :func:`gmtime` trong mô-đun này.
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [1] The use of ``%Z`` is now deprecated, but the ``%z`` escape that expands to the
-   preferred hour/minute offset is not supported by all ANSI C libraries. Also, a
-   strict reading of the original 1982 :rfc:`822` standard calls for a two-digit
-   year (``%y`` rather than ``%Y``), but practice moved to 4-digit years long before the
-   year 2000.  After that, :rfc:`822` became obsolete and the 4-digit year has
-   been first recommended by :rfc:`1123` and then mandated by :rfc:`2822`,
-   with :rfc:`5322` continuing this requirement.
+.. [1] Việc sử dụng ``%Z`` hiện đã không còn được khuyến nghị, nhưng escape ``%z``, vốn mở rộng thành độ lệch giờ/phút được ưu tiên, không được tất cả các thư viện ANSI C hỗ trợ. Ngoài ra, cách diễn giải chặt chẽ tiêu chuẩn :rfc:`822` nguyên bản năm 1982 yêu cầu năm có hai chữ số (``%y`` thay vì ``%Y``), nhưng trên thực tế, năm có 4 chữ số đã được sử dụng từ lâu trước năm 2000. Sau đó, :rfc:`822` trở nên lỗi thời, và năm có 4 chữ số lần đầu được :rfc:`1123` khuyến nghị, sau đó được :rfc:`2822` bắt buộc; :rfc:`5322` tiếp tục duy trì yêu cầu này.
+
+.. _`high-resolution timer`: https://learn.microsoft.com/windows/win32/api/synchapi/nf-synchapi-createwaitabletimerexw
+.. _`Unix time`: https://en.wikipedia.org/wiki/Unix_time
+.. _`International Atomic Time`: https://www.nist.gov/pml/time-and-frequency-division/how-utcnist-related-coordinated-universal-time-utc-international

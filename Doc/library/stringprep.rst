@@ -1,143 +1,117 @@
-:mod:`!stringprep` --- Internet String Preparation
-==================================================
+:mod:`!stringprep` --- Chuẩn bị chuỗi Internet
+==============================================
 
 .. module:: stringprep
-   :synopsis: String preparation, as per RFC 3453
+   :synopsis: Chuẩn bị chuỗi theo RFC 3453
 
 .. moduleauthor:: Martin v. Löwis <martin@v.loewis.de>
 .. sectionauthor:: Martin v. Löwis <martin@v.loewis.de>
 
-**Source code:** :source:`Lib/stringprep.py`
+**Mã nguồn:** :source:`Lib/stringprep.py`
 
 --------------
 
-When identifying things (such as host names) in the internet, it is often
-necessary to compare such identifications for "equality". Exactly how this
-comparison is executed may depend on the application domain, e.g. whether it
-should be case-insensitive or not. It may be also necessary to restrict the
-possible identifications, to allow only identifications consisting of
-"printable" characters.
+Khi xác định các đối tượng (chẳng hạn như tên máy chủ) trên Internet, thường cần so sánh các định danh đó để xác định "bằng nhau". Cách thực hiện chính xác việc so sánh này có thể phụ thuộc vào miền ứng dụng, chẳng hạn như có phân biệt chữ hoa chữ thường hay không. Cũng có thể cần giới hạn các định danh được phép, chỉ cho phép những định danh gồm các ký tự "in được".
 
-:rfc:`3454` defines a procedure for "preparing" Unicode strings in internet
-protocols. Before passing strings onto the wire, they are processed with the
-preparation procedure, after which they have a certain normalized form. The RFC
-defines a set of tables, which can be combined into profiles. Each profile must
-define which tables it uses, and what other optional parts of the ``stringprep``
-procedure are part of the profile. One example of a ``stringprep`` profile is
-``nameprep``, which is used for internationalized domain names.
+:rfc:`3454` định nghĩa một quy trình "chuẩn bị" các chuỗi Unicode trong các giao thức Internet. Trước khi truyền các chuỗi qua mạng, chúng được xử lý bằng quy trình chuẩn bị, sau đó có một dạng chuẩn hóa nhất định. RFC định nghĩa một tập hợp các bảng, có thể kết hợp thành các profile. Mỗi profile phải định nghĩa những bảng mà nó sử dụng và những phần tùy chọn nào khác của quy trình ``stringprep`` thuộc về profile đó. Một ví dụ về profile ``stringprep`` là ``nameprep``, được sử dụng cho các tên miền quốc tế hóa.
 
-The module :mod:`!stringprep` only exposes the tables from :rfc:`3454`. As these
-tables would be very large to represent as dictionaries or lists, the
-module uses the Unicode character database internally. The module source code
-itself was generated using the ``mkstringprep.py`` utility.
+Module :mod:`!stringprep` chỉ cung cấp các bảng từ :rfc:`3454`. Vì các bảng này sẽ rất lớn nếu biểu diễn dưới dạng dictionary hoặc list, module sử dụng cơ sở dữ liệu ký tự Unicode ở bên trong. Chính mã nguồn của module được tạo bằng tiện ích ``mkstringprep.py``.
 
-As a result, these tables are exposed as functions, not as data structures.
-There are two kinds of tables in the RFC: sets and mappings. For a set,
-:mod:`!stringprep` provides the "characteristic function", i.e. a function that
-returns ``True`` if the parameter is part of the set. For mappings, it provides the
-mapping function: given the key, it returns the associated value. Below is a
-list of all functions available in the module.
+Do đó, các bảng này được cung cấp dưới dạng hàm, không phải cấu trúc dữ liệu. RFC có hai loại bảng: tập hợp và ánh xạ. Đối với một tập hợp,
+:mod:`!stringprep` cung cấp “hàm đặc trưng”, tức là một hàm trả về ``True`` nếu tham số thuộc tập hợp. Đối với các ánh xạ, nó cung cấp hàm ánh xạ: khi nhận khóa, hàm trả về giá trị tương ứng. Dưới đây là danh sách tất cả các hàm có trong module.
 
 
 .. function:: in_table_a1(code)
 
-   Determine whether *code* is in tableA.1 (Unassigned code points in Unicode 3.2).
+   Xác định xem *code* có nằm trong bảngA.1 (Các điểm mã chưa được gán trong Unicode 3.2) hay không.
 
 
 .. function:: in_table_b1(code)
 
-   Determine whether *code* is in tableB.1 (Commonly mapped to nothing).
+   Xác định xem *code* có nằm trong bảngB.1 (Thường được ánh xạ thành không có gì) hay không.
 
 
 .. function:: map_table_b2(code)
 
-   Return the mapped value for *code* according to tableB.2 (Mapping for
-   case-folding used with NFKC).
+   Trả về giá trị được ánh xạ cho *code* theo bảngB.2 (Ánh xạ để folding chữ hoa chữ thường được sử dụng cùng với NFKC).
 
 
 .. function:: map_table_b3(code)
 
-   Return the mapped value for *code* according to tableB.3 (Mapping for
-   case-folding used with no normalization).
+   Trả về giá trị được ánh xạ cho *code* theo bảngB.3 (Ánh xạ để folding chữ hoa chữ thường được sử dụng mà không chuẩn hóa).
 
 
 .. function:: in_table_c11(code)
 
-   Determine whether *code* is in tableC.1.1  (ASCII space characters).
+   Xác định xem *code* có nằm trong bảngC.1.1  (Các ký tự khoảng trắng ASCII) hay không.
 
 
 .. function:: in_table_c12(code)
 
-   Determine whether *code* is in tableC.1.2  (Non-ASCII space characters).
+   Xác định xem *code* có nằm trong bảngC.1.2  (Các ký tự khoảng trắng không phải ASCII) hay không.
 
 
 .. function:: in_table_c11_c12(code)
 
-   Determine whether *code* is in tableC.1  (Space characters, union of C.1.1 and
-   C.1.2).
+   Xác định xem *code* có nằm trong tableC.1 (Ký tự khoảng trắng, hợp của C.1.1 và C.1.2) hay không.
 
 
 .. function:: in_table_c21(code)
 
-   Determine whether *code* is in tableC.2.1  (ASCII control characters).
+   Xác định xem *code* có nằm trong tableC.2.1 (Các ký tự điều khiển ASCII) hay không.
 
 
 .. function:: in_table_c22(code)
 
-   Determine whether *code* is in tableC.2.2  (Non-ASCII control characters).
+   Xác định xem *code* có nằm trong tableC.2.2 (Các ký tự điều khiển không phải ASCII) hay không.
 
 
 .. function:: in_table_c21_c22(code)
 
-   Determine whether *code* is in tableC.2  (Control characters, union of C.2.1 and
-   C.2.2).
+   Xác định xem *code* có nằm trong tableC.2 (Các ký tự điều khiển, hợp của C.2.1 và C.2.2) hay không.
 
 
 .. function:: in_table_c3(code)
 
-   Determine whether *code* is in tableC.3  (Private use).
+   Xác định xem *code* có nằm trong tableC.3 (Vùng sử dụng riêng) hay không.
 
 
 .. function:: in_table_c4(code)
 
-   Determine whether *code* is in tableC.4  (Non-character code points).
+   Xác định xem *code* có nằm trong tableC.4 (Các điểm mã không phải ký tự) hay không.
 
 
 .. function:: in_table_c5(code)
 
-   Determine whether *code* is in tableC.5  (Surrogate codes).
+   Xác định xem *code* có nằm trong tableC.5 (Các mã surrogate) hay không.
 
 
 .. function:: in_table_c6(code)
 
-   Determine whether *code* is in tableC.6  (Inappropriate for plain text).
+   Xác định xem *code* có nằm trong tableC.6 (Không phù hợp với văn bản thuần túy).
 
 
 .. function:: in_table_c7(code)
 
-   Determine whether *code* is in tableC.7  (Inappropriate for canonical
-   representation).
+   Xác định xem *code* có nằm trong tableC.7 (Không phù hợp với biểu diễn chuẩn tắc).
 
 
 .. function:: in_table_c8(code)
 
-   Determine whether *code* is in tableC.8  (Change display properties or are
-   deprecated).
+   Xác định xem *code* có nằm trong tableC.8 (Thay đổi thuộc tính hiển thị hoặc đã lỗi thời).
 
 
 .. function:: in_table_c9(code)
 
-   Determine whether *code* is in tableC.9  (Tagging characters).
+   Xác định xem *code* có nằm trong tableC.9 (Ký tự gắn thẻ).
 
 
 .. function:: in_table_d1(code)
 
-   Determine whether *code* is in tableD.1  (Characters with bidirectional property
-   "R" or "AL").
+   Xác định xem *code* có nằm trong tableD.1 (Các ký tự có thuộc tính hai chiều "R" hoặc "AL").
 
 
 .. function:: in_table_d2(code)
 
-   Determine whether *code* is in tableD.2  (Characters with bidirectional property
-   "L").
+   Xác định xem *code* có nằm trong tableD.2 (Các ký tự có thuộc tính hai chiều "L").
 

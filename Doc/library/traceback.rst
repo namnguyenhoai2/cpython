@@ -1,577 +1,435 @@
-:mod:`!traceback` --- Print or retrieve a stack traceback
-=========================================================
+:mod:`!traceback` --- In hoặc truy xuất traceback của ngăn xếp
+==============================================================
 
 .. module:: traceback
-   :synopsis: Print or retrieve a stack traceback.
+   :synopsis: In hoặc truy xuất traceback của ngăn xếp.
 
-**Source code:** :source:`Lib/traceback.py`
+**Mã nguồn:** :source:`Lib/traceback.py`
 
 --------------
 
-This module provides a standard interface to extract, format and print
-stack traces of Python programs. It is more flexible than the
-interpreter's default traceback display, and therefore makes it
-possible to configure certain aspects of the output. Finally,
-it contains a utility for capturing enough information about an
-exception to print it later, without the need to save a reference
-to the actual exception. Since exceptions can be the roots of large
-objects graph, this utility can significantly improve
-memory management.
+Mô-đun này cung cấp một giao diện chuẩn để trích xuất, định dạng và in các stack trace của chương trình Python. Mô-đun này linh hoạt hơn cách trình thông dịch hiển thị traceback theo mặc định, do đó cho phép cấu hình một số khía cạnh của đầu ra. Cuối cùng, mô-đun này chứa một tiện ích để thu thập đủ thông tin về một exception nhằm in thông tin đó sau này mà không cần lưu tham chiếu đến chính exception đó. Vì các exception có thể là gốc của một đồ thị đối tượng lớn, tiện ích này có thể cải thiện đáng kể việc quản lý bộ nhớ.
 
 .. index:: pair: object; traceback
 
-The module uses :ref:`traceback objects <traceback-objects>` --- these are
-objects of type :class:`types.TracebackType`,
-which are assigned to the :attr:`~BaseException.__traceback__` field of
-:class:`BaseException` instances.
+Mô-đun sử dụng các :ref:`đối tượng traceback <traceback-objects>` --- đây là các đối tượng thuộc kiểu :class:`types.TracebackType`, được gán cho trường :attr:`~BaseException.__traceback__` của
+:class:`BaseException` các instance.
 
 .. seealso::
 
-   Module :mod:`faulthandler`
-      Used to dump Python tracebacks explicitly, on a fault, after a timeout, or on a user signal.
+   Mô-đun :mod:`faulthandler`
+      Dùng để kết xuất rõ ràng các traceback của Python khi xảy ra lỗi, sau một khoảng thời gian chờ hoặc khi nhận tín hiệu từ người dùng.
 
-   Module :mod:`pdb`
-      Interactive source code debugger for Python programs.
+   Mô-đun :mod:`pdb`
+      Trình debugger mã nguồn tương tác dành cho các chương trình Python.
 
-The module's API can be divided into two parts:
+API của mô-đun có thể được chia thành hai phần:
 
-* Module-level functions offering basic functionality, which are useful for interactive
-  inspection of exceptions and tracebacks.
+* Các hàm cấp mô-đun cung cấp chức năng cơ bản, hữu ích để kiểm tra tương tác các exception và traceback.
 
-* :class:`TracebackException` class and its helper classes
-  :class:`StackSummary` and :class:`FrameSummary`. These offer both more
-  flexibility in the output generated and the ability to store the information
-  necessary for later formatting without holding references to actual exception
-  and traceback objects.
+* Lớp :class:`TracebackException` và các lớp trợ giúp của nó
+  :class:`StackSummary` và :class:`FrameSummary`. Các thành phần này vừa cung cấp nhiều tính linh hoạt hơn trong đầu ra được tạo, vừa cho phép lưu trữ thông tin cần thiết để định dạng sau này mà không phải giữ tham chiếu đến các đối tượng exception và traceback thực tế.
 
 .. versionadded:: 3.13
-   Output is colorized by default and can be
-   :ref:`controlled using environment variables <using-on-controlling-color>`.
+   Theo mặc định, đầu ra được tô màu và có thể được
+   :ref:`điều khiển bằng các biến môi trường <using-on-controlling-color>`.
 
 
-Module-Level Functions
-----------------------
+Các hàm cấp mô-đun
+------------------
 
 .. function:: print_tb(tb, limit=None, file=None)
 
-   Print up to *limit* stack trace entries from
-   :ref:`traceback object <traceback-objects>` *tb* (starting
-   from the caller's frame) if *limit* is positive.  Otherwise, print the last
-   ``abs(limit)`` entries.  If *limit* is omitted or ``None``, all entries are
-   printed.  If *file* is omitted or ``None``, the output goes to
-   :data:`sys.stderr`; otherwise it should be an open
-   :term:`file <file object>` or :term:`file-like object` to
-   receive the output.
+   In tối đa *limit* mục trong dấu vết ngăn xếp từ
+   :ref:`đối tượng traceback <traceback-objects>` *tb* (bắt đầu từ frame của caller) nếu *limit* là số dương. Nếu không, in các mục cuối cùng ``abs(limit)``. Nếu *limit* bị bỏ qua hoặc là ``None``, tất cả các mục sẽ được in. Nếu *file* bị bỏ qua hoặc là ``None``, đầu ra sẽ được chuyển đến
+   :data:`sys.stderr`; nếu không, đó phải là một tệp đang mở
+   :term:`file <file object>` hoặc :term:`file-like object` để nhận đầu ra.
 
    .. note::
 
-      The meaning of the *limit* parameter is different than the meaning
-      of :const:`sys.tracebacklimit`. A negative *limit* value corresponds to
-      a positive value of :const:`!sys.tracebacklimit`, whereas the behaviour of
-      a positive *limit* value cannot be achieved with
+      Ý nghĩa của tham số *limit* khác với ý nghĩa của :const:`sys.tracebacklimit`. Một giá trị *limit* âm tương ứng với một giá trị dương của :const:`!sys.tracebacklimit`, trong khi không thể đạt được hành vi của một giá trị *limit* dương bằng
       :const:`!sys.tracebacklimit`.
 
    .. versionchanged:: 3.5
-       Added negative *limit* support.
+       Đã bổ sung hỗ trợ *limit* âm.
 
 
 .. function:: print_exception(exc, /[, value, tb], limit=None, \
                               file=None, chain=True)
 
-   Print exception information and stack trace entries from
-   :ref:`traceback object <traceback-objects>`
-   *tb* to *file*. This differs from :func:`print_tb` in the following
-   ways:
+   In thông tin về ngoại lệ và các mục trong stack trace từ
+   :ref:`đối tượng traceback <traceback-objects>` *tb* đến *file*. Điều này khác với :func:`print_tb` theo những cách sau:
 
-   * if *tb* is not ``None``, it prints a header ``Traceback (most recent
-     call last):``
+   * nếu *tb* không phải là ``None``, hàm sẽ in một tiêu đề ``Traceback (most recent call last):``
 
-   * it prints the exception type and *value* after the stack trace
+   * in kiểu ngoại lệ và *value* sau stack trace
 
    .. index:: single: ^ (caret); marker
 
-   * if *type(value)* is :exc:`SyntaxError` and *value* has the appropriate
-     format, it prints the line where the syntax error occurred with a caret
-     indicating the approximate position of the error.
+   * nếu *type(value)* là :exc:`SyntaxError` và *value* có định dạng phù hợp, nó sẽ in dòng xảy ra lỗi cú pháp với dấu mũ chỉ vị trí gần đúng của lỗi.
 
-   Since Python 3.10, instead of passing *value* and *tb*, an exception object
-   can be passed as the first argument. If *value* and *tb* are provided, the
-   first argument is ignored in order to provide backwards compatibility.
+   Kể từ Python 3.10, thay vì truyền *value* và *tb*, bạn có thể truyền một đối tượng exception làm đối số đầu tiên. Nếu cung cấp *value* và *tb*, đối số đầu tiên sẽ bị bỏ qua để đảm bảo khả năng tương thích ngược.
 
-   The optional *limit* argument has the same meaning as for :func:`print_tb`.
-   If *chain* is true (the default), then chained exceptions (the
-   :attr:`~BaseException.__cause__` or :attr:`~BaseException.__context__`
-   attributes of the exception) will be
-   printed as well, like the interpreter itself does when printing an unhandled
-   exception.
+   Đối số tùy chọn *limit* có cùng ý nghĩa như đối với :func:`print_tb`. Nếu *chain* là true (mặc định), các exception được liên kết (the
+   :attr:`~BaseException.__cause__` hoặc :attr:`~BaseException.__context__` của exception) cũng sẽ được in, giống như chính interpreter khi in một exception chưa được xử lý.
 
    .. versionchanged:: 3.5
-      The *etype* argument is ignored and inferred from the type of *value*.
+      Đối số *etype* bị bỏ qua và được suy ra từ kiểu của *value*.
 
    .. versionchanged:: 3.10
-      The *etype* parameter has been renamed to *exc* and is now
-      positional-only.
+      Tham số *etype* đã được đổi tên thành *exc* và hiện chỉ được truyền theo vị trí.
 
 
 .. function:: print_exc(limit=None, file=None, chain=True)
 
-   This is a shorthand for ``print_exception(sys.exception(), limit=limit, file=file,
-   chain=chain)``.
+   Đây là cách viết tắt của ``print_exception(sys.exception(), limit=limit, file=file, chain=chain)``.
 
 
 .. function:: print_last(limit=None, file=None, chain=True)
 
-   This is a shorthand for ``print_exception(sys.last_exc, limit=limit, file=file,
-   chain=chain)``.  In general it will work only after an exception has reached
-   an interactive prompt (see :data:`sys.last_exc`).
+   Đây là cách viết tắt của ``print_exception(sys.last_exc, limit=limit, file=file, chain=chain)``.  Nhìn chung, cách này chỉ hoạt động sau khi một exception đã đến interactive prompt (xem :data:`sys.last_exc`).
 
 
 .. function:: print_stack(f=None, limit=None, file=None)
 
-   Print up to *limit* stack trace entries (starting from the invocation
-   point) if *limit* is positive.  Otherwise, print the last ``abs(limit)``
-   entries.  If *limit* is omitted or ``None``, all entries are printed.
-   The optional *f* argument can be used to specify an alternate
-   :ref:`stack frame <frame-objects>`
-   to start.  The optional *file* argument has the same meaning as for
+   In tối đa *limit* mục stack trace (bắt đầu từ điểm gọi) nếu *limit* là số dương.  Nếu không, in ``abs(limit)`` mục cuối cùng.  Nếu *limit* bị bỏ qua hoặc là ``None``, tất cả các mục sẽ được in. Có thể sử dụng đối số tùy chọn *f* để chỉ định một
+   :ref:`stack frame <frame-objects>` thay thế để bắt đầu.  Đối số tùy chọn *file* có cùng ý nghĩa như đối số của
    :func:`print_tb`.
 
    .. versionchanged:: 3.5
-          Added negative *limit* support.
+          Đã bổ sung hỗ trợ *limit* âm.
 
 
 .. function:: extract_tb(tb, limit=None)
 
-   Return a :class:`StackSummary` object representing a list of "pre-processed"
-   stack trace entries extracted from the
-   :ref:`traceback object <traceback-objects>` *tb*.  It is useful
-   for alternate formatting of stack traces.  The optional *limit* argument has
-   the same meaning as for :func:`print_tb`.  A "pre-processed" stack trace
-   entry is a :class:`FrameSummary` object with attributes representing the
-   information that is usually printed for a stack trace.
+   Trả về một đối tượng :class:`StackSummary` đại diện cho danh sách các mục stack trace đã được "tiền xử lý", được trích xuất từ
+   :ref:`traceback object <traceback-objects>` *tb*.  Đối tượng này hữu ích khi cần định dạng stack trace theo cách khác.  Đối số tùy chọn *limit* có cùng ý nghĩa như đối số của :func:`print_tb`.  Một mục stack trace đã được "tiền xử lý" là một đối tượng :class:`FrameSummary` có các thuộc tính biểu diễn thông tin thường được in cho một stack trace.
 
 
 .. function:: extract_stack(f=None, limit=None)
 
-   Extract the raw traceback from the current
-   :ref:`stack frame <frame-objects>`.  The return value has
-   the same format as for :func:`extract_tb`.  The optional *f* and *limit*
-   arguments have the same meaning as for :func:`print_stack`.
+   Trích xuất traceback thô từ
+   :ref:`stack frame <frame-objects>`. Giá trị trả về có cùng định dạng như đối với :func:`extract_tb`. Các đối số tùy chọn *f* và *limit* có cùng ý nghĩa như đối với :func:`print_stack`.
 
 
 .. function:: print_list(extracted_list, file=None)
 
-   Print the list of tuples as returned by :func:`extract_tb` or
-   :func:`extract_stack` as a formatted stack trace to the given file.
-   If *file* is ``None``, the output is written to :data:`sys.stderr`.
+   In danh sách các tuple như được trả về bởi :func:`extract_tb` hoặc
+   :func:`extract_stack` dưới dạng một stack trace được định dạng vào tệp được chỉ định. Nếu *file* là ``None``, đầu ra sẽ được ghi vào :data:`sys.stderr`.
 
 
 .. function:: format_list(extracted_list)
 
-   Given a list of tuples or :class:`FrameSummary` objects as returned by
-   :func:`extract_tb` or :func:`extract_stack`, return a list of strings ready
-   for printing.  Each string in the resulting list corresponds to the item with
-   the same index in the argument list.  Each string ends in a newline; the
-   strings may contain internal newlines as well, for those items whose source
-   text line is not ``None``.
+   Với một danh sách các tuple hoặc các đối tượng :class:`FrameSummary` như được trả về bởi
+   :func:`extract_tb` hoặc :func:`extract_stack`, trả về một danh sách các chuỗi sẵn sàng để in. Mỗi chuỗi trong danh sách kết quả tương ứng với mục có cùng chỉ mục trong danh sách đối số. Mỗi chuỗi kết thúc bằng một dòng mới; các chuỗi cũng có thể chứa những dòng mới bên trong, đối với những mục có dòng văn bản nguồn không phải là ``None``.
 
 
 .. function:: format_exception_only(exc, /[, value], *, show_group=False)
 
-   Format the exception part of a traceback using an exception value such as
-   given by :data:`sys.last_exc`.  The return value is a list of strings, each
-   ending in a newline.  The list contains the exception's message, which is
-   normally a single string; however, for :exc:`SyntaxError` exceptions, it
-   contains several lines that (when printed) display detailed information
-   about where the syntax error occurred. Following the message, the list
-   contains the exception's :attr:`notes <BaseException.__notes__>`.
+   Định dạng phần exception của một traceback bằng một giá trị exception, chẳng hạn như giá trị được cung cấp bởi :data:`sys.last_exc`. Giá trị trả về là một danh sách các chuỗi, mỗi chuỗi kết thúc bằng một dòng mới. Danh sách này chứa thông báo của exception, thường là một chuỗi đơn; tuy nhiên, đối với các exception :exc:`SyntaxError`, danh sách chứa nhiều dòng, khi được in ra sẽ hiển thị thông tin chi tiết về vị trí xảy ra lỗi cú pháp. Sau thông báo, danh sách chứa :attr:`notes <BaseException.__notes__>` của exception.
 
-   Since Python 3.10, instead of passing *value*, an exception object
-   can be passed as the first argument.  If *value* is provided, the first
-   argument is ignored in order to provide backwards compatibility.
+   Kể từ Python 3.10, thay vì truyền *value*, có thể truyền một đối tượng exception làm đối số đầu tiên. Nếu cung cấp *value*, đối số đầu tiên sẽ bị bỏ qua để duy trì khả năng tương thích ngược.
 
-   When *show_group* is ``True``, and the exception is an instance of
-   :exc:`BaseExceptionGroup`, the nested exceptions are included as
-   well, recursively, with indentation relative to their nesting depth.
+   Khi *show_group* là ``True``, và ngoại lệ là một thể hiện của
+   :exc:`BaseExceptionGroup`, các ngoại lệ lồng nhau cũng được bao gồm theo cách đệ quy, với mức thụt lề tương ứng với độ sâu lồng nhau của chúng.
 
    .. versionchanged:: 3.10
-      The *etype* parameter has been renamed to *exc* and is now
-      positional-only.
+      Tham số *etype* đã được đổi tên thành *exc* và hiện chỉ được truyền theo vị trí.
 
    .. versionchanged:: 3.11
-      The returned list now includes any
-      :attr:`notes <BaseException.__notes__>` attached to the exception.
+      Danh sách được trả về giờ đây bao gồm mọi
+      :attr:`notes <BaseException.__notes__>` được đính kèm với ngoại lệ.
 
    .. versionchanged:: 3.13
-      *show_group* parameter was added.
+      Đã thêm tham số *show_group*.
 
 
 .. function:: format_exception(exc, /[, value, tb], limit=None, chain=True)
 
-   Format a stack trace and the exception information.  The arguments  have the
-   same meaning as the corresponding arguments to :func:`print_exception`.  The
-   return value is a list of strings, each ending in a newline and some
-   containing internal newlines.  When these lines are concatenated and printed,
-   exactly the same text is printed as does :func:`print_exception`.
+   Định dạng stack trace và thông tin ngoại lệ. Các đối số có cùng ý nghĩa với những đối số tương ứng của :func:`print_exception`. Giá trị trả về là một danh sách các chuỗi, mỗi chuỗi kết thúc bằng một dòng mới và một số chuỗi chứa các dòng mới bên trong. Khi các dòng này được nối lại và in ra, chính xác cùng một văn bản được in ra như khi gọi :func:`print_exception`.
 
    .. versionchanged:: 3.5
-      The *etype* argument is ignored and inferred from the type of *value*.
+      Đối số *etype* bị bỏ qua và được suy ra từ kiểu của *value*.
 
    .. versionchanged:: 3.10
-      This function's behavior and signature were modified to match
+      Hành vi và chữ ký của hàm này đã được sửa đổi để khớp với
       :func:`print_exception`.
 
 
 .. function:: format_exc(limit=None, chain=True)
 
-   This is like ``print_exc(limit)`` but returns a string instead of printing to
-   a file.
+   Tương tự như ``print_exc(limit)`` nhưng trả về một chuỗi thay vì in ra tệp.
 
 
 .. function:: format_tb(tb, limit=None)
 
-   A shorthand for ``format_list(extract_tb(tb, limit))``.
+   Cách viết tắt của ``format_list(extract_tb(tb, limit))``.
 
 
 .. function:: format_stack(f=None, limit=None)
 
-   A shorthand for ``format_list(extract_stack(f, limit))``.
+   Cách viết tắt của ``format_list(extract_stack(f, limit))``.
 
 .. function:: clear_frames(tb)
 
-   Clears the local variables of all the stack frames in a
-   :ref:`traceback <traceback-objects>` *tb*
-   by calling the :meth:`~frame.clear` method of each
-   :ref:`frame object <frame-objects>`.
+   Xóa các biến cục bộ của tất cả các khung ngăn xếp trong một
+   :ref:`traceback <traceback-objects>` *tb* bằng cách gọi phương thức :meth:`~frame.clear` của mỗi
+   :ref:`đối tượng frame <frame-objects>`.
 
    .. versionadded:: 3.4
 
 .. function:: walk_stack(f)
 
-   Walk a stack following :attr:`f.f_back <frame.f_back>` from the given frame,
-   yielding the frame
-   and line number for each frame. If *f* is ``None``, the current stack is
-   used. This helper is used with :meth:`StackSummary.extract`.
+   Duyệt qua một stack theo :attr:`f.f_back <frame.f_back>` từ frame đã cho, trả về frame và số dòng cho từng frame. Nếu *f* là ``None``, stack hiện tại sẽ được sử dụng. Helper này được dùng với :meth:`StackSummary.extract`.
 
    .. versionadded:: 3.5
 
    .. versionchanged:: 3.14
-      This function previously returned a generator that would walk the stack
-      when first iterated over. The generator returned now is the state of the
-      stack when ``walk_stack`` is called.
+      Trước đây, hàm này trả về một generator sẽ duyệt qua stack khi được lặp lần đầu. Generator được trả về hiện nay chứa trạng thái của stack tại thời điểm ``walk_stack`` được gọi.
 
 .. function:: walk_tb(tb)
 
-   Walk a traceback following :attr:`~traceback.tb_next` yielding the frame and
-   line number
-   for each frame. This helper is used with :meth:`StackSummary.extract`.
+   Duyệt qua một traceback theo :attr:`~traceback.tb_next`, trả về frame và số dòng cho từng frame. Helper này được dùng với :meth:`StackSummary.extract`.
 
    .. versionadded:: 3.5
 
 
-:class:`!TracebackException` Objects
-------------------------------------
+:class:`!TracebackException` Đối tượng
+--------------------------------------
 
 .. versionadded:: 3.5
 
-:class:`!TracebackException` objects are created from actual exceptions to
-capture data for later printing.  They offer a more lightweight method of
-storing this information by avoiding holding references to
-:ref:`traceback<traceback-objects>` and :ref:`frame<frame-objects>` objects.
-In addition, they expose more options to configure the output compared to
-the module-level functions described above.
+:class:`!TracebackException` được tạo từ các exception thực tế để thu thập dữ liệu cho việc in sau này. Chúng cung cấp một phương thức nhẹ hơn để lưu trữ thông tin này bằng cách tránh giữ tham chiếu đến
+:ref:`traceback <traceback-objects>` và :ref:`frame <frame-objects>`. Ngoài ra, chúng cung cấp nhiều tùy chọn hơn để cấu hình đầu ra so với các hàm cấp module được mô tả ở trên.
 
 .. class:: TracebackException(exc_type, exc_value, exc_traceback, *, limit=None, lookup_lines=True, capture_locals=False, compact=False, max_group_width=15, max_group_depth=10)
 
-   Capture an exception for later rendering. The meaning of *limit*,
-   *lookup_lines* and *capture_locals* are as for the :class:`StackSummary`
-   class.
+   Ghi lại một exception để kết xuất sau. Ý nghĩa của *limit*, *lookup_lines* và *capture_locals* giống như đối với lớp :class:`StackSummary`.
 
-   If *compact* is true, only data that is required by
-   :class:`!TracebackException`'s :meth:`format` method
-   is saved in the class attributes. In particular, the
-   :attr:`__context__` field is calculated only if :attr:`__cause__` is
-   ``None`` and :attr:`__suppress_context__` is false.
+   Nếu *compact* là true, chỉ dữ liệu cần thiết cho
+   Phương thức :meth:`format` của :class:`!TracebackException` được lưu trong các thuộc tính của lớp. Cụ thể,
+   Trường :attr:`__context__` chỉ được tính nếu :attr:`__cause__` là ``None`` và :attr:`__suppress_context__` là false.
 
-   Note that when locals are captured, they are also shown in the traceback.
+   Lưu ý rằng khi các biến cục bộ được ghi lại, chúng cũng được hiển thị trong traceback.
 
-   *max_group_width* and *max_group_depth* control the formatting of exception
-   groups (see :exc:`BaseExceptionGroup`). The depth refers to the nesting
-   level of the group, and the width refers to the size of a single exception
-   group's exceptions array. The formatted output is truncated when either
-   limit is exceeded.
+   *max_group_width* và *max_group_depth* kiểm soát việc định dạng các exception group (xem :exc:`BaseExceptionGroup`). Độ sâu đề cập đến cấp độ lồng nhau của group, còn chiều rộng đề cập đến kích thước của mảng exceptions thuộc một exception group. Kết quả được định dạng sẽ bị cắt bớt khi vượt quá một trong hai giới hạn.
 
    .. versionchanged:: 3.10
-      Added the *compact* parameter.
+      Đã thêm tham số *compact*.
 
    .. versionchanged:: 3.11
-      Added the *max_group_width* and *max_group_depth* parameters.
+      Đã thêm các tham số *max_group_width* và *max_group_depth*.
 
    .. attribute:: __cause__
 
-      A :class:`!TracebackException` of the original
+      Một :class:`!TracebackException` của đối tượng ban đầu
       :attr:`~BaseException.__cause__`.
 
    .. attribute:: __context__
 
-      A :class:`!TracebackException` of the original
+      Một :class:`!TracebackException` của đối tượng ban đầu
       :attr:`~BaseException.__context__`.
 
    .. attribute:: exceptions
 
-      If ``self`` represents an :exc:`ExceptionGroup`, this field holds a list of
-      :class:`!TracebackException` instances representing the nested exceptions.
-      Otherwise it is ``None``.
+      Nếu ``self`` đại diện cho một :exc:`ExceptionGroup`, trường này chứa một danh sách
+      các thực thể :class:`!TracebackException` đại diện cho những ngoại lệ lồng nhau. Nếu không, nó là ``None``.
 
       .. versionadded:: 3.11
 
    .. attribute:: __suppress_context__
 
-      The :attr:`~BaseException.__suppress_context__` value from the original
-      exception.
+      Giá trị :attr:`~BaseException.__suppress_context__` từ ngoại lệ ban đầu.
 
    .. attribute:: __notes__
 
-      The :attr:`~BaseException.__notes__` value from the original exception,
-      or ``None``
-      if the exception does not have any notes. If it is not ``None``
-      is it formatted in the traceback after the exception string.
+      Giá trị :attr:`~BaseException.__notes__` từ ngoại lệ ban đầu, hoặc ``None`` nếu ngoại lệ không có ghi chú nào. Nếu nó không phải là ``None``, nó sẽ được định dạng trong traceback sau chuỗi ngoại lệ.
 
       .. versionadded:: 3.11
 
    .. attribute:: stack
 
-      A :class:`StackSummary` representing the traceback.
+      Một :class:`StackSummary` biểu diễn traceback.
 
    .. attribute:: exc_type
 
-      The class of the original exception.
+      Lớp của exception ban đầu.
 
       .. deprecated:: 3.13
 
    .. attribute:: exc_type_str
 
-      String display of the class of the original exception.
+      Hiển thị dưới dạng chuỗi của lớp exception ban đầu.
 
       .. versionadded:: 3.13
 
    .. attribute:: filename
 
-      For syntax errors - the file name where the error occurred.
+      Đối với lỗi cú pháp - tên tệp nơi xảy ra lỗi.
 
    .. attribute:: lineno
 
-      For syntax errors - the line number where the error occurred.
+      Đối với lỗi cú pháp - số dòng nơi xảy ra lỗi.
 
    .. attribute:: end_lineno
 
-      For syntax errors - the end line number where the error occurred.
-      Can be ``None`` if not present.
+      Đối với lỗi cú pháp - số dòng kết thúc nơi xảy ra lỗi. Có thể là ``None`` nếu không có.
 
       .. versionadded:: 3.10
 
    .. attribute:: text
 
-      For syntax errors - the text where the error occurred.
+      Đối với lỗi cú pháp - văn bản tại nơi xảy ra lỗi.
 
    .. attribute:: offset
 
-      For syntax errors - the offset into the text where the error occurred.
+      Đối với lỗi cú pháp - offset trong văn bản tại vị trí xảy ra lỗi.
 
    .. attribute:: end_offset
 
-      For syntax errors - the end offset into the text where the error occurred.
-      Can be ``None`` if not present.
+      Đối với lỗi cú pháp - offset kết thúc trong văn bản tại vị trí xảy ra lỗi. Có thể là ``None`` nếu không có.
 
       .. versionadded:: 3.10
 
    .. attribute:: msg
 
-      For syntax errors - the compiler error message.
+      Đối với lỗi cú pháp - thông báo lỗi của compiler.
 
    .. classmethod:: from_exception(exc, *, limit=None, lookup_lines=True, capture_locals=False, compact=False, max_group_width=15, max_group_depth=10)
 
-      Capture an exception for later rendering. *limit*, *lookup_lines* and
-      *capture_locals* are as for the :class:`StackSummary` class.
+      Ghi lại một exception để kết xuất sau. *limit*, *lookup_lines* và *capture_locals* giống như đối với class :class:`StackSummary`.
 
-      Note that when locals are captured, they are also shown in the traceback.
+      Lưu ý rằng khi các biến cục bộ được ghi lại, chúng cũng được hiển thị trong traceback.
 
    .. method::  print(*, file=None, chain=True)
 
-      Print to *file* (default ``sys.stderr``) the exception information returned by
+      In thông tin exception được trả về bởi vào *file* (mặc định là ``sys.stderr``).
       :meth:`format`.
 
       .. versionadded:: 3.11
 
    .. method:: format(*, chain=True)
 
-      Format the exception.
+      Định dạng exception.
 
-      If *chain* is not ``True``, :attr:`__cause__` and :attr:`__context__`
-      will not be formatted.
+      Nếu *chain* không phải là ``True``, :attr:`__cause__` và :attr:`__context__` sẽ không được định dạng.
 
-      The return value is a generator of strings, each ending in a newline and
-      some containing internal newlines. :func:`~traceback.print_exception`
-      is a wrapper around this method which just prints the lines to a file.
+      Giá trị trả về là một generator gồm các chuỗi, mỗi chuỗi kết thúc bằng một ký tự xuống dòng và một số chuỗi có chứa các ký tự xuống dòng bên trong. :func:`~traceback.print_exception` là một wrapper của phương thức này, chỉ thực hiện việc in các dòng vào một tệp.
 
    .. method::  format_exception_only(*, show_group=False)
 
-      Format the exception part of the traceback.
+      Định dạng phần exception của traceback.
 
-      The return value is a generator of strings, each ending in a newline.
+      Giá trị trả về là một generator gồm các chuỗi, mỗi chuỗi kết thúc bằng một ký tự xuống dòng.
 
-      When *show_group* is ``False``, the generator emits the exception's
-      message followed by its notes (if it has any). The exception message
-      is normally a single string; however, for :exc:`SyntaxError` exceptions,
-      it consists of several lines that (when printed) display detailed
-      information about where the syntax error occurred.
+      Khi *show_group* là ``False``, generator sẽ phát ra thông báo của exception, sau đó là các ghi chú của exception đó (nếu có). Thông báo của exception thường là một chuỗi duy nhất; tuy nhiên, đối với các exception :exc:`SyntaxError`, thông báo gồm nhiều dòng mà khi được in ra sẽ hiển thị thông tin chi tiết về vị trí xảy ra lỗi cú pháp.
 
-      When *show_group* is ``True``, and the exception is an instance of
-      :exc:`BaseExceptionGroup`, the nested exceptions are included as
-      well, recursively, with indentation relative to their nesting depth.
+      Khi *show_group* là ``True`` và exception là một instance của
+      :exc:`BaseExceptionGroup`, các exception lồng nhau cũng được đưa vào, theo cách đệ quy, với mức thụt lề tương ứng với độ sâu lồng nhau của chúng.
 
       .. versionchanged:: 3.11
-         The exception's :attr:`notes <BaseException.__notes__>` are now
-         included in the output.
+         :attr:`notes <BaseException.__notes__>` của exception hiện được đưa vào output.
 
       .. versionchanged:: 3.13
-         Added the *show_group* parameter.
+         Đã thêm tham số *show_group*.
 
 
-:class:`!StackSummary` Objects
-------------------------------
+Các đối tượng :class:`!StackSummary`
+------------------------------------
 
 .. versionadded:: 3.5
 
-:class:`!StackSummary` objects represent a call stack ready for formatting.
+Các đối tượng :class:`!StackSummary` đại diện cho một call stack sẵn sàng để format.
 
 .. class:: StackSummary
 
    .. classmethod:: extract(frame_gen, *, limit=None, lookup_lines=True, capture_locals=False)
 
-      Construct a :class:`!StackSummary` object from a frame generator (such as
-      is returned by :func:`~traceback.walk_stack` or
+      Tạo một đối tượng :class:`!StackSummary` từ trình tạo frame (chẳng hạn như trình được trả về bởi :func:`~traceback.walk_stack` hoặc
       :func:`~traceback.walk_tb`).
 
-      If *limit* is supplied, only this many frames are taken from *frame_gen*.
-      If *lookup_lines* is ``False``, the returned :class:`FrameSummary`
-      objects will not have read their lines in yet, making the cost of
-      creating the :class:`!StackSummary` cheaper (which may be valuable if it
-      may not actually get formatted). If *capture_locals* is ``True`` the
-      local variables in each :class:`!FrameSummary` are captured as object
-      representations.
+      Nếu cung cấp *limit*, chỉ số frame này được lấy từ *frame_gen*. Nếu *lookup_lines* là ``False``, các đối tượng :class:`FrameSummary` được trả về sẽ chưa đọc các dòng của chúng, giúp giảm chi phí tạo :class:`!StackSummary` (điều này có thể hữu ích nếu đối tượng có thể không thực sự được format). Nếu *capture_locals* là ``True``, các biến cục bộ trong mỗi :class:`!FrameSummary` sẽ được ghi lại dưới dạng biểu diễn đối tượng.
 
       .. versionchanged:: 3.12
-         Exceptions raised from :func:`repr` on a local variable (when
-         *capture_locals* is ``True``) are no longer propagated to the caller.
+         Các exception phát sinh từ :func:`repr` trên một biến cục bộ (khi *capture_locals* là ``True``) không còn được truyền tiếp đến caller.
 
    .. classmethod:: from_list(a_list)
 
-      Construct a :class:`!StackSummary` object from a supplied list of
-      :class:`FrameSummary` objects or old-style list of tuples.  Each tuple
-      should be a 4-tuple with *filename*, *lineno*, *name*, *line* as the
-      elements.
+      Tạo một đối tượng :class:`!StackSummary` từ một danh sách được cung cấp gồm
+      Các đối tượng :class:`FrameSummary` hoặc danh sách tuple kiểu cũ. Mỗi tuple phải là một tuple gồm 4 phần tử, lần lượt là *filename*, *lineno*, *name* và *line*.
 
    .. method:: format()
 
-      Returns a list of strings ready for printing.  Each string in the
-      resulting list corresponds to a single :ref:`frame <frame-objects>` from
-      the stack.
-      Each string ends in a newline; the strings may contain internal
-      newlines as well, for those items with source text lines.
+      Trả về một danh sách các chuỗi sẵn sàng để in. Mỗi chuỗi trong danh sách kết quả tương ứng với một :ref:`frame <frame-objects>` duy nhất từ stack. Mỗi chuỗi kết thúc bằng một ký tự xuống dòng; các chuỗi cũng có thể chứa những ký tự xuống dòng bên trong, đối với các mục có dòng văn bản nguồn.
 
-      For long sequences of the same frame and line, the first few
-      repetitions are shown, followed by a summary line stating the exact
-      number of further repetitions.
+      Đối với các chuỗi dài gồm cùng frame và dòng, một vài lần lặp đầu tiên sẽ được hiển thị, sau đó là một dòng tóm tắt cho biết chính xác số lần lặp tiếp theo.
 
       .. versionchanged:: 3.6
-         Long sequences of repeated frames are now abbreviated.
+         Các chuỗi frame lặp lại dài hiện được rút gọn.
 
    .. method:: format_frame_summary(frame_summary)
 
-      Returns a string for printing one of the :ref:`frames <frame-objects>`
-      involved in the stack.
-      This method is called for each :class:`FrameSummary` object to be
-      printed by :meth:`StackSummary.format`. If it returns ``None``, the
-      frame is omitted from the output.
+      Trả về một chuỗi để in một trong các :ref:`frames <frame-objects>` có trong stack. Phương thức này được gọi cho từng đối tượng :class:`FrameSummary` cần được in bởi :meth:`StackSummary.format`. Nếu trả về ``None``, frame sẽ được bỏ qua trong đầu ra.
 
       .. versionadded:: 3.11
 
 
-:class:`!FrameSummary` Objects
-------------------------------
+:class:`!FrameSummary` Đối tượng
+--------------------------------
 
 .. versionadded:: 3.5
 
-A :class:`!FrameSummary` object represents a single :ref:`frame <frame-objects>`
-in a :ref:`traceback <traceback-objects>`.
+Một đối tượng :class:`!FrameSummary` biểu diễn một :ref:`frame <frame-objects>` duy nhất trong một :ref:`traceback <traceback-objects>`.
 
 .. class:: FrameSummary(filename, lineno, name, *,\
-                        lookup_line=True, locals=None,\
-                        line=None, end_lineno=None, colno=None, end_colno=None)
+                        lookup_line=True, locals=None,\ line=None, end_lineno=None, colno=None, end_colno=None)
 
-   Represents a single :ref:`frame <frame-objects>` in the
-   :ref:`traceback <traceback-objects>` or stack that is being formatted
-   or printed. It may optionally have a stringified version of the frame's
-   locals included in it. If *lookup_line* is ``False``, the source code is not
-   looked up until the :class:`!FrameSummary` has the :attr:`~FrameSummary.line`
-   attribute accessed (which also happens when casting it to a :class:`tuple`).
-   :attr:`~FrameSummary.line` may be directly provided, and will prevent line
-   lookups happening at all. *locals* is an optional local variable
-   mapping, and if supplied the variable representations are stored in the
-   summary for later display.
+   Biểu diễn một :ref:`frame <frame-objects>` duy nhất trong
+   :ref:`traceback <traceback-objects>` hoặc stack đang được định dạng hoặc in ra. Đối tượng này có thể tùy chọn chứa phiên bản được chuyển thành chuỗi của các biến cục bộ của frame. Nếu *lookup_line* là ``False``, mã nguồn sẽ không được tra cứu cho đến khi thuộc tính :attr:`~FrameSummary.line` của :class:`!FrameSummary` được truy cập (điều này cũng xảy ra khi chuyển nó thành một :class:`tuple`).
+   :attr:`~FrameSummary.line` có thể được cung cấp trực tiếp và sẽ ngăn hoàn toàn việc tra cứu dòng. *locals* là một ánh xạ biến cục bộ tùy chọn; nếu được cung cấp, các biểu diễn của biến sẽ được lưu trong bản tóm tắt để hiển thị sau.
 
-   :class:`!FrameSummary` instances have the following attributes:
+   Các instance :class:`!FrameSummary` có những thuộc tính sau:
 
    .. attribute:: FrameSummary.filename
 
-      The filename of the source code for this frame. Equivalent to accessing
-      :attr:`f.f_code.co_filename <codeobject.co_filename>` on a
-      :ref:`frame object <frame-objects>` *f*.
+      Tên tệp của mã nguồn cho frame này. Tương đương với việc truy cập
+      :attr:`f.f_code.co_filename <codeobject.co_filename>` trên một
+      :ref:`đối tượng frame <frame-objects>` *f*.
 
    .. attribute:: FrameSummary.lineno
 
-      The line number of the source code for this frame.
+      Số dòng của mã nguồn cho frame này.
 
    .. attribute:: FrameSummary.name
 
-      Equivalent to accessing :attr:`f.f_code.co_name <codeobject.co_name>` on
-      a :ref:`frame object <frame-objects>` *f*.
+      Tương đương với việc truy cập :attr:`f.f_code.co_name <codeobject.co_name>` trên một :ref:`đối tượng frame <frame-objects>` *f*.
 
    .. attribute:: FrameSummary.line
 
-      A string representing the source code for this frame, with leading and
-      trailing whitespace stripped.
-      If the source is not available, it is ``None``.
+      Một chuỗi đại diện cho mã nguồn của frame này, trong đó khoảng trắng ở đầu và cuối đã được loại bỏ. Nếu không có mã nguồn, giá trị là ``None``.
 
    .. attribute:: FrameSummary.end_lineno
 
-      The last line number of the source code for this frame.
-      By default, it is set to ``lineno`` and indexation starts from 1.
+      Số dòng cuối cùng của mã nguồn cho frame này. Theo mặc định, giá trị này được đặt thành ``lineno`` và việc đánh số bắt đầu từ 1.
 
       .. versionchanged:: 3.13
-         The default value changed from ``None`` to ``lineno``.
+         Giá trị mặc định đã thay đổi từ ``None`` thành ``lineno``.
 
    .. attribute:: FrameSummary.colno
 
-      The column number of the source code for this frame.
-      By default, it is ``None`` and indexation starts from 0.
+      Số cột của mã nguồn cho frame này. Theo mặc định, giá trị là ``None`` và việc đánh chỉ mục bắt đầu từ 0.
 
    .. attribute:: FrameSummary.end_colno
 
-      The last column number of the source code for this frame.
-      By default, it is ``None`` and indexation starts from 0.
+      Số cột cuối cùng của mã nguồn cho frame này. Theo mặc định, giá trị là ``None`` và việc đánh chỉ mục bắt đầu từ 0.
 
 
 .. _traceback-example:
 
-Examples of Using the Module-Level Functions
---------------------------------------------
+Ví dụ về cách sử dụng các hàm cấp mô-đun
+----------------------------------------
 
-This simple example implements a basic read-eval-print loop, similar to (but
-less useful than) the standard Python interactive interpreter loop.  For a more
-complete implementation of the interpreter loop, refer to the :mod:`code`
-module. ::
+Ví dụ đơn giản này triển khai một vòng lặp đọc-đánh giá-in cơ bản, tương tự như vòng lặp trình thông dịch tương tác Python tiêu chuẩn (nhưng kém hữu ích hơn). Để xem cách triển khai đầy đủ hơn của vòng lặp trình thông dịch, hãy tham khảo mô-đun :mod:`code`.::
 
    import sys, traceback
 
@@ -590,8 +448,7 @@ module. ::
        run_user_code(envdir)
 
 
-The following example demonstrates the different ways to print and format the
-exception and traceback:
+Ví dụ sau đây minh họa các cách khác nhau để in và định dạng exception và traceback:
 
 .. testcode::
 
@@ -624,7 +481,7 @@ exception and traceback:
        print(repr(traceback.format_tb(exc.__traceback__)))
        print("*** tb_lineno:", exc.__traceback__.tb_lineno)
 
-The output for the example would look similar to this:
+Kết quả của ví dụ sẽ có dạng tương tự như sau:
 
 .. testoutput::
    :options: +NORMALIZE_WHITESPACE
@@ -671,7 +528,7 @@ The output for the example would look similar to this:
    *** tb_lineno: 10
 
 
-The following example shows the different ways to print and format the stack::
+Ví dụ sau đây trình bày các cách khác nhau để in và định dạng stack::
 
    >>> import traceback
    >>> def another_function():
@@ -697,7 +554,7 @@ The following example shows the different ways to print and format the stack::
     '  File "<doctest>", line 8, in lumberstack\n    print(repr(traceback.format_stack()))\n']
 
 
-This last example demonstrates the final few formatting functions:
+Ví dụ cuối cùng này minh họa một vài hàm định dạng cuối cùng:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -712,10 +569,10 @@ This last example demonstrates the final few formatting functions:
    ['IndexError: tuple index out of range\n']
 
 
-Examples of Using :class:`TracebackException`
----------------------------------------------
+Ví dụ về việc sử dụng :class:`TracebackException`
+-------------------------------------------------
 
-With the helper class, we have more options::
+Với lớp trợ giúp, chúng ta có thêm nhiều tùy chọn::
 
    >>> import sys
    >>> from traceback import TracebackException
@@ -740,7 +597,7 @@ With the helper class, we have more options::
    ... except Exception as e:
    ...     chained_exc = e
    ...
-   >>> # limit works as with the module-level functions
+   >>> # limit hoạt động giống như trong các hàm cấp mô-đun
    >>> TracebackException.from_exception(exc, limit=-2).print()
    Traceback (most recent call last):
      File "<python-input-1>", line 6, in lumberjack
@@ -751,7 +608,7 @@ With the helper class, we have more options::
               ~^^^
    IndexError: tuple index out of range
 
-   >>> # capture_locals adds local variables in frames
+   >>> # capture_locals thêm các biến cục bộ trong các frame
    >>> TracebackException.from_exception(exc, limit=-2, capture_locals=True).print()
    Traceback (most recent call last):
      File "<python-input-1>", line 6, in lumberjack
@@ -763,8 +620,8 @@ With the helper class, we have more options::
        t = ("bright", "side", "of", "life")
    IndexError: tuple index out of range
 
-   >>> # The *chain* kwarg to print() controls whether chained
-   >>> # exceptions are displayed
+   >>> # kwarg *chain* truyền cho print() kiểm soát việc các exception liên kết có được
+   >>> # hiển thị hay không
    >>> TracebackException.from_exception(chained_exc).print()
    Traceback (most recent call last):
      File "<python-input-19>", line 4, in <module>

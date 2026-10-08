@@ -1,15 +1,12 @@
-:mod:`!xmlrpc` --- XMLRPC server and client modules
-===================================================
+:mod:`!xmlrpc` --- các module server và client XMLRPC
+=====================================================
 
 .. module:: xmlrpc
-   :synopsis: Server and client modules implementing XML-RPC.
+   :synopsis: Các module server và client triển khai XML-RPC.
 
-XML-RPC is a Remote Procedure Call method that uses XML passed via HTTP as a
-transport.  With it, a client can call methods with parameters on a remote
-server (the server is named by a URI) and get back structured data.
+XML-RPC là một phương thức Remote Procedure Call sử dụng XML được truyền qua HTTP làm phương tiện truyền tải. Với phương thức này, client có thể gọi các method kèm tham số trên một server từ xa (server được xác định bằng một URI) và nhận lại dữ liệu có cấu trúc.
 
-``xmlrpc`` is a package that collects server and client modules implementing
-XML-RPC.  The modules are:
+``xmlrpc`` là một package tập hợp các module server và client triển khai XML-RPC. Các module gồm:
 
 * :mod:`xmlrpc.client`
 * :mod:`xmlrpc.server`

@@ -1,48 +1,41 @@
-:mod:`!tracemalloc` --- Trace memory allocations
-================================================
+:mod:`!tracemalloc` --- tracemalloc --- Theo dõi các cấp phát bộ nhớ
+====================================================================
 
 .. module:: tracemalloc
-   :synopsis: Trace memory allocations.
+   :synopsis: Theo dõi các cấp phát bộ nhớ.
 
 .. versionadded:: 3.4
 
-**Source code:** :source:`Lib/tracemalloc.py`
+**Mã nguồn:** :source:`Lib/tracemalloc.py`
 
 --------------
 
-The tracemalloc module is a debug tool to trace memory blocks allocated by
-Python. It provides the following information:
+Module tracemalloc là một công cụ debug dùng để theo dõi các khối bộ nhớ được Python cấp phát. Module này cung cấp các thông tin sau:
 
-* Traceback where an object was allocated
-* Statistics on allocated memory blocks per filename and per line number:
-  total size, number and average size of allocated memory blocks
-* Compute the differences between two snapshots to detect memory leaks
+* Traceback tại nơi một đối tượng được cấp phát
+* Thống kê về các khối bộ nhớ đã cấp phát theo tên tệp và số dòng: tổng kích thước, số lượng và kích thước trung bình của các khối bộ nhớ đã cấp phát
+* Tính toán sự khác biệt giữa hai snapshot để phát hiện memory leak
 
-To trace most memory blocks allocated by Python, the module should be started
-as early as possible by setting the :envvar:`PYTHONTRACEMALLOC` environment
-variable to ``1``, or by using :option:`-X` ``tracemalloc`` command line
-option. The :func:`tracemalloc.start` function can be called at runtime to
-start tracing Python memory allocations.
+Để theo dõi hầu hết các khối bộ nhớ được Python cấp phát, mô-đun này nên được khởi động sớm nhất có thể bằng cách đặt biến môi trường :envvar:`PYTHONTRACEMALLOC` thành ``1``, hoặc sử dụng tùy chọn dòng lệnh :option:`-X` ``tracemalloc``. Có thể gọi hàm :func:`tracemalloc.start` trong runtime để bắt đầu theo dõi các lần cấp phát bộ nhớ của Python.
 
-By default, a trace of an allocated memory block only stores the most recent
-frame (1 frame). To store 25 frames at startup: set the
-:envvar:`PYTHONTRACEMALLOC` environment variable to ``25``, or use the
-:option:`-X` ``tracemalloc=25`` command line option.
+Theo mặc định, một bản theo dõi khối bộ nhớ đã cấp phát chỉ lưu frame gần nhất (1 frame). Để lưu 25 frame khi khởi động: đặt
+biến môi trường :envvar:`PYTHONTRACEMALLOC` thành ``25``, hoặc sử dụng
+tùy chọn dòng lệnh :option:`-X` ``tracemalloc=25``.
 
 
-Examples
---------
+Ví dụ
+-----
 
-Display the top 10
-^^^^^^^^^^^^^^^^^^
+Hiển thị 10 mục đầu
+^^^^^^^^^^^^^^^^^^^
 
-Display the 10 files allocating the most memory::
+Hiển thị 10 tệp cấp phát nhiều bộ nhớ nhất::
 
     import tracemalloc
 
     tracemalloc.start()
 
-    # ... run your application ...
+    # ... chạy ứng dụng của bạn ...
 
     snapshot = tracemalloc.take_snapshot()
     top_stats = snapshot.statistics('lineno')
@@ -52,7 +45,7 @@ Display the 10 files allocating the most memory::
         print(stat)
 
 
-Example of output of the Python test suite::
+Ví dụ về đầu ra của bộ kiểm thử Python::
 
     [ Top 10 ]
     <frozen importlib._bootstrap>:716: size=4855 KiB, count=39328, average=126 B
@@ -66,24 +59,23 @@ Example of output of the Python test suite::
     <string>:5: size=49.7 KiB, count=148, average=344 B
     /usr/lib/python3.4/sysconfig.py:411: size=48.0 KiB, count=1, average=48.0 KiB
 
-We can see that Python loaded ``4855 KiB`` data (bytecode and constants) from
-modules and that the :mod:`collections` module allocated ``244 KiB`` to build
-:class:`~collections.namedtuple` types.
+Ta có thể thấy Python đã tải dữ liệu ``4855 KiB`` (bytecode và các hằng số) từ các module, còn module :mod:`collections` đã cấp phát ``244 KiB`` để xây dựng
+các kiểu :class:`~collections.namedtuple`.
 
-See :meth:`Snapshot.statistics` for more options.
+Xem :meth:`Snapshot.statistics` để biết thêm tùy chọn.
 
 
-Compute differences
-^^^^^^^^^^^^^^^^^^^
+Tính toán các khác biệt
+^^^^^^^^^^^^^^^^^^^^^^^
 
-Take two snapshots and display the differences::
+Chụp hai snapshot và hiển thị các khác biệt::
 
     import tracemalloc
     tracemalloc.start()
-    # ... start your application ...
+    # ... khởi chạy ứng dụng của bạn ...
 
     snapshot1 = tracemalloc.take_snapshot()
-    # ... call the function leaking memory ...
+    # ... gọi hàm gây rò rỉ bộ nhớ ...
     snapshot2 = tracemalloc.take_snapshot()
 
     top_stats = snapshot2.compare_to(snapshot1, 'lineno')
@@ -92,7 +84,7 @@ Take two snapshots and display the differences::
     for stat in top_stats[:10]:
         print(stat)
 
-Example of output before/after running some tests of the Python test suite::
+Ví dụ về kết quả trước và sau khi chạy một số kiểm thử của bộ kiểm thử Python::
 
     [ Top 10 differences ]
     <frozen importlib._bootstrap>:716: size=8173 KiB (+4428 KiB), count=71332 (+39369), average=117 B
@@ -106,39 +98,34 @@ Example of output before/after running some tests of the Python test suite::
     /usr/lib/python3.4/urllib/parse.py:476: size=71.8 KiB (+71.8 KiB), count=969 (+969), average=76 B
     /usr/lib/python3.4/contextlib.py:38: size=67.2 KiB (+67.2 KiB), count=126 (+126), average=546 B
 
-We can see that Python has loaded ``8173 KiB`` of module data (bytecode and
-constants), and that this is ``4428 KiB`` more than had been loaded before the
-tests, when the previous snapshot was taken. Similarly, the :mod:`linecache`
-module has cached ``940 KiB`` of Python source code to format tracebacks, all
-of it since the previous snapshot.
+Ta có thể thấy Python đã tải ``8173 KiB`` của mô-đun data (bytecode và các hằng số), và lượng này ``4428 KiB`` so với lượng đã được tải trước khi chạy các kiểm thử, khi snapshot trước đó được tạo. Tương tự, mô-đun :mod:`linecache` đã lưu vào bộ nhớ đệm ``940 KiB`` mã nguồn Python để định dạng traceback, tất cả đều xảy ra kể từ snapshot trước đó.
 
-If the system has little free memory, snapshots can be written on disk using
-the :meth:`Snapshot.dump` method to analyze the snapshot offline. Then use the
-:meth:`Snapshot.load` method reload the snapshot.
+Nếu hệ thống có ít bộ nhớ trống, bạn có thể ghi snapshot vào đĩa bằng phương thức :meth:`Snapshot.dump` để phân tích snapshot ngoại tuyến. Sau đó, hãy sử dụng
+phương thức :meth:`Snapshot.load` để tải lại snapshot.
 
 
-Get the traceback of a memory block
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Lấy traceback của một khối bộ nhớ
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Code to display the traceback of the biggest memory block::
+Mã để hiển thị traceback của khối bộ nhớ lớn nhất::
 
     import tracemalloc
 
-    # Store 25 frames
+    # Lưu 25 frame
     tracemalloc.start(25)
 
-    # ... run your application ...
+    # ... chạy ứng dụng của bạn ...
 
     snapshot = tracemalloc.take_snapshot()
     top_stats = snapshot.statistics('traceback')
 
-    # pick the biggest memory block
+    # chọn khối bộ nhớ lớn nhất
     stat = top_stats[0]
     print("%s memory blocks: %.1f KiB" % (stat.count, stat.size / 1024))
     for line in stat.traceback.format():
         print(line)
 
-Example of output of the Python test suite (traceback limited to 25 frames)::
+Ví dụ về đầu ra của bộ kiểm thử Python (traceback được giới hạn ở 25 frame)::
 
     903 memory blocks: 870.1 KiB
       File "<frozen importlib._bootstrap>", line 716
@@ -175,18 +162,13 @@ Example of output of the Python test suite (traceback limited to 25 frames)::
       File "/usr/lib/python3.4/runpy.py", line 160
         "__main__", fname, loader, pkg_name)
 
-We can see that the most memory was allocated in the :mod:`importlib` module to
-load data (bytecode and constants) from modules: ``870.1 KiB``. The traceback is
-where the :mod:`importlib` loaded data most recently: on the ``import pdb``
-line of the :mod:`doctest` module. The traceback may change if a new module is
-loaded.
+Ta có thể thấy rằng phần lớn bộ nhớ được cấp phát trong module :mod:`importlib` để tải dữ liệu (bytecode và hằng số) từ các module: ``870.1 KiB``. Traceback cho biết nơi :mod:`importlib` tải dữ liệu gần đây nhất: trên dòng ``import pdb`` của module :mod:`doctest`. Traceback có thể thay đổi nếu một module mới được tải.
 
 
-Pretty top
+Top dễ đọc
 ^^^^^^^^^^
 
-Code to display the 10 lines allocating the most memory with a pretty output,
-ignoring ``<frozen importlib._bootstrap>`` and ``<unknown>`` files::
+Mã để hiển thị 10 dòng cấp phát nhiều bộ nhớ nhất với đầu ra đẹp mắt, bỏ qua các tệp ``<frozen importlib._bootstrap>`` và ``<unknown>``::
 
     import linecache
     import os
@@ -217,12 +199,12 @@ ignoring ``<frozen importlib._bootstrap>`` and ``<unknown>`` files::
 
     tracemalloc.start()
 
-    # ... run your application ...
+    # ... chạy ứng dụng của bạn ...
 
     snapshot = tracemalloc.take_snapshot()
     display_top(snapshot)
 
-Example of output of the Python test suite::
+Ví dụ về đầu ra của bộ kiểm thử Python::
 
     Top 10 lines
     #1: Lib/base64.py:414: 419.8 KiB
@@ -247,29 +229,25 @@ Example of output of the Python test suite::
     6220 other: 3602.8 KiB
     Total allocated size: 5303.1 KiB
 
-See :meth:`Snapshot.statistics` for more options.
+Xem :meth:`Snapshot.statistics` để biết thêm tùy chọn.
 
-Record the current and peak size of all traced memory blocks
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Ghi lại kích thước hiện tại và kích thước cực đại của tất cả các khối bộ nhớ được theo dõi
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The following code computes two sums like ``0 + 1 + 2 + ...`` inefficiently, by
-creating a list of those numbers. This list consumes a lot of memory
-temporarily. We can use :func:`get_traced_memory` and :func:`reset_peak` to
-observe the small memory usage after the sum is computed as well as the peak
-memory usage during the computations::
+Đoạn mã sau tính hai tổng như ``0 + 1 + 2 + ...`` một cách không hiệu quả bằng cách tạo một danh sách chứa các số đó. Danh sách này tạm thời chiếm rất nhiều bộ nhớ. Chúng ta có thể sử dụng :func:`get_traced_memory` và :func:`reset_peak` để quan sát mức sử dụng bộ nhớ nhỏ sau khi tính tổng, cũng như mức sử dụng bộ nhớ cực đại trong quá trình tính toán::
 
   import tracemalloc
 
   tracemalloc.start()
 
-  # Example code: compute a sum with a large temporary list
+  # Mã ví dụ: tính một tổng bằng danh sách tạm thời lớn
   large_sum = sum(list(range(100000)))
 
   first_size, first_peak = tracemalloc.get_traced_memory()
 
   tracemalloc.reset_peak()
 
-  # Example code: compute a sum with a small temporary list
+  # Mã ví dụ: tính một tổng bằng danh sách tạm thời nhỏ
   small_sum = sum(list(range(1000)))
 
   second_size, second_peak = tracemalloc.get_traced_memory()
@@ -277,146 +255,114 @@ memory usage during the computations::
   print(f"{first_size=}, {first_peak=}")
   print(f"{second_size=}, {second_peak=}")
 
-Output::
+Kết quả::
 
   first_size=664, first_peak=3592984
   second_size=804, second_peak=29704
 
-Using :func:`reset_peak` ensured we could accurately record the peak during the
-computation of ``small_sum``, even though it is much smaller than the overall
-peak size of memory blocks since the :func:`start` call. Without the call to
-:func:`reset_peak`, ``second_peak`` would still be the peak from the
-computation ``large_sum`` (that is, equal to ``first_peak``). In this case,
-both peaks are much higher than the final memory usage, and which suggests we
-could optimise (by removing the unnecessary call to :class:`list`, and writing
-``sum(range(...))``).
+Việc sử dụng :func:`reset_peak` đảm bảo chúng ta có thể ghi lại chính xác mức cực đại trong quá trình tính ``small_sum``, mặc dù mức này nhỏ hơn nhiều so với kích thước cực đại tổng thể của các khối bộ nhớ kể từ lần gọi :func:`start`. Nếu không gọi
+:func:`reset_peak`, ``second_peak`` vẫn sẽ là mức cực đại từ phép tính ``large_sum`` (nghĩa là bằng ``first_peak``). Trong trường hợp này, cả hai mức cực đại đều cao hơn nhiều so với mức sử dụng bộ nhớ cuối cùng, cho thấy chúng ta có thể tối ưu hóa (bằng cách loại bỏ lệnh gọi không cần thiết đến :class:`list` và viết ``sum(range(...))``).
 
 API
 ---
 
-Functions
-^^^^^^^^^
+Các hàm
+^^^^^^^
 
 .. function:: clear_traces()
 
-   Clear traces of memory blocks allocated by Python.
+   Xóa dấu vết của các khối bộ nhớ được Python cấp phát.
 
-   See also :func:`stop`.
+   Xem thêm :func:`stop`.
 
 
 .. function:: get_object_traceback(obj)
 
-   Get the traceback where the Python object *obj* was allocated.
-   Return a :class:`Traceback` instance, or ``None`` if the :mod:`!tracemalloc`
-   module is not tracing memory allocations or did not trace the allocation of
-   the object.
+   Lấy traceback tại đó đối tượng Python *obj* được cấp phát. Trả về một thực thể :class:`Traceback`, hoặc ``None`` nếu module :mod:`!tracemalloc` không theo dõi việc cấp phát bộ nhớ hoặc không theo dõi việc cấp phát đối tượng.
 
-   See also :func:`gc.get_referrers` and :func:`sys.getsizeof` functions.
+   Xem thêm các hàm :func:`gc.get_referrers` và :func:`sys.getsizeof`.
 
 
 .. function:: get_traceback_limit()
 
-   Get the maximum number of frames stored in the traceback of a trace.
+   Lấy số lượng frame tối đa được lưu trong traceback của một trace.
 
-   The :mod:`!tracemalloc` module must be tracing memory allocations to
-   get the limit, otherwise an exception is raised.
+   Mô-đun :mod:`!tracemalloc` phải đang theo dõi việc cấp phát bộ nhớ để lấy giới hạn; nếu không, một ngoại lệ sẽ được đưa ra.
 
-   The limit is set by the :func:`start` function.
+   Giới hạn được thiết lập bởi hàm :func:`start`.
 
 
 .. function:: get_traced_memory()
 
-   Get the current size and peak size of memory blocks traced by the
-   :mod:`!tracemalloc` module as a tuple: ``(current: int, peak: int)``.
+   Lấy kích thước hiện tại và kích thước cực đại của các khối bộ nhớ được theo dõi bởi
+   mô-đun :mod:`!tracemalloc` dưới dạng tuple: ``(current: int, peak: int)``.
 
 
 .. function:: reset_peak()
 
-   Set the peak size of memory blocks traced by the :mod:`!tracemalloc` module
-   to the current size.
+   Đặt kích thước cực đại của các khối bộ nhớ được theo dõi bởi mô-đun :mod:`!tracemalloc` thành kích thước hiện tại.
 
-   Do nothing if the :mod:`!tracemalloc` module is not tracing memory
-   allocations.
+   Không thực hiện thao tác nào nếu mô-đun :mod:`!tracemalloc` không theo dõi việc cấp phát bộ nhớ.
 
-   This function only modifies the recorded peak size, and does not modify or
-   clear any traces, unlike :func:`clear_traces`. Snapshots taken with
-   :func:`take_snapshot` before a call to :func:`reset_peak` can be
-   meaningfully compared to snapshots taken after the call.
+   Hàm này chỉ sửa đổi kích thước cực đại đã ghi nhận, không sửa đổi hoặc xóa bất kỳ dấu vết nào, không giống như :func:`clear_traces`. Các snapshot được tạo bằng
+   :func:`take_snapshot` trước một lần gọi :func:`reset_peak` có thể được so sánh một cách có ý nghĩa với các snapshot được chụp sau lần gọi đó.
 
-   See also :func:`get_traced_memory`.
+   Xem thêm :func:`get_traced_memory`.
 
    .. versionadded:: 3.9
 
 
 .. function:: get_tracemalloc_memory()
 
-   Get the memory usage in bytes of the :mod:`!tracemalloc` module used to store
-   traces of memory blocks.
-   Return an :class:`int`.
+   Lấy mức sử dụng bộ nhớ tính bằng byte của module :mod:`!tracemalloc` được dùng để lưu trữ các dấu vết của các khối bộ nhớ. Trả về một :class:`int`.
 
 
 .. function:: is_tracing()
 
-    ``True`` if the :mod:`!tracemalloc` module is tracing Python memory
-    allocations, ``False`` otherwise.
+    ``True`` nếu module :mod:`!tracemalloc` đang theo dõi việc cấp phát bộ nhớ Python, nếu không thì ``False``.
 
-    See also :func:`start` and :func:`stop` functions.
+    Xem thêm các hàm :func:`start` và :func:`stop`.
 
 
 .. function:: start(nframe: int=1)
 
-   Start tracing Python memory allocations: install hooks on Python memory
-   allocators. Collected tracebacks of traces will be limited to *nframe*
-   frames. By default, a trace of a memory block only stores the most recent
-   frame: the limit is ``1``. *nframe* must be greater or equal to ``1``.
+   Bắt đầu theo dõi việc cấp phát bộ nhớ Python: cài đặt các hook trên các bộ cấp phát bộ nhớ Python. Các traceback được thu thập từ các dấu vết sẽ bị giới hạn ở *nframe* frame. Theo mặc định, một dấu vết của một khối bộ nhớ chỉ lưu frame gần nhất: giới hạn là ``1``. *nframe* phải lớn hơn hoặc bằng ``1``.
 
-   You can still read the original number of total frames that composed the
-   traceback by looking at the :attr:`Traceback.total_nframe` attribute.
+   Bạn vẫn có thể đọc số frame tổng ban đầu cấu thành traceback bằng cách xem thuộc tính :attr:`Traceback.total_nframe`.
 
-   Storing more than ``1`` frame is only useful to compute statistics grouped
-   by ``'traceback'`` or to compute cumulative statistics: see the
-   :meth:`Snapshot.compare_to` and :meth:`Snapshot.statistics` methods.
+   Việc lưu trữ nhiều hơn ``1`` frame chỉ hữu ích để tính các thống kê được nhóm theo ``'traceback'`` hoặc để tính các thống kê tích lũy: xem
+   các phương thức :meth:`Snapshot.compare_to` và :meth:`Snapshot.statistics`.
 
-   Storing more frames increases the memory and CPU overhead of the
-   :mod:`!tracemalloc` module. Use the :func:`get_tracemalloc_memory` function
-   to measure how much memory is used by the :mod:`!tracemalloc` module.
+   Lưu trữ nhiều frame hơn sẽ làm tăng chi phí bộ nhớ và CPU của
+   module :mod:`!tracemalloc`. Sử dụng hàm :func:`get_tracemalloc_memory` để đo lượng bộ nhớ được module :mod:`!tracemalloc` sử dụng.
 
-   The :envvar:`PYTHONTRACEMALLOC` environment variable
-   (``PYTHONTRACEMALLOC=NFRAME``) and the :option:`-X` ``tracemalloc=NFRAME``
-   command line option can be used to start tracing at startup.
+   Có thể sử dụng biến môi trường :envvar:`PYTHONTRACEMALLOC` (``PYTHONTRACEMALLOC=NFRAME``) và tùy chọn dòng lệnh :option:`-X` ``tracemalloc=NFRAME`` để bắt đầu tracing khi khởi động.
 
-   See also :func:`stop`, :func:`is_tracing` and :func:`get_traceback_limit`
-   functions.
+   Xem thêm các hàm :func:`stop`, :func:`is_tracing` và :func:`get_traceback_limit`.
 
 
 .. function:: stop()
 
-   Stop tracing Python memory allocations: uninstall hooks on Python memory
-   allocators. Also clears all previously collected traces of memory blocks
-   allocated by Python.
+   Dừng tracing các cấp phát bộ nhớ Python: gỡ cài đặt các hook trên các bộ cấp phát bộ nhớ Python. Đồng thời xóa tất cả các trace đã thu thập trước đó của những block bộ nhớ được Python cấp phát.
 
-   Call :func:`take_snapshot` function to take a snapshot of traces before
-   clearing them.
+   Gọi hàm :func:`take_snapshot` để chụp ảnh các dấu vết trước khi xóa chúng.
 
-   See also :func:`start`, :func:`is_tracing` and :func:`clear_traces`
-   functions.
+   Xem thêm các hàm :func:`start`, :func:`is_tracing` và :func:`clear_traces`.
 
 
 .. function:: take_snapshot()
 
-   Take a snapshot of traces of memory blocks allocated by Python. Return a new
-   :class:`Snapshot` instance.
+   Chụp ảnh các dấu vết của những khối bộ nhớ được Python cấp phát. Trả về một
+   đối tượng :class:`Snapshot` mới.
 
-   The snapshot does not include memory blocks allocated before the
-   :mod:`!tracemalloc` module started to trace memory allocations.
+   Ảnh chụp không bao gồm các khối bộ nhớ được cấp phát trước khi mô-đun
+   :mod:`!tracemalloc` bắt đầu theo dõi việc cấp phát bộ nhớ.
 
-   Tracebacks of traces are limited to :func:`get_traceback_limit` frames. Use
-   the *nframe* parameter of the :func:`start` function to store more frames.
+   Traceback của các dấu vết được giới hạn ở :func:`get_traceback_limit` frame. Sử dụng tham số *nframe* của hàm :func:`start` để lưu thêm frame.
 
-   The :mod:`!tracemalloc` module must be tracing memory allocations to take a
-   snapshot, see the :func:`start` function.
+   Mô-đun :mod:`!tracemalloc` phải đang theo dõi các lần cấp phát bộ nhớ để chụp snapshot; xem hàm :func:`start`.
 
-   See also the :func:`get_object_traceback` function.
+   Xem thêm hàm :func:`get_object_traceback`.
 
 
 DomainFilter
@@ -424,84 +370,74 @@ DomainFilter
 
 .. class:: DomainFilter(inclusive: bool, domain: int)
 
-   Filter traces of memory blocks by their address space (domain).
+   Lọc các trace của khối bộ nhớ theo không gian địa chỉ (domain) của chúng.
 
    .. versionadded:: 3.6
 
    .. attribute:: inclusive
 
-      If *inclusive* is ``True`` (include), match memory blocks allocated
-      in the address space :attr:`domain`.
+      Nếu *inclusive* là ``True`` (bao gồm), khớp với các khối bộ nhớ được cấp phát trong không gian địa chỉ :attr:`domain`.
 
-      If *inclusive* is ``False`` (exclude), match memory blocks not allocated
-      in the address space :attr:`domain`.
+      Nếu *inclusive* là ``False`` (loại trừ), khớp với các khối bộ nhớ không được cấp phát trong không gian địa chỉ :attr:`domain`.
 
    .. attribute:: domain
 
-      Address space of a memory block (``int``). Read-only property.
+      Không gian địa chỉ của một khối bộ nhớ (``int``). Thuộc tính chỉ đọc.
 
 
-Filter
+Bộ lọc
 ^^^^^^
 
 .. class:: Filter(inclusive: bool, filename_pattern: str, lineno: int=None, all_frames: bool=False, domain: int=None)
 
-   Filter on traces of memory blocks.
+   Lọc các trace của các block bộ nhớ.
 
-   See the :func:`fnmatch.fnmatch` function for the syntax of
-   *filename_pattern*. The ``'.pyc'`` file extension is
-   replaced with ``'.py'``.
+   Xem hàm :func:`fnmatch.fnmatch` để biết cú pháp của *filename_pattern*. Phần mở rộng tệp ``'.pyc'`` được thay thế bằng ``'.py'``.
 
-   Examples:
+   Ví dụ:
 
-   * ``Filter(True, subprocess.__file__)`` only includes traces of the
-     :mod:`subprocess` module
-   * ``Filter(False, tracemalloc.__file__)`` excludes traces of the
-     :mod:`!tracemalloc` module
-   * ``Filter(False, "<unknown>")`` excludes empty tracebacks
+   * ``Filter(True, subprocess.__file__)`` chỉ bao gồm các trace của
+     :mod:`subprocess` mô-đun
+   * ``Filter(False, tracemalloc.__file__)`` loại trừ các trace của
+     mô-đun :mod:`!tracemalloc`
+   * ``Filter(False, "<unknown>")`` loại trừ các traceback rỗng
 
 
    .. versionchanged:: 3.5
-      The ``'.pyo'`` file extension is no longer replaced with ``'.py'``.
+      Phần mở rộng tệp ``'.pyo'`` không còn được thay thế bằng ``'.py'``.
 
    .. versionchanged:: 3.6
-      Added the :attr:`domain` attribute.
+      Đã thêm thuộc tính :attr:`domain`.
 
 
    .. attribute:: domain
 
-      Address space of a memory block (``int`` or ``None``).
+      Không gian địa chỉ của một khối bộ nhớ (``int`` hoặc ``None``).
 
-      tracemalloc uses the domain ``0`` to trace memory allocations made by
-      Python. C extensions can use other domains to trace other resources.
+      tracemalloc sử dụng domain ``0`` để theo dõi các lần cấp phát bộ nhớ do Python thực hiện. Các phần mở rộng C có thể sử dụng các domain khác để theo dõi những tài nguyên khác.
 
    .. attribute:: inclusive
 
-      If *inclusive* is ``True`` (include), only match memory blocks allocated
-      in a file with a name matching :attr:`filename_pattern` at line number
+      Nếu *inclusive* là ``True`` (include), chỉ khớp với các khối bộ nhớ được cấp phát trong một tệp có tên khớp với :attr:`filename_pattern` tại số dòng
       :attr:`lineno`.
 
-      If *inclusive* is ``False`` (exclude), ignore memory blocks allocated in
-      a file with a name matching :attr:`filename_pattern` at line number
+      Nếu *inclusive* là ``False`` (loại trừ), bỏ qua các khối bộ nhớ được cấp phát trong tệp có tên khớp với :attr:`filename_pattern` tại số dòng
       :attr:`lineno`.
 
    .. attribute:: lineno
 
-      Line number (``int``) of the filter. If *lineno* is ``None``, the filter
-      matches any line number.
+      Số dòng (``int``) của bộ lọc. Nếu *lineno* là ``None``, bộ lọc khớp với mọi số dòng.
 
    .. attribute:: filename_pattern
 
-      Filename pattern of the filter (``str``). Read-only property.
+      Mẫu tên tệp của bộ lọc (``str``). Thuộc tính chỉ đọc.
 
    .. attribute:: all_frames
 
-      If *all_frames* is ``True``, all frames of the traceback are checked. If
-      *all_frames* is ``False``, only the most recent frame is checked.
+      Nếu *all_frames* là ``True``, tất cả frame trong traceback đều được kiểm tra. Nếu *all_frames* là ``False``, chỉ frame gần nhất được kiểm tra.
 
-      This attribute has no effect if the traceback limit is ``1``.  See the
-      :func:`get_traceback_limit` function and :attr:`Snapshot.traceback_limit`
-      attribute.
+      Thuộc tính này không có tác dụng nếu giới hạn traceback là ``1``. Xem
+      hàm :func:`get_traceback_limit` và thuộc tính :attr:`Snapshot.traceback_limit`.
 
 
 Frame
@@ -509,17 +445,17 @@ Frame
 
 .. class:: Frame
 
-   Frame of a traceback.
+   Frame của một traceback.
 
-   The :class:`Traceback` class is a sequence of :class:`Frame` instances.
+   Lớp :class:`Traceback` là một chuỗi các instance :class:`Frame`.
 
    .. attribute:: filename
 
-      Filename (``str``).
+      Tên tệp (``str``).
 
    .. attribute:: lineno
 
-      Line number (``int``).
+      Số dòng (``int``).
 
 
 Snapshot
@@ -527,41 +463,33 @@ Snapshot
 
 .. class:: Snapshot
 
-   Snapshot of traces of memory blocks allocated by Python.
+   Snapshot của các dấu vết bộ nhớ do Python cấp phát.
 
-   The :func:`take_snapshot` function creates a snapshot instance.
+   Hàm :func:`take_snapshot` tạo một instance snapshot.
 
    .. method:: compare_to(old_snapshot: Snapshot, key_type: str, cumulative: bool=False)
 
-      Compute the differences with an old snapshot. Get statistics as a sorted
-      list of :class:`StatisticDiff` instances grouped by *key_type*.
+      Tính toán các khác biệt với một snapshot cũ. Nhận thống kê dưới dạng danh sách các đối tượng :class:`StatisticDiff` được sắp xếp và nhóm theo *key_type*.
 
-      See the :meth:`Snapshot.statistics` method for *key_type* and *cumulative*
-      parameters.
+      Xem phương thức :meth:`Snapshot.statistics` để biết về các tham số *key_type* và *cumulative*.
 
-      The result is sorted from the biggest to the smallest by: absolute value
-      of :attr:`StatisticDiff.size_diff`, :attr:`StatisticDiff.size`, absolute
-      value of :attr:`StatisticDiff.count_diff`, :attr:`Statistic.count` and
-      then by :attr:`StatisticDiff.traceback`.
+      Kết quả được sắp xếp từ lớn nhất đến nhỏ nhất theo: giá trị tuyệt đối của :attr:`StatisticDiff.size_diff`, :attr:`StatisticDiff.size`, giá trị tuyệt đối của :attr:`StatisticDiff.count_diff`, :attr:`Statistic.count` và sau đó theo :attr:`StatisticDiff.traceback`.
 
 
    .. method:: dump(filename)
 
-      Write the snapshot into a file.
+      Ghi snapshot vào một tệp.
 
-      Use :meth:`load` to reload the snapshot.
+      Sử dụng :meth:`load` để tải lại snapshot.
 
 
    .. method:: filter_traces(filters)
 
-      Create a new :class:`Snapshot` instance with a filtered :attr:`traces`
-      sequence, *filters* is a list of :class:`DomainFilter` and
-      :class:`Filter` instances.  If *filters* is an empty list, return a new
-      :class:`Snapshot` instance with a copy of the traces.
+      Tạo một đối tượng :class:`Snapshot` mới với một chuỗi :attr:`traces` đã được lọc, trong đó *filters* là danh sách các :class:`DomainFilter` và
+      các đối tượng :class:`Filter`. Nếu *filters* là một danh sách rỗng, trả về một đối tượng mới
+      :class:`Snapshot` instance chứa một bản sao của các trace.
 
-      All inclusive filters are applied at once, a trace is ignored if no
-      inclusive filters match it. A trace is ignored if at least one exclusive
-      filter matches it.
+      Tất cả các bộ lọc bao gồm được áp dụng cùng lúc; một trace sẽ bị bỏ qua nếu không có bộ lọc bao gồm nào khớp với trace đó. Một trace sẽ bị bỏ qua nếu có ít nhất một bộ lọc loại trừ khớp với trace đó.
 
       .. versionchanged:: 3.6
          :class:`DomainFilter` instances are now also accepted in *filters*.
@@ -569,71 +497,66 @@ Snapshot
 
    .. classmethod:: load(filename)
 
-      Load a snapshot from a file.
+      Tải snapshot từ một tệp.
 
-      See also :meth:`dump`.
+      Xem thêm :meth:`dump`.
 
 
    .. method:: statistics(key_type: str, cumulative: bool=False)
 
-      Get statistics as a sorted list of :class:`Statistic` instances grouped
-      by *key_type*:
+      Lấy thống kê dưới dạng danh sách :class:`Statistic` instance được sắp xếp, nhóm theo *key_type*:
 
-      =====================  ========================
-      key_type               description
-      =====================  ========================
-      ``'filename'``         filename
-      ``'lineno'``           filename and line number
-      ``'traceback'``        traceback
-      =====================  ========================
+      +-----------------+--------------------+
+      | key_type        | description        |
+      +=================+====================+
+      | ``'filename'``  | tên tệp            |
+      +-----------------+--------------------+
+      | ``'lineno'``    | tên tệp và số dòng |
+      +-----------------+--------------------+
+      | ``'traceback'`` | traceback          |
+      +-----------------+--------------------+
 
-      If *cumulative* is ``True``, cumulate size and count of memory blocks of
-      all frames of the traceback of a trace, not only the most recent frame.
-      The cumulative mode can only be used with *key_type* equal to
-      ``'filename'`` and ``'lineno'``.
+      Nếu *cumulative* là ``True``, hãy cộng dồn kích thước và số lượng các khối bộ nhớ của tất cả các frame trong traceback của một trace, không chỉ frame gần nhất. Chế độ cộng dồn chỉ có thể được sử dụng với *key_type* bằng ``'filename'`` và ``'lineno'``.
 
-      The result is sorted from the biggest to the smallest by:
-      :attr:`Statistic.size`, :attr:`Statistic.count` and then by
+      Kết quả được sắp xếp từ lớn nhất đến nhỏ nhất theo:
+      :attr:`Statistic.size`, :attr:`Statistic.count` rồi đến
       :attr:`Statistic.traceback`.
 
 
    .. attribute:: traceback_limit
 
-      Maximum number of frames stored in the traceback of :attr:`traces`:
-      result of the :func:`get_traceback_limit` when the snapshot was taken.
+      Số frame tối đa được lưu trong traceback của :attr:`traces`: kết quả của :func:`get_traceback_limit` tại thời điểm snapshot được chụp.
 
    .. attribute:: traces
 
-      Traces of all memory blocks allocated by Python: sequence of
-      :class:`Trace` instances.
+      Dấu vết của tất cả các khối bộ nhớ được Python cấp phát: một chuỗi các
+      :class:`Trace` thực thể.
 
-      The sequence has an undefined order. Use the :meth:`Snapshot.statistics`
-      method to get a sorted list of statistics.
+      Chuỗi này có thứ tự không xác định. Sử dụng phương thức :meth:`Snapshot.statistics` để nhận danh sách thống kê đã được sắp xếp.
 
 
-Statistic
-^^^^^^^^^
+Thống kê
+^^^^^^^^
 
 .. class:: Statistic
 
-   Statistic on memory allocations.
+   Thống kê về việc cấp phát bộ nhớ.
 
-   :func:`Snapshot.statistics` returns a list of :class:`Statistic` instances.
+   :func:`Snapshot.statistics` trả về một danh sách các thực thể :class:`Statistic`.
 
-   See also the :class:`StatisticDiff` class.
+   Xem thêm lớp :class:`StatisticDiff`.
 
    .. attribute:: count
 
-      Number of memory blocks (``int``).
+      Số lượng khối bộ nhớ (``int``).
 
    .. attribute:: size
 
-      Total size of memory blocks in bytes (``int``).
+      Tổng kích thước của các khối bộ nhớ tính bằng byte (``int``).
 
    .. attribute:: traceback
 
-      Traceback where the memory block was allocated, :class:`Traceback`
-      instance.
+      Traceback tại vị trí khối bộ nhớ được cấp phát, instance :class:`Traceback`.
 
 
 StatisticDiff
@@ -641,38 +564,30 @@ StatisticDiff
 
 .. class:: StatisticDiff
 
-   Statistic difference on memory allocations between an old and a new
-   :class:`Snapshot` instance.
+   Chênh lệch thống kê về việc cấp phát bộ nhớ giữa một
+   instance :class:`Snapshot` cũ và mới.
 
-   :func:`Snapshot.compare_to` returns a list of :class:`StatisticDiff`
-   instances. See also the :class:`Statistic` class.
+   :func:`Snapshot.compare_to` trả về một danh sách các instance :class:`StatisticDiff`. Xem thêm lớp :class:`Statistic`.
 
    .. attribute:: count
 
-      Number of memory blocks in the new snapshot (``int``): ``0`` if
-      the memory blocks have been released in the new snapshot.
+      Số lượng khối bộ nhớ trong snapshot mới (``int``): ``0`` nếu các khối bộ nhớ đã được giải phóng trong snapshot mới.
 
    .. attribute:: count_diff
 
-      Difference of number of memory blocks between the old and the new
-      snapshots (``int``): ``0`` if the memory blocks have been allocated in
-      the new snapshot.
+      Chênh lệch số lượng khối bộ nhớ giữa snapshot cũ và snapshot mới (``int``): ``0`` nếu các khối bộ nhớ đã được cấp phát trong snapshot mới.
 
    .. attribute:: size
 
-      Total size of memory blocks in bytes in the new snapshot (``int``):
-      ``0`` if the memory blocks have been released in the new snapshot.
+      Tổng kích thước tính bằng byte của các khối bộ nhớ trong snapshot mới (``int``): ``0`` nếu các khối bộ nhớ đã được giải phóng trong snapshot mới.
 
    .. attribute:: size_diff
 
-      Difference of total size of memory blocks in bytes between the old and
-      the new snapshots (``int``): ``0`` if the memory blocks have been
-      allocated in the new snapshot.
+      Chênh lệch tổng kích thước tính bằng byte của các khối bộ nhớ giữa snapshot cũ và snapshot mới (``int``): ``0`` nếu các khối bộ nhớ đã được cấp phát trong snapshot mới.
 
    .. attribute:: traceback
 
-      Traceback where the memory blocks were allocated, :class:`Traceback`
-      instance.
+      Traceback nơi các khối bộ nhớ được cấp phát, instance :class:`Traceback`.
 
 
 Trace
@@ -680,29 +595,26 @@ Trace
 
 .. class:: Trace
 
-   Trace of a memory block.
+   Trace của một khối bộ nhớ.
 
-   The :attr:`Snapshot.traces` attribute is a sequence of :class:`Trace`
-   instances.
+   Thuộc tính :attr:`Snapshot.traces` là một chuỗi các thực thể :class:`Trace`.
 
    .. versionchanged:: 3.6
-      Added the :attr:`domain` attribute.
+      Đã thêm thuộc tính :attr:`domain`.
 
    .. attribute:: domain
 
-      Address space of a memory block (``int``). Read-only property.
+      Không gian địa chỉ của một khối bộ nhớ (``int``). Thuộc tính chỉ đọc.
 
-      tracemalloc uses the domain ``0`` to trace memory allocations made by
-      Python. C extensions can use other domains to trace other resources.
+      tracemalloc sử dụng domain ``0`` để theo dõi các cấp phát bộ nhớ do Python thực hiện. Các phần mở rộng C có thể sử dụng những domain khác để theo dõi các tài nguyên khác.
 
    .. attribute:: size
 
-      Size of the memory block in bytes (``int``).
+      Kích thước của khối bộ nhớ tính bằng byte (``int``).
 
    .. attribute:: traceback
 
-      Traceback where the memory block was allocated, :class:`Traceback`
-      instance.
+      Traceback tại đó khối bộ nhớ được cấp phát, thực thể :class:`Traceback`.
 
 
 Traceback
@@ -710,52 +622,40 @@ Traceback
 
 .. class:: Traceback
 
-   Sequence of :class:`Frame` instances sorted from the oldest frame to the
-   most recent frame.
+   Chuỗi các thực thể :class:`Frame` được sắp xếp từ frame cũ nhất đến frame gần đây nhất.
 
-   A traceback contains at least ``1`` frame. If the ``tracemalloc`` module
-   failed to get a frame, the filename ``"<unknown>"`` at line number ``0`` is
-   used.
+   Một traceback chứa ít nhất ``1`` frame. Nếu module ``tracemalloc`` không lấy được frame, tên tệp ``"<unknown>"`` tại số dòng ``0`` sẽ được sử dụng.
 
-   When a snapshot is taken, tracebacks of traces are limited to
-   :func:`get_traceback_limit` frames. See the :func:`take_snapshot` function.
-   The original number of frames of the traceback is stored in the
-   :attr:`Traceback.total_nframe` attribute. That allows one to know if a traceback
-   has been truncated by the traceback limit.
+   Khi snapshot được tạo, traceback của các trace bị giới hạn ở
+   :func:`get_traceback_limit` frame. Xem hàm :func:`take_snapshot`. Số frame ban đầu của traceback được lưu trong
+   thuộc tính :attr:`Traceback.total_nframe`. Điều này cho phép biết traceback có bị cắt ngắn bởi giới hạn traceback hay không.
 
-   The :attr:`Trace.traceback` attribute is a :class:`Traceback` instance.
+   Thuộc tính :attr:`Trace.traceback` là một thực thể :class:`Traceback`.
 
    .. versionchanged:: 3.7
-      Frames are now sorted from the oldest to the most recent, instead of most recent to oldest.
+      Các frame hiện được sắp xếp từ frame cũ nhất đến frame gần đây nhất, thay vì từ frame gần đây nhất đến frame cũ nhất.
 
    .. attribute:: total_nframe
 
-      Total number of frames that composed the traceback before truncation.
-      This attribute can be set to ``None`` if the information is not
-      available.
+      Tổng số frame tạo nên traceback trước khi cắt ngắn. Thuộc tính này có thể được đặt thành ``None`` nếu không có thông tin.
 
    .. versionchanged:: 3.9
-      The :attr:`Traceback.total_nframe` attribute was added.
+      Thuộc tính :attr:`Traceback.total_nframe` đã được thêm.
 
    .. method:: format(limit=None, most_recent_first=False)
 
-      Format the traceback as a list of lines. Use the :mod:`linecache` module to
-      retrieve lines from the source code. If *limit* is set, format the *limit*
-      most recent frames if *limit* is positive. Otherwise, format the
-      ``abs(limit)`` oldest frames. If *most_recent_first* is ``True``, the order
-      of the formatted frames is reversed, returning the most recent frame first
-      instead of last.
+      Định dạng traceback thành một danh sách các dòng. Sử dụng module :mod:`linecache` để lấy các dòng từ mã nguồn. Nếu *limit* được đặt, hãy định dạng *limit* frame gần đây nhất nếu *limit* là số dương. Nếu không, hãy định dạng ``abs(limit)`` frame cũ nhất. Nếu *most_recent_first* là ``True``, thứ tự của các frame được định dạng sẽ bị đảo ngược, trả về frame gần đây nhất trước thay vì sau cùng.
 
-      Similar to the :func:`traceback.format_tb` function, except that
-      :meth:`.format` does not include newlines.
+      Tương tự hàm :func:`traceback.format_tb`, ngoại trừ việc
+      :meth:`.format` không bao gồm các dòng mới.
 
-      Example::
+      Ví dụ::
 
           print("Traceback (most recent call first):")
           for line in traceback:
               print(line)
 
-      Output::
+      Kết quả::
 
           Traceback (most recent call first):
             File "test.py", line 9

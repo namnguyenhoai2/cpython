@@ -1,34 +1,23 @@
-:mod:`!multiprocessing` --- Process-based parallelism
-=====================================================
+:mod:`!multiprocessing` --- Tính song song dựa trên tiến trình
+==============================================================
 
 .. module:: multiprocessing
-   :synopsis: Process-based parallelism.
+   :synopsis: Tính song song dựa trên tiến trình.
 
-**Source code:** :source:`Lib/multiprocessing/`
+**Mã nguồn:** :source:`Lib/multiprocessing/`
 
 --------------
 
 .. include:: ../includes/wasm-mobile-notavail.rst
 
-Introduction
-------------
+Giới thiệu
+----------
 
-:mod:`!multiprocessing` is a package that supports spawning processes using an
-API similar to the :mod:`threading` module.  The :mod:`!multiprocessing` package
-offers both local and remote concurrency, effectively side-stepping the
-:term:`Global Interpreter Lock <global interpreter lock>` by using
-subprocesses instead of threads.  Due
-to this, the :mod:`!multiprocessing` module allows the programmer to fully
-leverage multiple processors on a given machine.  It runs on both POSIX and
-Windows.
+:mod:`!multiprocessing` là một package hỗ trợ tạo tiến trình bằng API tương tự module :mod:`threading`. Package :mod:`!multiprocessing` cung cấp khả năng chạy đồng thời cả cục bộ và từ xa, qua đó tránh hiệu quả
+:term:`Global Interpreter Lock <global interpreter lock>` bằng cách sử dụng các subprocess thay vì thread. Vì vậy, module :mod:`!multiprocessing` cho phép lập trình viên tận dụng tối đa nhiều bộ xử lý trên một máy. Module này chạy trên cả POSIX và Windows.
 
-The :mod:`!multiprocessing` module also introduces the
-:class:`~multiprocessing.pool.Pool` object which offers a convenient means of
-parallelizing the execution of a function across multiple input values,
-distributing the input data across processes (data parallelism).  The following
-example demonstrates the common practice of defining such functions in a module
-so that child processes can successfully import that module.  This basic example
-of data parallelism using :class:`~multiprocessing.pool.Pool`, ::
+Module :mod:`!multiprocessing` cũng giới thiệu
+:class:`~multiprocessing.pool.Pool` là đối tượng cung cấp một phương thức thuận tiện để thực hiện song song một hàm trên nhiều giá trị đầu vào, phân phối dữ liệu đầu vào cho các tiến trình (data parallelism). Ví dụ sau đây minh họa cách thường dùng là định nghĩa các hàm như vậy trong một module để các tiến trình con có thể import module đó thành công. Ví dụ cơ bản về data parallelism này sử dụng :class:`~multiprocessing.pool.Pool`,::
 
    from multiprocessing import Pool
 
@@ -39,32 +28,21 @@ of data parallelism using :class:`~multiprocessing.pool.Pool`, ::
        with Pool(5) as p:
            print(p.map(f, [1, 2, 3]))
 
-will print to standard output ::
+sẽ in ra đầu ra tiêu chuẩn::
 
    [1, 4, 9]
 
-The :mod:`!multiprocessing` module also introduces APIs which do not have
-analogs in the :mod:`threading` module, like the ability to :meth:`terminate
-<Process.terminate>`, :meth:`interrupt <Process.interrupt>` or :meth:`kill
-<Process.kill>` a running process.
+Module :mod:`!multiprocessing` cũng giới thiệu các API không có phần tương đương trong module :mod:`threading`, chẳng hạn như khả năng :meth:`terminate <Process.terminate>`, :meth:`interrupt <Process.interrupt>` hoặc :meth:`kill <Process.kill>` một tiến trình đang chạy.
 
 .. seealso::
 
-   :class:`concurrent.futures.ProcessPoolExecutor` offers a higher level interface
-   to push tasks to a background process without blocking execution of the
-   calling process. Compared to using the :class:`~multiprocessing.pool.Pool`
-   interface directly, the :mod:`concurrent.futures` API more readily allows
-   the submission of work to the underlying process pool to be separated from
-   waiting for the results.
+   :class:`concurrent.futures.ProcessPoolExecutor` cung cấp một interface cấp cao hơn để đẩy các tác vụ vào một tiến trình nền mà không chặn việc thực thi của tiến trình gọi. So với việc sử dụng trực tiếp interface :class:`~multiprocessing.pool.Pool`, API :mod:`concurrent.futures` cho phép dễ dàng hơn tách việc gửi công việc đến process pool bên dưới khỏi việc chờ kết quả.
 
 
-The :class:`Process` class
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Lớp :class:`Process`
+^^^^^^^^^^^^^^^^^^^^
 
-In :mod:`!multiprocessing`, processes are spawned by creating a :class:`Process`
-object and then calling its :meth:`~Process.start` method.  :class:`Process`
-follows the API of :class:`threading.Thread`.  A trivial example of a
-multiprocess program is ::
+Trong :mod:`!multiprocessing`, các tiến trình được tạo bằng cách tạo một đối tượng :class:`Process` rồi gọi phương thức :meth:`~Process.start` của đối tượng đó. :class:`Process` tuân theo API của :class:`threading.Thread`. Một ví dụ đơn giản về chương trình multiprocess là::
 
    from multiprocessing import Process
 
@@ -76,7 +54,7 @@ multiprocess program is ::
        p.start()
        p.join()
 
-To show the individual process IDs involved, here is an expanded example::
+Để hiển thị các ID tiến trình riêng lẻ có liên quan, dưới đây là một ví dụ mở rộng::
 
     from multiprocessing import Process
     import os
@@ -97,109 +75,66 @@ To show the individual process IDs involved, here is an expanded example::
         p.start()
         p.join()
 
-For an explanation of why the ``if __name__ == '__main__'`` part is
-necessary, see :ref:`multiprocessing-programming`.
+Để biết giải thích về lý do phần ``if __name__ == '__main__'`` là cần thiết, hãy xem :ref:`multiprocessing-programming`.
 
-The arguments to :class:`Process` usually need to be picklable so they can be
-passed to the child process. If you tried typing the above example directly
-into a REPL it could lead to an :exc:`AttributeError` in the child process
-trying to locate the *f* function in the ``__main__`` module.
+Các đối số của :class:`Process` thường cần có thể được picklable để có thể truyền chúng cho tiến trình con. Nếu bạn thử nhập trực tiếp ví dụ trên vào REPL, điều đó có thể dẫn đến :exc:`AttributeError` trong tiến trình con khi cố gắng tìm hàm *f* trong mô-đun ``__main__``.
 
 
 .. _multiprocessing-start-methods:
 
-Contexts and start methods
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Ngữ cảnh và phương thức khởi động
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Depending on the platform, :mod:`!multiprocessing` supports three ways
-to start a process.  These *start methods* are
+Tùy thuộc vào nền tảng, :mod:`!multiprocessing` hỗ trợ ba cách để khởi động một tiến trình. Các *start methods* này là
 
   .. _multiprocessing-start-method-spawn:
 
   *spawn*
-    The parent process starts a fresh Python interpreter process.  The
-    child process will only inherit those resources necessary to run
-    the process object's :meth:`~Process.run` method.  In particular,
-    unnecessary file descriptors and handles from the parent process
-    will not be inherited.  Starting a process using this method is
-    rather slow compared to using *fork* or *forkserver*.
+    Tiến trình cha khởi động một tiến trình trình thông dịch Python mới. Tiến trình con sẽ chỉ kế thừa những tài nguyên cần thiết để chạy phương thức :meth:`~Process.run` của đối tượng tiến trình. Cụ thể, các bộ mô tả tệp và handle không cần thiết từ tiến trình cha sẽ không được kế thừa. Việc khởi động một tiến trình bằng phương thức này khá chậm so với việc sử dụng *fork* hoặc *forkserver*.
 
-    Available on POSIX and Windows platforms.  The default on Windows and macOS.
+    Có trên các nền tảng POSIX và Windows. Đây là mặc định trên Windows và macOS.
 
   .. _multiprocessing-start-method-fork:
 
   *fork*
-    The parent process uses :func:`os.fork` to fork the Python
-    interpreter.  The child process, when it begins, is effectively
-    identical to the parent process.  All resources of the parent are
-    inherited by the child process.  Note that safely forking a
-    multithreaded process is problematic.
+    Quy trình cha sử dụng :func:`os.fork` để fork trình thông dịch Python. Khi bắt đầu, quy trình con về cơ bản giống hệt quy trình cha. Tất cả tài nguyên của quy trình cha đều được kế thừa bởi quy trình con. Lưu ý rằng việc fork một quy trình đa luồng một cách an toàn là vấn đề phức tạp.
 
-    Available on POSIX systems.
+    Có trên các hệ thống POSIX.
 
     .. versionchanged:: 3.14
-       This is no longer the default start method on any platform.
-       Code that requires *fork* must explicitly specify that via
-       :func:`get_context` or :func:`set_start_method`.
+       Đây không còn là phương thức khởi động mặc định trên bất kỳ nền tảng nào. Mã yêu cầu *fork* phải chỉ định rõ điều đó thông qua
+       :func:`get_context` hoặc :func:`set_start_method`.
 
     .. versionchanged:: 3.12
-       If Python is able to detect that your process has multiple threads, the
-       :func:`os.fork` function that this start method calls internally will
-       raise a :exc:`DeprecationWarning`. Use a different start method.
-       See the :func:`os.fork` documentation for further explanation.
+       Nếu Python phát hiện quy trình của bạn có nhiều luồng,
+       hàm :func:`os.fork` được phương thức khởi động này gọi nội bộ sẽ phát sinh :exc:`DeprecationWarning`. Hãy sử dụng một phương thức khởi động khác. Xem tài liệu :func:`os.fork` để biết thêm giải thích.
 
   .. _multiprocessing-start-method-forkserver:
 
   *forkserver*
-    When the program starts and selects the *forkserver* start method,
-    a server process is spawned.  From then on, whenever a new process
-    is needed, the parent process connects to the server and requests
-    that it fork a new process.  The fork server process is single threaded
-    unless system libraries or preloaded imports spawn threads as a
-    side-effect so it is generally safe for it to use :func:`os.fork`.
-    No unnecessary resources are inherited.
+    Khi chương trình khởi động và chọn phương thức khởi động *forkserver*, một tiến trình máy chủ sẽ được tạo.  Kể từ đó, bất cứ khi nào cần một tiến trình mới, tiến trình cha sẽ kết nối với máy chủ và yêu cầu máy chủ fork một tiến trình mới.  Tiến trình máy chủ fork là tiến trình đơn luồng, trừ khi các thư viện hệ thống hoặc các import được tải trước tạo ra các luồng như một tác dụng phụ, vì vậy nhìn chung việc sử dụng :func:`os.fork` là an toàn. Không kế thừa các tài nguyên không cần thiết.
 
-    Available on POSIX platforms which support passing file descriptors over
-    Unix pipes such as Linux.  The default on those.
+    Có sẵn trên các nền tảng POSIX hỗ trợ truyền file descriptor qua các pipe Unix, chẳng hạn như Linux. Đây là mặc định trên các nền tảng đó.
 
     .. versionchanged:: 3.14
-       This became the default start method on POSIX platforms.
+       Đây đã trở thành phương thức khởi động mặc định trên các nền tảng POSIX.
 
 .. versionchanged:: 3.4
-   *spawn* added on all POSIX platforms, and *forkserver* added for
-   some POSIX platforms.
-   Child processes no longer inherit all of the parents inheritable
-   handles on Windows.
+   *spawn* được thêm vào tất cả các nền tảng POSIX, còn *forkserver* được thêm vào một số nền tảng POSIX. Các tiến trình con không còn kế thừa tất cả các handle có thể kế thừa của tiến trình cha trên Windows.
 
 .. versionchanged:: 3.8
 
-   On macOS, the *spawn* start method is now the default.  The *fork* start
-   method should be considered unsafe as it can lead to crashes of the
-   subprocess as macOS system libraries may start threads. See :issue:`33725`.
+   Trên macOS, phương thức khởi động *spawn* hiện là mặc định.  Phương thức khởi động *fork* nên được xem là không an toàn vì có thể khiến tiến trình con bị crash, do các thư viện hệ thống macOS có thể khởi động các luồng. Xem :issue:`33725`.
 
 .. versionchanged:: 3.14
 
-   On POSIX platforms the default start method was changed from *fork* to
-   *forkserver* to retain the performance but avoid common multithreaded
-   process incompatibilities. See :gh:`84559`.
+   Trên các nền tảng POSIX, phương thức khởi động mặc định đã được thay đổi từ *fork* thành *forkserver* để duy trì hiệu năng nhưng tránh các vấn đề không tương thích phổ biến giữa các tiến trình đa luồng. Xem :gh:`84559`.
 
 
-On POSIX using the *spawn* or *forkserver* start methods will also
-start a *resource tracker* process which tracks the unlinked named
-system resources (such as named semaphores or
-:class:`~multiprocessing.shared_memory.SharedMemory` objects) created
-by processes of the program.  When all processes
-have exited the resource tracker unlinks any remaining tracked object.
-Usually there should be none, but if a process was killed by a signal
-there may be some "leaked" resources.  (Neither leaked semaphores nor shared
-memory segments will be automatically unlinked until the next reboot. This is
-problematic for both objects because the system allows only a limited number of
-named semaphores, and shared memory segments occupy some space in the main
-memory.)
+Trên POSIX, việc sử dụng các phương thức khởi động *spawn* hoặc *forkserver* cũng sẽ khởi động một tiến trình *resource tracker*, tiến trình này theo dõi các tài nguyên hệ thống có tên chưa được hủy liên kết (chẳng hạn như semaphore có tên hoặc
+:class:`~multiprocessing.shared_memory.SharedMemory` objects) được tạo bởi các tiến trình của chương trình. Khi tất cả tiến trình đã thoát, resource tracker sẽ hủy liên kết mọi đối tượng còn lại đang được theo dõi. Thông thường sẽ không có đối tượng nào, nhưng nếu một tiến trình bị kết thúc bởi một signal thì có thể còn một số tài nguyên "bị rò rỉ". (Các semaphore bị rò rỉ và các phân đoạn shared memory đều sẽ không được tự động hủy liên kết cho đến lần khởi động lại tiếp theo. Điều này gây vấn đề cho cả hai loại đối tượng, vì hệ thống chỉ cho phép một số lượng semaphore có tên hạn chế, còn các phân đoạn shared memory chiếm một phần dung lượng bộ nhớ chính.)
 
-To select a start method you use the :func:`set_start_method` in
-the ``if __name__ == '__main__'`` clause of the main module.  For
-example::
+Để chọn một phương thức khởi động, bạn sử dụng :func:`set_start_method` trong mệnh đề ``if __name__ == '__main__'`` của mô-đun chính. Ví dụ::
 
        import multiprocessing as mp
 
@@ -214,13 +149,9 @@ example::
            print(q.get())
            p.join()
 
-:func:`set_start_method` should not be used more than once in the
-program.
+:func:`set_start_method` không nên được sử dụng nhiều hơn một lần trong chương trình.
 
-Alternatively, you can use :func:`get_context` to obtain a context
-object.  Context objects have the same API as the multiprocessing
-module, and allow one to use multiple start methods in the same
-program. ::
+Ngoài ra, bạn có thể sử dụng :func:`get_context` để lấy một đối tượng context. Các đối tượng context có cùng API như mô-đun multiprocessing và cho phép sử dụng nhiều phương thức khởi động trong cùng một chương trình.::
 
        import multiprocessing as mp
 
@@ -235,36 +166,24 @@ program. ::
            print(q.get())
            p.join()
 
-Note that objects related to one context may not be compatible with
-processes for a different context.  In particular, locks created using
-the *fork* context cannot be passed to processes started using the
-*spawn* or *forkserver* start methods.
+Lưu ý rằng các đối tượng liên quan đến một context có thể không tương thích với các tiến trình thuộc một context khác. Cụ thể, các lock được tạo bằng context *fork* không thể được truyền cho các tiến trình được khởi động bằng các phương thức khởi động *spawn* hoặc *forkserver*.
 
-Libraries using :mod:`!multiprocessing` or
-:class:`~concurrent.futures.ProcessPoolExecutor` should be designed to allow
-their users to provide their own multiprocessing context.  Using a specific
-context of your own within a library can lead to incompatibilities with the
-rest of the library user's application.  Always document if your library
-requires a specific start method.
+Các thư viện sử dụng :mod:`!multiprocessing` hoặc
+:class:`~concurrent.futures.ProcessPoolExecutor` nên được thiết kế để cho phép người dùng của chúng cung cấp context multiprocessing của riêng họ. Việc sử dụng một context cụ thể của riêng bạn trong một thư viện có thể dẫn đến sự không tương thích với phần còn lại trong ứng dụng của người dùng thư viện. Luôn ghi rõ trong tài liệu nếu thư viện của bạn yêu cầu một start method cụ thể.
 
 .. warning::
 
-   The ``'spawn'`` and ``'forkserver'`` start methods generally cannot
-   be used with "frozen" executables (i.e., binaries produced by
-   packages like **PyInstaller** and **cx_Freeze**) on POSIX systems.
-   The ``'fork'`` start method may work if code does not use threads.
+   Các start method ``'spawn'`` và ``'forkserver'`` nhìn chung không thể được sử dụng với các tệp thực thi "đóng băng" (tức là các tệp nhị phân được tạo bởi những package như **PyInstaller** và **cx_Freeze**) trên các hệ thống POSIX. Start method ``'fork'`` có thể hoạt động nếu mã không sử dụng thread.
 
 
-Exchanging objects between processes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Trao đổi object giữa các process
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-:mod:`!multiprocessing` supports two types of communication channel between
-processes:
+:mod:`!multiprocessing` hỗ trợ hai loại kênh giao tiếp giữa các process:
 
 **Queues**
 
-   The :class:`Queue` class is a near clone of :class:`queue.Queue`.  For
-   example::
+   Class :class:`Queue` gần như là bản sao của :class:`queue.Queue`. Ví dụ:::
 
       from multiprocessing import Process, Queue
 
@@ -275,16 +194,14 @@ processes:
           q = Queue()
           p = Process(target=f, args=(q,))
           p.start()
-          print(q.get())    # prints "[42, None, 'hello']"
+          print(q.get())    # in ra "[42, None, 'hello']"
           p.join()
 
-   Queues are thread and process safe.
-   Any object put into a :mod:`!multiprocessing` queue will be serialized.
+   Queue an toàn với thread và process. Bất kỳ đối tượng nào được đưa vào queue :mod:`!multiprocessing` đều sẽ được serialize.
 
 **Pipes**
 
-   The :func:`Pipe` function returns a pair of connection objects connected by a
-   pipe which by default is duplex (two-way).  For example::
+   Hàm :func:`Pipe` trả về một cặp connection object được kết nối bằng một pipe, theo mặc định là duplex (hai chiều). Ví dụ::
 
       from multiprocessing import Process, Pipe
 
@@ -296,26 +213,19 @@ processes:
           parent_conn, child_conn = Pipe()
           p = Process(target=f, args=(child_conn,))
           p.start()
-          print(parent_conn.recv())   # prints "[42, None, 'hello']"
+          print(parent_conn.recv())   # in ra "[42, None, 'hello']"
           p.join()
 
-   The two connection objects returned by :func:`Pipe` represent the two ends of
-   the pipe.  Each connection object has :meth:`~Connection.send` and
-   :meth:`~Connection.recv` methods (among others).  Note that data in a pipe
-   may become corrupted if two processes (or threads) try to read from or write
-   to the *same* end of the pipe at the same time.  Of course there is no risk
-   of corruption from processes using different ends of the pipe at the same
-   time.
+   Hai connection object được :func:`Pipe` trả về đại diện cho hai đầu của pipe. Mỗi connection object có :meth:`~Connection.send` và
+   các phương thức :meth:`~Connection.recv` (cùng những phương thức khác). Lưu ý rằng dữ liệu trong pipe có thể bị hỏng nếu hai process (hoặc thread) cùng cố đọc từ hoặc ghi vào *same* đầu của pipe tại cùng một thời điểm. Tất nhiên, không có nguy cơ dữ liệu bị hỏng khi các process đồng thời sử dụng những đầu khác nhau của pipe.
 
-   The :meth:`~Connection.send` method serializes the object and
-   :meth:`~Connection.recv` re-creates the object.
+   Phương thức :meth:`~Connection.send` serialize đối tượng và
+   :meth:`~Connection.recv` tạo lại đối tượng.
 
-Synchronization between processes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Đồng bộ hóa giữa các tiến trình
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-:mod:`!multiprocessing` contains equivalents of all the synchronization
-primitives from :mod:`threading`.  For instance one can use a lock to ensure
-that only one process prints to standard output at a time::
+:mod:`!multiprocessing` chứa các thành phần tương đương với tất cả các primitive đồng bộ hóa từ :mod:`threading`. Ví dụ, bạn có thể sử dụng lock để đảm bảo rằng mỗi lần chỉ có một tiến trình in ra đầu ra tiêu chuẩn::
 
    from multiprocessing import Process, Lock
 
@@ -332,24 +242,21 @@ that only one process prints to standard output at a time::
        for num in range(10):
            Process(target=f, args=(lock, num)).start()
 
-Without using the lock output from the different processes is liable to get all
-mixed up.
+Nếu không sử dụng lock, đầu ra từ các tiến trình khác nhau rất dễ bị trộn lẫn hoàn toàn.
 
 
-Sharing state between processes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Chia sẻ trạng thái giữa các tiến trình
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-As mentioned above, when doing concurrent programming it is usually best to
-avoid using shared state as far as possible.  This is particularly true when
-using multiple processes.
+Như đã đề cập ở trên, khi lập trình đồng thời, thông thường tốt nhất là tránh sử dụng trạng thái dùng chung ככל có thể. Điều này đặc biệt đúng khi sử dụng nhiều tiến trình.
 
-However, if you really do need to use some shared data then
-:mod:`!multiprocessing` provides a couple of ways of doing so.
+Tuy nhiên, nếu thực sự cần sử dụng một số dữ liệu dùng chung thì
+:mod:`!multiprocessing` cung cấp một vài cách để thực hiện việc đó.
 
-**Shared memory**
+**Bộ nhớ dùng chung**
 
-   Data can be stored in a shared memory map using :class:`Value` or
-   :class:`Array`.  For example, the following code ::
+   Dữ liệu có thể được lưu trữ trong một map bộ nhớ dùng chung bằng :class:`Value` hoặc
+   :class:`Array`. Ví dụ: đoạn mã sau đây::
 
       from multiprocessing import Process, Value, Array
 
@@ -369,31 +276,25 @@ However, if you really do need to use some shared data then
           print(num.value)
           print(arr[:])
 
-   will print ::
+   sẽ in ra::
 
       3.1415927
       [0, -1, -2, -3, -4, -5, -6, -7, -8, -9]
 
-   The ``'d'`` and ``'i'`` arguments used when creating ``num`` and ``arr`` are
-   typecodes of the kind used by the :mod:`array` module: ``'d'`` indicates a
-   double precision float and ``'i'`` indicates a signed integer.  These shared
-   objects will be process and thread-safe.
+   Các đối số ``'d'`` và ``'i'`` được sử dụng khi tạo ``num`` và ``arr`` là các mã kiểu (typecode) thuộc loại được sử dụng bởi module :mod:`array`: ``'d'`` cho biết một số thực có độ chính xác kép, còn ``'i'`` cho biết một số nguyên có dấu. Các đối tượng dùng chung này sẽ an toàn đối với process và thread.
 
-   For more flexibility in using shared memory one can use the
-   :mod:`multiprocessing.sharedctypes` module which supports the creation of
-   arbitrary ctypes objects allocated from shared memory.
+   Để linh hoạt hơn khi sử dụng bộ nhớ dùng chung, bạn có thể sử dụng
+   :mod:`multiprocessing.sharedctypes` mô-đun hỗ trợ tạo các đối tượng ctypes tùy ý được cấp phát từ bộ nhớ dùng chung.
 
-**Server process**
+**Quy trình máy chủ**
 
-   A manager object returned by :func:`Manager` controls a server process which
-   holds Python objects and allows other processes to manipulate them using
-   proxies.
+   Một đối tượng manager được trả về bởi :func:`Manager` điều khiển một quy trình máy chủ lưu giữ các đối tượng Python và cho phép các quy trình khác thao tác với chúng bằng proxy.
 
-   A manager returned by :func:`Manager` will support types
+   Một manager được trả về bởi :func:`Manager` sẽ hỗ trợ các kiểu
    :class:`list`, :class:`dict`, :class:`set`, :class:`~managers.Namespace`, :class:`Lock`,
    :class:`RLock`, :class:`Semaphore`, :class:`BoundedSemaphore`,
    :class:`Condition`, :class:`Event`, :class:`Barrier`,
-   :class:`Queue`, :class:`Value` and :class:`Array`.  For example, ::
+   :class:`Queue`, :class:`Value` và :class:`Array`.  Ví dụ:::
 
       from multiprocessing import Process, Manager
 
@@ -419,26 +320,21 @@ However, if you really do need to use some shared data then
               print(l)
               print(s)
 
-   will print ::
+   sẽ in ra::
 
        {0.25: None, 1: '1', '2': 2}
        [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
        {'a', 'b'}
 
-   Server process managers are more flexible than using shared memory objects
-   because they can be made to support arbitrary object types.  Also, a single
-   manager can be shared by processes on different computers over a network.
-   They are, however, slower than using shared memory.
+   Các manager quy trình máy chủ linh hoạt hơn so với việc sử dụng các đối tượng bộ nhớ dùng chung vì chúng có thể được cấu hình để hỗ trợ các kiểu đối tượng tùy ý. Ngoài ra, một manager duy nhất có thể được các quy trình trên những máy tính khác nhau chia sẻ qua mạng. Tuy nhiên, chúng chậm hơn so với việc sử dụng bộ nhớ dùng chung.
 
 
-Using a pool of workers
+Sử dụng một nhóm worker
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-The :class:`~multiprocessing.pool.Pool` class represents a pool of worker
-processes.  It has methods which allows tasks to be offloaded to the worker
-processes in a few different ways.
+Lớp :class:`~multiprocessing.pool.Pool` biểu diễn một nhóm các tiến trình worker. Lớp này có các phương thức cho phép chuyển tác vụ sang các tiến trình worker theo một vài cách khác nhau.
 
-For example::
+Ví dụ::
 
    from multiprocessing import Pool, TimeoutError
    import time
@@ -448,29 +344,29 @@ For example::
        return x*x
 
    if __name__ == '__main__':
-       # start 4 worker processes
+       # khởi động 4 tiến trình worker
        with Pool(processes=4) as pool:
 
-           # print "[0, 1, 4,..., 81]"
+           # in "[0, 1, 4,..., 81]"
            print(pool.map(f, range(10)))
 
-           # print same numbers in arbitrary order
+           # in các số đó theo thứ tự bất kỳ
            for i in pool.imap_unordered(f, range(10)):
                print(i)
 
-           # evaluate "f(20)" asynchronously
-           res = pool.apply_async(f, (20,))      # runs in *only* one process
-           print(res.get(timeout=1))             # prints "400"
+           # đánh giá "f(20)" một cách bất đồng bộ
+           res = pool.apply_async(f, (20,))      # chạy trong *chỉ* một process
+           print(res.get(timeout=1))             # in "400"
 
-           # evaluate "os.getpid()" asynchronously
-           res = pool.apply_async(os.getpid, ()) # runs in *only* one process
-           print(res.get(timeout=1))             # prints the PID of that process
+           # đánh giá "os.getpid()" một cách bất đồng bộ
+           res = pool.apply_async(os.getpid, ()) # chạy trong *chỉ* một process
+           print(res.get(timeout=1))             # in PID của process đó
 
-           # launching multiple evaluations asynchronously *may* use more processes
+           # việc khởi chạy nhiều lần đánh giá một cách bất đồng bộ *có thể* sử dụng nhiều process
            multiple_results = [pool.apply_async(os.getpid, ()) for i in range(4)]
            print([res.get(timeout=1) for res in multiple_results])
 
-           # make a single worker sleep for 10 seconds
+           # cho một worker duy nhất ngủ trong 10 giây
            res = pool.apply_async(time.sleep, (10,))
            try:
                print(res.get(timeout=1))
@@ -479,19 +375,14 @@ For example::
 
            print("For the moment, the pool remains available for more work")
 
-       # exiting the 'with'-block has stopped the pool
+       # thoát khỏi khối 'with' đã dừng pool
        print("Now the pool is closed and no longer available")
 
-Note that the methods of a pool should only ever be used by the
-process which created it.
+Lưu ý rằng các phương thức của pool chỉ được sử dụng bởi tiến trình đã tạo ra pool đó.
 
 .. note::
 
-   Functionality within this package requires that the ``__main__`` module be
-   importable by the children. This is covered in :ref:`multiprocessing-programming`
-   however it is worth pointing out here. This means that some examples, such
-   as the :class:`multiprocessing.pool.Pool` examples will not work in the
-   interactive interpreter. For example::
+   Các chức năng trong package này yêu cầu module ``__main__`` có thể được import bởi các tiến trình con. Điều này đã được đề cập trong :ref:`multiprocessing-programming`, tuy nhiên vẫn cần lưu ý ở đây. Điều này có nghĩa là một số ví dụ, chẳng hạn như các ví dụ :class:`multiprocessing.pool.Pool`, sẽ không hoạt động trong trình thông dịch tương tác. Ví dụ::
 
       >>> from multiprocessing import Pool
       >>> p = Pool(5)
@@ -510,75 +401,50 @@ process which created it.
       AttributeError: Can't get attribute 'f' on <module '__main__' (<class '_frozen_importlib.BuiltinImporter'>)>
       AttributeError: Can't get attribute 'f' on <module '__main__' (<class '_frozen_importlib.BuiltinImporter'>)>
 
-   (If you try this it will actually output three full tracebacks
-   interleaved in a semi-random fashion, and then you may have to
-   stop the parent process somehow.)
+   (Nếu thử chạy đoạn này, thực tế nó sẽ xuất ra ba traceback đầy đủ xen kẽ theo thứ tự gần như ngẫu nhiên, sau đó bạn có thể phải dừng tiến trình cha bằng cách nào đó.)
 
 
-Reference
+Tham khảo
 ---------
 
-The :mod:`!multiprocessing` package mostly replicates the API of the
-:mod:`threading` module.
+Package :mod:`!multiprocessing` chủ yếu mô phỏng API của
+module :mod:`threading`.
 
 .. _global-start-method:
 
-Global start method
-^^^^^^^^^^^^^^^^^^^
+Phương thức khởi động toàn cục
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Python supports several ways to create and initialize a process.
-The global start method sets the default mechanism for creating a process.
+Python hỗ trợ một số cách để tạo và khởi tạo một process. Phương thức khởi động toàn cục đặt cơ chế mặc định để tạo process.
 
-Several multiprocessing functions and methods that may also instantiate
-certain objects will implicitly set the global start method to the system's default,
-if it hasn’t been set already. The global start method can only be set once.
-If you need to change the start method from the system default, you must
-proactively set the global start method before calling functions or methods,
-or creating these objects.
+Một số hàm và phương thức multiprocessing cũng có thể khởi tạo một số đối tượng nhất định sẽ ngầm đặt phương thức khởi động toàn cục thành giá trị mặc định của hệ thống, nếu phương thức này chưa được đặt. Phương thức khởi động toàn cục chỉ có thể được đặt một lần. Nếu cần thay đổi phương thức khởi động khỏi giá trị mặc định của hệ thống, bạn phải chủ động đặt phương thức khởi động toàn cục trước khi gọi các hàm hoặc phương thức, hoặc tạo các đối tượng này.
 
 
-:class:`Process` and exceptions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+:class:`Process` và các ngoại lệ
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. class:: Process(group=None, target=None, name=None, args=(), kwargs={}, \
                    *, daemon=None)
 
-   Process objects represent activity that is run in a separate process. The
-   :class:`Process` class has equivalents of all the methods of
+   Các đối tượng Process biểu diễn hoạt động được chạy trong một process riêng biệt.
+   Lớp :class:`Process` có các phương thức tương đương với tất cả các phương thức của
    :class:`threading.Thread`.
 
-   The constructor should always be called with keyword arguments. *group*
-   should always be ``None``; it exists solely for compatibility with
-   :class:`threading.Thread`.  *target* is the callable object to be invoked by
-   the :meth:`run` method.  It defaults to ``None``, meaning nothing is
-   called. *name* is the process name (see :attr:`name` for more details).
-   *args* is the argument tuple for the target invocation.  *kwargs* is a
-   dictionary of keyword arguments for the target invocation.  If provided,
-   the keyword-only *daemon* argument sets the process :attr:`daemon` flag
-   to ``True`` or ``False``.  If ``None`` (the default), this flag will be
-   inherited from the creating process.
+   Hàm khởi tạo luôn phải được gọi bằng các đối số từ khóa. *group* luôn phải là ``None``; nó chỉ tồn tại để duy trì khả năng tương thích với
+   :class:`threading.Thread`. *target* là đối tượng callable sẽ được gọi bởi phương thức :meth:`run`. Giá trị mặc định là ``None``, nghĩa là không có gì được gọi. *name* là tên của process (xem :attr:`name` để biết thêm chi tiết). *args* là tuple đối số dùng để gọi target. *kwargs* là dictionary chứa các đối số từ khóa dùng để gọi target. Nếu được cung cấp, đối số chỉ có thể dùng với từ khóa *daemon* sẽ đặt cờ :attr:`daemon` của process thành ``True`` hoặc ``False``. Nếu là ``None`` (giá trị mặc định), cờ này sẽ được kế thừa từ process tạo ra nó.
 
-   By default, no arguments are passed to *target*. The *args* argument,
-   which defaults to ``()``, can be used to specify a list or tuple of the arguments
-   to pass to *target*.
+   Theo mặc định, không có đối số nào được truyền cho *target*. Đối số *args*, có giá trị mặc định là ``()``, có thể được dùng để chỉ định danh sách hoặc tuple các đối số truyền cho *target*.
 
-   If a subclass overrides the constructor, it must make sure it invokes the
-   base class constructor (``super().__init__()``) before doing anything else
-   to the process.
+   Nếu một subclass ghi đè hàm khởi tạo, subclass đó phải bảo đảm gọi hàm khởi tạo của lớp cơ sở (``super().__init__()``) trước khi thực hiện bất kỳ thao tác nào khác với process.
 
    .. note::
 
-      In general, all arguments to :class:`Process` must be picklable.  This is
-      frequently observed when trying to create a :class:`Process` or use a
-      :class:`concurrent.futures.ProcessPoolExecutor` from a REPL with a
-      locally defined *target* function.
+      Nhìn chung, mọi đối số truyền cho :class:`Process` đều phải có thể được pickling. Điều này thường được nhận thấy khi cố tạo một :class:`Process` hoặc sử dụng một
+      :class:`concurrent.futures.ProcessPoolExecutor` từ REPL với một hàm *target* được định nghĩa cục bộ.
 
-      Passing a callable object defined in the current REPL session causes the
-      child process to die via an uncaught :exc:`AttributeError` exception when
-      starting as *target* must have been defined within an importable module
-      in order to be loaded during unpickling.
+      Việc truyền một đối tượng callable được định nghĩa trong phiên REPL hiện tại khiến child process kết thúc do ngoại lệ :exc:`AttributeError` không được bắt khi khởi động, vì *target* phải được định nghĩa trong một module có thể import để được tải trong quá trình unpickling.
 
-      Example of this uncatchable error from the child::
+      Ví dụ về lỗi không thể bắt này từ tiến trình con::
 
          >>> import multiprocessing as mp
          >>> def knigit():
@@ -593,28 +459,21 @@ or creating these objects.
          >>> process
          <SpawnProcess name='SpawnProcess-1' pid=379473 parent=378707 stopped exitcode=1>
 
-      See :ref:`multiprocessing-programming-spawn`.  While this restriction is
-      not true if using the ``"fork"`` start method, as of Python ``3.14`` that
-      is no longer the default on any platform.  See
-      :ref:`multiprocessing-start-methods`.
-      See also :gh:`132898`.
+      Xem :ref:`multiprocessing-programming-spawn`. Mặc dù hạn chế này không đúng khi sử dụng phương thức start ``"fork"``, kể từ Python ``3.14`` phương thức này không còn là mặc định trên bất kỳ nền tảng nào. Xem
+      :ref:`multiprocessing-start-methods`. Xem thêm :gh:`132898`.
 
    .. versionchanged:: 3.3
-      Added the *daemon* parameter.
+      Đã thêm tham số *daemon*.
 
    .. method:: run()
 
-      Method representing the process's activity.
+      Phương thức đại diện cho hoạt động của tiến trình.
 
-      You may override this method in a subclass.  The standard :meth:`run`
-      method invokes the callable object passed to the object's constructor as
-      the target argument, if any, with sequential and keyword arguments taken
-      from the *args* and *kwargs* arguments, respectively.
+      Bạn có thể ghi đè phương thức này trong một lớp con. Phương thức :meth:`run` chuẩn gọi đối tượng callable được truyền vào hàm khởi tạo của đối tượng làm đối số target, nếu có, với các đối số tuần tự và đối số từ khóa lần lượt được lấy từ các đối số *args* và *kwargs*.
 
-      Using a list or tuple as the *args* argument passed to :class:`Process`
-      achieves the same effect.
+      Sử dụng một list hoặc tuple làm đối số *args* được truyền vào :class:`Process` sẽ tạo ra hiệu ứng tương tự.
 
-      Example::
+      Ví dụ::
 
          >>> from multiprocessing import Process
          >>> p = Process(target=print, args=[1])
@@ -626,165 +485,115 @@ or creating these objects.
 
    .. method:: start()
 
-      Start the process's activity.
+      Bắt đầu hoạt động của tiến trình.
 
-      This must be called at most once per process object.  It arranges for the
-      object's :meth:`run` method to be invoked in a separate process.
+      Phương thức này phải được gọi nhiều nhất một lần cho mỗi đối tượng tiến trình. Phương thức này sắp xếp để phương thức :meth:`run` của đối tượng được gọi trong một tiến trình riêng.
 
    .. method:: join([timeout])
 
-      If the optional argument *timeout* is ``None`` (the default), the method
-      blocks until the process whose :meth:`join` method is called terminates.
-      If *timeout* is a positive number, it blocks at most *timeout* seconds.
-      Note that the method returns ``None`` if its process terminates or if the
-      method times out.  Check the process's :attr:`exitcode` to determine if
-      it terminated.
+      Nếu đối số tùy chọn *timeout* là ``None`` (giá trị mặc định), phương thức sẽ chặn cho đến khi tiến trình có phương thức :meth:`join` được gọi kết thúc. Nếu *timeout* là một số dương, phương thức sẽ chặn nhiều nhất *timeout* giây. Lưu ý rằng phương thức trả về ``None`` nếu tiến trình của nó kết thúc hoặc nếu phương thức hết thời gian chờ. Kiểm tra :attr:`exitcode` của tiến trình để xác định xem tiến trình đó đã kết thúc hay chưa.
 
-      A process can be joined many times.
+      Có thể join một tiến trình nhiều lần.
 
-      A process cannot join itself because this would cause a deadlock.  It is
-      an error to attempt to join a process before it has been started.
+      Một tiến trình không thể join chính nó vì điều này sẽ gây ra deadlock. Việc cố gắng join một tiến trình trước khi tiến trình đó được khởi động là một lỗi.
 
    .. attribute:: name
 
-      The process's name.  The name is a string used for identification purposes
-      only.  It has no semantics.  Multiple processes may be given the same
-      name.
+      Tên của tiến trình. Tên là một chuỗi chỉ được dùng cho mục đích nhận dạng. Tên không mang ngữ nghĩa nào. Nhiều tiến trình có thể được đặt cùng một tên.
 
-      The initial name is set by the constructor.  If no explicit name is
-      provided to the constructor, a name of the form
-      'Process-N\ :sub:`1`:N\ :sub:`2`:...:N\ :sub:`k`' is constructed, where
-      each N\ :sub:`k` is the N-th child of its parent.
+      Tên ban đầu được đặt bởi constructor. Nếu không cung cấp tên rõ ràng cho constructor, một tên có dạng 'Process-N\ :sub:`1`:N\ :sub:`2`:...:N\ :sub:`k`' sẽ được tạo, trong đó mỗi N\ :sub:`k` là con thứ N của tiến trình cha.
 
    .. method:: is_alive
 
-      Return whether the process is alive.
+      Trả về liệu tiến trình có đang hoạt động hay không.
 
-      Roughly, a process object is alive from the moment the :meth:`start`
-      method returns until the child process terminates.
+      Nói chung, một đối tượng tiến trình được xem là đang hoạt động kể từ thời điểm phương thức :meth:`start` trả về cho đến khi tiến trình con kết thúc.
 
    .. attribute:: daemon
 
-      The process's daemon flag, a Boolean value.  This must be set before
-      :meth:`start` is called.
+      Cờ daemon của tiến trình, một giá trị Boolean. Giá trị này phải được đặt trước khi
+      gọi :meth:`start`.
 
-      The initial value is inherited from the creating process.
+      Giá trị ban đầu được kế thừa từ tiến trình tạo ra nó.
 
-      When a process exits, it attempts to terminate all of its daemonic child
-      processes.
+      Khi một tiến trình kết thúc, nó cố gắng chấm dứt tất cả các tiến trình con daemon của mình.
 
-      Note that a daemonic process is not allowed to create child processes.
-      Otherwise a daemonic process would leave its children orphaned if it gets
-      terminated when its parent process exits. Additionally, these are **not**
-      Unix daemons or services, they are normal processes that will be
-      terminated (and not joined) if non-daemonic processes have exited.
+      Lưu ý rằng một tiến trình daemon không được phép tạo các tiến trình con. Nếu không, tiến trình daemon sẽ để lại các tiến trình con của nó ở trạng thái mồ côi nếu bị chấm dứt khi tiến trình cha kết thúc. Ngoài ra, đây **không phải** là Unix daemon hoặc service, mà là các tiến trình thông thường sẽ bị chấm dứt (chứ không được join) nếu các tiến trình không phải daemon đã kết thúc.
 
-   In addition to the  :class:`threading.Thread` API, :class:`Process` objects
-   also support the following attributes and methods:
+   Ngoài :class:`threading.Thread` API, các đối tượng :class:`Process` cũng hỗ trợ các thuộc tính và phương thức sau:
 
    .. attribute:: pid
 
-      Return the process ID.  Before the process is spawned, this will be
-      ``None``.
+      Trả về ID của tiến trình. Trước khi tiến trình được tạo, giá trị này sẽ là ``None``.
 
    .. attribute:: exitcode
 
-      The child's exit code.  This will be ``None`` if the process has not yet
-      terminated.
+      Mã thoát của tiến trình con. Giá trị này sẽ là ``None`` nếu tiến trình chưa kết thúc.
 
-      If the child's :meth:`run` method returned normally, the exit code
-      will be 0.  If it terminated via :func:`sys.exit` with an integer
-      argument *N*, the exit code will be *N*.
+      Nếu phương thức :meth:`run` của tiến trình con trả về bình thường, mã thoát sẽ là 0. Nếu tiến trình kết thúc qua :func:`sys.exit` với đối số số nguyên *N*, mã thoát sẽ là *N*.
 
-      If the child terminated due to an exception not caught within
-      :meth:`run`, the exit code will be 1.  If it was terminated by
-      signal *N*, the exit code will be the negative value *-N*.
+      Nếu tiến trình con kết thúc do một ngoại lệ không được bắt trong
+      :meth:`run`, mã thoát sẽ là 1. Nếu tiến trình bị chấm dứt bởi signal *N*, mã thoát sẽ là giá trị âm *-N*.
 
    .. attribute:: authkey
 
-      The process's authentication key (a byte string).
+      Khóa xác thực của process (một chuỗi byte).
 
-      When :mod:`!multiprocessing` is initialized the main process is assigned a
-      random string using :func:`os.urandom`.
+      Khi :mod:`!multiprocessing` được khởi tạo, process chính được gán một chuỗi ngẫu nhiên bằng :func:`os.urandom`.
 
-      When a :class:`Process` object is created, it will inherit the
-      authentication key of its parent process, although this may be changed by
-      setting :attr:`authkey` to another byte string.
+      Khi một đối tượng :class:`Process` được tạo, đối tượng này sẽ kế thừa khóa xác thực của process cha, mặc dù khóa này có thể được thay đổi bằng cách đặt :attr:`authkey` thành một chuỗi byte khác.
 
-      See :ref:`multiprocessing-auth-keys`.
+      Xem :ref:`multiprocessing-auth-keys`.
 
    .. attribute:: sentinel
 
-      A numeric handle of a system object which will become "ready" when
-      the process ends.
+      Một handle dạng số của đối tượng hệ thống sẽ chuyển sang trạng thái "sẵn sàng" khi process kết thúc.
 
-      You can use this value if you want to wait on several events at
-      once using :func:`multiprocessing.connection.wait`.  Otherwise
-      calling :meth:`join` is simpler.
+      Bạn có thể sử dụng giá trị này nếu muốn chờ nhiều sự kiện cùng lúc bằng :func:`multiprocessing.connection.wait`. Nếu không, việc gọi :meth:`join` sẽ đơn giản hơn.
 
-      On Windows, this is an OS handle usable with the ``WaitForSingleObject``
-      and ``WaitForMultipleObjects`` family of API calls.  On POSIX, this is
-      a file descriptor usable with primitives from the :mod:`select` module.
+      Trên Windows, đây là một handle của hệ điều hành có thể sử dụng với nhóm lệnh gọi API ``WaitForSingleObject`` và ``WaitForMultipleObjects``. Trên POSIX, đây là một file descriptor có thể sử dụng với các primitive từ module :mod:`select`.
 
       .. versionadded:: 3.3
 
    .. method:: interrupt()
 
-      Terminate the process. Works on POSIX using the :py:const:`~signal.SIGINT` signal.
-      Behavior on Windows is undefined.
+      Kết thúc tiến trình. Hoạt động trên POSIX bằng tín hiệu :py:const:`~signal.SIGINT`. Hành vi trên Windows không được xác định.
 
-      By default, this terminates the child process by raising :exc:`KeyboardInterrupt`.
-      This behavior can be altered by setting the respective signal handler in the child
-      process :func:`signal.signal` for :py:const:`~signal.SIGINT`.
+      Theo mặc định, thao tác này kết thúc tiến trình con bằng cách phát sinh :exc:`KeyboardInterrupt`. Có thể thay đổi hành vi này bằng cách thiết lập trình xử lý tín hiệu tương ứng trong tiến trình con :func:`signal.signal` cho :py:const:`~signal.SIGINT`.
 
-      Note: if the child process catches and discards :exc:`KeyboardInterrupt`, the
-      process will not be terminated.
+      Lưu ý: nếu tiến trình con bắt và loại bỏ :exc:`KeyboardInterrupt`, tiến trình sẽ không bị kết thúc.
 
-      Note: the default behavior will also set :attr:`exitcode` to ``1`` as if an
-      uncaught exception was raised in the child process. To have a different
-      :attr:`exitcode` you may simply catch :exc:`KeyboardInterrupt` and call
-      ``exit(your_code)``.
+      Lưu ý: hành vi mặc định cũng sẽ đặt :attr:`exitcode` thành ``1``, như thể một ngoại lệ không được bắt đã được phát sinh trong tiến trình con. Để có một
+      :attr:`exitcode` khác, bạn chỉ cần bắt :exc:`KeyboardInterrupt` và gọi ``exit(your_code)``.
 
       .. versionadded:: 3.14
 
    .. method:: terminate()
 
-      Terminate the process.  On POSIX this is done using the :py:const:`~signal.SIGTERM` signal;
-      on Windows :c:func:`!TerminateProcess` is used.  Note that exit handlers and
-      finally clauses, etc., will not be executed.
+      Kết thúc tiến trình. Trên POSIX, việc này được thực hiện bằng tín hiệu :py:const:`~signal.SIGTERM`; trên Windows, :c:func:`!TerminateProcess` được sử dụng. Lưu ý rằng các trình xử lý khi thoát và mệnh đề finally, v.v. sẽ không được thực thi.
 
-      Note that descendant processes of the process will *not* be terminated --
-      they will simply become orphaned.
+      Lưu ý rằng các tiến trình hậu duệ của tiến trình này *không* bị kết thúc -- chúng sẽ đơn giản trở thành các tiến trình mồ côi.
 
       .. warning::
 
-         If this method is used when the associated process is using a pipe or
-         queue then the pipe or queue is liable to become corrupted and may
-         become unusable by other process.  Similarly, if the process has
-         acquired a lock or semaphore etc. then terminating it is liable to
-         cause other processes to deadlock.
+         Nếu phương thức này được sử dụng khi process liên quan đang sử dụng pipe hoặc queue thì pipe hoặc queue có nguy cơ bị hỏng và có thể không thể được process khác sử dụng. Tương tự, nếu process đã chiếm một lock hoặc semaphore, v.v. thì việc kết thúc process đó có nguy cơ khiến các process khác bị deadlock.
 
    .. method:: kill()
 
-      Same as :meth:`terminate` but using the ``SIGKILL`` signal on POSIX.
+      Tương tự như :meth:`terminate` nhưng sử dụng signal ``SIGKILL`` trên POSIX.
 
       .. versionadded:: 3.7
 
    .. method:: close()
 
-      Close the :class:`Process` object, releasing all resources associated
-      with it.  :exc:`ValueError` is raised if the underlying process
-      is still running.  Once :meth:`close` returns successfully, most
-      other methods and attributes of the :class:`Process` object will
-      raise :exc:`ValueError`.
+      Đóng đối tượng :class:`Process`, giải phóng tất cả tài nguyên liên kết với đối tượng đó. :exc:`ValueError` sẽ được phát sinh nếu process nền vẫn đang chạy. Sau khi :meth:`close` trả về thành công, hầu hết các phương thức và thuộc tính khác của đối tượng :class:`Process` sẽ phát sinh :exc:`ValueError`.
 
       .. versionadded:: 3.7
 
-   Note that the :meth:`start`, :meth:`join`, :meth:`is_alive`,
-   :meth:`terminate` and :attr:`exitcode` methods should only be called by
-   the process that created the process object.
+   Lưu ý rằng các phương thức :meth:`start`, :meth:`join`, :meth:`is_alive`,
+   :meth:`terminate` và :attr:`exitcode` chỉ nên được gọi bởi process đã tạo đối tượng process.
 
-   Example usage of some of the methods of :class:`Process`:
+   Ví dụ sử dụng một số phương thức của :class:`Process`:
 
    .. doctest::
 
@@ -805,327 +614,239 @@ or creating these objects.
 
 .. exception:: ProcessError
 
-   The base class of all :mod:`!multiprocessing` exceptions.
+   Lớp cơ sở của tất cả các exception :mod:`!multiprocessing`.
 
 .. exception:: BufferTooShort
 
-   Exception raised by :meth:`Connection.recv_bytes_into` when the supplied
-   buffer object is too small for the message read.
+   Ngoại lệ do :meth:`Connection.recv_bytes_into` đưa ra khi đối tượng buffer được cung cấp quá nhỏ so với thông báo được đọc.
 
-   If ``e`` is an instance of :exc:`BufferTooShort` then ``e.args[0]`` will give
-   the message as a byte string.
+   Nếu ``e`` là một thể hiện của :exc:`BufferTooShort` thì ``e.args[0]`` sẽ cung cấp thông báo dưới dạng chuỗi byte.
 
 .. exception:: AuthenticationError
 
-   Raised when there is an authentication error.
+   Được đưa ra khi xảy ra lỗi xác thực.
 
 .. exception:: TimeoutError
 
-   Raised by methods with a timeout when the timeout expires.
+   Được đưa ra bởi các phương thức có thời gian chờ khi thời gian chờ hết hạn.
 
-Pipes and Queues
-^^^^^^^^^^^^^^^^
+Pipe và Queue
+^^^^^^^^^^^^^
 
-When using multiple processes, one generally uses message passing for
-communication between processes and avoids having to use any synchronization
-primitives like locks.
+Khi sử dụng nhiều process, thông thường người ta dùng truyền thông báo để giao tiếp giữa các process và tránh phải sử dụng các primitive đồng bộ hóa như lock.
 
-For passing messages one can use :func:`Pipe` (for a connection between two
-processes) or a queue (which allows multiple producers and consumers).
+Để truyền thông báo, có thể sử dụng :func:`Pipe` (cho một kết nối giữa hai process) hoặc queue (cho phép nhiều producer và consumer).
 
-The :class:`Queue`, :class:`SimpleQueue` and :class:`JoinableQueue` types
-are multi-producer, multi-consumer :abbr:`FIFO (first-in, first-out)`
-queues modelled on the :class:`queue.Queue` class in the
-standard library.  They differ in that :class:`Queue` lacks the
-:meth:`~queue.Queue.task_done` and :meth:`~queue.Queue.join` methods introduced
-into Python 2.5's :class:`queue.Queue` class.
+Các kiểu :class:`Queue`, :class:`SimpleQueue` và :class:`JoinableQueue` là các hàng đợi :abbr:`FIFO (first-in, first-out)` đa nhà sản xuất, đa người tiêu dùng, được mô phỏng theo lớp :class:`queue.Queue` trong thư viện chuẩn. Chúng khác ở chỗ :class:`Queue` không có
+các phương thức :meth:`~queue.Queue.task_done` và :meth:`~queue.Queue.join` được giới thiệu trong lớp :class:`queue.Queue` của Python 2.5.
 
-If you use :class:`JoinableQueue` then you **must** call
-:meth:`JoinableQueue.task_done` for each task removed from the queue or else the
-semaphore used to count the number of unfinished tasks may eventually overflow,
-raising an exception.
+Nếu sử dụng :class:`JoinableQueue`, bạn **must** gọi
+:meth:`JoinableQueue.task_done` cho mỗi tác vụ được lấy khỏi hàng đợi; nếu không, semaphore dùng để đếm số tác vụ chưa hoàn thành cuối cùng có thể bị tràn, khiến một ngoại lệ được nâng lên.
 
-One difference from other Python queue implementations, is that :mod:`!multiprocessing`
-queues serializes all objects that are put into them using :mod:`pickle`.
-The object returned by the get method is a re-created object that does not share
-memory with the original object.
+Một điểm khác so với các cách triển khai hàng đợi Python khác là các hàng đợi :mod:`!multiprocessing` tuần tự hóa tất cả đối tượng được đưa vào chúng bằng :mod:`pickle`. Đối tượng được phương thức get trả về là một đối tượng được tạo lại và không dùng chung bộ nhớ với đối tượng ban đầu.
 
-Note that one can also create a shared queue by using a manager object -- see
+Lưu ý rằng bạn cũng có thể tạo một hàng đợi dùng chung bằng cách sử dụng đối tượng manager -- xem
 :ref:`multiprocessing-managers`.
 
 .. note::
 
-   :mod:`!multiprocessing` uses the usual :exc:`queue.Empty` and
-   :exc:`queue.Full` exceptions to signal a timeout.  They are not available in
-   the :mod:`!multiprocessing` namespace so you need to import them from
+   :mod:`!multiprocessing` sử dụng :exc:`queue.Empty` thông thường và
+   :exc:`queue.Full` để báo hiệu hết thời gian chờ. Chúng không có trong namespace :mod:`!multiprocessing`, vì vậy bạn cần import chúng từ
    :mod:`queue`.
 
 .. note::
 
-   When an object is put on a queue, the object is pickled and a
-   background thread later flushes the pickled data to an underlying
-   pipe.  This has some consequences which are a little surprising,
-   but should not cause any practical difficulties -- if they really
-   bother you then you can instead use a queue created with a
+   Khi một đối tượng được đưa vào queue, đối tượng đó sẽ được pickle và một background thread sau đó sẽ flush dữ liệu đã pickle vào pipe bên dưới. Điều này dẫn đến một số hệ quả hơi bất ngờ, nhưng không gây ra khó khăn thực tế nào -- nếu chúng thực sự khiến bạn khó chịu, bạn có thể thay vào đó sử dụng một queue được tạo bằng
    :ref:`manager <multiprocessing-managers>`.
 
-   (1) After putting an object on an empty queue there may be an
-       infinitesimal delay before the queue's :meth:`~Queue.empty`
-       method returns :const:`False` and :meth:`~Queue.get_nowait` can
-       return without raising :exc:`queue.Empty`.
+   (1) Sau khi đưa một đối tượng vào queue đang trống, có thể xảy ra một khoảng trễ cực nhỏ trước khi phương thức :meth:`~Queue.empty` của queue trả về :const:`False` và :meth:`~Queue.get_nowait` có thể trả về mà không phát sinh :exc:`queue.Empty`.
 
-   (2) If multiple processes are enqueuing objects, it is possible for
-       the objects to be received at the other end out-of-order.
-       However, objects enqueued by the same process will always be in
-       the expected order with respect to each other.
+   (2) Nếu nhiều process đang đưa các đối tượng vào queue, các đối tượng có thể được nhận ở đầu bên kia không đúng thứ tự. Tuy nhiên, các đối tượng được đưa vào queue bởi cùng một process sẽ luôn giữ đúng thứ tự tương ứng với nhau.
 
 .. warning::
 
-   If a process is killed using :meth:`Process.terminate` or :func:`os.kill`
-   while it is trying to use a :class:`Queue`, then the data in the queue is
-   likely to become corrupted.  This may cause any other process to get an
-   exception when it tries to use the queue later on.
+   Nếu một process bị kết thúc bằng :meth:`Process.terminate` hoặc :func:`os.kill` trong khi đang cố sử dụng :class:`Queue`, dữ liệu trong queue có thể bị hỏng. Điều này có thể khiến bất kỳ process nào khác phát sinh exception khi cố sử dụng queue về sau.
 
 .. warning::
 
-   As mentioned above, if a child process has put items on a queue (and it has
-   not used :meth:`JoinableQueue.cancel_join_thread
-   <multiprocessing.Queue.cancel_join_thread>`), then that process will
-   not terminate until all buffered items have been flushed to the pipe.
+   Như đã đề cập ở trên, nếu một child process đã đưa các mục vào queue (và chưa sử dụng :meth:`JoinableQueue.cancel_join_thread <multiprocessing.Queue.cancel_join_thread>`), process đó sẽ không kết thúc cho đến khi tất cả các mục trong buffer được flush vào pipe.
 
-   This means that if you try joining that process you may get a deadlock unless
-   you are sure that all items which have been put on the queue have been
-   consumed.  Similarly, if the child process is non-daemonic then the parent
-   process may hang on exit when it tries to join all its non-daemonic children.
+   Điều này có nghĩa là nếu bạn cố gắng join tiến trình đó, bạn có thể gặp deadlock trừ khi chắc chắn rằng tất cả các mục đã được đưa vào queue đều đã được xử lý. Tương tự, nếu tiến trình con không phải daemon thì tiến trình cha có thể bị treo khi thoát, lúc cố gắng join tất cả các tiến trình con không phải daemon của nó.
 
-   Note that a queue created using a manager does not have this issue.  See
+   Lưu ý rằng queue được tạo bằng manager không gặp vấn đề này. Xem
    :ref:`multiprocessing-programming`.
 
-For an example of the usage of queues for interprocess communication see
+Để xem ví dụ về cách sử dụng queue cho giao tiếp giữa các tiến trình, hãy xem
 :ref:`multiprocessing-examples`.
 
 
 .. function:: Pipe(duplex=True)
 
-   Returns a pair ``(conn1, conn2)`` of
-   :class:`~multiprocessing.connection.Connection` objects representing the
-   ends of a pipe.
+   Trả về một cặp ``(conn1, conn2)`` gồm
+   các đối tượng :class:`~multiprocessing.connection.Connection` đại diện cho hai đầu của một pipe.
 
-   If *duplex* is ``True`` (the default) then the pipe is bidirectional.  If
-   *duplex* is ``False`` then the pipe is unidirectional: ``conn1`` can only be
-   used for receiving messages and ``conn2`` can only be used for sending
-   messages.
+   Nếu *duplex* là ``True`` (mặc định) thì pipe là hai chiều. Nếu *duplex* là ``False`` thì pipe là một chiều: ``conn1`` chỉ có thể được dùng để nhận thông báo và ``conn2`` chỉ có thể được dùng để gửi thông báo.
 
-   The :meth:`~multiprocessing.Connection.send` method serializes the object using
-   :mod:`pickle` and the :meth:`~multiprocessing.Connection.recv` re-creates the object.
+   Phương thức :meth:`~multiprocessing.Connection.send` tuần tự hóa đối tượng bằng cách sử dụng
+   :mod:`pickle` và :meth:`~multiprocessing.Connection.recv` tạo lại đối tượng.
 
 .. class:: Queue([maxsize])
 
-   Returns a process shared queue implemented using a pipe and a few
-   locks/semaphores.  When a process first puts an item on the queue a feeder
-   thread is started which transfers objects from a buffer into the pipe.
+   Trả về một queue dùng chung giữa các process, được triển khai bằng một pipe và một số locks/semaphores. Khi một process lần đầu đưa một item vào queue, một feeder thread sẽ được khởi động để chuyển các object từ bộ đệm vào pipe.
 
-   Instantiating this class may set the global start method. See
-   :ref:`global-start-method` for more details.
+   Việc khởi tạo class này có thể thiết lập phương thức start toàn cục. Xem
+   :ref:`global-start-method` để biết thêm chi tiết.
 
-   The usual :exc:`queue.Empty` and :exc:`queue.Full` exceptions from the
-   standard library's :mod:`queue` module are raised to signal timeouts.
+   Các exception :exc:`queue.Empty` và :exc:`queue.Full` thông thường từ module :mod:`queue` của standard library được raise để báo hiệu timeout.
 
-   :class:`Queue` implements all the methods of :class:`queue.Queue` except for
-   :meth:`~queue.Queue.task_done`, :meth:`~queue.Queue.join`, and
+   :class:`Queue` triển khai tất cả các phương thức của :class:`queue.Queue` ngoại trừ
+   :meth:`~queue.Queue.task_done`, :meth:`~queue.Queue.join`, và
    :meth:`~queue.Queue.shutdown`.
 
    .. method:: qsize()
 
-      Return the approximate size of the queue.  Because of
-      multithreading/multiprocessing semantics, this number is not reliable.
+      Trả về kích thước xấp xỉ của hàng đợi. Do ngữ nghĩa của multithreading/multiprocessing, con số này không đáng tin cậy.
 
-      Note that this may raise :exc:`NotImplementedError` on platforms like
-      macOS where ``sem_getvalue()`` is not implemented.
+      Lưu ý rằng thao tác này có thể phát sinh :exc:`NotImplementedError` trên các nền tảng như macOS, nơi ``sem_getvalue()`` chưa được triển khai.
 
    .. method:: empty()
 
-      Return ``True`` if the queue is empty, ``False`` otherwise.  Because of
-      multithreading/multiprocessing semantics, this is not reliable.
+      Trả về ``True`` nếu hàng đợi trống, ngược lại trả về ``False``. Do ngữ nghĩa của multithreading/multiprocessing, kết quả này không đáng tin cậy.
 
-      May raise an :exc:`OSError` on closed queues. (not guaranteed)
+      Có thể phát sinh một :exc:`OSError` trên các hàng đợi đã đóng. (không được đảm bảo)
 
    .. method:: full()
 
-      Return ``True`` if the queue is full, ``False`` otherwise.  Because of
-      multithreading/multiprocessing semantics, this is not reliable.
+      Trả về ``True`` nếu hàng đợi đầy, ngược lại trả về ``False``. Do ngữ nghĩa của multithreading/multiprocessing, kết quả này không đáng tin cậy.
 
    .. method:: put(obj[, block[, timeout]])
 
-      Put obj into the queue.  If the optional argument *block* is ``True``
-      (the default) and *timeout* is ``None`` (the default), block if necessary until
-      a free slot is available.  If *timeout* is a positive number, it blocks at
-      most *timeout* seconds and raises the :exc:`queue.Full` exception if no
-      free slot was available within that time.  Otherwise (*block* is
-      ``False``), put an item on the queue if a free slot is immediately
-      available, else raise the :exc:`queue.Full` exception (*timeout* is
-      ignored in that case).
+      Đưa obj vào hàng đợi. Nếu đối số tùy chọn *block* là ``True`` (mặc định) và *timeout* là ``None`` (mặc định), thao tác sẽ chặn nếu cần cho đến khi có một vị trí trống. Nếu *timeout* là một số dương, thao tác sẽ chặn tối đa *timeout* giây và phát sinh ngoại lệ :exc:`queue.Full` nếu không có vị trí trống trong khoảng thời gian đó. Ngược lại (*block* là ``False``), đưa một mục vào hàng đợi nếu có ngay một vị trí trống; nếu không, phát sinh ngoại lệ :exc:`queue.Full` (*timeout* bị bỏ qua trong trường hợp này).
 
       .. versionchanged:: 3.8
-         If the queue is closed, :exc:`ValueError` is raised instead of
+         Nếu hàng đợi đã đóng, :exc:`ValueError` sẽ được phát sinh thay vì
          :exc:`AssertionError`.
 
    .. method:: put_nowait(obj)
 
-      Equivalent to ``put(obj, False)``.
+      Tương đương với ``put(obj, False)``.
 
    .. method:: get([block[, timeout]])
 
-      Remove and return an item from the queue.  If optional args *block* is
-      ``True`` (the default) and *timeout* is ``None`` (the default), block if
-      necessary until an item is available.  If *timeout* is a positive number,
-      it blocks at most *timeout* seconds and raises the :exc:`queue.Empty`
-      exception if no item was available within that time.  Otherwise (block is
-      ``False``), return an item if one is immediately available, else raise the
-      :exc:`queue.Empty` exception (*timeout* is ignored in that case).
+      Xóa và trả về một mục khỏi queue. Nếu các đối số tùy chọn *block* là ``True`` (mặc định) và *timeout* là ``None`` (mặc định), hãy chờ nếu cần cho đến khi có một mục. Nếu *timeout* là một số dương, thao tác sẽ chờ tối đa *timeout* giây và phát sinh ngoại lệ :exc:`queue.Empty` nếu không có mục nào trong khoảng thời gian đó. Ngược lại (block là ``False``), trả về một mục nếu có sẵn ngay lập tức; nếu không, phát sinh
+      ngoại lệ :exc:`queue.Empty` (*timeout* bị bỏ qua trong trường hợp đó).
 
       .. versionchanged:: 3.8
-         If the queue is closed, :exc:`ValueError` is raised instead of
+         Nếu hàng đợi đã đóng, :exc:`ValueError` sẽ được phát sinh thay vì
          :exc:`OSError`.
 
    .. method:: get_nowait()
 
-      Equivalent to ``get(False)``.
+      Tương đương với ``get(False)``.
 
-   :class:`multiprocessing.Queue` has a few additional methods not found in
-   :class:`queue.Queue`.  These methods are usually unnecessary for most
-   code:
+   :class:`multiprocessing.Queue` có một số phương thức bổ sung không có trong
+   :class:`queue.Queue`. Các phương thức này thường không cần thiết đối với hầu hết mã nguồn:
 
    .. method:: close()
 
-      Close the queue: release internal resources.
+      Đóng queue: giải phóng các tài nguyên nội bộ.
 
-      A queue must not be used anymore after it is closed. For example,
-      :meth:`~Queue.get`, :meth:`~Queue.put` and :meth:`~Queue.empty`
-      methods must no longer be called.
+      Không được sử dụng queue nữa sau khi đã đóng. Ví dụ:
+      Không được gọi các phương thức :meth:`~Queue.get`, :meth:`~Queue.put` và :meth:`~Queue.empty` nữa.
 
-      The background thread will quit once it has flushed all buffered
-      data to the pipe.  This is called automatically when the queue is garbage
-      collected.
+      Luồng nền sẽ thoát sau khi đã flush toàn bộ dữ liệu được đệm vào pipe. Thao tác này được tự động gọi khi queue được garbage collect.
 
    .. method:: join_thread()
 
-      Join the background thread.  This can only be used after :meth:`close` has
-      been called.  It blocks until the background thread exits, ensuring that
-      all data in the buffer has been flushed to the pipe.
+      Join luồng nền. Chỉ có thể sử dụng thao tác này sau khi đã gọi :meth:`close`. Thao tác này sẽ chặn cho đến khi luồng nền thoát, đảm bảo toàn bộ dữ liệu trong bộ đệm đã được flush vào pipe.
 
-      By default if a process is not the creator of the queue then on exit it
-      will attempt to join the queue's background thread.  The process can call
-      :meth:`cancel_join_thread` to make :meth:`join_thread` do nothing.
+      Theo mặc định, nếu một process không phải là process tạo queue thì khi thoát, process đó sẽ cố gắng join luồng nền của queue. Process có thể gọi
+      :meth:`cancel_join_thread` để khiến :meth:`join_thread` không thực hiện thao tác nào.
 
    .. method:: cancel_join_thread()
 
-      Prevent :meth:`join_thread` from blocking.  In particular, this prevents
-      the background thread from being joined automatically when the process
-      exits -- see :meth:`join_thread`.
+      Ngăn :meth:`join_thread` chặn. Cụ thể, thao tác này ngăn luồng nền tự động được join khi tiến trình thoát — xem :meth:`join_thread`.
 
-      A better name for this method might be
-      ``allow_exit_without_flush()``.  It is likely to cause enqueued
-      data to be lost, and you almost certainly will not need to use it.
-      It is really only there if you need the current process to exit
-      immediately without waiting to flush enqueued data to the
-      underlying pipe, and you don't care about lost data.
+      Một tên phù hợp hơn cho phương thức này có thể là ``allow_exit_without_flush()``. Phương thức này có khả năng khiến dữ liệu đã xếp hàng bị mất, và gần như chắc chắn bạn sẽ không cần sử dụng nó. Thực ra, phương thức này chỉ tồn tại trong trường hợp bạn cần tiến trình hiện tại thoát ngay lập tức mà không chờ xả dữ liệu đã xếp hàng vào pipe bên dưới, đồng thời không quan tâm đến việc dữ liệu bị mất.
 
    .. note::
 
-      This class's functionality requires a functioning shared semaphore
-      implementation on the host operating system. Without one, the
-      functionality in this class will be disabled, and attempts to
-      instantiate a :class:`Queue` will result in an :exc:`ImportError`. See
-      :issue:`3770` for additional information.  The same holds true for any
-      of the specialized queue types listed below.
+      Chức năng của lớp này yêu cầu hệ điều hành máy chủ có một implementation semaphore dùng chung hoạt động được. Nếu không có, chức năng của lớp này sẽ bị vô hiệu hóa, và việc khởi tạo một :class:`Queue` sẽ dẫn đến :exc:`ImportError`. Xem
+      :issue:`3770` để biết thêm thông tin. Điều tương tự cũng áp dụng cho bất kỳ kiểu queue chuyên biệt nào được liệt kê bên dưới.
 
 .. class:: SimpleQueue()
 
-   It is a simplified :class:`Queue` type, very close to a locked :class:`Pipe`.
+   Đây là một kiểu :class:`Queue` đơn giản hóa, rất gần với một :class:`Pipe` bị khóa.
 
-   Instantiating this class may set the global start method. See
-   :ref:`global-start-method` for more details.
+   Việc khởi tạo class này có thể thiết lập phương thức start toàn cục. Xem
+   :ref:`global-start-method` để biết thêm chi tiết.
 
    .. method:: close()
 
-      Close the queue: release internal resources.
+      Đóng queue: giải phóng các tài nguyên nội bộ.
 
-      A queue must not be used anymore after it is closed. For example,
-      :meth:`get`, :meth:`put` and :meth:`empty` methods must no longer be
-      called.
+      Không được sử dụng queue nữa sau khi đã đóng. Ví dụ:
+      Không được gọi các phương thức :meth:`get`, :meth:`put` và :meth:`empty` nữa.
 
       .. versionadded:: 3.9
 
    .. method:: empty()
 
-      Return ``True`` if the queue is empty, ``False`` otherwise.
+      Trả về ``True`` nếu hàng đợi rỗng, nếu không thì trả về ``False``.
 
-      Always raises an :exc:`OSError` if the SimpleQueue is closed.
+      Luôn phát sinh một :exc:`OSError` nếu SimpleQueue bị đóng.
 
    .. method:: get()
 
-      Remove and return an item from the queue.
+      Xóa và trả về một mục khỏi hàng đợi.
 
    .. method:: put(item)
 
-      Put *item* into the queue.
+      Đưa *item* vào hàng đợi.
 
 
 .. class:: JoinableQueue([maxsize])
 
-   :class:`JoinableQueue`, a :class:`Queue` subclass, is a queue which
-   additionally has :meth:`task_done` and :meth:`join` methods.
+   :class:`JoinableQueue`, một lớp con của :class:`Queue`, là một queue có thêm các phương thức :meth:`task_done` và :meth:`join`.
 
-   Instantiating this class may set the global start method. See
-   :ref:`global-start-method` for more details.
+   Việc khởi tạo class này có thể thiết lập phương thức start toàn cục. Xem
+   :ref:`global-start-method` để biết thêm chi tiết.
 
    .. method:: task_done()
 
-      Indicate that a formerly enqueued task is complete. Used by queue
-      consumers.  For each :meth:`~Queue.get` used to fetch a task, a subsequent
-      call to :meth:`task_done` tells the queue that the processing on the task
-      is complete.
+      Đánh dấu rằng một tác vụ đã được đưa vào queue trước đó đã hoàn tất. Được các consumer của queue sử dụng. Với mỗi :meth:`~Queue.get` được sử dụng để lấy một tác vụ, một lần gọi :meth:`task_done` tiếp theo sẽ cho queue biết rằng việc xử lý tác vụ đó đã hoàn tất.
 
-      If a :meth:`~queue.Queue.join` is currently blocking, it will resume when all
-      items have been processed (meaning that a :meth:`task_done` call was
-      received for every item that had been :meth:`~Queue.put` into the queue).
+      Nếu một :meth:`~queue.Queue.join` hiện đang bị chặn, nó sẽ tiếp tục khi tất cả các mục đã được xử lý (nghĩa là đã nhận được một lần gọi :meth:`task_done` cho mỗi mục đã được :meth:`~Queue.put` vào queue).
 
-      Raises a :exc:`ValueError` if called more times than there were items
-      placed in the queue.
+      Phát sinh :exc:`ValueError` nếu được gọi nhiều lần hơn số mục đã được đưa vào queue.
 
 
    .. method:: join()
 
-      Block until all items in the queue have been gotten and processed.
+      Chặn cho đến khi tất cả các mục trong queue đã được lấy ra và xử lý.
 
-      The count of unfinished tasks goes up whenever an item is added to the
-      queue.  The count goes down whenever a consumer calls
-      :meth:`task_done` to indicate that the item was retrieved and all work on
-      it is complete.  When the count of unfinished tasks drops to zero,
-      :meth:`~queue.Queue.join` unblocks.
+      Số lượng tác vụ chưa hoàn tất tăng lên mỗi khi một mục được thêm vào queue. Số lượng này giảm xuống mỗi khi consumer gọi
+      :meth:`task_done` để cho biết rằng mục đó đã được truy xuất và mọi công việc liên quan đã hoàn tất. Khi số lượng tác vụ chưa hoàn tất giảm xuống bằng 0,
+      :meth:`~queue.Queue.join` bỏ chặn.
 
 
-Miscellaneous
-^^^^^^^^^^^^^
+Linh tinh
+^^^^^^^^^
 
 .. function:: active_children()
 
-   Return list of all live children of the current process.
+   Trả về danh sách tất cả tiến trình con đang hoạt động của tiến trình hiện tại.
 
-   Calling this has the side effect of "joining" any processes which have
-   already finished.
+   Việc gọi hàm này có tác dụng phụ là "join" mọi tiến trình đã kết thúc.
 
 .. function:: cpu_count()
 
-   Return the number of CPUs in the system.
+   Trả về số lượng CPU trong hệ thống.
 
-   This number is not equivalent to the number of CPUs the current process can
-   use.  The number of usable CPUs can be obtained with
-   :func:`os.process_cpu_count` (or ``len(os.sched_getaffinity(0))``).
+   Con số này không tương đương với số CPU mà tiến trình hiện tại có thể sử dụng. Có thể lấy số CPU khả dụng bằng
+   :func:`os.process_cpu_count` (hoặc ``len(os.sched_getaffinity(0))``).
 
-   When the number of CPUs cannot be determined a :exc:`NotImplementedError`
-   is raised.
+   Khi không thể xác định số CPU, :exc:`NotImplementedError` sẽ được đưa ra.
 
    .. seealso::
       :func:`os.cpu_count`
@@ -1133,32 +854,26 @@ Miscellaneous
 
    .. versionchanged:: 3.13
 
-      The return value can also be overridden using the
-      :option:`-X cpu_count <-X>` flag or :envvar:`PYTHON_CPU_COUNT` as this is
-      merely a wrapper around the :mod:`os` cpu count APIs.
+      Giá trị trả về cũng có thể được ghi đè bằng
+      cờ :option:`-X cpu_count <-X>` hoặc :envvar:`PYTHON_CPU_COUNT`, vì đây chỉ là một wrapper quanh các API đếm CPU :mod:`os`.
 
 .. function:: current_process()
 
-   Return the :class:`Process` object corresponding to the current process.
+   Trả về đối tượng :class:`Process` tương ứng với tiến trình hiện tại.
 
-   An analogue of :func:`threading.current_thread`.
+   Một phiên bản tương đương với :func:`threading.current_thread`.
 
 .. function:: parent_process()
 
-   Return the :class:`Process` object corresponding to the parent process of
-   the :func:`current_process`. For the main process, ``parent_process`` will
-   be ``None``.
+   Trả về đối tượng :class:`Process` tương ứng với tiến trình cha của :func:`current_process`. Đối với tiến trình chính, ``parent_process`` sẽ là ``None``.
 
    .. versionadded:: 3.8
 
 .. function:: freeze_support()
 
-   Add support for when a program which uses :mod:`!multiprocessing` has been
-   frozen to produce an executable.  (Has been tested with **py2exe**,
-   **PyInstaller** and **cx_Freeze**.)
+   Thêm hỗ trợ cho trường hợp một chương trình sử dụng :mod:`!multiprocessing` đã được đóng băng để tạo thành tệp thực thi. (Đã được kiểm thử với **py2exe**, **PyInstaller** và **cx_Freeze**.)
 
-   One needs to call this function straight after the ``if __name__ ==
-   '__main__'`` line of the main module.  For example::
+   Cần gọi hàm này ngay sau dòng ``if __name__ == '__main__'`` của module chính. Ví dụ::
 
       from multiprocessing import Process, freeze_support
 
@@ -1169,214 +884,158 @@ Miscellaneous
           freeze_support()
           Process(target=f).start()
 
-   If the ``freeze_support()`` line is omitted then trying to run the frozen
-   executable will raise :exc:`RuntimeError`.
+   Nếu bỏ qua dòng ``freeze_support()`` thì việc cố chạy tệp thực thi đã đóng băng sẽ gây ra :exc:`RuntimeError`.
 
-   Calling ``freeze_support()`` has no effect when the start method is not
-   *spawn*. In addition, if the module is being run normally by the Python
-   interpreter (the program has not been frozen), then ``freeze_support()``
-   has no effect.
+   Việc gọi ``freeze_support()`` không có tác dụng khi phương thức khởi động không phải là *spawn*. Ngoài ra, nếu module đang được chạy bình thường bằng trình thông dịch Python (chương trình chưa được đóng băng), thì ``freeze_support()`` cũng không có tác dụng.
 
 .. function:: get_all_start_methods()
 
-   Returns a list of the supported start methods, the first of which
-   is the default.  The possible start methods are ``'fork'``,
-   ``'spawn'`` and ``'forkserver'``.  Not all platforms support all
-   methods.  See :ref:`multiprocessing-start-methods`.
+   Trả về danh sách các phương thức khởi động được hỗ trợ, trong đó phương thức đầu tiên là mặc định. Các phương thức khởi động có thể có là ``'fork'``, ``'spawn'`` và ``'forkserver'``. Không phải nền tảng nào cũng hỗ trợ tất cả các phương thức. Xem :ref:`multiprocessing-start-methods`.
 
    .. versionadded:: 3.4
 
 .. function:: get_context(method=None)
 
-   Return a context object which has the same attributes as the
-   :mod:`!multiprocessing` module.
+   Trả về một đối tượng context có các thuộc tính giống như
+   mô-đun :mod:`!multiprocessing`.
 
-   If *method* is ``None`` then the default context is returned. Note that if
-   the global start method has not been set, this will set it to the system default
-   See :ref:`global-start-method` for more details.
-   Otherwise *method* should be ``'fork'``, ``'spawn'``,
-   ``'forkserver'``.  :exc:`ValueError` is raised if the specified
-   start method is not available.  See :ref:`multiprocessing-start-methods`.
+   Nếu *method* là ``None`` thì context mặc định sẽ được trả về. Lưu ý rằng nếu phương thức start toàn cục chưa được đặt, thao tác này sẽ đặt nó thành mặc định của hệ thống. Xem :ref:`global-start-method` để biết thêm chi tiết. Nếu không, *method* phải là ``'fork'``, ``'spawn'`` hoặc ``'forkserver'``. :exc:`ValueError` sẽ được phát sinh nếu phương thức start được chỉ định không khả dụng. Xem :ref:`multiprocessing-start-methods`.
 
    .. versionadded:: 3.4
 
 .. function:: get_start_method(allow_none=False)
 
-   Return the name of start method used for starting processes.
+   Trả về tên của phương thức start được sử dụng để khởi động các process.
 
-   If the global start method is not set and *allow_none* is ``False``, the global start
-   method is set to the default, and its name is returned. See
-   :ref:`global-start-method` for more details.
+   Nếu phương thức start toàn cục chưa được đặt và *allow_none* là ``False``, phương thức start toàn cục sẽ được đặt thành giá trị mặc định và tên của nó được trả về. Xem
+   :ref:`global-start-method` để biết thêm chi tiết.
 
-   The return value can be ``'fork'``, ``'spawn'``, ``'forkserver'``
-   or ``None``.  See :ref:`multiprocessing-start-methods`.
+   Giá trị trả về có thể là ``'fork'``, ``'spawn'``, ``'forkserver'`` hoặc ``None``. Xem :ref:`multiprocessing-start-methods`.
 
    .. versionadded:: 3.4
 
    .. versionchanged:: 3.8
 
-      On macOS, the *spawn* start method is now the default.  The *fork* start
-      method should be considered unsafe as it can lead to crashes of the
-      subprocess. See :issue:`33725`.
+      Trên macOS, phương thức start *spawn* hiện là mặc định. Phương thức start *fork* nên được xem là không an toàn vì có thể khiến subprocess bị crash. Xem :issue:`33725`.
 
 .. function:: set_executable(executable)
 
-   Set the path of the Python interpreter to use when starting a child process.
-   (By default :data:`sys.executable` is used).  Embedders will probably need to
-   do something like ::
+   Đặt đường dẫn đến trình thông dịch Python sẽ được sử dụng khi khởi động tiến trình con. (Theo mặc định, sử dụng :data:`sys.executable`). Các chương trình nhúng có thể sẽ cần thực hiện việc như sau::
 
       set_executable(os.path.join(sys.exec_prefix, 'pythonw.exe'))
 
-   before they can create child processes.
+   trước khi có thể tạo các tiến trình con.
 
    .. versionchanged:: 3.4
-      Now supported on POSIX when the ``'spawn'`` start method is used.
+      Hiện được hỗ trợ trên POSIX khi sử dụng phương thức khởi động ``'spawn'``.
 
    .. versionchanged:: 3.11
-      Accepts a :term:`path-like object`.
+      Nhận một :term:`path-like object`.
 
 .. function:: set_forkserver_preload(module_names)
 
-   Set a list of module names for the forkserver main process to attempt to
-   import so that their already imported state is inherited by forked
-   processes. Any :exc:`ImportError` when doing so is silently ignored.
-   This can be used as a performance enhancement to avoid repeated work
-   in every process.
+   Đặt danh sách tên mô-đun để tiến trình chính của forkserver cố gắng import, ताकि trạng thái đã import của chúng được các tiến trình fork kế thừa. Mọi :exc:`ImportError` xảy ra trong quá trình này sẽ bị bỏ qua một cách im lặng. Có thể sử dụng tùy chọn này để cải thiện hiệu năng bằng cách tránh thực hiện lặp lại công việc trong mỗi tiến trình.
 
-   For this to work, it must be called before the forkserver process has been
-   launched (before creating a :class:`Pool` or starting a :class:`Process`).
+   Để hoạt động, hàm này phải được gọi trước khi tiến trình forkserver được khởi chạy (trước khi tạo :class:`Pool` hoặc khởi động :class:`Process`).
 
-   Only meaningful when using the ``'forkserver'`` start method.
-   See :ref:`multiprocessing-start-methods`.
+   Chỉ có ý nghĩa khi sử dụng phương thức khởi động ``'forkserver'``. Xem :ref:`multiprocessing-start-methods`.
 
    .. versionadded:: 3.4
 
 .. function:: set_start_method(method, force=False)
 
-   Set the method which should be used to start child processes.
-   The *method* argument can be ``'fork'``, ``'spawn'`` or ``'forkserver'``.
-   Raises :exc:`RuntimeError` if the start method has already been set and *force*
-   is not ``True``.  If *method* is ``None`` and *force* is ``True`` then the start
-   method is set to ``None``.  If *method* is ``None`` and *force* is ``False``
-   then the context is set to the default context.
+   Đặt phương thức sẽ được sử dụng để khởi động các tiến trình con. Đối số *method* có thể là ``'fork'``, ``'spawn'`` hoặc ``'forkserver'``. Gây ra :exc:`RuntimeError` nếu phương thức khởi động đã được đặt và *force* không phải là ``True``. Nếu *method* là ``None`` và *force* là ``True`` thì phương thức khởi động được đặt thành ``None``. Nếu *method* là ``None`` và *force* là ``False`` thì context được đặt thành context mặc định.
 
-   Note that this should be called at most once, and it should be
-   protected inside the ``if __name__ == '__main__'`` clause of the
-   main module.
+   Lưu ý rằng hàm này chỉ nên được gọi nhiều nhất một lần và nên được bảo vệ bên trong mệnh đề ``if __name__ == '__main__'`` của mô-đun chính.
 
-   See :ref:`multiprocessing-start-methods`.
+   Xem :ref:`multiprocessing-start-methods`.
 
    .. versionadded:: 3.4
 
 .. note::
 
-   :mod:`!multiprocessing` contains no analogues of
+   :mod:`!multiprocessing` không chứa các thành phần tương đương với
    :func:`threading.active_count`, :func:`threading.enumerate`,
    :func:`threading.settrace`, :func:`threading.setprofile`,
-   :class:`threading.Timer`, or :class:`threading.local`.
+   :class:`threading.Timer` hoặc :class:`threading.local`.
 
 
-Connection Objects
-^^^^^^^^^^^^^^^^^^
+Đối tượng kết nối
+^^^^^^^^^^^^^^^^^
 
 .. currentmodule:: multiprocessing.connection
 
-Connection objects allow the sending and receiving of picklable objects or
-strings.  They can be thought of as message oriented connected sockets.
+Các đối tượng kết nối cho phép gửi và nhận các đối tượng có thể pickle hoặc các chuỗi. Có thể hình dung chúng như các socket được kết nối theo hướng thông điệp.
 
-Connection objects are usually created using
-:func:`Pipe <multiprocessing.Pipe>` -- see also
+Các đối tượng Connection thường được tạo bằng
+:func:`Pipe <multiprocessing.Pipe>` -- xem thêm
 :ref:`multiprocessing-listeners-clients`.
 
 .. class:: Connection
 
    .. method:: send(obj)
 
-      Send an object to the other end of the connection which should be read
-      using :meth:`recv`.
+      Gửi một đối tượng đến đầu kia của kết nối; đối tượng này sẽ được đọc bằng :meth:`recv`.
 
-      The object must be picklable.  Very large pickles (approximately 32 MiB+,
-      though it depends on the OS) may raise a :exc:`ValueError` exception.
+      Đối tượng phải có thể pickle. Các pickle rất lớn (khoảng từ 32 MiB trở lên, tùy thuộc vào hệ điều hành) có thể gây ra ngoại lệ :exc:`ValueError`.
 
    .. method:: recv()
 
-      Return an object sent from the other end of the connection using
-      :meth:`send`.  Blocks until there is something to receive.  Raises
-      :exc:`EOFError` if there is nothing left to receive
-      and the other end was closed.
+      Trả về một đối tượng được gửi từ đầu kia của kết nối bằng
+      :meth:`send`. Chặn cho đến khi có dữ liệu để nhận. Gây ra
+      :exc:`EOFError` nếu không còn gì để nhận và đầu kia đã bị đóng.
 
    .. method:: fileno()
 
-      Return the file descriptor or handle used by the connection.
+      Trả về file descriptor hoặc handle được kết nối sử dụng.
 
    .. method:: close()
 
-      Close the connection.
+      Đóng kết nối.
 
-      This is called automatically when the connection is garbage collected.
+      Thao tác này được tự động gọi khi kết nối được garbage collected.
 
    .. method:: poll([timeout])
 
-      Return whether there is any data available to be read.
+      Cho biết có dữ liệu nào sẵn sàng để đọc hay không.
 
-      If *timeout* is not specified then it will return immediately.  If
-      *timeout* is a number then this specifies the maximum time in seconds to
-      block.  If *timeout* is ``None`` then an infinite timeout is used.
+      Nếu *timeout* không được chỉ định thì hàm sẽ trả về ngay lập tức.  Nếu *timeout* là một số thì giá trị này chỉ định thời gian tối đa tính bằng giây mà hàm sẽ chờ.  Nếu *timeout* là ``None`` thì sẽ sử dụng thời gian chờ vô hạn.
 
-      Note that multiple connection objects may be polled at once by
-      using :func:`multiprocessing.connection.wait`.
+      Lưu ý rằng có thể poll nhiều đối tượng kết nối cùng lúc bằng cách sử dụng :func:`multiprocessing.connection.wait`.
 
    .. method:: send_bytes(buf[, offset[, size]])
 
-      Send byte data from a :term:`bytes-like object` as a complete message.
+      Gửi dữ liệu byte từ một :term:`bytes-like object` dưới dạng một message hoàn chỉnh.
 
-      If *offset* is given then data is read from that position in *buf*.  If
-      *size* is given then that many bytes will be read from *buf*.  Very large
-      buffers (approximately 32 MiB+, though it depends on the OS) may raise a
-      :exc:`ValueError` exception
+      Nếu *offset* được cung cấp thì dữ liệu sẽ được đọc từ vị trí đó trong *buf*. Nếu *size* được cung cấp thì số byte tương ứng sẽ được đọc từ *buf*. Các buffer rất lớn (xấp xỉ từ 32 MiB trở lên, mặc dù còn tùy thuộc vào hệ điều hành) có thể phát sinh một
+      :exc:`ValueError` ngoại lệ
 
    .. method:: recv_bytes([maxlength])
 
-      Return a complete message of byte data sent from the other end of the
-      connection as a string.  Blocks until there is something to receive.
-      Raises :exc:`EOFError` if there is nothing left
-      to receive and the other end has closed.
+      Trả về toàn bộ thông báo chứa dữ liệu byte được gửi từ đầu kia của kết nối dưới dạng một chuỗi. Chặn cho đến khi có dữ liệu để nhận. Phát sinh :exc:`EOFError` nếu không còn gì để nhận và đầu kia đã đóng kết nối.
 
-      If *maxlength* is specified and the message is longer than *maxlength*
-      then :exc:`OSError` is raised and the connection will no longer be
-      readable.
+      Nếu *maxlength* được chỉ định và thông báo dài hơn *maxlength* thì :exc:`OSError` sẽ được phát sinh và kết nối sẽ không còn có thể đọc được.
 
       .. versionchanged:: 3.3
-         This function used to raise :exc:`IOError`, which is now an
-         alias of :exc:`OSError`.
+         Trước đây, hàm này phát sinh :exc:`IOError`, hiện là bí danh của :exc:`OSError`.
 
 
    .. method:: recv_bytes_into(buf[, offset])
 
-      Read into *buf* a complete message of byte data sent from the other end
-      of the connection and return the number of bytes in the message.  Blocks
-      until there is something to receive.  Raises
-      :exc:`EOFError` if there is nothing left to receive and the other end was
-      closed.
+      Đọc vào *buf* toàn bộ thông báo chứa dữ liệu byte được gửi từ đầu kia của kết nối và trả về số byte trong thông báo. Chặn cho đến khi có dữ liệu để nhận. Phát sinh
+      :exc:`EOFError` nếu không còn gì để nhận và đầu kia đã bị đóng.
 
-      *buf* must be a writable :term:`bytes-like object`.  If
-      *offset* is given then the message will be written into the buffer from
-      that position.  Offset must be a non-negative integer less than the
-      length of *buf* (in bytes).
+      *buf* phải là một :term:`bytes-like object` có thể ghi. Nếu *offset* được cung cấp thì thông báo sẽ được ghi vào bộ đệm từ vị trí đó. Offset phải là một số nguyên không âm nhỏ hơn độ dài của *buf* (tính bằng byte).
 
-      If the buffer is too short then a :exc:`BufferTooShort` exception is
-      raised and the complete message is available as ``e.args[0]`` where ``e``
-      is the exception instance.
+      Nếu bộ đệm quá ngắn thì một ngoại lệ :exc:`BufferTooShort` sẽ được phát sinh và toàn bộ thông báo có sẵn dưới dạng ``e.args[0]``, trong đó ``e`` là thực thể ngoại lệ.
 
    .. versionchanged:: 3.3
-      Connection objects themselves can now be transferred between processes
-      using :meth:`Connection.send` and :meth:`Connection.recv`.
+      Bản thân các đối tượng Connection giờ đây có thể được truyền giữa các tiến trình bằng cách sử dụng :meth:`Connection.send` và :meth:`Connection.recv`.
 
-      Connection objects also now support the context management protocol -- see
-      :ref:`typecontextmanager`.  :meth:`~contextmanager.__enter__` returns the
-      connection object, and :meth:`~contextmanager.__exit__` calls :meth:`close`.
+      Các đối tượng Connection giờ đây cũng hỗ trợ giao thức quản lý ngữ cảnh -- xem
+      :ref:`typecontextmanager`. :meth:`~contextmanager.__enter__` trả về đối tượng Connection, còn :meth:`~contextmanager.__exit__` gọi :meth:`close`.
 
-For example:
+Ví dụ:
 
 .. doctest::
 
@@ -1401,454 +1060,317 @@ For example:
 
 .. warning::
 
-    The :meth:`Connection.recv` method automatically unpickles the data it
-    receives, which can be a security risk unless you can trust the process
-    which sent the message.
+    Phương thức :meth:`Connection.recv` tự động unpickle dữ liệu mà nó nhận được, điều này có thể gây rủi ro bảo mật trừ khi bạn có thể tin tưởng tiến trình đã gửi thông báo.
 
-    Therefore, unless the connection object was produced using :func:`Pipe` you
-    should only use the :meth:`~Connection.recv` and :meth:`~Connection.send`
-    methods after performing some sort of authentication.  See
+    Do đó, trừ khi đối tượng connection được tạo bằng :func:`Pipe`, bạn chỉ nên sử dụng các phương thức :meth:`~Connection.recv` và :meth:`~Connection.send` sau khi thực hiện một hình thức authentication nào đó. Xem
     :ref:`multiprocessing-auth-keys`.
 
 .. warning::
 
-    If a process is killed while it is trying to read or write to a pipe then
-    the data in the pipe is likely to become corrupted, because it may become
-    impossible to be sure where the message boundaries lie.
+    Nếu một process bị kết thúc trong khi đang cố đọc hoặc ghi vào pipe, dữ liệu trong pipe có khả năng bị hỏng, vì có thể không thể xác định chắc chắn ranh giới giữa các message.
 
 
-Synchronization primitives
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các primitive đồng bộ hóa
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. currentmodule:: multiprocessing
 
-Generally synchronization primitives are not as necessary in a multiprocess
-program as they are in a multithreaded program.  See the documentation for
-:mod:`threading` module.
+Nhìn chung, các primitive đồng bộ hóa không cần thiết trong chương trình multiprocess nhiều như trong chương trình multithread. Xem tài liệu về
+module :mod:`threading`.
 
-Note that one can also create synchronization primitives by using a manager
-object -- see :ref:`multiprocessing-managers`.
+Lưu ý rằng bạn cũng có thể tạo các primitive đồng bộ hóa bằng cách sử dụng đối tượng manager -- xem :ref:`multiprocessing-managers`.
 
 .. class:: Barrier(parties[, action[, timeout]])
 
-   A barrier object: a clone of :class:`threading.Barrier`.
+   Một đối tượng barrier: bản sao của :class:`threading.Barrier`.
 
-   Instantiating this class may set the global start method. See
-   :ref:`global-start-method` for more details.
+   Việc khởi tạo lớp này có thể thiết lập phương thức start toàn cục. Xem
+   :ref:`global-start-method` để biết thêm chi tiết.
 
    .. versionadded:: 3.3
 
 .. class:: BoundedSemaphore([value])
 
-   A bounded semaphore object: a close analog of
+   Một đối tượng semaphore bị giới hạn: tương tự gần nhất của
    :class:`threading.BoundedSemaphore`.
 
-   Instantiating this class may set the global start method. See
-   :ref:`global-start-method` for more details.
+   Việc khởi tạo lớp này có thể thiết lập phương thức start toàn cục. Xem
+   :ref:`global-start-method` để biết thêm chi tiết.
 
-   A solitary difference from its close analog exists: its ``acquire`` method's
-   first argument is named *block*, as is consistent with :meth:`Lock.acquire`.
+   Chỉ có một điểm khác biệt so với đối tượng tương tự gần nhất: đối số đầu tiên của phương thức ``acquire`` có tên là *block*, phù hợp với :meth:`Lock.acquire`.
 
    .. method:: locked()
 
-      Return a boolean indicating whether this object is locked right now.
+      Trả về một giá trị boolean cho biết liệu đối tượng này hiện có đang bị khóa hay không.
 
       .. versionadded:: 3.14
 
    .. note::
-      On macOS, this is indistinguishable from :class:`Semaphore` because
-      ``sem_getvalue()`` is not implemented on that platform.
+      Trên macOS, điều này không thể phân biệt được với :class:`Semaphore` vì ``sem_getvalue()`` chưa được triển khai trên nền tảng đó.
 
 .. class:: Condition([lock])
 
-   A condition variable: an alias for :class:`threading.Condition`.
+   Một condition variable: bí danh của :class:`threading.Condition`.
 
-   If *lock* is specified then it should be a :class:`Lock` or :class:`RLock`
-   object from :mod:`!multiprocessing`.
+   Nếu chỉ định *lock* thì đó phải là một đối tượng :class:`Lock` hoặc :class:`RLock` từ :mod:`!multiprocessing`.
 
-   Instantiating this class may set the global start method. See
-   :ref:`global-start-method` for more details.
+   Việc khởi tạo lớp này có thể thiết lập phương thức start toàn cục. Xem
+   :ref:`global-start-method` để biết thêm chi tiết.
 
    .. versionchanged:: 3.3
-      The :meth:`~threading.Condition.wait_for` method was added.
+      Phương thức :meth:`~threading.Condition.wait_for` đã được thêm vào.
 
 .. class:: Event()
 
-   A clone of :class:`threading.Event`.
+   Một bản sao của :class:`threading.Event`.
 
-   Instantiating this class may set the global start method. See
-   :ref:`global-start-method` for more details.
+   Việc khởi tạo lớp này có thể thiết lập phương thức start toàn cục. Xem
+   :ref:`global-start-method` để biết thêm chi tiết.
 
 .. class:: Lock()
 
-   A non-recursive lock object: a close analog of :class:`threading.Lock`.
-   Once a process or thread has acquired a lock, subsequent attempts to
-   acquire it from any process or thread will block until it is released;
-   any process or thread may release it.  The concepts and behaviors of
-   :class:`threading.Lock` as it applies to threads are replicated here in
-   :class:`multiprocessing.Lock` as it applies to either processes or threads,
-   except as noted.
+   Một đối tượng khóa không đệ quy: tương tự gần nhất với :class:`threading.Lock`. Sau khi một tiến trình hoặc luồng đã lấy được khóa, mọi nỗ lực tiếp theo nhằm lấy khóa từ bất kỳ tiến trình hoặc luồng nào sẽ bị chặn cho đến khi khóa được giải phóng; bất kỳ tiến trình hoặc luồng nào cũng có thể giải phóng khóa. Các khái niệm và hành vi của
+   :class:`threading.Lock` khi áp dụng cho các luồng được mô phỏng tại đây trong
+   :class:`multiprocessing.Lock` khi áp dụng cho tiến trình hoặc luồng, ngoại trừ các trường hợp được lưu ý.
 
-   Note that :class:`Lock` is actually a factory function which returns an
-   instance of ``multiprocessing.synchronize.Lock`` initialized with a
-   default context.
+   Lưu ý rằng :class:`Lock` thực chất là một hàm factory trả về một thực thể của ``multiprocessing.synchronize.Lock`` được khởi tạo với một context mặc định.
 
-   Instantiating this class may set the global start method. See
-   :ref:`global-start-method` for more details.
+   Việc khởi tạo lớp này có thể thiết lập phương thức start toàn cục. Xem
+   :ref:`global-start-method` để biết thêm chi tiết.
 
-   :class:`Lock` supports the :term:`context manager` protocol and thus may be
-   used in :keyword:`with` statements.
+   :class:`Lock` hỗ trợ giao thức :term:`context manager` và do đó có thể được sử dụng trong các câu lệnh :keyword:`with`.
 
    .. method:: acquire(block=True, timeout=None)
 
-      Acquire a lock, blocking or non-blocking.
+      Nhận một lock, theo cách chặn hoặc không chặn.
 
-      With the *block* argument set to ``True`` (the default), the method call
-      will block until the lock is in an unlocked state, then set it to locked
-      and return ``True``.  Note that the name of this first argument differs
-      from that in :meth:`threading.Lock.acquire`.
+      Với đối số *block* được đặt thành ``True`` (mặc định), lệnh gọi phương thức sẽ chặn cho đến khi lock ở trạng thái không bị khóa, sau đó đặt lock về trạng thái đã khóa và trả về ``True``. Lưu ý rằng tên của đối số đầu tiên này khác với tên trong :meth:`threading.Lock.acquire`.
 
-      With the *block* argument set to ``False``, the method call does not
-      block.  If the lock is currently in a locked state, return ``False``;
-      otherwise set the lock to a locked state and return ``True``.
+      Với đối số *block* được đặt thành ``False``, lệnh gọi phương thức không chặn. Nếu lock hiện đang ở trạng thái đã khóa, trả về ``False``; nếu không, đặt lock về trạng thái đã khóa và trả về ``True``.
 
-      When invoked with a positive, floating-point value for *timeout*, block
-      for at most the number of seconds specified by *timeout* as long as
-      the lock can not be acquired.  Invocations with a negative value for
-      *timeout* are equivalent to a *timeout* of zero.  Invocations with a
-      *timeout* value of ``None`` (the default) set the timeout period to
-      infinite.  Note that the treatment of negative or ``None`` values for
-      *timeout* differs from the implemented behavior in
-      :meth:`threading.Lock.acquire`.  The *timeout* argument has no practical
-      implications if the *block* argument is set to ``False`` and is thus
-      ignored.  Returns ``True`` if the lock has been acquired or ``False`` if
-      the timeout period has elapsed.
+      Khi được gọi với giá trị dấu phẩy động dương cho *timeout*, chặn trong nhiều nhất số giây được chỉ định bởi *timeout* miễn là không thể nhận lock. Các lần gọi với giá trị âm cho *timeout* tương đương với *timeout* bằng không. Các lần gọi với giá trị *timeout* là ``None`` (mặc định) sẽ đặt khoảng thời gian chờ thành vô hạn. Lưu ý rằng cách xử lý các giá trị âm hoặc ``None`` của *timeout* khác với hành vi được triển khai trong
+      :meth:`threading.Lock.acquire`. Đối số *timeout* không có tác dụng thực tế nếu đối số *block* được đặt thành ``False`` và do đó sẽ bị bỏ qua. Trả về ``True`` nếu đã nhận được lock hoặc ``False`` nếu khoảng thời gian chờ đã hết.
 
 
    .. method:: release()
 
-      Release a lock.  This can be called from any process or thread, not only
-      the process or thread which originally acquired the lock.
+      Giải phóng một lock. Có thể gọi hàm này từ bất kỳ process hoặc thread nào, không chỉ process hoặc thread đã lấy lock ban đầu.
 
-      Behavior is the same as in :meth:`threading.Lock.release` except that
-      when invoked on an unlocked lock, a :exc:`ValueError` is raised.
+      Hành vi giống như :meth:`threading.Lock.release`, ngoại trừ khi được gọi trên một lock chưa được khóa, hàm sẽ phát sinh :exc:`ValueError`.
 
 
    .. method:: locked()
 
-      Return a boolean indicating whether this object is locked right now.
+      Trả về một giá trị boolean cho biết liệu đối tượng này hiện có đang bị khóa hay không.
 
       .. versionadded:: 3.14
 
 
 .. class:: RLock()
 
-   A recursive lock object: a close analog of :class:`threading.RLock`.  A
-   recursive lock must be released by the process or thread that acquired it.
-   Once a process or thread has acquired a recursive lock, the same process
-   or thread may acquire it again without blocking; that process or thread
-   must release it once for each time it has been acquired.
+   Một đối tượng recursive lock: tương tự như :class:`threading.RLock`. Recursive lock phải được process hoặc thread đã lấy nó giải phóng. Sau khi một process hoặc thread đã lấy recursive lock, chính process hoặc thread đó có thể lấy lại lock mà không bị chặn; process hoặc thread đó phải giải phóng lock một lần cho mỗi lần đã lấy lock.
 
-   Note that :class:`RLock` is actually a factory function which returns an
-   instance of ``multiprocessing.synchronize.RLock`` initialized with a
-   default context.
+   Lưu ý rằng :class:`RLock` thực chất là một factory function trả về một instance của ``multiprocessing.synchronize.RLock`` được khởi tạo với context mặc định.
 
-   Instantiating this class may set the global start method. See
-   :ref:`global-start-method` for more details.
+   Việc khởi tạo lớp này có thể thiết lập phương thức start toàn cục. Xem
+   :ref:`global-start-method` để biết thêm chi tiết.
 
-   :class:`RLock` supports the :term:`context manager` protocol and thus may be
-   used in :keyword:`with` statements.
+   :class:`RLock` hỗ trợ giao thức :term:`context manager` và do đó có thể được sử dụng trong các câu lệnh :keyword:`with`.
 
 
    .. method:: acquire(block=True, timeout=None)
 
-      Acquire a lock, blocking or non-blocking.
+      Nhận một lock, theo cách chặn hoặc không chặn.
 
-      When invoked with the *block* argument set to ``True``, block until the
-      lock is in an unlocked state (not owned by any process or thread) unless
-      the lock is already owned by the current process or thread.  The current
-      process or thread then takes ownership of the lock (if it does not
-      already have ownership) and the recursion level inside the lock increments
-      by one, resulting in a return value of ``True``.  Note that there are
-      several differences in this first argument's behavior compared to the
-      implementation of :meth:`threading.RLock.acquire`, starting with the name
-      of the argument itself.
+      Khi được gọi với đối số *block* được đặt thành ``True``, hãy chặn cho đến khi khóa ở trạng thái mở khóa (không do bất kỳ tiến trình hoặc thread nào sở hữu), trừ khi khóa đã được tiến trình hoặc thread hiện tại sở hữu. Khi đó, tiến trình hoặc thread hiện tại sẽ sở hữu khóa (nếu chưa sở hữu) và mức đệ quy bên trong khóa tăng lên một, dẫn đến giá trị trả về là ``True``. Lưu ý rằng hành vi của đối số thứ nhất này có một số điểm khác biệt so với cách triển khai của :meth:`threading.RLock.acquire`, bắt đầu từ chính tên của đối số.
 
-      When invoked with the *block* argument set to ``False``, do not block.
-      If the lock has already been acquired (and thus is owned) by another
-      process or thread, the current process or thread does not take ownership
-      and the recursion level within the lock is not changed, resulting in
-      a return value of ``False``.  If the lock is in an unlocked state, the
-      current process or thread takes ownership and the recursion level is
-      incremented, resulting in a return value of ``True``.
+      Khi được gọi với đối số *block* được đặt thành ``False``, không chặn. Nếu khóa đã được một tiến trình hoặc thread khác thu nhận (và do đó đang được sở hữu), tiến trình hoặc thread hiện tại không sở hữu khóa và mức đệ quy bên trong khóa không thay đổi, dẫn đến giá trị trả về là ``False``. Nếu khóa ở trạng thái mở khóa, tiến trình hoặc thread hiện tại sẽ sở hữu khóa và mức đệ quy tăng lên, dẫn đến giá trị trả về là ``True``.
 
-      Use and behaviors of the *timeout* argument are the same as in
-      :meth:`Lock.acquire`.  Note that some of these behaviors of *timeout*
-      differ from the implemented behaviors in :meth:`threading.RLock.acquire`.
+      Cách sử dụng và hành vi của đối số *timeout* giống như trong
+      :meth:`Lock.acquire`. Lưu ý rằng một số hành vi của *timeout* khác với các hành vi được triển khai trong :meth:`threading.RLock.acquire`.
 
 
    .. method:: release()
 
-      Release a lock, decrementing the recursion level.  If after the
-      decrement the recursion level is zero, reset the lock to unlocked (not
-      owned by any process or thread) and if any other processes or threads
-      are blocked waiting for the lock to become unlocked, allow exactly one
-      of them to proceed.  If after the decrement the recursion level is still
-      nonzero, the lock remains locked and owned by the calling process or
-      thread.
+      Giải phóng khóa, giảm mức đệ quy. Nếu sau khi giảm, mức đệ quy bằng không, đặt lại khóa về trạng thái mở khóa (không do bất kỳ tiến trình hoặc thread nào sở hữu) và nếu có tiến trình hoặc thread khác đang bị chặn chờ khóa được mở khóa, cho phép chính xác một tiến trình hoặc thread trong số đó tiếp tục. Nếu sau khi giảm, mức đệ quy vẫn khác không, khóa vẫn bị khóa và do tiến trình hoặc thread đang gọi sở hữu.
 
-      Only call this method when the calling process or thread owns the lock.
-      An :exc:`AssertionError` is raised if this method is called by a process
-      or thread other than the owner or if the lock is in an unlocked (unowned)
-      state.  Note that the type of exception raised in this situation
-      differs from the implemented behavior in :meth:`threading.RLock.release`.
+      Chỉ gọi phương thức này khi process hoặc thread gọi nó đang sở hữu lock. Một :exc:`AssertionError` sẽ được raise nếu phương thức này được gọi bởi process hoặc thread không phải chủ sở hữu, hoặc nếu lock đang ở trạng thái chưa được khóa (không có chủ sở hữu). Lưu ý rằng loại exception được raise trong tình huống này khác với hành vi được triển khai trong :meth:`threading.RLock.release`.
 
 
    .. method:: locked()
 
-      Return a boolean indicating whether this object is locked right now.
+      Trả về một giá trị boolean cho biết liệu đối tượng này hiện có đang bị khóa hay không.
 
       .. versionadded:: 3.14
 
 
 .. class:: Semaphore([value])
 
-   A semaphore object: a close analog of :class:`threading.Semaphore`.
+   Một semaphore object: tương tự gần giống :class:`threading.Semaphore`.
 
-   Instantiating this class may set the global start method. See
-   :ref:`global-start-method` for more details.
+   Việc khởi tạo lớp này có thể thiết lập phương thức start toàn cục. Xem
+   :ref:`global-start-method` để biết thêm chi tiết.
 
-   A solitary difference from its close analog exists: its ``acquire`` method's
-   first argument is named *block*, as is consistent with :meth:`Lock.acquire`.
+   Chỉ có một điểm khác biệt so với đối tượng tương tự gần nhất: đối số đầu tiên của phương thức ``acquire`` có tên là *block*, phù hợp với :meth:`Lock.acquire`.
 
 
    .. method:: get_value()
 
-      Return the current value of semaphore.
+      Trả về giá trị hiện tại của semaphore.
 
-      Note that this may raise :exc:`NotImplementedError` on platforms like
-      macOS where ``sem_getvalue()`` is not implemented.
+      Lưu ý rằng điều này có thể gây ra :exc:`NotImplementedError` trên các nền tảng như macOS, nơi ``sem_getvalue()`` chưa được triển khai.
 
 
    .. method:: locked()
 
-      Return a boolean indicating whether this object is locked right now.
+      Trả về một giá trị boolean cho biết liệu đối tượng này hiện có đang bị khóa hay không.
 
       .. versionadded:: 3.14
 
 
 .. note::
 
-   On macOS, ``sem_timedwait`` is unsupported, so calling ``acquire()`` with
-   a timeout will emulate that function's behavior using a sleeping loop.
+   Trên macOS, ``sem_timedwait`` không được hỗ trợ, vì vậy việc gọi ``acquire()`` với thời gian chờ sẽ mô phỏng hành vi của hàm đó bằng một vòng lặp tạm dừng.
 
 .. note::
 
-   Some of this package's functionality requires a functioning shared semaphore
-   implementation on the host operating system. Without one, the
-   :mod:`multiprocessing.synchronize` module will be disabled, and attempts to
-   import it will result in an :exc:`ImportError`. See
-   :issue:`3770` for additional information.
+   Một số chức năng của gói này yêu cầu hệ điều hành máy chủ phải có triển khai semaphore dùng chung hoạt động được. Nếu không có, mô-đun
+   :mod:`multiprocessing.synchronize` sẽ bị vô hiệu hóa và việc cố gắng nhập mô-đun này sẽ dẫn đến :exc:`ImportError`. Xem
+   :issue:`3770` để biết thêm thông tin.
 
 
-Shared :mod:`ctypes` Objects
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các đối tượng :mod:`ctypes` dùng chung
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-It is possible to create shared objects using shared memory which can be
-inherited by child processes.
+Có thể tạo các đối tượng dùng chung bằng bộ nhớ dùng chung, bộ nhớ này có thể được các tiến trình con kế thừa.
 
 .. function:: Value(typecode_or_type, *args, lock=True)
 
-   Return a :mod:`ctypes` object allocated from shared memory.  By default the
-   return value is actually a synchronized wrapper for the object.  The object
-   itself can be accessed via the *value* attribute of a :class:`Value`.
+   Trả về một đối tượng :mod:`ctypes` được cấp phát từ bộ nhớ dùng chung. Theo mặc định, giá trị trả về thực chất là một trình bao bọc được đồng bộ hóa cho đối tượng. Bản thân đối tượng có thể được truy cập thông qua thuộc tính *value* của một :class:`Value`.
 
-   *typecode_or_type* determines the type of the returned object: it is either a
-   ctypes type or a one character typecode of the kind used by the :mod:`array`
-   module.  *\*args* is passed on to the constructor for the type.
+   *typecode_or_type* xác định kiểu của đối tượng được trả về: đó có thể là một kiểu ctypes hoặc một typecode gồm một ký tự, thuộc loại được :mod:`array` module sử dụng. *\*args* được truyền cho hàm khởi tạo của kiểu đó.
 
-   If *lock* is ``True`` (the default) then a new recursive lock
-   object is created to synchronize access to the value.  If *lock* is
-   a :class:`Lock` or :class:`RLock` object then that will be used to
-   synchronize access to the value.  If *lock* is ``False`` then
-   access to the returned object will not be automatically protected
-   by a lock, so it will not necessarily be "process-safe".
+   Nếu *lock* là ``True`` (mặc định) thì một đối tượng khóa đệ quy mới sẽ được tạo để đồng bộ hóa quyền truy cập vào giá trị. Nếu *lock* là một đối tượng :class:`Lock` hoặc :class:`RLock` thì đối tượng đó sẽ được dùng để đồng bộ hóa quyền truy cập vào giá trị. Nếu *lock* là ``False`` thì quyền truy cập vào đối tượng được trả về sẽ không được khóa tự động bảo vệ, vì vậy không nhất thiết phải "an toàn cho tiến trình".
 
-   Operations like ``+=`` which involve a read and write are not
-   atomic.  So if, for instance, you want to atomically increment a
-   shared value it is insufficient to just do ::
+   Các thao tác như ``+=`` có liên quan đến việc đọc và ghi không phải là nguyên tử. Vì vậy, chẳng hạn, nếu muốn tăng một giá trị dùng chung theo cách nguyên tử thì chỉ thực hiện::
 
        counter.value += 1
 
-   Assuming the associated lock is recursive (which it is by default)
-   you can instead do ::
+   Với điều kiện khóa liên kết là khóa đệ quy (theo mặc định là như vậy), thay vào đó bạn có thể thực hiện::
 
        with counter.get_lock():
            counter.value += 1
 
-   Note that *lock* is a keyword-only argument.
+   Lưu ý rằng *lock* là một đối số chỉ dùng cho từ khóa.
 
 .. function:: Array(typecode_or_type, size_or_initializer, *, lock=True)
 
-   Return a ctypes array allocated from shared memory.  By default the return
-   value is actually a synchronized wrapper for the array.
+   Trả về một mảng ctypes được cấp phát từ bộ nhớ dùng chung. Theo mặc định, giá trị trả về thực chất là một wrapper được đồng bộ hóa cho mảng.
 
-   *typecode_or_type* determines the type of the elements of the returned array:
-   it is either a :ref:`ctypes type <ctypes-fundamental-data-types>` or a one
-   character typecode of the kind used by the :mod:`array` module with the
-   exception of ``'w'``, which is not supported.  In addition, the ``'c'``
-   typecode is an alias for :class:`ctypes.c_char`.  If *size_or_initializer*
-   is an integer, then it determines the length of the array, and the array
-   will be initially zeroed. Otherwise, *size_or_initializer* is a sequence
-   which is used to initialize the array and whose length determines the length
-   of the array.
+   *typecode_or_type* xác định kiểu của các phần tử trong mảng được trả về: đó là một :ref:`ctypes type <ctypes-fundamental-data-types>` hoặc một typecode dài một ký tự thuộc loại được :mod:`array` module sử dụng, ngoại trừ ``'w'``, vốn không được hỗ trợ. Ngoài ra, typecode ``'c'`` là bí danh của :class:`ctypes.c_char`. Nếu *size_or_initializer* là một số nguyên thì nó xác định độ dài của mảng và mảng ban đầu sẽ được đặt toàn bộ về 0. Nếu không, *size_or_initializer* là một sequence được dùng để khởi tạo mảng, đồng thời độ dài của sequence này xác định độ dài của mảng.
 
-   If *lock* is ``True`` (the default) then a new lock object is created to
-   synchronize access to the value.  If *lock* is a :class:`Lock` or
-   :class:`RLock` object then that will be used to synchronize access to the
-   value.  If *lock* is ``False`` then access to the returned object will not be
-   automatically protected by a lock, so it will not necessarily be
-   "process-safe".
+   Nếu *lock* là ``True`` (mặc định), một đối tượng lock mới sẽ được tạo để đồng bộ hóa việc truy cập vào giá trị. Nếu *lock* là một :class:`Lock` hoặc
+   :class:`RLock` object thì đối tượng đó sẽ được dùng để đồng bộ hóa việc truy cập vào giá trị. Nếu *lock* là ``False`` thì việc truy cập vào đối tượng được trả về sẽ không được tự động bảo vệ bằng lock, vì vậy không nhất thiết phải là "process-safe".
 
-   Note that *lock* is a keyword only argument.
+   Lưu ý rằng *lock* là một đối số chỉ dành cho keyword.
 
-   Note that an array of :data:`ctypes.c_char` has *value* and *raw*
-   attributes which can both be used to store and retrieve byte strings.
-   While *raw* allows interaction with a :class:`bytes` object the full size of
-   the array, reading *value* will terminate after a null byte, like most
-   programming languages handle strings.
+   Lưu ý rằng một mảng :data:`ctypes.c_char` có các thuộc tính *value* và *raw*, cả hai đều có thể được dùng để lưu trữ và truy xuất các chuỗi byte. Trong khi *raw* cho phép tương tác với một đối tượng :class:`bytes` có kích thước đầy đủ của mảng, việc đọc *value* sẽ kết thúc sau một byte null, giống như cách hầu hết các ngôn ngữ lập trình xử lý chuỗi.
 
 
-The :mod:`!multiprocessing.sharedctypes` module
-"""""""""""""""""""""""""""""""""""""""""""""""
+Module :mod:`!multiprocessing.sharedctypes`
+"""""""""""""""""""""""""""""""""""""""""""
 
 .. module:: multiprocessing.sharedctypes
-   :synopsis: Allocate ctypes objects from shared memory.
+   :synopsis: Cấp phát các đối tượng ctypes từ bộ nhớ dùng chung.
 
-The :mod:`!multiprocessing.sharedctypes` module provides functions for allocating
-:mod:`ctypes` objects from shared memory which can be inherited by child
-processes.
+Mô-đun :mod:`!multiprocessing.sharedctypes` cung cấp các hàm để cấp phát
+các đối tượng :mod:`ctypes` từ bộ nhớ dùng chung, có thể được các tiến trình con kế thừa.
 
 .. note::
 
-   Although it is possible to store a pointer in shared memory remember that
-   this will refer to a location in the address space of a specific process.
-   However, the pointer is quite likely to be invalid in the context of a second
-   process and trying to dereference the pointer from the second process may
-   cause a crash.
+   Mặc dù có thể lưu trữ một con trỏ trong bộ nhớ dùng chung, hãy nhớ rằng con trỏ này sẽ trỏ đến một vị trí trong không gian địa chỉ của một tiến trình cụ thể. Tuy nhiên, con trỏ này rất có thể không hợp lệ trong ngữ cảnh của tiến trình thứ hai, và việc cố gắng giải tham chiếu con trỏ từ tiến trình thứ hai có thể gây ra lỗi.
 
 .. function:: RawArray(typecode_or_type, size_or_initializer)
 
-   Return a ctypes array allocated from shared memory.
+   Trả về một mảng ctypes được cấp phát từ bộ nhớ dùng chung.
 
-   *typecode_or_type* determines the type of the elements of the returned array:
-   it is either a ctypes type or a one character typecode of the kind used by
-   the :mod:`array` module.  If *size_or_initializer* is an integer then it
-   determines the length of the array, and the array will be initially zeroed.
-   Otherwise *size_or_initializer* is a sequence which is used to initialize the
-   array and whose length determines the length of the array.
+   *typecode_or_type* xác định kiểu của các phần tử trong mảng được trả về: đó là một kiểu ctypes hoặc một typecode gồm một ký tự thuộc loại được :mod:`array` module sử dụng. Nếu *size_or_initializer* là một số nguyên thì nó xác định độ dài của mảng, và mảng sẽ được khởi tạo bằng các giá trị 0. Nếu không, *size_or_initializer* là một sequence được dùng để khởi tạo mảng, và độ dài của sequence này xác định độ dài của mảng.
 
-   Note that setting and getting an element is potentially non-atomic -- use
-   :func:`Array` instead to make sure that access is automatically synchronized
-   using a lock.
+   Lưu ý rằng việc thiết lập và lấy một phần tử có thể không mang tính nguyên tử -- hãy sử dụng
+   :func:`Array` thay vào đó để đảm bảo rằng quyền truy cập được tự động đồng bộ hóa bằng một khóa.
 
 .. function:: RawValue(typecode_or_type, *args)
 
-   Return a ctypes object allocated from shared memory.
+   Trả về một đối tượng ctypes được cấp phát từ bộ nhớ dùng chung.
 
-   *typecode_or_type* determines the type of the returned object: it is either a
-   ctypes type or a one character typecode of the kind used by the :mod:`array`
-   module.  *\*args* is passed on to the constructor for the type.
+   *typecode_or_type* xác định kiểu của đối tượng được trả về: đó là một kiểu ctypes hoặc một typecode gồm một ký tự, thuộc loại được :mod:`array` sử dụng.  *\*args* được truyền cho hàm khởi tạo của kiểu đó.
 
-   Note that setting and getting the value is potentially non-atomic -- use
-   :func:`Value` instead to make sure that access is automatically synchronized
-   using a lock.
+   Lưu ý rằng việc đặt và lấy giá trị có khả năng không nguyên tử -- hãy sử dụng
+   :func:`Value` thay vào đó để đảm bảo rằng quyền truy cập được tự động đồng bộ hóa bằng một khóa.
 
-   Note that an array of :data:`ctypes.c_char` has ``value`` and ``raw``
-   attributes which allow one to use it to store and retrieve strings -- see
-   documentation for :mod:`ctypes`.
+   Lưu ý rằng một mảng :data:`ctypes.c_char` có các thuộc tính ``value`` và ``raw``, cho phép sử dụng nó để lưu trữ và truy xuất chuỗi -- xem tài liệu về :mod:`ctypes`.
 
 .. function:: Array(typecode_or_type, size_or_initializer, *, lock=True, ctx=None)
 
-   The same as :func:`RawArray` except that depending on the value of *lock* a
-   process-safe synchronization wrapper may be returned instead of a raw ctypes
-   array.
+   Tương tự như :func:`RawArray`, ngoại trừ việc tùy thuộc vào giá trị của *lock*, một wrapper đồng bộ hóa an toàn cho tiến trình có thể được trả về thay vì một mảng ctypes thô.
 
-   If *lock* is ``True`` (the default) then a new lock object is created to
-   synchronize access to the value.  If *lock* is a
-   :class:`~multiprocessing.Lock` or :class:`~multiprocessing.RLock` object
-   then that will be used to synchronize access to the
-   value.  If *lock* is ``False`` then access to the returned object will not be
-   automatically protected by a lock, so it will not necessarily be
-   "process-safe".
+   Nếu *lock* là ``True`` (mặc định) thì một đối tượng lock mới sẽ được tạo để đồng bộ hóa quyền truy cập vào giá trị. Nếu *lock* là một
+   :class:`~multiprocessing.Lock` hoặc đối tượng :class:`~multiprocessing.RLock` thì đối tượng đó sẽ được dùng để đồng bộ hóa quyền truy cập vào giá trị. Nếu *lock* là ``False`` thì quyền truy cập vào đối tượng được trả về sẽ không được bảo vệ tự động bằng lock, vì vậy không nhất thiết là "an toàn cho tiến trình" (process-safe).
 
-   *ctx* is a context object, or ``None`` (use the current context). If ``None``,
-   calling this may set the global start method. See
-   :ref:`global-start-method` for more details.
+   *ctx* là một đối tượng context hoặc ``None`` (sử dụng context hiện tại). Nếu ``None``, việc gọi hàm này có thể đặt start method toàn cục. Xem
+   :ref:`global-start-method` để biết thêm chi tiết.
 
-   Note that *lock* and *ctx* are keyword-only parameters.
+   Lưu ý rằng *lock* và *ctx* là các tham số chỉ có thể được truyền bằng từ khóa.
 
 .. function:: Value(typecode_or_type, *args, lock=True, ctx=None)
 
-   The same as :func:`RawValue` except that depending on the value of *lock* a
-   process-safe synchronization wrapper may be returned instead of a raw ctypes
-   object.
+   Tương tự như :func:`RawValue`, ngoại trừ việc tùy thuộc vào giá trị của *lock*, một wrapper đồng bộ hóa an toàn cho tiến trình có thể được trả về thay vì một đối tượng ctypes thô.
 
-   If *lock* is ``True`` (the default) then a new lock object is created to
-   synchronize access to the value.  If *lock* is a :class:`~multiprocessing.Lock` or
-   :class:`~multiprocessing.RLock` object then that will be used to synchronize access to the
-   value.  If *lock* is ``False`` then access to the returned object will not be
-   automatically protected by a lock, so it will not necessarily be
-   "process-safe".
+   Nếu *lock* là ``True`` (mặc định) thì một đối tượng lock mới sẽ được tạo để đồng bộ hóa quyền truy cập vào giá trị. Nếu *lock* là một :class:`~multiprocessing.Lock` hoặc
+   :class:`~multiprocessing.RLock` đối tượng, sau đó đối tượng này sẽ được dùng để đồng bộ hóa quyền truy cập vào giá trị. Nếu *lock* là ``False`` thì quyền truy cập vào đối tượng được trả về sẽ không được bảo vệ tự động bằng lock, vì vậy không nhất thiết sẽ “an toàn cho process”.
 
-   *ctx* is a context object, or ``None`` (use the current context). If ``None``,
-   calling this may set the global start method. See
-   :ref:`global-start-method` for more details.
+   *ctx* là một đối tượng context hoặc ``None`` (sử dụng context hiện tại). Nếu ``None``, việc gọi hàm này có thể đặt start method toàn cục. Xem
+   :ref:`global-start-method` để biết thêm chi tiết.
 
-   Note that *lock* and *ctx* are keyword-only parameters.
+   Lưu ý rằng *lock* và *ctx* là các tham số chỉ có thể được truyền bằng từ khóa.
 
 .. function:: copy(obj)
 
-   Return a ctypes object allocated from shared memory which is a copy of the
-   ctypes object *obj*.
+   Trả về một đối tượng ctypes được cấp phát từ shared memory, là bản sao của đối tượng ctypes *obj*.
 
 .. function:: synchronized(obj, lock=None, ctx=None)
 
-   Return a process-safe wrapper object for a ctypes object which uses *lock* to
-   synchronize access.  If *lock* is ``None`` (the default) then a
-   :class:`multiprocessing.RLock` object is created automatically.
+   Trả về một đối tượng wrapper an toàn cho process cho một đối tượng ctypes, sử dụng *lock* để đồng bộ hóa quyền truy cập. Nếu *lock* là ``None`` (mặc định) thì một
+   :class:`multiprocessing.RLock` đối tượng sẽ được tự động tạo.
 
-   *ctx* is a context object, or ``None`` (use the current context). If ``None``,
-   calling this may set the global start method. See
-   :ref:`global-start-method` for more details.
+   *ctx* là một đối tượng context hoặc ``None`` (sử dụng context hiện tại). Nếu ``None``, việc gọi hàm này có thể đặt start method toàn cục. Xem
+   :ref:`global-start-method` để biết thêm chi tiết.
 
-   A synchronized wrapper will have two methods in addition to those of the
-   object it wraps: :meth:`get_obj` returns the wrapped object and
-   :meth:`get_lock` returns the lock object used for synchronization.
+   Một wrapper đồng bộ sẽ có hai phương thức, ngoài các phương thức của đối tượng mà nó bao bọc: :meth:`get_obj` trả về đối tượng được bao bọc và
+   :meth:`get_lock` trả về đối tượng lock được dùng để đồng bộ hóa.
 
-   Note that accessing the ctypes object through the wrapper can be a lot slower
-   than accessing the raw ctypes object.
+   Lưu ý rằng việc truy cập đối tượng ctypes thông qua wrapper có thể chậm hơn rất nhiều so với việc truy cập đối tượng ctypes thô.
 
    .. versionchanged:: 3.5
-      Synchronized objects support the :term:`context manager` protocol.
+      Các đối tượng đồng bộ hỗ trợ protocol :term:`context manager`.
 
 
-The table below compares the syntax for creating shared ctypes objects from
-shared memory with the normal ctypes syntax.  (In the table ``MyStruct`` is some
-subclass of :class:`ctypes.Structure`.)
+Bảng dưới đây so sánh cú pháp tạo các đối tượng shared ctypes từ shared memory với cú pháp ctypes thông thường. (Trong bảng, ``MyStruct`` là một lớp con của :class:`ctypes.Structure`.)
 
-==================== ========================== ===========================
-ctypes               sharedctypes using type    sharedctypes using typecode
-==================== ========================== ===========================
-c_double(2.4)        RawValue(c_double, 2.4)    RawValue('d', 2.4)
-MyStruct(4, 6)       RawValue(MyStruct, 4, 6)
-(c_short * 7)()      RawArray(c_short, 7)       RawArray('h', 7)
-(c_int * 3)(9, 2, 8) RawArray(c_int, (9, 2, 8)) RawArray('i', (9, 2, 8))
-==================== ========================== ===========================
++----------------------+----------------------------+-------------------------------+
+| ctypes               | sharedctypes sử dụng kiểu  | sharedctypes sử dụng typecode |
++======================+============================+===============================+
+| c_double(2.4)        | RawValue(c_double, 2.4)    | RawValue('d', 2.4)            |
++----------------------+----------------------------+-------------------------------+
+| MyStruct(4, 6)       | RawValue(MyStruct, 4, 6)   |                               |
++----------------------+----------------------------+-------------------------------+
+| (c_short * 7)()      | RawArray(c_short, 7)       | RawArray('h', 7)              |
++----------------------+----------------------------+-------------------------------+
+| (c_int * 3)(9, 2, 8) | RawArray(c_int, (9, 2, 8)) | RawArray('i', (9, 2, 8))      |
++----------------------+----------------------------+-------------------------------+
 
 
-Below is an example where a number of ctypes objects are modified by a child
-process::
+Dưới đây là một ví dụ trong đó một số đối tượng ctypes được sửa đổi bởi một tiến trình con::
 
    from multiprocessing import Process, Lock
    from multiprocessing.sharedctypes import Value, Array
@@ -1885,7 +1407,7 @@ process::
 
 .. highlight:: none
 
-The results printed are ::
+Kết quả được in ra là::
 
     49
     0.1111111111111111
@@ -1900,78 +1422,58 @@ The results printed are ::
 Managers
 ^^^^^^^^
 
-Managers provide a way to create data which can be shared between different
-processes, including sharing over a network between processes running on
-different machines. A manager object controls a server process which manages
-*shared objects*.  Other processes can access the shared objects by using
-proxies.
+Manager cung cấp một cách để tạo dữ liệu có thể được chia sẻ giữa các process khác nhau, bao gồm cả việc chia sẻ qua mạng giữa các process chạy trên những máy khác nhau. Một manager object điều khiển một server process quản lý *các object được chia sẻ*. Các process khác có thể truy cập những object được chia sẻ bằng cách sử dụng proxy.
 
 .. function:: multiprocessing.Manager()
    :module:
 
-   Returns a started :class:`~multiprocessing.managers.SyncManager` object which
-   can be used for sharing objects between processes.  The returned manager
-   object corresponds to a spawned child process and has methods which will
-   create shared objects and return corresponding proxies.
+   Trả về một đối tượng :class:`~multiprocessing.managers.SyncManager` đã được khởi động, có thể được dùng để chia sẻ các đối tượng giữa các tiến trình. Đối tượng manager được trả về tương ứng với một tiến trình con được tạo và có các phương thức tạo các đối tượng được chia sẻ rồi trả về các proxy tương ứng.
 
 .. module:: multiprocessing.managers
-   :synopsis: Share data between process with shared objects.
+   :synopsis: Chia sẻ dữ liệu giữa các tiến trình bằng các đối tượng được chia sẻ.
 
-Manager processes will be shutdown as soon as they are garbage collected or
-their parent process exits.  The manager classes are defined in the
-:mod:`multiprocessing.managers` module:
+Các tiến trình manager sẽ được tắt ngay khi chúng được thu gom rác hoặc khi tiến trình cha của chúng thoát. Các lớp manager được định nghĩa trong
+:mod:`multiprocessing.managers` mô-đun:
 
 .. class:: BaseManager(address=None, authkey=None, serializer='pickle', ctx=None, *, shutdown_timeout=1.0)
 
-   Create a BaseManager object.
+   Tạo một đối tượng BaseManager.
 
-   Once created one should call :meth:`start` or ``get_server().serve_forever()`` to ensure
-   that the manager object refers to a started manager process.
+   Sau khi tạo, nên gọi :meth:`start` hoặc ``get_server().serve_forever()`` để đảm bảo rằng đối tượng manager tham chiếu đến một tiến trình manager đã khởi động.
 
-   *address* is the address on which the manager process listens for new
-   connections.  If *address* is ``None`` then an arbitrary one is chosen.
+   *address* là địa chỉ mà tiến trình manager lắng nghe các kết nối mới. Nếu *address* là ``None`` thì một địa chỉ bất kỳ sẽ được chọn.
 
-   *authkey* is the authentication key which will be used to check the
-   validity of incoming connections to the server process.  If
-   *authkey* is ``None`` then ``current_process().authkey`` is used.
-   Otherwise *authkey* is used and it must be a byte string.
+   *authkey* là khóa xác thực được dùng để kiểm tra tính hợp lệ của các kết nối đến tiến trình máy chủ. Nếu *authkey* là ``None`` thì ``current_process().authkey`` được sử dụng. Nếu không, *authkey* được sử dụng và phải là một chuỗi byte.
 
-   *serializer* must be ``'pickle'`` (use :mod:`pickle` serialization) or
-   ``'xmlrpclib'`` (use :mod:`xmlrpc.client` serialization).
+   *serializer* phải là ``'pickle'`` (sử dụng cơ chế tuần tự hóa :mod:`pickle`) hoặc ``'xmlrpclib'`` (sử dụng cơ chế tuần tự hóa :mod:`xmlrpc.client`).
 
-   *ctx* is a context object, or ``None`` (use the current context). If ``None``,
-   calling this may set the global start method. See
-   :ref:`global-start-method` for more details.
+   *ctx* là một đối tượng context hoặc ``None`` (sử dụng context hiện tại). Nếu ``None``, việc gọi phương thức này có thể thiết lập phương thức khởi động toàn cục. Xem
+   :ref:`global-start-method` để biết thêm chi tiết.
 
-   *shutdown_timeout* is a timeout in seconds used to wait until the process
-   used by the manager completes in the :meth:`shutdown` method. If the
-   shutdown times out, the process is terminated. If terminating the process
-   also times out, the process is killed.
+   *shutdown_timeout* là thời gian chờ tính bằng giây, được dùng để đợi cho đến khi tiến trình do manager sử dụng hoàn tất trong phương thức :meth:`shutdown`. Nếu hết thời gian chờ shutdown, tiến trình sẽ bị chấm dứt. Nếu thao tác chấm dứt tiến trình cũng hết thời gian chờ, tiến trình sẽ bị kill.
 
    .. versionchanged:: 3.11
-      Added the *shutdown_timeout* parameter.
+      Đã thêm tham số *shutdown_timeout*.
 
    .. method:: start([initializer[, initargs]])
 
-      Start a subprocess to start the manager.  If *initializer* is not ``None``
-      then the subprocess will call ``initializer(*initargs)`` when it starts.
+      Khởi động một subprocess để khởi động manager. Nếu *initializer* không phải là ``None`` thì subprocess sẽ gọi ``initializer(*initargs)`` khi khởi động.
 
    .. method:: get_server()
 
-      Returns a :class:`Server` object which represents the actual server under
-      the control of the Manager. The :class:`Server` object supports the
-      :meth:`serve_forever` method::
+      Trả về một đối tượng :class:`Server`, đại diện cho server thực tế dưới sự điều khiển của Manager. Đối tượng :class:`Server` hỗ trợ
+      phương thức :meth:`serve_forever`::
 
       >>> from multiprocessing.managers import BaseManager
       >>> manager = BaseManager(address=('', 50000), authkey=b'abc')
       >>> server = manager.get_server()
       >>> server.serve_forever()
 
-      :class:`Server` additionally has an :attr:`address` attribute.
+      :class:`Server` cũng có một thuộc tính :attr:`address`.
 
    .. method:: connect()
 
-      Connect a local manager object to a remote manager process::
+      Kết nối một đối tượng manager cục bộ với một tiến trình manager từ xa::
 
       >>> from multiprocessing.managers import BaseManager
       >>> m = BaseManager(address=('127.0.0.1', 50000), authkey=b'abc')
@@ -1979,166 +1481,129 @@ their parent process exits.  The manager classes are defined in the
 
    .. method:: shutdown()
 
-      Stop the process used by the manager.  This is only available if
-      :meth:`start` has been used to start the server process.
+      Dừng tiến trình được manager sử dụng. Tính năng này chỉ khả dụng nếu
+      :meth:`start` đã được dùng để khởi động tiến trình server.
 
-      This can be called multiple times.
+      Có thể gọi hàm này nhiều lần.
 
    .. method:: register(typeid[, callable[, proxytype[, exposed[, method_to_typeid[, create_method]]]]])
 
-      A classmethod which can be used for registering a type or callable with
-      the manager class.
+      Một classmethod có thể được dùng để đăng ký một kiểu hoặc callable với lớp manager.
 
-      *typeid* is a "type identifier" which is used to identify a particular
-      type of shared object.  This must be a string.
+      *typeid* là một "mã định danh kiểu" được dùng để xác định một kiểu cụ thể của đối tượng dùng chung. Giá trị này phải là một chuỗi.
 
-      *callable* is a callable used for creating objects for this type
-      identifier.  If a manager instance will be connected to the
-      server using the :meth:`connect` method, or if the
-      *create_method* argument is ``False`` then this can be left as
-      ``None``.
+      *callable* là một callable được dùng để tạo các đối tượng cho mã định danh kiểu này. Nếu một instance của manager sẽ được kết nối với server bằng phương thức :meth:`connect`, hoặc nếu đối số *create_method* là ``False`` thì có thể để giá trị này là ``None``.
 
-      *proxytype* is a subclass of :class:`BaseProxy` which is used to create
-      proxies for shared objects with this *typeid*.  If ``None`` then a proxy
-      class is created automatically.
+      *proxytype* là một lớp con của :class:`BaseProxy`, được dùng để tạo proxy cho các đối tượng dùng chung có *typeid* này. Nếu ``None`` thì một lớp proxy sẽ được tự động tạo.
 
-      *exposed* is used to specify a sequence of method names which proxies for
-      this typeid should be allowed to access using
-      :meth:`BaseProxy._callmethod`.  (If *exposed* is ``None`` then
-      :attr:`proxytype._exposed_` is used instead if it exists.)  In the case
-      where no exposed list is specified, all "public methods" of the shared
-      object will be accessible.  (Here a "public method" means any attribute
-      which has a :meth:`~object.__call__` method and whose name does not begin
-      with ``'_'``.)
+      *exposed* được dùng để chỉ định một chuỗi tên phương thức mà các proxy cho typeid này được phép truy cập bằng
+      :meth:`BaseProxy._callmethod`.  (Nếu *exposed* là ``None`` thì
+      :attr:`proxytype._exposed_` sẽ được sử dụng thay thế nếu tồn tại.) Trong trường hợp không chỉ định danh sách exposed, tất cả "public methods" của đối tượng dùng chung đều có thể được truy cập. (Ở đây, "public method" nghĩa là bất kỳ thuộc tính nào có phương thức :meth:`~object.__call__` và tên của thuộc tính đó không bắt đầu bằng ``'_'``.)
 
-      *method_to_typeid* is a mapping used to specify the return type of those
-      exposed methods which should return a proxy.  It maps method names to
-      typeid strings.  (If *method_to_typeid* is ``None`` then
-      :attr:`proxytype._method_to_typeid_` is used instead if it exists.)  If a
-      method's name is not a key of this mapping or if the mapping is ``None``
-      then the object returned by the method will be copied by value.
+      *method_to_typeid* là một ánh xạ dùng để chỉ định kiểu trả về của những phương thức exposed cần trả về một proxy. Ánh xạ này liên kết tên phương thức với các chuỗi typeid. (Nếu *method_to_typeid* là ``None`` thì
+      :attr:`proxytype._method_to_typeid_` sẽ được sử dụng thay thế nếu tồn tại.) Nếu tên của một phương thức không phải là khóa của ánh xạ này hoặc nếu ánh xạ là ``None`` thì đối tượng do phương thức trả về sẽ được sao chép theo giá trị.
 
-      *create_method* determines whether a method should be created with name
-      *typeid* which can be used to tell the server process to create a new
-      shared object and return a proxy for it.  By default it is ``True``.
+      *create_method* xác định liệu một phương thức có nên được tạo với tên *typeid* hay không; phương thức này có thể được dùng để yêu cầu tiến trình máy chủ tạo một đối tượng dùng chung mới và trả về một proxy cho đối tượng đó. Theo mặc định, giá trị này là ``True``.
 
-   :class:`BaseManager` instances also have one read-only property:
+   Các instance của :class:`BaseManager` cũng có một thuộc tính chỉ đọc:
 
    .. attribute:: address
 
-      The address used by the manager.
+      Địa chỉ được manager sử dụng.
 
    .. versionchanged:: 3.3
-      Manager objects support the context management protocol -- see
-      :ref:`typecontextmanager`.  :meth:`~contextmanager.__enter__` starts the
-      server process (if it has not already started) and then returns the
-      manager object.  :meth:`~contextmanager.__exit__` calls :meth:`shutdown`.
+      Các đối tượng Manager hỗ trợ context management protocol -- xem
+      :ref:`typecontextmanager`.  :meth:`~contextmanager.__enter__` khởi động tiến trình server (nếu tiến trình này chưa được khởi động) rồi trả về đối tượng manager.  :meth:`~contextmanager.__exit__` gọi :meth:`shutdown`.
 
-      In previous versions :meth:`~contextmanager.__enter__` did not start the
-      manager's server process if it was not already started.
+      Trong các phiên bản trước, :meth:`~contextmanager.__enter__` không khởi động tiến trình server của manager nếu tiến trình này chưa được khởi động.
 
 .. class:: SyncManager
 
-   A subclass of :class:`BaseManager` which can be used for the synchronization
-   of processes.  Objects of this type are returned by
+   Một lớp con của :class:`BaseManager` có thể được dùng để đồng bộ hóa các tiến trình. Các đối tượng thuộc kiểu này được trả về bởi
    :func:`multiprocessing.Manager`.
 
-   Its methods create and return :ref:`multiprocessing-proxy_objects` for a
-   number of commonly used data types to be synchronized across processes.
-   This notably includes shared lists and dictionaries.
+   Các phương thức của nó tạo và trả về :ref:`multiprocessing-proxy_objects` cho một số kiểu dữ liệu thường dùng cần được đồng bộ hóa giữa các tiến trình. Đáng chú ý trong số đó là các list và dictionary dùng chung.
 
    .. method:: Barrier(parties[, action[, timeout]])
 
-      Create a shared :class:`threading.Barrier` object and return a
-      proxy for it.
+      Tạo một đối tượng :class:`threading.Barrier` dùng chung và trả về một proxy cho đối tượng đó.
 
       .. versionadded:: 3.3
 
    .. method:: BoundedSemaphore([value])
 
-      Create a shared :class:`threading.BoundedSemaphore` object and return a
-      proxy for it.
+      Tạo một đối tượng :class:`threading.BoundedSemaphore` dùng chung và trả về một proxy cho đối tượng đó.
 
    .. method:: Condition([lock])
 
-      Create a shared :class:`threading.Condition` object and return a proxy for
-      it.
+      Tạo một đối tượng :class:`threading.Condition` dùng chung và trả về một proxy cho đối tượng đó.
 
-      If *lock* is supplied then it should be a proxy for a
-      :class:`threading.Lock` or :class:`threading.RLock` object.
+      Nếu *lock* được cung cấp thì nó phải là một proxy cho một
+      đối tượng :class:`threading.Lock` hoặc :class:`threading.RLock`.
 
       .. versionchanged:: 3.3
-         The :meth:`~threading.Condition.wait_for` method was added.
+         Phương thức :meth:`~threading.Condition.wait_for` đã được thêm.
 
    .. method:: Event()
 
-      Create a shared :class:`threading.Event` object and return a proxy for it.
+      Tạo một đối tượng :class:`threading.Event` dùng chung và trả về một proxy cho đối tượng đó.
 
    .. method:: Lock()
 
-      Create a shared :class:`threading.Lock` object and return a proxy for it.
+      Tạo một đối tượng :class:`threading.Lock` dùng chung và trả về một proxy cho đối tượng đó.
 
    .. method:: Namespace()
 
-      Create a shared :class:`Namespace` object and return a proxy for it.
+      Tạo một đối tượng :class:`Namespace` dùng chung và trả về một proxy cho đối tượng đó.
 
    .. method:: Queue([maxsize])
 
-      Create a shared :class:`queue.Queue` object and return a proxy for it.
+      Tạo một đối tượng :class:`queue.Queue` dùng chung và trả về một proxy cho đối tượng đó.
 
    .. method:: RLock()
 
-      Create a shared :class:`threading.RLock` object and return a proxy for it.
+      Tạo một đối tượng :class:`threading.RLock` dùng chung và trả về một proxy cho đối tượng đó.
 
    .. method:: Semaphore([value])
 
-      Create a shared :class:`threading.Semaphore` object and return a proxy for
-      it.
+      Tạo một đối tượng :class:`threading.Semaphore` dùng chung và trả về một proxy cho đối tượng đó.
 
    .. method:: Array(typecode, sequence)
 
-      Create an array and return a proxy for it.
+      Tạo một mảng và trả về một proxy cho mảng đó.
 
    .. method:: Value(typecode, value)
 
-      Create an object with a writable ``value`` attribute and return a proxy
-      for it.
+      Tạo một đối tượng có thuộc tính ``value`` có thể ghi và trả về một proxy cho đối tượng đó.
 
    .. method:: dict()
-               dict(mapping)
-               dict(sequence)
+               dict(mapping) dict(sequence)
 
-      Create a shared :class:`dict` object and return a proxy for it.
+      Tạo một đối tượng :class:`dict` dùng chung và trả về một proxy cho đối tượng đó.
 
    .. method:: list()
                list(sequence)
 
-      Create a shared :class:`list` object and return a proxy for it.
+      Tạo một đối tượng :class:`list` dùng chung và trả về một proxy cho đối tượng đó.
 
    .. method:: set()
-               set(sequence)
-               set(mapping)
+               set(sequence) set(mapping)
 
-      Create a shared :class:`set` object and return a proxy for it.
+      Tạo một đối tượng :class:`set` dùng chung và trả về một proxy cho đối tượng đó.
 
       .. versionadded:: 3.14
          :class:`set` support was added.
 
    .. versionchanged:: 3.6
-      Shared objects are capable of being nested.  For example, a shared
-      container object such as a shared list can contain other shared objects
-      which will all be managed and synchronized by the :class:`SyncManager`.
+      Các đối tượng dùng chung có thể được lồng nhau. Ví dụ: một đối tượng container dùng chung như một list dùng chung có thể chứa các đối tượng dùng chung khác, và tất cả sẽ được :class:`SyncManager` quản lý và đồng bộ hóa.
 
 .. class:: Namespace
 
-   A type that can register with :class:`SyncManager`.
+   Một kiểu có thể đăng ký với :class:`SyncManager`.
 
-   A namespace object has no public methods, but does have writable attributes.
-   Its representation shows the values of its attributes.
+   Đối tượng namespace không có phương thức công khai, nhưng có các thuộc tính có thể ghi. Biểu diễn của đối tượng hiển thị các giá trị thuộc tính của nó.
 
-   However, when using a proxy for a namespace object, an attribute beginning
-   with ``'_'`` will be an attribute of the proxy and not an attribute of the
-   referent:
+   Tuy nhiên, khi sử dụng proxy cho một đối tượng namespace, một thuộc tính bắt đầu bằng ``'_'`` sẽ là thuộc tính của proxy, không phải thuộc tính của đối tượng được tham chiếu:
 
    .. doctest::
 
@@ -2147,17 +1612,15 @@ their parent process exits.  The manager classes are defined in the
     >>> Global = manager.Namespace()
     >>> Global.x = 10
     >>> Global.y = 'hello'
-    >>> Global._z = 12.3    # this is an attribute of the proxy
+    >>> Global._z = 12.3    # đây là thuộc tính của proxy
     >>> print(Global)
     Namespace(x=10, y='hello')
 
 
-Customized managers
-"""""""""""""""""""
+Các manager tùy chỉnh
+"""""""""""""""""""""
 
-To create one's own manager, one creates a subclass of :class:`BaseManager` and
-uses the :meth:`~BaseManager.register` classmethod to register new types or
-callables with the manager class.  For example::
+Để tạo manager riêng, ta tạo một lớp con của :class:`BaseManager` và sử dụng classmethod :meth:`~BaseManager.register` để đăng ký các kiểu hoặc callable mới với lớp manager. Ví dụ::
 
    from multiprocessing.managers import BaseManager
 
@@ -2175,18 +1638,16 @@ callables with the manager class.  For example::
    if __name__ == '__main__':
        with MyManager() as manager:
            maths = manager.Maths()
-           print(maths.add(4, 3))         # prints 7
-           print(maths.mul(7, 8))         # prints 56
+           print(maths.add(4, 3))         # in ra 7
+           print(maths.mul(7, 8))         # in ra 56
 
 
-Using a remote manager
-""""""""""""""""""""""
+Sử dụng manager từ xa
+"""""""""""""""""""""
 
-It is possible to run a manager server on one machine and have clients use it
-from other machines (assuming that the firewalls involved allow it).
+Bạn có thể chạy một manager server trên một máy và cho phép các client sử dụng nó từ những máy khác (với điều kiện các firewall liên quan cho phép điều này).
 
-Running the following commands creates a server for a single shared queue which
-remote clients can access::
+Chạy các lệnh sau sẽ tạo một server cho một hàng đợi dùng chung duy nhất mà các client từ xa có thể truy cập::
 
    >>> from multiprocessing.managers import BaseManager
    >>> from queue import Queue
@@ -2197,7 +1658,7 @@ remote clients can access::
    >>> s = m.get_server()
    >>> s.serve_forever()
 
-One client can access the server as follows::
+Một client có thể truy cập server như sau::
 
    >>> from multiprocessing.managers import BaseManager
    >>> class QueueManager(BaseManager): pass
@@ -2207,7 +1668,7 @@ One client can access the server as follows::
    >>> queue = m.get_queue()
    >>> queue.put('hello')
 
-Another client can also use it::
+Một client khác cũng có thể sử dụng nó::
 
    >>> from multiprocessing.managers import BaseManager
    >>> class QueueManager(BaseManager): pass
@@ -2218,8 +1679,7 @@ Another client can also use it::
    >>> queue.get()
    'hello'
 
-Local processes can also access that queue, using the code from above on the
-client to access it remotely::
+Các tiến trình cục bộ cũng có thể truy cập hàng đợi đó bằng cách sử dụng code ở trên phía client để truy cập từ xa::
 
     >>> from multiprocessing import Process, Queue
     >>> from multiprocessing.managers import BaseManager
@@ -2242,16 +1702,12 @@ client to access it remotely::
 
 .. _multiprocessing-proxy_objects:
 
-Proxy Objects
-^^^^^^^^^^^^^
+Đối tượng Proxy
+^^^^^^^^^^^^^^^
 
-A proxy is an object which *refers* to a shared object which lives (presumably)
-in a different process.  The shared object is said to be the *referent* of the
-proxy.  Multiple proxy objects may have the same referent.
+Proxy là một đối tượng *tham chiếu* đến một đối tượng dùng chung, đối tượng này (có lẽ) nằm trong một process khác. Đối tượng dùng chung được gọi là *đối tượng được tham chiếu* của proxy. Nhiều đối tượng proxy có thể có cùng một đối tượng được tham chiếu.
 
-A proxy object has methods which invoke corresponding methods of its referent
-(although not every method of the referent will necessarily be available through
-the proxy).  In this way, a proxy can be used just like its referent can:
+Một đối tượng proxy có các phương thức gọi những phương thức tương ứng của đối tượng được tham chiếu (mặc dù không phải mọi phương thức của đối tượng được tham chiếu đều nhất thiết khả dụng thông qua proxy). Theo cách này, proxy có thể được sử dụng giống như đối tượng được tham chiếu:
 
 .. doctest::
 
@@ -2267,27 +1723,23 @@ the proxy).  In this way, a proxy can be used just like its referent can:
    >>> l[2:5]
    [4, 9, 16]
 
-Notice that applying :func:`str` to a proxy will return the representation of
-the referent, whereas applying :func:`repr` will return the representation of
-the proxy.
+Lưu ý rằng việc áp dụng :func:`str` cho một proxy sẽ trả về biểu diễn của đối tượng được tham chiếu, trong khi việc áp dụng :func:`repr` sẽ trả về biểu diễn của proxy.
 
-An important feature of proxy objects is that they are picklable so they can be
-passed between processes.  As such, a referent can contain
-:ref:`multiprocessing-proxy_objects`.  This permits nesting of these managed
-lists, dicts, and other :ref:`multiprocessing-proxy_objects`:
+Một đặc điểm quan trọng của các đối tượng proxy là chúng có thể được pickle, nên có thể truyền giữa các process. Vì vậy, một đối tượng được tham chiếu có thể chứa
+:ref:`multiprocessing-proxy_objects`. Điều này cho phép lồng các list, dict và các :ref:`multiprocessing-proxy_objects` được quản lý khác:
 
 .. doctest::
 
    >>> a = manager.list()
    >>> b = manager.list()
-   >>> a.append(b)         # referent of a now contains referent of b
+   >>> a.append(b)         # đối tượng được tham chiếu của a hiện chứa đối tượng được tham chiếu của b
    >>> print(a, b)
    [<ListProxy object, typeid 'list' at ...>] []
    >>> b.append('hello')
    >>> print(a[0], b)
    ['hello'] ['hello']
 
-Similarly, dict and list proxies may be nested inside one another::
+Tương tự, các proxy dict và list có thể được lồng vào nhau::
 
    >>> l_outer = manager.list([ manager.dict() for i in range(2) ])
    >>> d_first_inner = l_outer[0]
@@ -2300,323 +1752,242 @@ Similarly, dict and list proxies may be nested inside one another::
    >>> print(l_outer[1])
    {'c': 3, 'z': 26}
 
-If standard (non-proxy) :class:`list` or :class:`dict` objects are contained
-in a referent, modifications to those mutable values will not be propagated
-through the manager because the proxy has no way of knowing when the values
-contained within are modified.  However, storing a value in a container proxy
-(which triggers a ``__setitem__`` on the proxy object) does propagate through
-the manager and so to effectively modify such an item, one could re-assign the
-modified value to the container proxy::
+Nếu các đối tượng :class:`list` hoặc :class:`dict` tiêu chuẩn (không phải proxy) được chứa trong referent, các sửa đổi đối với những giá trị có thể thay đổi đó sẽ không được truyền qua manager vì proxy không có cách nào biết khi các giá trị bên trong được sửa đổi. Tuy nhiên, việc lưu một giá trị vào container proxy (kích hoạt ``__setitem__`` trên đối tượng proxy) sẽ truyền thay đổi qua manager; do đó, để sửa đổi một phần tử như vậy một cách hiệu quả, bạn có thể gán lại giá trị đã sửa đổi cho container proxy::
 
-   # create a list proxy and append a mutable object (a dictionary)
+   # tạo một list proxy và thêm một đối tượng có thể thay đổi (một dictionary)
    lproxy = manager.list()
    lproxy.append({})
-   # now mutate the dictionary
+   # bây giờ thay đổi dictionary
    d = lproxy[0]
    d['a'] = 1
    d['b'] = 2
-   # at this point, the changes to d are not yet synced, but by
-   # updating the dictionary, the proxy is notified of the change
+   # tại thời điểm này, các thay đổi đối với d vẫn chưa được đồng bộ, nhưng bằng cách
+   # cập nhật dictionary, proxy sẽ được thông báo về thay đổi
    lproxy[0] = d
 
-This approach is perhaps less convenient than employing nested
-:ref:`multiprocessing-proxy_objects` for most use cases but also
-demonstrates a level of control over the synchronization.
+Cách tiếp cận này có lẽ kém thuận tiện hơn so với việc sử dụng các proxy lồng nhau
+:ref:`multiprocessing-proxy_objects` cho hầu hết các trường hợp sử dụng, nhưng cũng thể hiện mức độ kiểm soát đối với việc đồng bộ hóa.
 
 .. note::
 
-   The proxy types in :mod:`!multiprocessing` do nothing to support comparisons
-   by value.  So, for instance, we have:
+   Các kiểu proxy trong :mod:`!multiprocessing` không hỗ trợ việc so sánh theo giá trị. Vì vậy, chẳng hạn, ta có:
 
    .. doctest::
 
        >>> manager.list([1,2,3]) == [1,2,3]
        False
 
-   One should just use a copy of the referent instead when making comparisons.
+   Thay vào đó, khi thực hiện so sánh, bạn chỉ nên sử dụng một bản sao của đối tượng được tham chiếu.
 
 .. class:: BaseProxy
 
-   Proxy objects are instances of subclasses of :class:`BaseProxy`.
+   Các đối tượng proxy là những thể hiện của các lớp con của :class:`BaseProxy`.
 
    .. method:: _callmethod(methodname[, args[, kwds]])
 
-      Call and return the result of a method of the proxy's referent.
+      Gọi một phương thức của đối tượng được proxy tham chiếu và trả về kết quả.
 
-      If ``proxy`` is a proxy whose referent is ``obj`` then the expression ::
+      Nếu ``proxy`` là một proxy có đối tượng được tham chiếu là ``obj`` thì biểu thức::
 
          proxy._callmethod(methodname, args, kwds)
 
-      will evaluate the expression ::
+      sẽ đánh giá biểu thức::
 
          getattr(obj, methodname)(*args, **kwds)
 
-      in the manager's process.
+      trong tiến trình của manager.
 
-      The returned value will be a copy of the result of the call or a proxy to
-      a new shared object -- see documentation for the *method_to_typeid*
-      argument of :meth:`BaseManager.register`.
+      Giá trị được trả về sẽ là một bản sao của kết quả lời gọi hoặc một proxy tới một shared object mới -- xem tài liệu về đối số *method_to_typeid* của :meth:`BaseManager.register`.
 
-      If an exception is raised by the call, then is re-raised by
-      :meth:`_callmethod`.  If some other exception is raised in the manager's
-      process then this is converted into a :exc:`RemoteError` exception and is
-      raised by :meth:`_callmethod`.
+      Nếu lời gọi phát sinh một ngoại lệ thì ngoại lệ đó sẽ được phát sinh lại bởi
+      :meth:`_callmethod`. Nếu một ngoại lệ khác được phát sinh trong tiến trình của manager thì ngoại lệ này được chuyển thành ngoại lệ :exc:`RemoteError` và được phát sinh bởi :meth:`_callmethod`.
 
-      Note in particular that an exception will be raised if *methodname* has
-      not been *exposed*.
+      Đặc biệt lưu ý rằng một ngoại lệ sẽ được phát sinh nếu *methodname* chưa được *exposed*.
 
-      An example of the usage of :meth:`_callmethod`:
+      Ví dụ về cách sử dụng :meth:`_callmethod`:
 
       .. doctest::
 
          >>> l = manager.list(range(10))
          >>> l._callmethod('__len__')
          10
-         >>> l._callmethod('__getitem__', (slice(2, 7),)) # equivalent to l[2:7]
+         >>> l._callmethod('__getitem__', (slice(2, 7),)) # tương đương với l[2:7]
          [2, 3, 4, 5, 6]
-         >>> l._callmethod('__getitem__', (20,))          # equivalent to l[20]
+         >>> l._callmethod('__getitem__', (20,))          # tương đương với l[20]
          Traceback (most recent call last):
          ...
          IndexError: list index out of range
 
    .. method:: _getvalue()
 
-      Return a copy of the referent.
+      Trả về một bản sao của đối tượng được tham chiếu.
 
-      If the referent is unpicklable then this will raise an exception.
+      Nếu đối tượng được tham chiếu không thể pickle thì thao tác này sẽ phát sinh ngoại lệ.
 
    .. method:: __repr__
 
-      Return a representation of the proxy object.
+      Trả về biểu diễn của đối tượng proxy.
 
    .. method:: __str__
 
-      Return the representation of the referent.
+      Trả về biểu diễn của đối tượng được tham chiếu.
 
 
-Cleanup
+Dọn dẹp
 """""""
 
-A proxy object uses a weakref callback so that when it gets garbage collected it
-deregisters itself from the manager which owns its referent.
+Một đối tượng proxy sử dụng callback weakref để khi được garbage collector thu gom, nó sẽ tự hủy đăng ký khỏi manager sở hữu đối tượng được tham chiếu.
 
-A shared object gets deleted from the manager process when there are no longer
-any proxies referring to it.
+Một shared object sẽ bị xóa khỏi tiến trình manager khi không còn proxy nào tham chiếu đến nó.
 
 
-Process Pools
-^^^^^^^^^^^^^
+Các pool tiến trình
+^^^^^^^^^^^^^^^^^^^
 
 .. module:: multiprocessing.pool
-   :synopsis: Create pools of processes.
+   :synopsis: Tạo các pool tiến trình.
 
-One can create a pool of processes which will carry out tasks submitted to it
-with the :class:`Pool` class.
+Có thể tạo một pool tiến trình để thực hiện các tác vụ được gửi đến nó bằng lớp :class:`Pool`.
 
 .. class:: Pool([processes[, initializer[, initargs[, maxtasksperchild [, context]]]]])
 
-   A process pool object which controls a pool of worker processes to which jobs
-   can be submitted.  It supports asynchronous results with timeouts and
-   callbacks and has a parallel map implementation.
+   Một đối tượng process pool điều khiển một pool gồm các worker process, nơi có thể gửi các job. Đối tượng này hỗ trợ kết quả bất đồng bộ với timeout và callback, đồng thời có một triển khai map song song.
 
-   *processes* is the number of worker processes to use.  If *processes* is
-   ``None`` then the number returned by :func:`os.process_cpu_count` is used.
+   *processes* là số worker process cần sử dụng. Nếu *processes* là ``None`` thì số được :func:`os.process_cpu_count` trả về sẽ được sử dụng.
 
-   If *initializer* is not ``None`` then each worker process will call
-   ``initializer(*initargs)`` when it starts.
+   Nếu *initializer* không phải là ``None`` thì mỗi worker process sẽ gọi ``initializer(*initargs)`` khi khởi động.
 
-   *maxtasksperchild* is the number of tasks a worker process can complete
-   before it will exit and be replaced with a fresh worker process, to enable
-   unused resources to be freed. The default *maxtasksperchild* is ``None``, which
-   means worker processes will live as long as the pool.
+   *maxtasksperchild* là số lượng tác vụ mà một worker process có thể hoàn thành trước khi thoát và được thay thế bằng một worker process mới, nhằm giải phóng các tài nguyên không còn được sử dụng. Giá trị mặc định của *maxtasksperchild* là ``None``, nghĩa là các worker process sẽ tồn tại trong suốt thời gian hoạt động của pool.
 
-   *context* can be used to specify the context used for starting
-   the worker processes.  Usually a pool is created using the
-   function :func:`multiprocessing.Pool` or the :meth:`Pool` method
-   of a context object.  In both cases *context* is set
-   appropriately. If ``None``, calling this function will have the side effect
-   of setting the current global start method if it has not been set already.
-   See the :func:`get_context` function.
+   *context* có thể được sử dụng để chỉ định context dùng để khởi chạy các worker process. Thông thường, pool được tạo bằng hàm :func:`multiprocessing.Pool` hoặc phương thức :meth:`Pool` của một đối tượng context. Trong cả hai trường hợp, *context* được thiết lập phù hợp. Nếu ``None``, việc gọi hàm này sẽ có thêm tác dụng thiết lập start method toàn cục hiện tại nếu phương thức này chưa được thiết lập. Xem hàm :func:`get_context`.
 
-   Note that the methods of the pool object should only be called by
-   the process which created the pool.
+   Lưu ý rằng các phương thức của đối tượng pool chỉ nên được gọi bởi process đã tạo pool.
 
    .. warning::
       :class:`multiprocessing.pool` objects have internal resources that need to be
-      properly managed (like any other resource) by using the pool as a context manager
-      or by calling :meth:`close` and :meth:`terminate` manually. Failure to do this
-      can lead to the process hanging on finalization.
+      được quản lý đúng cách (giống như mọi tài nguyên khác) bằng cách sử dụng pool như một context manager hoặc gọi thủ công :meth:`close` và :meth:`terminate`. Nếu không làm vậy, process có thể bị treo trong quá trình hoàn tất.
 
-      Note that it is **not correct** to rely on the garbage collector to destroy the pool
-      as CPython does not assure that the finalizer of the pool will be called
-      (see :meth:`object.__del__` for more information).
+      Lưu ý rằng **không đúng** khi dựa vào garbage collector để hủy pool, vì CPython không đảm bảo rằng finalizer của pool sẽ được gọi (xem :meth:`object.__del__` để biết thêm thông tin).
 
    .. versionchanged:: 3.2
-      Added the *maxtasksperchild* parameter.
+      Đã thêm tham số *maxtasksperchild*.
 
    .. versionchanged:: 3.4
-      Added the *context* parameter.
+      Đã thêm tham số *context*.
 
    .. versionchanged:: 3.13
-      *processes* uses :func:`os.process_cpu_count` by default, instead of
+      *processes* sử dụng :func:`os.process_cpu_count` theo mặc định, thay vì
       :func:`os.cpu_count`.
 
    .. note::
 
-      Worker processes within a :class:`Pool` typically live for the complete
-      duration of the Pool's work queue. A frequent pattern found in other
-      systems (such as Apache, mod_wsgi, etc) to free resources held by
-      workers is to allow a worker within a pool to complete only a set
-      amount of work before exiting, being cleaned up and a new
-      process spawned to replace the old one. The *maxtasksperchild*
-      argument to the :class:`Pool` exposes this ability to the end user.
+      Các worker process trong một :class:`Pool` thường tồn tại trong toàn bộ thời gian hàng đợi công việc của Pool. Một mẫu thường gặp trong các hệ thống khác (chẳng hạn như Apache, mod_wsgi, v.v.) để giải phóng tài nguyên do các worker nắm giữ là cho phép một worker trong pool chỉ hoàn thành một lượng công việc nhất định trước khi thoát, được dọn dẹp và một process mới được tạo ra để thay thế process cũ. Đối số *maxtasksperchild* của :class:`Pool` cung cấp khả năng này cho người dùng cuối.
 
    .. method:: apply(func[, args[, kwds]])
 
-      Call *func* with arguments *args* and keyword arguments *kwds*.  It blocks
-      until the result is ready. Given this blocks, :meth:`apply_async` is
-      better suited for performing work in parallel. Additionally, *func*
-      is only executed in one of the workers of the pool.
+      Gọi *func* với các đối số *args* và các đối số từ khóa *kwds*. Lệnh này sẽ chặn cho đến khi kết quả sẵn sàng. Vì thao tác này bị chặn, :meth:`apply_async` phù hợp hơn để thực hiện công việc song song. Ngoài ra, *func* chỉ được thực thi trong một worker của pool.
 
    .. method:: apply_async(func[, args[, kwds[, callback[, error_callback]]]])
 
-      A variant of the :meth:`apply` method which returns a
-      :class:`~multiprocessing.pool.AsyncResult` object.
+      Một biến thể của phương thức :meth:`apply` trả về một
+      :class:`~multiprocessing.pool.AsyncResult` đối tượng.
 
-      If *callback* is specified then it should be a callable which accepts a
-      single argument.  When the result becomes ready *callback* is applied to
-      it, that is unless the call failed, in which case the *error_callback*
-      is applied instead.
+      Nếu *callback* được chỉ định thì đó phải là một callable chấp nhận một đối số. Khi kết quả sẵn sàng, *callback* sẽ được gọi với kết quả đó, trừ khi lệnh gọi thất bại; trong trường hợp đó, *error_callback* sẽ được gọi thay thế.
 
-      If *error_callback* is specified then it should be a callable which
-      accepts a single argument.  If the target function fails, then
-      the *error_callback* is called with the exception instance.
+      Nếu *error_callback* được chỉ định thì đó phải là một callable chấp nhận một đối số. Nếu hàm đích thất bại, *error_callback* sẽ được gọi với instance của exception.
 
-      Callbacks should complete immediately since otherwise the thread which
-      handles the results will get blocked.
+      Các callback nên hoàn tất ngay lập tức, vì nếu không, thread xử lý kết quả sẽ bị chặn.
 
    .. method:: map(func, iterable[, chunksize])
 
-      A parallel equivalent of the :func:`map` built-in function (it supports only
-      one *iterable* argument though, for multiple iterables see :meth:`starmap`).
-      It blocks until the result is ready.
+      Một phiên bản tương đương chạy song song của hàm dựng sẵn :func:`map` (tuy nhiên, hàm này chỉ hỗ trợ một đối số *iterable*; để sử dụng nhiều iterable, hãy xem :meth:`starmap`). Hàm này sẽ chặn cho đến khi kết quả sẵn sàng.
 
-      This method chops the iterable into a number of chunks which it submits to
-      the process pool as separate tasks.  The (approximate) size of these
-      chunks can be specified by setting *chunksize* to a positive integer.
+      Phương thức này chia iterable thành một số chunk rồi gửi chúng đến process pool dưới dạng các task riêng biệt. Có thể chỉ định kích thước (xấp xỉ) của các chunk này bằng cách đặt *chunksize* thành một số nguyên dương.
 
-      Note that it may cause high memory usage for very long iterables. Consider
-      using :meth:`imap` or :meth:`imap_unordered` with explicit *chunksize*
-      option for better efficiency.
+      Lưu ý rằng điều này có thể gây ra mức sử dụng bộ nhớ cao đối với các iterable rất dài. Hãy cân nhắc sử dụng :meth:`imap` hoặc :meth:`imap_unordered` với tùy chọn *chunksize* được chỉ định rõ ràng để đạt hiệu quả tốt hơn.
 
    .. method:: map_async(func, iterable[, chunksize[, callback[, error_callback]]])
 
-      A variant of the :meth:`.map` method which returns a
-      :class:`~multiprocessing.pool.AsyncResult` object.
+      Một biến thể của phương thức :meth:`.map` trả về một
+      :class:`~multiprocessing.pool.AsyncResult` đối tượng.
 
-      If *callback* is specified then it should be a callable which accepts a
-      single argument.  When the result becomes ready *callback* is applied to
-      it, that is unless the call failed, in which case the *error_callback*
-      is applied instead.
+      Nếu *callback* được chỉ định thì đó phải là một callable chấp nhận một đối số. Khi kết quả sẵn sàng, *callback* sẽ được gọi với kết quả đó, trừ khi lệnh gọi thất bại; trong trường hợp đó, *error_callback* sẽ được gọi thay thế.
 
-      If *error_callback* is specified then it should be a callable which
-      accepts a single argument.  If the target function fails, then
-      the *error_callback* is called with the exception instance.
+      Nếu *error_callback* được chỉ định thì đó phải là một callable chấp nhận một đối số. Nếu hàm đích thất bại, *error_callback* sẽ được gọi với instance của exception.
 
-      Callbacks should complete immediately since otherwise the thread which
-      handles the results will get blocked.
+      Các callback nên hoàn tất ngay lập tức, vì nếu không, thread xử lý kết quả sẽ bị chặn.
 
    .. method:: imap(func, iterable[, chunksize])
 
-      An iterator-based version of :meth:`.map`.
+      Một phiên bản dựa trên iterator của :meth:`.map`.
 
-      The *chunksize* argument is the same as the one used by the :meth:`.map`
-      method.  For very long iterables using a large value for *chunksize* can
-      make the job complete **much** faster than using the default value of
-      ``1``.
+      Đối số *chunksize* giống với đối số được sử dụng bởi phương thức :meth:`.map`. Đối với các iterable rất dài, việc sử dụng giá trị lớn cho *chunksize* có thể giúp công việc hoàn tất **much** nhanh hơn đáng kể so với việc sử dụng giá trị mặc định là ``1``.
 
-      Also if *chunksize* is ``1`` then the :meth:`!next` method of the iterator
-      returned by the :meth:`imap` method has an optional *timeout* parameter:
-      ``next(timeout)`` will raise :exc:`multiprocessing.TimeoutError` if the
-      result cannot be returned within *timeout* seconds.
+      Ngoài ra, nếu *chunksize* là ``1``, thì phương thức :meth:`!next` của iterator được trả về bởi phương thức :meth:`imap` có một tham số tùy chọn *timeout*: ``next(timeout)`` sẽ phát sinh :exc:`multiprocessing.TimeoutError` nếu không thể trả về kết quả trong vòng *timeout* giây.
 
    .. method:: imap_unordered(func, iterable[, chunksize])
 
-      The same as :meth:`imap` except that the ordering of the results from the
-      returned iterator should be considered arbitrary.  (Only when there is
-      only one worker process is the order guaranteed to be "correct".)
+      Tương tự :meth:`imap`, ngoại trừ việc thứ tự các kết quả từ iterator được trả về nên được xem là tùy ý. (Chỉ khi có duy nhất một worker process thì thứ tự mới được đảm bảo là "đúng".)
 
    .. method:: starmap(func, iterable[, chunksize])
 
-      Like :meth:`~multiprocessing.pool.Pool.map` except that the
-      elements of the *iterable* are expected to be iterables that are
-      unpacked as arguments.
+      Tương tự :meth:`~multiprocessing.pool.Pool.map`, ngoại trừ việc các phần tử của *iterable* được kỳ vọng là các iterable sẽ được unpack thành các đối số.
 
-      Hence an *iterable* of ``[(1,2), (3, 4)]`` results in ``[func(1,2),
-      func(3,4)]``.
+      Do đó, một *iterable* của ``[(1,2), (3, 4)]`` sẽ cho kết quả là ``[func(1,2), func(3,4)]``.
 
       .. versionadded:: 3.3
 
    .. method:: starmap_async(func, iterable[, chunksize[, callback[, error_callback]]])
 
-      A combination of :meth:`starmap` and :meth:`map_async` that iterates over
-      *iterable* of iterables and calls *func* with the iterables unpacked.
-      Returns a result object.
+      Sự kết hợp giữa :meth:`starmap` và :meth:`map_async`, lặp qua *iterable* gồm các iterable và gọi *func* với các iterable được unpack. Trả về một đối tượng kết quả.
 
       .. versionadded:: 3.3
 
    .. method:: close()
 
-      Prevents any more tasks from being submitted to the pool.  Once all the
-      tasks have been completed the worker processes will exit.
+      Ngăn không cho gửi thêm task nào đến pool. Sau khi tất cả task hoàn tất, các worker process sẽ thoát.
 
    .. method:: terminate()
 
-      Stops the worker processes immediately without completing outstanding
-      work.  When the pool object is garbage collected :meth:`terminate` will be
-      called immediately.
+      Dừng ngay các worker process mà không hoàn thành công việc đang chờ. Khi đối tượng pool được garbage collect, :meth:`terminate` sẽ được gọi ngay lập tức.
 
    .. method:: join()
 
-      Wait for the worker processes to exit.  One must call :meth:`close` or
-      :meth:`terminate` before using :meth:`join`.
+      Chờ các worker process thoát. Phải gọi :meth:`close` hoặc
+      :meth:`terminate` trước khi sử dụng :meth:`join`.
 
    .. versionchanged:: 3.3
-      Pool objects now support the context management protocol -- see
-      :ref:`typecontextmanager`.  :meth:`~contextmanager.__enter__` returns the
-      pool object, and :meth:`~contextmanager.__exit__` calls :meth:`terminate`.
+      Các đối tượng Pool hiện hỗ trợ context management protocol -- xem
+      :ref:`typecontextmanager`.  :meth:`~contextmanager.__enter__` trả về đối tượng pool, còn :meth:`~contextmanager.__exit__` gọi :meth:`terminate`.
 
 
 .. class:: AsyncResult
 
-   The class of the result returned by :meth:`Pool.apply_async` and
+   Lớp của kết quả được :meth:`Pool.apply_async` trả về và
    :meth:`Pool.map_async`.
 
    .. method:: get([timeout])
 
-      Return the result when it arrives.  If *timeout* is not ``None`` and the
-      result does not arrive within *timeout* seconds then
-      :exc:`multiprocessing.TimeoutError` is raised.  If the remote call raised
-      an exception then that exception will be reraised by :meth:`get`.
+      Trả về kết quả khi kết quả có sẵn.  Nếu *timeout* không phải là ``None`` và kết quả không xuất hiện trong vòng *timeout* giây thì
+      :exc:`multiprocessing.TimeoutError` được đưa ra.  Nếu lệnh gọi từ xa đưa ra một ngoại lệ thì ngoại lệ đó sẽ được :meth:`get` đưa ra lại.
 
    .. method:: wait([timeout])
 
-      Wait until the result is available or until *timeout* seconds pass.
+      Chờ cho đến khi kết quả có sẵn hoặc cho đến khi *timeout* giây trôi qua.
 
    .. method:: ready()
 
-      Return whether the call has completed.
+      Trả về việc lệnh gọi đã hoàn tất hay chưa.
 
    .. method:: successful()
 
-      Return whether the call completed without raising an exception.  Will
-      raise :exc:`ValueError` if the result is not ready.
+      Trả về việc lệnh gọi đã hoàn tất mà không đưa ra ngoại lệ hay chưa.  Sẽ đưa ra :exc:`ValueError` nếu kết quả chưa sẵn sàng.
 
       .. versionchanged:: 3.7
-         If the result is not ready, :exc:`ValueError` is raised instead of
+         Nếu kết quả chưa sẵn sàng, :exc:`ValueError` sẽ được raised thay vì
          :exc:`AssertionError`.
 
-The following example demonstrates the use of a pool::
+Ví dụ sau minh họa cách sử dụng một pool::
 
    from multiprocessing import Pool
    import time
@@ -2625,181 +1996,129 @@ The following example demonstrates the use of a pool::
        return x*x
 
    if __name__ == '__main__':
-       with Pool(processes=4) as pool:         # start 4 worker processes
-           result = pool.apply_async(f, (10,)) # evaluate "f(10)" asynchronously in a single process
-           print(result.get(timeout=1))        # prints "100" unless your computer is *very* slow
+       with Pool(processes=4) as pool:         # khởi động 4 worker process
+           result = pool.apply_async(f, (10,)) # đánh giá "f(10)" một cách bất đồng bộ trong một process duy nhất
+           print(result.get(timeout=1))        # in "100" trừ khi máy tính của bạn *cực kỳ* chậm
 
-           print(pool.map(f, range(10)))       # prints "[0, 1, 4,..., 81]"
+           print(pool.map(f, range(10)))       # in "[0, 1, 4,..., 81]"
 
            it = pool.imap(f, range(10))
-           print(next(it))                     # prints "0"
-           print(next(it))                     # prints "1"
-           print(it.next(timeout=1))           # prints "4" unless your computer is *very* slow
+           print(next(it))                     # in "0"
+           print(next(it))                     # in "1"
+           print(it.next(timeout=1))           # in "4" trừ khi máy tính của bạn *rất* chậm
 
            result = pool.apply_async(time.sleep, (10,))
-           print(result.get(timeout=1))        # raises multiprocessing.TimeoutError
+           print(result.get(timeout=1))        # phát sinh multiprocessing.TimeoutError
 
 
 .. _multiprocessing-listeners-clients:
 
-Listeners and Clients
-^^^^^^^^^^^^^^^^^^^^^
+Listeners và Clients
+^^^^^^^^^^^^^^^^^^^^
 
 .. module:: multiprocessing.connection
-   :synopsis: API for dealing with sockets.
+   :synopsis: API để làm việc với socket.
 
-Usually message passing between processes is done using queues or by using
-:class:`~Connection` objects returned by
+Thông thường, việc truyền thông điệp giữa các tiến trình được thực hiện bằng queue hoặc bằng cách sử dụng
+:class:`~Connection` các đối tượng được trả về bởi
 :func:`~multiprocessing.Pipe`.
 
-However, the :mod:`!multiprocessing.connection` module allows some extra
-flexibility.  It basically gives a high level message oriented API for dealing
-with sockets or Windows named pipes.  It also has support for *digest
-authentication* using the :mod:`hmac` module, and for polling
-multiple connections at the same time.
+Tuy nhiên, mô-đun :mod:`!multiprocessing.connection` cho phép linh hoạt hơn. Về cơ bản, mô-đun này cung cấp một API cấp cao hướng thông điệp để làm việc với socket hoặc named pipe của Windows. Mô-đun này cũng hỗ trợ *digest authentication* bằng mô-đun :mod:`hmac`, cũng như hỗ trợ polling nhiều kết nối cùng lúc.
 
 
 .. function:: deliver_challenge(connection, authkey)
 
-   Send a randomly generated message to the other end of the connection and wait
-   for a reply.
+   Gửi một thông điệp được tạo ngẫu nhiên đến đầu bên kia của kết nối và chờ phản hồi.
 
-   If the reply matches the digest of the message using *authkey* as the key
-   then a welcome message is sent to the other end of the connection.  Otherwise
-   :exc:`~multiprocessing.AuthenticationError` is raised.
+   Nếu phản hồi khớp với digest của thông điệp khi sử dụng *authkey* làm khóa thì một thông điệp chào mừng sẽ được gửi đến đầu bên kia của kết nối. Nếu không thì
+   :exc:`~multiprocessing.AuthenticationError` được phát sinh.
 
 .. function:: answer_challenge(connection, authkey)
 
-   Receive a message, calculate the digest of the message using *authkey* as the
-   key, and then send the digest back.
+   Nhận một thông điệp, tính digest của thông điệp bằng *authkey* làm khóa, sau đó gửi digest trở lại.
 
-   If a welcome message is not received, then
-   :exc:`~multiprocessing.AuthenticationError` is raised.
+   Nếu không nhận được thông điệp chào mừng thì
+   :exc:`~multiprocessing.AuthenticationError` được phát sinh.
 
 .. function:: Client(address[, family[, authkey]])
 
-   Attempt to set up a connection to the listener which is using address
-   *address*, returning a :class:`~Connection`.
+   Thử thiết lập kết nối tới listener đang sử dụng địa chỉ *address*, trả về một :class:`~Connection`.
 
-   The type of the connection is determined by *family* argument, but this can
-   generally be omitted since it can usually be inferred from the format of
-   *address*. (See :ref:`multiprocessing-address-formats`)
+   Loại kết nối được xác định bởi đối số *family*, nhưng nhìn chung có thể bỏ qua đối số này vì thường có thể suy ra từ định dạng của *address*. (Xem :ref:`multiprocessing-address-formats`)
 
-   If *authkey* is given and not ``None``, it should be a byte string and will be
-   used as the secret key for an HMAC-based authentication challenge. No
-   authentication is done if *authkey* is ``None``.
-   :exc:`~multiprocessing.AuthenticationError` is raised if authentication fails.
-   See :ref:`multiprocessing-auth-keys`.
+   Nếu *authkey* được cung cấp và không phải là ``None``, thì giá trị này phải là một chuỗi byte và sẽ được dùng làm khóa bí mật cho thử thách xác thực dựa trên HMAC. Không thực hiện xác thực nếu *authkey* là ``None``.
+   :exc:`~multiprocessing.AuthenticationError` được phát sinh nếu xác thực thất bại. Xem :ref:`multiprocessing-auth-keys`.
 
 .. class:: Listener([address[, family[, backlog[, authkey]]]])
 
-   A wrapper for a bound socket or Windows named pipe which is 'listening' for
-   connections.
+   Một wrapper cho socket đã liên kết hoặc named pipe của Windows đang 'lắng nghe' các kết nối.
 
-   *address* is the address to be used by the bound socket or named pipe of the
-   listener object.
+   *address* là địa chỉ được sử dụng bởi socket đã liên kết hoặc named pipe của đối tượng listener.
 
    .. note::
 
-      If an address of '0.0.0.0' is used, the address will not be a connectable
-      end point on Windows. If you require a connectable end-point,
-      you should use '127.0.0.1'.
+      Nếu sử dụng địa chỉ '0.0.0.0', địa chỉ này sẽ không phải là một điểm cuối có thể kết nối trên Windows. Nếu cần một điểm cuối có thể kết nối, bạn nên sử dụng '127.0.0.1'.
 
-   *family* is the type of socket (or named pipe) to use.  This can be one of
-   the strings ``'AF_INET'`` (for a TCP socket), ``'AF_UNIX'`` (for a Unix
-   domain socket) or ``'AF_PIPE'`` (for a Windows named pipe).  Of these only
-   the first is guaranteed to be available.  If *family* is ``None`` then the
-   family is inferred from the format of *address*.  If *address* is also
-   ``None`` then a default is chosen.  This default is the family which is
-   assumed to be the fastest available.  See
-   :ref:`multiprocessing-address-formats`.  Note that if *family* is
-   ``'AF_UNIX'`` and address is ``None`` then the socket will be created in a
-   private temporary directory created using :func:`tempfile.mkstemp`.
+   *family* là loại socket (hoặc named pipe) cần sử dụng. Giá trị này có thể là một trong các chuỗi ``'AF_INET'`` (cho socket TCP), ``'AF_UNIX'`` (cho Unix domain socket) hoặc ``'AF_PIPE'`` (cho Windows named pipe). Trong số đó, chỉ giá trị đầu tiên được đảm bảo luôn khả dụng. Nếu *family* là ``None`` thì family được suy ra từ định dạng của *address*. Nếu *address* cũng là ``None`` thì một giá trị mặc định sẽ được chọn. Giá trị mặc định này là family được giả định là nhanh nhất trong các family hiện có. Xem
+   :ref:`multiprocessing-address-formats`. Lưu ý rằng nếu *family* là ``'AF_UNIX'`` và address là ``None`` thì socket sẽ được tạo trong một thư mục tạm riêng được tạo bằng :func:`tempfile.mkstemp`.
 
-   If the listener object uses a socket then *backlog* (1 by default) is passed
-   to the :meth:`~socket.socket.listen` method of the socket once it has been
-   bound.
+   Nếu listener object sử dụng socket thì *backlog* (mặc định là 1) sẽ được truyền cho phương thức :meth:`~socket.socket.listen` của socket sau khi socket được bind.
 
-   If *authkey* is given and not ``None``, it should be a byte string and will be
-   used as the secret key for an HMAC-based authentication challenge. No
-   authentication is done if *authkey* is ``None``.
-   :exc:`~multiprocessing.AuthenticationError` is raised if authentication fails.
-   See :ref:`multiprocessing-auth-keys`.
+   Nếu *authkey* được cung cấp và không phải là ``None``, thì giá trị này phải là một chuỗi byte và sẽ được dùng làm khóa bí mật cho thử thách xác thực dựa trên HMAC. Không thực hiện xác thực nếu *authkey* là ``None``.
+   :exc:`~multiprocessing.AuthenticationError` được phát sinh nếu xác thực thất bại. Xem :ref:`multiprocessing-auth-keys`.
 
    .. method:: accept()
 
-      Accept a connection on the bound socket or named pipe of the listener
-      object and return a :class:`~Connection` object.
-      If authentication is attempted and fails, then
-      :exc:`~multiprocessing.AuthenticationError` is raised.
+      Chấp nhận một kết nối trên socket đã bind hoặc named pipe của listener object và trả về một :class:`~Connection` object. Nếu quá trình xác thực được thực hiện nhưng thất bại thì
+      :exc:`~multiprocessing.AuthenticationError` được phát sinh.
 
    .. method:: close()
 
-      Close the bound socket or named pipe of the listener object.  This is
-      called automatically when the listener is garbage collected.  However it
-      is advisable to call it explicitly.
+      Đóng socket đã liên kết hoặc named pipe của đối tượng listener. Thao tác này được tự động gọi khi listener được thu gom rác. Tuy nhiên, bạn nên gọi nó một cách tường minh.
 
-   Listener objects have the following read-only properties:
+   Đối tượng listener có các thuộc tính chỉ đọc sau:
 
    .. attribute:: address
 
-      The address which is being used by the Listener object.
+      Địa chỉ đang được đối tượng Listener sử dụng.
 
    .. attribute:: last_accepted
 
-      The address from which the last accepted connection came.  If this is
-      unavailable then it is ``None``.
+      Địa chỉ mà từ đó kết nối được chấp nhận gần đây nhất đến. Nếu không lấy được địa chỉ này thì đó là ``None``.
 
    .. versionchanged:: 3.3
-      Listener objects now support the context management protocol -- see
-      :ref:`typecontextmanager`.  :meth:`~contextmanager.__enter__` returns the
-      listener object, and :meth:`~contextmanager.__exit__` calls :meth:`close`.
+      Các đối tượng listener hiện hỗ trợ context management protocol -- xem
+      :ref:`typecontextmanager`. :meth:`~contextmanager.__enter__` trả về đối tượng listener, còn :meth:`~contextmanager.__exit__` gọi :meth:`close`.
 
 .. function:: wait(object_list, timeout=None)
 
-   Wait till an object in *object_list* is ready.  Returns the list of
-   those objects in *object_list* which are ready.  If *timeout* is a
-   float then the call blocks for at most that many seconds.  If
-   *timeout* is ``None`` then it will block for an unlimited period.
-   A negative timeout is equivalent to a zero timeout.
+   Chờ cho đến khi một đối tượng trong *object_list* sẵn sàng. Trả về danh sách các đối tượng trong *object_list* đang sẵn sàng. Nếu *timeout* là một số thực thì lệnh gọi sẽ chặn tối đa trong khoảng thời gian đó, tính bằng giây. Nếu *timeout* là ``None`` thì lệnh gọi sẽ chặn trong thời gian không giới hạn. Timeout âm tương đương với timeout bằng không.
 
-   For both POSIX and Windows, an object can appear in *object_list* if
-   it is
+   Đối với cả POSIX và Windows, một đối tượng có thể xuất hiện trong *object_list* nếu đó là
 
-   * a readable :class:`~multiprocessing.connection.Connection` object;
-   * a connected and readable :class:`socket.socket` object; or
-   * the :attr:`~multiprocessing.Process.sentinel` attribute of a
-     :class:`~multiprocessing.Process` object.
+   * một đối tượng :class:`~multiprocessing.connection.Connection` có thể đọc được;
+   * một đối tượng :class:`socket.socket` đã kết nối và có thể đọc được; hoặc
+   * thuộc tính :attr:`~multiprocessing.Process.sentinel` của một
+     :class:`~multiprocessing.Process` đối tượng.
 
-   A connection or socket object is ready when there is data available
-   to be read from it, or the other end has been closed.
+   Một đối tượng kết nối hoặc socket ở trạng thái sẵn sàng khi có dữ liệu để đọc từ nó hoặc đầu bên kia đã đóng kết nối.
 
-   **POSIX**: ``wait(object_list, timeout)`` almost equivalent
-   ``select.select(object_list, [], [], timeout)``.  The difference is
-   that, if :func:`select.select` is interrupted by a signal, it can
-   raise :exc:`OSError` with an error number of ``EINTR``, whereas
-   :func:`wait` will not.
+   **POSIX**: ``wait(object_list, timeout)`` gần như tương đương ``select.select(object_list, [], [], timeout)``.  Điểm khác biệt là nếu :func:`select.select` bị gián đoạn bởi một signal, nó có thể phát sinh :exc:`OSError` với số lỗi là ``EINTR``, trong khi
+   :func:`wait` sẽ không.
 
-   **Windows**: An item in *object_list* must either be an integer
-   handle which is waitable (according to the definition used by the
-   documentation of the Win32 function ``WaitForMultipleObjects()``)
-   or it can be an object with a :meth:`~io.IOBase.fileno` method which returns a
-   socket handle or pipe handle.  (Note that pipe handles and socket
-   handles are **not** waitable handles.)
+   **Windows**: Một mục trong *object_list* phải là một integer handle có thể chờ được (theo định nghĩa được sử dụng trong tài liệu của hàm Win32 ``WaitForMultipleObjects()``) hoặc có thể là một object có phương thức :meth:`~io.IOBase.fileno` trả về socket handle hoặc pipe handle. (Lưu ý rằng pipe handle và socket handle là các handle **not** có thể chờ được.)
 
    .. versionadded:: 3.3
 
 
-**Examples**
+**Ví dụ**
 
-The following server code creates a listener which uses ``'secret password'`` as
-an authentication key.  It then waits for a connection and sends some data to
-the client::
+Đoạn mã server sau đây tạo một listener sử dụng ``'secret password'`` làm khóa xác thực. Sau đó, nó chờ một kết nối và gửi một số dữ liệu đến client::
 
    from multiprocessing.connection import Listener
    from array import array
 
-   address = ('localhost', 6000)     # family is deduced to be 'AF_INET'
+   address = ('localhost', 6000)     # family được suy ra là 'AF_INET'
 
    with Listener(address, authkey=b'secret password') as listener:
        with listener.accept() as conn:
@@ -2811,8 +2130,7 @@ the client::
 
            conn.send_bytes(array('i', [42, 1729]))
 
-The following code connects to the server and receives some data from the
-server::
+Đoạn mã sau đây kết nối đến server và nhận một số dữ liệu từ server::
 
    from multiprocessing.connection import Client
    from array import array
@@ -2828,8 +2146,7 @@ server::
        print(conn.recv_bytes_into(arr))    # => 8
        print(arr)                          # => array('i', [42, 1729, 0, 0, 0])
 
-The following code uses :func:`~multiprocessing.connection.wait` to
-wait for messages from multiple processes at once::
+Đoạn mã sau sử dụng :func:`~multiprocessing.connection.wait` để chờ thông báo từ nhiều tiến trình cùng lúc::
 
    from multiprocessing import Process, Pipe, current_process
    from multiprocessing.connection import wait
@@ -2847,10 +2164,10 @@ wait for messages from multiple processes at once::
            readers.append(r)
            p = Process(target=foo, args=(w,))
            p.start()
-           # We close the writable end of the pipe now to be sure that
-           # p is the only process which owns a handle for it.  This
-           # ensures that when p closes its handle for the writable end,
-           # wait() will promptly report the readable end as being ready.
+           # Bây giờ chúng ta đóng đầu có thể ghi của pipe để chắc chắn rằng
+           # p là tiến trình duy nhất sở hữu một handle cho đầu này. Điều này
+           # đảm bảo rằng khi p đóng handle của nó đối với đầu có thể ghi,
+           # wait() sẽ nhanh chóng báo cáo rằng đầu có thể đọc đã sẵn sàng.
            w.close()
 
        while readers:
@@ -2865,93 +2182,58 @@ wait for messages from multiple processes at once::
 
 .. _multiprocessing-address-formats:
 
-Address Formats
-"""""""""""""""
+Định dạng địa chỉ
+"""""""""""""""""
 
-* An ``'AF_INET'`` address is a tuple of the form ``(hostname, port)`` where
-  *hostname* is a string and *port* is an integer.
+* Địa chỉ ``'AF_INET'`` là một tuple có dạng ``(hostname, port)``, trong đó *hostname* là một chuỗi và *port* là một số nguyên.
 
-* An ``'AF_UNIX'`` address is a string representing a filename on the
-  filesystem.
+* Địa chỉ ``'AF_UNIX'`` là một chuỗi biểu diễn tên tệp trên hệ thống tệp.
 
-* An ``'AF_PIPE'`` address is a string of the form
-  :samp:`r'\\\\\\.\\pipe\\\\{PipeName}'`.  To use :func:`Client` to connect to a named
-  pipe on a remote computer called *ServerName* one should use an address of the
-  form :samp:`r'\\\\\\\\{ServerName}\\pipe\\\\{PipeName}'` instead.
+* Địa chỉ ``'AF_PIPE'`` là một chuỗi có dạng
+  :samp:`r'\\\\\\.\\pipe\\\\{PipeName}'`.  Để sử dụng :func:`Client` kết nối đến một named pipe trên máy tính từ xa có tên là *ServerName*, cần sử dụng địa chỉ có dạng :samp:`r'\\\\\\\\{ServerName}\\pipe\\\\{PipeName}'` thay thế.
 
-Note that any string beginning with two backslashes is assumed by default to be
-an ``'AF_PIPE'`` address rather than an ``'AF_UNIX'`` address.
+Lưu ý rằng mọi chuỗi bắt đầu bằng hai dấu gạch chéo ngược theo mặc định đều được coi là địa chỉ ``'AF_PIPE'`` thay vì địa chỉ ``'AF_UNIX'``.
 
 
 .. _multiprocessing-auth-keys:
 
-Authentication keys
-^^^^^^^^^^^^^^^^^^^
+Khóa xác thực
+^^^^^^^^^^^^^
 
-When one uses :meth:`Connection.recv <Connection.recv>`, the
-data received is automatically
-unpickled. Unfortunately unpickling data from an untrusted source is a security
-risk. Therefore :class:`Listener` and :func:`Client` use the :mod:`hmac` module
-to provide digest authentication.
+Khi sử dụng :meth:`Connection.recv <Connection.recv>`, dữ liệu nhận được sẽ tự động được unpickle. Đáng tiếc là việc unpickle dữ liệu từ nguồn không đáng tin cậy tiềm ẩn rủi ro bảo mật. Vì vậy, :class:`Listener` và :func:`Client` sử dụng module :mod:`hmac` để cung cấp cơ chế xác thực digest.
 
-An authentication key is a byte string which can be thought of as a
-password: once a connection is established both ends will demand proof
-that the other knows the authentication key.  (Demonstrating that both
-ends are using the same key does **not** involve sending the key over
-the connection.)
+Khóa xác thực là một chuỗi byte có thể được xem như một mật khẩu: sau khi kết nối được thiết lập, cả hai đầu sẽ yêu cầu bằng chứng rằng đầu kia biết khóa xác thực. (Việc chứng minh rằng cả hai đầu đang sử dụng cùng một khóa **không** đòi hỏi phải gửi khóa qua kết nối.)
 
-If authentication is requested but no authentication key is specified then the
-return value of ``current_process().authkey`` is used (see
-:class:`~multiprocessing.Process`).  This value will be automatically inherited by
-any :class:`~multiprocessing.Process` object that the current process creates.
-This means that (by default) all processes of a multi-process program will share
-a single authentication key which can be used when setting up connections
-between themselves.
+Nếu xác thực được yêu cầu nhưng không chỉ định khóa xác thực thì giá trị trả về của ``current_process().authkey`` sẽ được sử dụng (xem
+:class:`~multiprocessing.Process`). Giá trị này sẽ được mọi đối tượng :class:`~multiprocessing.Process` mà tiến trình hiện tại tạo ra tự động kế thừa. Điều này có nghĩa là (theo mặc định) mọi tiến trình của một chương trình đa tiến trình sẽ dùng chung một khóa xác thực, có thể được sử dụng khi thiết lập các kết nối giữa chúng.
 
-Suitable authentication keys can also be generated by using :func:`os.urandom`.
+Bạn cũng có thể tạo các khóa xác thực phù hợp bằng cách sử dụng :func:`os.urandom`.
 
-This authentication protects :class:`Listener` and :func:`Client` connections,
-which are reachable by address.  It is not applied to the anonymous pipes
-created by :func:`~multiprocessing.Pipe` or used internally by
+Cơ chế xác thực này bảo vệ các kết nối :class:`Listener` và :func:`Client`, vốn có thể được truy cập bằng địa chỉ. Cơ chế này không được áp dụng cho các pipe ẩn danh do :func:`~multiprocessing.Pipe` tạo ra hoặc được sử dụng nội bộ bởi
 :class:`~multiprocessing.Queue`.
-:mod:`multiprocessing` treats all local processes running as the same user as
-trusted; on most operating systems such processes can access each other's pipe
-file descriptors regardless.  Applications that require isolation between
-processes of the same user must arrange it at the operating-system level --
-for example, by running workers under a different user account or in a sandbox.
+:mod:`multiprocessing` xem mọi tiến trình cục bộ chạy với cùng một người dùng là đáng tin cậy; trên hầu hết các hệ điều hành, các tiến trình như vậy vốn có thể truy cập bộ mô tả pipe của nhau. Các ứng dụng yêu cầu sự cô lập giữa những tiến trình của cùng một người dùng phải thực hiện việc đó ở cấp hệ điều hành -- chẳng hạn bằng cách chạy worker dưới một tài khoản người dùng khác hoặc trong một sandbox.
 
 
-Logging
-^^^^^^^
+Ghi nhật ký
+^^^^^^^^^^^
 
-Some support for logging is available.  Note, however, that the :mod:`logging`
-package does not use process shared locks so it is possible (depending on the
-handler type) for messages from different processes to get mixed up.
+Có hỗ trợ ghi nhật ký ở mức nhất định. Tuy nhiên, lưu ý rằng gói :mod:`logging` không sử dụng các khóa dùng chung giữa các process, vì vậy (tùy thuộc vào loại handler) các thông báo từ những process khác nhau có thể bị trộn lẫn.
 
 .. currentmodule:: multiprocessing
 .. function:: get_logger()
 
-   Returns the logger used by :mod:`!multiprocessing`.  If necessary, a new one
-   will be created.
+   Trả về logger được :mod:`!multiprocessing` sử dụng. Nếu cần, một logger mới sẽ được tạo.
 
-   When first created the logger has level :const:`logging.NOTSET` and no
-   default handler. Messages sent to this logger will not by default propagate
-   to the root logger.
+   Khi mới được tạo, logger có level :const:`logging.NOTSET` và không có handler mặc định. Theo mặc định, các thông báo gửi đến logger này sẽ không được truyền đến root logger.
 
-   Note that on Windows child processes will only inherit the level of the
-   parent process's logger -- any other customization of the logger will not be
-   inherited.
+   Lưu ý rằng trên Windows, các process con chỉ kế thừa level của logger trong process cha -- mọi tùy chỉnh khác của logger sẽ không được kế thừa.
 
 .. currentmodule:: multiprocessing
 .. function:: log_to_stderr(level=None)
 
-   This function performs a call to :func:`get_logger` but in addition to
-   returning the logger created by get_logger, it adds a handler which sends
-   output to :data:`sys.stderr` using format
-   ``'[%(levelname)s/%(processName)s] %(message)s'``.
-   You can modify ``levelname`` of the logger by passing a ``level`` argument.
+   Hàm này thực hiện một lệnh gọi đến :func:`get_logger`, nhưng ngoài việc trả về logger do get_logger tạo, nó còn thêm một handler gửi đầu ra đến :data:`sys.stderr` bằng format ``'[%(levelname)s/%(processName)s] %(message)s'``. Bạn có thể sửa đổi ``levelname`` của logger bằng cách truyền một đối số ``level``.
 
-Below is an example session with logging turned on::
+Dưới đây là một phiên làm việc mẫu khi bật tính năng ghi nhật ký::
 
     >>> import multiprocessing, logging
     >>> logger = multiprocessing.log_to_stderr()
@@ -2966,140 +2248,97 @@ Below is an example session with logging turned on::
     [INFO/MainProcess] sending shutdown message to manager
     [INFO/SyncManager-...] manager exiting with exitcode 0
 
-For a full table of logging levels, see the :mod:`logging` module.
+Để xem bảng đầy đủ về các cấp độ logging, hãy xem mô-đun :mod:`logging`.
 
 
-The :mod:`!multiprocessing.dummy` module
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Mô-đun :mod:`!multiprocessing.dummy`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. module:: multiprocessing.dummy
-   :synopsis: Dumb wrapper around threading.
+   :synopsis: Lớp bọc đơn giản quanh threading.
 
-:mod:`!multiprocessing.dummy` replicates the API of :mod:`!multiprocessing` but is
-no more than a wrapper around the :mod:`threading` module.
+:mod:`!multiprocessing.dummy` tái tạo API của :mod:`!multiprocessing` nhưng không hơn gì một lớp bọc quanh mô-đun :mod:`threading`.
 
 .. currentmodule:: multiprocessing.pool
 
-In particular, the ``Pool`` function provided by :mod:`!multiprocessing.dummy`
-returns an instance of :class:`ThreadPool`, which is a subclass of
-:class:`Pool` that supports all the same method calls but uses a pool of
-worker threads rather than worker processes.
+Cụ thể, hàm ``Pool`` do :mod:`!multiprocessing.dummy` cung cấp trả về một thực thể của :class:`ThreadPool`, là một lớp con của
+:class:`Pool` hỗ trợ tất cả các lời gọi phương thức tương tự nhưng sử dụng một pool của các worker thread thay vì các worker process.
 
 
 .. class:: ThreadPool([processes[, initializer[, initargs]]])
 
-   A thread pool object which controls a pool of worker threads to which jobs
-   can be submitted.  :class:`ThreadPool` instances are fully interface
-   compatible with :class:`Pool` instances, and their resources must also be
-   properly managed, either by using the pool as a context manager or by
-   calling :meth:`~multiprocessing.pool.Pool.close` and
-   :meth:`~multiprocessing.pool.Pool.terminate` manually.
+   Một đối tượng thread pool điều khiển một pool gồm các worker thread để nhận những công việc được gửi đến. Các thực thể :class:`ThreadPool` hoàn toàn tương thích về giao diện với các thực thể :class:`Pool`, và tài nguyên của chúng cũng phải được quản lý đúng cách, bằng cách sử dụng pool như một context manager hoặc gọi :meth:`~multiprocessing.pool.Pool.close` và
+   :meth:`~multiprocessing.pool.Pool.terminate` theo cách thủ công.
 
-   *processes* is the number of worker threads to use.  If *processes* is
-   ``None`` then the number returned by :func:`os.process_cpu_count` is used.
+   *processes* là số lượng luồng worker cần sử dụng. Nếu *processes* là ``None`` thì giá trị do :func:`os.process_cpu_count` trả về được sử dụng.
 
-   If *initializer* is not ``None`` then each worker process will call
-   ``initializer(*initargs)`` when it starts.
+   Nếu *initializer* không phải là ``None`` thì mỗi tiến trình worker sẽ gọi ``initializer(*initargs)`` khi khởi động.
 
-   Unlike :class:`Pool`, *maxtasksperchild* and *context* cannot be provided.
+   Không giống :class:`Pool`, không thể cung cấp *maxtasksperchild* và *context*.
 
    .. note::
 
-      A :class:`ThreadPool` shares the same interface as :class:`Pool`, which
-      is designed around a pool of processes and predates the introduction of
-      the :class:`concurrent.futures` module.  As such, it inherits some
-      operations that don't make sense for a pool backed by threads, and it
-      has its own type for representing the status of asynchronous jobs,
-      :class:`AsyncResult`, that is not understood by any other libraries.
+      Một :class:`ThreadPool` có cùng giao diện với :class:`Pool`, vốn được thiết kế xoay quanh một pool các tiến trình và có trước khi giới thiệu :class:`concurrent.futures` module. Vì vậy, nó kế thừa một số thao tác không phù hợp với pool được hỗ trợ bởi các luồng, đồng thời có kiểu riêng để biểu diễn trạng thái của các job bất đồng bộ,
+      :class:`AsyncResult`, mà không thư viện nào khác hiểu được.
 
-      Users should generally prefer to use
-      :class:`concurrent.futures.ThreadPoolExecutor`, which has a simpler
-      interface that was designed around threads from the start, and which
-      returns :class:`concurrent.futures.Future` instances that are
-      compatible with many other libraries, including :mod:`asyncio`.
+      Nhìn chung, người dùng nên ưu tiên sử dụng
+      :class:`concurrent.futures.ThreadPoolExecutor`, có giao diện đơn giản hơn được thiết kế ngay từ đầu dựa trên các thread và trả về các instance :class:`concurrent.futures.Future` tương thích với nhiều thư viện khác, bao gồm cả :mod:`asyncio`.
 
 
 .. _multiprocessing-programming:
 
-Programming guidelines
-----------------------
+Hướng dẫn lập trình
+-------------------
 
-There are certain guidelines and idioms which should be adhered to when using
+Có một số hướng dẫn và quy ước cần tuân thủ khi sử dụng
 :mod:`!multiprocessing`.
 
 
-All start methods
-^^^^^^^^^^^^^^^^^
+Tất cả phương thức khởi động
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The following applies to all start methods.
+Những điều sau đây áp dụng cho tất cả các phương thức khởi động.
 
-Avoid shared state
+Tránh trạng thái dùng chung
 
-    As far as possible one should try to avoid shifting large amounts of data
-    between processes.
+    Trong phạm vi có thể, nên cố gắng tránh chuyển một lượng lớn dữ liệu giữa các tiến trình.
 
-    It is probably best to stick to using queues or pipes for communication
-    between processes rather than using the lower level synchronization
-    primitives.
+    Có lẽ tốt nhất là dùng queue hoặc pipe để giao tiếp giữa các tiến trình thay vì sử dụng các primitive đồng bộ hóa cấp thấp hơn.
 
-Picklability
+Khả năng pickle hóa
 
-    Ensure that the arguments to the methods of proxies are picklable.
+    Đảm bảo các đối số truyền cho các phương thức của proxy có thể pickle hóa.
 
-Thread safety of proxies
+Tính an toàn luồng của proxy
 
-    Do not use a proxy object from more than one thread unless you protect it
-    with a lock.
+    Không sử dụng đối tượng proxy từ nhiều thread, trừ khi bạn bảo vệ nó bằng một lock.
 
-    (There is never a problem with different processes using the *same* proxy.)
+    (Không bao giờ có vấn đề khi các tiến trình khác nhau sử dụng cùng một proxy *same*.)
 
-Joining zombie processes
+Chờ các tiến trình zombie
 
-    On POSIX when a process finishes but has not been joined it becomes a zombie.
-    There should never be very many because each time a new process starts (or
-    :func:`~multiprocessing.active_children` is called) all completed processes
-    which have not yet been joined will be joined.  Also calling a finished
-    process's :meth:`Process.is_alive <multiprocessing.Process.is_alive>` will
-    join the process.  Even so it is probably good
-    practice to explicitly join all the processes that you start.
+    Trên POSIX, khi một process kết thúc nhưng chưa được join, nó sẽ trở thành zombie. Số lượng zombie không bao giờ nên quá nhiều, vì mỗi khi một process mới khởi chạy (hoặc
+    :func:`~multiprocessing.active_children` được gọi), tất cả các process đã hoàn tất nhưng chưa được join sẽ được join. Ngoài ra, việc gọi :meth:`Process.is_alive <multiprocessing.Process.is_alive>` của một process đã hoàn tất cũng sẽ join process đó. Dù vậy, việc chủ động join tất cả các process mà bạn khởi chạy vẫn được xem là một thực hành tốt.
 
-Better to inherit than pickle/unpickle
+Nên kế thừa thay vì pickle/unpickle
 
-    When using the *spawn* or *forkserver* start methods many types
-    from :mod:`!multiprocessing` need to be picklable so that child
-    processes can use them.  However, one should generally avoid
-    sending shared objects to other processes using pipes or queues.
-    Instead you should arrange the program so that a process which
-    needs access to a shared resource created elsewhere can inherit it
-    from an ancestor process.
+    Khi sử dụng phương thức khởi chạy *spawn* hoặc *forkserver*, nhiều kiểu từ :mod:`!multiprocessing` cần có khả năng pickle để các process con có thể sử dụng chúng. Tuy nhiên, nhìn chung bạn nên tránh gửi các đối tượng dùng chung đến các process khác bằng pipe hoặc queue. Thay vào đó, hãy tổ chức chương trình sao cho một process cần truy cập tài nguyên dùng chung được tạo ở nơi khác có thể kế thừa tài nguyên đó từ một process tổ tiên.
 
-Avoid terminating processes
+Tránh kết thúc process
 
-    Using the :meth:`Process.terminate <multiprocessing.Process.terminate>`
-    method to stop a process is liable to
-    cause any shared resources (such as locks, semaphores, pipes and queues)
-    currently being used by the process to become broken or unavailable to other
-    processes.
+    Việc sử dụng phương thức :meth:`Process.terminate <multiprocessing.Process.terminate>` để dừng một process có thể khiến mọi tài nguyên dùng chung (chẳng hạn như lock, semaphore, pipe và queue) mà process đó đang sử dụng bị hỏng hoặc không thể truy cập bởi các process khác.
 
-    Therefore it is probably best to only consider using
-    :meth:`Process.terminate <multiprocessing.Process.terminate>` on processes
-    which never use any shared resources.
+    Vì vậy, có lẽ tốt nhất là chỉ cân nhắc sử dụng
+    :meth:`Process.terminate <multiprocessing.Process.terminate>` trên các tiến trình không bao giờ sử dụng tài nguyên dùng chung nào.
 
-Joining processes that use queues
+Tham gia các tiến trình sử dụng hàng đợi
 
-    Bear in mind that a process that has put items in a queue will wait before
-    terminating until all the buffered items are fed by the "feeder" thread to
-    the underlying pipe.  (The child process can call the
-    :meth:`Queue.cancel_join_thread <multiprocessing.Queue.cancel_join_thread>`
-    method of the queue to avoid this behaviour.)
+    Hãy lưu ý rằng một tiến trình đã đưa các mục vào hàng đợi sẽ chờ trước khi kết thúc cho đến khi tất cả các mục đã được đệm được luồng "feeder" đưa vào pipe bên dưới. (Tiến trình con có thể gọi phương thức
+    :meth:`Queue.cancel_join_thread <multiprocessing.Queue.cancel_join_thread>` của hàng đợi để tránh hành vi này.)
 
-    This means that whenever you use a queue you need to make sure that all
-    items which have been put on the queue will eventually be removed before the
-    process is joined.  Otherwise you cannot be sure that processes which have
-    put items on the queue will terminate.  Remember also that non-daemonic
-    processes will be joined automatically.
+    Điều này có nghĩa là bất cứ khi nào sử dụng hàng đợi, bạn cần đảm bảo rằng tất cả các mục đã được đưa vào hàng đợi cuối cùng đều được lấy ra trước khi tiến trình được join. Nếu không, bạn không thể chắc chắn rằng các tiến trình đã đưa mục vào hàng đợi sẽ kết thúc. Cũng hãy nhớ rằng các tiến trình không phải daemon sẽ tự động được join.
 
-    An example which will deadlock is the following::
+    Ví dụ sau sẽ gây deadlock::
 
         from multiprocessing import Process, Queue
 
@@ -3110,27 +2349,18 @@ Joining processes that use queues
             queue = Queue()
             p = Process(target=f, args=(queue,))
             p.start()
-            p.join()                    # this deadlocks
+            p.join()                    # gây deadlock
             obj = queue.get()
 
-    A fix here would be to swap the last two lines (or simply remove the
-    ``p.join()`` line).
+    Một cách khắc phục ở đây là hoán đổi hai dòng cuối (hoặc chỉ cần xóa dòng ``p.join()``).
 
-Explicitly pass resources to child processes
+Truyền tường minh các tài nguyên cho tiến trình con
 
-    On POSIX using the *fork* start method, a child process can make
-    use of a shared resource created in a parent process using a
-    global resource.  However, it is better to pass the object as an
-    argument to the constructor for the child process.
+    Trên POSIX, khi sử dụng phương thức khởi động *fork*, một tiến trình con có thể sử dụng tài nguyên dùng chung được tạo trong tiến trình cha thông qua một tài nguyên toàn cục. Tuy nhiên, tốt hơn là truyền đối tượng này làm đối số cho hàm khởi tạo của tiến trình con.
 
-    Apart from making the code (potentially) compatible with Windows
-    and the other start methods this also ensures that as long as the
-    child process is still alive the object will not be garbage
-    collected in the parent process.  This might be important if some
-    resource is freed when the object is garbage collected in the
-    parent process.
+    Ngoài việc giúp mã (có khả năng) tương thích với Windows và các phương thức khởi động khác, cách này còn đảm bảo rằng đối tượng sẽ không bị garbage collection trong tiến trình cha chừng nào tiến trình con vẫn còn hoạt động. Điều này có thể quan trọng nếu một tài nguyên nào đó được giải phóng khi đối tượng bị garbage collection trong tiến trình cha.
 
-    So for instance ::
+    Ví dụ::
 
         from multiprocessing import Process, Lock
 
@@ -3142,7 +2372,7 @@ Explicitly pass resources to child processes
             for i in range(10):
                 Process(target=f).start()
 
-    should be rewritten as ::
+    nên được viết lại thành::
 
         from multiprocessing import Process, Lock
 
@@ -3154,28 +2384,21 @@ Explicitly pass resources to child processes
             for i in range(10):
                 Process(target=f, args=(lock,)).start()
 
-Beware of replacing :data:`sys.stdin` with a "file like object"
+Cẩn thận khi thay thế :data:`sys.stdin` bằng một "đối tượng dạng tệp"
 
-    :mod:`!multiprocessing` originally unconditionally called::
+    :mod:`!multiprocessing` ban đầu luôn gọi vô điều kiện::
 
         os.close(sys.stdin.fileno())
 
-    in the :meth:`multiprocessing.Process._bootstrap` method --- this resulted
-    in issues with processes-in-processes. This has been changed to::
+    trong phương thức :meth:`multiprocessing.Process._bootstrap` --- điều này gây ra sự cố với các quy trình trong quy trình. Điều này đã được thay đổi thành::
 
         sys.stdin.close()
         sys.stdin = open(os.open(os.devnull, os.O_RDONLY), closefd=False)
 
-    Which solves the fundamental issue of processes colliding with each other
-    resulting in a bad file descriptor error, but introduces a potential danger
-    to applications which replace :func:`sys.stdin` with a "file-like object"
-    with output buffering.  This danger is that if multiple processes call
-    :meth:`~io.IOBase.close` on this file-like object, it could result in the same
-    data being flushed to the object multiple times, resulting in corruption.
+    Điều này giải quyết vấn đề cốt lõi về việc các quy trình va chạm với nhau, dẫn đến lỗi bộ mô tả tệp không hợp lệ, nhưng lại tạo ra một nguy cơ tiềm ẩn đối với các ứng dụng thay thế :func:`sys.stdin` bằng một "đối tượng giống tệp" có bộ đệm đầu ra. Nguy cơ này xảy ra khi nhiều quy trình gọi
+    :meth:`~io.IOBase.close` trên đối tượng giống tệp này, khiến cùng một dữ liệu có thể được flush vào đối tượng nhiều lần và dẫn đến hỏng dữ liệu.
 
-    If you write a file-like object and implement your own caching, you can
-    make it fork-safe by storing the pid whenever you append to the cache,
-    and discarding the cache when the pid changes. For example::
+    Nếu bạn viết một đối tượng giống tệp và tự triển khai cơ chế caching, bạn có thể làm cho đối tượng đó an toàn với fork bằng cách lưu pid mỗi khi bạn thêm dữ liệu vào cache và loại bỏ cache khi pid thay đổi. Ví dụ::
 
        @property
        def cache(self):
@@ -3185,44 +2408,34 @@ Beware of replacing :data:`sys.stdin` with a "file like object"
                self._cache = []
            return self._cache
 
-    For more information, see :issue:`5155`, :issue:`5313` and :issue:`5331`
+    Để biết thêm thông tin, hãy xem :issue:`5155`, :issue:`5313` và :issue:`5331`
 
 .. _multiprocessing-programming-spawn:
 .. _multiprocessing-programming-forkserver:
 
-The *spawn* and *forkserver* start methods
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các phương thức khởi động *spawn* và *forkserver*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-There are a few extra restrictions which don't apply to the *fork*
-start method.
+Có một số hạn chế bổ sung không áp dụng cho phương thức khởi động *fork*.
 
-More picklability
+Yêu cầu về khả năng pickling cao hơn
 
-    Ensure that all arguments to :class:`~multiprocessing.Process` are
-    picklable.  Also, if you subclass ``Process.__init__``, you must make sure
-    that instances will be picklable when the
-    :meth:`Process.start <multiprocessing.Process.start>` method is called.
+    Đảm bảo rằng tất cả các đối số của :class:`~multiprocessing.Process` đều có thể được pickling. Ngoài ra, nếu bạn tạo lớp con của ``Process.__init__``, bạn phải đảm bảo rằng các thực thể của lớp đó có thể được pickling khi
+    phương thức :meth:`Process.start <multiprocessing.Process.start>` được gọi.
 
-Global variables
+Biến toàn cục
 
-    Bear in mind that if code run in a child process tries to access a global
-    variable, then the value it sees (if any) may not be the same as the value
-    in the parent process at the time that :meth:`Process.start
-    <multiprocessing.Process.start>` was called.
+    Hãy lưu ý rằng nếu mã chạy trong một tiến trình con cố gắng truy cập một biến toàn cục, thì giá trị mà nó thấy (nếu có) có thể không giống với giá trị trong tiến trình cha tại thời điểm :meth:`Process.start <multiprocessing.Process.start>` được gọi.
 
-    However, global variables which are just module level constants cause no
-    problems.
+    Tuy nhiên, các biến toàn cục chỉ là hằng số cấp mô-đun thì không gây ra vấn đề gì.
 
 .. _multiprocessing-safe-main-import:
 
-Safe importing of main module
+Nhập module chính an toàn
 
-    Make sure that the main module can be safely imported by a new Python
-    interpreter without causing unintended side effects (such as starting a new
-    process).
+    Hãy đảm bảo rằng module chính có thể được một trình thông dịch Python mới nhập một cách an toàn mà không gây ra các tác dụng phụ ngoài ý muốn (chẳng hạn như khởi động một tiến trình mới).
 
-    For example, using the *spawn* or *forkserver* start method
-    running the following module would fail with a
+    Ví dụ: nếu sử dụng phương thức khởi động *spawn* hoặc *forkserver*, việc chạy module sau sẽ thất bại với một
     :exc:`RuntimeError`::
 
         from multiprocessing import Process
@@ -3233,8 +2446,7 @@ Safe importing of main module
         p = Process(target=foo)
         p.start()
 
-    Instead one should protect the "entry point" of the program by using ``if
-    __name__ == '__main__':`` as follows::
+    Thay vào đó, cần bảo vệ "entry point" của chương trình bằng cách sử dụng ``if __name__ == '__main__':`` như sau::
 
        from multiprocessing import Process, freeze_support, set_start_method
 
@@ -3247,34 +2459,30 @@ Safe importing of main module
            p = Process(target=foo)
            p.start()
 
-    (The ``freeze_support()`` line can be omitted if the program will be run
-    normally instead of frozen.)
+    (Có thể bỏ qua dòng ``freeze_support()`` nếu chương trình sẽ được chạy bình thường thay vì ở chế độ frozen.)
 
-    This allows the newly spawned Python interpreter to safely import the module
-    and then run the module's ``foo()`` function.
+    Điều này cho phép trình thông dịch Python mới được tạo an toàn nhập module, sau đó chạy hàm ``foo()`` của module.
 
-    Similar restrictions apply if a pool or manager is created in the main
-    module.
+    Các hạn chế tương tự cũng áp dụng nếu một pool hoặc manager được tạo trong module chính.
 
 
 .. _multiprocessing-examples:
 
-Examples
---------
+Ví dụ
+-----
 
-Demonstration of how to create and use customized managers and proxies:
+Minh họa cách tạo và sử dụng các manager và proxy tùy chỉnh:
 
 .. literalinclude:: ../includes/mp_newtype.py
    :language: python3
 
 
-Using :class:`~multiprocessing.pool.Pool`:
+Sử dụng :class:`~multiprocessing.pool.Pool`:
 
 .. literalinclude:: ../includes/mp_pool.py
    :language: python3
 
 
-An example showing how to use queues to feed tasks to a collection of worker
-processes and collect the results:
+Ví dụ minh họa cách sử dụng các queue để phân phối tác vụ cho một tập hợp các tiến trình worker và thu thập kết quả:
 
 .. literalinclude:: ../includes/mp_workers.py

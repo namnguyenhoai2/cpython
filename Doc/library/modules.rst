@@ -1,13 +1,12 @@
 .. _modules:
 
-*****************
-Importing Modules
-*****************
+***************
+Nhập các module
+***************
 
-The modules described in this chapter provide new ways to import other Python
-modules and hooks for customizing the import process.
+Các module được mô tả trong chương này cung cấp những cách mới để nhập các module Python khác và các hook để tùy chỉnh quá trình nhập.
 
-The full list of modules described in this chapter is:
+Danh sách đầy đủ các module được mô tả trong chương này là:
 
 
 .. toctree::

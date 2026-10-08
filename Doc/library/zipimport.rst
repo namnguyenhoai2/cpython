@@ -1,119 +1,97 @@
-:mod:`!zipimport` --- Import modules from Zip archives
-======================================================
+:mod:`!zipimport` --- Nhập các mô-đun từ kho lưu trữ Zip
+========================================================
 
 .. module:: zipimport
-   :synopsis: Support for importing Python modules from ZIP archives.
+   :synopsis: Hỗ trợ nhập các mô-đun Python từ kho lưu trữ ZIP.
 
 .. moduleauthor:: Just van Rossum <just@letterror.com>
 
-**Source code:** :source:`Lib/zipimport.py`
+**Mã nguồn:** :source:`Lib/zipimport.py`
 
 --------------
 
-This module adds the ability to import Python modules (:file:`\*.py`,
-:file:`\*.pyc`) and packages from ZIP-format archives. It is usually not
-needed to use the :mod:`!zipimport` module explicitly; it is automatically used
-by the built-in :keyword:`import` mechanism for :data:`sys.path` items that are paths
-to ZIP archives.
+Mô-đun này bổ sung khả năng nhập các mô-đun Python (:file:`\*.py`,
+:file:`\*.pyc`) và các package từ kho lưu trữ định dạng ZIP. Thông thường không cần sử dụng rõ ràng mô-đun :mod:`!zipimport`; cơ chế :keyword:`import` tích hợp sẵn sẽ tự động sử dụng mô-đun này cho các mục :data:`sys.path` là những đường dẫn đến kho lưu trữ ZIP.
 
-Typically, :data:`sys.path` is a list of directory names as strings.  This module
-also allows an item of :data:`sys.path` to be a string naming a ZIP file archive.
-The ZIP archive can contain a subdirectory structure to support package imports,
-and a path within the archive can be specified to only import from a
-subdirectory.  For example, the path :file:`example.zip/lib/` would only
-import from the :file:`lib/` subdirectory within the archive.
+Thông thường, :data:`sys.path` là một danh sách các tên thư mục dưới dạng chuỗi. Mô-đun này cũng cho phép một mục của :data:`sys.path` là một chuỗi chỉ định tên của tệp lưu trữ ZIP. Kho lưu trữ ZIP có thể chứa cấu trúc thư mục con để hỗ trợ việc nhập package, và có thể chỉ định một đường dẫn bên trong kho lưu trữ để chỉ nhập từ một thư mục con. Ví dụ: đường dẫn :file:`example.zip/lib/` sẽ chỉ nhập từ thư mục con :file:`lib/` bên trong kho lưu trữ.
 
-Any files may be present in the ZIP archive, but importers are only invoked for
-:file:`.py` and :file:`.pyc` files.  ZIP import of dynamic modules
-(:file:`.pyd`, :file:`.so`) is disallowed. Note that if an archive only contains
-:file:`.py` files, Python will not attempt to modify the archive by adding the
-corresponding :file:`.pyc` file, meaning that if a ZIP archive
-doesn't contain :file:`.pyc` files, importing may be rather slow.
+Kho lưu trữ ZIP có thể chứa bất kỳ tệp nào, nhưng các importer chỉ được gọi cho
+:file:`.py` và :file:`.pyc` files. Không cho phép nhập ZIP các dynamic module (:file:`.pyd`, :file:`.so`). Lưu ý rằng nếu một archive chỉ chứa
+:file:`.py` files, Python sẽ không cố sửa đổi archive bằng cách thêm file :file:`.pyc` tương ứng, nghĩa là nếu một ZIP archive không chứa các file :file:`.pyc`, việc import có thể khá chậm.
 
 .. versionchanged:: 3.13
-   ZIP64 is supported
+   ZIP64 được hỗ trợ
 
 .. versionchanged:: 3.8
-   Previously, ZIP archives with an archive comment were not supported.
+   Trước đây, các ZIP archive có archive comment không được hỗ trợ.
 
 .. seealso::
 
-   `PKZIP Application Note <https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT>`_
-      Documentation on the ZIP file format by Phil Katz, the creator of the format and
-      algorithms used.
+   `Ghi chú ứng dụng PKZIP <https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT>`_
+      Tài liệu về định dạng tệp ZIP do Phil Katz, người tạo ra định dạng và các thuật toán được sử dụng, viết.
 
-   :pep:`273` - Import Modules from Zip Archives
-      Written by James C. Ahlstrom, who also provided an implementation. Python 2.3
-      follows the specification in :pep:`273`, but uses an implementation written by Just
-      van Rossum that uses the import hooks described in :pep:`302`.
+   :pep:`273` - Nhập module từ các ZIP archive
+      Được viết bởi James C. Ahlstrom, người cũng cung cấp một implementation. Python 2.3 tuân theo đặc tả trong :pep:`273`, nhưng sử dụng một implementation do Just van Rossum viết, sử dụng các import hook được mô tả trong :pep:`302`.
 
-   :mod:`importlib` - The implementation of the import machinery
-      Package providing the relevant protocols for all importers to
-      implement.
+   :mod:`importlib` - Implementation của cơ chế import
+      Package cung cấp các protocol liên quan để mọi importer triển khai.
 
 
-This module defines an exception:
+Module này định nghĩa một exception:
 
 .. exception:: ZipImportError
 
-   Exception raised by zipimporter objects. It's a subclass of :exc:`ImportError`,
-   so it can be caught as :exc:`ImportError`, too.
+   Exception được các đối tượng zipimporter phát sinh. Đây là một subclass của :exc:`ImportError`, nên cũng có thể được bắt dưới dạng :exc:`ImportError`.
 
 
 .. _zipimporter-objects:
 
-zipimporter Objects
--------------------
+Các đối tượng zipimporter
+-------------------------
 
-:class:`zipimporter` is the class for importing ZIP files.
+:class:`zipimporter` là class dùng để import các tệp ZIP.
 
 .. class:: zipimporter(archivepath)
 
-   Create a new zipimporter instance. *archivepath* must be a path to a ZIP
-   file, or to a specific path within a ZIP file.  For example, an *archivepath*
-   of :file:`foo/bar.zip/lib` will look for modules in the :file:`lib` directory
-   inside the ZIP file :file:`foo/bar.zip` (provided that it exists).
+   Tạo một instance zipimporter mới. *archivepath* phải là đường dẫn đến một tệp ZIP hoặc đến một đường dẫn cụ thể bên trong tệp ZIP. Ví dụ: *archivepath* có giá trị :file:`foo/bar.zip/lib` sẽ tìm các module trong thư mục :file:`lib` bên trong tệp ZIP :file:`foo/bar.zip` (với điều kiện thư mục này tồn tại).
 
-   :exc:`ZipImportError` is raised if *archivepath* doesn't point to a valid ZIP
-   archive.
+   :exc:`ZipImportError` được phát sinh nếu *archivepath* không trỏ đến một kho lưu trữ ZIP hợp lệ.
 
    .. versionchanged:: 3.12
 
-      Methods ``find_loader()`` and ``find_module()``, deprecated in 3.10 are
-      now removed.  Use :meth:`find_spec` instead.
+      Các phương thức ``find_loader()`` và ``find_module()``, đã bị deprecated trong 3.10, hiện đã bị xóa. Thay vào đó, hãy sử dụng :meth:`find_spec`.
 
    .. method:: create_module(spec)
 
-      Implementation of :meth:`importlib.abc.Loader.create_module` that returns
-      :const:`None` to explicitly request the default semantics.
+      Triển khai :meth:`importlib.abc.Loader.create_module` trả về
+      :const:`None` để yêu cầu rõ ràng các ngữ nghĩa mặc định.
 
       .. versionadded:: 3.10
 
 
    .. method:: exec_module(module)
 
-      Implementation of :meth:`importlib.abc.Loader.exec_module`.
+      Triển khai :meth:`importlib.abc.Loader.exec_module`.
 
       .. versionadded:: 3.10
 
 
    .. method:: find_spec(fullname, target=None)
 
-      An implementation of :meth:`importlib.abc.PathEntryFinder.find_spec`.
+      Một triển khai của :meth:`importlib.abc.PathEntryFinder.find_spec`.
 
       .. versionadded:: 3.10
 
 
    .. method:: get_code(fullname)
 
-      Return the code object for the specified module. Raise
-      :exc:`ZipImportError` if the module couldn't be imported.
+      Trả về đối tượng mã cho mô-đun được chỉ định. Phát sinh
+      :exc:`ZipImportError` nếu không thể import mô-đun.
 
 
    .. method:: get_data(pathname)
 
-      Return the data associated with *pathname*. Raise :exc:`OSError` if the
-      file wasn't found.
+      Trả về dữ liệu liên kết với *pathname*. Phát sinh :exc:`OSError` nếu không tìm thấy tệp.
 
       .. versionchanged:: 3.3
          :exc:`IOError` used to be raised, it is now an alias of :exc:`OSError`.
@@ -121,70 +99,60 @@ zipimporter Objects
 
    .. method:: get_filename(fullname)
 
-      Return the value ``__file__`` would be set to if the specified module
-      was imported. Raise :exc:`ZipImportError` if the module couldn't be
-      imported.
+      Trả về giá trị mà ``__file__`` sẽ được gán nếu mô-đun được chỉ định được import. Phát sinh :exc:`ZipImportError` nếu không thể import mô-đun.
 
       .. versionadded:: 3.1
 
 
    .. method:: get_source(fullname)
 
-      Return the source code for the specified module. Raise
-      :exc:`ZipImportError` if the module couldn't be found, return
-      :const:`None` if the archive does contain the module, but has no source
-      for it.
+      Trả về mã nguồn cho mô-đun được chỉ định. Phát sinh
+      :exc:`ZipImportError` nếu không tìm thấy mô-đun, trả về
+      :const:`None` nếu tệp lưu trữ có chứa mô-đun nhưng không có mã nguồn cho mô-đun đó.
 
 
    .. method:: is_package(fullname)
 
-      Return ``True`` if the module specified by *fullname* is a package. Raise
-      :exc:`ZipImportError` if the module couldn't be found.
+      Trả về ``True`` nếu module được chỉ định bởi *fullname* là một package. Phát sinh
+      :exc:`ZipImportError` nếu không thể tìm thấy module.
 
 
    .. method:: load_module(fullname)
 
-      Load the module specified by *fullname*. *fullname* must be the fully
-      qualified (dotted) module name. Returns the imported module on success,
-      raises :exc:`ZipImportError` on failure.
+      Tải module được chỉ định bởi *fullname*. *fullname* phải là tên module đủ điều kiện (dạng dấu chấm). Trả về module đã import khi thành công và phát sinh :exc:`ZipImportError` khi thất bại.
 
       .. deprecated-removed:: 3.10 3.15
 
-         Use :meth:`exec_module` instead.
+         Thay vào đó, sử dụng :meth:`exec_module`.
 
 
    .. method:: invalidate_caches()
 
-      Clear out the internal cache of information about files found within
-      the ZIP archive.
+      Xóa bộ nhớ đệm nội bộ chứa thông tin về các tệp được tìm thấy trong kho lưu trữ ZIP.
 
       .. versionadded:: 3.10
 
 
    .. attribute:: archive
 
-      The file name of the importer's associated ZIP file, without a possible
-      subpath.
+      Tên tệp ZIP liên kết với importer, không bao gồm phần đường dẫn con nếu có.
 
 
    .. attribute:: prefix
 
-      The subpath within the ZIP file where modules are searched.  This is the
-      empty string for zipimporter objects which point to the root of the ZIP
-      file.
+      Đường dẫn con bên trong tệp ZIP nơi các module được tìm kiếm. Đây là chuỗi rỗng đối với các đối tượng zipimporter trỏ đến thư mục gốc của tệp ZIP.
 
-   The :attr:`archive` and :attr:`prefix` attributes, when combined with a
-   slash, equal the original *archivepath* argument given to the
-   :class:`zipimporter` constructor.
+   Các thuộc tính :attr:`archive` và :attr:`prefix`, khi kết hợp với dấu gạch chéo, tương đương với đối số *archivepath* ban đầu được truyền cho
+   hàm khởi tạo :class:`zipimporter`.
 
 
 .. _zipimport-examples:
 
-Examples
---------
+Ví dụ
+-----
 
-Here is an example that imports a module from a ZIP archive - note that the
-:mod:`!zipimport` module is not explicitly used.
+Sau đây là một ví dụ nhập một mô-đun từ kho lưu trữ ZIP - lưu ý rằng
+mô-đun :mod:`!zipimport` không được sử dụng một cách rõ ràng.
 
 .. code-block:: shell-session
 
@@ -199,9 +167,10 @@ Here is an example that imports a module from a ZIP archive - note that the
 .. code-block:: pycon
 
    >>> import sys
-   >>> # Add the archive to the front of the module search path
+   >>> # Thêm kho lưu trữ vào đầu đường dẫn tìm kiếm mô-đun
    >>> sys.path.insert(0, 'example_archive.zip')
    >>> import example
    >>> example.__file__
    'example_archive.zip/example.py'
 
+.. _`PKZIP Application Note`: https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT

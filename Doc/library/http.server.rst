@@ -1,10 +1,10 @@
-:mod:`!http.server` --- HTTP servers
+:mod:`!http.server` --- Máy chủ HTTP
 ====================================
 
 .. module:: http.server
-   :synopsis: HTTP server and request handlers.
+   :synopsis: Máy chủ HTTP và các trình xử lý yêu cầu.
 
-**Source code:** :source:`Lib/http/server.py`
+**Mã nguồn:** :source:`Lib/http/server.py`
 
 .. index::
    pair: WWW; server
@@ -14,19 +14,17 @@
 
 --------------
 
-This module defines classes for implementing HTTP servers.
+Mô-đun này định nghĩa các lớp để triển khai máy chủ HTTP.
 
 
 .. warning::
 
-    :mod:`!http.server` is not recommended for production. It only implements
-    :ref:`basic security checks <http.server-security>`.
+    :mod:`!http.server` không được khuyến nghị dùng trong môi trường production. Nó chỉ triển khai
+    :ref:`các kiểm tra bảo mật cơ bản <http.server-security>`.
 
 .. include:: ../includes/wasm-notavail.rst
 
-One class, :class:`HTTPServer`, is a :class:`socketserver.TCPServer` subclass.
-It creates and listens at the HTTP socket, dispatching the requests to a
-handler.  Code to create and run the server looks like this::
+Một lớp, :class:`HTTPServer`, là một lớp con của :class:`socketserver.TCPServer`. Lớp này tạo và lắng nghe trên HTTP socket, phân phối các yêu cầu đến một trình xử lý. Mã để tạo và chạy máy chủ có dạng như sau::
 
    def run(server_class=HTTPServer, handler_class=BaseHTTPRequestHandler):
        server_address = ('', 8000)
@@ -36,455 +34,323 @@ handler.  Code to create and run the server looks like this::
 
 .. class:: HTTPServer(server_address, RequestHandlerClass)
 
-   This class builds on the :class:`~socketserver.TCPServer` class by storing
-   the server address as instance variables named :attr:`server_name` and
-   :attr:`server_port`. The server is accessible by the handler, typically
-   through the handler's :attr:`~socketserver.BaseRequestHandler.server`
-   instance variable.
+   Lớp này được xây dựng dựa trên lớp :class:`~socketserver.TCPServer` bằng cách lưu trữ địa chỉ máy chủ dưới dạng các biến thực thể có tên :attr:`server_name` và
+   :attr:`server_port`. Máy chủ có thể được handler truy cập, thường thông qua biến thực thể :attr:`~socketserver.BaseRequestHandler.server` của handler.
 
    .. attribute:: server_name
 
-      The HTTP server's fully qualified domain name.
+      Tên miền đầy đủ của máy chủ HTTP.
 
    .. attribute:: server_port
 
-      The HTTP server's port number obtained from *server_address*.
+      Số cổng của máy chủ HTTP lấy từ *server_address*.
 
 
 .. class:: ThreadingHTTPServer(server_address, RequestHandlerClass)
 
-   This class is identical to HTTPServer but uses threads to handle
-   requests by using the :class:`~socketserver.ThreadingMixIn`. This
-   is useful to handle web browsers pre-opening sockets, on which
-   :class:`HTTPServer` would wait indefinitely.
+   Lớp này giống hệt HTTPServer nhưng sử dụng các thread để xử lý yêu cầu thông qua :class:`~socketserver.ThreadingMixIn`. Điều này hữu ích khi xử lý các trình duyệt web mở socket trước, trên đó
+   :class:`HTTPServer` sẽ chờ vô thời hạn.
 
    .. versionadded:: 3.7
 
 
 .. class:: HTTPSServer(server_address, RequestHandlerClass,\
-                       bind_and_activate=True, *, certfile, keyfile=None,\
-                       password=None, alpn_protocols=None)
+                       bind_and_activate=True, *, certfile, keyfile=None,\ password=None, alpn_protocols=None)
 
-   Subclass of :class:`HTTPServer` with a wrapped socket using the :mod:`ssl` module.
-   If the :mod:`ssl` module is not available, instantiating a :class:`!HTTPSServer`
-   object fails with a :exc:`RuntimeError`.
+   Lớp con của :class:`HTTPServer` với socket được bọc bằng module :mod:`ssl`. Nếu module :mod:`ssl` không khả dụng, việc khởi tạo đối tượng :class:`!HTTPSServer` sẽ thất bại với :exc:`RuntimeError`.
 
-   The *certfile* argument is the path to the SSL certificate chain file,
-   and the *keyfile* is the path to the file containing the private key.
+   Đối số *certfile* là đường dẫn đến tệp chuỗi chứng chỉ SSL, còn *keyfile* là đường dẫn đến tệp chứa khóa riêng tư.
 
-   A *password* can be specified for files protected and wrapped with PKCS#8,
-   but beware that this could possibly expose hardcoded passwords in clear.
+   Có thể chỉ định *password* cho các tệp được bảo vệ và bọc bằng PKCS#8, nhưng hãy lưu ý rằng điều này có thể làm lộ các mật khẩu hardcoded ở dạng văn bản thuần túy.
 
    .. seealso::
 
-      See :meth:`ssl.SSLContext.load_cert_chain` for additional
-      information on the accepted values for *certfile*, *keyfile*
-      and *password*.
+      Xem :meth:`ssl.SSLContext.load_cert_chain` để biết thêm thông tin về các giá trị được chấp nhận cho *certfile*, *keyfile* và *password*.
 
-   When specified, the *alpn_protocols* argument must be a sequence of strings
-   specifying the "Application-Layer Protocol Negotiation" (ALPN) protocols
-   supported by the server. ALPN allows the server and the client to negotiate
-   the application protocol during the TLS handshake.
+   Khi được chỉ định, đối số *alpn_protocols* phải là một chuỗi các chuỗi chỉ định những giao thức "Application-Layer Protocol Negotiation" (ALPN) được máy chủ hỗ trợ. ALPN cho phép máy chủ và máy khách thương lượng giao thức ứng dụng trong quá trình bắt tay TLS.
 
-   By default, it is set to ``["http/1.1"]``, meaning the server supports HTTP/1.1.
+   Theo mặc định, giá trị này là ``["http/1.1"]``, nghĩa là máy chủ hỗ trợ HTTP/1.1.
 
    .. versionadded:: 3.14
 
 .. class:: ThreadingHTTPSServer(server_address, RequestHandlerClass,\
-                                bind_and_activate=True, *, certfile, keyfile=None,\
-                                password=None, alpn_protocols=None)
+                                bind_and_activate=True, *, certfile, keyfile=None,\ password=None, alpn_protocols=None)
 
-   This class is identical to :class:`HTTPSServer` but uses threads to handle
-   requests by inheriting from :class:`~socketserver.ThreadingMixIn`. This is
-   analogous to :class:`ThreadingHTTPServer` only using :class:`HTTPSServer`.
+   Lớp này giống hệt :class:`HTTPSServer` nhưng sử dụng các thread để xử lý yêu cầu bằng cách kế thừa từ :class:`~socketserver.ThreadingMixIn`. Điều này tương tự như :class:`ThreadingHTTPServer`, chỉ khác là sử dụng :class:`HTTPSServer`.
 
    .. versionadded:: 3.14
 
 
-The :class:`HTTPServer`, :class:`ThreadingHTTPServer`, :class:`HTTPSServer` and
-:class:`ThreadingHTTPSServer` must be given a *RequestHandlerClass* on
-instantiation, of which this module provides three different variants:
+:class:`HTTPServer`, :class:`ThreadingHTTPServer`, :class:`HTTPSServer` và
+:class:`ThreadingHTTPSServer` phải được cung cấp một *RequestHandlerClass* khi khởi tạo; mô-đun này cung cấp ba biến thể khác nhau của lớp đó:
 
 .. class:: BaseHTTPRequestHandler(request, client_address, server)
 
-   This class is used to handle the HTTP requests that arrive at the server.  By
-   itself, it cannot respond to any actual HTTP requests; it must be subclassed
-   to handle each request method (for example, ``'GET'`` or ``'POST'``).
-   :class:`BaseHTTPRequestHandler` provides a number of class and instance
-   variables, and methods for use by subclasses.
+   Lớp này được dùng để xử lý các yêu cầu HTTP đến máy chủ. Tự nó không thể phản hồi bất kỳ yêu cầu HTTP thực tế nào; nó phải được tạo lớp con để xử lý từng phương thức yêu cầu (ví dụ: ``'GET'`` hoặc ``'POST'``).
+   :class:`BaseHTTPRequestHandler` cung cấp một số biến lớp và biến instance, cùng các phương thức để các lớp con sử dụng.
 
-   The handler will parse the request and the headers, then call a method
-   specific to the request type. The method name is constructed from the
-   request. For example, for the request method ``SPAM``, the :meth:`!do_SPAM`
-   method will be called with no arguments. All of the relevant information is
-   stored in instance variables of the handler.  Subclasses should not need to
-   override or extend the :meth:`!__init__` method.
+   Handler sẽ phân tích yêu cầu và các header, sau đó gọi một phương thức tương ứng với loại yêu cầu. Tên phương thức được tạo từ yêu cầu. Ví dụ, với phương thức yêu cầu ``SPAM``, phương thức :meth:`!do_SPAM` sẽ được gọi mà không có đối số. Tất cả thông tin liên quan được lưu trong các biến instance của handler. Các lớp con không cần phải ghi đè hoặc mở rộng phương thức :meth:`!__init__`.
 
-   :class:`BaseHTTPRequestHandler` has the following instance variables:
+   :class:`BaseHTTPRequestHandler` có các biến instance sau:
 
    .. attribute:: client_address
 
-      Contains a tuple of the form ``(host, port)`` referring to the client's
-      address.
+      Chứa một tuple có dạng ``(host, port)`` tham chiếu đến địa chỉ của client.
 
    .. attribute:: server
 
-      Contains the server instance.
+      Chứa instance của server.
 
    .. attribute:: close_connection
 
-      Boolean that should be set before :meth:`handle_one_request` returns,
-      indicating if another request may be expected, or if the connection should
-      be shut down.
+      Giá trị Boolean cần được thiết lập trước khi :meth:`handle_one_request` trả về, cho biết có thể có request khác hay không, hoặc kết nối có nên được đóng hay không.
 
    .. attribute:: requestline
 
-      Contains the string representation of the HTTP request line. The
-      terminating CRLF is stripped. This attribute should be set by
-      :meth:`handle_one_request`. If no valid request line was processed, it
-      should be set to the empty string.
+      Chứa biểu diễn dạng chuỗi của dòng request HTTP. CRLF kết thúc bị loại bỏ. Thuộc tính này cần được thiết lập bởi
+      :meth:`handle_one_request`. Nếu không xử lý được dòng request hợp lệ nào, thuộc tính này cần được thiết lập thành chuỗi rỗng.
 
    .. attribute:: command
 
-      Contains the command (request type). For example, ``'GET'``.
+      Chứa command (loại request). Ví dụ: ``'GET'``.
 
    .. attribute:: path
 
-      Contains the request path. If the query component of the URL is present,
-      then ``path`` includes the query. Using the terminology of :rfc:`3986`,
-      ``path`` here includes ``hier-part`` and the ``query``.
+      Chứa đường dẫn request. Nếu URL có query component, thì ``path`` bao gồm query đó. Theo thuật ngữ của :rfc:`3986`, ``path`` ở đây bao gồm ``hier-part`` và ``query``.
 
    .. attribute:: request_version
 
-      Contains the version string from the request. For example, ``'HTTP/1.0'``.
+      Chứa chuỗi phiên bản từ request. Ví dụ: ``'HTTP/1.0'``.
 
    .. attribute:: headers
 
-      Holds an instance of the class specified by the :attr:`MessageClass` class
-      variable. This instance parses and manages the headers in the HTTP
-      request. The :func:`~http.client.parse_headers` function from
-      :mod:`http.client` is used to parse the headers and it requires that the
-      HTTP request provide a valid :rfc:`5322` style header.
+      Lưu một instance của class được chỉ định bởi biến class :attr:`MessageClass`. Instance này phân tích cú pháp và quản lý các header trong HTTP request. Hàm :func:`~http.client.parse_headers` từ
+      :mod:`http.client` được dùng để phân tích cú pháp các header và yêu cầu HTTP request cung cấp một header kiểu :rfc:`5322` hợp lệ.
 
    .. attribute:: rfile
 
-      An :class:`io.BufferedIOBase` input stream, ready to read from
-      the start of the optional input data.
+      Một input stream :class:`io.BufferedIOBase`, sẵn sàng để đọc từ đầu phần dữ liệu đầu vào tùy chọn.
 
    .. attribute:: wfile
 
-      Contains the output stream for writing a response back to the
-      client. Proper adherence to the HTTP protocol must be used when writing to
-      this stream in order to achieve successful interoperation with HTTP
-      clients.
+      Chứa output stream để ghi response trả về client. Khi ghi vào stream này, phải tuân thủ đúng giao thức HTTP để đảm bảo khả năng tương tác thành công với các HTTP client.
 
       .. versionchanged:: 3.6
-         This is an :class:`io.BufferedIOBase` stream.
+         Đây là một stream :class:`io.BufferedIOBase`.
 
-   :class:`BaseHTTPRequestHandler` has the following attributes:
+   :class:`BaseHTTPRequestHandler` có các thuộc tính sau:
 
    .. attribute:: server_version
 
-      Specifies the server software version.  You may want to override this. The
-      format is multiple whitespace-separated strings, where each string is of
-      the form name[/version]. For example, ``'BaseHTTP/0.2'``.
+      Chỉ định phiên bản phần mềm máy chủ. Bạn có thể muốn ghi đè giá trị này. Định dạng gồm nhiều chuỗi được phân tách bằng khoảng trắng, trong đó mỗi chuỗi có dạng name[/version]. Ví dụ: ``'BaseHTTP/0.2'``.
 
    .. attribute:: sys_version
 
-      Contains the Python system version, in a form usable by the
-      :attr:`version_string` method and the :attr:`server_version` class
-      variable. For example, ``'Python/1.4'``.
+      Chứa phiên bản hệ thống Python, ở dạng có thể được sử dụng bởi
+      :attr:`version_string` phương thức và biến lớp :attr:`server_version`. Ví dụ: ``'Python/1.4'``.
 
    .. attribute:: error_message_format
 
-      Specifies a format string that should be used by :meth:`send_error` method
-      for building an error response to the client. The string is filled by
-      default with variables from :attr:`responses` based on the status code
-      passed to :meth:`send_error`.
+      Chỉ định chuỗi định dạng sẽ được phương thức :meth:`send_error` sử dụng để tạo phản hồi lỗi gửi đến máy khách. Theo mặc định, chuỗi này được điền các biến từ :attr:`responses` dựa trên mã trạng thái được truyền vào :meth:`send_error`.
 
    .. attribute:: error_content_type
 
-      Specifies the Content-Type HTTP header of error responses sent to the
-      client.  The default value is ``'text/html'``.
+      Chỉ định HTTP header Content-Type của các phản hồi lỗi gửi đến máy khách. Giá trị mặc định là ``'text/html'``.
 
    .. attribute:: protocol_version
 
-      Specifies the HTTP version to which the server is conformant. It is sent
-      in responses to let the client know the server's communication
-      capabilities for future requests. If set to
-      ``'HTTP/1.1'``, the server will permit HTTP persistent connections;
-      however, your server *must* then include an accurate ``Content-Length``
-      header (using :meth:`send_header`) in all of its responses to clients.
-      For backwards compatibility, the setting defaults to ``'HTTP/1.0'``.
+      Chỉ định phiên bản HTTP mà máy chủ tuân thủ. Phiên bản này được gửi trong các phản hồi để cho máy khách biết khả năng giao tiếp của máy chủ cho các yêu cầu sau này. Nếu được đặt thành ``'HTTP/1.1'``, máy chủ sẽ cho phép các kết nối HTTP persistent; tuy nhiên, máy chủ của bạn *phải* sau đó bao gồm một header ``Content-Length`` chính xác (sử dụng :meth:`send_header`) trong tất cả phản hồi gửi đến máy khách. Để tương thích ngược, cài đặt này mặc định là ``'HTTP/1.0'``.
 
    .. attribute:: MessageClass
 
-      Specifies an :class:`email.message.Message`\ -like class to parse HTTP
-      headers.  Typically, this is not overridden, and it defaults to
+      Chỉ định một lớp tương tự :class:`email.message.Message`\  để phân tích các HTTP header. Thông thường, giá trị này không được ghi đè và mặc định là
       :class:`http.client.HTTPMessage`.
 
    .. attribute:: responses
 
-      This attribute contains a mapping of error code integers to two-element tuples
-      containing a short and long message. For example, ``{code: (shortmessage,
-      longmessage)}``. The *shortmessage* is usually used as the *message* key in an
-      error response, and *longmessage* as the *explain* key.  It is used by
-      :meth:`send_response_only` and :meth:`send_error` methods.
+      Thuộc tính này chứa ánh xạ từ các số nguyên mã lỗi đến các tuple gồm hai phần tử, chứa thông báo ngắn và dài. Ví dụ: ``{code: (shortmessage, longmessage)}``. *shortmessage* thường được dùng làm khóa *message* trong phản hồi lỗi, còn *longmessage* được dùng làm khóa *explain*. Thuộc tính này được sử dụng bởi
+      các phương thức :meth:`send_response_only` và :meth:`send_error`.
 
-   A :class:`BaseHTTPRequestHandler` instance has the following methods:
+   Một instance :class:`BaseHTTPRequestHandler` có các phương thức sau:
 
    .. method:: handle()
 
-      Calls :meth:`handle_one_request` once (or, if persistent connections are
-      enabled, multiple times) to handle incoming HTTP requests. You should
-      never need to override it; instead, implement appropriate :meth:`!do_\*`
-      methods.
+      Gọi :meth:`handle_one_request` một lần (hoặc nhiều lần nếu bật persistent connection) để xử lý các yêu cầu HTTP đến. Bạn không bao giờ cần ghi đè phương thức này; thay vào đó, hãy triển khai các phương thức :meth:`!do_\*` thích hợp.
 
    .. method:: handle_one_request()
 
-      This method will parse and dispatch the request to the appropriate
-      :meth:`!do_\*` method.  You should never need to override it.
+      Phương thức này sẽ phân tích cú pháp và điều phối yêu cầu đến
+      phương thức :meth:`!do_\*` thích hợp. Bạn không bao giờ cần ghi đè phương thức này.
 
    .. method:: handle_expect_100()
 
-      When an HTTP/1.1 conformant server receives an ``Expect: 100-continue``
-      request header it responds with a ``100 Continue`` followed by ``200 OK``
-      headers.
-      This method can be overridden to raise an error if the server does not
-      want the client to continue.  For example, the server can choose to send ``417
-      Expectation Failed`` as a response header and ``return False``.
+      Khi một server tuân thủ HTTP/1.1 nhận được header yêu cầu ``Expect: 100-continue``, server sẽ phản hồi bằng ``100 Continue`` rồi đến các header ``200 OK``. Có thể ghi đè phương thức này để phát sinh lỗi nếu server không muốn client tiếp tục. Ví dụ, server có thể chọn gửi ``417 Expectation Failed`` dưới dạng header phản hồi và ``return False``.
 
       .. versionadded:: 3.2
 
    .. method:: send_error(code, message=None, explain=None)
 
-      Sends and logs a complete error reply to the client. The numeric *code*
-      specifies the HTTP error code, with *message* as an optional, short, human
-      readable description of the error.  The *explain* argument can be used to
-      provide more detailed information about the error; it will be formatted
-      using the :attr:`error_message_format` attribute and emitted, after
-      a complete set of headers, as the response body.  The :attr:`responses`
-      attribute holds the default values for *message* and *explain* that
-      will be used if no value is provided; for unknown codes the default value
-      for both is the string ``???``. The body will be empty if the method is
-      HEAD or the response code is one of the following: :samp:`1{xx}`,
-      ``204 No Content``, ``205 Reset Content``, ``304 Not Modified``.
+      Gửi và ghi nhật ký một phản hồi lỗi hoàn chỉnh cho client. Số *code* chỉ định mã lỗi HTTP, trong đó *message* là phần mô tả lỗi ngắn gọn, dễ đọc đối với con người và không bắt buộc. Đối số *explain* có thể được dùng để cung cấp thông tin chi tiết hơn về lỗi; thông tin này sẽ được định dạng bằng thuộc tính :attr:`error_message_format` và được ghi ra sau một bộ header hoàn chỉnh, dưới dạng nội dung phản hồi. Thuộc tính :attr:`responses` chứa các giá trị mặc định cho *message* và *explain*, được sử dụng nếu không cung cấp giá trị; đối với các mã không xác định, giá trị mặc định cho cả hai là chuỗi ``???``. Nội dung sẽ rỗng nếu method là HEAD hoặc mã phản hồi là một trong các mã sau: :samp:`1{xx}`, ``204 No Content``, ``205 Reset Content``, ``304 Not Modified``.
 
       .. versionchanged:: 3.4
-         The error response includes a Content-Length header.
-         Added the *explain* argument.
+         Phản hồi lỗi bao gồm header Content-Length. Đã thêm đối số *explain*.
 
    .. method:: send_response(code, message=None)
 
-      Adds a response header to the headers buffer and logs the accepted
-      request. The HTTP response line is written to the internal buffer,
-      followed by *Server* and *Date* headers. The values for these two headers
-      are picked up from the :meth:`version_string` and
-      :meth:`date_time_string` methods, respectively. If the server does not
-      intend to send any other headers using the :meth:`send_header` method,
-      then :meth:`send_response` should be followed by an :meth:`end_headers`
-      call.
+      Thêm một header phản hồi vào bộ đệm header và ghi nhật ký request đã được chấp nhận. Dòng phản hồi HTTP được ghi vào bộ đệm nội bộ, theo sau là các header *Server* và *Date*. Giá trị của hai header này được lấy từ :meth:`version_string` và
+      các method :meth:`date_time_string`, tương ứng. Nếu server không định gửi thêm header nào bằng method :meth:`send_header`, thì sau :meth:`send_response` phải gọi :meth:`end_headers`.
 
       .. versionchanged:: 3.3
-         Headers are stored to an internal buffer and :meth:`end_headers`
-         needs to be called explicitly.
+         Các header được lưu vào bộ đệm nội bộ và cần gọi :meth:`end_headers` một cách rõ ràng.
 
    .. method:: send_header(keyword, value)
 
-      Adds the HTTP header to an internal buffer which will be written to the
-      output stream when either :meth:`end_headers` or :meth:`flush_headers` is
-      invoked. *keyword* should specify the header keyword, with *value*
-      specifying its value. Note that, after the send_header calls are done,
-      :meth:`end_headers` MUST BE called in order to complete the operation.
+      Thêm header HTTP vào bộ đệm nội bộ, bộ đệm này sẽ được ghi vào stream đầu ra khi gọi :meth:`end_headers` hoặc :meth:`flush_headers`. *keyword* phải chỉ định keyword của header, còn *value* chỉ định giá trị của header. Lưu ý rằng, sau khi hoàn tất các lệnh gọi send_header,
+      :meth:`end_headers` BẮT BUỘC phải được gọi để hoàn tất thao tác.
 
-      This method does not reject input containing CRLF sequences.
+      Phương thức này không từ chối đầu vào chứa các chuỗi CRLF.
 
       .. versionchanged:: 3.2
-         Headers are stored in an internal buffer.
+         Các header được lưu trong một bộ đệm nội bộ.
 
    .. method:: send_response_only(code, message=None)
 
-      Sends the response header only, used for the purposes when ``100
-      Continue`` response is sent by the server to the client. The headers are
-      not buffered and sent directly the output stream. If the *message* is not
-      specified, the HTTP message corresponding the response *code*  is sent.
+      Chỉ gửi header phản hồi, được dùng trong trường hợp ``100 Continue`` phản hồi được máy chủ gửi đến client. Các header không được đệm mà được gửi trực tiếp đến luồng đầu ra. Nếu không chỉ định *message*, thông điệp HTTP tương ứng với *code* phản hồi sẽ được gửi.
 
-      This method does not reject *message* containing CRLF sequences.
+      Phương thức này không từ chối *message* chứa các chuỗi CRLF.
 
       .. versionadded:: 3.2
 
    .. method:: end_headers()
 
-      Adds a blank line
-      (indicating the end of the HTTP headers in the response)
-      to the headers buffer and calls :meth:`flush_headers`.
+      Thêm một dòng trống (cho biết phần cuối của các HTTP header trong phản hồi) vào bộ đệm header và gọi :meth:`flush_headers`.
 
       .. versionchanged:: 3.2
-         The buffered headers are written to the output stream.
+         Các header được đệm sẽ được ghi vào luồng đầu ra.
 
    .. method:: flush_headers()
 
-      Finally send the headers to the output stream and flush the internal
-      headers buffer.
+      Cuối cùng, gửi các header đến luồng đầu ra và xóa bộ đệm header nội bộ.
 
       .. versionadded:: 3.3
 
    .. method:: log_request(code='-', size='-')
 
-      Logs an accepted (successful) request. *code* should specify the numeric
-      HTTP code associated with the response. If a size of the response is
-      available, then it should be passed as the *size* parameter.
+      Ghi nhật ký một yêu cầu đã được chấp nhận (thành công). *code* phải chỉ định mã HTTP dạng số tương ứng với phản hồi. Nếu có kích thước của phản hồi, thì kích thước đó phải được truyền dưới dạng tham số *size*.
 
    .. method:: log_error(...)
 
-      Logs an error when a request cannot be fulfilled. By default, it passes
-      the message to :meth:`log_message`, so it takes the same arguments
-      (*format* and additional values).
+      Ghi nhật ký lỗi khi không thể đáp ứng một yêu cầu. Theo mặc định, phương thức này truyền thông báo đến :meth:`log_message`, vì vậy nó nhận cùng các đối số (*format* và các giá trị bổ sung).
 
 
    .. method:: log_message(format, ...)
 
-      Logs an arbitrary message to ``sys.stderr``. This is typically overridden
-      to create custom error logging mechanisms. The *format* argument is a
-      standard printf-style format string, where the additional arguments to
-      :meth:`log_message` are applied as inputs to the formatting. The client
-      IP address and current date and time are prefixed to every message logged.
+      Ghi một thông báo tùy ý vào ``sys.stderr``. Thông thường, phương thức này được ghi đè để tạo các cơ chế ghi nhật ký lỗi tùy chỉnh. Đối số *format* là một chuỗi định dạng theo kiểu printf tiêu chuẩn, trong đó các đối số bổ sung truyền cho
+      :meth:`log_message` được dùng làm đầu vào cho việc định dạng. Địa chỉ IP của máy khách cùng ngày và giờ hiện tại được thêm vào trước mọi thông báo được ghi nhật ký.
 
    .. method:: version_string()
 
-      Returns the server software's version string. This is a combination of the
-      :attr:`server_version` and :attr:`sys_version` attributes.
+      Trả về chuỗi phiên bản của phần mềm máy chủ. Chuỗi này là sự kết hợp của
+      các thuộc tính :attr:`server_version` và :attr:`sys_version`.
 
    .. method:: date_time_string(timestamp=None)
 
-      Returns the date and time given by *timestamp* (which must be ``None`` or in
-      the format returned by :func:`time.time`), formatted for a message
-      header. If *timestamp* is omitted, it uses the current date and time.
+      Trả về ngày và giờ do *timestamp* cung cấp (phải là ``None`` hoặc có định dạng do :func:`time.time` trả về), được định dạng để dùng trong tiêu đề thông báo. Nếu bỏ qua *timestamp*, phương thức này sử dụng ngày và giờ hiện tại.
 
-      The result looks like ``'Sun, 06 Nov 1994 08:49:37 GMT'``.
+      Kết quả có dạng ``'Sun, 06 Nov 1994 08:49:37 GMT'``.
 
    .. method:: log_date_time_string()
 
-      Returns the current date and time, formatted for logging.
+      Trả về ngày và giờ hiện tại, được định dạng để ghi nhật ký.
 
    .. method:: address_string()
 
-      Returns the client address.
+      Trả về địa chỉ của client.
 
       .. versionchanged:: 3.3
-         Previously, a name lookup was performed. To avoid name resolution
-         delays, it now always returns the IP address.
+         Trước đây, thao tác tra cứu tên đã được thực hiện. Để tránh độ trễ khi phân giải tên, hiện tại phương thức này luôn trả về địa chỉ IP.
 
 
 .. class:: SimpleHTTPRequestHandler(request, client_address, server, directory=None)
 
-   This class serves files from the directory *directory* and below,
-   or the current directory if *directory* is not provided, directly
-   mapping the directory structure to HTTP requests.
+   Lớp này phục vụ các tệp từ thư mục *directory* trở xuống hoặc từ thư mục hiện tại nếu không cung cấp *directory*, trực tiếp ánh xạ cấu trúc thư mục với các yêu cầu HTTP.
 
    .. versionchanged:: 3.7
-      Added the *directory* parameter.
+      Đã thêm tham số *directory*.
 
    .. versionchanged:: 3.9
-      The *directory* parameter accepts a :term:`path-like object`.
+      Tham số *directory* chấp nhận một :term:`path-like object`.
 
-   A lot of the work, such as parsing the request, is done by the base class
-   :class:`BaseHTTPRequestHandler`.  This class implements the :func:`do_GET`
-   and :func:`do_HEAD` functions.
+   Phần lớn công việc, chẳng hạn như phân tích cú pháp request, được thực hiện bởi lớp cơ sở
+   :class:`BaseHTTPRequestHandler`. Lớp này triển khai các hàm :func:`do_GET` và :func:`do_HEAD`.
 
-   The following are defined as class-level attributes of
+   Sau đây được định nghĩa là các thuộc tính cấp lớp của
    :class:`SimpleHTTPRequestHandler`:
 
    .. attribute:: server_version
 
-      This will be ``"SimpleHTTP/" + __version__``, where ``__version__`` is
-      defined at the module level.
+      Đây sẽ là ``"SimpleHTTP/" + __version__``, trong đó ``__version__`` được định nghĩa ở cấp module.
 
    .. attribute:: index_pages
 
-      Specifies the filenames that are treated as directory index pages.
+      Chỉ định các tên tệp được coi là các trang chỉ mục của thư mục.
 
-      Defaults to ``("index.html", "index.htm")``.
+      Mặc định là ``("index.html", "index.htm")``.
 
       .. versionadded:: 3.12
 
    .. attribute:: extensions_map
 
-      A dictionary mapping suffixes into MIME types, contains custom overrides
-      for the default system mappings. The mapping is used case-insensitively,
-      and so should contain only lower-cased keys.
+      Một dictionary ánh xạ các hậu tố sang các MIME type, chứa các ghi đè tùy chỉnh cho các ánh xạ mặc định của hệ thống. Việc ánh xạ không phân biệt chữ hoa chữ thường, vì vậy chỉ nên chứa các khóa được viết bằng chữ thường.
 
       .. versionchanged:: 3.9
-         This dictionary is no longer filled with the default system mappings,
-         but only contains overrides.
+         Từ điển này không còn được điền bằng các ánh xạ hệ thống mặc định mà chỉ chứa các giá trị ghi đè.
 
-   The :class:`SimpleHTTPRequestHandler` class defines the following methods:
+   Lớp :class:`SimpleHTTPRequestHandler` định nghĩa các phương thức sau:
 
    .. method:: do_HEAD()
 
-      This method serves the ``'HEAD'`` request type: it sends the headers it
-      would send for the equivalent ``GET`` request. See the :meth:`do_GET`
-      method for a more complete explanation of the possible headers.
+      Phương thức này xử lý loại yêu cầu ``'HEAD'``: nó gửi các header mà nó sẽ gửi cho yêu cầu ``GET`` tương đương. Xem phương thức :meth:`do_GET` để biết giải thích đầy đủ hơn về các header có thể có.
 
    .. method:: do_GET()
 
-      The request is mapped to a local file by interpreting the request as a
-      path relative to the current working directory.
+      Yêu cầu được ánh xạ tới một tệp cục bộ bằng cách diễn giải yêu cầu như một đường dẫn tương đối so với thư mục làm việc hiện tại.
 
-      If the request was mapped to a directory, the directory is checked for
-      an index page as specified by :attr:`index_pages`. If found, the
-      file's contents are returned; otherwise a directory listing is generated
-      by calling the :meth:`list_directory` method. This method uses
-      :func:`os.listdir` to scan the directory, and returns a ``404`` error
-      response if the :func:`~os.listdir` fails.
+      Nếu yêu cầu được ánh xạ tới một thư mục, thư mục đó sẽ được kiểm tra để tìm trang chỉ mục như được chỉ định bởi :attr:`index_pages`. Nếu tìm thấy, nội dung của tệp sẽ được trả về; nếu không, danh sách thư mục sẽ được tạo bằng cách gọi phương thức :meth:`list_directory`. Phương thức này sử dụng
+      :func:`os.listdir` để quét thư mục và trả về phản hồi lỗi ``404`` nếu :func:`~os.listdir` không thành công.
 
-      If the request was mapped to a file, it is opened. Any :exc:`OSError`
-      exception in opening the requested file is mapped to a ``404``,
-      ``'File not found'`` error. If there was an ``'If-Modified-Since'``
-      header in the request, and the file was not modified after this time,
-      a ``304``, ``'Not Modified'`` response is sent. Otherwise, the content
-      type is guessed by calling the :meth:`guess_type` method, which in turn
-      uses the *extensions_map* variable, and the file contents are returned.
+      Nếu yêu cầu được ánh xạ tới một tệp, tệp đó sẽ được mở. Mọi ngoại lệ :exc:`OSError` khi mở tệp được yêu cầu sẽ được ánh xạ tới lỗi ``404``, ``'File not found'``. Nếu yêu cầu có header ``'If-Modified-Since'`` và tệp không được sửa đổi sau thời điểm này, phản hồi ``304``, ``'Not Modified'`` sẽ được gửi. Nếu không, loại nội dung được suy đoán bằng cách gọi phương thức :meth:`guess_type`, phương thức này lần lượt sử dụng biến *extensions_map*, rồi nội dung tệp được trả về.
 
-      A ``'Content-type:'`` header with the guessed content type is output,
-      followed by a ``'Content-Length:'`` header with the file's size and a
-      ``'Last-Modified:'`` header with the file's modification time.
+      Một header ``'Content-type:'`` với kiểu nội dung được phỏng đoán sẽ được xuất ra, tiếp theo là header ``'Content-Length:'`` với kích thước tệp và header ``'Last-Modified:'`` với thời điểm tệp được sửa đổi.
 
-      Then follows a blank line signifying the end of the headers, and then the
-      contents of the file are output.
+      Tiếp theo là một dòng trống biểu thị phần kết thúc của các header, rồi nội dung của tệp được xuất ra.
 
-      For example usage, see the implementation of the ``test`` function
-      in :source:`Lib/http/server.py`.
+      Để xem ví dụ sử dụng, hãy xem phần triển khai của hàm ``test`` trong :source:`Lib/http/server.py`.
 
       .. versionchanged:: 3.7
-         Support of the ``'If-Modified-Since'`` header.
+         Hỗ trợ header ``'If-Modified-Since'``.
 
    .. method:: list_directory(path)
 
-      Helper to list the contents of *path* when no index page is present.
+      Hàm trợ giúp liệt kê nội dung của *path* khi không có trang chỉ mục.
 
-      This returns either a :term:`file-like object` (which must be closed
-      by the caller) or ``None`` to indicate an error, in which case the
-      caller has nothing further to do. In either case, the headers are sent.
+      Hàm này trả về либо một :term:`file-like object` (bên gọi phải đóng đối tượng này) hoặc ``None`` để chỉ ra lỗi; trong trường hợp đó, bên gọi không cần thực hiện thêm thao tác nào. Trong cả hai trường hợp, các header đều được gửi.
 
    .. method:: guess_type(path)
 
-      Guess the type of the file at the given *path*.
+      Đoán kiểu của tệp tại *path* đã cho.
 
-      This returns a string of the form ``type/subtype``, usable for
-      a MIME Content-type header.
+      Phương thức này trả về một chuỗi có dạng ``type/subtype``, có thể dùng cho header MIME Content-type.
 
-      The default implementation looks the file's extension up in
-      :attr:`extensions_map`, falling back to
-      :func:`mimetypes.guess_file_type` and then to
-      ``'application/octet-stream'``.
+      Cài đặt mặc định tra cứu phần mở rộng của tệp trong
+      :attr:`extensions_map`, nếu không tìm thấy thì chuyển sang
+      :func:`mimetypes.guess_file_type`, rồi đến ``'application/octet-stream'``.
 
       .. versionchanged:: 3.13
-         Add :func:`mimetypes.guess_file_type` as a fallback.
+         Thêm :func:`mimetypes.guess_file_type` làm giá trị dự phòng.
 
 
-The :class:`SimpleHTTPRequestHandler` class can be used to create a very basic
-webserver serving files relative to the current directory as follows::
+Có thể dùng lớp :class:`SimpleHTTPRequestHandler` để tạo một webserver rất cơ bản, phục vụ các tệp tương đối với thư mục hiện tại như sau::
 
    import http.server
    import socketserver
@@ -498,83 +364,60 @@ webserver serving files relative to the current directory as follows::
        httpd.serve_forever()
 
 
-:class:`SimpleHTTPRequestHandler` can also be subclassed to enhance behavior,
-such as using different index file names by overriding the class attribute
+:class:`SimpleHTTPRequestHandler` cũng có thể được phân lớp để mở rộng hành vi, chẳng hạn như sử dụng các tên tệp chỉ mục khác bằng cách ghi đè thuộc tính lớp
 :attr:`~SimpleHTTPRequestHandler.index_pages`.
 
 
 .. class:: CGIHTTPRequestHandler(request, client_address, server)
 
-   This class is used to serve either files or output of CGI scripts from the
-   current directory and below. Note that mapping HTTP hierarchic structure to
-   local directory structure is exactly as in :class:`SimpleHTTPRequestHandler`.
+   Lớp này được dùng để phục vụ các tệp hoặc đầu ra của các script CGI từ thư mục hiện tại và các thư mục bên dưới. Lưu ý rằng việc ánh xạ cấu trúc phân cấp HTTP sang cấu trúc thư mục cục bộ hoàn toàn giống như trong :class:`SimpleHTTPRequestHandler`.
 
    .. note::
 
-      CGI scripts run by the :class:`CGIHTTPRequestHandler` class cannot execute
-      redirects (HTTP code 302), because code 200 (script output follows) is
-      sent prior to execution of the CGI script.  This pre-empts the status
-      code.
+      Các script CGI được chạy bởi lớp :class:`CGIHTTPRequestHandler` không thể thực hiện chuyển hướng (mã HTTP 302), vì mã 200 (sau đó là đầu ra của script) được gửi trước khi thực thi script CGI. Điều này khiến mã trạng thái bị bỏ qua.
 
-   The class will however, run the CGI script, instead of serving it as a file,
-   if it guesses it to be a CGI script.  Only directory-based CGI are used ---
-   the other common server configuration is to treat special extensions as
-   denoting CGI scripts.
+   Tuy nhiên, lớp này sẽ chạy script CGI thay vì phục vụ script đó dưới dạng tệp nếu nhận định đó là một script CGI. Chỉ CGI dựa trên thư mục được sử dụng --- cấu hình máy chủ phổ biến khác là coi các phần mở rộng đặc biệt là dấu hiệu của script CGI.
 
-   The :func:`~SimpleHTTPRequestHandler.do_GET` and
-   :func:`~SimpleHTTPRequestHandler.do_HEAD` functions
-   are modified to run CGI scripts
-   and serve the output, instead of serving files, if the request leads to
-   somewhere below the ``cgi_directories`` path.
+   :func:`~SimpleHTTPRequestHandler.do_GET` và
+   Các hàm :func:`~SimpleHTTPRequestHandler.do_HEAD` được sửa đổi để chạy các script CGI và phục vụ đầu ra của chúng thay vì phục vụ tệp, nếu yêu cầu dẫn đến một vị trí bên dưới đường dẫn ``cgi_directories``.
 
-   The :class:`CGIHTTPRequestHandler` defines the following data member:
+   :class:`CGIHTTPRequestHandler` định nghĩa thành viên dữ liệu sau:
 
    .. attribute:: cgi_directories
 
-      This defaults to ``['/cgi-bin', '/htbin']`` and describes directories to
-      treat as containing CGI scripts.
+      Giá trị mặc định là ``['/cgi-bin', '/htbin']`` và mô tả các thư mục được coi là chứa các script CGI.
 
-   The :class:`CGIHTTPRequestHandler` defines the following method:
+   :class:`CGIHTTPRequestHandler` định nghĩa phương thức sau:
 
    .. method:: do_POST()
 
-      This method serves the ``'POST'`` request type, only allowed for CGI
-      scripts.  Error 501, "Can only POST to CGI scripts", is output when trying
-      to POST to a non-CGI url.
+      Phương thức này phục vụ loại yêu cầu ``'POST'``, chỉ được phép đối với các CGI script. Lỗi 501, "Can only POST to CGI scripts", sẽ được xuất ra khi cố gắng POST đến một url không phải CGI.
 
-   Note that CGI scripts will be run with UID of user nobody, for security
-   reasons.  Problems with the CGI script will be translated to error 403.
+   Lưu ý rằng các CGI script sẽ được chạy với UID của người dùng nobody vì lý do bảo mật. Các vấn đề với CGI script sẽ được chuyển thành lỗi 403.
 
    .. deprecated-removed:: 3.13 3.15
 
-      :class:`CGIHTTPRequestHandler` is being removed in 3.15.  CGI has not
-      been considered a good way to do things for well over a decade. This code
-      has been unmaintained for a while now and sees very little practical use.
-      Retaining it could lead to further :ref:`security considerations
-      <http.server-security>`.
+      :class:`CGIHTTPRequestHandler` sẽ bị loại bỏ trong 3.15. CGI từ lâu, hơn một thập kỷ, đã không được xem là cách làm tốt. Mã này đã không được bảo trì trong một thời gian và hầu như không được sử dụng trong thực tế. Việc giữ lại mã này có thể dẫn đến các :ref:`security considerations <http.server-security>` tiếp theo.
 
 
 .. _http-server-cli:
 
-Command-line interface
-----------------------
+Giao diện dòng lệnh
+-------------------
 
-:mod:`!http.server` can also be invoked directly using the :option:`-m`
-switch of the interpreter.  The following example illustrates how to serve
-files relative to the current directory:
+:mod:`!http.server` cũng có thể được gọi trực tiếp bằng switch :option:`-m` của interpreter. Ví dụ sau minh họa cách phục vụ các tệp tương đối với thư mục hiện tại:
 
 .. code-block:: bash
 
    python -m http.server [OPTIONS] [port]
 
-The following options are accepted:
+Các tùy chọn sau được chấp nhận:
 
 .. program:: http.server
 
 .. option:: port
 
-   The server listens to port 8000 by default. The default can be overridden
-   by passing the desired port number as an argument:
+   Theo mặc định, máy chủ lắng nghe trên cổng 8000. Có thể ghi đè giá trị mặc định bằng cách truyền số cổng mong muốn làm đối số:
 
    .. code-block:: bash
 
@@ -582,10 +425,7 @@ The following options are accepted:
 
 .. option:: -b, --bind <address>
 
-   Specifies a specific address to which it should bind. Both IPv4 and IPv6
-   addresses are supported. By default, the server binds itself to all
-   interfaces. For example, the following command causes the server to bind
-   to localhost only:
+   Chỉ định một địa chỉ cụ thể mà máy chủ sẽ liên kết. Cả địa chỉ IPv4 và IPv6 đều được hỗ trợ. Theo mặc định, máy chủ tự liên kết với tất cả các giao diện. Ví dụ: lệnh sau khiến máy chủ chỉ liên kết với localhost:
 
    .. code-block:: bash
 
@@ -594,13 +434,11 @@ The following options are accepted:
    .. versionadded:: 3.4
 
    .. versionchanged:: 3.8
-      Support IPv6 in the ``--bind`` option.
+      Hỗ trợ IPv6 trong tùy chọn ``--bind``.
 
 .. option:: -d, --directory <dir>
 
-   Specifies a directory to which it should serve the files. By default,
-   the server uses the current directory. For example, the following command
-   uses a specific directory:
+   Chỉ định một thư mục để máy chủ cung cấp các tệp. Theo mặc định, máy chủ sử dụng thư mục hiện tại. Ví dụ: lệnh sau sử dụng một thư mục cụ thể:
 
    .. code-block:: bash
 
@@ -610,9 +448,7 @@ The following options are accepted:
 
 .. option:: -p, --protocol <version>
 
-   Specifies the HTTP version to which the server is conformant. By default,
-   the server is conformant to HTTP/1.0. For example, the following command
-   runs an HTTP/1.1 conformant server:
+   Chỉ định phiên bản HTTP mà máy chủ tuân thủ. Theo mặc định, máy chủ tuân thủ HTTP/1.0. Ví dụ: lệnh sau chạy một máy chủ tuân thủ HTTP/1.1:
 
    .. code-block:: bash
 
@@ -622,25 +458,21 @@ The following options are accepted:
 
 .. option:: --cgi
 
-   :class:`CGIHTTPRequestHandler` can be enabled in the command line by passing
-   the ``--cgi`` option::
+   Có thể bật :class:`CGIHTTPRequestHandler` trên dòng lệnh bằng cách truyền tùy chọn ``--cgi``::
 
       python -m http.server --cgi
 
    .. deprecated-removed:: 3.13 3.15
 
-      :mod:`!http.server` command line ``--cgi`` support is being removed
-      because :class:`CGIHTTPRequestHandler` is being removed.
+      :mod:`!http.server` dòng lệnh ``--cgi`` hỗ trợ đang bị loại bỏ vì :class:`CGIHTTPRequestHandler` đang bị loại bỏ.
 
 .. warning::
 
-   :class:`CGIHTTPRequestHandler` and the ``--cgi`` command-line option
-   are not intended for use by untrusted clients and may be vulnerable
-   to exploitation. Always use within a secure environment.
+   :class:`CGIHTTPRequestHandler` và tùy chọn dòng lệnh ``--cgi`` không предназначены để các client không đáng tin cậy sử dụng và có thể dễ bị khai thác. Luôn sử dụng trong môi trường an toàn.
 
 .. option:: --tls-cert
 
-   Specifies a TLS certificate chain for HTTPS connections:
+   Chỉ định chuỗi chứng chỉ TLS cho các kết nối HTTPS:
 
    .. code-block:: bash
 
@@ -650,15 +482,15 @@ The following options are accepted:
 
 .. option:: --tls-key
 
-   Specifies a private key file for HTTPS connections.
+   Chỉ định tệp khóa riêng tư cho các kết nối HTTPS.
 
-   This option requires ``--tls-cert`` to be specified.
+   Tùy chọn này yêu cầu phải chỉ định ``--tls-cert``.
 
    .. versionadded:: 3.14
 
 .. option:: --tls-password-file
 
-   Specifies the password file for password-protected private keys:
+   Chỉ định tệp mật khẩu cho các khóa riêng tư được bảo vệ bằng mật khẩu:
 
    .. code-block:: bash
 
@@ -667,32 +499,24 @@ The following options are accepted:
              --tls-key key.pem \
              --tls-password-file password.txt
 
-   This option requires ``--tls-cert`` to be specified.
+   Tùy chọn này yêu cầu phải chỉ định ``--tls-cert``.
 
    .. versionadded:: 3.14
 
 
 .. _http.server-security:
 
-Security considerations
+Các cân nhắc về bảo mật
 -----------------------
 
 .. index:: pair: http.server; security
 
-:class:`SimpleHTTPRequestHandler` will follow symbolic links when handling
-requests which makes it possible for files outside of the specified directory
-to be served.
+:class:`SimpleHTTPRequestHandler` sẽ đi theo các symbolic link khi xử lý yêu cầu, khiến các tệp bên ngoài thư mục được chỉ định có thể được phân phát.
 
-Methods :meth:`BaseHTTPRequestHandler.send_header` and
-:meth:`BaseHTTPRequestHandler.send_response_only` assume sanitized input
-and do not perform input validation such as checking for the presence of CRLF
-sequences. Untrusted input may result in HTTP header injection attacks.
+Các phương thức :meth:`BaseHTTPRequestHandler.send_header` và
+:meth:`BaseHTTPRequestHandler.send_response_only` giả định rằng dữ liệu đầu vào đã được làm sạch và không thực hiện việc xác thực đầu vào, chẳng hạn như kiểm tra sự hiện diện của các chuỗi CRLF. Dữ liệu đầu vào không đáng tin cậy có thể dẫn đến các cuộc tấn công chèn HTTP header.
 
-Earlier versions of Python did not scrub control characters from the
-log messages emitted to stderr from ``python -m http.server`` or the
-default :class:`BaseHTTPRequestHandler` ``.log_message``
-implementation. This could allow remote clients connecting to your
-server to send nefarious control codes to your terminal.
+Các phiên bản Python trước đây không loại bỏ các ký tự điều khiển khỏi thông báo nhật ký được ghi vào stderr từ ``python -m http.server`` hoặc từ triển khai :class:`BaseHTTPRequestHandler` ``.log_message`` mặc định. Điều này có thể cho phép các client từ xa kết nối với máy chủ của bạn gửi các mã điều khiển độc hại đến terminal của bạn.
 
 .. versionchanged:: 3.12
-   Control characters are scrubbed in stderr logs.
+   Các ký tự điều khiển được loại bỏ khỏi nhật ký stderr.

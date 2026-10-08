@@ -1,105 +1,71 @@
-:mod:`!xml.sax.saxutils` --- SAX Utilities
-==========================================
+:mod:`!xml.sax.saxutils` --- Tiện ích SAX
+=========================================
 
 .. module:: xml.sax.saxutils
-   :synopsis: Convenience functions and classes for use with SAX.
+   :synopsis: Các hàm và lớp tiện lợi dùng với SAX.
 
 .. moduleauthor:: Lars Marius Garshol <larsga@garshol.priv.no>
 .. sectionauthor:: Martin v. Löwis <martin@v.loewis.de>
 
-**Source code:** :source:`Lib/xml/sax/saxutils.py`
+**Mã nguồn:** :source:`Lib/xml/sax/saxutils.py`
 
 --------------
 
-The module :mod:`!xml.sax.saxutils` contains a number of classes and functions
-that are commonly useful when creating SAX applications, either in direct use,
-or as base classes.
+Mô-đun :mod:`!xml.sax.saxutils` chứa một số lớp và hàm thường hữu ích khi tạo các ứng dụng SAX, dùng trực tiếp hoặc làm lớp cơ sở.
 
 
 .. function:: escape(data, entities={})
 
-   Escape ``'&'``, ``'<'``, and ``'>'`` in a string of data.
+   Escape ``'&'``, ``'<'`` và ``'>'`` trong một chuỗi dữ liệu.
 
-   You can escape other strings of data by passing a dictionary as the optional
-   *entities* parameter.  The keys and values must all be strings; each key will be
-   replaced with its corresponding value.  The characters ``'&'``, ``'<'`` and
-   ``'>'`` are always escaped, even if *entities* is provided.
+   Bạn có thể escape các chuỗi dữ liệu khác bằng cách truyền một dictionary làm tham số tùy chọn *entities*. Tất cả khóa và giá trị phải là chuỗi; mỗi khóa sẽ được thay thế bằng giá trị tương ứng. Các ký tự ``'&'``, ``'<'`` và ``'>'`` luôn được escape, ngay cả khi *entities* được cung cấp.
 
    .. note::
 
-      This function should only be used to escape characters that
-      can't be used directly in XML. Do not use this function as a general
-      string translation function.
+      Chỉ nên dùng hàm này để escape các ký tự không thể sử dụng trực tiếp trong XML. Không dùng hàm này như một hàm dịch chuỗi tổng quát.
 
 .. function:: unescape(data, entities={})
 
-   Unescape ``'&amp;'``, ``'&lt;'``, and ``'&gt;'`` in a string of data.
+   Hủy escape cho ``'&amp;'``, ``'&lt;'`` và ``'&gt;'`` trong một chuỗi dữ liệu.
 
-   You can unescape other strings of data by passing a dictionary as the optional
-   *entities* parameter.  The keys and values must all be strings; each key will be
-   replaced with its corresponding value.  ``'&amp;'``, ``'&lt;'``, and ``'&gt;'``
-   are always unescaped, even if *entities* is provided.
+   Bạn có thể hủy escape cho các chuỗi dữ liệu khác bằng cách truyền một dictionary làm tham số tùy chọn *entities*. Các khóa và giá trị đều phải là chuỗi; mỗi khóa sẽ được thay thế bằng giá trị tương ứng. ``'&amp;'``, ``'&lt;'`` và ``'&gt;'`` luôn được hủy escape, ngay cả khi *entities* được cung cấp.
 
 
 .. function:: quoteattr(data, entities={})
 
-   Similar to :func:`escape`, but also prepares *data* to be used as an
-   attribute value.  The return value is a quoted version of *data* with any
-   additional required replacements. :func:`quoteattr` will select a quote
-   character based on the content of *data*, attempting to avoid encoding any
-   quote characters in the string.  If both single- and double-quote characters
-   are already in *data*, the double-quote characters will be encoded and *data*
-   will be wrapped in double-quotes.  The resulting string can be used directly
-   as an attribute value::
+   Tương tự :func:`escape`, nhưng cũng chuẩn bị *data* để dùng làm giá trị thuộc tính. Giá trị trả về là phiên bản được đặt trong dấu ngoặc kép của *data*, kèm theo mọi thay thế bổ sung cần thiết. :func:`quoteattr` sẽ chọn một ký tự dấu ngoặc dựa trên nội dung của *data*, cố gắng tránh mã hóa bất kỳ ký tự dấu ngoặc nào trong chuỗi. Nếu cả ký tự dấu ngoặc đơn và dấu ngoặc kép đều đã có trong *data*, các ký tự dấu ngoặc kép sẽ được mã hóa và *data* sẽ được bao quanh bằng dấu ngoặc kép. Chuỗi kết quả có thể được dùng trực tiếp làm giá trị thuộc tính::
 
       >>> print("<element attr=%s>" % quoteattr("ab ' cd \" ef"))
       <element attr="ab ' cd &quot; ef">
 
-   This function is useful when generating attribute values for HTML or any SGML
-   using the reference concrete syntax.
+   Hàm này hữu ích khi tạo các giá trị thuộc tính cho HTML hoặc bất kỳ SGML nào sử dụng cú pháp tham chiếu cụ thể.
 
 
 .. class:: XMLGenerator(out=None, encoding='iso-8859-1', short_empty_elements=False)
 
-   This class implements the :class:`~xml.sax.handler.ContentHandler` interface
-   by writing SAX
-   events back into an XML document. In other words, using an :class:`XMLGenerator`
-   as the content handler will reproduce the original document being parsed. *out*
-   should be a file-like object which will default to *sys.stdout*. *encoding* is
-   the encoding of the output stream which defaults to ``'iso-8859-1'``.
-   *short_empty_elements* controls the formatting of elements that contain no
-   content:  if ``False`` (the default) they are emitted as a pair of start/end
-   tags, if set to ``True`` they are emitted as a single self-closed tag.
+   Lớp này triển khai interface :class:`~xml.sax.handler.ContentHandler` bằng cách ghi các sự kiện SAX trở lại một tài liệu XML. Nói cách khác, việc sử dụng một :class:`XMLGenerator` làm content handler sẽ tái tạo tài liệu gốc đang được phân tích cú pháp. *out* phải là một đối tượng dạng tệp, mặc định là *sys.stdout*. *encoding* là encoding của output stream, mặc định là ``'iso-8859-1'``. *short_empty_elements* kiểm soát cách định dạng các phần tử không chứa nội dung: nếu là ``False`` (mặc định), chúng được xuất ra dưới dạng một cặp thẻ bắt đầu/kết thúc; nếu đặt thành ``True``, chúng được xuất ra dưới dạng một thẻ tự đóng duy nhất.
 
    .. versionchanged:: 3.2
-      Added the *short_empty_elements* parameter.
+      Đã thêm tham số *short_empty_elements*.
 
 
 .. class:: XMLFilterBase(base)
 
-   This class is designed to sit between an
-   :class:`~xml.sax.xmlreader.XMLReader` and the client
-   application's event handlers.  By default, it does nothing but pass requests up
-   to the reader and events on to the handlers unmodified, but subclasses can
-   override specific methods to modify the event stream or the configuration
-   requests as they pass through.
+   Lớp này được thiết kế để nằm giữa một
+   :class:`~xml.sax.xmlreader.XMLReader` và các event handler của ứng dụng client. Theo mặc định, nó chỉ chuyển tiếp các request lên reader và các event đến handler mà không thay đổi, nhưng các subclass có thể override những method cụ thể để sửa đổi event stream hoặc các request cấu hình khi chúng đi qua.
 
    .. method:: getParent()
 
-      Return the parent reader, or ``None`` if it is not set.
+      Trả về reader cha hoặc ``None`` nếu chưa được thiết lập.
 
 
    .. method:: setParent(parent)
 
-      Set the parent reader, which the events are read from.
+      Thiết lập reader cha, từ đó các event được đọc.
 
 
 .. function:: prepare_input_source(source, base='')
 
-   This function takes an input source and an optional base URL and returns a
-   fully resolved :class:`~xml.sax.xmlreader.InputSource` object ready for
-   reading.  The input source can be given as a string, a file-like object, or
-   an :class:`~xml.sax.xmlreader.InputSource` object; parsers will use this
-   function to implement the polymorphic *source* argument to their
-   :meth:`~xml.sax.xmlreader.XMLReader.parse` method.
+   Hàm này nhận một input source và một base URL tùy chọn, rồi trả về một đối tượng :class:`~xml.sax.xmlreader.InputSource` đã được phân giải đầy đủ và sẵn sàng để đọc. Input source có thể được cung cấp dưới dạng chuỗi, đối tượng giống file hoặc đối tượng :class:`~xml.sax.xmlreader.InputSource`; các parser sẽ sử dụng hàm này để triển khai đối số *source* cho các
+   method :meth:`~xml.sax.xmlreader.XMLReader.parse`.
 

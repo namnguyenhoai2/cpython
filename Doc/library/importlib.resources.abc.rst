@@ -1,10 +1,10 @@
-:mod:`!importlib.resources.abc` -- Abstract base classes for resources
-----------------------------------------------------------------------
+:mod:`!importlib.resources.abc` -- Các lớp cơ sở trừu tượng cho tài nguyên
+--------------------------------------------------------------------------
 
 .. module:: importlib.resources.abc
-    :synopsis: Abstract base classes for resources
+    :synopsis: Các lớp cơ sở trừu tượng cho tài nguyên
 
-**Source code:** :source:`Lib/importlib/resources/abc.py`
+**Mã nguồn:** :source:`Lib/importlib/resources/abc.py`
 
 --------------
 
@@ -12,177 +12,127 @@
 
 .. class:: ResourceReader
 
-    *Superseded by TraversableResources*
+    *Được thay thế bởi TraversableResources*
 
-    An :term:`abstract base class` to provide the ability to read
-    *resources*.
+    Một :term:`abstract base class` để cung cấp khả năng đọc *tài nguyên*.
 
-    From the perspective of this ABC, a *resource* is a binary
-    artifact that is shipped within a package. Typically this is
-    something like a data file that lives next to the ``__init__.py``
-    file of the package. The purpose of this class is to help abstract
-    out the accessing of such data files so that it does not matter if
-    the package and its data file(s) are stored e.g. in a zip file
-    versus on the file system.
+    Theo góc nhìn của ABC này, một *tài nguyên* là một tạo phẩm nhị phân được đóng gói bên trong một package. Thông thường, đó là một tệp dữ liệu nằm cùng với tệp ``__init__.py`` của package. Mục đích của lớp này là trừu tượng hóa việc truy cập các tệp dữ liệu như vậy, để không phụ thuộc vào việc package và (các) tệp dữ liệu của nó được lưu trữ trong một tệp zip hay trên hệ thống tệp.
 
-    For any of methods of this class, a *resource* argument is
-    expected to be a :term:`path-like object` which represents
-    conceptually just a file name. This means that no subdirectory
-    paths should be included in the *resource* argument. This is
-    because the location of the package the reader is for, acts as the
-    "directory". Hence the metaphor for directories and file
-    names is packages and resources, respectively. This is also why
-    instances of this class are expected to directly correlate to
-    a specific package (instead of potentially representing multiple
-    packages or a module).
+    Đối với mọi phương thức của lớp này, đối số *tài nguyên* được kỳ vọng là một :term:`path-like object`, về mặt khái niệm chỉ đại diện cho một tên tệp. Điều này có nghĩa là không được chứa đường dẫn thư mục con trong đối số *tài nguyên*. Lý do là vị trí của package mà reader phục vụ đóng vai trò là "thư mục". Vì vậy, phép ẩn dụ cho thư mục và tên tệp lần lượt là package và tài nguyên. Đây cũng là lý do các thực thể của lớp này được kỳ vọng tương ứng trực tiếp với một package cụ thể (thay vì có thể đại diện cho nhiều package hoặc một module).
 
-    Loaders that wish to support resource reading are expected to
-    provide a method called ``get_resource_reader(fullname)`` which
-    returns an object implementing this ABC's interface. If the module
-    specified by fullname is not a package, this method should return
-    :const:`None`. An object compatible with this ABC should only be
-    returned when the specified module is a package.
+    Các loader muốn hỗ trợ việc đọc tài nguyên được yêu cầu cung cấp một phương thức có tên ``get_resource_reader(fullname)``, phương thức này trả về một đối tượng triển khai giao diện của ABC này. Nếu module được chỉ định bởi fullname không phải là package, phương thức này nên trả về
+    :const:`None`. Chỉ nên trả về một đối tượng tương thích với ABC này khi module được chỉ định là một package.
 
     .. deprecated:: 3.12
-       Use :class:`importlib.resources.abc.TraversableResources` instead.
+       Thay vào đó, hãy sử dụng :class:`importlib.resources.abc.TraversableResources`.
 
     .. method:: open_resource(resource)
        :abstractmethod:
 
-       Returns an opened, :term:`file-like object` for binary reading
-       of the *resource*.
+       Trả về một :term:`file-like object` đã mở để đọc nhị phân *tài nguyên*.
 
-       If the resource cannot be found, :exc:`FileNotFoundError` is
-       raised.
+       Nếu không tìm thấy tài nguyên, :exc:`FileNotFoundError` sẽ được raise.
 
     .. method:: resource_path(resource)
        :abstractmethod:
 
-       Returns the file system path to the *resource*.
+       Trả về đường dẫn hệ thống tệp tới *tài nguyên*.
 
-       If the resource does not concretely exist on the file system,
-       raise :exc:`FileNotFoundError`.
+       Nếu tài nguyên không thực sự tồn tại trên hệ thống tệp, hãy raise :exc:`FileNotFoundError`.
 
     .. method:: is_resource(path)
        :abstractmethod:
 
-       Returns ``True`` if the named *path* is considered a resource.
-       :exc:`FileNotFoundError` is raised if *path* does not exist.
+       Trả về ``True`` nếu *path* được coi là một tài nguyên.
+       :exc:`FileNotFoundError` được phát sinh nếu *path* không tồn tại.
 
        .. versionchanged:: 3.10
-          The argument *name* was renamed to *path*.
+          Đối số *name* đã được đổi tên thành *path*.
 
     .. method:: contents()
        :abstractmethod:
 
-       Returns an :term:`iterable` of strings over the contents of
-       the package. Do note that it is not required that all names
-       returned by the iterator be actual resources, e.g. it is
-       acceptable to return names for which :meth:`is_resource` would
-       be false.
+       Trả về một :term:`iterable` gồm các chuỗi về nội dung của package. Lưu ý rằng không bắt buộc tất cả các tên được iterator trả về phải là tài nguyên thực tế; chẳng hạn, việc trả về các tên mà :meth:`is_resource` sẽ là sai là hoàn toàn hợp lệ.
 
-       Allowing non-resource names to be returned is to allow for
-       situations where how a package and its resources are stored
-       are known a priori and the non-resource names would be useful.
-       For instance, returning subdirectory names is allowed so that
-       when it is known that the package and resources are stored on
-       the file system then those subdirectory names can be used
-       directly.
+       Cho phép trả về các tên không phải tài nguyên nhằm hỗ trợ những trường hợp đã biết trước cách package và các tài nguyên của package được lưu trữ, và các tên không phải tài nguyên sẽ hữu ích. Chẳng hạn, cho phép trả về tên các thư mục con để khi biết package và các tài nguyên được lưu trữ trên hệ thống tệp thì có thể sử dụng trực tiếp các tên thư mục con đó.
 
-       The abstract method returns an iterable of no items.
+       Phương thức abstract trả về một iterable không chứa phần tử nào.
 
 
 .. class:: Traversable
 
-    An object with a subset of :class:`pathlib.Path` methods suitable for
-    traversing directories and opening files.
+    Một đối tượng có một tập hợp con các phương thức :class:`pathlib.Path`, phù hợp để duyệt qua các thư mục và mở tệp.
 
-    For a representation of the object on the file-system, use
+    Để biểu diễn đối tượng trên hệ thống tệp, hãy sử dụng
     :meth:`importlib.resources.as_file`.
 
     .. attribute:: name
 
-       Abstract. The base name of this object without any parent references.
+       Trừu tượng. Tên cơ sở của đối tượng này, không bao gồm bất kỳ tham chiếu nào đến đối tượng cha.
 
     .. method:: iterdir()
        :abstractmethod:
 
-       Yield Traversable objects in self.
+       Sinh các đối tượng Traversable trong self.
 
     .. method:: is_dir()
        :abstractmethod:
 
-       Return ``True`` if self is a directory.
+       Trả về ``True`` nếu self là một thư mục.
 
     .. method:: is_file()
        :abstractmethod:
 
-       Return ``True`` if self is a file.
+       Trả về ``True`` nếu self là một tệp.
 
     .. method:: joinpath(*pathsegments)
        :abstractmethod:
 
-       Traverse directories according to *pathsegments* and return
-       the result as :class:`!Traversable`.
+       Duyệt qua các thư mục theo *pathsegments* và trả về kết quả dưới dạng :class:`!Traversable`.
 
-       Each *pathsegments* argument may contain multiple names separated by
-       forward slashes (``/``, ``posixpath.sep`` ).
-       For example, the following are equivalent::
+       Mỗi đối số *pathsegments* có thể chứa nhiều tên được phân tách bằng dấu gạch chéo xuôi (``/``, ``posixpath.sep``). Ví dụ, các cách sau là tương đương::
 
            files.joinpath('subdir', 'subsuddir', 'file.txt')
            files.joinpath('subdir/subsuddir/file.txt')
 
-       Note that some :class:`!Traversable` implementations
-       might not be updated to the latest version of the protocol.
-       For compatibility with such implementations, provide a single argument
-       without path separators to each call to ``joinpath``. For example::
+       Lưu ý rằng một số triển khai :class:`!Traversable` có thể chưa được cập nhật lên phiên bản mới nhất của giao thức. Để tương thích với các triển khai như vậy, hãy cung cấp một đối số duy nhất không chứa dấu phân cách đường dẫn cho mỗi lần gọi ``joinpath``. Ví dụ::
 
            files.joinpath('subdir').joinpath('subsubdir').joinpath('file.txt')
 
        .. versionchanged:: 3.11
 
-          ``joinpath`` accepts multiple *pathsegments*, and these segments
-          may contain forward slashes as path separators.
-          Previously, only a single *child* argument was accepted.
+          ``joinpath`` chấp nhận nhiều *pathsegments*, và các đoạn này có thể chứa dấu gạch chéo xuôi làm dấu phân cách đường dẫn. Trước đây, chỉ chấp nhận một đối số *child* duy nhất.
 
     .. method:: __truediv__(child)
        :abstractmethod:
 
-       Return Traversable child in self.
-       Equivalent to ``joinpath(child)``.
+       Trả về đối tượng Traversable con trong self. Tương đương với ``joinpath(child)``.
 
     .. method:: open(mode='r', *args, **kwargs)
        :abstractmethod:
 
-       *mode* may be 'r' or 'rb' to open as text or binary. Return a handle
-       suitable for reading (same as :attr:`pathlib.Path.open`).
+       *mode* có thể là 'r' hoặc 'rb' để mở ở dạng văn bản hoặc nhị phân. Trả về một handle phù hợp để đọc (giống như :attr:`pathlib.Path.open`).
 
-       When opening as text, accepts encoding parameters such as those
-       accepted by :class:`io.TextIOWrapper`.
+       Khi mở ở dạng văn bản, chấp nhận các tham số encoding như những tham số được :class:`io.TextIOWrapper` chấp nhận.
 
     .. method:: read_bytes()
 
-       Read contents of self as bytes.
+       Đọc nội dung của self dưới dạng bytes.
 
     .. method:: read_text(encoding=None)
 
-       Read contents of self as text.
+       Đọc nội dung của self dưới dạng văn bản.
 
 
 .. class:: TraversableResources
 
-    An abstract base class for resource readers capable of serving
-    the :meth:`importlib.resources.files` interface. Subclasses
-    :class:`ResourceReader` and provides
-    concrete implementations of the :class:`!ResourceReader`'s
-    abstract methods. Therefore, any loader supplying
-    :class:`!TraversableResources` also supplies :class:`!ResourceReader`.
+    Một lớp cơ sở trừu tượng dành cho các resource reader có khả năng cung cấp giao diện :meth:`importlib.resources.files`. Các lớp con
+    :class:`ResourceReader` và cung cấp các triển khai cụ thể cho các phương thức trừu tượng của :class:`!ResourceReader`. Do đó, mọi loader cung cấp
+    :class:`!TraversableResources` cũng cung cấp :class:`!ResourceReader`.
 
-    Loaders that wish to support resource reading are expected to
-    implement this interface.
+    Các loader muốn hỗ trợ việc đọc resource được kỳ vọng sẽ triển khai giao diện này.
 
     .. method:: files()
        :abstractmethod:
 
-       Returns a :class:`importlib.resources.abc.Traversable` object for the loaded
-       package.
+       Trả về một đối tượng :class:`importlib.resources.abc.Traversable` cho package đã được tải.

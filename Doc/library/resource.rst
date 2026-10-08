@@ -1,102 +1,73 @@
-:mod:`!resource` --- Resource usage information
-===============================================
+:mod:`!resource` --- Thông tin sử dụng tài nguyên
+=================================================
 
 .. module:: resource
-   :synopsis: An interface to provide resource usage information on the current process.
+   :synopsis: Một interface cung cấp thông tin sử dụng tài nguyên của tiến trình hiện tại.
 
 .. moduleauthor:: Jeremy Hylton <jeremy@alum.mit.edu>
 .. sectionauthor:: Jeremy Hylton <jeremy@alum.mit.edu>
 
 --------------
 
-This module provides basic mechanisms for measuring and controlling system
-resources utilized by a program.
+Module này cung cấp các cơ chế cơ bản để đo lường và kiểm soát tài nguyên hệ thống được một chương trình sử dụng.
 
 .. availability:: Unix, not WASI.
 
-Symbolic constants are used to specify particular system resources and to
-request usage information about either the current process or its children.
+Các hằng số ký hiệu được sử dụng để chỉ định những tài nguyên hệ thống cụ thể và yêu cầu thông tin sử dụng về tiến trình hiện tại hoặc các tiến trình con của nó.
 
-An :exc:`OSError` is raised on syscall failure.
+:exc:`OSError` được nêu ra khi syscall thất bại.
 
 
 .. exception:: error
 
-   A deprecated alias of :exc:`OSError`.
+   Một bí danh đã lỗi thời của :exc:`OSError`.
 
    .. versionchanged:: 3.3
-      Following :pep:`3151`, this class was made an alias of :exc:`OSError`.
+      Sau :pep:`3151`, class này trở thành bí danh của :exc:`OSError`.
 
 
-Resource Limits
----------------
+Giới hạn tài nguyên
+-------------------
 
-Resources usage can be limited using the :func:`setrlimit` function described
-below. Each resource is controlled by a pair of limits: a soft limit and a hard
-limit. The soft limit is the current limit, and may be lowered or raised by a
-process over time. The soft limit can never exceed the hard limit. The hard
-limit can be lowered to any value greater than the soft limit, but not raised.
-(Only processes with the effective UID of the super-user can raise a hard
-limit.)
+Có thể giới hạn mức sử dụng tài nguyên bằng hàm :func:`setrlimit` được mô tả bên dưới. Mỗi tài nguyên được kiểm soát bằng một cặp giới hạn: giới hạn mềm và giới hạn cứng. Giới hạn mềm là giới hạn hiện tại và một process có thể giảm hoặc tăng giới hạn này theo thời gian. Giới hạn mềm không bao giờ có thể vượt quá giới hạn cứng. Có thể giảm giới hạn cứng xuống bất kỳ giá trị nào lớn hơn giới hạn mềm, nhưng không thể tăng giới hạn này. (Chỉ các process có UID hiệu lực của super-user mới có thể tăng giới hạn cứng.)
 
-The specific resources that can be limited are system dependent. They are
-described in the :manpage:`getrlimit(2)` man page.  The resources listed below
-are supported when the underlying operating system supports them; resources
-which cannot be checked or controlled by the operating system are not defined in
-this module for those platforms.
+Các tài nguyên cụ thể có thể bị giới hạn phụ thuộc vào hệ thống. Chúng được mô tả trong trang man :manpage:`getrlimit(2)`. Các tài nguyên được liệt kê bên dưới được hỗ trợ khi hệ điều hành bên dưới hỗ trợ chúng; các tài nguyên không thể được hệ điều hành kiểm tra hoặc kiểm soát sẽ không được định nghĩa trong module này trên các nền tảng đó.
 
 
 .. data:: RLIM_INFINITY
 
-   Constant used to represent the limit for an unlimited resource.
+   Hằng số dùng để biểu diễn giới hạn của một tài nguyên không giới hạn.
 
 
 .. function:: getrlimit(resource)
 
-   Returns a tuple ``(soft, hard)`` with the current soft and hard limits of
-   *resource*. Raises :exc:`ValueError` if an invalid resource is specified, or
-   :exc:`error` if the underlying system call fails unexpectedly.
+   Trả về một tuple ``(soft, hard)`` chứa các giới hạn mềm và cứng hiện tại của *resource*. Phát sinh :exc:`ValueError` nếu chỉ định một tài nguyên không hợp lệ, hoặc
+   :exc:`error` nếu system call bên dưới gặp lỗi không mong đợi.
 
 
 .. function:: setrlimit(resource, limits)
 
-   Sets new limits of consumption of *resource*. The *limits* argument must be a
-   tuple ``(soft, hard)`` of two integers describing the new limits. A value of
-   :const:`~resource.RLIM_INFINITY` can be used to request a limit that is
-   unlimited.
+   Đặt các giới hạn mới về mức tiêu thụ của *resource*. Đối số *limits* phải là một tuple ``(soft, hard)`` gồm hai số nguyên mô tả các giới hạn mới. Một giá trị
+   :const:`~resource.RLIM_INFINITY` có thể được sử dụng để yêu cầu một giới hạn không bị giới hạn.
 
-   Raises :exc:`ValueError` if an invalid resource is specified, if the new soft
-   limit exceeds the hard limit, or if a process tries to raise its hard limit.
-   Specifying a limit of :const:`~resource.RLIM_INFINITY` when the hard or
-   system limit for that resource is not unlimited will result in a
-   :exc:`ValueError`.  A process with the effective UID of super-user can
-   request any valid limit value, including unlimited, but :exc:`ValueError`
-   will still be raised if the requested limit exceeds the system imposed
-   limit.
+   Phát sinh :exc:`ValueError` nếu chỉ định tài nguyên không hợp lệ, nếu giới hạn mềm mới vượt quá giới hạn cứng, hoặc nếu một tiến trình cố gắng tăng giới hạn cứng của nó. Việc chỉ định giới hạn :const:`~resource.RLIM_INFINITY` khi giới hạn cứng hoặc giới hạn hệ thống cho tài nguyên đó không phải là không bị giới hạn sẽ dẫn đến một
+   :exc:`ValueError`. Một tiến trình có UID hiệu dụng của super-user có thể yêu cầu bất kỳ giá trị giới hạn hợp lệ nào, bao gồm cả không bị giới hạn, nhưng :exc:`ValueError` vẫn sẽ được phát sinh nếu giới hạn được yêu cầu vượt quá giới hạn do hệ thống áp đặt.
 
-   ``setrlimit`` may also raise :exc:`error` if the underlying system call
-   fails.
+   ``setrlimit`` cũng có thể phát sinh :exc:`error` nếu system call bên dưới thất bại.
 
-   VxWorks only supports setting :const:`RLIMIT_NOFILE`.
+   VxWorks chỉ hỗ trợ thiết lập :const:`RLIMIT_NOFILE`.
 
    .. audit-event:: resource.setrlimit resource,limits resource.setrlimit
 
 
 .. function:: prlimit(pid, resource[, limits])
 
-   Combines :func:`setrlimit` and :func:`getrlimit` in one function and
-   supports to get and set the resources limits of an arbitrary process. If
-   *pid* is 0, then the call applies to the current process. *resource* and
-   *limits* have the same meaning as in :func:`setrlimit`, except that
-   *limits* is optional.
+   Kết hợp :func:`setrlimit` và :func:`getrlimit` trong một hàm, đồng thời hỗ trợ lấy và thiết lập giới hạn tài nguyên của một tiến trình bất kỳ. Nếu *pid* bằng 0, lệnh gọi sẽ áp dụng cho tiến trình hiện tại. *resource* và *limits* có cùng ý nghĩa như trong :func:`setrlimit`, ngoại trừ việc *limits* là tùy chọn.
 
-   When *limits* is not given the function returns the *resource* limit of the
-   process *pid*. When *limits* is given the *resource* limit of the process is
-   set and the former resource limit is returned.
+   Khi không cung cấp *limits*, hàm trả về giới hạn *resource* của tiến trình *pid*. Khi cung cấp *limits*, giới hạn *resource* của tiến trình sẽ được thiết lập và giới hạn tài nguyên trước đó được trả về.
 
-   Raises :exc:`ProcessLookupError` when *pid* can't be found and
-   :exc:`PermissionError` when the user doesn't have ``CAP_SYS_RESOURCE`` for
-   the process.
+   Ném :exc:`ProcessLookupError` khi không tìm thấy *pid* và
+   :exc:`PermissionError` khi người dùng không có ``CAP_SYS_RESOURCE`` cho tiến trình.
 
    .. audit-event:: resource.prlimit pid,resource,limits resource.prlimit
 
@@ -105,89 +76,77 @@ this module for those platforms.
    .. versionadded:: 3.4
 
 
-These symbols define resources whose consumption can be controlled using the
-:func:`setrlimit` and :func:`getrlimit` functions described below. The values of
-these symbols are exactly the constants used by C programs.
+Các ký hiệu này xác định những tài nguyên mà mức tiêu thụ có thể được kiểm soát bằng
+các hàm :func:`setrlimit` và :func:`getrlimit` được mô tả bên dưới. Giá trị của các ký hiệu này chính xác là những hằng số được các chương trình C sử dụng.
 
-The Unix man page for :manpage:`getrlimit(2)` lists the available resources.
-Note that not all systems use the same symbol or same value to denote the same
-resource.  This module does not attempt to mask platform differences --- symbols
-not defined for a platform will not be available from this module on that
-platform.
+Trang man Unix về :manpage:`getrlimit(2)` liệt kê các tài nguyên hiện có. Lưu ý rằng không phải tất cả các hệ thống đều sử dụng cùng một ký hiệu hoặc cùng một giá trị để biểu thị cùng một tài nguyên. Mô-đun này không cố gắng che giấu những khác biệt giữa các nền tảng --- các ký hiệu không được định nghĩa cho một nền tảng sẽ không khả dụng từ mô-đun này trên nền tảng đó.
 
 
 .. data:: RLIMIT_CORE
 
-   The maximum size (in bytes) of a core file that the current process can create.
-   This may result in the creation of a partial core file if a larger core would be
-   required to contain the entire process image.
+   Kích thước tối đa (tính bằng byte) của tệp core mà tiến trình hiện tại có thể tạo. Điều này có thể dẫn đến việc tạo một tệp core không đầy đủ nếu cần một tệp core lớn hơn để chứa toàn bộ ảnh tiến trình.
 
 
 .. data:: RLIMIT_CPU
 
-   The maximum amount of processor time (in seconds) that a process can use. If
-   this limit is exceeded, a :const:`~signal.SIGXCPU` signal is sent to the process. (See
-   the :mod:`signal` module documentation for information about how to catch this
-   signal and do something useful, e.g. flush open files to disk.)
+   Lượng thời gian xử lý tối đa (tính bằng giây) mà một tiến trình có thể sử dụng. Nếu vượt quá giới hạn này, một tín hiệu :const:`~signal.SIGXCPU` sẽ được gửi đến tiến trình. (Xem tài liệu về mô-đun :mod:`signal` để biết cách bắt tín hiệu này và thực hiện điều hữu ích, chẳng hạn như flush các tệp đang mở xuống đĩa.)
 
 
 .. data:: RLIMIT_FSIZE
 
-   The maximum size of a file which the process may create.
+   Kích thước tối đa của một tệp mà tiến trình có thể tạo.
 
 
 .. data:: RLIMIT_DATA
 
-   The maximum size (in bytes) of the process's heap.
+   Kích thước tối đa (tính bằng byte) của heap của tiến trình.
 
 
 .. data:: RLIMIT_STACK
 
-   The maximum size (in bytes) of the call stack for the current process.  This only
-   affects the stack of the main thread in a multi-threaded process.
+   Kích thước tối đa (tính bằng byte) của call stack của tiến trình hiện tại. Điều này chỉ ảnh hưởng đến stack của luồng chính trong một tiến trình đa luồng.
 
 
 .. data:: RLIMIT_RSS
 
-   The maximum resident set size that should be made available to the process.
+   Kích thước tập thường trú tối đa nên được cung cấp cho tiến trình.
 
 
 .. data:: RLIMIT_NPROC
 
-   The maximum number of processes the current process may create.
+   Số lượng tiến trình tối đa mà tiến trình hiện tại có thể tạo.
 
 
 .. data:: RLIMIT_NOFILE
 
-   The maximum number of open file descriptors for the current process.
+   Số lượng file descriptor đang mở tối đa của tiến trình hiện tại.
 
 
 .. data:: RLIMIT_OFILE
 
-   The BSD name for :const:`RLIMIT_NOFILE`.
+   Tên BSD của :const:`RLIMIT_NOFILE`.
 
 
 .. data:: RLIMIT_MEMLOCK
 
-   The maximum address space which may be locked in memory.
+   Không gian địa chỉ tối đa có thể được khóa trong bộ nhớ.
 
 
 .. data:: RLIMIT_VMEM
 
-   The largest area of mapped memory which the process may occupy.
-   Usually an alias of :const:`RLIMIT_AS`.
+   Vùng bộ nhớ được ánh xạ lớn nhất mà tiến trình có thể chiếm dụng. Thường là bí danh của :const:`RLIMIT_AS`.
 
    .. availability:: Solaris, FreeBSD, NetBSD.
 
 
 .. data:: RLIMIT_AS
 
-   The maximum area (in bytes) of address space which may be taken by the process.
+   Vùng tối đa (tính bằng byte) của không gian địa chỉ mà tiến trình có thể sử dụng.
 
 
 .. data:: RLIMIT_MSGQUEUE
 
-   The number of bytes that can be allocated for POSIX message queues.
+   Số byte có thể được cấp phát cho các hàng đợi thông báo POSIX.
 
    .. availability:: Linux >= 2.6.8.
 
@@ -196,7 +155,7 @@ platform.
 
 .. data:: RLIMIT_NICE
 
-   The ceiling for the process's nice level (calculated as 20 - rlim_cur).
+   Mức trần của mức nice của tiến trình (được tính là 20 - rlim_cur).
 
    .. availability:: Linux >= 2.6.12.
 
@@ -205,7 +164,7 @@ platform.
 
 .. data:: RLIMIT_RTPRIO
 
-   The ceiling of the real-time priority.
+   Mức trần của độ ưu tiên real-time.
 
    .. availability:: Linux >= 2.6.12.
 
@@ -214,8 +173,7 @@ platform.
 
 .. data:: RLIMIT_RTTIME
 
-   The time limit (in microseconds) on CPU time that a process can spend
-   under real-time scheduling without making a blocking syscall.
+   Giới hạn thời gian (tính bằng micro giây) đối với thời gian CPU mà một tiến trình có thể sử dụng khi lập lịch real-time mà không thực hiện syscall chặn.
 
    .. availability:: Linux >= 2.6.25.
 
@@ -224,7 +182,7 @@ platform.
 
 .. data:: RLIMIT_SIGPENDING
 
-   The number of signals which the process may queue.
+   Số lượng tín hiệu mà tiến trình có thể xếp hàng.
 
    .. availability:: Linux >= 2.6.8.
 
@@ -233,9 +191,7 @@ platform.
 
 .. data:: RLIMIT_SBSIZE
 
-   The maximum size (in bytes) of socket buffer usage for this user.
-   This limits the amount of network memory, and hence the amount of mbufs,
-   that this user may hold at any time.
+   Kích thước tối đa (tính bằng byte) của bộ đệm socket mà người dùng này có thể sử dụng. Điều này giới hạn lượng bộ nhớ mạng, và do đó giới hạn số lượng mbuf mà người dùng này có thể giữ tại bất kỳ thời điểm nào.
 
    .. availability:: FreeBSD, NetBSD.
 
@@ -244,12 +200,7 @@ platform.
 
 .. data:: RLIMIT_SWAP
 
-   The maximum size (in bytes) of the swap space that may be reserved or
-   used by all of this user id's processes.
-   This limit is enforced only if bit 1 of the vm.overcommit sysctl is set.
-   Please see
-   `tuning(7) <https://man.freebsd.org/cgi/man.cgi?query=tuning&sektion=7>`__
-   for a complete description of this sysctl.
+   Kích thước tối đa (tính bằng byte) của không gian swap có thể được dành riêng hoặc sử dụng bởi tất cả các tiến trình thuộc ID người dùng này. Giới hạn này chỉ được áp dụng nếu bit 1 của sysctl vm.overcommit được đặt. Vui lòng xem `tuning(7) <https://man.freebsd.org/cgi/man.cgi?query=tuning&sektion=7>`__ để biết mô tả đầy đủ về sysctl này.
 
    .. availability:: FreeBSD >= 8.
 
@@ -258,7 +209,7 @@ platform.
 
 .. data:: RLIMIT_NPTS
 
-   The maximum number of pseudo-terminals created by this user id.
+   Số lượng pseudo-terminal tối đa mà ID người dùng này có thể tạo.
 
    .. availability:: FreeBSD >= 8.
 
@@ -267,124 +218,106 @@ platform.
 
 .. data:: RLIMIT_KQUEUES
 
-   The maximum number of kqueues this user id is allowed to create.
+   Số lượng kqueue tối đa mà ID người dùng này được phép tạo.
 
    .. availability:: FreeBSD >= 11.
 
    .. versionadded:: 3.10
 
 
-Resource Usage
---------------
+Mức sử dụng tài nguyên
+----------------------
 
-These functions are used to retrieve resource usage information:
+Các hàm này được dùng để truy xuất thông tin về mức sử dụng tài nguyên:
 
 
 .. function:: getrusage(who)
 
-   This function returns an object that describes the resources consumed by either
-   the current process or its children, as specified by the *who* parameter.  The
-   *who* parameter should be specified using one of the :const:`!RUSAGE_\*`
-   constants described below.
+   Hàm này trả về một đối tượng mô tả các tài nguyên được tiến trình hiện tại hoặc các tiến trình con của nó sử dụng, như được chỉ định bởi tham số *who*. Tham số *who* phải được chỉ định bằng một trong các hằng số :const:`!RUSAGE_\*` được mô tả bên dưới.
 
-   A simple example::
+   Một ví dụ đơn giản::
 
       from resource import *
       import time
 
-      # a non CPU-bound task
+      # một tác vụ không bị giới hạn bởi CPU
       time.sleep(3)
       print(getrusage(RUSAGE_SELF))
 
-      # a CPU-bound task
+      # một tác vụ bị giới hạn bởi CPU
       for i in range(10 ** 8):
          _ = 1 + 1
       print(getrusage(RUSAGE_SELF))
 
-   The fields of the return value each describe how a particular system resource
-   has been used, e.g. amount of time spent running in user mode or number of times
-   the process was swapped out of main memory. Some values are dependent on the
-   clock tick interval, e.g. the amount of memory the process is using.
+   Mỗi trường trong giá trị trả về mô tả cách một tài nguyên hệ thống cụ thể được sử dụng, chẳng hạn như lượng thời gian chạy ở chế độ người dùng hoặc số lần tiến trình bị hoán đổi khỏi bộ nhớ chính. Một số giá trị phụ thuộc vào khoảng thời gian của nhịp đồng hồ, chẳng hạn như lượng bộ nhớ mà tiến trình đang sử dụng.
 
-   For backward compatibility, the return value is also accessible as a tuple of 16
-   elements.
+   Để đảm bảo khả năng tương thích ngược, giá trị trả về cũng có thể được truy cập dưới dạng một tuple gồm 16 phần tử.
 
-   The fields :attr:`!ru_utime` and :attr:`!ru_stime` of the return value are
-   floating-point values representing the amount of time spent executing in user
-   mode and the amount of time spent executing in system mode, respectively. The
-   remaining values are integers. Consult the :manpage:`getrusage(2)` man page for
-   detailed information about these values. A brief summary is presented here:
+   Các trường :attr:`!ru_utime` và :attr:`!ru_stime` của giá trị trả về là các giá trị dấu phẩy động, lần lượt biểu thị lượng thời gian thực thi ở chế độ người dùng và lượng thời gian thực thi ở chế độ hệ thống. Các giá trị còn lại là số nguyên. Hãy tham khảo trang hướng dẫn :manpage:`getrusage(2)` để biết thông tin chi tiết về các giá trị này. Dưới đây là phần tóm tắt ngắn gọn:
 
-   +--------+----------------------+---------------------------------------+
-   | Index  | Field                | Resource                              |
-   +========+======================+=======================================+
-   | ``0``  | :attr:`!ru_utime`    | time in user mode (float seconds)     |
-   +--------+----------------------+---------------------------------------+
-   | ``1``  | :attr:`!ru_stime`    | time in system mode (float seconds)   |
-   +--------+----------------------+---------------------------------------+
-   | ``2``  | :attr:`!ru_maxrss`   | maximum resident set size             |
-   +--------+----------------------+---------------------------------------+
-   | ``3``  | :attr:`!ru_ixrss`    | shared memory size                    |
-   +--------+----------------------+---------------------------------------+
-   | ``4``  | :attr:`!ru_idrss`    | unshared memory size                  |
-   +--------+----------------------+---------------------------------------+
-   | ``5``  | :attr:`!ru_isrss`    | unshared stack size                   |
-   +--------+----------------------+---------------------------------------+
-   | ``6``  | :attr:`!ru_minflt`   | page faults not requiring I/O         |
-   +--------+----------------------+---------------------------------------+
-   | ``7``  | :attr:`!ru_majflt`   | page faults requiring I/O             |
-   +--------+----------------------+---------------------------------------+
-   | ``8``  | :attr:`!ru_nswap`    | number of swap outs                   |
-   +--------+----------------------+---------------------------------------+
-   | ``9``  | :attr:`!ru_inblock`  | block input operations                |
-   +--------+----------------------+---------------------------------------+
-   | ``10`` | :attr:`!ru_oublock`  | block output operations               |
-   +--------+----------------------+---------------------------------------+
-   | ``11`` | :attr:`!ru_msgsnd`   | messages sent                         |
-   +--------+----------------------+---------------------------------------+
-   | ``12`` | :attr:`!ru_msgrcv`   | messages received                     |
-   +--------+----------------------+---------------------------------------+
-   | ``13`` | :attr:`!ru_nsignals` | signals received                      |
-   +--------+----------------------+---------------------------------------+
-   | ``14`` | :attr:`!ru_nvcsw`    | voluntary context switches            |
-   +--------+----------------------+---------------------------------------+
-   | ``15`` | :attr:`!ru_nivcsw`   | involuntary context switches          |
-   +--------+----------------------+---------------------------------------+
+   +---------+----------------------+---------------------------------------------------+
+   | Chỉ mục | Trường               | Tài nguyên                                        |
+   +=========+======================+===================================================+
+   | ``0``   | :attr:`!ru_utime`    | thời gian ở chế độ người dùng (giây dạng số thực) |
+   +---------+----------------------+---------------------------------------------------+
+   | ``1``   | :attr:`!ru_stime`    | thời gian ở chế độ hệ thống (giây dạng số thực)   |
+   +---------+----------------------+---------------------------------------------------+
+   | ``2``   | :attr:`!ru_maxrss`   | kích thước tối đa của tập cư trú                  |
+   +---------+----------------------+---------------------------------------------------+
+   | ``3``   | :attr:`!ru_ixrss`    | kích thước bộ nhớ dùng chung                      |
+   +---------+----------------------+---------------------------------------------------+
+   | ``4``   | :attr:`!ru_idrss`    | kích thước bộ nhớ không chia sẻ                   |
+   +---------+----------------------+---------------------------------------------------+
+   | ``5``   | :attr:`!ru_isrss`    | kích thước ngăn xếp không chia sẻ                 |
+   +---------+----------------------+---------------------------------------------------+
+   | ``6``   | :attr:`!ru_minflt`   | lỗi trang không yêu cầu I/O                       |
+   +---------+----------------------+---------------------------------------------------+
+   | ``7``   | :attr:`!ru_majflt`   | lỗi trang yêu cầu I/O                             |
+   +---------+----------------------+---------------------------------------------------+
+   | ``8``   | :attr:`!ru_nswap`    | số lần đưa ra bộ nhớ hoán đổi                     |
+   +---------+----------------------+---------------------------------------------------+
+   | ``9``   | :attr:`!ru_inblock`  | các thao tác nhập theo khối                       |
+   +---------+----------------------+---------------------------------------------------+
+   | ``10``  | :attr:`!ru_oublock`  | các thao tác xuất theo khối                       |
+   +---------+----------------------+---------------------------------------------------+
+   | ``11``  | :attr:`!ru_msgsnd`   | tin nhắn đã gửi                                   |
+   +---------+----------------------+---------------------------------------------------+
+   | ``12``  | :attr:`!ru_msgrcv`   | tin nhắn đã nhận                                  |
+   +---------+----------------------+---------------------------------------------------+
+   | ``13``  | :attr:`!ru_nsignals` | tín hiệu đã nhận                                  |
+   +---------+----------------------+---------------------------------------------------+
+   | ``14``  | :attr:`!ru_nvcsw`    | chuyển đổi ngữ cảnh tự nguyện                     |
+   +---------+----------------------+---------------------------------------------------+
+   | ``15``  | :attr:`!ru_nivcsw`   | chuyển đổi ngữ cảnh không tự nguyện               |
+   +---------+----------------------+---------------------------------------------------+
 
-   This function will raise a :exc:`ValueError` if an invalid *who* parameter is
-   specified. It may also raise :exc:`error` exception in unusual circumstances.
+   Hàm này sẽ phát sinh :exc:`ValueError` nếu chỉ định tham số *who* không hợp lệ. Hàm cũng có thể phát sinh ngoại lệ :exc:`error` trong những trường hợp bất thường.
 
 
 .. function:: getpagesize()
 
-   Returns the number of bytes in a system page. (This need not be the same as the
-   hardware page size.)
+   Trả về số byte trong một trang hệ thống. (Kích thước này không nhất thiết giống với kích thước trang phần cứng.)
 
-The following :const:`!RUSAGE_\*` symbols are passed to the :func:`getrusage`
-function to specify which processes information should be provided for.
+Các ký hiệu :const:`!RUSAGE_\*` sau được truyền vào hàm :func:`getrusage` để chỉ định thông tin của những tiến trình nào cần được cung cấp.
 
 
 .. data:: RUSAGE_SELF
 
-   Pass to :func:`getrusage` to request resources consumed by the calling
-   process, which is the sum of resources used by all threads in the process.
+   Truyền :func:`getrusage` vào để yêu cầu các tài nguyên mà tiến trình gọi đã sử dụng, tức là tổng tài nguyên được tất cả các thread trong tiến trình sử dụng.
 
 
 .. data:: RUSAGE_CHILDREN
 
-   Pass to :func:`getrusage` to request resources consumed by child processes
-   of the calling process which have been terminated and waited for.
+   Truyền :func:`getrusage` vào để yêu cầu các tài nguyên mà những tiến trình con của tiến trình gọi đã sử dụng, với điều kiện các tiến trình đó đã kết thúc và được chờ.
 
 
 .. data:: RUSAGE_BOTH
 
-   Pass to :func:`getrusage` to request resources consumed by both the current
-   process and child processes.  May not be available on all systems.
+   Truyền :func:`getrusage` vào để yêu cầu các tài nguyên mà cả tiến trình hiện tại và các tiến trình con đã sử dụng. Có thể không khả dụng trên mọi hệ thống.
 
 
 .. data:: RUSAGE_THREAD
 
-   Pass to :func:`getrusage` to request resources consumed by the current
-   thread.  May not be available on all systems.
+   Truyền :func:`getrusage` vào để yêu cầu các tài nguyên mà thread hiện tại đã sử dụng. Có thể không khả dụng trên mọi hệ thống.
 
    .. versionadded:: 3.2

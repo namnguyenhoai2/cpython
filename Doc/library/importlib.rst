@@ -1,232 +1,169 @@
-:mod:`!importlib` --- The implementation of :keyword:`!import`
-==============================================================
+:mod:`!importlib` --- Việc triển khai :keyword:`!import`
+========================================================
 
 .. module:: importlib
-   :synopsis: The implementation of the import machinery.
+   :synopsis: Việc triển khai cơ chế import.
 
 .. moduleauthor:: Brett Cannon <brett@python.org>
 .. sectionauthor:: Brett Cannon <brett@python.org>
 
 .. versionadded:: 3.1
 
-**Source code:** :source:`Lib/importlib/__init__.py`
+**Mã nguồn:** :source:`Lib/importlib/__init__.py`
 
 --------------
 
 
-Introduction
-------------
+Giới thiệu
+----------
 
-The purpose of the :mod:`!importlib` package is three-fold.
+Mục đích của gói :mod:`!importlib` có ba phần.
 
-One is to provide the
-implementation of the :keyword:`import` statement (and thus, by extension, the
-:func:`__import__` function) in Python source code. This provides an
-implementation of :keyword:`!import` which is portable to any Python
-interpreter. This also provides an implementation which is easier to
-comprehend than one implemented in a programming language other than Python.
+Một mục đích là cung cấp triển khai câu lệnh :keyword:`import` (và do đó, mở rộng ra, triển khai
+hàm :func:`__import__`) trong mã nguồn Python. Điều này cung cấp một triển khai :keyword:`!import` có thể chuyển đổi giữa mọi trình thông dịch Python. Đồng thời, đây cũng là một triển khai dễ hiểu hơn so với triển khai bằng một ngôn ngữ lập trình khác ngoài Python.
 
-Two, the components to implement :keyword:`import` are exposed in this
-package, making it easier for users to create their own custom objects (known
-generically as an :term:`importer`) to participate in the import process.
+Thứ hai, các thành phần cần triển khai :keyword:`import` được cung cấp trong gói này, giúp người dùng dễ dàng tạo các đối tượng tùy chỉnh của riêng mình (thường được gọi là :term:`importer`) để tham gia vào quá trình import.
 
-Three, the package contains modules exposing additional functionality for
-managing aspects of Python packages:
+Thứ ba, gói này chứa các mô-đun cung cấp thêm chức năng để quản lý các khía cạnh của các gói Python:
 
-* :mod:`importlib.metadata` presents access to metadata from third-party
-  distributions.
-* :mod:`importlib.resources` provides routines for accessing non-code
-  "resources" from Python packages.
+* :mod:`importlib.metadata` cung cấp quyền truy cập vào siêu dữ liệu từ các distribution bên thứ ba.
+* :mod:`importlib.resources` cung cấp các routine để truy cập vào "resource" không phải mã từ các gói Python.
 
 .. seealso::
 
     :ref:`import`
-        The language reference for the :keyword:`import` statement.
+        Tài liệu tham chiếu ngôn ngữ cho câu lệnh :keyword:`import`.
 
-    `Packages specification <https://www.python.org/doc/essays/packages/>`__
-        Original specification of packages. Some semantics have changed since
-        the writing of this document (e.g. redirecting based on ``None``
-        in :data:`sys.modules`).
+    `Đặc tả các gói Python <https://www.python.org/doc/essays/packages/>`__
+        Đặc tả ban đầu của các gói. Một số ngữ nghĩa đã thay đổi kể từ khi tài liệu này được soạn thảo (ví dụ: chuyển hướng dựa trên ``None`` trong :data:`sys.modules`).
 
-    The :func:`.__import__` function
-        The :keyword:`import` statement is syntactic sugar for this function.
+    Hàm :func:`.__import__`
+        Câu lệnh :keyword:`import` là cú pháp rút gọn cho hàm này.
 
     :ref:`sys-path-init`
-        The initialization of :data:`sys.path`.
+        Việc khởi tạo :data:`sys.path`.
 
     :pep:`235`
-        Import on Case-Insensitive Platforms
+        Import trên các nền tảng không phân biệt chữ hoa chữ thường
 
     :pep:`263`
-        Defining Python Source Code Encodings
+        Xác định mã hóa mã nguồn Python
 
     :pep:`302`
-        New Import Hooks
+        Các import hook mới
 
     :pep:`328`
-        Imports: Multi-Line and Absolute/Relative
+        Import: Nhiều dòng và Tuyệt đối/Tương đối
 
     :pep:`366`
-        Main module explicit relative imports
+        Nhập tương đối rõ ràng trong module chính
 
     :pep:`420`
-        Implicit namespace packages
+        Các gói namespace ngầm định
 
     :pep:`451`
-        A ModuleSpec Type for the Import System
+        Kiểu ModuleSpec cho hệ thống import
 
     :pep:`488`
-        Elimination of PYO files
+        Loại bỏ các tệp PYO
 
     :pep:`489`
-        Multi-phase extension module initialization
+        Khởi tạo module mở rộng theo nhiều giai đoạn
 
     :pep:`552`
-        Deterministic pycs
+        Các tệp pyc xác định
 
     :pep:`3120`
-        Using UTF-8 as the Default Source Encoding
+        Sử dụng UTF-8 làm mã hóa nguồn mặc định
 
     :pep:`3147`
-        PYC Repository Directories
+        Các thư mục của PYC Repository
 
 
-Functions
----------
+Hàm
+---
 
 .. function:: __import__(name, globals=None, locals=None, fromlist=(), level=0)
 
-    An implementation of the built-in :func:`__import__` function.
+    Một cách triển khai hàm :func:`__import__` tích hợp sẵn.
 
     .. note::
-       Programmatic importing of modules should use :func:`import_module`
-       instead of this function.
+       Việc import module bằng lập trình nên sử dụng :func:`import_module` thay vì hàm này.
 
 .. function:: import_module(name, package=None)
 
-    Import a module. The *name* argument specifies what module to
-    import in absolute or relative terms
-    (e.g. either ``pkg.mod`` or ``..mod``). If the name is
-    specified in relative terms, then the *package* argument must be set to
-    the name of the package which is to act as the anchor for resolving the
-    package name (e.g. ``import_module('..mod', 'pkg.subpkg')`` will import
-    ``pkg.mod``).
+    Import một module. Đối số *name* chỉ định module cần import theo dạng tuyệt đối hoặc tương đối (ví dụ: ``pkg.mod`` hoặc ``..mod``). Nếu tên được chỉ định theo dạng tương đối, đối số *package* phải được đặt thành tên của package dùng làm mốc để phân giải tên package (ví dụ, ``import_module('..mod', 'pkg.subpkg')`` sẽ import ``pkg.mod``).
 
-    The :func:`import_module` function acts as a simplifying wrapper around
-    :func:`importlib.__import__`. This means all semantics of the function are
-    derived from :func:`importlib.__import__`. The most important difference
-    between these two functions is that :func:`import_module` returns the
-    specified package or module (e.g. ``pkg.mod``), while :func:`__import__`
-    returns the top-level package or module (e.g. ``pkg``).
+    Hàm :func:`import_module` hoạt động như một wrapper đơn giản hóa cho
+    :func:`importlib.__import__`. Điều này có nghĩa là toàn bộ ngữ nghĩa của hàm được kế thừa từ :func:`importlib.__import__`. Điểm khác biệt quan trọng nhất giữa hai hàm này là :func:`import_module` trả về package hoặc module được chỉ định (ví dụ: ``pkg.mod``), trong khi :func:`__import__` trả về package hoặc module cấp cao nhất (ví dụ: ``pkg``).
 
-    If you are dynamically importing a module that was created since the
-    interpreter began execution (e.g., created a Python source file), you may
-    need to call :func:`invalidate_caches` in order for the new module to be
-    noticed by the import system.
+    Nếu bạn đang import động một module được tạo sau khi interpreter bắt đầu thực thi (ví dụ: tạo một tệp mã nguồn Python), bạn có thể cần gọi :func:`invalidate_caches` để hệ thống import nhận biết module mới.
 
     .. versionchanged:: 3.3
-       Parent packages are automatically imported.
+       Các package cha được tự động import.
 
 .. function:: invalidate_caches()
 
-   Invalidate the internal caches of finders stored at
-   :data:`sys.meta_path`. If a finder implements ``invalidate_caches()`` then it
-   will be called to perform the invalidation.  This function should be called
-   if any modules are created/installed while your program is running to
-   guarantee all finders will notice the new module's existence.
+   Vô hiệu hóa các bộ nhớ đệm nội bộ của các finder được lưu tại
+   :data:`sys.meta_path`. Nếu một finder triển khai ``invalidate_caches()`` thì nó sẽ được gọi để thực hiện việc vô hiệu hóa. Hàm này nên được gọi nếu có module được tạo/cài đặt trong khi chương trình đang chạy, nhằm đảm bảo mọi finder đều nhận biết sự tồn tại của module mới.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.10
-      Namespace packages created/installed in a different :data:`sys.path`
-      location after the same namespace was already imported are noticed.
+      Các namespace package được tạo/cài đặt tại một vị trí :data:`sys.path` khác sau khi cùng namespace đã được import sẽ được nhận biết.
 
 .. function:: reload(module)
 
-   Reload a previously imported *module*.  The argument must be a module object,
-   so it must have been successfully imported before.  This is useful if you
-   have edited the module source file using an external editor and want to try
-   out the new version without leaving the Python interpreter.  The return value
-   is the module object (which can be different if re-importing causes a
-   different object to be placed in :data:`sys.modules`).
+   Tải lại *module* đã được import trước đó. Đối số phải là một đối tượng module, vì vậy module đó phải được import thành công trước đó. Điều này hữu ích nếu bạn đã chỉnh sửa tệp mã nguồn của module bằng trình soạn thảo bên ngoài và muốn thử phiên bản mới mà không cần thoát khỏi Python interpreter. Giá trị trả về là đối tượng module (có thể khác nếu việc import lại khiến một đối tượng khác được đặt vào :data:`sys.modules`).
 
-   When :func:`reload` is executed:
+   Khi :func:`reload` được thực thi:
 
-   * Python module's code is recompiled and the module-level code re-executed,
-     defining a new set of objects which are bound to names in the module's
-     dictionary by reusing the :term:`loader` which originally loaded the
-     module.  The ``init`` function of extension modules is not called a second
-     time.
+   * Mã của module Python được biên dịch lại và mã cấp module được thực thi lại, tạo ra một tập đối tượng mới được liên kết với các tên trong dictionary của module bằng cách sử dụng lại :term:`loader` đã tải module ban đầu. Hàm ``init`` của các extension module không được gọi lần thứ hai.
 
-   * As with all other objects in Python the old objects are only reclaimed
-     after their reference counts drop to zero.
+   * Cũng như mọi đối tượng khác trong Python, các đối tượng cũ chỉ được thu hồi sau khi số lượng tham chiếu của chúng giảm xuống bằng không.
 
-   * The names in the module namespace are updated to point to any new or
-     changed objects.
+   * Các tên trong namespace của module được cập nhật để trỏ đến mọi đối tượng mới hoặc đã thay đổi.
 
-   * Other references to the old objects (such as names external to the module) are
-     not rebound to refer to the new objects and must be updated in each namespace
-     where they occur if that is desired.
+   * Các tham chiếu khác đến những đối tượng cũ (chẳng hạn như các tên bên ngoài module) không được liên kết lại để trỏ đến các đối tượng mới và phải được cập nhật trong từng namespace nơi chúng xuất hiện nếu muốn như vậy.
 
-   There are a number of other caveats:
+   Có một số điểm cần lưu ý khác:
 
-   When a module is reloaded, its dictionary (containing the module's global
-   variables) is retained.  Redefinitions of names will override the old
-   definitions, so this is generally not a problem.  If the new version of a
-   module does not define a name that was defined by the old version, the old
-   definition remains.  This feature can be used to the module's advantage if it
-   maintains a global table or cache of objects --- with a :keyword:`try`
-   statement it can test for the table's presence and skip its initialization if
-   desired::
+   Khi một module được tải lại, dictionary của module (chứa các biến toàn cục của module) được giữ lại. Việc định nghĩa lại các tên sẽ ghi đè các định nghĩa cũ, vì vậy nhìn chung đây không phải là vấn đề. Nếu phiên bản mới của module không định nghĩa một tên đã được định nghĩa trong phiên bản cũ, định nghĩa cũ vẫn được giữ lại. Tính năng này có thể được tận dụng nếu module duy trì một bảng hoặc cache toàn cục của các đối tượng --- với một câu lệnh :keyword:`try`, module có thể kiểm tra sự tồn tại của bảng và bỏ qua việc khởi tạo nếu muốn.::
 
       try:
           cache
       except NameError:
           cache = {}
 
-   It is generally not very useful to reload built-in or dynamically loaded
-   modules.  Reloading :mod:`sys`, :mod:`__main__`, :mod:`builtins` and other
-   key modules is not recommended.  In many cases extension modules are not
-   designed to be initialized more than once, and may fail in arbitrary ways
-   when reloaded.
+   Nhìn chung, việc tải lại các module tích hợp sẵn hoặc được tải động không mang lại nhiều ích lợi. Không nên tải lại :mod:`sys`, :mod:`__main__`, :mod:`builtins` và các module cốt lõi khác. Trong nhiều trường hợp, các extension module không được thiết kế để khởi tạo nhiều hơn một lần và có thể gặp lỗi theo những cách không thể dự đoán khi được tải lại.
 
-   If a module imports objects from another module using :keyword:`from` ...
-   :keyword:`import` ..., calling :func:`reload` for the other module does not
-   redefine the objects imported from it --- one way around this is to
-   re-execute the :keyword:`!from` statement, another is to use :keyword:`!import`
-   and qualified names (*module.name*) instead.
+   Nếu một module import các đối tượng từ module khác bằng :keyword:`from` ...
+   :keyword:`import` ..., việc gọi :func:`reload` cho module kia không định nghĩa lại các đối tượng được import từ đó --- một cách để khắc phục là thực thi lại câu lệnh :keyword:`!from`, cách khác là sử dụng :keyword:`!import` và các tên đủ điều kiện (*module.name*) thay thế.
 
-   If a module instantiates instances of a class, reloading the module that
-   defines the class does not affect the method definitions of the instances ---
-   they continue to use the old class definition.  The same is true for derived
-   classes.
+   Nếu một module khởi tạo các instance của một class, việc tải lại module định nghĩa class đó không ảnh hưởng đến các định nghĩa phương thức của các instance --- chúng tiếp tục sử dụng định nghĩa class cũ. Điều tương tự cũng đúng với các class dẫn xuất.
 
    .. versionadded:: 3.4
    .. versionchanged:: 3.7
        :exc:`ModuleNotFoundError` is raised when the module being reloaded lacks
-       a :class:`~importlib.machinery.ModuleSpec`.
+       một :class:`~importlib.machinery.ModuleSpec`.
 
    .. warning::
-      This function is not thread-safe. Calling it from multiple threads can result
-      in unexpected behavior. It's recommended to use the :class:`threading.Lock`
-      or other synchronization primitives for thread-safe module reloading.
+      Hàm này không an toàn khi sử dụng trong nhiều thread. Việc gọi hàm này từ nhiều thread có thể dẫn đến hành vi không mong muốn. Bạn nên sử dụng :class:`threading.Lock` hoặc các primitive đồng bộ hóa khác để tải lại module một cách an toàn khi sử dụng trong nhiều thread.
 
-:mod:`!importlib.abc` -- Abstract base classes related to import
-----------------------------------------------------------------
+:mod:`!importlib.abc` -- Các abstract base class liên quan đến import
+---------------------------------------------------------------------
 
 .. module:: importlib.abc
-    :synopsis: Abstract base classes related to import
+    :synopsis: Các abstract base class liên quan đến import
 
-**Source code:** :source:`Lib/importlib/abc.py`
+**Mã nguồn:** :source:`Lib/importlib/abc.py`
 
 --------------
 
 
-The :mod:`!importlib.abc` module contains all of the core abstract base classes
-used by :keyword:`import`. Some subclasses of the core abstract base classes
-are also provided to help in implementing the core ABCs.
+Mô-đun :mod:`!importlib.abc` chứa tất cả các abstract base class cốt lõi được :keyword:`import` sử dụng. Mô-đun cũng cung cấp một số lớp con của các abstract base class cốt lõi để hỗ trợ việc triển khai các ABC cốt lõi.
 
-ABC hierarchy::
+Cấu trúc phân cấp ABC::
 
     object
      +-- MetaPathFinder
@@ -241,99 +178,74 @@ ABC hierarchy::
 
 .. class:: MetaPathFinder
 
-   An abstract base class representing a :term:`meta path finder`.
+   Một abstract base class đại diện cho :term:`meta path finder`.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.10
-      No longer a subclass of :class:`!Finder`.
+      Không còn là lớp con của :class:`!Finder`.
 
    .. method:: find_spec(fullname, path, target=None)
 
-      An abstract method for finding a :term:`spec <module spec>` for
-      the specified module.  If this is a top-level import, *path* will
-      be ``None``.  Otherwise, this is a search for a subpackage or
-      module and *path* will be the value of :attr:`~module.__path__` from the
-      parent package. If a spec cannot be found, ``None`` is returned.
-      When passed in, ``target`` is a module object that the finder may
-      use to make a more educated guess about what spec to return.
-      :func:`importlib.util.spec_from_loader` may be useful for implementing
-      concrete ``MetaPathFinders``.
+      Một phương thức trừu tượng để tìm :term:`spec <module spec>` cho mô-đun được chỉ định. Nếu đây là một import cấp cao nhất, *path* sẽ là ``None``. Nếu không, đây là một tìm kiếm đối với subpackage hoặc mô-đun, và *path* sẽ là giá trị của :attr:`~module.__path__` từ package cha. Nếu không tìm thấy spec, ``None`` sẽ được trả về. Khi được truyền vào, ``target`` là một đối tượng mô-đun mà finder có thể sử dụng để đưa ra phán đoán chính xác hơn về spec cần trả về.
+      :func:`importlib.util.spec_from_loader` có thể hữu ích khi triển khai các ``MetaPathFinders`` cụ thể.
 
       .. versionadded:: 3.4
 
    .. method:: invalidate_caches()
 
-      An optional method which, when called, should invalidate any internal
-      cache used by the finder. Used by :func:`importlib.invalidate_caches`
-      when invalidating the caches of all finders on :data:`sys.meta_path`.
+      Một phương thức tùy chọn mà khi được gọi sẽ vô hiệu hóa mọi bộ nhớ đệm nội bộ được finder sử dụng. Được :func:`importlib.invalidate_caches` sử dụng khi vô hiệu hóa bộ nhớ đệm của tất cả finder trên :data:`sys.meta_path`.
 
       .. versionchanged:: 3.4
-         Returns ``None`` when called instead of :data:`NotImplemented`.
+         Trả về ``None`` khi được gọi thay vì :data:`NotImplemented`.
 
 
 .. class:: PathEntryFinder
 
-   An abstract base class representing a :term:`path entry finder`.  Though
-   it bears some similarities to :class:`MetaPathFinder`, ``PathEntryFinder``
-   is meant for use only within the path-based import subsystem provided
-   by :class:`importlib.machinery.PathFinder`.
+   Một lớp cơ sở trừu tượng đại diện cho một :term:`path entry finder`. Mặc dù có một số điểm tương đồng với :class:`MetaPathFinder`, ``PathEntryFinder`` chỉ được dùng trong subsystem import dựa trên đường dẫn do :class:`importlib.machinery.PathFinder` cung cấp.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.10
-      No longer a subclass of :class:`!Finder`.
+      Không còn là lớp con của :class:`!Finder`.
 
    .. method:: find_spec(fullname, target=None)
 
-      An abstract method for finding a :term:`spec <module spec>` for
-      the specified module.  The finder will search for the module only
-      within the :term:`path entry` to which it is assigned.  If a spec
-      cannot be found, ``None`` is returned.  When passed in, ``target``
-      is a module object that the finder may use to make a more educated
-      guess about what spec to return. :func:`importlib.util.spec_from_loader`
-      may be useful for implementing concrete ``PathEntryFinders``.
+      Một phương thức trừu tượng dùng để tìm :term:`spec <module spec>` cho mô-đun được chỉ định. Finder sẽ chỉ tìm kiếm mô-đun trong :term:`path entry` mà nó được gán vào. Nếu không tìm thấy spec, ``None`` sẽ được trả về. Khi được truyền vào, ``target`` là một đối tượng mô-đun mà finder có thể sử dụng để đưa ra phỏng đoán chính xác hơn về spec cần trả về. :func:`importlib.util.spec_from_loader` có thể hữu ích khi triển khai các ``PathEntryFinders`` cụ thể.
 
       .. versionadded:: 3.4
 
    .. method:: invalidate_caches()
 
-      An optional method which, when called, should invalidate any internal
-      cache used by the finder. Used by
-      :meth:`importlib.machinery.PathFinder.invalidate_caches`
-      when invalidating the caches of all cached finders.
+      Một phương thức tùy chọn mà khi được gọi sẽ vô hiệu hóa mọi bộ nhớ đệm nội bộ được finder sử dụng. Được sử dụng bởi
+      :meth:`importlib.machinery.PathFinder.invalidate_caches` khi vô hiệu hóa bộ nhớ đệm của tất cả finder đã lưu trong bộ nhớ đệm.
 
 
 .. class:: Loader
 
-    An abstract base class for a :term:`loader`.
-    See :pep:`302` for the exact definition for a loader.
+    Một abstract base class cho :term:`loader`. Xem :pep:`302` để biết định nghĩa chính xác dành cho loader.
 
-    Loaders that wish to support resource reading should implement a
-    :meth:`!get_resource_reader` method as specified by
+    Các loader muốn hỗ trợ việc đọc resource nên triển khai một
+    phương thức :meth:`!get_resource_reader` như được quy định trong
     :class:`importlib.resources.abc.ResourceReader`.
 
     .. versionchanged:: 3.7
-       Introduced the optional :meth:`!get_resource_reader` method.
+       Đã giới thiệu phương thức :meth:`!get_resource_reader` tùy chọn.
 
     .. method:: create_module(spec)
 
-       A method that returns the module object to use when
-       importing a module.  This method may return ``None``,
-       indicating that default module creation semantics should take place.
+       Một phương thức trả về đối tượng module sẽ được sử dụng khi import một module. Phương thức này có thể trả về ``None``, cho biết các ngữ nghĩa tạo module mặc định sẽ được áp dụng.
 
        .. versionadded:: 3.4
 
        .. versionchanged:: 3.6
-          This method is no longer optional when
-          :meth:`exec_module` is defined.
+          Phương thức này không còn là tùy chọn khi
+          :meth:`exec_module` được định nghĩa.
 
     .. method:: exec_module(module)
 
-       An abstract method that executes the module in its own namespace
-       when a module is imported or reloaded.  The module should already
-       be initialized when :meth:`exec_module` is called.  When this method exists,
-       :meth:`create_module` must be defined.
+       Một phương thức trừu tượng thực thi module trong không gian tên riêng của module khi module được import hoặc tải lại. Module phải được khởi tạo trước khi gọi :meth:`exec_module`. Khi phương thức này tồn tại,
+       :meth:`create_module` phải được định nghĩa.
 
        .. versionadded:: 3.4
 
@@ -342,59 +254,42 @@ ABC hierarchy::
 
     .. method:: load_module(fullname)
 
-        A legacy method for loading a module.  If the module cannot be
-        loaded, :exc:`ImportError` is raised, otherwise the loaded module is
-        returned.
+        Một phương thức cũ dùng để tải module. Nếu không thể tải module, :exc:`ImportError` sẽ được phát sinh; nếu không, module đã tải sẽ được trả về.
 
-        If the requested module already exists in :data:`sys.modules`, that
-        module should be used and reloaded.
-        Otherwise the loader should create a new module and insert it into
-        :data:`sys.modules` before any loading begins, to prevent recursion
-        from the import.  If the loader inserted a module and the load fails, it
-        must be removed by the loader from :data:`sys.modules`; modules already
-        in :data:`sys.modules` before the loader began execution should be left
-        alone.
+        Nếu module được yêu cầu đã tồn tại trong :data:`sys.modules`, module đó phải được sử dụng và tải lại. Nếu không, loader phải tạo một module mới và chèn module đó vào
+        :data:`sys.modules` trước khi bắt đầu tải để ngăn việc import đệ quy. Nếu loader đã chèn một module nhưng quá trình tải thất bại, loader phải xóa module đó khỏi :data:`sys.modules`; các module đã có trong :data:`sys.modules` trước khi loader bắt đầu thực thi phải được giữ nguyên.
 
-        The loader should set several attributes on the module
-        (note that some of these attributes can change when a module is
-        reloaded):
+        Loader phải thiết lập một số thuộc tính trên module (lưu ý rằng một số thuộc tính có thể thay đổi khi module được tải lại):
 
         - :attr:`module.__name__`
         - :attr:`module.__file__`
-        - :attr:`module.__cached__` *(deprecated)*
+        - :attr:`module.__cached__` *(không dùng nữa)*
         - :attr:`module.__path__`
-        - :attr:`module.__package__` *(deprecated)*
-        - :attr:`module.__loader__` *(deprecated)*
+        - :attr:`module.__package__` *(không còn được khuyến nghị)*
+        - :attr:`module.__loader__` *(không còn được khuyến nghị)*
 
-        When :meth:`exec_module` is available then backwards-compatible
-        functionality is provided.
+        Khi :meth:`exec_module` khả dụng, chức năng tương thích ngược sẽ được cung cấp.
 
         .. versionchanged:: 3.4
-           Raise :exc:`ImportError` when called instead of
-           :exc:`NotImplementedError`.  Functionality provided when
-           :meth:`exec_module` is available.
+           Ném :exc:`ImportError` khi được gọi thay cho
+           :exc:`NotImplementedError`. Chức năng được cung cấp khi
+           :meth:`exec_module` khả dụng.
 
         .. deprecated-removed:: 3.4 3.15
-           The recommended API for loading a module is :meth:`exec_module`
-           (and :meth:`create_module`).  Loaders should implement it instead of
-           :meth:`load_module`.  The import machinery takes care of all the
-           other responsibilities of :meth:`load_module` when
-           :meth:`exec_module` is implemented.
+           API được khuyến nghị để tải một module là :meth:`exec_module` (và :meth:`create_module`). Loader nên triển khai API này thay cho
+           :meth:`load_module`. Bộ máy nhập đảm nhiệm tất cả các trách nhiệm khác của :meth:`load_module` khi
+           :meth:`exec_module` được triển khai.
 
 
 .. class:: ResourceLoader
 
-   *Superseded by TraversableResources*
+   *Được thay thế bởi TraversableResources*
 
-    An abstract base class for a :term:`loader` which implements the optional
-    :pep:`302` protocol for loading arbitrary resources from the storage
-    back-end.
+    Một lớp cơ sở trừu tượng cho một :term:`loader` triển khai tùy chọn
+    :pep:`302` protocol để tải các tài nguyên tùy ý từ phần lưu trữ phía sau.
 
     .. deprecated:: 3.7
-       This ABC is deprecated in favour of supporting resource loading
-       through :class:`importlib.resources.abc.TraversableResources`.
-       This class exists for backwards compatibility only with other ABCs in
-       this module.
+       ABC này không còn được khuyến nghị; thay vào đó, hãy hỗ trợ tải tài nguyên thông qua :class:`importlib.resources.abc.TraversableResources`. Lớp này chỉ tồn tại để duy trì khả năng tương thích ngược với các ABC khác trong mô-đun này.
 
     .. method:: get_data(path)
        :abstractmethod:
@@ -414,25 +309,21 @@ ABC hierarchy::
 
 .. class:: InspectLoader
 
-    An abstract base class for a :term:`loader` which implements the optional
-    :pep:`302` protocol for loaders that inspect modules.
+    Một lớp cơ sở trừu tượng cho một :term:`loader` triển khai tùy chọn
+    :pep:`302` protocol dành cho các loader kiểm tra module.
 
     .. method:: get_code(fullname)
 
-        Return the code object for a module, or ``None`` if the module does not
-        have a code object (as would be the case, for example, for a built-in
-        module).  Raise an :exc:`ImportError` if loader cannot find the
-        requested module.
+        Trả về đối tượng mã cho một module hoặc ``None`` nếu module không có đối tượng mã (chẳng hạn như đối với một module tích hợp sẵn). Phát sinh :exc:`ImportError` nếu loader không tìm thấy module được yêu cầu.
 
         .. note::
-           While the method has a default implementation, it is suggested that
-           it be overridden if possible for performance.
+           Mặc dù phương thức này có triển khai mặc định, bạn nên ghi đè nó nếu có thể để cải thiện hiệu suất.
 
         .. index::
            single: universal newlines; importlib.abc.InspectLoader.get_source method
 
         .. versionchanged:: 3.4
-           No longer abstract and a concrete implementation is provided.
+           Không còn là abstract và đã cung cấp một triển khai cụ thể.
 
     .. method:: get_source(fullname)
        :abstractmethod:
@@ -448,49 +339,42 @@ ABC hierarchy::
 
     .. method:: is_package(fullname)
 
-        An optional method to return a true value if the module is a package, a
-        false value otherwise. :exc:`ImportError` is raised if the
-        :term:`loader` cannot find the module.
+        Một phương thức tùy chọn trả về giá trị true nếu module là một package, nếu không thì trả về giá trị false. :exc:`ImportError` được phát sinh nếu
+        :term:`loader` không thể tìm thấy module.
 
         .. versionchanged:: 3.4
-           Raises :exc:`ImportError` instead of :exc:`NotImplementedError`.
+           Phát sinh :exc:`ImportError` thay vì :exc:`NotImplementedError`.
 
     .. staticmethod:: source_to_code(data, path='<string>')
 
-        Create a code object from Python source.
+        Tạo một đối tượng code từ mã nguồn Python.
 
-        The *data* argument can be whatever the :func:`compile` function
-        supports (i.e. string or bytes). The *path* argument should be
-        the "path" to where the source code originated from, which can be an
-        abstract concept (e.g. location in a zip file).
+        Đối số *data* có thể là bất kỳ kiểu dữ liệu nào mà hàm :func:`compile` hỗ trợ (tức là chuỗi hoặc bytes). Đối số *path* phải là "đường dẫn" đến nơi mã nguồn bắt nguồn, có thể là một khái niệm trừu tượng (ví dụ: vị trí trong tệp zip).
 
-        With the subsequent code object one can execute it in a module by
-        running ``exec(code, module.__dict__)``.
+        Với đối tượng code tiếp theo, bạn có thể thực thi nó trong một module bằng cách chạy ``exec(code, module.__dict__)``.
 
         .. versionadded:: 3.4
 
         .. versionchanged:: 3.5
-           Made the method static.
+           Đã chuyển phương thức thành static.
 
     .. method:: exec_module(module)
 
-       Implementation of :meth:`Loader.exec_module`.
+       Triển khai :meth:`Loader.exec_module`.
 
        .. versionadded:: 3.4
 
     .. method:: load_module(fullname)
 
-       Implementation of :meth:`Loader.load_module`.
+       Triển khai :meth:`Loader.load_module`.
 
        .. deprecated-removed:: 3.4 3.15
-          use :meth:`exec_module` instead.
+          hãy sử dụng :meth:`exec_module` thay vào đó.
 
 
 .. class:: ExecutionLoader
 
-    An abstract base class which inherits from :class:`InspectLoader` that,
-    when implemented, helps a module to be executed as a script. The ABC
-    represents an optional :pep:`302` protocol.
+    Một lớp cơ sở trừu tượng kế thừa từ :class:`InspectLoader` mà khi được triển khai sẽ giúp một mô-đun được thực thi như một tập lệnh. ABC này đại diện cho một giao thức :pep:`302` tùy chọn.
 
     .. method:: get_filename(fullname)
        :abstractmethod:
@@ -509,487 +393,396 @@ ABC hierarchy::
 
 .. class:: FileLoader(fullname, path)
 
-   An abstract base class which inherits from :class:`ResourceLoader` and
-   :class:`ExecutionLoader`, providing concrete implementations of
-   :meth:`ResourceLoader.get_data` and :meth:`ExecutionLoader.get_filename`.
+   Một lớp cơ sở trừu tượng kế thừa từ :class:`ResourceLoader` và
+   :class:`ExecutionLoader`, cung cấp các triển khai cụ thể của
+   :meth:`ResourceLoader.get_data` và :meth:`ExecutionLoader.get_filename`.
 
-   The *fullname* argument is a fully resolved name of the module the loader is
-   to handle. The *path* argument is the path to the file for the module.
+   Đối số *fullname* là tên đầy đủ đã được phân giải của mô-đun mà loader sẽ xử lý. Đối số *path* là đường dẫn đến tệp của mô-đun.
 
    .. versionadded:: 3.3
 
    .. attribute:: name
 
-      The name of the module the loader can handle.
+      Tên của mô-đun mà loader có thể xử lý.
 
    .. attribute:: path
 
-      Path to the file of the module.
+      Đường dẫn đến tệp của mô-đun.
 
    .. method:: load_module(fullname)
 
-      Calls super's ``load_module()``.
+      Gọi ``load_module()`` của lớp cha.
 
       .. deprecated-removed:: 3.4 3.15
-         Use :meth:`Loader.exec_module` instead.
+         Thay vào đó, hãy sử dụng :meth:`Loader.exec_module`.
 
    .. method:: get_filename(fullname)
       :abstractmethod:
 
-      Returns :attr:`path`.
+      Trả về :attr:`path`.
 
    .. method:: get_data(path)
       :abstractmethod:
 
-      Reads *path* as a binary file and returns the bytes from it.
+      Đọc *path* dưới dạng tệp nhị phân và trả về các byte từ tệp đó.
 
 
 .. class:: SourceLoader
 
-    An abstract base class for implementing source (and optionally bytecode)
-    file loading. The class inherits from both :class:`ResourceLoader` and
-    :class:`ExecutionLoader`, requiring the implementation of:
+    Một lớp cơ sở trừu tượng để triển khai việc tải tệp mã nguồn (và tùy chọn cả bytecode). Lớp này kế thừa từ cả :class:`ResourceLoader` và
+    :class:`ExecutionLoader`, yêu cầu triển khai:
 
     * :meth:`ResourceLoader.get_data`
     * :meth:`ExecutionLoader.get_filename`
-          Should only return the path to the source file; sourceless
-          loading is not supported.
+          Chỉ nên trả về đường dẫn đến tệp mã nguồn; không hỗ trợ tải không có mã nguồn.
 
-    The abstract methods defined by this class are to add optional bytecode
-    file support. Not implementing these optional methods (or causing them to
-    raise :exc:`NotImplementedError`) causes the loader to
-    only work with source code. Implementing the methods allows the loader to
-    work with source *and* bytecode files; it does not allow for *sourceless*
-    loading where only bytecode is provided.  Bytecode files are an
-    optimization to speed up loading by removing the parsing step of Python's
-    compiler, and so no bytecode-specific API is exposed.
+    Các phương thức trừu tượng được định nghĩa bởi lớp này dùng để bổ sung khả năng hỗ trợ tệp bytecode tùy chọn. Nếu không triển khai các phương thức tùy chọn này (hoặc khiến chúng phát sinh :exc:`NotImplementedError`) thì loader chỉ hoạt động với mã nguồn. Việc triển khai các phương thức này cho phép loader hoạt động với mã nguồn *và* các tệp bytecode; nhưng không cho phép nạp *sourceless* khi chỉ cung cấp bytecode. Các tệp bytecode là một tối ưu hóa giúp tăng tốc quá trình nạp bằng cách loại bỏ bước phân tích cú pháp của compiler Python, vì vậy không có API dành riêng cho bytecode nào được cung cấp.
 
     .. method:: path_stats(path)
 
-        Optional abstract method which returns a :class:`dict` containing
-        metadata about the specified path.  Supported dictionary keys are:
+        Phương thức trừu tượng tùy chọn trả về một :class:`dict` chứa siêu dữ liệu về path được chỉ định. Các khóa dictionary được hỗ trợ gồm:
 
-        - ``'mtime'`` (mandatory): an integer or floating-point number
-          representing the modification time of the source code;
-        - ``'size'`` (optional): the size in bytes of the source code.
+        - ``'mtime'`` (bắt buộc): một số nguyên hoặc số dấu phẩy động biểu thị thời gian sửa đổi của mã nguồn;
+        - ``'size'`` (tùy chọn): kích thước của mã nguồn tính bằng byte.
 
-        Any other keys in the dictionary are ignored, to allow for future
-        extensions. If the path cannot be handled, :exc:`OSError` is raised.
+        Mọi khóa khác trong dictionary đều bị bỏ qua để cho phép mở rộng trong tương lai. Nếu không thể xử lý path, :exc:`OSError` sẽ được phát sinh.
 
         .. versionadded:: 3.3
 
         .. versionchanged:: 3.4
-           Raise :exc:`OSError` instead of :exc:`NotImplementedError`.
+           Phát sinh :exc:`OSError` thay vì :exc:`NotImplementedError`.
 
     .. method:: path_mtime(path)
 
-        Optional abstract method which returns the modification time for the
-        specified path.
+        Phương thức trừu tượng tùy chọn trả về thời gian sửa đổi của path được chỉ định.
 
         .. deprecated:: 3.3
-           This method is deprecated in favour of :meth:`path_stats`.  You don't
-           have to implement it, but it is still available for compatibility
-           purposes. Raise :exc:`OSError` if the path cannot be handled.
+           Phương thức này không còn được khuyến nghị sử dụng và được thay thế bằng :meth:`path_stats`. Bạn không bắt buộc phải triển khai phương thức này, nhưng nó vẫn được cung cấp để đảm bảo khả năng tương thích. Hãy raise :exc:`OSError` nếu không thể xử lý đường dẫn.
 
         .. versionchanged:: 3.4
-           Raise :exc:`OSError` instead of :exc:`NotImplementedError`.
+           Phát sinh :exc:`OSError` thay vì :exc:`NotImplementedError`.
 
     .. method:: set_data(path, data)
 
-        Optional abstract method which writes the specified bytes to a file
-        path. Any intermediate directories which do not exist are to be created
-        automatically.
+        Phương thức trừu tượng tùy chọn ghi các byte được chỉ định vào một đường dẫn tệp. Mọi thư mục trung gian chưa tồn tại sẽ được tự động tạo.
 
-        When writing to the path fails because the path is read-only
-        (:const:`errno.EACCES`/:exc:`PermissionError`), do not propagate the
-        exception.
+        Khi việc ghi vào đường dẫn không thành công vì đường dẫn chỉ có quyền đọc (:const:`errno.EACCES`/:exc:`PermissionError`), không truyền tiếp ngoại lệ.
 
         .. versionchanged:: 3.4
-           No longer raises :exc:`NotImplementedError` when called.
+           Không còn raise :exc:`NotImplementedError` khi được gọi.
 
     .. method:: get_code(fullname)
 
-        Concrete implementation of :meth:`InspectLoader.get_code`.
+        Triển khai cụ thể của :meth:`InspectLoader.get_code`.
 
     .. method:: exec_module(module)
 
-       Concrete implementation of :meth:`Loader.exec_module`.
+       Triển khai cụ thể của :meth:`Loader.exec_module`.
 
        .. versionadded:: 3.4
 
     .. method:: load_module(fullname)
 
-       Concrete implementation of :meth:`Loader.load_module`.
+       Triển khai cụ thể của :meth:`Loader.load_module`.
 
        .. deprecated-removed:: 3.4 3.15
-          Use :meth:`exec_module` instead.
+          Thay vào đó, hãy sử dụng :meth:`exec_module`.
 
     .. method:: get_source(fullname)
 
-        Concrete implementation of :meth:`InspectLoader.get_source`.
+        Triển khai cụ thể của :meth:`InspectLoader.get_source`.
 
     .. method:: is_package(fullname)
 
-        Concrete implementation of :meth:`InspectLoader.is_package`. A module
-        is determined to be a package if its file path (as provided by
-        :meth:`ExecutionLoader.get_filename`) is a file named
-        ``__init__`` when the file extension is removed **and** the module name
-        itself does not end in ``__init__``.
+        Triển khai cụ thể của :meth:`InspectLoader.is_package`. Một mô-đun được xác định là một package nếu đường dẫn tệp của nó (do
+        :meth:`ExecutionLoader.get_filename` cung cấp) là một tệp có tên ``__init__`` sau khi loại bỏ phần mở rộng tệp **và** tên mô-đun không kết thúc bằng ``__init__``.
 
 
-:mod:`!importlib.machinery` -- Importers and path hooks
--------------------------------------------------------
+:mod:`!importlib.machinery` -- Trình nhập và path hook
+------------------------------------------------------
 
 .. module:: importlib.machinery
-    :synopsis: Importers and path hooks
+    :synopsis: Trình nhập và path hook
 
-**Source code:** :source:`Lib/importlib/machinery.py`
+**Mã nguồn:** :source:`Lib/importlib/machinery.py`
 
 --------------
 
-This module contains the various objects that help :keyword:`import`
-find and load modules.
+Mô-đun này chứa nhiều đối tượng khác nhau giúp :keyword:`import` tìm và tải các mô-đun.
 
 .. data:: SOURCE_SUFFIXES
 
-   A list of strings representing the recognized file suffixes for source
-   modules.
+   Danh sách các chuỗi biểu thị các hậu tố tệp được nhận diện cho các mô-đun mã nguồn.
 
    .. versionadded:: 3.3
 
 .. data:: DEBUG_BYTECODE_SUFFIXES
 
-   A list of strings representing the file suffixes for non-optimized bytecode
-   modules.
+   Danh sách các chuỗi biểu thị các hậu tố tệp cho các mô-đun bytecode chưa được tối ưu hóa.
 
    .. versionadded:: 3.3
 
    .. deprecated:: 3.5
-      Use :const:`BYTECODE_SUFFIXES` instead.
+      Thay vào đó, hãy sử dụng :const:`BYTECODE_SUFFIXES`.
 
 .. data:: OPTIMIZED_BYTECODE_SUFFIXES
 
-   A list of strings representing the file suffixes for optimized bytecode
-   modules.
+   Danh sách các chuỗi biểu thị các hậu tố tệp cho các mô-đun bytecode đã được tối ưu hóa.
 
    .. versionadded:: 3.3
 
    .. deprecated:: 3.5
-      Use :const:`BYTECODE_SUFFIXES` instead.
+      Thay vào đó, hãy sử dụng :const:`BYTECODE_SUFFIXES`.
 
 .. data:: BYTECODE_SUFFIXES
 
-   A list of strings representing the recognized file suffixes for bytecode
-   modules (including the leading dot).
+   Danh sách các chuỗi biểu diễn những hậu tố tệp được nhận diện cho các module bytecode (bao gồm cả dấu chấm ở đầu).
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.5
-      The value is no longer dependent on ``__debug__``.
+      Giá trị này không còn phụ thuộc vào ``__debug__``.
 
 .. data:: EXTENSION_SUFFIXES
 
-   A list of strings representing the recognized file suffixes for
-   extension modules.
+   Danh sách các chuỗi biểu diễn những hậu tố tệp được nhận diện cho các module mở rộng.
 
    .. versionadded:: 3.3
 
 .. function:: all_suffixes()
 
-   Returns a combined list of strings representing all file suffixes for
-   modules recognized by the standard import machinery. This is a
-   helper for code which simply needs to know if a filesystem path
-   potentially refers to a module without needing any details on the kind
-   of module (for example, :func:`inspect.getmodulename`).
+   Trả về danh sách kết hợp các chuỗi biểu diễn tất cả hậu tố tệp của những module được cơ chế import tiêu chuẩn nhận diện. Đây là một hàm trợ giúp cho mã chỉ cần xác định liệu một đường dẫn hệ thống tệp có khả năng trỏ đến một module hay không mà không cần biết chi tiết về loại module (ví dụ: :func:`inspect.getmodulename`).
 
    .. versionadded:: 3.3
 
 
 .. class:: BuiltinImporter
 
-    An :term:`importer` for built-in modules. All known built-in modules are
-    listed in :data:`sys.builtin_module_names`. This class implements the
-    :class:`importlib.abc.MetaPathFinder` and
-    :class:`importlib.abc.InspectLoader` ABCs.
+    Một :term:`importer` dành cho các module tích hợp sẵn. Tất cả các module tích hợp sẵn đã biết được liệt kê trong :data:`sys.builtin_module_names`. Lớp này triển khai
+    :class:`importlib.abc.MetaPathFinder` và
+    các ABC :class:`importlib.abc.InspectLoader`.
 
-    Only class methods are defined by this class to alleviate the need for
-    instantiation.
+    Lớp này chỉ định nghĩa các phương thức lớp để tránh nhu cầu khởi tạo đối tượng.
 
     .. versionchanged:: 3.5
-       As part of :pep:`489`, the builtin importer now implements
-       :meth:`Loader.create_module <importlib.abc.Loader.create_module>`
-       and :meth:`Loader.exec_module <importlib.abc.Loader.exec_module>`
+       Là một phần của :pep:`489`, trình nhập tích hợp sẵn hiện triển khai
+       :meth:`Loader.create_module <importlib.abc.Loader.create_module>` và :meth:`Loader.exec_module <importlib.abc.Loader.exec_module>`
 
 
 .. class:: FrozenImporter
 
-    An :term:`importer` for frozen modules. This class implements the
-    :class:`importlib.abc.MetaPathFinder` and
-    :class:`importlib.abc.InspectLoader` ABCs.
+    Một :term:`importer` dành cho các module đóng băng. Lớp này triển khai
+    :class:`importlib.abc.MetaPathFinder` và
+    các ABC :class:`importlib.abc.InspectLoader`.
 
-    Only class methods are defined by this class to alleviate the need for
-    instantiation.
+    Lớp này chỉ định nghĩa các phương thức lớp để tránh nhu cầu khởi tạo đối tượng.
 
     .. versionchanged:: 3.4
-       Gained :meth:`~importlib.abc.Loader.create_module` and
-       :meth:`~importlib.abc.Loader.exec_module`
-       methods.
+       Được bổ sung :meth:`~importlib.abc.Loader.create_module` và
+       :meth:`~importlib.abc.Loader.exec_module` các phương thức.
 
 
 .. class:: WindowsRegistryFinder
 
-   :term:`Finder <finder>` for modules declared in the Windows registry.  This class
-   implements the :class:`importlib.abc.MetaPathFinder` ABC.
+   :term:`Finder <finder>` cho các module được khai báo trong Windows registry. Lớp này triển khai ABC :class:`importlib.abc.MetaPathFinder`.
 
-   Only class methods are defined by this class to alleviate the need for
-   instantiation.
+   Lớp này chỉ định nghĩa các phương thức lớp để tránh nhu cầu khởi tạo đối tượng.
 
    .. versionadded:: 3.3
 
    .. deprecated:: 3.6
-      Use :mod:`site` configuration instead. Future versions of Python may
-      not enable this finder by default.
+      Thay vào đó, hãy sử dụng cấu hình :mod:`site`. Các phiên bản Python trong tương lai có thể không bật finder này theo mặc định.
 
 
 .. class:: PathFinder
 
-   A :term:`Finder <finder>` for :data:`sys.path` and package ``__path__`` attributes.
-   This class implements the :class:`importlib.abc.MetaPathFinder` ABC.
+   Một :term:`Finder <finder>` cho :data:`sys.path` và các thuộc tính ``__path__`` của package. Lớp này triển khai ABC :class:`importlib.abc.MetaPathFinder`.
 
-   Only class methods are defined by this class to alleviate the need for
-   instantiation.
+   Lớp này chỉ định nghĩa các phương thức lớp để tránh nhu cầu khởi tạo đối tượng.
 
    .. classmethod:: find_spec(fullname, path=None, target=None)
 
-      Class method that attempts to find a :term:`spec <module spec>`
-      for the module specified by *fullname* on :data:`sys.path` or, if
-      defined, on *path*. For each path entry that is searched,
-      :data:`sys.path_importer_cache` is checked. If a non-false object
-      is found then it is used as the :term:`path entry finder` to look
-      for the module being searched for. If no entry is found in
-      :data:`sys.path_importer_cache`, then :data:`sys.path_hooks` is
-      searched for a finder for the path entry and, if found, is stored
-      in :data:`sys.path_importer_cache` along with being queried about
-      the module. If no finder is ever found then ``None`` is both
-      stored in the cache and returned.
+      Phương thức lớp cố gắng tìm một :term:`spec <module spec>` cho module được chỉ định bởi *fullname* trên :data:`sys.path` hoặc, nếu được định nghĩa, trên *path*. Với mỗi mục đường dẫn được tìm kiếm,
+      :data:`sys.path_importer_cache` được kiểm tra. Nếu tìm thấy một đối tượng khác false thì đối tượng đó được dùng làm :term:`path entry finder` để tìm module đang được tìm kiếm. Nếu không tìm thấy mục nào trong
+      :data:`sys.path_importer_cache`, thì :data:`sys.path_hooks` được tìm kiếm để tìm finder cho mục đường dẫn và, nếu tìm thấy, được lưu vào :data:`sys.path_importer_cache` đồng thời được truy vấn về module. Nếu không tìm thấy finder nào thì ``None`` vừa được lưu vào cache vừa được trả về.
 
       .. versionadded:: 3.4
 
       .. versionchanged:: 3.5
-         If the current working directory -- represented by an empty string --
-         is no longer valid then ``None`` is returned but no value is cached
-         in :data:`sys.path_importer_cache`.
+         Nếu thư mục làm việc hiện tại -- được biểu diễn bằng một chuỗi rỗng -- không còn hợp lệ thì ``None`` được trả về nhưng không có giá trị nào được lưu vào cache trong :data:`sys.path_importer_cache`.
 
    .. classmethod:: invalidate_caches()
 
-      Calls :meth:`importlib.abc.PathEntryFinder.invalidate_caches` on all
-      finders stored in :data:`sys.path_importer_cache` that define the method.
-      Otherwise entries in :data:`sys.path_importer_cache` set to ``None`` are
-      deleted.
+      Gọi :meth:`importlib.abc.PathEntryFinder.invalidate_caches` trên tất cả finder được lưu trong :data:`sys.path_importer_cache` có định nghĩa phương thức này. Nếu không, các mục trong :data:`sys.path_importer_cache` được đặt thành ``None`` sẽ bị xóa.
 
       .. versionchanged:: 3.7
-         Entries of ``None`` in :data:`sys.path_importer_cache` are deleted.
+         Các mục của ``None`` trong :data:`sys.path_importer_cache` sẽ bị xóa.
 
    .. versionchanged:: 3.4
-      Calls objects in :data:`sys.path_hooks` with the current working
-      directory for ``''`` (i.e. the empty string).
+      Gọi các đối tượng trong :data:`sys.path_hooks` với thư mục làm việc hiện tại cho ``''`` (tức là chuỗi rỗng).
 
 
 .. class:: FileFinder(path, *loader_details)
 
-   A concrete implementation of :class:`importlib.abc.PathEntryFinder` which
-   caches results from the file system.
+   Một triển khai cụ thể của :class:`importlib.abc.PathEntryFinder` dùng bộ nhớ đệm để lưu các kết quả từ hệ thống tệp.
 
-   The *path* argument is the directory for which the finder is in charge of
-   searching.
+   Đối số *path* là thư mục mà finder chịu trách nhiệm tìm kiếm.
 
-   The *loader_details* argument is a variable number of 2-item tuples each
-   containing a loader and a sequence of file suffixes the loader recognizes.
-   The loaders are expected to be callables which accept two arguments of
-   the module's name and the path to the file found.
+   Đối số *loader_details* là một số lượng biến đổi các tuple gồm 2 phần tử, mỗi tuple chứa một loader và một chuỗi hậu tố tệp mà loader đó nhận dạng. Các loader được kỳ vọng là những callable nhận hai đối số: tên của module và đường dẫn đến tệp được tìm thấy.
 
-   The finder will cache the directory contents as necessary, making stat calls
-   for each module search to verify the cache is not outdated. Because cache
-   staleness relies upon the granularity of the operating system's state
-   information of the file system, there is a potential race condition of
-   searching for a module, creating a new file, and then searching for the
-   module the new file represents. If the operations happen fast enough to fit
-   within the granularity of stat calls, then the module search will fail. To
-   prevent this from happening, when you create a module dynamically, make sure
-   to call :func:`importlib.invalidate_caches`.
+   Finder sẽ lưu nội dung thư mục vào bộ nhớ đệm khi cần, thực hiện các lệnh gọi stat cho mỗi lần tìm kiếm module để xác minh bộ nhớ đệm chưa lỗi thời. Vì độ lỗi thời của bộ nhớ đệm phụ thuộc vào độ phân giải của thông tin trạng thái hệ điều hành về hệ thống tệp, nên có thể xảy ra điều kiện tranh đua khi tìm kiếm một module, tạo một tệp mới, rồi tìm kiếm module mà tệp mới đó đại diện. Nếu các thao tác diễn ra đủ nhanh để nằm trong độ phân giải của các lệnh gọi stat, việc tìm kiếm module sẽ thất bại. Để ngăn điều này xảy ra, khi tạo module một cách động, hãy nhớ gọi :func:`importlib.invalidate_caches`.
 
    .. versionadded:: 3.3
 
    .. attribute:: path
 
-      The path the finder will search in.
+      Đường dẫn mà finder sẽ tìm kiếm.
 
    .. method:: find_spec(fullname, target=None)
 
-      Attempt to find the spec to handle *fullname* within :attr:`path`.
+      Cố gắng tìm spec để xử lý *fullname* trong :attr:`path`.
 
       .. versionadded:: 3.4
 
    .. method:: invalidate_caches()
 
-      Clear out the internal cache.
+      Xóa bộ nhớ đệm nội bộ.
 
    .. classmethod:: path_hook(*loader_details)
 
-      A class method which returns a closure for use on :data:`sys.path_hooks`.
-      An instance of :class:`FileFinder` is returned by the closure using the
-      path argument given to the closure directly and *loader_details*
-      indirectly.
+      Một phương thức lớp trả về một closure để sử dụng trên :data:`sys.path_hooks`. Closure trả về một thể hiện của :class:`FileFinder` bằng cách sử dụng trực tiếp đối số path được truyền cho closure và gián tiếp *loader_details*.
 
-      If the argument to the closure is not an existing directory,
-      :exc:`ImportError` is raised.
+      Nếu đối số truyền cho closure không phải là một thư mục hiện có,
+      :exc:`ImportError` sẽ được phát sinh.
 
 
 .. class:: SourceFileLoader(fullname, path)
 
-   A concrete implementation of :class:`importlib.abc.SourceLoader` by
-   subclassing :class:`importlib.abc.FileLoader` and providing some concrete
-   implementations of other methods.
+   Một triển khai cụ thể của :class:`importlib.abc.SourceLoader` bằng cách tạo lớp con của :class:`importlib.abc.FileLoader` và cung cấp một số triển khai cụ thể cho các phương thức khác.
 
    .. versionadded:: 3.3
 
    .. attribute:: name
 
-      The name of the module that this loader will handle.
+      Tên của module mà loader này sẽ xử lý.
 
    .. attribute:: path
 
-      The path to the source file.
+      Đường dẫn đến tệp nguồn.
 
    .. method:: is_package(fullname)
 
-      Return ``True`` if :attr:`path` appears to be for a package.
+      Trả về ``True`` nếu :attr:`path` có vẻ là một package.
 
    .. method:: path_stats(path)
 
-      Concrete implementation of :meth:`importlib.abc.SourceLoader.path_stats`.
+      Triển khai cụ thể của :meth:`importlib.abc.SourceLoader.path_stats`.
 
    .. method:: set_data(path, data)
 
-      Concrete implementation of :meth:`importlib.abc.SourceLoader.set_data`.
+      Triển khai cụ thể của :meth:`importlib.abc.SourceLoader.set_data`.
 
    .. method:: load_module(name=None)
 
-      Concrete implementation of :meth:`importlib.abc.Loader.load_module` where
-      specifying the name of the module to load is optional.
+      Triển khai cụ thể của :meth:`importlib.abc.Loader.load_module`, trong đó việc chỉ định tên mô-đun cần tải là tùy chọn.
 
       .. deprecated-removed:: 3.6 3.15
 
-         Use :meth:`importlib.abc.Loader.exec_module` instead.
+         Thay vào đó, hãy sử dụng :meth:`importlib.abc.Loader.exec_module`.
 
 
 .. class:: SourcelessFileLoader(fullname, path)
 
-   A concrete implementation of :class:`importlib.abc.FileLoader` which can
-   import bytecode files (i.e. no source code files exist).
+   Một triển khai cụ thể của :class:`importlib.abc.FileLoader` có thể nhập các tệp bytecode (tức là không có tệp mã nguồn).
 
-   Please note that direct use of bytecode files (and thus not source code
-   files) inhibits your modules from being usable by all Python
-   implementations or new versions of Python which change the bytecode
-   format.
+   Xin lưu ý rằng việc sử dụng trực tiếp các tệp bytecode (và do đó không sử dụng các tệp mã nguồn) khiến các mô-đun của bạn không thể được sử dụng bởi mọi triển khai Python hoặc các phiên bản Python mới thay đổi định dạng bytecode.
 
    .. versionadded:: 3.3
 
    .. attribute:: name
 
-      The name of the module the loader will handle.
+      Tên của mô-đun mà trình nạp sẽ xử lý.
 
    .. attribute:: path
 
-      The path to the bytecode file.
+      Đường dẫn đến tệp bytecode.
 
    .. method:: is_package(fullname)
 
-      Determines if the module is a package based on :attr:`path`.
+      Xác định module có phải là package hay không dựa trên :attr:`path`.
 
    .. method:: get_code(fullname)
 
-      Returns the code object for :attr:`name` created from :attr:`path`.
+      Trả về đối tượng code cho :attr:`name` được tạo từ :attr:`path`.
 
    .. method:: get_source(fullname)
 
-      Returns ``None`` as bytecode files have no source when this loader is
-      used.
+      Trả về ``None`` vì các tệp bytecode không có mã nguồn khi sử dụng loader này.
 
    .. method:: load_module(name=None)
 
-   Concrete implementation of :meth:`importlib.abc.Loader.load_module` where
-   specifying the name of the module to load is optional.
+   Triển khai cụ thể của :meth:`importlib.abc.Loader.load_module`, trong đó việc chỉ định tên mô-đun cần tải là tùy chọn.
 
    .. deprecated-removed:: 3.6 3.15
 
-      Use :meth:`importlib.abc.Loader.exec_module` instead.
+      Thay vào đó, hãy sử dụng :meth:`importlib.abc.Loader.exec_module`.
 
 
 .. class:: ExtensionFileLoader(fullname, path)
 
-   A concrete implementation of :class:`importlib.abc.ExecutionLoader` for
-   extension modules.
+   Một triển khai cụ thể của :class:`importlib.abc.ExecutionLoader` dành cho các module mở rộng.
 
-   The *fullname* argument specifies the name of the module the loader is to
-   support. The *path* argument is the path to the extension module's file.
+   Đối số *fullname* chỉ định tên của module mà loader sẽ hỗ trợ. Đối số *path* là đường dẫn đến tệp của extension module.
 
-   Note that, by default, importing an extension module will fail
-   in subinterpreters if it doesn't implement multi-phase init
-   (see :pep:`489`), even if it would otherwise import successfully.
+   Lưu ý rằng theo mặc định, việc import extension module sẽ thất bại trong các subinterpreter nếu module đó không triển khai multi-phase init (xem :pep:`489`), ngay cả khi trong các trường hợp khác việc import vẫn thành công.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.12
-      Multi-phase init is now required for use in subinterpreters.
+      Hiện tại, multi-phase init là bắt buộc để sử dụng trong các subinterpreter.
 
    .. attribute:: name
 
-      Name of the module the loader supports.
+      Tên của module mà loader hỗ trợ.
 
    .. attribute:: path
 
-      Path to the extension module.
+      Đường dẫn đến extension module.
 
    .. method:: create_module(spec)
 
-      Creates the module object from the given specification in accordance
-      with :pep:`489`.
+      Tạo đối tượng module từ specification đã cho theo :pep:`489`.
 
       .. versionadded:: 3.5
 
    .. method:: exec_module(module)
 
-      Initializes the given module object in accordance with :pep:`489`.
+      Khởi tạo đối tượng module đã cho theo :pep:`489`.
 
       .. versionadded:: 3.5
 
    .. method:: is_package(fullname)
 
-      Returns ``True`` if the file path points to a package's ``__init__``
-      module based on :const:`EXTENSION_SUFFIXES`.
+      Trả về ``True`` nếu đường dẫn tệp trỏ đến module ``__init__`` của một package dựa trên :const:`EXTENSION_SUFFIXES`.
 
    .. method:: get_code(fullname)
 
-      Returns ``None`` as extension modules lack a code object.
+      Trả về ``None`` vì các extension module không có code object.
 
    .. method:: get_source(fullname)
 
-      Returns ``None`` as extension modules do not have source code.
+      Trả về ``None`` vì các extension module không có mã nguồn.
 
    .. method:: get_filename(fullname)
 
-      Returns :attr:`path`.
+      Trả về :attr:`path`.
 
       .. versionadded:: 3.4
 
 
 .. class:: NamespaceLoader(name, path, path_finder)
 
-   A concrete implementation of :class:`importlib.abc.InspectLoader` for
-   namespace packages.  This is an alias for a private class and is only made
-   public for introspecting the ``__loader__`` attribute on namespace
-   packages::
+   Một triển khai cụ thể của :class:`importlib.abc.InspectLoader` dành cho namespace package. Đây là bí danh của một class riêng tư và chỉ được công khai để kiểm tra thuộc tính ``__loader__`` trên các namespace package::
 
        >>> from importlib.machinery import NamespaceLoader
        >>> import my_namespace
@@ -1004,126 +797,59 @@ find and load modules.
 
 .. class:: ModuleSpec(name, loader, *, origin=None, loader_state=None, is_package=None)
 
-   A specification for a module's import-system-related state.  This is
-   typically exposed as the module's :attr:`~module.__spec__` attribute.  Many
-   of these attributes are also available directly on a module: for example,
-   ``module.__spec__.origin == module.__file__``.  Note, however, that
-   while the *values* are usually equivalent, they can differ since there is
-   no synchronization between the two objects.  For example, it is possible to
-   update the module's :attr:`~module.__file__` at runtime and this will not be
-   automatically reflected in the module's
-   :attr:`__spec__.origin <ModuleSpec.origin>`, and vice versa.
+   Một đặc tả cho trạng thái liên quan đến import system của một module. Đặc tả này thường được cung cấp dưới dạng thuộc tính :attr:`~module.__spec__` của module. Nhiều thuộc tính trong số này cũng có sẵn trực tiếp trên một module: ví dụ: ``module.__spec__.origin == module.__file__``. Tuy nhiên, lưu ý rằng mặc dù *các giá trị* thường tương đương, chúng có thể khác nhau vì không có cơ chế đồng bộ giữa hai đối tượng. Ví dụ, bạn có thể cập nhật :attr:`~module.__file__` của module tại runtime và thay đổi này sẽ không tự động được phản ánh trong thuộc tính của module
+   :attr:`__spec__.origin <ModuleSpec.origin>`, và ngược lại.
 
    .. versionadded:: 3.4
 
    .. attribute:: name
 
-      The module's fully qualified name (see :attr:`module.__name__`).
-      The :term:`finder` should always set this attribute to a non-empty string.
+      Tên đầy đủ của module (xem :attr:`module.__name__`). :term:`finder` luôn phải đặt thuộc tính này thành một chuỗi không rỗng.
 
    .. attribute:: loader
 
-      The :term:`loader` used to load the module (see :attr:`module.__loader__`).
-      The :term:`finder` should always set this attribute.
+      :term:`loader` được dùng để tải module (xem :attr:`module.__loader__`). :term:`finder` luôn phải đặt thuộc tính này.
 
    .. attribute:: origin
 
-      The location the :term:`loader` should use to load the module
-      (see :attr:`module.__file__`).
-      For example, for modules loaded from a ``.py`` file this is the filename.
-      The :term:`finder` should always set this attribute to a meaningful value
-      for the :term:`loader` to use.  In the uncommon case that there is not one
-      (like for namespace packages), it should be set to ``None``.
+      Vị trí mà :term:`loader` nên sử dụng để tải module (xem :attr:`module.__file__`). Ví dụ, đối với các module được tải từ tệp ``.py``, đây là tên tệp. :term:`finder` luôn phải đặt thuộc tính này thành một giá trị có ý nghĩa để :term:`loader` sử dụng. Trong trường hợp không phổ biến khi không có vị trí này (chẳng hạn như với các namespace package), thuộc tính này phải được đặt thành ``None``.
 
    .. attribute:: submodule_search_locations
 
-      A (possibly empty) :term:`sequence` of strings enumerating the locations
-      in which a package's submodules will be found
-      (see :attr:`module.__path__`). Most of the time there will only be a
-      single directory in this list.
+      Một :term:`sequence` các chuỗi (có thể rỗng) liệt kê những vị trí mà tại đó các submodule của package sẽ được tìm thấy (xem :attr:`module.__path__`). Phần lớn thời gian, danh sách này sẽ chỉ có một thư mục duy nhất.
 
-      The :term:`finder` should set this attribute to a sequence, even an empty
-      one, to indicate
-      to the import system that the module is a package.  It should be set to ``None`` for
-      non-package modules.  It is set automatically later to a special object for
-      namespace packages.
+      :term:`finder` phải đặt thuộc tính này thành một sequence, kể cả sequence rỗng, để cho hệ thống import biết rằng module là một package. Với các module không phải package, thuộc tính này phải được đặt thành ``None``. Sau đó, thuộc tính này sẽ tự động được đặt thành một đối tượng đặc biệt đối với namespace package.
 
    .. attribute:: loader_state
 
-      The :term:`finder` may set this attribute to an object containing additional,
-      module-specific data to use when loading the module.  Otherwise it should be
-      set to ``None``.
+      :term:`finder` có thể đặt thuộc tính này thành một đối tượng chứa dữ liệu bổ sung dành riêng cho module để sử dụng khi tải module. Nếu không, thuộc tính này phải được đặt thành ``None``.
 
    .. attribute:: cached
 
-      The filename of a compiled version of the module's code
-      (see :attr:`module.__cached__`).
-      The :term:`finder` should always set this attribute but it may be ``None``
-      for modules that do not need compiled code stored.
+      Tên tệp của phiên bản đã biên dịch của mã module (xem :attr:`module.__cached__`). :term:`finder` luôn phải đặt thuộc tính này, nhưng thuộc tính có thể là ``None`` đối với các module không cần lưu trữ mã đã biên dịch.
 
    .. attribute:: parent
 
-      (Read-only) The fully qualified name of the package the module is in (or the
-      empty string for a top-level module).
-      See :attr:`module.__package__`.
-      If the module is a package then this is the same as :attr:`name`.
+      (Chỉ đọc) Tên đầy đủ của package chứa module (hoặc chuỗi rỗng đối với module cấp cao nhất). Xem :attr:`module.__package__`. Nếu module là một package thì tên này giống với :attr:`name`.
 
    .. attribute:: has_location
 
-      ``True`` if the spec's :attr:`origin` refers to a loadable location,
-      ``False`` otherwise.  This value impacts how :attr:`!origin` is interpreted
-      and how the module's :attr:`~module.__file__` is populated.
+      ``True`` nếu :attr:`origin` của spec tham chiếu đến một vị trí có thể tải, nếu không thì là ``False``. Giá trị này ảnh hưởng đến cách diễn giải :attr:`!origin` và cách điền :attr:`~module.__file__` của module.
 
 
 .. class:: AppleFrameworkLoader(name, path)
 
-   A specialization of :class:`importlib.machinery.ExtensionFileLoader` that
-   is able to load extension modules in Framework format.
+   Một dạng chuyên biệt của :class:`importlib.machinery.ExtensionFileLoader` có khả năng tải các extension module ở định dạng Framework.
 
-   For compatibility with the iOS App Store, *all* binary modules in an iOS app
-   must be dynamic libraries, contained in a framework with appropriate
-   metadata, stored in the ``Frameworks`` folder of the packaged app. There can
-   be only a single binary per framework, and there can be no executable binary
-   material outside the Frameworks folder.
+   Để tương thích với iOS App Store, *all* binary module trong một ứng dụng iOS phải là dynamic library, được chứa trong một framework có metadata phù hợp và được lưu trong thư mục ``Frameworks`` của ứng dụng đã đóng gói. Mỗi framework chỉ được có một binary duy nhất và không được có dữ liệu binary thực thi nào bên ngoài thư mục Frameworks.
 
-   To accommodate this requirement, when running on iOS, extension module
-   binaries are *not* packaged as ``.so`` files on ``sys.path``, but as
-   individual standalone frameworks. To discover those frameworks, this loader
-   is registered against the ``.fwork`` file extension, with a ``.fwork``
-   file acting as a placeholder in the original location of the binary on
-   ``sys.path``. The ``.fwork`` file contains the path of the actual binary in
-   the ``Frameworks`` folder, relative to the app bundle. To allow for
-   resolving a framework-packaged binary back to the original location, the
-   framework is expected to contain a ``.origin`` file that contains the
-   location of the ``.fwork`` file, relative to the app bundle.
+   Để đáp ứng yêu cầu này, khi chạy trên iOS, các binary của extension module *not* được đóng gói dưới dạng các tệp ``.so`` trên ``sys.path``, mà dưới dạng các framework độc lập riêng lẻ. Để phát hiện các framework đó, loader này được đăng ký với phần mở rộng tệp ``.fwork``, trong đó một tệp ``.fwork`` đóng vai trò là placeholder tại vị trí ban đầu của binary trên ``sys.path``. Tệp ``.fwork`` chứa đường dẫn đến binary thực tế trong thư mục ``Frameworks``, tương đối so với app bundle. Để cho phép ánh xạ một binary được đóng gói trong framework trở về vị trí ban đầu, framework được kỳ vọng phải chứa một tệp ``.origin`` chứa vị trí của tệp ``.fwork``, tương đối so với app bundle.
 
-   For example, consider the case of an import ``from foo.bar import _whiz``,
-   where ``_whiz`` is implemented with the binary module
-   ``sources/foo/bar/_whiz.abi3.so``, with ``sources`` being the location
-   registered on ``sys.path``, relative to the application bundle. This module
-   *must* be distributed as
-   ``Frameworks/foo.bar._whiz.framework/foo.bar._whiz`` (creating the framework
-   name from the full import path of the module), with an ``Info.plist`` file
-   in the ``.framework`` directory identifying the binary as a framework. The
-   ``foo.bar._whiz`` module would be represented in the original location with
-   a ``sources/foo/bar/_whiz.abi3.fwork`` marker file, containing the path
-   ``Frameworks/foo.bar._whiz/foo.bar._whiz``. The framework would also contain
-   ``Frameworks/foo.bar._whiz.framework/foo.bar._whiz.origin``, containing the
-   path to the ``.fwork`` file.
+   Ví dụ, hãy xét trường hợp import ``from foo.bar import _whiz``, trong đó ``_whiz`` được triển khai bằng binary module ``sources/foo/bar/_whiz.abi3.so``, với ``sources`` là vị trí được đăng ký trên ``sys.path``, tương đối so với application bundle. Module này *must* được phân phối dưới dạng ``Frameworks/foo.bar._whiz.framework/foo.bar._whiz`` (tạo tên framework từ đường dẫn import đầy đủ của module), với một tệp ``Info.plist`` trong thư mục ``.framework`` xác định binary là một framework. Module ``foo.bar._whiz`` sẽ được biểu diễn tại vị trí ban đầu bằng một tệp đánh dấu ``sources/foo/bar/_whiz.abi3.fwork``, chứa đường dẫn ``Frameworks/foo.bar._whiz/foo.bar._whiz``. Framework cũng sẽ chứa ``Frameworks/foo.bar._whiz.framework/foo.bar._whiz.origin``, chứa đường dẫn đến tệp ``.fwork``.
 
-   When a module is loaded with this loader, the ``__file__`` for the module
-   will report as the location of the ``.fwork`` file. This allows code to use
-   the ``__file__`` of a  module as an anchor for file system traversal.
-   However, the spec origin will reference the location of the *actual* binary
-   in the ``.framework`` folder.
+   Khi một module được tải bằng loader này, ``__file__`` của module sẽ báo cáo vị trí của tệp ``.fwork``. Điều này cho phép code sử dụng ``__file__`` của một module làm mốc để duyệt hệ thống tệp. Tuy nhiên, origin của spec sẽ tham chiếu đến vị trí của binary *actual* trong thư mục ``.framework``.
 
-   The Xcode project building the app is responsible for converting any ``.so``
-   files from wherever they exist in the ``PYTHONPATH`` into frameworks in the
-   ``Frameworks`` folder (including stripping extensions from the module file,
-   the addition of framework metadata, and signing the resulting framework),
-   and creating the ``.fwork`` and ``.origin`` files. This will usually be done
-   with a build step in the Xcode project; see the iOS documentation for
-   details on how to construct this build step.
+   Dự án Xcode xây dựng ứng dụng chịu trách nhiệm chuyển đổi mọi tệp ``.so`` từ bất kỳ vị trí nào trong ``PYTHONPATH`` thành các framework trong thư mục ``Frameworks`` (bao gồm việc loại bỏ phần mở rộng khỏi tệp module, thêm metadata của framework và ký framework kết quả), đồng thời tạo các tệp ``.fwork`` và ``.origin``. Thông thường, việc này sẽ được thực hiện bằng một build step trong dự án Xcode; xem tài liệu iOS để biết chi tiết về cách xây dựng build step này.
 
    .. versionadded:: 3.13
 
@@ -1131,303 +857,215 @@ find and load modules.
 
    .. attribute:: name
 
-      Name of the module the loader supports.
+      Tên của module mà loader hỗ trợ.
 
    .. attribute:: path
 
-      Path to the ``.fwork`` file for the extension module.
+      Đường dẫn đến tệp ``.fwork`` của mô-đun mở rộng.
 
 
-:mod:`!importlib.util` -- Utility code for importers
-----------------------------------------------------
+:mod:`!importlib.util` -- Mã tiện ích cho các importer
+------------------------------------------------------
 
 .. module:: importlib.util
-    :synopsis: Utility code for importers
+    :synopsis: Mã tiện ích cho các importer
 
 
-**Source code:** :source:`Lib/importlib/util.py`
+**Mã nguồn:** :source:`Lib/importlib/util.py`
 
 --------------
 
-This module contains the various objects that help in the construction of
-an :term:`importer`.
+Mô-đun này chứa nhiều đối tượng hỗ trợ việc xây dựng một :term:`importer`.
 
 .. data:: MAGIC_NUMBER
 
-   The bytes which represent the bytecode version number. If you need help with
-   loading/writing bytecode then consider :class:`importlib.abc.SourceLoader`.
+   Các byte biểu diễn số phiên bản bytecode. Nếu cần trợ giúp về việc tải/ghi bytecode, hãy xem :class:`importlib.abc.SourceLoader`.
 
    .. versionadded:: 3.4
 
 .. function:: cache_from_source(path, debug_override=None, *, optimization=None)
 
-   Return the :pep:`3147`/:pep:`488` path to the byte-compiled file associated
-   with the source *path*.  For example, if *path* is ``/foo/bar/baz.py`` the return
-   value would be ``/foo/bar/__pycache__/baz.cpython-32.pyc`` for Python 3.2.
-   The ``cpython-32`` string comes from the current magic tag (see
-   :attr:`sys.implementation.cache_tag <sys.implementation>`; if it is not
-   defined then :exc:`NotImplementedError` will be raised).
+   Trả về đường dẫn :pep:`3147`/:pep:`488` đến tệp đã biên dịch thành bytecode tương ứng với *path* nguồn. Ví dụ: nếu *path* là ``/foo/bar/baz.py`` thì giá trị trả về sẽ là ``/foo/bar/__pycache__/baz.cpython-32.pyc`` đối với Python 3.2. Chuỗi ``cpython-32`` lấy từ thẻ magic hiện tại (xem
+   :attr:`sys.implementation.cache_tag <sys.implementation>`; nếu chưa được định nghĩa thì sẽ phát sinh :exc:`NotImplementedError`).
 
-   The *optimization* parameter is used to specify the optimization level of the
-   bytecode file. An empty string represents no optimization, so
-   ``/foo/bar/baz.py`` with an *optimization* of ``''`` will result in a
-   bytecode path of ``/foo/bar/__pycache__/baz.cpython-32.pyc``. ``None`` causes
-   the interpreter's optimization level to be used. Any other value's string
-   representation is used, so ``/foo/bar/baz.py`` with an *optimization* of
-   ``2`` will lead to the bytecode path of
-   ``/foo/bar/__pycache__/baz.cpython-32.opt-2.pyc``. The string representation
-   of *optimization* can only be alphanumeric, else :exc:`ValueError` is raised.
+   Tham số *optimization* được dùng để chỉ định mức tối ưu hóa của tệp bytecode. Chuỗi rỗng biểu thị không tối ưu hóa, vì vậy ``/foo/bar/baz.py`` với *optimization* là ``''`` sẽ cho kết quả là đường dẫn bytecode ``/foo/bar/__pycache__/baz.cpython-32.pyc``. ``None`` khiến interpreter sử dụng mức tối ưu hóa của nó. Chuỗi biểu diễn của mọi giá trị khác sẽ được sử dụng, vì vậy ``/foo/bar/baz.py`` với *optimization* là ``2`` sẽ dẫn đến đường dẫn bytecode ``/foo/bar/__pycache__/baz.cpython-32.opt-2.pyc``. Chuỗi biểu diễn của *optimization* chỉ được chứa chữ và số; nếu không, :exc:`ValueError` sẽ được phát sinh.
 
-   The *debug_override* parameter is deprecated and can be used to override
-   the system's value for ``__debug__``. A ``True`` value is the equivalent of
-   setting *optimization* to the empty string. A ``False`` value is the same as
-   setting *optimization* to ``1``. If both *debug_override* an *optimization*
-   are not ``None`` then :exc:`TypeError` is raised.
+   Tham số *debug_override* đã lỗi thời và có thể được dùng để ghi đè giá trị hệ thống cho ``__debug__``. Giá trị ``True`` tương đương với việc đặt *optimization* thành chuỗi rỗng. Giá trị ``False`` tương đương với việc đặt *optimization* thành ``1``. Nếu cả *debug_override* và *optimization* đều không phải là ``None`` thì :exc:`TypeError` sẽ được phát sinh.
 
    .. versionadded:: 3.4
 
    .. versionchanged:: 3.5
-      The *optimization* parameter was added and the *debug_override* parameter
-      was deprecated.
+      Tham số *optimization* được bổ sung và tham số *debug_override* đã lỗi thời.
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 
 .. function:: source_from_cache(path)
 
-   Given the *path* to a :pep:`3147` file name, return the associated source code
-   file path.  For example, if *path* is
-   ``/foo/bar/__pycache__/baz.cpython-32.pyc`` the returned path would be
-   ``/foo/bar/baz.py``.  *path* need not exist, however if it does not conform
-   to :pep:`3147` or :pep:`488` format, a :exc:`ValueError` is raised. If
-   :attr:`sys.implementation.cache_tag <sys.implementation>` is not defined,
-   :exc:`NotImplementedError` is raised.
+   Với *path* trỏ đến tên :pep:`3147` tệp, trả về đường dẫn tệp mã nguồn tương ứng. Ví dụ: nếu *path* là ``/foo/bar/__pycache__/baz.cpython-32.pyc``, đường dẫn được trả về sẽ là ``/foo/bar/baz.py``. Tuy nhiên, *path* không nhất thiết phải tồn tại; nếu không đúng định dạng :pep:`3147` hoặc :pep:`488`, một :exc:`ValueError` sẽ được đưa ra. Nếu
+   :attr:`sys.implementation.cache_tag <sys.implementation>` chưa được định nghĩa,
+   :exc:`NotImplementedError` được đưa ra.
 
    .. versionadded:: 3.4
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 .. function:: decode_source(source_bytes)
 
-   Decode the given bytes representing source code and return it as a string
-   with universal newlines (as required by
+   Giải mã các byte đã cho biểu diễn mã nguồn và trả về dưới dạng chuỗi với ký tự xuống dòng phổ quát (universal newlines), theo yêu cầu của
    :meth:`importlib.abc.InspectLoader.get_source`).
 
    .. versionadded:: 3.4
 
 .. function:: resolve_name(name, package)
 
-   Resolve a relative module name to an absolute one.
+   Chuyển đổi tên module tương đối thành tên tuyệt đối.
 
-   If  **name** has no leading dots, then **name** is simply returned. This
-   allows for usage such as
-   ``importlib.util.resolve_name('sys', __spec__.parent)`` without doing a
-   check to see if the **package** argument is needed.
+   Nếu **name** không có dấu chấm ở đầu, thì **name** được trả về nguyên trạng. Điều này cho phép sử dụng như ``importlib.util.resolve_name('sys', __spec__.parent)`` mà không cần kiểm tra xem đối số **package** có cần thiết hay không.
 
-   :exc:`ImportError` is raised if **name** is a relative module name but
-   **package** is a false value (e.g. ``None`` or the empty string).
-   :exc:`ImportError` is also raised if a relative name would escape its
-   containing package (e.g. requesting ``..bacon`` from within the ``spam``
-   package).
+   :exc:`ImportError` được phát sinh nếu **name** là tên mô-đun tương đối nhưng **package** có giá trị false (ví dụ: ``None`` hoặc chuỗi rỗng).
+   :exc:`ImportError` cũng được phát sinh nếu một tên tương đối thoát ra khỏi package chứa nó (ví dụ: yêu cầu ``..bacon`` từ bên trong package ``spam``).
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.9
-      To improve consistency with import statements, raise
-      :exc:`ImportError` instead of :exc:`ValueError` for invalid relative
-      import attempts.
+      Để tăng tính nhất quán với các câu lệnh import, hãy phát sinh
+      :exc:`ImportError` thay vì :exc:`ValueError` cho các lần thử import tương đối không hợp lệ.
 
 .. function:: find_spec(name, package=None)
 
-   Find the :term:`spec <module spec>` for a module, optionally relative to
-   the specified **package** name. If the module is in :data:`sys.modules`,
-   then ``sys.modules[name].__spec__`` is returned (unless the spec would be
-   ``None`` or is not set, in which case :exc:`ValueError` is raised).
-   Otherwise a search using :data:`sys.meta_path` is done. ``None`` is
-   returned if no spec is found.
+   Tìm :term:`spec <module spec>` của một mô-đun, có thể tìm tương đối với tên **package** được chỉ định. Nếu mô-đun nằm trong :data:`sys.modules`, thì ``sys.modules[name].__spec__`` được trả về (trừ khi spec là ``None`` hoặc chưa được thiết lập, trong trường hợp đó :exc:`ValueError` được phát sinh). Nếu không, một tìm kiếm bằng :data:`sys.meta_path` sẽ được thực hiện. ``None`` được trả về nếu không tìm thấy spec.
 
-   If **name** is for a submodule (contains a dot), the parent module is
-   automatically imported.
+   Nếu **name** là tên của một submodule (có chứa dấu chấm), module cha sẽ được tự động import.
 
-   **name** and **package** work the same as for
+   **name** và **package** hoạt động giống như đối với
    :func:`importlib.import_module`.
 
    .. versionadded:: 3.4
 
    .. versionchanged:: 3.7
-      Raises :exc:`ModuleNotFoundError` instead of :exc:`AttributeError` if
-      **package** is in fact not a package (i.e. lacks a
-      :attr:`~module.__path__` attribute).
+      Nêu :exc:`ModuleNotFoundError` thay vì :exc:`AttributeError` nếu **package** thực tế không phải là một package (tức là thiếu một
+      thuộc tính :attr:`~module.__path__`).
 
 .. function:: module_from_spec(spec)
 
-   Create a new module based on **spec** and
+   Tạo một module mới dựa trên **spec** và
    :meth:`spec.loader.create_module <importlib.abc.Loader.create_module>`.
 
-   If :meth:`spec.loader.create_module <importlib.abc.Loader.create_module>`
-   does not return ``None``, then any pre-existing attributes will not be reset.
-   Also, no :exc:`AttributeError` will be raised if triggered while accessing
-   **spec** or setting an attribute on the module.
+   Nếu :meth:`spec.loader.create_module <importlib.abc.Loader.create_module>` không trả về ``None``, thì mọi thuộc tính đã tồn tại trước đó sẽ không được đặt lại. Ngoài ra, sẽ không có :exc:`AttributeError` nào được nêu ra nếu lỗi xảy ra khi truy cập **spec** hoặc đặt một thuộc tính trên module.
 
-   This function is preferred over using :class:`types.ModuleType` to create a
-   new module as **spec** is used to set as many import-controlled attributes on
-   the module as possible.
+   Nên dùng hàm này thay vì sử dụng :class:`types.ModuleType` để tạo module mới, vì **spec** được dùng để đặt nhiều thuộc tính do quá trình import kiểm soát nhất có thể trên module.
 
    .. versionadded:: 3.5
 
 .. function:: spec_from_loader(name, loader, *, origin=None, is_package=None)
 
-   A factory function for creating a :class:`~importlib.machinery.ModuleSpec`
-   instance based on a loader.  The parameters have the same meaning as they do
-   for ModuleSpec.  The function uses available :term:`loader` APIs, such as
-   :meth:`InspectLoader.is_package
-   <importlib.abc.InspectLoader.is_package>`, to fill in any missing
-   information on the spec.
+   Một hàm factory để tạo một thực thể :class:`~importlib.machinery.ModuleSpec` dựa trên một loader. Các tham số có cùng ý nghĩa như trong ModuleSpec. Hàm này sử dụng các API :term:`loader` có sẵn, chẳng hạn như
+   :meth:`InspectLoader.is_package <importlib.abc.InspectLoader.is_package>`, để điền mọi thông tin còn thiếu vào spec.
 
    .. versionadded:: 3.4
 
 .. function:: spec_from_file_location(name, location, *, loader=None, submodule_search_locations=None)
 
-   A factory function for creating a :class:`~importlib.machinery.ModuleSpec`
-   instance based on the path to a file.  Missing information will be filled in
-   on the spec by making use of loader APIs and by the implication that the
-   module will be file-based.
+   Một factory function để tạo một instance :class:`~importlib.machinery.ModuleSpec` dựa trên đường dẫn đến một tệp. Thông tin còn thiếu sẽ được điền vào spec bằng cách sử dụng các API của loader và dựa trên giả định rằng module này sẽ dựa trên tệp.
 
    .. versionadded:: 3.4
 
    .. versionchanged:: 3.6
-      Accepts a :term:`path-like object`.
+      Chấp nhận một :term:`path-like object`.
 
 .. function:: source_hash(source_bytes)
 
-   Return the hash of *source_bytes* as bytes. A hash-based ``.pyc`` file embeds
-   the :func:`source_hash` of the corresponding source file's contents in its
-   header.
+   Trả về giá trị băm của *source_bytes* dưới dạng bytes. Một tệp ``.pyc`` dựa trên giá trị băm sẽ nhúng :func:`source_hash` nội dung của tệp nguồn tương ứng vào phần header.
 
    .. versionadded:: 3.7
 
 .. function:: _incompatible_extension_module_restrictions(*, disable_check)
 
-   A context manager that can temporarily skip the compatibility check
-   for extension modules.  By default the check is enabled and will fail
-   when a single-phase init module is imported in a subinterpreter.
-   It will also fail for a multi-phase init module that doesn't
-   explicitly support a per-interpreter GIL, when imported
-   in an interpreter with its own GIL.
+   Một context manager có thể tạm thời bỏ qua việc kiểm tra tính tương thích đối với các extension module. Theo mặc định, việc kiểm tra được bật và sẽ thất bại khi một module khởi tạo một pha được import trong subinterpreter. Việc kiểm tra cũng sẽ thất bại đối với một module khởi tạo nhiều pha không hỗ trợ rõ ràng GIL riêng cho từng interpreter, khi được import trong một interpreter có GIL riêng.
 
-   Note that this function is meant to accommodate an unusual case;
-   one which is likely to eventually go away.  There's is a pretty good
-   chance this is not what you were looking for.
+   Lưu ý rằng function này nhằm xử lý một trường hợp bất thường, có khả năng sẽ biến mất hoàn toàn trong tương lai. Khả năng khá cao là đây không phải điều bạn đang tìm kiếm.
 
-   You can get the same effect as this function by implementing the
-   basic interface of multi-phase init (:pep:`489`) and lying about
-   support for multiple interpreters (or per-interpreter GIL).
+   Bạn có thể đạt được hiệu ứng tương tự như function này bằng cách triển khai interface cơ bản của khởi tạo nhiều pha (:pep:`489`) và khai báo không đúng về khả năng hỗ trợ nhiều interpreter (hoặc GIL riêng cho từng interpreter).
 
    .. warning::
-      Using this function to disable the check can lead to
-      unexpected behavior and even crashes.  It should only be used during
-      extension module development.
+      Việc sử dụng function này để tắt kiểm tra có thể dẫn đến hành vi không mong đợi, thậm chí gây crash. Chỉ nên sử dụng function này trong quá trình phát triển extension module.
 
    .. versionadded:: 3.12
 
 .. class:: LazyLoader(loader)
 
-   A class which postpones the execution of the loader of a module until the
-   module has an attribute accessed.
+   Một lớp trì hoãn việc thực thi loader của một module cho đến khi một thuộc tính của module được truy cập.
 
-   This class **only** works with loaders that define
-   :meth:`~importlib.abc.Loader.exec_module` as control over what module type
-   is used for the module is required. For those same reasons, the loader's
-   :meth:`~importlib.abc.Loader.create_module` method must return ``None`` or a
-   type for which its ``__class__`` attribute can be mutated along with not
-   using :term:`slots <__slots__>`. Finally, modules which substitute the object
-   placed into :data:`sys.modules` will not work as there is no way to properly
-   replace the module references throughout the interpreter safely;
-   :exc:`ValueError` is raised if such a substitution is detected.
+   Lớp này **chỉ** hoạt động với các loader định nghĩa
+   :meth:`~importlib.abc.Loader.exec_module` vì cần kiểm soát loại module được sử dụng cho module. Vì những lý do tương tự, phương thức của loader
+   :meth:`~importlib.abc.Loader.create_module` phải trả về ``None`` hoặc một kiểu mà thuộc tính ``__class__`` của nó có thể được thay đổi, đồng thời không sử dụng :term:`slots <__slots__>`. Cuối cùng, các module thay thế đối tượng được đặt vào :data:`sys.modules` sẽ không hoạt động vì không có cách nào thay thế đúng cách các tham chiếu đến module trên toàn bộ interpreter một cách an toàn;
+   :exc:`ValueError` được phát sinh nếu phát hiện việc thay thế như vậy.
 
    .. note::
-      For projects where startup time is critical, this class allows for
-      potentially minimizing the cost of loading a module if it is never used.
-      For projects where startup time is not essential then use of this class is
-      **heavily** discouraged due to error messages created during loading being
-      postponed and thus occurring out of context.
+      Đối với các dự án mà thời gian khởi động rất quan trọng, lớp này có thể giúp giảm chi phí tải một module nếu module đó không bao giờ được sử dụng. Đối với các dự án mà thời gian khởi động không thiết yếu, việc sử dụng lớp này bị **khuyến nghị mạnh mẽ** không nên dùng do các thông báo lỗi phát sinh trong quá trình tải bị trì hoãn và vì thế xuất hiện không đúng ngữ cảnh.
 
    .. versionadded:: 3.5
 
    .. versionchanged:: 3.6
-      Began calling :meth:`~importlib.abc.Loader.create_module`, removing the
-      compatibility warning for :class:`importlib.machinery.BuiltinImporter` and
+      Bắt đầu gọi :meth:`~importlib.abc.Loader.create_module`, loại bỏ cảnh báo tương thích đối với :class:`importlib.machinery.BuiltinImporter` và
       :class:`importlib.machinery.ExtensionFileLoader`.
 
    .. classmethod:: factory(loader)
 
-      A class method which returns a callable that creates a lazy loader. This
-      is meant to be used in situations where the loader is passed by class
-      instead of by instance.
-      ::
+      Một phương thức của lớp trả về một callable tạo ra lazy loader. Phương thức này được dùng trong những trường hợp loader được truyền vào dưới dạng lớp
+      thay vì dưới dạng instance.
+      :::::::::::::::::::::::::::
 
-        suffixes = importlib.machinery.SOURCE_SUFFIXES
-        loader = importlib.machinery.SourceFileLoader
-        lazy_loader = importlib.util.LazyLoader.factory(loader)
-        finder = importlib.machinery.FileFinder(path, (lazy_loader, suffixes))
+        suffixes = importlib.machinery.SOURCE_SUFFIXES loader = importlib.machinery.SourceFileLoader lazy_loader = importlib.util.LazyLoader.factory(loader) finder = importlib.machinery.FileFinder(path, (lazy_loader, suffixes))
 
 .. _importlib-examples:
 
-Examples
---------
+Ví dụ
+-----
 
-Importing programmatically
+Import theo cách lập trình
 ''''''''''''''''''''''''''
 
-To programmatically import a module, use :func:`importlib.import_module`.
-::
+Để import một module theo cách lập trình, hãy sử dụng :func:`importlib.import_module`.
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
   import importlib
 
   itertools = importlib.import_module('itertools')
 
 
-Checking if a module can be imported
-''''''''''''''''''''''''''''''''''''
+Kiểm tra xem một module có thể được import hay không
+''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-If you need to find out if a module can be imported without actually doing the
-import, then you should use :func:`importlib.util.find_spec`.
+Nếu bạn cần xác định xem một module có thể được import hay không mà không thực sự thực hiện việc import, bạn nên sử dụng :func:`importlib.util.find_spec`.
 
-Note that if ``name`` is a submodule (contains a dot),
-:func:`importlib.util.find_spec` will import the parent module.
-::
+Lưu ý rằng nếu ``name`` là một submodule (có chứa dấu chấm),
+:func:`importlib.util.find_spec` sẽ import module cha.
+::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-  import importlib.util
-  import sys
+  import importlib.util import sys
 
-  # For illustrative purposes.
-  name = 'itertools'
+  # Chỉ nhằm minh họa. name = 'itertools'
 
   if name in sys.modules:
       print(f"{name!r} already in sys.modules")
   elif (spec := importlib.util.find_spec(name)) is not None:
-      # If you chose to perform the actual import ...
-      module = importlib.util.module_from_spec(spec)
-      sys.modules[name] = module
-      spec.loader.exec_module(module)
-      print(f"{name!r} has been imported")
+      # Nếu bạn chọn thực hiện import thực tế ... module = importlib.util.module_from_spec(spec) sys.modules[name] = module spec.loader.exec_module(module) print(f"{name!r} has been imported")
   else:
       print(f"can't find the {name!r} module")
 
 
-Importing a source file directly
-''''''''''''''''''''''''''''''''
+Import trực tiếp một tệp nguồn
+''''''''''''''''''''''''''''''
 
-This recipe should be used with caution: it is an approximation of an import
-statement where the file path is specified directly, rather than
-:data:`sys.path` being searched. Alternatives should first be considered first,
-such as modifying :data:`sys.path` when a proper module is required, or using
-:func:`runpy.run_path` when the global namespace resulting from running a Python
-file is appropriate.
+Thận trọng khi sử dụng công thức này: đây là cách gần đúng để thực hiện câu lệnh import trong đó đường dẫn tệp được chỉ định trực tiếp, thay vì
+:data:`sys.path` được tìm kiếm. Trước tiên nên cân nhắc các phương án khác, chẳng hạn như sửa đổi :data:`sys.path` khi cần một module phù hợp, hoặc sử dụng
+:func:`runpy.run_path` khi namespace toàn cục tạo ra từ việc chạy tệp Python là phù hợp.
 
-To import a Python source file directly from a path, use the following recipe::
+Để import trực tiếp tệp mã nguồn Python từ một đường dẫn, hãy sử dụng công thức sau::
 
     import importlib.util
     import sys
@@ -1441,19 +1079,19 @@ To import a Python source file directly from a path, use the following recipe::
         return module
 
 
-    # For illustrative purposes only (use of `json` is arbitrary).
+    # Chỉ nhằm mục đích minh họa (việc sử dụng `json` là tùy ý).
     import json
     file_path = json.__file__
     module_name = json.__name__
 
-    # Similar outcome as `import json`.
+    # Kết quả tương tự như `import json`.
     json = import_from_path(module_name, file_path)
 
 
-Implementing lazy imports
-'''''''''''''''''''''''''
+Triển khai lazy import
+''''''''''''''''''''''
 
-The example below shows how to implement lazy imports::
+Ví dụ dưới đây cho thấy cách triển khai lazy import::
 
     >>> import importlib.util
     >>> import sys
@@ -1467,53 +1105,42 @@ The example below shows how to implement lazy imports::
     ...     return module
     ...
     >>> lazy_typing = lazy_import("typing")
-    >>> #lazy_typing is a real module object,
-    >>> #but it is not loaded in memory yet.
+    >>> #lazy_typing là một đối tượng module thực sự,
+    >>> #nhưng hiện vẫn chưa được tải vào bộ nhớ.
     >>> lazy_typing.TYPE_CHECKING
     False
 
 
-Setting up an importer
-''''''''''''''''''''''
+Thiết lập importer
+''''''''''''''''''
 
-For deep customizations of import, you typically want to implement an
-:term:`importer`. This means managing both the :term:`finder` and :term:`loader`
-side of things. For finders there are two flavours to choose from depending on
-your needs: a :term:`meta path finder` or a :term:`path entry finder`. The
-former is what you would put on :data:`sys.meta_path` while the latter is what
-you create using a :term:`path entry hook` on :data:`sys.path_hooks` which works
-with :data:`sys.path` entries to potentially create a finder. This example will
-show you how to register your own importers so that import will use them (for
-creating an importer for yourself, read the documentation for the appropriate
-classes defined within this package)::
+Để tùy chỉnh sâu việc import, thông thường bạn sẽ muốn triển khai một
+:term:`importer`. Điều này có nghĩa là quản lý cả phần :term:`finder` và :term:`loader`. Đối với finder, có hai dạng để lựa chọn tùy theo nhu cầu: :term:`meta path finder` hoặc :term:`path entry finder`. Dạng đầu tiên là thứ bạn sẽ đặt trên :data:`sys.meta_path`, còn dạng sau là thứ bạn tạo bằng một :term:`path entry hook` trên :data:`sys.path_hooks`, hoạt động với các mục :data:`sys.path` để có thể tạo ra một finder. Ví dụ này sẽ hướng dẫn bạn cách đăng ký các importer của riêng mình để import sử dụng chúng (để tạo một importer cho chính bạn, hãy đọc tài liệu về các class thích hợp được định nghĩa trong package này)::
 
   import importlib.machinery
   import sys
 
-  # For illustrative purposes only.
+  # Chỉ nhằm mục đích minh họa.
   SpamMetaPathFinder = importlib.machinery.PathFinder
   SpamPathEntryFinder = importlib.machinery.FileFinder
   loader_details = (importlib.machinery.SourceFileLoader,
                     importlib.machinery.SOURCE_SUFFIXES)
 
-  # Setting up a meta path finder.
-  # Make sure to put the finder in the proper location in the list in terms of
-  # priority.
+  # Thiết lập bộ tìm kiếm meta path.
+  # Đảm bảo đặt bộ tìm kiếm ở vị trí thích hợp trong danh sách xét theo
+  # độ ưu tiên.
   sys.meta_path.append(SpamMetaPathFinder)
 
-  # Setting up a path entry finder.
-  # Make sure to put the path hook in the proper location in the list in terms
-  # of priority.
+  # Thiết lập bộ tìm kiếm mục nhập đường dẫn.
+  # Đảm bảo đặt path hook ở vị trí thích hợp trong danh sách xét theo
+  # độ ưu tiên.
   sys.path_hooks.append(SpamPathEntryFinder.path_hook(loader_details))
 
 
-Approximating :func:`importlib.import_module`
-'''''''''''''''''''''''''''''''''''''''''''''
+Mô phỏng :func:`importlib.import_module`
+''''''''''''''''''''''''''''''''''''''''
 
-Import itself is implemented in Python code, making it possible to
-expose most of the import machinery through importlib. The following
-helps illustrate the various APIs that importlib exposes by providing an
-approximate implementation of
+Bản thân thao tác import được triển khai bằng mã Python, nhờ đó có thể cung cấp hầu hết cơ chế import thông qua importlib. Phần sau minh họa các API khác nhau mà importlib cung cấp bằng cách đưa ra một cách triển khai gần đúng của
 :func:`importlib.import_module`::
 
   import importlib.util

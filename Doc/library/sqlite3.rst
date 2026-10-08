@@ -1,12 +1,12 @@
-:mod:`!sqlite3` --- DB-API 2.0 interface for SQLite databases
-=============================================================
+:mod:`!sqlite3` --- Giao diện DB-API 2.0 cho cơ sở dữ liệu SQLite
+=================================================================
 
 .. module:: sqlite3
-   :synopsis: A DB-API 2.0 implementation using SQLite 3.x.
+   :synopsis: Một triển khai DB-API 2.0 sử dụng SQLite 3.x.
 
 .. sectionauthor:: Gerhard Häring <gh@ghaering.de>
 
-**Source code:** :source:`Lib/sqlite3/`
+**Mã nguồn:** :source:`Lib/sqlite3/`
 
 .. Make sure we always doctest the tutorial with an empty database.
 
@@ -22,39 +22,29 @@
 
 .. _sqlite3-intro:
 
-SQLite is a C library that provides a lightweight disk-based database that
-doesn't require a separate server process and allows accessing the database
-using a nonstandard variant of the SQL query language. Some applications can use
-SQLite for internal data storage.  It's also possible to prototype an
-application using SQLite and then port the code to a larger database such as
-PostgreSQL or Oracle.
+SQLite là một thư viện C cung cấp cơ sở dữ liệu nhẹ trên đĩa, không yêu cầu một tiến trình máy chủ riêng và cho phép truy cập cơ sở dữ liệu bằng một biến thể không chuẩn của ngôn ngữ truy vấn SQL. Một số ứng dụng có thể sử dụng SQLite để lưu trữ dữ liệu nội bộ. Bạn cũng có thể tạo nguyên mẫu ứng dụng bằng SQLite rồi chuyển mã sang một cơ sở dữ liệu lớn hơn như PostgreSQL hoặc Oracle.
 
-The :mod:`!sqlite3` module was written by Gerhard Häring.  It provides an SQL interface
-compliant with the DB-API 2.0 specification described by :pep:`249`, and
-requires the third-party `SQLite <https://sqlite.org/>`_ library.
+Mô-đun :mod:`!sqlite3` do Gerhard Häring viết. Mô-đun này cung cấp giao diện SQL tuân thủ đặc tả DB-API 2.0 được mô tả bởi :pep:`249`, và yêu cầu thư viện `SQLite <https://sqlite.org/>`_ của bên thứ ba.
 
 .. include:: ../includes/optional-module.rst
 
-This document includes four main sections:
+Tài liệu này gồm bốn phần chính:
 
-* :ref:`sqlite3-tutorial` teaches how to use the :mod:`!sqlite3` module.
-* :ref:`sqlite3-reference` describes the classes and functions this module
-  defines.
-* :ref:`sqlite3-howtos` details how to handle specific tasks.
-* :ref:`sqlite3-explanation` provides in-depth background on
-  transaction control.
+* :ref:`sqlite3-tutorial` hướng dẫn cách sử dụng mô-đun :mod:`!sqlite3`.
+* :ref:`sqlite3-reference` mô tả các lớp và hàm mà module này định nghĩa.
+* :ref:`sqlite3-howtos` trình bày chi tiết cách xử lý các tác vụ cụ thể.
+* :ref:`sqlite3-explanation` cung cấp thông tin nền tảng chuyên sâu về việc kiểm soát giao dịch.
 
 .. seealso::
 
    https://www.sqlite.org
-      The SQLite web page; the documentation describes the syntax and the
-      available data types for the supported SQL dialect.
+      Trang web SQLite; tài liệu mô tả cú pháp và các kiểu dữ liệu hiện có cho phương ngữ SQL được hỗ trợ.
 
    https://www.w3schools.com/sql/
-      Tutorial, reference and examples for learning SQL syntax.
+      Hướng dẫn, tài liệu tham khảo và ví dụ để học cú pháp SQL.
 
-   :pep:`249` - Database API Specification 2.0
-      PEP written by Marc-André Lemburg.
+   :pep:`249` - Đặc tả Database API 2.0
+      PEP do Marc-André Lemburg viết.
 
 
 .. We use the following practices for SQL code:
@@ -66,44 +56,27 @@ This document includes four main sections:
 
 .. _sqlite3-tutorial:
 
-Tutorial
---------
+Hướng dẫn
+---------
 
-In this tutorial, you will create a database of Monty Python movies
-using basic :mod:`!sqlite3` functionality.
-It assumes a fundamental understanding of database concepts,
-including `cursors`_ and `transactions`_.
+Trong hướng dẫn này, bạn sẽ tạo một cơ sở dữ liệu về các bộ phim của Monty Python bằng chức năng :mod:`!sqlite3` cơ bản. Hướng dẫn này giả định bạn đã nắm được những khái niệm nền tảng về cơ sở dữ liệu, bao gồm `cursors`_ và `transactions`_.
 
-First, we need to create a new database and open
-a database connection to allow :mod:`!sqlite3` to work with it.
-Call :func:`sqlite3.connect` to create a connection to
-the database :file:`tutorial.db` in the current working directory,
-implicitly creating it if it does not exist:
+Trước tiên, chúng ta cần tạo một cơ sở dữ liệu mới và mở một kết nối cơ sở dữ liệu để :mod:`!sqlite3` có thể làm việc với cơ sở dữ liệu đó. Gọi :func:`sqlite3.connect` để tạo kết nối đến cơ sở dữ liệu :file:`tutorial.db` trong thư mục làm việc hiện tại; cơ sở dữ liệu sẽ được tạo ngầm nếu chưa tồn tại:
 
 .. testcode::
 
    import sqlite3
    con = sqlite3.connect("tutorial.db")
 
-The returned :class:`Connection` object ``con``
-represents the connection to the on-disk database.
+Đối tượng :class:`Connection` được trả về, ``con``, đại diện cho kết nối đến cơ sở dữ liệu trên đĩa.
 
-In order to execute SQL statements and fetch results from SQL queries,
-we will need to use a database cursor.
-Call :meth:`con.cursor() <Connection.cursor>` to create the :class:`Cursor`:
+Để thực thi các câu lệnh SQL và lấy kết quả từ các truy vấn SQL, chúng ta cần sử dụng một database cursor. Gọi :meth:`con.cursor() <Connection.cursor>` để tạo :class:`Cursor`:
 
 .. testcode::
 
    cur = con.cursor()
 
-Now that we've got a database connection and a cursor,
-we can create a database table ``movie`` with columns for title,
-release year, and review score.
-For simplicity, we can just use column names in the table declaration --
-thanks to the `flexible typing`_ feature of SQLite,
-specifying the data types is optional.
-Execute the ``CREATE TABLE`` statement
-by calling :meth:`cur.execute(...) <Cursor.execute>`:
+Giờ đây, khi đã có kết nối cơ sở dữ liệu và cursor, chúng ta có thể tạo một bảng cơ sở dữ liệu ``movie`` với các cột cho tiêu đề, năm phát hành và điểm đánh giá. Để đơn giản, chúng ta chỉ cần sử dụng tên cột trong khai báo bảng — nhờ tính năng `kiểu dữ liệu linh hoạt <flexible typing_>`_ của SQLite, việc chỉ định kiểu dữ liệu là tùy chọn. Thực thi câu lệnh ``CREATE TABLE`` bằng cách gọi :meth:`cur.execute(...) <Cursor.execute>`:
 
 .. testcode::
 
@@ -112,13 +85,7 @@ by calling :meth:`cur.execute(...) <Cursor.execute>`:
 .. Ideally, we'd use sqlite_schema instead of sqlite_master below,
    but SQLite versions older than 3.33.0 do not recognise that variant.
 
-We can verify that the new table has been created by querying
-the ``sqlite_master`` table built-in to SQLite,
-which should now contain an entry for the ``movie`` table definition
-(see `The Schema Table`_ for details).
-Execute that query by calling :meth:`cur.execute(...) <Cursor.execute>`,
-assign the result to ``res``,
-and call :meth:`res.fetchone() <Cursor.fetchone>` to fetch the resulting row:
+Chúng ta có thể xác minh rằng bảng mới đã được tạo bằng cách truy vấn bảng ``sqlite_master`` tích hợp sẵn trong SQLite. Bảng này hiện sẽ chứa một mục cho định nghĩa bảng ``movie`` (xem `Bảng lược đồ <The Schema Table_>`_ để biết chi tiết). Thực thi truy vấn đó bằng cách gọi :meth:`cur.execute(...) <Cursor.execute>`, gán kết quả cho ``res``, rồi gọi :meth:`res.fetchone() <Cursor.fetchone>` để lấy hàng kết quả:
 
 .. doctest::
 
@@ -126,10 +93,8 @@ and call :meth:`res.fetchone() <Cursor.fetchone>` to fetch the resulting row:
    >>> res.fetchone()
    ('movie',)
 
-We can see that the table has been created,
-as the query returns a :class:`tuple` containing the table's name.
-If we query ``sqlite_master`` for a non-existent table ``spam``,
-:meth:`!res.fetchone` will return ``None``:
+Ta có thể thấy bảng đã được tạo, vì truy vấn trả về một :class:`tuple` chứa tên bảng. Nếu truy vấn ``sqlite_master`` cho một bảng không tồn tại ``spam``,
+:meth:`!res.fetchone` sẽ trả về ``None``:
 
 .. doctest::
 
@@ -137,9 +102,7 @@ If we query ``sqlite_master`` for a non-existent table ``spam``,
    >>> res.fetchone() is None
    True
 
-Now, add two rows of data supplied as SQL literals
-by executing an ``INSERT`` statement,
-once again by calling :meth:`cur.execute(...) <Cursor.execute>`:
+Bây giờ, thêm hai hàng dữ liệu được cung cấp dưới dạng SQL literal bằng cách thực thi một câu lệnh ``INSERT``, một lần nữa bằng cách gọi :meth:`cur.execute(...) <Cursor.execute>`:
 
 .. testcode::
 
@@ -149,21 +112,13 @@ once again by calling :meth:`cur.execute(...) <Cursor.execute>`:
            ('And Now for Something Completely Different', 1971, 7.5)
    """)
 
-The ``INSERT`` statement implicitly opens a transaction,
-which needs to be committed before changes are saved in the database
-(see :ref:`sqlite3-controlling-transactions` for details).
-Call :meth:`con.commit() <Connection.commit>` on the connection object
-to commit the transaction:
+Câu lệnh ``INSERT`` ngầm mở một transaction, transaction này cần được commit trước khi các thay đổi được lưu vào cơ sở dữ liệu (xem :ref:`sqlite3-controlling-transactions` để biết chi tiết). Gọi :meth:`con.commit() <Connection.commit>` trên đối tượng connection để commit transaction:
 
 .. testcode::
 
    con.commit()
 
-We can verify that the data was inserted correctly
-by executing a ``SELECT`` query.
-Use the now-familiar :meth:`cur.execute(...) <Cursor.execute>` to
-assign the result to ``res``,
-and call :meth:`res.fetchall() <Cursor.fetchall>` to return all resulting rows:
+Ta có thể xác minh rằng dữ liệu đã được chèn chính xác bằng cách thực thi một truy vấn ``SELECT``. Sử dụng :meth:`cur.execute(...) <Cursor.execute>` vốn đã quen thuộc để gán kết quả cho ``res``, rồi gọi :meth:`res.fetchall() <Cursor.fetchall>` để trả về tất cả các hàng thu được:
 
 .. doctest::
 
@@ -171,10 +126,9 @@ and call :meth:`res.fetchall() <Cursor.fetchall>` to return all resulting rows:
    >>> res.fetchall()
    [(8.2,), (7.5,)]
 
-The result is a :class:`list` of two :class:`!tuple`\s, one per row,
-each containing that row's ``score`` value.
+Kết quả là một :class:`list` gồm hai :class:`!tuple`\s, mỗi phần tương ứng với một hàng và chứa giá trị ``score`` của hàng đó.
 
-Now, insert three more rows by calling
+Bây giờ, chèn thêm ba hàng bằng cách gọi
 :meth:`cur.executemany(...) <Cursor.executemany>`:
 
 .. testcode::
@@ -185,17 +139,11 @@ Now, insert three more rows by calling
        ("Monty Python's Life of Brian", 1979, 8.0),
    ]
    cur.executemany("INSERT INTO movie VALUES(?, ?, ?)", data)
-   con.commit()  # Remember to commit the transaction after executing INSERT.
+   con.commit()  # Nhớ commit transaction sau khi thực thi INSERT.
 
-Notice that ``?`` placeholders are used to bind ``data`` to the query.
-Always use placeholders instead of :ref:`string formatting <tut-formatting>`
-to bind Python values to SQL statements,
-to avoid `SQL injection attacks`_
-(see :ref:`sqlite3-placeholders` for more details).
+Lưu ý rằng các placeholder ``?`` được dùng để liên kết ``data`` với query. Luôn sử dụng placeholder thay vì :ref:`string formatting <tut-formatting>` để liên kết các giá trị Python với câu lệnh SQL, nhằm tránh `SQL injection attacks <SQL injection attacks_>`_ (xem :ref:`sqlite3-placeholders` để biết thêm chi tiết).
 
-We can verify that the new rows were inserted
-by executing a ``SELECT`` query,
-this time iterating over the results of the query:
+Bạn có thể xác minh rằng các hàng mới đã được chèn bằng cách thực thi query ``SELECT``, lần này lặp qua các kết quả của query:
 
 .. doctest::
 
@@ -207,13 +155,9 @@ this time iterating over the results of the query:
    (1982, 'Monty Python Live at the Hollywood Bowl')
    (1983, "Monty Python's The Meaning of Life")
 
-Each row is a two-item :class:`tuple` of ``(year, title)``,
-matching the columns selected in the query.
+Mỗi hàng là một :class:`tuple` gồm hai phần tử thuộc ``(year, title)``, tương ứng với các cột được chọn trong query.
 
-Finally, verify that the database has been written to disk
-by calling :meth:`con.close() <Connection.close>`
-to close the existing connection, opening a new one,
-creating a new cursor, then querying the database:
+Cuối cùng, hãy xác minh rằng cơ sở dữ liệu đã được ghi vào đĩa bằng cách gọi :meth:`con.close() <Connection.close>` để đóng connection hiện có, mở một connection mới, tạo một cursor mới, rồi truy vấn cơ sở dữ liệu:
 
 .. doctest::
 
@@ -226,8 +170,7 @@ creating a new cursor, then querying the database:
    The highest scoring Monty Python movie is 'Monty Python and the Holy Grail', released in 1975
    >>> new_con.close()
 
-You've now created an SQLite database using the :mod:`!sqlite3` module,
-inserted data and retrieved values from it in multiple ways.
+Bạn đã tạo một cơ sở dữ liệu SQLite bằng module :mod:`!sqlite3`, chèn dữ liệu và truy xuất các giá trị từ đó theo nhiều cách.
 
 .. _SQL injection attacks: https://en.wikipedia.org/wiki/SQL_injection
 .. _The Schema Table: https://www.sqlite.org/schematab.html
@@ -238,7 +181,7 @@ inserted data and retrieved values from it in multiple ways.
 
 .. seealso::
 
-   * :ref:`sqlite3-howtos` for further reading:
+   * :ref:`sqlite3-howtos` để đọc thêm:
 
      * :ref:`sqlite3-placeholders`
      * :ref:`sqlite3-adapters`
@@ -246,98 +189,52 @@ inserted data and retrieved values from it in multiple ways.
      * :ref:`sqlite3-connection-context-manager`
      * :ref:`sqlite3-howto-row-factory`
 
-   * :ref:`sqlite3-explanation` for in-depth background on transaction control.
+   * :ref:`sqlite3-explanation` để biết thông tin nền tảng chuyên sâu về việc kiểm soát giao dịch.
 
 .. _sqlite3-reference:
 
-Reference
----------
+Tài liệu tham khảo
+------------------
 
 .. We keep the old sqlite3-module-contents ref to prevent breaking links.
 .. _sqlite3-module-contents:
 
 .. _sqlite3-module-functions:
 
-Module functions
-^^^^^^^^^^^^^^^^
+Các hàm mô-đun
+^^^^^^^^^^^^^^
 
 .. function:: connect(database, timeout=5.0, detect_types=0, \
-                      isolation_level="DEFERRED", check_same_thread=True, \
-                      factory=sqlite3.Connection, cached_statements=128, \
-                      uri=False, *, \
-                      autocommit=sqlite3.LEGACY_TRANSACTION_CONTROL)
+                      isolation_level="DEFERRED", check_same_thread=True, \ factory=sqlite3.Connection, cached_statements=128, \ uri=False, *, \ autocommit=sqlite3.LEGACY_TRANSACTION_CONTROL)
 
-   Open a connection to an SQLite database.
+   Mở kết nối đến cơ sở dữ liệu SQLite.
 
-   :param database:
-       The path to the database file to be opened.
-       You can pass ``":memory:"`` to create an `SQLite database existing only
-       in memory <https://sqlite.org/inmemorydb.html>`_, and open a connection
-       to it.
+   :param database:Đường dẫn đến tệp cơ sở dữ liệu cần mở. Bạn có thể truyền ``":memory:"`` để tạo một `cơ sở dữ liệu SQLite chỉ tồn tại trong bộ nhớ <https://sqlite.org/inmemorydb.html>`_ và mở kết nối đến cơ sở dữ liệu đó.
    :type database: :term:`path-like object`
 
-   :param float timeout:
-       How many seconds the connection should wait before raising
-       an :exc:`OperationalError` when a table is locked.
-       If another connection opens a transaction to modify a table,
-       that table will be locked until the transaction is committed.
-       Default five seconds.
+   :param float timeout:Số giây mà kết nối sẽ chờ trước khi phát sinh :exc:`OperationalError` khi một bảng bị khóa. Nếu một kết nối khác mở giao dịch để sửa đổi một bảng, bảng đó sẽ bị khóa cho đến khi giao dịch được commit. Mặc định là năm giây.
 
-   :param int detect_types:
-       Control whether and how data types not
-       :ref:`natively supported by SQLite <sqlite3-types>`
-       are looked up to be converted to Python types,
-       using the converters registered with :func:`register_converter`.
-       Set it to any combination (using ``|``, bitwise or) of
-       :const:`PARSE_DECLTYPES` and :const:`PARSE_COLNAMES`
-       to enable this.
-       Column names take precedence over declared types if both flags are set.
-       By default (``0``), type detection is disabled.
+   :param int detect_types:Kiểm soát việc có tra cứu và cách tra cứu các kiểu dữ liệu không
+       :ref:`được SQLite hỗ trợ gốc <sqlite3-types>` để chuyển đổi thành các kiểu Python, bằng cách sử dụng các converter đã đăng ký với :func:`register_converter`. Đặt giá trị này thành bất kỳ tổ hợp nào (sử dụng ``|``, phép OR theo bit) của
+       :const:`PARSE_DECLTYPES` và :const:`PARSE_COLNAMES` để bật tính năng này. Tên cột được ưu tiên hơn các kiểu đã khai báo nếu cả hai cờ đều được đặt. Theo mặc định (``0``), tính năng phát hiện kiểu bị vô hiệu hóa.
 
-   :param isolation_level:
-       Control legacy transaction handling behaviour.
-       See :attr:`Connection.isolation_level` and
-       :ref:`sqlite3-transaction-control-isolation-level` for more information.
-       Can be ``"DEFERRED"`` (default), ``"EXCLUSIVE"`` or ``"IMMEDIATE"``;
-       or ``None`` to disable opening transactions implicitly.
-       Has no effect unless :attr:`Connection.autocommit` is set to
-       :const:`~sqlite3.LEGACY_TRANSACTION_CONTROL` (the default).
+   :param isolation_level:Kiểm soát hành vi xử lý giao dịch legacy. Xem :attr:`Connection.isolation_level` và
+       :ref:`sqlite3-transaction-control-isolation-level` để biết thêm thông tin. Có thể là ``"DEFERRED"`` (mặc định), ``"EXCLUSIVE"`` hoặc ``"IMMEDIATE"``; hoặc ``None`` để vô hiệu hóa việc ngầm mở các giao dịch. Không có tác dụng trừ khi :attr:`Connection.autocommit` được đặt thành
+       :const:`~sqlite3.LEGACY_TRANSACTION_CONTROL` (mặc định).
    :type isolation_level: str | None
 
-   :param bool check_same_thread:
-       If ``True`` (default), :exc:`ProgrammingError` will be raised
-       if the database connection is used by a thread
-       other than the one that created it.
-       If ``False``, the connection may be accessed in multiple threads;
-       write operations may need to be serialized by the user
-       to avoid data corruption.
-       See :attr:`threadsafety` for more information.
+   :param bool check_same_thread:Nếu ``True`` (mặc định), :exc:`ProgrammingError` sẽ được phát sinh nếu kết nối cơ sở dữ liệu được sử dụng bởi một thread khác với thread đã tạo kết nối đó. Nếu ``False``, kết nối có thể được truy cập trong nhiều thread; người dùng có thể cần tuần tự hóa các thao tác ghi để tránh làm hỏng dữ liệu. Xem :attr:`threadsafety` để biết thêm thông tin.
 
-   :param ~sqlite3.Connection factory:
-       A custom subclass of :class:`Connection` to create the connection with,
-       if not the default :class:`Connection` class.
+   :param ~sqlite3.Connection factory:Một lớp con tùy chỉnh của :class:`Connection` dùng để tạo kết nối, nếu không sử dụng lớp :class:`Connection` mặc định.
 
-   :param int cached_statements:
-       The number of statements that :mod:`!sqlite3`
-       should internally cache for this connection, to avoid parsing overhead.
-       By default, 128 statements.
+   :param int cached_statements:Số lượng câu lệnh mà :mod:`!sqlite3` nên lưu vào bộ nhớ đệm nội bộ cho kết nối này để tránh chi phí phân tích cú pháp. Theo mặc định là 128 câu lệnh.
 
-   :param bool uri:
-       If set to ``True``, *database* is interpreted as a
-       :abbr:`URI (Uniform Resource Identifier)` with a file path
-       and an optional query string.
-       The scheme part *must* be ``"file:"``,
-       and the path can be relative or absolute.
-       The query string allows passing parameters to SQLite,
-       enabling various :ref:`sqlite3-uri-tricks`.
+   :param bool uri:Nếu được đặt thành ``True``, *database* sẽ được diễn giải là một
+       :abbr:`URI (Uniform Resource Identifier)` có đường dẫn tệp và chuỗi truy vấn tùy chọn. Phần scheme *must* là ``"file:"``, còn đường dẫn có thể là tương đối hoặc tuyệt đối. Chuỗi truy vấn cho phép truyền tham số vào SQLite, qua đó bật nhiều :ref:`sqlite3-uri-tricks` khác nhau.
 
-   :param autocommit:
-       Control :pep:`249` transaction handling behaviour.
-       See :attr:`Connection.autocommit` and
-       :ref:`sqlite3-transaction-control-autocommit` for more information.
-       *autocommit* currently defaults to
-       :const:`~sqlite3.LEGACY_TRANSACTION_CONTROL`.
-       The default will change to ``False`` in a future Python release.
+   :param autocommit:Kiểm soát hành vi xử lý giao dịch của :pep:`249`. Xem :attr:`Connection.autocommit` và
+       :ref:`sqlite3-transaction-control-autocommit` để biết thêm thông tin. *autocommit* hiện được mặc định là
+       :const:`~sqlite3.LEGACY_TRANSACTION_CONTROL`. Giá trị mặc định sẽ thay đổi thành ``False`` trong một bản phát hành Python trong tương lai.
    :type autocommit: bool
 
    :rtype: ~sqlite3.Connection
@@ -346,32 +243,25 @@ Module functions
    .. audit-event:: sqlite3.connect/handle connection_handle sqlite3.connect
 
    .. versionchanged:: 3.4
-      Added the *uri* parameter.
+      Đã thêm tham số *uri*.
 
    .. versionchanged:: 3.7
-      *database* can now also be a :term:`path-like object`, not only a string.
+      *database* giờ đây cũng có thể là một :term:`path-like object`, không chỉ là một chuỗi.
 
    .. versionchanged:: 3.10
-      Added the ``sqlite3.connect/handle`` auditing event.
+      Đã thêm sự kiện kiểm tra (auditing event) ``sqlite3.connect/handle``.
 
    .. versionchanged:: 3.12
-      Added the *autocommit* parameter.
+      Đã thêm tham số *autocommit*.
 
    .. versionchanged:: 3.13
-      Positional use of the parameters *timeout*, *detect_types*,
-      *isolation_level*, *check_same_thread*, *factory*, *cached_statements*,
-      and *uri* is deprecated.
-      They will become keyword-only parameters in Python 3.15.
+      Việc sử dụng theo vị trí các tham số *timeout*, *detect_types*, *isolation_level*, *check_same_thread*, *factory*, *cached_statements* và *uri* đã không còn được khuyến nghị. Chúng sẽ trở thành các tham số chỉ dùng theo từ khóa trong Python 3.15.
 
 .. function:: complete_statement(statement)
 
-   Return ``True`` if the string *statement* appears to contain
-   one or more complete SQL statements.
-   No syntactic verification or parsing of any kind is performed,
-   other than checking that there are no unclosed string literals
-   and the statement is terminated by a semicolon.
+   Trả về ``True`` nếu chuỗi *statement* dường như chứa một hoặc nhiều câu lệnh SQL hoàn chỉnh. Không thực hiện bất kỳ việc xác minh cú pháp hoặc phân tích cú pháp nào, ngoại trừ kiểm tra để bảo đảm không có literal chuỗi nào chưa được đóng và câu lệnh được kết thúc bằng dấu chấm phẩy.
 
-   For example:
+   Ví dụ:
 
    .. doctest::
 
@@ -380,70 +270,45 @@ Module functions
       >>> sqlite3.complete_statement("SELECT foo")
       False
 
-   This function may be useful during command-line input
-   to determine if the entered text seems to form a complete SQL statement,
-   or if additional input is needed before calling :meth:`~Cursor.execute`.
+   Hàm này có thể hữu ích khi nhập liệu trên command line để xác định xem văn bản đã nhập có vẻ tạo thành một câu lệnh SQL hoàn chỉnh hay chưa, hoặc có cần thêm dữ liệu đầu vào trước khi gọi :meth:`~Cursor.execute` hay không.
 
-   See :func:`!runsource` in :source:`Lib/sqlite3/__main__.py`
-   for real-world use.
+   Xem :func:`!runsource` trong :source:`Lib/sqlite3/__main__.py` để biết cách sử dụng trong thực tế.
 
 .. function:: enable_callback_tracebacks(flag, /)
 
-   Enable or disable callback tracebacks.
-   By default you will not get any tracebacks in user-defined functions,
-   aggregates, converters, authorizer callbacks etc. If you want to debug them,
-   you can call this function with *flag* set to ``True``. Afterwards, you
-   will get tracebacks from callbacks on :data:`sys.stderr`. Use ``False``
-   to disable the feature again.
+   Bật hoặc tắt traceback của callback. Theo mặc định, bạn sẽ không nhận được traceback nào trong các hàm, aggregate, converter, callback authorizer do người dùng định nghĩa, v.v. Nếu muốn debug chúng, bạn có thể gọi hàm này với *flag* được đặt thành ``True``. Sau đó, bạn sẽ nhận được traceback từ các callback trên :data:`sys.stderr`. Sử dụng ``False`` để tắt lại tính năng này.
 
    .. note::
 
-      Errors in user-defined function callbacks are logged as unraisable exceptions.
-      Use an :func:`unraisable hook handler <sys.unraisablehook>` for
-      introspection of the failed callback.
+      Các lỗi trong callback của hàm do người dùng định nghĩa được ghi lại dưới dạng các exception không thể raise. Sử dụng một :func:`unraisable hook handler <sys.unraisablehook>` để kiểm tra callback bị lỗi.
 
 .. function:: register_adapter(type, adapter, /)
 
-   Register an *adapter* :term:`callable` to adapt the Python type *type*
-   into an SQLite type.
-   The adapter is called with a Python object of type *type* as its sole
-   argument, and must return a value of a
-   :ref:`type that SQLite natively understands <sqlite3-types>`.
+   Đăng ký một *adapter* :term:`callable` để điều chỉnh kiểu Python *type* thành một kiểu SQLite. Adapter nhận một đối tượng Python thuộc kiểu *type* làm đối số duy nhất và phải trả về một giá trị thuộc
+   :ref:`kiểu mà SQLite hiểu một cách nguyên bản <sqlite3-types>`.
 
 .. function:: register_converter(typename, converter, /)
 
-   Register the *converter* :term:`callable` to convert SQLite objects of type
-   *typename* into a Python object of a specific type.
-   The converter is invoked for all SQLite values of type *typename*;
-   it is passed a :class:`bytes` object and should return an object of the
-   desired Python type.
-   Consult the parameter *detect_types* of
-   :func:`connect` for information regarding how type detection works.
+   Đăng ký *converter* :term:`callable` để chuyển đổi các đối tượng SQLite thuộc kiểu *typename* thành một đối tượng Python thuộc kiểu cụ thể. Converter được gọi cho mọi giá trị SQLite thuộc kiểu *typename*; nó nhận một đối tượng :class:`bytes` và phải trả về một đối tượng thuộc kiểu Python mong muốn. Tham khảo tham số *detect_types* của
+   :func:`connect` để biết thông tin về cách hoạt động của việc phát hiện kiểu.
 
-   Note: *typename* and the name of the type in your query are matched
-   case-insensitively.
+   Lưu ý: *typename* và tên của kiểu trong truy vấn sẽ được đối sánh không phân biệt chữ hoa chữ thường.
 
 
 .. _sqlite3-module-constants:
 
-Module constants
-^^^^^^^^^^^^^^^^
+Các hằng số của module
+^^^^^^^^^^^^^^^^^^^^^^
 
 .. data:: LEGACY_TRANSACTION_CONTROL
 
-   Set :attr:`~Connection.autocommit` to this constant to select
-   old style (pre-Python 3.12) transaction control behaviour.
-   See :ref:`sqlite3-transaction-control-isolation-level` for more information.
+   Đặt :attr:`~Connection.autocommit` thành hằng số này để chọn hành vi kiểm soát giao dịch kiểu cũ (trước Python 3.12). Xem :ref:`sqlite3-transaction-control-isolation-level` để biết thêm thông tin.
 
 .. data:: PARSE_DECLTYPES
 
-   Pass this flag value to the *detect_types* parameter of
-   :func:`connect` to look up a converter function using
-   the declared types for each column.
-   The types are declared when the database table is created.
-   :mod:`!sqlite3` will look up a converter function using the first word of the
-   declared type as the converter dictionary key.
-   For example:
+   Truyền giá trị cờ này vào tham số *detect_types* của
+   :func:`connect` để tra cứu một hàm chuyển đổi bằng cách sử dụng các kiểu được khai báo cho từng cột. Các kiểu được khai báo khi bảng cơ sở dữ liệu được tạo.
+   :mod:`!sqlite3` sẽ tra cứu một hàm chuyển đổi bằng cách sử dụng từ đầu tiên của kiểu đã khai báo làm khóa của từ điển bộ chuyển đổi. Ví dụ:
 
    .. code-block:: sql
 
@@ -453,82 +318,62 @@ Module constants
          n number(10)            ! will look up a converter named "number"
        )
 
-   This flag may be combined with :const:`PARSE_COLNAMES` using the ``|``
-   (bitwise or) operator.
+   Cờ này có thể được kết hợp với :const:`PARSE_COLNAMES` bằng toán tử ``|`` (OR theo bit).
 
    .. note::
 
-      Generated fields (for example ``MAX(p)``) are returned as :class:`str`.
-      Use :const:`!PARSE_COLNAMES` to enforce types for such queries.
+      Các trường được tạo (ví dụ ``MAX(p)``) được trả về dưới dạng :class:`str`. Sử dụng :const:`!PARSE_COLNAMES` để thực thi các kiểu cho những truy vấn như vậy.
 
 .. data:: PARSE_COLNAMES
 
-   Pass this flag value to the *detect_types* parameter of
-   :func:`connect` to look up a converter function by
-   using the type name, parsed from the query column name,
-   as the converter dictionary key.
-   The query column name must be wrapped in double quotes (``"``)
-   and the type name must be wrapped in square brackets (``[]``).
+   Truyền giá trị cờ này vào tham số *detect_types* của
+   :func:`connect` để tra cứu một hàm chuyển đổi bằng cách sử dụng tên kiểu, được phân tích từ tên cột truy vấn, làm khóa của từ điển bộ chuyển đổi. Tên cột truy vấn phải được đặt trong dấu ngoặc kép (``"``) và tên kiểu phải được đặt trong dấu ngoặc vuông (``[]``).
 
    .. code-block:: sql
 
       SELECT MAX(p) as "p [point]" FROM test;  ! will look up converter "point"
 
-   This flag may be combined with :const:`PARSE_DECLTYPES` using the ``|``
-   (bitwise or) operator.
+   Cờ này có thể được kết hợp với :const:`PARSE_DECLTYPES` bằng toán tử ``|`` (bitwise or).
 
 .. data:: SQLITE_OK
-          SQLITE_DENY
-          SQLITE_IGNORE
+          SQLITE_DENY SQLITE_IGNORE
 
-   Flags that should be returned by the *authorizer_callback* :term:`callable`
-   passed to :meth:`Connection.set_authorizer`, to indicate whether:
+   Các cờ cần được trả về bởi *authorizer_callback* :term:`callable` được truyền vào :meth:`Connection.set_authorizer`, để cho biết liệu:
 
-   * Access is allowed (:const:`!SQLITE_OK`),
-   * The SQL statement should be aborted with an error (:const:`!SQLITE_DENY`)
-   * The column should be treated as a ``NULL`` value (:const:`!SQLITE_IGNORE`)
+   * Quyền truy cập được cho phép (:const:`!SQLITE_OK`),
+   * Câu lệnh SQL sẽ bị hủy bỏ kèm theo lỗi (:const:`!SQLITE_DENY`)
+   * Cột sẽ được coi là giá trị ``NULL`` (:const:`!SQLITE_IGNORE`)
 
 .. data:: apilevel
 
-   String constant stating the supported DB-API level. Required by the DB-API.
-   Hard-coded to ``"2.0"``.
+   Chuỗi hằng cho biết cấp độ DB-API được hỗ trợ. DB-API yêu cầu hằng này. Được hard-code thành ``"2.0"``.
 
 .. data:: paramstyle
 
-   String constant stating the type of parameter marker formatting expected by
-   the :mod:`!sqlite3` module. Required by the DB-API. Hard-coded to
-   ``"qmark"``.
+   Hằng số chuỗi nêu rõ kiểu định dạng dấu đánh dấu tham số mà module :mod:`!sqlite3` yêu cầu. Đây là yêu cầu của DB-API. Được hard-code thành ``"qmark"``.
 
    .. note::
 
-      The ``named`` DB-API parameter style is also supported.
+      Kiểu tham số ``named`` của DB-API cũng được hỗ trợ.
 
 .. data:: sqlite_version
 
-   Version number of the runtime SQLite library as a :class:`string <str>`.
+   Số phiên bản của thư viện SQLite runtime dưới dạng một :class:`string <str>`.
 
 .. data:: sqlite_version_info
 
-   Version number of the runtime SQLite library as a :class:`tuple` of
+   Số phiên bản của thư viện SQLite runtime dưới dạng một :class:`tuple` của
    :class:`integers <int>`.
 
 .. data:: threadsafety
 
-   Integer constant required by the DB-API 2.0, stating the level of thread
-   safety the :mod:`!sqlite3` module supports. This attribute is set based on
-   the default `threading mode <https://sqlite.org/threadsafe.html>`_ the
-   underlying SQLite library is compiled with. The SQLite threading modes are:
+   Hằng số số nguyên do DB-API 2.0 yêu cầu, nêu rõ mức độ an toàn luồng mà module :mod:`!sqlite3` hỗ trợ. Thuộc tính này được thiết lập dựa trên `threading mode <https://sqlite.org/threadsafe.html>`_ mặc định mà thư viện SQLite bên dưới được biên dịch cùng. Các chế độ luồng của SQLite là:
 
-   1. **Single-thread**: In this mode, all mutexes are disabled and SQLite is
-      unsafe to use in more than a single thread at once.
-   2. **Multi-thread**: In this mode, SQLite can be safely used by multiple
-      threads provided that no single database connection is used
-      simultaneously in two or more threads.
-   3. **Serialized**: In serialized mode, SQLite can be safely used by
-      multiple threads with no restriction.
+   1. **Đơn luồng**: Ở chế độ này, tất cả mutex đều bị vô hiệu hóa và SQLite không an toàn khi được sử dụng đồng thời trong nhiều hơn một luồng.
+   2. **Đa luồng**: Ở chế độ này, SQLite có thể được nhiều luồng sử dụng an toàn, với điều kiện không có một kết nối cơ sở dữ liệu nào được sử dụng đồng thời trong hai hoặc nhiều luồng.
+   3. **Serialized**: Ở chế độ Serialized, SQLite có thể được nhiều thread sử dụng an toàn mà không bị hạn chế.
 
-   The mappings from SQLite threading modes to DB-API 2.0 threadsafety levels
-   are as follows:
+   Ánh xạ từ các chế độ threading của SQLite sang các cấp độ threadsafety của DB-API 2.0 như sau:
 
    +------------------+----------------------+----------------------+-------------------------------+
    | SQLite threading | :pep:`threadsafety   | `SQLITE_THREADSAFE`_ | DB-API 2.0 meaning            |
@@ -547,54 +392,35 @@ Module constants
    .. _SQLITE_THREADSAFE: https://sqlite.org/compile.html#threadsafe
 
    .. versionchanged:: 3.11
-      Set *threadsafety* dynamically instead of hard-coding it to ``1``.
+      Đặt *threadsafety* một cách động thay vì hard-code thành ``1``.
 
 .. _sqlite3-dbconfig-constants:
 
 .. data:: SQLITE_DBCONFIG_DEFENSIVE
-          SQLITE_DBCONFIG_DQS_DDL
-          SQLITE_DBCONFIG_DQS_DML
-          SQLITE_DBCONFIG_ENABLE_FKEY
-          SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER
-          SQLITE_DBCONFIG_ENABLE_LOAD_EXTENSION
-          SQLITE_DBCONFIG_ENABLE_QPSG
-          SQLITE_DBCONFIG_ENABLE_TRIGGER
-          SQLITE_DBCONFIG_ENABLE_VIEW
-          SQLITE_DBCONFIG_LEGACY_ALTER_TABLE
-          SQLITE_DBCONFIG_LEGACY_FILE_FORMAT
-          SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE
-          SQLITE_DBCONFIG_RESET_DATABASE
-          SQLITE_DBCONFIG_TRIGGER_EQP
-          SQLITE_DBCONFIG_TRUSTED_SCHEMA
-          SQLITE_DBCONFIG_WRITABLE_SCHEMA
+          SQLITE_DBCONFIG_DQS_DDL SQLITE_DBCONFIG_DQS_DML SQLITE_DBCONFIG_ENABLE_FKEY SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER SQLITE_DBCONFIG_ENABLE_LOAD_EXTENSION SQLITE_DBCONFIG_ENABLE_QPSG SQLITE_DBCONFIG_ENABLE_TRIGGER SQLITE_DBCONFIG_ENABLE_VIEW SQLITE_DBCONFIG_LEGACY_ALTER_TABLE SQLITE_DBCONFIG_LEGACY_FILE_FORMAT SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE SQLITE_DBCONFIG_RESET_DATABASE SQLITE_DBCONFIG_TRIGGER_EQP SQLITE_DBCONFIG_TRUSTED_SCHEMA SQLITE_DBCONFIG_WRITABLE_SCHEMA
 
-   These constants are used for the :meth:`Connection.setconfig`
-   and :meth:`~Connection.getconfig` methods.
+   Các hằng số này được sử dụng cho các phương thức :meth:`Connection.setconfig` và :meth:`~Connection.getconfig`.
 
-   The availability of these constants varies depending on the version of SQLite
-   Python was compiled with.
+   Tính khả dụng của các hằng số này thay đổi tùy thuộc vào phiên bản SQLite mà Python được biên dịch cùng.
 
    .. versionadded:: 3.12
 
    .. seealso::
 
      https://www.sqlite.org/c3ref/c_dbconfig_defensive.html
-        SQLite docs: Database Connection Configuration Options
+        Tài liệu SQLite: Tùy chọn cấu hình kết nối cơ sở dữ liệu
 
 .. deprecated-removed:: 3.12 3.14
-   The :data:`!version` and :data:`!version_info` constants.
+   Các hằng số :data:`!version` và :data:`!version_info`.
 
 .. _sqlite3-connection-objects:
 
-Connection objects
-^^^^^^^^^^^^^^^^^^
+Các đối tượng kết nối
+^^^^^^^^^^^^^^^^^^^^^
 
 .. class:: Connection
 
-   Each open SQLite database is represented by a ``Connection`` object,
-   which is created using :func:`sqlite3.connect`.
-   Their main purpose is creating :class:`Cursor` objects,
-   and :ref:`sqlite3-controlling-transactions`.
+   Mỗi cơ sở dữ liệu SQLite đang mở được biểu diễn bằng một đối tượng ``Connection``, được tạo bằng :func:`sqlite3.connect`. Mục đích chính của chúng là tạo các đối tượng :class:`Cursor` và :ref:`sqlite3-controlling-transactions`.
 
    .. seealso::
 
@@ -604,124 +430,83 @@ Connection objects
 
    .. versionchanged:: 3.13
 
-      A :exc:`ResourceWarning` is emitted if :meth:`close` is not called before
-      a :class:`!Connection` object is deleted.
+      Một :exc:`ResourceWarning` được phát ra nếu :meth:`close` không được gọi trước khi một đối tượng :class:`!Connection` bị xóa.
 
-   An SQLite database connection has the following attributes and methods:
+   Một kết nối cơ sở dữ liệu SQLite có các thuộc tính và phương thức sau:
 
    .. method:: cursor(factory=Cursor)
 
-      Create and return a :class:`Cursor` object.
-      The cursor method accepts a single optional parameter *factory*. If
-      supplied, this must be a :term:`callable` returning
-      an instance of :class:`Cursor` or its subclasses.
+      Tạo và trả về một đối tượng :class:`Cursor`. Phương thức cursor chấp nhận một tham số tùy chọn duy nhất là *factory*. Nếu được cung cấp, tham số này phải là một :term:`callable` trả về một thực thể của :class:`Cursor` hoặc các lớp con của nó.
 
    .. method:: blobopen(table, column, rowid, /, *, readonly=False, name="main")
 
-      Open a :class:`Blob` handle to an existing
-      :abbr:`BLOB (Binary Large OBject)`.
+      Mở một handle :class:`Blob` tới một đối tượng hiện có
+      :abbr:`BLOB (Đối tượng nhị phân lớn)`.
 
-      :param str table:
-          The name of the table where the blob is located.
+      :param str table:Tên của bảng nơi blob nằm.
 
-      :param str column:
-          The name of the column where the blob is located.
+      :param str column:Tên của cột nơi blob nằm.
 
-      :param int rowid:
-          The row id where the blob is located.
+      :param int rowid:ID của hàng nơi blob nằm.
 
-      :param bool readonly:
-          Set to ``True`` if the blob should be opened without write
-          permissions.
-          Defaults to ``False``.
+      :param bool readonly:Đặt thành ``True`` nếu blob cần được mở mà không có quyền ghi. Mặc định là ``False``.
 
-      :param str name:
-          The name of the database where the blob is located.
-          Defaults to ``"main"``.
+      :param str name:Tên của cơ sở dữ liệu nơi blob nằm. Mặc định là ``"main"``.
 
-      :raises OperationalError:
-          When trying to open a blob in a ``WITHOUT ROWID`` table.
+      :raises OperationalError:Khi cố gắng mở một blob trong bảng ``WITHOUT ROWID``.
 
       :rtype: Blob
 
       .. note::
 
-         The blob size cannot be changed using the :class:`Blob` class.
-         Use the SQL function ``zeroblob`` to create a blob with a fixed size.
+         Không thể thay đổi kích thước blob bằng lớp :class:`Blob`. Sử dụng hàm SQL ``zeroblob`` để tạo blob có kích thước cố định.
 
       .. versionadded:: 3.11
 
    .. method:: commit()
 
-      Commit any pending transaction to the database.
-      If :attr:`autocommit` is ``True``, or there is no open transaction,
-      this method does nothing.
-      If :attr:`!autocommit` is ``False``, a new transaction is implicitly
-      opened if a pending transaction was committed by this method.
+      Commit mọi giao dịch đang chờ vào cơ sở dữ liệu. Nếu :attr:`autocommit` là ``True``, hoặc không có giao dịch nào đang mở, phương thức này không thực hiện thao tác nào. Nếu :attr:`!autocommit` là ``False``, một giao dịch mới sẽ được ngầm mở nếu giao dịch đang chờ đã được commit bởi phương thức này.
 
    .. method:: rollback()
 
-      Roll back to the start of any pending transaction.
-      If :attr:`autocommit` is ``True``, or there is no open transaction,
-      this method does nothing.
-      If :attr:`!autocommit` is ``False``, a new transaction is implicitly
-      opened if a pending transaction was rolled back by this method.
+      Rollback về thời điểm bắt đầu của mọi giao dịch đang chờ. Nếu :attr:`autocommit` là ``True``, hoặc không có giao dịch nào đang mở, phương thức này không thực hiện thao tác nào. Nếu :attr:`!autocommit` là ``False``, một giao dịch mới sẽ được ngầm mở nếu giao dịch đang chờ đã được rollback bởi phương thức này.
 
    .. method:: close()
 
-      Close the database connection.
-      If :attr:`autocommit` is ``False``,
-      any pending transaction is implicitly rolled back.
-      If :attr:`!autocommit` is ``True`` or :data:`LEGACY_TRANSACTION_CONTROL`,
-      no implicit transaction control is executed.
-      Make sure to :meth:`commit` before closing
-      to avoid losing pending changes.
+      Đóng kết nối cơ sở dữ liệu. Nếu :attr:`autocommit` là ``False``, mọi giao dịch đang chờ sẽ được ngầm rollback. Nếu :attr:`!autocommit` là ``True`` hoặc :data:`LEGACY_TRANSACTION_CONTROL`, sẽ không thực hiện việc kiểm soát giao dịch ngầm nào. Hãy đảm bảo :meth:`commit` trước khi đóng để tránh mất các thay đổi đang chờ.
 
    .. method:: execute(sql, parameters=(), /)
 
-      Create a new :class:`Cursor` object and call
-      :meth:`~Cursor.execute` on it with the given *sql* and *parameters*.
-      Return the new cursor object.
+      Tạo một đối tượng :class:`Cursor` mới và gọi
+      :meth:`~Cursor.execute` trên đối tượng đó với *sql* và *parameters* đã cho. Trả về đối tượng cursor mới.
 
    .. method:: executemany(sql, parameters, /)
 
-      Create a new :class:`Cursor` object and call
-      :meth:`~Cursor.executemany` on it with the given *sql* and *parameters*.
-      Return the new cursor object.
+      Tạo một đối tượng :class:`Cursor` mới và gọi
+      :meth:`~Cursor.executemany` trên đó với *sql* và *parameters* đã cho. Trả về đối tượng cursor mới.
 
    .. method:: executescript(sql_script, /)
 
-      Create a new :class:`Cursor` object and call
-      :meth:`~Cursor.executescript` on it with the given *sql_script*.
-      Return the new cursor object.
+      Tạo một đối tượng :class:`Cursor` mới và gọi
+      :meth:`~Cursor.executescript` trên đó với *sql_script* đã cho. Trả về đối tượng cursor mới.
 
    .. method:: create_function(name, narg, func, *, deterministic=False)
 
-      Create or remove a user-defined SQL function.
+      Tạo hoặc xóa một hàm SQL do người dùng định nghĩa.
 
-      :param str name:
-          The name of the SQL function.
+      :param str name:Tên của hàm SQL.
 
-      :param int narg:
-          The number of arguments the SQL function can accept.
-          If ``-1``, it may take any number of arguments.
+      :param int narg:Số lượng đối số mà hàm SQL có thể nhận. Nếu là ``-1``, hàm có thể nhận bất kỳ số lượng đối số nào.
 
-      :param func:
-          A :term:`callable` that is called when the SQL function is invoked.
-          The callable must return :ref:`a type natively supported by SQLite
-          <sqlite3-types>`.
-          Set to ``None`` to remove an existing SQL function.
+      :param func:Một :term:`callable` được gọi khi hàm SQL được gọi. Callable phải trả về :ref:`một kiểu được SQLite hỗ trợ nguyên bản <sqlite3-types>`. Đặt thành ``None`` để xóa một hàm SQL hiện có.
       :type func: :term:`callback` | None
 
-      :param bool deterministic:
-          If ``True``, the created SQL function is marked as
-          `deterministic <https://sqlite.org/deterministic.html>`_,
-          which allows SQLite to perform additional optimizations.
+      :param bool deterministic:Nếu ``True``, hàm SQL được tạo sẽ được đánh dấu là `deterministic <https://sqlite.org/deterministic.html>`_, cho phép SQLite thực hiện thêm các tối ưu hóa.
 
       .. versionchanged:: 3.8
-         Added the *deterministic* parameter.
+         Đã thêm tham số *deterministic*.
 
-      Example:
+      Ví dụ:
 
       .. doctest::
 
@@ -737,35 +522,29 @@ Connection objects
 
       .. versionchanged:: 3.13
 
-         Passing *name*, *narg*, and *func* as keyword arguments is deprecated.
-         These parameters will become positional-only in Python 3.15.
+         Việc truyền *name*, *narg* và *func* dưới dạng đối số từ khóa không được khuyến nghị. Các tham số này sẽ chỉ có thể được truyền theo vị trí trong Python 3.15.
 
 
    .. method:: create_aggregate(name, n_arg, aggregate_class)
 
-      Create or remove a user-defined SQL aggregate function.
+      Tạo hoặc xóa một hàm aggregate SQL do người dùng định nghĩa.
 
-      :param str name:
-          The name of the SQL aggregate function.
+      :param str name:Tên của hàm aggregate SQL.
 
-      :param int n_arg:
-          The number of arguments the SQL aggregate function can accept.
-          If ``-1``, it may take any number of arguments.
+      :param int n_arg:Số lượng đối số mà hàm aggregate SQL có thể nhận. Nếu ``-1``, hàm có thể nhận bất kỳ số lượng đối số nào.
 
-      :param aggregate_class:
-          A class must implement the following methods:
+      :param aggregate_class:Một class phải triển khai các phương thức sau:
 
-          * ``step()``: Add a row to the aggregate.
-          * ``finalize()``: Return the final result of the aggregate as
-            :ref:`a type natively supported by SQLite <sqlite3-types>`.
+          * ``step()``: Thêm một hàng vào aggregate.
+          * ``finalize()``: Trả về kết quả cuối cùng của aggregate dưới dạng
+            :ref:`một kiểu được SQLite hỗ trợ nguyên bản <sqlite3-types>`.
 
-          The number of arguments that the ``step()`` method must accept
-          is controlled by *n_arg*.
+          Số lượng đối số mà phương thức ``step()`` phải chấp nhận được kiểm soát bởi *n_arg*.
 
-          Set to ``None`` to remove an existing SQL aggregate function.
+          Đặt thành ``None`` để xóa một hàm aggregate SQL hiện có.
       :type aggregate_class: :term:`class` | None
 
-      Example:
+      Ví dụ:
 
       .. testcode::
 
@@ -796,48 +575,40 @@ Connection objects
 
       .. versionchanged:: 3.13
 
-         Passing *name*, *n_arg*, and *aggregate_class* as keyword arguments is deprecated.
-         These parameters will become positional-only in Python 3.15.
+         Việc truyền *name*, *n_arg* và *aggregate_class* dưới dạng đối số từ khóa đã không còn được khuyến nghị. Các tham số này sẽ chỉ được phép truyền theo vị trí trong Python 3.15.
 
 
    .. method:: create_window_function(name, num_params, aggregate_class, /)
 
-      Create or remove a user-defined aggregate window function.
+      Tạo hoặc xóa một hàm cửa sổ aggregate do người dùng định nghĩa.
 
-      :param str name:
-          The name of the SQL aggregate window function to create or remove.
+      :param str name:Tên của hàm cửa sổ aggregate SQL cần tạo hoặc xóa.
 
-      :param int num_params:
-          The number of arguments the SQL aggregate window function can accept.
-          If ``-1``, it may take any number of arguments.
+      :param int num_params:Số lượng đối số mà hàm cửa sổ aggregate SQL có thể nhận. Nếu là ``-1``, hàm có thể nhận số lượng đối số bất kỳ.
 
-      :param aggregate_class:
-          A class that must implement the following methods:
+      :param aggregate_class:Một lớp phải triển khai các phương thức sau:
 
-          * ``step()``: Add a row to the current window.
-          * ``value()``: Return the current value of the aggregate.
-          * ``inverse()``: Remove a row from the current window.
-          * ``finalize()``: Return the final result of the aggregate as
-            :ref:`a type natively supported by SQLite <sqlite3-types>`.
+          * ``step()``: Thêm một hàng vào cửa sổ hiện tại.
+          * ``value()``: Trả về giá trị hiện tại của aggregate.
+          * ``inverse()``: Xóa một hàng khỏi cửa sổ hiện tại.
+          * ``finalize()``: Trả về kết quả cuối cùng của aggregate dưới dạng
+            :ref:`một kiểu được SQLite hỗ trợ nguyên bản <sqlite3-types>`.
 
-          The number of arguments that the ``step()`` and ``value()`` methods
-          must accept is controlled by *num_params*.
+          Số lượng đối số mà các phương thức ``step()`` và ``value()`` phải chấp nhận được kiểm soát bởi *num_params*.
 
-          Set to ``None`` to remove an existing SQL aggregate window function.
+          Đặt thành ``None`` để xóa một hàm cửa sổ tổng hợp SQL hiện có.
 
-      :raises NotSupportedError:
-          If used with a version of SQLite older than 3.25.0,
-          which does not support aggregate window functions.
+      :raises NotSupportedError:Nếu được sử dụng với phiên bản SQLite cũ hơn 3.25.0, phiên bản không hỗ trợ các hàm cửa sổ tổng hợp.
 
       :type aggregate_class: :term:`class` | None
 
       .. versionadded:: 3.11
 
-      Example:
+      Ví dụ:
 
       .. testcode::
 
-         # Example taken from https://www.sqlite.org/windowfunctions.html#udfwinfunc
+         # Ví dụ lấy từ https://www.sqlite.org/windowfunctions.html#udfwinfunc
          class WindowSumInt:
              def __init__(self):
                  self.count = 0
@@ -889,15 +660,13 @@ Connection objects
 
    .. method:: create_collation(name, callable, /)
 
-      Create a collation named *name* using the collating function *callable*.
-      *callable* is passed two :class:`string <str>` arguments,
-      and it should return an :class:`integer <int>`:
+      Tạo một collation có tên *name* bằng hàm đối chiếu *callable*. *callable* nhận hai đối số :class:`string <str>`, và hàm này nên trả về một :class:`integer <int>`:
 
-      * ``1`` if the first is ordered higher than the second
-      * ``-1`` if the first is ordered lower than the second
-      * ``0`` if they are ordered equal
+      * ``1`` nếu phần tử thứ nhất được sắp xếp cao hơn phần tử thứ hai
+      * ``-1`` nếu phần tử thứ nhất được sắp xếp trước phần tử thứ hai
+      * ``0`` nếu thứ tự của chúng bằng nhau
 
-      The following example shows a reverse sorting collation:
+      Ví dụ sau đây minh họa một collation dùng để sắp xếp theo thứ tự ngược:
 
       .. testcode::
 
@@ -925,121 +694,83 @@ Connection objects
          ('b',)
          ('a',)
 
-      Remove a collation function by setting *callable* to ``None``.
+      Xóa một hàm collation bằng cách đặt *callable* thành ``None``.
 
       .. versionchanged:: 3.11
-         The collation name can contain any Unicode character.  Earlier, only
-         ASCII characters were allowed.
+         Tên collation có thể chứa bất kỳ ký tự Unicode nào. Trước đây, chỉ cho phép các ký tự ASCII.
 
 
    .. method:: interrupt()
 
-      Call this method from a different thread to abort any queries that might
-      be executing on the connection.
-      Aborted queries will raise an :exc:`OperationalError`.
+      Gọi phương thức này từ một thread khác để hủy mọi truy vấn có thể đang thực thi trên connection. Các truy vấn bị hủy sẽ phát sinh một :exc:`OperationalError`.
 
 
    .. method:: set_authorizer(authorizer_callback)
 
-      Register :term:`callable` *authorizer_callback* to be invoked
-      for each attempt to access a column of a table in the database.
-      The callback should return one of :const:`SQLITE_OK`,
-      :const:`SQLITE_DENY`, or :const:`SQLITE_IGNORE`
-      to signal how access to the column should be handled
-      by the underlying SQLite library.
+      Đăng ký :term:`callable` *authorizer_callback* để được gọi cho mỗi lần thử truy cập một cột của một bảng trong cơ sở dữ liệu. Callback phải trả về một trong các giá trị sau: :const:`SQLITE_OK`,
+      :const:`SQLITE_DENY`, hoặc :const:`SQLITE_IGNORE` để báo hiệu cách thư viện SQLite bên dưới cần xử lý quyền truy cập vào cột.
 
-      The first argument to the callback signifies what kind of operation is to be
-      authorized. The second and third argument will be arguments or ``None``
-      depending on the first argument. The 4th argument is the name of the database
-      ("main", "temp", etc.) if applicable. The 5th argument is the name of the
-      inner-most trigger or view that is responsible for the access attempt or
-      ``None`` if this access attempt is directly from input SQL code.
+      Đối số đầu tiên của callback cho biết loại thao tác cần được cấp quyền. Đối số thứ hai và thứ ba sẽ là các đối số hoặc ``None`` tùy thuộc vào đối số đầu tiên. Đối số thứ 4 là tên cơ sở dữ liệu ("main", "temp", v.v.) nếu có. Đối số thứ 5 là tên của trigger hoặc view ở trong cùng chịu trách nhiệm cho lần thử truy cập, hoặc ``None`` nếu lần thử truy cập này đến trực tiếp từ mã SQL đầu vào.
 
-      Please consult the SQLite documentation about the possible values for the first
-      argument and the meaning of the second and third argument depending on the first
-      one. All necessary constants are available in the :mod:`!sqlite3` module.
+      Vui lòng tham khảo tài liệu SQLite để biết các giá trị có thể có của đối số đầu tiên cũng như ý nghĩa của đối số thứ hai và thứ ba tùy thuộc vào đối số đầu tiên. Tất cả các hằng số cần thiết đều có trong mô-đun :mod:`!sqlite3`.
 
-      Passing ``None`` as *authorizer_callback* will disable the authorizer.
+      Truyền ``None`` làm *authorizer_callback* sẽ vô hiệu hóa authorizer.
 
       .. versionchanged:: 3.11
-         Added support for disabling the authorizer using ``None``.
+         Đã bổ sung hỗ trợ vô hiệu hóa authorizer bằng ``None``.
 
       .. versionchanged:: 3.13
-         Passing *authorizer_callback* as a keyword argument is deprecated.
-         The parameter will become positional-only in Python 3.15.
+         Việc truyền *authorizer_callback* dưới dạng đối số từ khóa đã không còn được khuyến nghị. Tham số này sẽ chỉ được phép truyền theo vị trí trong Python 3.15.
 
 
    .. method:: set_progress_handler(progress_handler, n)
 
-      Register :term:`callable` *progress_handler* to be invoked for every *n*
-      instructions of the SQLite virtual machine. This is useful if you want to
-      get called from SQLite during long-running operations, for example to update
-      a GUI.
+      Đăng ký :term:`callable` *progress_handler* để được gọi sau mỗi *n* lệnh của máy ảo SQLite. Điều này hữu ích nếu bạn muốn được gọi từ SQLite trong các thao tác chạy lâu, chẳng hạn như để cập nhật GUI.
 
-      If you want to clear any previously installed progress handler, call the
-      method with ``None`` for *progress_handler*.
+      Nếu muốn xóa mọi progress handler đã được cài đặt trước đó, hãy gọi phương thức với ``None`` cho *progress_handler*.
 
-      Returning a non-zero value from the handler function will terminate the
-      currently executing query and cause it to raise a :exc:`DatabaseError`
-      exception.
+      Việc trả về một giá trị khác không từ hàm handler sẽ chấm dứt truy vấn hiện đang thực thi và khiến truy vấn đó phát sinh ngoại lệ :exc:`DatabaseError`.
 
       .. versionchanged:: 3.13
-         Passing *progress_handler* as a keyword argument is deprecated.
-         The parameter will become positional-only in Python 3.15.
+         Việc truyền *progress_handler* dưới dạng đối số từ khóa không còn được khuyến nghị. Tham số này sẽ chỉ nhận đối số theo vị trí trong Python 3.15.
 
 
    .. method:: set_trace_callback(trace_callback)
 
-      Register :term:`callable` *trace_callback* to be invoked
-      for each SQL statement that is actually executed by the SQLite backend.
+      Đăng ký :term:`callable` *trace_callback* để callback được gọi cho mỗi câu lệnh SQL thực sự được backend SQLite thực thi.
 
-      The only argument passed to the callback is the statement (as
-      :class:`str`) that is being executed. The return value of the callback is
-      ignored. Note that the backend does not only run statements passed to the
-      :meth:`Cursor.execute` methods.  Other sources include the
-      :ref:`transaction management <sqlite3-controlling-transactions>` of the
-      :mod:`!sqlite3` module and the execution of triggers defined in the current
-      database.
+      Đối số duy nhất được truyền cho callback là câu lệnh (dưới dạng
+      :class:`str`) đang được thực thi. Giá trị trả về của callback bị bỏ qua. Lưu ý rằng backend không chỉ chạy các câu lệnh được truyền cho
+      :meth:`Cursor.execute` các phương thức. Các nguồn khác bao gồm
+      :ref:`quản lý giao dịch <sqlite3-controlling-transactions>` của
+      :mod:`!sqlite3` module và việc thực thi các trigger được định nghĩa trong cơ sở dữ liệu hiện tại.
 
-      Passing ``None`` as *trace_callback* will disable the trace callback.
+      Truyền ``None`` làm *trace_callback* sẽ vô hiệu hóa trace callback.
 
       .. note::
-         Exceptions raised in the trace callback are not propagated. As a
-         development and debugging aid, use
-         :meth:`~sqlite3.enable_callback_tracebacks` to enable printing
-         tracebacks from exceptions raised in the trace callback.
+         Các exception được phát sinh trong trace callback không được truyền đi. Để hỗ trợ phát triển và gỡ lỗi, hãy sử dụng
+         :meth:`~sqlite3.enable_callback_tracebacks` để bật việc in traceback từ các exception được phát sinh trong trace callback.
 
       .. versionadded:: 3.3
 
       .. versionchanged:: 3.13
-         Passing *trace_callback* as a keyword argument is deprecated.
-         The parameter will become positional-only in Python 3.15.
+         Việc truyền *trace_callback* dưới dạng keyword argument đã không còn được khuyến nghị. Tham số này sẽ chỉ có thể được truyền theo vị trí trong Python 3.15.
 
 
    .. method:: enable_load_extension(enabled, /)
 
-      Enable the SQLite engine to load SQLite extensions from shared libraries
-      if *enabled* is ``True``;
-      else, disallow loading SQLite extensions.
-      SQLite extensions can define new functions,
-      aggregates or whole new virtual table implementations.  One well-known
-      extension is the fulltext-search extension distributed with SQLite.
+      Cho phép SQLite engine tải các SQLite extension từ shared library nếu *enabled* là ``True``; nếu không, không cho phép tải SQLite extension. SQLite extension có thể định nghĩa các function, aggregate mới hoặc toàn bộ implementation của virtual table mới. Một extension nổi tiếng là extension tìm kiếm toàn văn được phân phối cùng SQLite.
 
       .. note::
 
-         The :mod:`!sqlite3` module is not built with loadable extension support by
-         default, because some platforms (notably macOS) have SQLite
-         libraries which are compiled without this feature.
-         To get loadable extension support,
-         you must pass the :option:`--enable-loadable-sqlite-extensions` option
-         to :program:`configure`.
+         Mô-đun :mod:`!sqlite3` theo mặc định không được xây dựng với hỗ trợ extension có thể nạp, vì một số nền tảng (đáng chú ý là macOS) có các thư viện SQLite được biên dịch mà không có tính năng này. Để có hỗ trợ extension có thể nạp, bạn phải truyền tùy chọn :option:`--enable-loadable-sqlite-extensions` cho :program:`configure`.
 
       .. audit-event:: sqlite3.enable_load_extension connection,enabled sqlite3.Connection.enable_load_extension
 
       .. versionadded:: 3.2
 
       .. versionchanged:: 3.10
-         Added the ``sqlite3.enable_load_extension`` auditing event.
+         Đã thêm sự kiện auditing ``sqlite3.enable_load_extension``.
 
       .. We cannot doctest the load extension API, since there is no convenient
          way to skip it.
@@ -1048,16 +779,16 @@ Connection objects
 
          con.enable_load_extension(True)
 
-         # Load the fulltext search extension
+         # Nạp extension tìm kiếm toàn văn
          con.execute("select load_extension('./fts3.so')")
 
-         # alternatively you can load the extension using an API call:
+         # hoặc bạn có thể nạp extension bằng một lệnh gọi API:
          # con.load_extension("./fts3.so")
 
-         # disable extension loading again
+         # tắt lại việc nạp extension
          con.enable_load_extension(False)
 
-         # example from SQLite wiki
+         # ví dụ từ wiki SQLite
          con.execute("CREATE VIRTUAL TABLE recipe USING fts3(name, ingredients)")
          con.executescript("""
              INSERT INTO recipe (name, ingredients) VALUES('broccoli stew', 'broccoli peppers cheese tomatoes');
@@ -1070,20 +801,15 @@ Connection objects
 
    .. method:: load_extension(path, /, *, entrypoint=None)
 
-      Load an SQLite extension from a shared library.
-      Enable extension loading with :meth:`enable_load_extension` before
-      calling this method.
+      Tải một extension của SQLite từ thư viện dùng chung. Bật tính năng tải extension bằng :meth:`enable_load_extension` trước khi gọi phương thức này.
 
       :param str path:
 
-         The path to the SQLite extension.
+         Đường dẫn đến extension của SQLite.
 
       :param entrypoint:
 
-         Entry point name.
-         If ``None`` (the default),
-         SQLite will come up with an entry point name of its own;
-         see the SQLite docs `Loading an Extension`_ for details.
+         Tên entry point. Nếu ``None`` (giá trị mặc định), SQLite sẽ tự chọn tên entry point; xem tài liệu SQLite `Loading an Extension <Loading an Extension_>`_ để biết chi tiết.
 
       :type entrypoint: str | None
 
@@ -1092,31 +818,28 @@ Connection objects
       .. versionadded:: 3.2
 
       .. versionchanged:: 3.10
-         Added the ``sqlite3.load_extension`` auditing event.
+         Đã thêm sự kiện auditing ``sqlite3.load_extension``.
 
       .. versionchanged:: 3.12
-         Added the *entrypoint* parameter.
+         Đã thêm tham số *entrypoint*.
 
    .. _Loading an Extension: https://www.sqlite.org/loadext.html#loading_an_extension
 
    .. method:: iterdump(*, filter=None)
 
-      Return an :term:`iterator` to dump the database as SQL source code.
-      Useful when saving an in-memory database for later restoration.
-      Similar to the ``.dump`` command in the :program:`sqlite3` shell.
+      Trả về một :term:`iterator` để kết xuất cơ sở dữ liệu dưới dạng mã nguồn SQL. Hữu ích khi lưu cơ sở dữ liệu trong bộ nhớ để khôi phục sau này. Tương tự lệnh ``.dump`` trong shell :program:`sqlite3`.
 
       :param filter:
 
-        An optional ``LIKE`` pattern for database objects to dump, e.g. ``prefix_%``.
-        If ``None`` (the default), all database objects will be included.
+        Một mẫu ``LIKE`` tùy chọn cho các đối tượng cơ sở dữ liệu cần dump, ví dụ: ``prefix_%``. Nếu là ``None`` (mặc định), tất cả các đối tượng cơ sở dữ liệu sẽ được đưa vào.
 
       :type filter: str | None
 
-      Example:
+      Ví dụ:
 
       .. testcode::
 
-         # Convert file example.db to SQL dump file dump.sql
+         # Chuyển đổi tệp example.db thành tệp dump SQL dump.sql
          con = sqlite3.connect('example.db')
          with open('dump.sql', 'w') as f:
              for line in con.iterdump():
@@ -1128,45 +851,26 @@ Connection objects
          :ref:`sqlite3-howto-encoding`
 
       .. versionchanged:: 3.13
-         Added the *filter* parameter.
+         Đã thêm tham số *filter*.
 
    .. method:: backup(target, *, pages=-1, progress=None, name="main", sleep=0.250)
 
-      Create a backup of an SQLite database.
+      Tạo bản sao lưu của cơ sở dữ liệu SQLite.
 
-      Works even if the database is being accessed by other clients
-      or concurrently by the same connection.
+      Vẫn hoạt động ngay cả khi cơ sở dữ liệu đang được các client khác truy cập hoặc được cùng một connection truy cập đồng thời.
 
-      :param ~sqlite3.Connection target:
-          The database connection to save the backup to.
+      :param ~sqlite3.Connection target:Kết nối cơ sở dữ liệu để lưu bản sao lưu vào.
 
-      :param int pages:
-          The number of pages to copy at a time.
-          If equal to or less than ``0``,
-          the entire database is copied in a single step.
-          Defaults to ``-1``.
+      :param int pages:Số trang cần sao chép mỗi lần. Nếu nhỏ hơn hoặc bằng ``0``, toàn bộ cơ sở dữ liệu sẽ được sao chép trong một bước duy nhất. Mặc định là ``-1``.
 
-      :param progress:
-          If set to a :term:`callable`,
-          it is invoked with three integer arguments for every backup iteration:
-          the *status* of the last iteration,
-          the *remaining* number of pages still to be copied,
-          and the *total* number of pages.
-          Defaults to ``None``.
+      :param progress:Nếu được đặt thành một :term:`callable`, nó sẽ được gọi với ba đối số số nguyên cho mỗi lần lặp sao lưu: *trạng thái* của lần lặp trước, *số trang còn lại* vẫn cần sao chép và *tổng số trang*. Mặc định là ``None``.
       :type progress: :term:`callback` | None
 
-      :param str name:
-          The name of the database to back up.
-          Either ``"main"`` (the default) for the main database,
-          ``"temp"`` for the temporary database,
-          or the name of a custom database as attached using the
-          ``ATTACH DATABASE`` SQL statement.
+      :param str name:Tên cơ sở dữ liệu cần sao lưu. Có thể là ``"main"`` (mặc định) cho cơ sở dữ liệu chính, ``"temp"`` cho cơ sở dữ liệu tạm thời hoặc tên của cơ sở dữ liệu tùy chỉnh được đính kèm bằng câu lệnh SQL ``ATTACH DATABASE``.
 
-      :param float sleep:
-          The number of seconds to sleep between successive attempts
-          to back up remaining pages.
+      :param float sleep:Số giây tạm dừng giữa các lần thử liên tiếp để sao lưu các trang còn lại.
 
-      Example 1, copy an existing database into another:
+      Ví dụ 1: sao chép một cơ sở dữ liệu hiện có vào một cơ sở dữ liệu khác:
 
       .. testcode::
 
@@ -1185,7 +889,7 @@ Connection objects
 
          Copied 0 of 0 pages...
 
-      Example 2, copy an existing database into a transient copy:
+      Ví dụ 2, sao chép một cơ sở dữ liệu hiện có vào một bản sao tạm thời:
 
       .. testcode::
 
@@ -1203,18 +907,15 @@ Connection objects
 
    .. method:: getlimit(category, /)
 
-      Get a connection runtime limit.
+      Lấy giới hạn runtime của kết nối.
 
-      :param int category:
-         The `SQLite limit category`_ to be queried.
+      :param int category:`Danh mục giới hạn SQLite <SQLite limit category_>`_ cần truy vấn.
 
       :rtype: int
 
-      :raises ProgrammingError:
-         If *category* is not recognised by the underlying SQLite library.
+      :raises ProgrammingError:Nếu *category* không được thư viện SQLite bên dưới nhận diện.
 
-      Example, query the maximum length of an SQL statement
-      for :class:`Connection` ``con`` (the default is 1000000000):
+      Ví dụ, truy vấn độ dài tối đa của một câu lệnh SQL cho :class:`Connection` ``con`` (mặc định là 1000000000):
 
       .. testsetup:: sqlite3.limits
 
@@ -1233,25 +934,17 @@ Connection objects
 
    .. method:: setlimit(category, limit, /)
 
-      Set a connection runtime limit.
-      Attempts to increase a limit above its hard upper bound are silently
-      truncated to the hard upper bound. Regardless of whether or not the limit
-      was changed, the prior value of the limit is returned.
+      Đặt giới hạn runtime của kết nối. Các nỗ lực tăng giới hạn vượt quá cận trên cố định sẽ bị âm thầm cắt giảm về cận trên cố định. Bất kể giới hạn có được thay đổi hay không, giá trị trước đó của giới hạn sẽ được trả về.
 
-      :param int category:
-         The `SQLite limit category`_ to be set.
+      :param int category:Danh mục `giới hạn SQLite <SQLite limit category_>`_ cần đặt.
 
-      :param int limit:
-         The value of the new limit.
-         If negative, the current limit is unchanged.
+      :param int limit:Giá trị của giới hạn mới. Nếu là số âm, giới hạn hiện tại sẽ không thay đổi.
 
       :rtype: int
 
-      :raises ProgrammingError:
-         If *category* is not recognised by the underlying SQLite library.
+      :raises ProgrammingError:Nếu *category* không được thư viện SQLite bên dưới nhận diện.
 
-      Example, limit the number of attached databases to 1
-      for :class:`Connection` ``con`` (the default limit is 10):
+      Ví dụ, giới hạn số cơ sở dữ liệu được đính kèm ở mức 1 cho :class:`Connection` ``con`` (giới hạn mặc định là 10):
 
       .. doctest:: sqlite3.limits
 
@@ -1271,10 +964,9 @@ Connection objects
 
    .. method:: getconfig(op, /)
 
-      Query a boolean connection configuration option.
+      Truy vấn một tùy chọn cấu hình kết nối kiểu boolean.
 
-      :param int op:
-         A :ref:`SQLITE_DBCONFIG code <sqlite3-dbconfig-constants>`.
+      :param int op:Một :ref:`mã SQLITE_DBCONFIG <sqlite3-dbconfig-constants>`.
 
       :rtype: bool
 
@@ -1282,180 +974,128 @@ Connection objects
 
    .. method:: setconfig(op, enable=True, /)
 
-      Set a boolean connection configuration option.
+      Đặt một tùy chọn cấu hình kết nối kiểu boolean.
 
-      :param int op:
-         A :ref:`SQLITE_DBCONFIG code <sqlite3-dbconfig-constants>`.
+      :param int op:Một :ref:`mã SQLITE_DBCONFIG <sqlite3-dbconfig-constants>`.
 
-      :param bool enable:
-         ``True`` if the configuration option should be enabled (default);
-         ``False`` if it should be disabled.
+      :param bool enable:``True`` nếu tùy chọn cấu hình cần được bật (mặc định); ``False`` nếu tùy chọn này cần được tắt.
 
       .. versionadded:: 3.12
 
    .. method:: serialize(*, name="main")
 
-      Serialize a database into a :class:`bytes` object.  For an
-      ordinary on-disk database file, the serialization is just a copy of the
-      disk file.  For an in-memory database or a "temp" database, the
-      serialization is the same sequence of bytes which would be written to
-      disk if that database were backed up to disk.
+      Tuần tự hóa một cơ sở dữ liệu thành một đối tượng :class:`bytes`. Đối với tệp cơ sở dữ liệu thông thường trên đĩa, dữ liệu tuần tự hóa chỉ là một bản sao của tệp trên đĩa. Đối với cơ sở dữ liệu trong bộ nhớ hoặc cơ sở dữ liệu "temp", dữ liệu tuần tự hóa là cùng một chuỗi byte sẽ được ghi vào đĩa nếu cơ sở dữ liệu đó được sao lưu vào đĩa.
 
-      :param str name:
-         The database name to be serialized.
-         Defaults to ``"main"``.
+      :param str name:Tên cơ sở dữ liệu cần được tuần tự hóa. Mặc định là ``"main"``.
 
       :rtype: bytes
 
       .. note::
 
-         This method is only available if the underlying SQLite library has the
-         serialize API.
+         Phương thức này chỉ khả dụng nếu thư viện SQLite bên dưới có API serialize.
 
       .. versionadded:: 3.11
 
 
    .. method:: deserialize(data, /, *, name="main")
 
-      Deserialize a :meth:`serialized <serialize>` database into a
-      :class:`Connection`.
-      This method causes the database connection to disconnect from database
-      *name*, and reopen *name* as an in-memory database based on the
-      serialization contained in *data*.
+      Giải tuần tự một cơ sở dữ liệu :meth:`serialized <serialize>` thành một
+      :class:`Connection`. Phương thức này khiến kết nối cơ sở dữ liệu ngắt kết nối khỏi cơ sở dữ liệu có tên *name*, rồi mở lại *name* dưới dạng cơ sở dữ liệu trong bộ nhớ dựa trên nội dung tuần tự hóa trong *data*.
 
-      :param bytes data:
-         A serialized database.
+      :param bytes data:Một cơ sở dữ liệu đã được tuần tự hóa.
 
-      :param str name:
-         The database name to deserialize into.
-         Defaults to ``"main"``.
+      :param str name:Tên cơ sở dữ liệu để giải tuần tự vào đó. Mặc định là ``"main"``.
 
-      :raises OperationalError:
-         If the database connection is currently involved in a read
-         transaction or a backup operation.
+      :raises OperationalError:Nếu kết nối cơ sở dữ liệu hiện đang tham gia vào một giao dịch đọc hoặc thao tác sao lưu.
 
-      :raises DatabaseError:
-         If *data* does not contain a valid SQLite database.
+      :raises DatabaseError:Nếu *data* không chứa một cơ sở dữ liệu SQLite hợp lệ.
 
-      :raises OverflowError:
-         If :func:`len(data) <len>` is larger than ``2**63 - 1``.
+      :raises OverflowError:Nếu :func:`len(data) <len>` lớn hơn ``2**63 - 1``.
 
       .. note::
 
-         This method is only available if the underlying SQLite library has the
-         deserialize API.
+         Phương thức này chỉ khả dụng nếu thư viện SQLite nền tảng có API deserialize.
 
       .. versionadded:: 3.11
 
    .. attribute:: autocommit
 
-      This attribute controls :pep:`249`-compliant transaction behaviour.
-      :attr:`!autocommit` has three allowed values:
+      Thuộc tính này kiểm soát hành vi giao dịch tuân thủ :pep:`249`.
+      :attr:`!autocommit` có ba giá trị được phép:
 
-      * ``False``: Select :pep:`249`-compliant transaction behaviour,
-        implying that :mod:`!sqlite3` ensures a transaction is always open.
-        Use :meth:`commit` and :meth:`rollback` to close transactions.
+      * ``False``: Chọn hành vi giao dịch tuân thủ :pep:`249`, ngụ ý rằng :mod:`!sqlite3` đảm bảo một giao dịch luôn mở. Sử dụng :meth:`commit` và :meth:`rollback` để đóng các giao dịch.
 
-        This is the recommended value of :attr:`!autocommit`.
+        Đây là giá trị được khuyến nghị cho :attr:`!autocommit`.
 
-      * ``True``: Use SQLite's `autocommit mode`_.
-        :meth:`commit` and :meth:`rollback` have no effect in this mode.
+      * ``True``: Sử dụng `chế độ autocommit của SQLite <autocommit mode_>`_.
+        :meth:`commit` và :meth:`rollback` không có tác dụng ở chế độ này.
 
-      * :data:`LEGACY_TRANSACTION_CONTROL`:
-        Pre-Python 3.12 (non-:pep:`249`-compliant) transaction control.
-        See :attr:`isolation_level` for more details.
+      * :data:`LEGACY_TRANSACTION_CONTROL`: Kiểm soát giao dịch trước Python 3.12 (không tuân thủ :pep:`249`). Xem :attr:`isolation_level` để biết thêm chi tiết.
 
-        This is currently the default value of :attr:`!autocommit`.
+        Đây hiện là giá trị mặc định của :attr:`!autocommit`.
 
-      Changing :attr:`!autocommit` to ``False`` will open a new transaction,
-      and changing it to ``True`` will commit any pending transaction.
+      Thay đổi :attr:`!autocommit` thành ``False`` sẽ mở một giao dịch mới, còn thay đổi thành ``True`` sẽ commit mọi giao dịch đang chờ xử lý.
 
-      See :ref:`sqlite3-transaction-control-autocommit` for more details.
+      Xem :ref:`sqlite3-transaction-control-autocommit` để biết thêm chi tiết.
 
       .. note::
 
-         The :attr:`isolation_level` attribute has no effect unless
-         :attr:`autocommit` is :data:`LEGACY_TRANSACTION_CONTROL`.
+         Thuộc tính :attr:`isolation_level` không có tác dụng trừ khi
+         :attr:`autocommit` là :data:`LEGACY_TRANSACTION_CONTROL`.
 
       .. versionadded:: 3.12
 
    .. attribute:: in_transaction
 
-      This read-only attribute corresponds to the low-level SQLite
-      `autocommit mode`_.
+      Thuộc tính chỉ đọc này tương ứng với `chế độ autocommit cấp thấp <autocommit mode_>`_ của SQLite.
 
-      ``True`` if a transaction is active (there are uncommitted changes),
-      ``False`` otherwise.
+      ``True`` nếu một giao dịch đang hoạt động (có các thay đổi chưa commit), ``False`` nếu không.
 
       .. versionadded:: 3.2
 
    .. attribute:: isolation_level
 
-      Controls the :ref:`legacy transaction handling mode
-      <sqlite3-transaction-control-isolation-level>` of :mod:`!sqlite3`.
-      If set to ``None``, transactions are never implicitly opened.
-      If set to one of ``"DEFERRED"``, ``"IMMEDIATE"``, or ``"EXCLUSIVE"``,
-      corresponding to the underlying `SQLite transaction behaviour`_,
-      :ref:`implicit transaction management
-      <sqlite3-transaction-control-isolation-level>` is performed.
+      Kiểm soát :ref:`chế độ xử lý giao dịch legacy <sqlite3-transaction-control-isolation-level>` của :mod:`!sqlite3`. Nếu được đặt thành ``None``, các giao dịch sẽ không bao giờ được mở ngầm. Nếu được đặt thành một trong ``"DEFERRED"``, ``"IMMEDIATE"`` hoặc ``"EXCLUSIVE"``, tương ứng với `hành vi giao dịch SQLite <SQLite transaction behaviour_>`_ cơ bản,
+      :ref:`việc quản lý giao dịch ngầm <sqlite3-transaction-control-isolation-level>` sẽ được thực hiện.
 
-      If not overridden by the *isolation_level* parameter of :func:`connect`,
-      the default is ``""``, which is an alias for ``"DEFERRED"``.
+      Nếu không bị ghi đè bởi tham số *isolation_level* của :func:`connect`, giá trị mặc định là ``""``, đây là bí danh của ``"DEFERRED"``.
 
       .. note::
 
-         Using :attr:`autocommit` to control transaction handling is
-         recommended over using :attr:`!isolation_level`.
-         :attr:`!isolation_level` has no effect unless :attr:`autocommit` is
-         set to :data:`LEGACY_TRANSACTION_CONTROL` (the default).
+         Khuyến nghị sử dụng :attr:`autocommit` để kiểm soát việc xử lý giao dịch thay vì sử dụng :attr:`!isolation_level`.
+         :attr:`!isolation_level` không có tác dụng trừ khi :attr:`autocommit` được đặt thành :data:`LEGACY_TRANSACTION_CONTROL` (mặc định).
 
    .. attribute:: row_factory
 
-      The initial :attr:`~Cursor.row_factory`
-      for :class:`Cursor` objects created from this connection.
-      Assigning to this attribute does not affect the :attr:`!row_factory`
-      of existing cursors belonging to this connection, only new ones.
-      Is ``None`` by default,
-      meaning each row is returned as a :class:`tuple`.
+      :attr:`~Cursor.row_factory` ban đầu cho các đối tượng :class:`Cursor` được tạo từ kết nối này. Việc gán cho thuộc tính này không ảnh hưởng đến :attr:`!row_factory` của các cursor hiện có thuộc kết nối này, mà chỉ ảnh hưởng đến các cursor mới. Theo mặc định, thuộc tính này là ``None``, nghĩa là mỗi hàng được trả về dưới dạng :class:`tuple`.
 
-      See :ref:`sqlite3-howto-row-factory` for more details.
+      Xem :ref:`sqlite3-howto-row-factory` để biết thêm chi tiết.
 
       .. versionchanged:: 3.14.6
-         Deleting the ``row_factory`` attribute is no longer allowed.
+         Không còn được phép xóa thuộc tính ``row_factory``.
 
    .. attribute:: text_factory
 
-      A :term:`callable` that accepts a :class:`bytes` parameter
-      and returns a text representation of it.
-      The callable is invoked for SQLite values with the ``TEXT`` data type.
-      By default, this attribute is set to :class:`str`.
+      Một :term:`callable` nhận tham số :class:`bytes` và trả về biểu diễn dạng văn bản của tham số đó. Callable này được gọi cho các giá trị SQLite có kiểu dữ liệu ``TEXT``. Theo mặc định, thuộc tính này được đặt thành :class:`str`.
 
-      See :ref:`sqlite3-howto-encoding` for more details.
+      Xem :ref:`sqlite3-howto-encoding` để biết thêm chi tiết.
 
       .. versionchanged:: 3.14.6
-         Deleting the ``text_factory`` attribute is no longer allowed.
+         Không còn được phép xóa thuộc tính ``text_factory``.
 
    .. attribute:: total_changes
 
-      Return the total number of database rows that have been modified, inserted, or
-      deleted since the database connection was opened.
+      Trả về tổng số hàng trong cơ sở dữ liệu đã được sửa đổi, chèn hoặc xóa kể từ khi kết nối cơ sở dữ liệu được mở.
 
 
 .. _sqlite3-cursor-objects:
 
-Cursor objects
-^^^^^^^^^^^^^^
+Đối tượng cursor
+^^^^^^^^^^^^^^^^
 
-   A ``Cursor`` object represents a `database cursor`_
-   which is used to execute SQL statements,
-   and manage the context of a fetch operation.
-   Cursors are created using :meth:`Connection.cursor`,
-   or by using any of the :ref:`connection shortcut methods
-   <sqlite3-connection-shortcuts>`.
+   Một đối tượng ``Cursor`` đại diện cho `con trỏ cơ sở dữ liệu <database cursor_>`_ được dùng để thực thi các câu lệnh SQL và quản lý ngữ cảnh của thao tác fetch. Cursor được tạo bằng :meth:`Connection.cursor` hoặc bằng bất kỳ :ref:`phương thức tắt nào của connection <sqlite3-connection-shortcuts>`.
 
-   Cursor objects are :term:`iterators <iterator>`,
-   meaning that if you :meth:`~Cursor.execute` a ``SELECT`` query,
-   you can simply iterate over the cursor to fetch the resulting rows:
+   Đối tượng cursor là :term:`iterator <iterator>`, nghĩa là nếu bạn :meth:`~Cursor.execute` thực thi một ``SELECT`` truy vấn, bạn chỉ cần lặp qua cursor để lấy các hàng kết quả:
 
    .. testsetup:: sqlite3.cursor
 
@@ -1478,71 +1118,49 @@ Cursor objects
 
 .. class:: Cursor
 
-   A :class:`Cursor` instance has the following attributes and methods.
+   Một :class:`Cursor` instance có các thuộc tính và phương thức sau đây.
 
    .. index:: single: ? (question mark); in SQL statements
    .. index:: single: : (colon); in SQL statements
 
    .. method:: execute(sql, parameters=(), /)
 
-      Execute a single SQL statement,
-      optionally binding Python values using
-      :ref:`placeholders <sqlite3-placeholders>`.
+      Thực thi một câu lệnh SQL duy nhất, tùy chọn binding các giá trị Python bằng cách sử dụng
+      :ref:`placeholder <sqlite3-placeholders>`.
 
-      :param str sql:
-         A single SQL statement.
+      :param str sql:Một câu lệnh SQL duy nhất.
 
-      :param parameters:
-         Python values to bind to placeholders in *sql*.
-         A :class:`!dict` if named placeholders are used.
-         A :term:`!sequence` if unnamed placeholders are used.
-         See :ref:`sqlite3-placeholders`.
+      :param parameters:Các giá trị Python để liên kết với các placeholder trong *sql*. Một :class:`!dict` nếu sử dụng placeholder có tên. Một :term:`!sequence` nếu sử dụng placeholder không có tên. Xem :ref:`sqlite3-placeholders`.
       :type parameters: :class:`dict` | :term:`sequence`
 
-      :raises ProgrammingError:
-         When *sql* contains more than one SQL statement.
-         When :ref:`named placeholders <sqlite3-placeholders>` are used
-         and *parameters* is a sequence instead of a :class:`dict`.
+      :raises ProgrammingError:Khi *sql* chứa nhiều câu lệnh SQL. Khi sử dụng :ref:`named placeholders <sqlite3-placeholders>` và *parameters* là một sequence thay vì một :class:`dict`.
 
-      If :attr:`~Connection.autocommit` is
+      Nếu :attr:`~Connection.autocommit` là
       :data:`LEGACY_TRANSACTION_CONTROL`,
-      :attr:`~Connection.isolation_level` is not ``None``,
-      *sql* is an ``INSERT``, ``UPDATE``, ``DELETE``, or ``REPLACE`` statement,
-      and there is no open transaction,
-      a transaction is implicitly opened before executing *sql*.
+      Nếu :attr:`~Connection.isolation_level` không phải là ``None``, *sql* là một câu lệnh ``INSERT``, ``UPDATE``, ``DELETE`` hoặc ``REPLACE``, và không có transaction nào đang mở, một transaction sẽ được ngầm mở trước khi thực thi *sql*.
 
       .. versionchanged:: 3.14
 
-         :exc:`ProgrammingError` is emitted if
-         :ref:`named placeholders <sqlite3-placeholders>` are used
-         and *parameters* is a sequence instead of a :class:`dict`.
+         :exc:`ProgrammingError` sẽ được phát ra nếu
+         Khi sử dụng :ref:`named placeholders <sqlite3-placeholders>` và *parameters* là một sequence thay vì một :class:`dict`.
 
-      Use :meth:`executescript` to execute multiple SQL statements.
+      Sử dụng :meth:`executescript` để thực thi nhiều câu lệnh SQL.
 
    .. method:: executemany(sql, parameters, /)
 
-      For every item in *parameters*,
-      repeatedly execute the :ref:`parameterized <sqlite3-placeholders>`
-      :abbr:`DML (Data Manipulation Language)` SQL statement *sql*.
+      Với mỗi mục trong *parameters*, thực thi lặp lại :ref:`parameterized <sqlite3-placeholders>`
+      Câu lệnh SQL :abbr:`DML (Ngôn ngữ thao tác dữ liệu)` *sql*.
 
-      Uses the same implicit transaction handling as :meth:`~Cursor.execute`.
+      Sử dụng cùng cách xử lý giao dịch ngầm định như :meth:`~Cursor.execute`.
 
-      :param str sql:
-         A single SQL DML statement.
+      :param str sql:Một câu lệnh SQL DML duy nhất.
 
-      :param parameters:
-         An :term:`!iterable` of parameters to bind with
-         the placeholders in *sql*.
-         See :ref:`sqlite3-placeholders`.
+      :param parameters:Một :term:`!iterable` gồm các tham số để liên kết với các placeholder trong *sql*. Xem :ref:`sqlite3-placeholders`.
       :type parameters: :term:`iterable`
 
-      :raises ProgrammingError:
-         When *sql* contains more than one SQL statement
-         or is not a DML statement,
-         When :ref:`named placeholders <sqlite3-placeholders>` are used
-         and the items in *parameters* are sequences instead of :class:`dict`\s.
+      :raises ProgrammingError:Khi *sql* chứa nhiều hơn một câu lệnh SQL hoặc không phải là câu lệnh DML, khi sử dụng :ref:`placeholder được đặt tên <sqlite3-placeholders>` và các mục trong *parameters* là các sequence thay vì :class:`dict`\s.
 
-      Example:
+      Ví dụ:
 
       .. testcode:: sqlite3.cursor
 
@@ -1550,7 +1168,7 @@ Cursor objects
              ("row1",),
              ("row2",),
          ]
-         # cur is an sqlite3.Cursor object
+         # cur là một đối tượng sqlite3.Cursor
          cur.executemany("INSERT INTO data VALUES(?)", rows)
 
       .. testcleanup:: sqlite3.cursor
@@ -1559,35 +1177,27 @@ Cursor objects
 
       .. note::
 
-         Any resulting rows are discarded,
-         including DML statements with `RETURNING clauses`_.
+         Mọi hàng kết quả đều bị loại bỏ, bao gồm cả các câu lệnh DML có mệnh đề `RETURNING clauses <RETURNING clauses_>`_.
 
       .. _RETURNING clauses: https://www.sqlite.org/lang_returning.html
 
       .. versionchanged:: 3.14
 
-         :exc:`ProgrammingError` is emitted if
-         :ref:`named placeholders <sqlite3-placeholders>` are used
-         and the items in *parameters* are sequences
-         instead of :class:`dict`\s.
+         :exc:`ProgrammingError` sẽ được phát ra nếu
+         :ref:`named placeholders <sqlite3-placeholders>` được sử dụng và các mục trong *parameters* là các sequence thay vì :class:`dict`\s.
 
    .. method:: executescript(sql_script, /)
 
-      Execute the SQL statements in *sql_script*.
-      If the :attr:`~Connection.autocommit` is
-      :data:`LEGACY_TRANSACTION_CONTROL`
-      and there is a pending transaction,
-      an implicit ``COMMIT`` statement is executed first.
-      No other implicit transaction control is performed;
-      any transaction control must be added to *sql_script*.
+      Thực thi các câu lệnh SQL trong *sql_script*. Nếu :attr:`~Connection.autocommit` là
+      :data:`LEGACY_TRANSACTION_CONTROL` và có một giao dịch đang chờ xử lý, trước tiên sẽ thực thi một câu lệnh ``COMMIT`` ngầm định. Không thực hiện bất kỳ thao tác kiểm soát giao dịch ngầm định nào khác; mọi thao tác kiểm soát giao dịch phải được thêm vào *sql_script*.
 
-      *sql_script* must be a :class:`string <str>`.
+      *sql_script* phải là một :class:`string <str>`.
 
-      Example:
+      Ví dụ:
 
       .. testcode:: sqlite3.cursor
 
-         # cur is an sqlite3.Cursor object
+         # cur là một đối tượng sqlite3.Cursor
          cur.executescript("""
              BEGIN;
              CREATE TABLE person(firstname, lastname, age);
@@ -1598,67 +1208,49 @@ Cursor objects
 
    .. method:: fetchone()
 
-      If :attr:`~Cursor.row_factory` is ``None``,
-      return the next row query result set as a :class:`tuple`.
-      Else, pass it to the row factory and return its result.
-      Return ``None`` if no more data is available.
+      Nếu :attr:`~Cursor.row_factory` là ``None``, trả về tập kết quả của truy vấn hàng tiếp theo dưới dạng :class:`tuple`. Nếu không, truyền kết quả đó cho row factory và trả về kết quả của nó. Trả về ``None`` nếu không còn dữ liệu.
 
 
    .. method:: fetchmany(size=cursor.arraysize)
 
-      Return the next set of rows of a query result as a :class:`list`.
-      Return an empty list if no more rows are available.
+      Trả về tập các hàng tiếp theo của kết quả truy vấn dưới dạng :class:`list`. Trả về một danh sách rỗng nếu không còn hàng nào.
 
-      The number of rows to fetch per call is specified by the *size* parameter.
-      If *size* is not given, :attr:`arraysize` determines the number of rows
-      to be fetched.
-      If fewer than *size* rows are available,
-      as many rows as are available are returned.
+      Số hàng cần lấy trong mỗi lần gọi được chỉ định bởi tham số *size*. Nếu không cung cấp *size*, :attr:`arraysize` sẽ xác định số hàng cần lấy. Nếu có ít hơn *size* hàng, số hàng hiện có sẽ được trả về.
 
-      Note there are performance considerations involved with the *size* parameter.
-      For optimal performance, it is usually best to use the arraysize attribute.
-      If the *size* parameter is used, then it is best for it to retain the same
-      value from one :meth:`fetchmany` call to the next.
+      Lưu ý rằng tham số *size* có những cân nhắc về hiệu năng. Để đạt hiệu năng tối ưu, thông thường nên sử dụng thuộc tính arraysize. Nếu sử dụng tham số *size*, tốt nhất là giữ nguyên giá trị của tham số này từ lần gọi :meth:`fetchmany` này đến lần gọi tiếp theo.
 
       .. versionchanged:: 3.14.1
-         Negative *size* values are rejected by raising :exc:`ValueError`.
+         Các giá trị *size* âm sẽ bị từ chối bằng cách nêu ra :exc:`ValueError`.
 
    .. method:: fetchall()
 
-      Return all (remaining) rows of a query result as a :class:`list`.
-      Return an empty list if no rows are available.
-      Note that the :attr:`arraysize` attribute can affect the performance of
-      this operation.
+      Trả về tất cả các hàng (còn lại) của kết quả truy vấn dưới dạng một :class:`list`. Trả về một danh sách rỗng nếu không có hàng nào. Lưu ý rằng thuộc tính :attr:`arraysize` có thể ảnh hưởng đến hiệu suất của thao tác này.
 
    .. method:: close()
 
-      Close the cursor now (rather than whenever ``__del__`` is called).
+      Đóng cursor ngay bây giờ (thay vì khi ``__del__`` được gọi).
 
-      The cursor will be unusable from this point forward; a :exc:`ProgrammingError`
-      exception will be raised if any operation is attempted with the cursor.
+      Cursor sẽ không thể sử dụng kể từ thời điểm này; một ngoại lệ :exc:`ProgrammingError` sẽ được phát sinh nếu cố thực hiện bất kỳ thao tác nào với cursor.
 
    .. method:: setinputsizes(sizes, /)
 
-      Required by the DB-API. Does nothing in :mod:`!sqlite3`.
+      Bắt buộc theo DB-API. Không thực hiện thao tác nào trong :mod:`!sqlite3`.
 
    .. method:: setoutputsize(size, column=None, /)
 
-      Required by the DB-API. Does nothing in :mod:`!sqlite3`.
+      Bắt buộc theo DB-API. Không thực hiện thao tác nào trong :mod:`!sqlite3`.
 
    .. attribute:: arraysize
 
-      Read/write attribute that controls the number of rows returned by :meth:`fetchmany`.
-      The default value is 1 which means a single row would be fetched per call.
+      Thuộc tính đọc/ghi kiểm soát số lượng hàng được trả về bởi :meth:`fetchmany`. Giá trị mặc định là 1, nghĩa là mỗi lần gọi sẽ lấy một hàng duy nhất.
 
       .. versionchanged:: 3.14.1
-         Negative values are rejected by raising :exc:`ValueError`.
+         Các giá trị âm sẽ bị từ chối bằng cách phát sinh :exc:`ValueError`.
 
    .. attribute:: connection
 
-      Read-only attribute that provides the SQLite database :class:`Connection`
-      belonging to the cursor.  A :class:`Cursor` object created by
-      calling :meth:`con.cursor() <Connection.cursor>` will have a
-      :attr:`connection` attribute that refers to *con*:
+      Thuộc tính chỉ đọc cung cấp cơ sở dữ liệu SQLite :class:`Connection` thuộc về cursor. Một đối tượng :class:`Cursor` được tạo bằng cách gọi :meth:`con.cursor() <Connection.cursor>` sẽ có
+      thuộc tính :attr:`connection` tham chiếu đến *con*:
 
       .. doctest::
 
@@ -1670,56 +1262,37 @@ Cursor objects
 
    .. attribute:: description
 
-      Read-only attribute that provides the column names of the last query. To
-      remain compatible with the Python DB API, it returns a 7-tuple for each
-      column where the last six items of each tuple are ``None``.
+      Thuộc tính chỉ đọc cung cấp tên các cột của truy vấn gần nhất. Để duy trì khả năng tương thích với Python DB API, thuộc tính này trả về một bộ 7 phần tử cho mỗi cột, trong đó sáu phần tử cuối của mỗi bộ là ``None``.
 
-      It is set for ``SELECT`` statements without any matching rows as well.
+      Thuộc tính này cũng được thiết lập cho các câu lệnh ``SELECT`` không có hàng nào khớp.
 
    .. attribute:: lastrowid
 
-      Read-only attribute that provides the row id of the last inserted row. It
-      is only updated after successful ``INSERT`` or ``REPLACE`` statements
-      using the :meth:`execute` method.  For other statements, after
-      :meth:`executemany` or :meth:`executescript`, or if the insertion failed,
-      the value of ``lastrowid`` is left unchanged.  The initial value of
-      ``lastrowid`` is ``None``.
+      Thuộc tính chỉ đọc cung cấp row id của hàng được chèn gần nhất. Thuộc tính này chỉ được cập nhật sau các câu lệnh ``INSERT`` hoặc ``REPLACE`` thực thi thành công bằng phương thức :meth:`execute`. Đối với các câu lệnh khác, sau khi
+      :meth:`executemany` hoặc :meth:`executescript`, hoặc nếu thao tác chèn thất bại, giá trị của ``lastrowid`` vẫn không thay đổi. Giá trị ban đầu của ``lastrowid`` là ``None``.
 
       .. note::
-         Inserts into ``WITHOUT ROWID`` tables are not recorded.
+         Các thao tác chèn vào bảng ``WITHOUT ROWID`` không được ghi lại.
 
       .. versionchanged:: 3.6
-         Added support for the ``REPLACE`` statement.
+         Đã bổ sung hỗ trợ cho câu lệnh ``REPLACE``.
 
    .. attribute:: rowcount
 
-      Read-only attribute that provides the number of modified rows for
-      ``INSERT``, ``UPDATE``, ``DELETE``, and ``REPLACE`` statements;
-      is ``-1`` for other statements,
-      including :abbr:`CTE (Common Table Expression)` queries.
-      It is only updated by the :meth:`execute` and :meth:`executemany` methods,
-      after the statement has run to completion.
-      This means that any resulting rows must be fetched in order for
-      :attr:`!rowcount` to be updated.
+      Thuộc tính chỉ đọc cung cấp số hàng đã được sửa đổi đối với các câu lệnh ``INSERT``, ``UPDATE``, ``DELETE`` và ``REPLACE``; là ``-1`` đối với các câu lệnh khác, bao gồm cả các truy vấn :abbr:`CTE (Common Table Expression)`. Thuộc tính này chỉ được cập nhật bởi các phương thức :meth:`execute` và :meth:`executemany`, sau khi câu lệnh chạy hoàn tất. Điều này có nghĩa là mọi hàng được trả về phải được lấy để
+      :attr:`!rowcount` được cập nhật.
 
    .. attribute:: row_factory
 
-      Control how a row fetched from this :class:`!Cursor` is represented.
-      If ``None``, a row is represented as a :class:`tuple`.
-      Can be set to the included :class:`sqlite3.Row`;
-      or a :term:`callable` that accepts two arguments,
-      a :class:`Cursor` object and the :class:`!tuple` of row values,
-      and returns a custom object representing an SQLite row.
+      Kiểm soát cách biểu diễn một hàng được lấy từ :class:`!Cursor` này. Nếu là ``None``, một hàng sẽ được biểu diễn dưới dạng :class:`tuple`. Có thể đặt thành :class:`sqlite3.Row` đi kèm; hoặc một :term:`callable` nhận hai đối số, một đối tượng :class:`Cursor` và :class:`!tuple` các giá trị hàng, rồi trả về một đối tượng tùy chỉnh đại diện cho một hàng SQLite.
 
-      Defaults to what :attr:`Connection.row_factory` was set to
-      when the :class:`!Cursor` was created.
-      Assigning to this attribute does not affect
-      :attr:`Connection.row_factory` of the parent connection.
+      Mặc định là giá trị mà :attr:`Connection.row_factory` được đặt thành khi :class:`!Cursor` được tạo. Việc gán cho thuộc tính này không ảnh hưởng đến
+      :attr:`Connection.row_factory` của connection cha.
 
-      See :ref:`sqlite3-howto-row-factory` for more details.
+      Xem :ref:`sqlite3-howto-row-factory` để biết thêm chi tiết.
 
       .. versionchanged:: 3.14.6
-         Deleting the ``row_factory`` attribute is no longer allowed.
+         Việc xóa thuộc tính ``row_factory`` không còn được phép.
 
 
 .. The sqlite3.Row example used to be a how-to. It has now been incorporated
@@ -1729,47 +1302,38 @@ Cursor objects
 .. _sqlite3-columns-by-name:
 .. _sqlite3-row-objects:
 
-Row objects
-^^^^^^^^^^^
+Đối tượng hàng
+^^^^^^^^^^^^^^
 
 .. class:: Row
 
-   A :class:`!Row` instance serves as a highly optimized
-   :attr:`~Connection.row_factory` for :class:`Connection` objects.
-   It supports iteration, equality testing, :func:`len`,
-   and :term:`mapping` access by column name and index.
+   Một instance :class:`!Row` đóng vai trò là một
+   :attr:`~Connection.row_factory` được tối ưu hóa cao cho các đối tượng :class:`Connection`. Nó hỗ trợ việc lặp, kiểm tra tính bằng nhau, :func:`len` và truy cập :term:`mapping` theo tên và chỉ mục cột.
 
-   Two :class:`!Row` objects compare equal
-   if they have identical column names and values.
+   Hai đối tượng :class:`!Row` được xem là bằng nhau nếu chúng có tên cột và giá trị giống hệt nhau.
 
-   See :ref:`sqlite3-howto-row-factory` for more details.
+   Xem :ref:`sqlite3-howto-row-factory` để biết thêm chi tiết.
 
    .. method:: keys
 
-      Return a :class:`list` of column names as :class:`strings <str>`.
-      Immediately after a query,
-      it is the first member of each tuple in :attr:`Cursor.description`.
+      Trả về một :class:`list` gồm tên cột dưới dạng :class:`strings <str>`. Ngay sau một truy vấn, đây là phần tử đầu tiên của mỗi tuple trong :attr:`Cursor.description`.
 
    .. versionchanged:: 3.5
-      Added support of slicing.
+      Đã bổ sung hỗ trợ slicing.
 
 
 .. _sqlite3-blob-objects:
 
-Blob objects
-^^^^^^^^^^^^
+Đối tượng Blob
+^^^^^^^^^^^^^^
 
 .. class:: Blob
 
    .. versionadded:: 3.11
 
-   A :class:`Blob` instance is a :term:`file-like object`
-   that can read and write data in an SQLite :abbr:`BLOB (Binary Large OBject)`.
-   Call :func:`len(blob) <len>` to get the size (number of bytes) of the blob.
-   Use indices and :term:`slices <slice>` for direct access to the blob data.
+   Một thực thể :class:`Blob` là một :term:`file-like object` có thể đọc và ghi dữ liệu trong một SQLite :abbr:`BLOB (Binary Large OBject)`. Gọi :func:`len(blob) <len>` để lấy kích thước (số byte) của blob. Sử dụng các chỉ mục và :term:`slices <slice>` để truy cập trực tiếp vào dữ liệu blob.
 
-   Use the :class:`Blob` as a :term:`context manager` to ensure that the blob
-   handle is closed after use.
+   Sử dụng :class:`Blob` như một :term:`context manager` để đảm bảo handle của blob được đóng sau khi sử dụng.
 
    .. testcode::
 
@@ -1777,19 +1341,19 @@ Blob objects
       con.execute("CREATE TABLE test(blob_col blob)")
       con.execute("INSERT INTO test(blob_col) VALUES(zeroblob(13))")
 
-      # Write to our blob, using two write operations:
+      # Ghi vào blob của chúng ta bằng hai thao tác ghi:
       with con.blobopen("test", "blob_col", 1) as blob:
           blob.write(b"hello, ")
           blob.write(b"world.")
-          # Modify the first and last bytes of our blob
+          # Sửa đổi byte đầu tiên và byte cuối cùng của blob
           blob[0] = ord("H")
           blob[-1] = ord("!")
 
-      # Read the contents of our blob
+      # Đọc nội dung của blob
       with con.blobopen("test", "blob_col", 1) as blob:
           greeting = blob.read()
 
-      print(greeting)  # outputs "b'Hello, world!'"
+      print(greeting)  # xuất "b'Hello, world!'"
       con.close()
 
    .. testoutput::
@@ -1799,220 +1363,167 @@ Blob objects
 
    .. method:: close()
 
-      Close the blob.
+      Đóng blob.
 
-      The blob will be unusable from this point onward.  An
-      :class:`~sqlite3.Error` (or subclass) exception will be raised if any
-      further operation is attempted with the blob.
+      Blob sẽ không thể sử dụng được kể từ thời điểm này. Một
+      :class:`~sqlite3.Error` (hoặc lớp con) exception sẽ được phát sinh nếu thực hiện bất kỳ thao tác nào khác với blob.
 
    .. method:: read(length=-1, /)
 
-      Read *length* bytes of data from the blob at the current offset position.
-      If the end of the blob is reached, the data up to
-      :abbr:`EOF (End of File)` will be returned.  When *length* is not
-      specified, or is negative, :meth:`~Blob.read` will read until the end of
-      the blob.
+      Đọc *length* byte dữ liệu từ blob tại vị trí offset hiện tại. Nếu đã đến cuối blob, dữ liệu cho đến
+      :abbr:`EOF (End of File)` sẽ được trả về. Khi không chỉ định *length*, hoặc giá trị này là số âm, :meth:`~Blob.read` sẽ đọc cho đến cuối blob.
 
    .. method:: write(data, /)
 
-      Write *data* to the blob at the current offset.  This function cannot
-      change the blob length.  Writing beyond the end of the blob will raise
+      Ghi *data* vào blob tại offset hiện tại. Hàm này không thể thay đổi độ dài blob. Việc ghi vượt quá cuối blob sẽ phát sinh
       :exc:`ValueError`.
 
    .. method:: tell()
 
-      Return the current access position of the blob.
+      Trả về vị trí truy cập hiện tại của blob.
 
    .. method:: seek(offset, origin=os.SEEK_SET, /)
 
-      Set the current access position of the blob to *offset*.  The *origin*
-      argument defaults to :const:`os.SEEK_SET` (absolute blob positioning).
-      Other values for *origin* are :const:`os.SEEK_CUR` (seek relative to the
-      current position) and :const:`os.SEEK_END` (seek relative to the blob’s
-      end).
+      Đặt vị trí truy cập hiện tại của blob thành *offset*. Đối số *origin* mặc định là :const:`os.SEEK_SET` (định vị blob tuyệt đối). Các giá trị khác của *origin* là :const:`os.SEEK_CUR` (tìm kiếm tương đối so với vị trí hiện tại) và :const:`os.SEEK_END` (tìm kiếm tương đối so với cuối blob).
 
 
-PrepareProtocol objects
-^^^^^^^^^^^^^^^^^^^^^^^
+Đối tượng PrepareProtocol
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. class:: PrepareProtocol
 
-   The PrepareProtocol type's single purpose is to act as a :pep:`246` style
-   adaption protocol for objects that can :ref:`adapt themselves
-   <sqlite3-conform>` to :ref:`native SQLite types <sqlite3-types>`.
+   Mục đích duy nhất của kiểu PrepareProtocol là hoạt động như một giao thức điều chỉnh kiểu :pep:`246` cho các đối tượng có thể :ref:`tự điều chỉnh <sqlite3-conform>` thành :ref:`các kiểu SQLite gốc <sqlite3-types>`.
 
 
 .. _sqlite3-exceptions:
 
-Exceptions
-^^^^^^^^^^
+Ngoại lệ
+^^^^^^^^
 
-The exception hierarchy is defined by the DB-API 2.0 (:pep:`249`).
+Hệ thống phân cấp ngoại lệ được định nghĩa bởi DB-API 2.0 (:pep:`249`).
 
 .. exception:: Warning
 
-   This exception is not currently raised by the :mod:`!sqlite3` module,
-   but may be raised by applications using :mod:`!sqlite3`,
-   for example if a user-defined function truncates data while inserting.
-   ``Warning`` is a subclass of :exc:`Exception`.
+   Ngoại lệ này hiện không được module :mod:`!sqlite3` đưa ra, nhưng có thể được đưa ra bởi các ứng dụng sử dụng :mod:`!sqlite3`, chẳng hạn như khi một hàm do người dùng định nghĩa cắt ngắn dữ liệu trong quá trình chèn. ``Warning`` là lớp con của :exc:`Exception`.
 
 .. exception:: Error
 
-   The base class of the other exceptions in this module.
-   Use this to catch all errors with one single :keyword:`except` statement.
-   ``Error`` is a subclass of :exc:`Exception`.
+   Lớp cơ sở của các ngoại lệ khác trong mô-đun này. Dùng lớp này để bắt tất cả lỗi chỉ bằng một câu lệnh :keyword:`except`. ``Error`` là lớp con của :exc:`Exception`.
 
-   If the exception originated from within the SQLite library,
-   the following two attributes are added to the exception:
+   Nếu ngoại lệ bắt nguồn từ bên trong thư viện SQLite, hai thuộc tính sau sẽ được thêm vào ngoại lệ:
 
    .. attribute:: sqlite_errorcode
 
-      The numeric error code from the
-      `SQLite API <https://sqlite.org/rescode.html>`_
+      Mã lỗi dạng số từ `SQLite API <https://sqlite.org/rescode.html>`_
 
       .. versionadded:: 3.11
 
    .. attribute:: sqlite_errorname
 
-      The symbolic name of the numeric error code
-      from the `SQLite API <https://sqlite.org/rescode.html>`_
+      Tên ký hiệu của mã lỗi dạng số từ `SQLite API <https://sqlite.org/rescode.html>`_
 
       .. versionadded:: 3.11
 
 .. exception:: InterfaceError
 
-   Exception raised for misuse of the low-level SQLite C API.
-   In other words, if this exception is raised, it probably indicates a bug in the
-   :mod:`!sqlite3` module.
-   ``InterfaceError`` is a subclass of :exc:`Error`.
+   Ngoại lệ được nâng lên khi sử dụng sai SQLite C API cấp thấp. Nói cách khác, nếu ngoại lệ này được nâng lên, có thể nó cho biết có lỗi trong
+   :mod:`!sqlite3` mô-đun. ``InterfaceError`` là lớp con của :exc:`Error`.
 
 .. exception:: DatabaseError
 
-   Exception raised for errors that are related to the database.
-   This serves as the base exception for several types of database errors.
-   It is only raised implicitly through the specialised subclasses.
-   ``DatabaseError`` is a subclass of :exc:`Error`.
+   Ngoại lệ được nâng lên cho các lỗi liên quan đến cơ sở dữ liệu. Đây là ngoại lệ cơ sở cho một số loại lỗi cơ sở dữ liệu. Ngoại lệ này chỉ được nâng lên một cách ngầm định thông qua các lớp con chuyên biệt. ``DatabaseError`` là lớp con của :exc:`Error`.
 
 .. exception:: DataError
 
-   Exception raised for errors caused by problems with the processed data,
-   like numeric values out of range, and strings which are too long.
-   ``DataError`` is a subclass of :exc:`DatabaseError`.
+   Ngoại lệ được phát sinh cho các lỗi do vấn đề với dữ liệu được xử lý, chẳng hạn như giá trị số nằm ngoài phạm vi và chuỗi quá dài. ``DataError`` là lớp con của :exc:`DatabaseError`.
 
 .. exception:: OperationalError
 
-   Exception raised for errors that are related to the database's operation,
-   and not necessarily under the control of the programmer.
-   For example, the database path is not found,
-   or a transaction could not be processed.
-   ``OperationalError`` is a subclass of :exc:`DatabaseError`.
+   Ngoại lệ được phát sinh cho các lỗi liên quan đến hoạt động của cơ sở dữ liệu và không nhất thiết nằm trong quyền kiểm soát của lập trình viên. Ví dụ: không tìm thấy đường dẫn cơ sở dữ liệu hoặc không thể xử lý một giao dịch. ``OperationalError`` là lớp con của :exc:`DatabaseError`.
 
 .. exception:: IntegrityError
 
-   Exception raised when the relational integrity of the database is affected,
-   e.g. a foreign key check fails.  It is a subclass of :exc:`DatabaseError`.
+   Ngoại lệ được phát sinh khi tính toàn vẹn quan hệ của cơ sở dữ liệu bị ảnh hưởng, chẳng hạn như khi kiểm tra khóa ngoại không thành công. Đây là lớp con của :exc:`DatabaseError`.
 
 .. exception:: InternalError
 
-   Exception raised when SQLite encounters an internal error.
-   If this is raised, it may indicate that there is a problem with the runtime
-   SQLite library.
-   ``InternalError`` is a subclass of :exc:`DatabaseError`.
+   Ngoại lệ được phát sinh khi SQLite gặp lỗi nội bộ. Nếu ngoại lệ này được phát sinh, có thể runtime SQLite library đang gặp vấn đề. ``InternalError`` là lớp con của :exc:`DatabaseError`.
 
 .. exception:: ProgrammingError
 
-   Exception raised for :mod:`!sqlite3` API programming errors,
-   for example supplying the wrong number of bindings to a query,
-   or trying to operate on a closed :class:`Connection`.
-   ``ProgrammingError`` is a subclass of :exc:`DatabaseError`.
+   Ngoại lệ được phát sinh đối với các lỗi lập trình API của :mod:`!sqlite3`, chẳng hạn như cung cấp sai số lượng binding cho một truy vấn hoặc cố thao tác trên một :class:`Connection` đã đóng. ``ProgrammingError`` là lớp con của :exc:`DatabaseError`.
 
 .. exception:: NotSupportedError
 
-   Exception raised in case a method or database API is not supported by the
-   underlying SQLite library. For example, setting *deterministic* to
-   ``True`` in :meth:`~Connection.create_function`, if the underlying SQLite library
-   does not support deterministic functions.
-   ``NotSupportedError`` is a subclass of :exc:`DatabaseError`.
+   Ngoại lệ được phát sinh khi một phương thức hoặc API cơ sở dữ liệu không được SQLite library bên dưới hỗ trợ. Ví dụ: đặt *deterministic* thành ``True`` trong :meth:`~Connection.create_function` nếu SQLite library bên dưới không hỗ trợ các hàm deterministic. ``NotSupportedError`` là lớp con của :exc:`DatabaseError`.
 
 
 .. _sqlite3-types:
 
-SQLite and Python types
-^^^^^^^^^^^^^^^^^^^^^^^
+Các kiểu SQLite và Python
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-SQLite natively supports the following types: ``NULL``, ``INTEGER``,
-``REAL``, ``TEXT``, ``BLOB``.
+SQLite hỗ trợ nguyên bản các kiểu sau: ``NULL``, ``INTEGER``, ``REAL``, ``TEXT``, ``BLOB``.
 
-The following Python types can thus be sent to SQLite without any problem:
+Do đó, các kiểu Python sau có thể được gửi đến SQLite mà không gặp vấn đề gì:
 
-+-------------------------------+-------------+
-| Python type                   | SQLite type |
-+===============================+=============+
-| ``None``                      | ``NULL``    |
-+-------------------------------+-------------+
-| :class:`int`                  | ``INTEGER`` |
-+-------------------------------+-------------+
-| :class:`float`                | ``REAL``    |
-+-------------------------------+-------------+
-| :class:`str`                  | ``TEXT``    |
-+-------------------------------+-------------+
-| :class:`bytes`                | ``BLOB``    |
-+-------------------------------+-------------+
++----------------+-------------+
+| Kiểu Python    | Kiểu SQLite |
++================+=============+
+| ``None``       | ``NULL``    |
++----------------+-------------+
+| :class:`int`   | ``INTEGER`` |
++----------------+-------------+
+| :class:`float` | ``REAL``    |
++----------------+-------------+
+| :class:`str`   | ``TEXT``    |
++----------------+-------------+
+| :class:`bytes` | ``BLOB``    |
++----------------+-------------+
 
 
-This is how SQLite types are converted to Python types by default:
+Theo mặc định, các kiểu SQLite được chuyển đổi sang kiểu Python như sau:
 
-+-------------+----------------------------------------------+
-| SQLite type | Python type                                  |
-+=============+==============================================+
-| ``NULL``    | ``None``                                     |
-+-------------+----------------------------------------------+
-| ``INTEGER`` | :class:`int`                                 |
-+-------------+----------------------------------------------+
-| ``REAL``    | :class:`float`                               |
-+-------------+----------------------------------------------+
-| ``TEXT``    | depends on :attr:`~Connection.text_factory`, |
-|             | :class:`str` by default                      |
-+-------------+----------------------------------------------+
-| ``BLOB``    | :class:`bytes`                               |
-+-------------+----------------------------------------------+
++-------------+-------------------------------------------------+
+| Kiểu SQLite | Kiểu Python                                     |
++=============+=================================================+
+| ``NULL``    | ``None``                                        |
++-------------+-------------------------------------------------+
+| ``INTEGER`` | :class:`int`                                    |
++-------------+-------------------------------------------------+
+| ``REAL``    | :class:`float`                                  |
++-------------+-------------------------------------------------+
+| ``TEXT``    | phụ thuộc vào :attr:`~Connection.text_factory`, |
+|             | :class:`str` theo mặc định                      |
++-------------+-------------------------------------------------+
+| ``BLOB``    | :class:`bytes`                                  |
++-------------+-------------------------------------------------+
 
-The type system of the :mod:`!sqlite3` module is extensible in two ways: you can
-store additional Python types in an SQLite database via
-:ref:`object adapters <sqlite3-adapters>`,
-and you can let the :mod:`!sqlite3` module convert SQLite types to
-Python types via :ref:`converters <sqlite3-converters>`.
+Hệ thống kiểu của mô-đun :mod:`!sqlite3` có thể mở rộng theo hai cách: bạn có thể lưu trữ các kiểu Python bổ sung trong cơ sở dữ liệu SQLite thông qua
+:ref:`bộ điều hợp đối tượng <sqlite3-adapters>`, và bạn có thể để mô-đun :mod:`!sqlite3` chuyển đổi các kiểu SQLite thành các kiểu Python thông qua :ref:`bộ chuyển đổi <sqlite3-converters>`.
 
 
 .. _sqlite3-default-converters:
 
-Default adapters and converters (deprecated)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Bộ điều hợp và bộ chuyển đổi mặc định (đã lỗi thời)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. note::
 
-   The default adapters and converters are deprecated as of Python 3.12.
-   Instead, use the :ref:`sqlite3-adapter-converter-recipes`
-   and tailor them to your needs.
+   Các bộ điều hợp và bộ chuyển đổi mặc định đã lỗi thời kể từ Python 3.12. Thay vào đó, hãy sử dụng :ref:`sqlite3-adapter-converter-recipes` và điều chỉnh chúng cho phù hợp với nhu cầu của bạn.
 
-The deprecated default adapters and converters consist of:
+Các bộ điều hợp và bộ chuyển đổi mặc định đã lỗi thời bao gồm:
 
-* An adapter for :class:`datetime.date` objects to :class:`strings <str>` in
-  `ISO 8601`_ format.
-* An adapter for :class:`datetime.datetime` objects to strings in
-  ISO 8601 format.
-* A converter for :ref:`declared <sqlite3-converters>` "date" types to
-  :class:`datetime.date` objects.
-* A converter for declared "timestamp" types to
-  :class:`datetime.datetime` objects.
-  Fractional parts will be truncated to 6 digits (microsecond precision).
+* Bộ chuyển đổi cho các đối tượng :class:`datetime.date` sang :class:`strings <str>` ở định dạng `ISO 8601 <ISO 8601_>`_.
+* Bộ chuyển đổi cho các đối tượng :class:`datetime.datetime` sang chuỗi ở định dạng ISO 8601.
+* Bộ chuyển đổi cho các kiểu "date" :ref:`được khai báo <sqlite3-converters>` sang
+  các đối tượng :class:`datetime.date`.
+* Bộ chuyển đổi cho các kiểu "timestamp" đã khai báo sang
+  các đối tượng :class:`datetime.datetime`. Phần thập phân sẽ bị cắt ngắn còn 6 chữ số (độ chính xác microsecond).
 
 .. note::
 
-   The default "timestamp" converter ignores UTC offsets in the database and
-   always returns a naive :class:`datetime.datetime` object. To preserve UTC
-   offsets in timestamps, either leave converters disabled, or register an
-   offset-aware converter with :func:`register_converter`.
+   Bộ chuyển đổi "timestamp" mặc định bỏ qua các độ lệch UTC trong cơ sở dữ liệu và luôn trả về một đối tượng :class:`datetime.datetime` không có thông tin múi giờ. Để giữ lại các độ lệch UTC trong timestamp, hãy tắt các bộ chuyển đổi hoặc đăng ký một bộ chuyển đổi có hỗ trợ độ lệch với :func:`register_converter`.
 
 .. deprecated:: 3.12
 
@@ -2021,47 +1532,41 @@ The deprecated default adapters and converters consist of:
 
 .. _sqlite3-cli:
 
-Command-line interface
-^^^^^^^^^^^^^^^^^^^^^^
+Giao diện dòng lệnh
+^^^^^^^^^^^^^^^^^^^
 
-The :mod:`!sqlite3` module can be invoked as a script,
-using the interpreter's :option:`-m` switch,
-in order to provide a simple SQLite shell.
-The argument signature is as follows::
+Có thể gọi module :mod:`!sqlite3` như một script bằng switch :option:`-m` của trình thông dịch để cung cấp một shell SQLite đơn giản. Cú pháp đối số như sau::
 
    python -m sqlite3 [-h] [-v] [filename] [sql]
 
-Type ``.quit`` or CTRL-D to exit the shell.
+Nhập ``.quit`` hoặc CTRL-D để thoát shell.
 
 .. program:: python -m sqlite3 [-h] [-v] [filename] [sql]
 
 .. option:: -h, --help
 
-   Print CLI help.
+   In trợ giúp CLI.
 
 .. option:: -v, --version
 
-   Print underlying SQLite library version.
+   In phiên bản thư viện SQLite nền tảng.
 
 .. versionadded:: 3.12
 
 
 .. _sqlite3-howtos:
 
-How-to guides
--------------
+Hướng dẫn thực hiện
+-------------------
 
 .. _sqlite3-placeholders:
 
-How to use placeholders to bind values in SQL queries
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Cách sử dụng placeholder để liên kết giá trị trong các truy vấn SQL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-SQL operations usually need to use values from Python variables. However,
-beware of using Python's string operations to assemble queries, as they
-are vulnerable to `SQL injection attacks`_. For example, an attacker can simply
-close the single quote and inject ``OR TRUE`` to select all rows::
+Các thao tác SQL thường cần sử dụng các giá trị từ biến Python. Tuy nhiên, hãy cẩn thận khi dùng các thao tác chuỗi của Python để ghép truy vấn, vì chúng dễ bị `tấn công SQL injection <SQL injection attacks_>`_. Ví dụ, kẻ tấn công có thể chỉ cần đóng dấu nháy đơn rồi chèn ``OR TRUE`` để chọn tất cả các hàng::
 
-   >>> # Never do this -- insecure!
+   >>> # Tuyệt đối không làm như vậy -- không an toàn!
    >>> symbol = input()
    ' OR TRUE; --
    >>> sql = "SELECT * FROM stocks WHERE symbol = '%s'" % symbol
@@ -2069,28 +1574,17 @@ close the single quote and inject ``OR TRUE`` to select all rows::
    SELECT * FROM stocks WHERE symbol = '' OR TRUE; --'
    >>> cur.execute(sql)
 
-Instead, use the DB-API's parameter substitution. To insert a variable into a
-query string, use a placeholder in the string, and substitute the actual values
-into the query by providing them as a :class:`tuple` of values to the second
-argument of the cursor's :meth:`~Cursor.execute` method.
+Thay vào đó, hãy sử dụng cơ chế thay thế tham số của DB-API. Để chèn một biến vào chuỗi truy vấn, hãy sử dụng một placeholder trong chuỗi, rồi thay thế các giá trị thực tế vào truy vấn bằng cách cung cấp chúng dưới dạng một :class:`tuple` gồm các giá trị cho đối số thứ hai của phương thức :meth:`~Cursor.execute` của cursor.
 
-An SQL statement may use one of two kinds of placeholders:
-question marks (qmark style) or named placeholders (named style).
-For the qmark style, *parameters* must be a
-:term:`sequence` whose length must match the number of placeholders,
-or a :exc:`ProgrammingError` is raised.
-For the named style, *parameters* must be
-an instance of a :class:`dict` (or a subclass),
-which must contain keys for all named parameters;
-any extra items are ignored.
-Here's an example of both styles:
+Một câu lệnh SQL có thể sử dụng một trong hai loại placeholder: dấu chấm hỏi (kiểu qmark) hoặc placeholder có tên (kiểu named). Với kiểu qmark, *parameters* phải là một
+:term:`sequence` có độ dài phải khớp với số lượng placeholder, nếu không sẽ phát sinh :exc:`ProgrammingError`. Với kiểu named, *parameters* phải là một thể hiện của :class:`dict` (hoặc một lớp con), và phải chứa khóa cho tất cả các tham số có tên; mọi phần tử thừa sẽ bị bỏ qua. Dưới đây là ví dụ về cả hai kiểu:
 
 .. testcode::
 
    con = sqlite3.connect(":memory:")
    cur = con.execute("CREATE TABLE lang(name, first_appeared)")
 
-   # This is the named style used with executemany():
+   # Đây là kiểu named được sử dụng với executemany():
    data = (
        {"name": "C", "year": 1972},
        {"name": "Fortran", "year": 1957},
@@ -2099,7 +1593,7 @@ Here's an example of both styles:
    )
    cur.executemany("INSERT INTO lang VALUES(:name, :year)", data)
 
-   # This is the qmark style used in a SELECT query:
+   # Đây là kiểu qmark được sử dụng trong truy vấn SELECT:
    params = (1972,)
    cur.execute("SELECT * FROM lang WHERE first_appeared = ?", params)
    print(cur.fetchall())
@@ -2112,40 +1606,26 @@ Here's an example of both styles:
 
 .. note::
 
-   :pep:`249` numeric placeholders are *not* supported.
-   If used, they will be interpreted as named placeholders.
+   :pep:`249` các placeholder dạng số *không* được hỗ trợ. Nếu được sử dụng, chúng sẽ được diễn giải là các placeholder có tên.
 
 
 .. _sqlite3-adapters:
 
-How to adapt custom Python types to SQLite values
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Cách điều chỉnh các kiểu Python tùy chỉnh cho các giá trị SQLite
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-SQLite supports only a limited set of data types natively.
-To store custom Python types in SQLite databases, *adapt* them to one of the
-:ref:`Python types SQLite natively understands <sqlite3-types>`.
+SQLite chỉ hỗ trợ nguyên bản một tập hợp kiểu dữ liệu hạn chế. Để lưu trữ các kiểu Python tùy chỉnh trong cơ sở dữ liệu SQLite, hãy *điều chỉnh* chúng thành một trong các
+:ref:`kiểu Python mà SQLite hiểu nguyên bản <sqlite3-types>`.
 
-There are two ways to adapt Python objects to SQLite types:
-letting your object adapt itself, or using an *adapter callable*.
-The latter will take precedence above the former.
-For a library that exports a custom type,
-it may make sense to enable that type to adapt itself.
-As an application developer, it may make more sense to take direct control by
-registering custom adapter functions.
+Có hai cách để điều chỉnh các đối tượng Python cho phù hợp với các kiểu SQLite: để đối tượng tự điều chỉnh hoặc sử dụng một *adapter callable*. Cách thứ hai sẽ được ưu tiên hơn cách thứ nhất. Đối với một thư viện cung cấp một kiểu tùy chỉnh, việc cho phép kiểu đó tự điều chỉnh có thể là lựa chọn hợp lý. Với vai trò nhà phát triển ứng dụng, việc trực tiếp kiểm soát bằng cách đăng ký các hàm adapter tùy chỉnh có thể phù hợp hơn.
 
 
 .. _sqlite3-conform:
 
-How to write adaptable objects
-""""""""""""""""""""""""""""""
+Cách viết các đối tượng có thể điều chỉnh
+"""""""""""""""""""""""""""""""""""""""""
 
-Suppose we have a :class:`!Point` class that represents a pair of coordinates,
-``x`` and ``y``, in a Cartesian coordinate system.
-The coordinate pair will be stored as a text string in the database,
-using a semicolon to separate the coordinates.
-This can be implemented by adding a ``__conform__(self, protocol)``
-method which returns the adapted value.
-The object passed to *protocol* will be of type :class:`PrepareProtocol`.
+Giả sử chúng ta có một :class:`!Point` lớp đại diện cho một cặp tọa độ, ``x`` và ``y``, trong hệ tọa độ Descartes. Cặp tọa độ này sẽ được lưu trữ dưới dạng chuỗi văn bản trong cơ sở dữ liệu, dùng dấu chấm phẩy để phân tách các tọa độ. Có thể triển khai điều này bằng cách thêm một phương thức ``__conform__(self, protocol)`` trả về giá trị đã điều chỉnh. Đối tượng được truyền cho *protocol* sẽ có kiểu :class:`PrepareProtocol`.
 
 .. testcode::
 
@@ -2170,12 +1650,10 @@ The object passed to *protocol* will be of type :class:`PrepareProtocol`.
    4.0;-3.2
 
 
-How to register adapter callables
+Cách đăng ký các callable adapter
 """""""""""""""""""""""""""""""""
 
-The other possibility is to create a function that converts the Python object
-to an SQLite-compatible type.
-This function can then be registered using :func:`register_adapter`.
+Một khả năng khác là tạo một hàm chuyển đổi đối tượng Python thành kiểu tương thích với SQLite. Sau đó, có thể đăng ký hàm này bằng :func:`register_adapter`.
 
 .. testcode::
 
@@ -2203,24 +1681,18 @@ This function can then be registered using :func:`register_adapter`.
 
 .. _sqlite3-converters:
 
-How to convert SQLite values to custom Python types
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Cách chuyển đổi các giá trị SQLite thành các kiểu Python tùy chỉnh
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Writing an adapter lets you convert *from* custom Python types *to* SQLite
-values.
-To be able to convert *from* SQLite values *to* custom Python types,
-we use *converters*.
+Việc viết một adapter cho phép bạn chuyển đổi *từ* các kiểu Python tùy chỉnh *sang* các giá trị SQLite. Để có thể chuyển đổi *từ* các giá trị SQLite *sang* các kiểu Python tùy chỉnh, chúng ta sử dụng *converters*.
 
-Let's go back to the :class:`!Point` class. We stored the x and y coordinates
-separated via semicolons as strings in SQLite.
+Hãy quay lại lớp :class:`!Point`. Chúng ta đã lưu tọa độ x và y, được phân tách bằng dấu chấm phẩy, dưới dạng chuỗi trong SQLite.
 
-First, we'll define a converter function that accepts the string as a parameter
-and constructs a :class:`!Point` object from it.
+Trước tiên, chúng ta sẽ định nghĩa một hàm converter nhận chuỗi làm tham số và tạo một đối tượng :class:`!Point` từ chuỗi đó.
 
 .. note::
 
-   Converter functions are **always** passed a :class:`bytes` object,
-   no matter the underlying SQLite data type.
+   Các hàm converter **luôn** nhận một :class:`bytes` object, bất kể kiểu dữ liệu SQLite bên dưới là gì.
 
 .. testcode::
 
@@ -2228,17 +1700,13 @@ and constructs a :class:`!Point` object from it.
        x, y = map(float, s.split(b";"))
        return Point(x, y)
 
-We now need to tell :mod:`!sqlite3` when it should convert a given SQLite value.
-This is done when connecting to a database, using the *detect_types* parameter
-of :func:`connect`. There are three options:
+Bây giờ, chúng ta cần cho :mod:`!sqlite3` biết khi nào nó nên chuyển đổi một giá trị SQLite đã cho. Việc này được thực hiện khi kết nối với cơ sở dữ liệu, bằng cách sử dụng tham số *detect_types* của :func:`connect`. Có ba tùy chọn:
 
-* Implicit: set *detect_types* to :const:`PARSE_DECLTYPES`
-* Explicit: set *detect_types* to :const:`PARSE_COLNAMES`
-* Both: set *detect_types* to
-  ``sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES``.
-  Column names take precedence over declared types.
+* Ngầm định: đặt *detect_types* thành :const:`PARSE_DECLTYPES`
+* Tường minh: đặt *detect_types* thành :const:`PARSE_COLNAMES`
+* Cả hai: đặt *detect_types* thành ``sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES``. Tên cột được ưu tiên hơn các kiểu đã khai báo.
 
-The following example illustrates the implicit and explicit approaches:
+Ví dụ sau minh họa các phương pháp ngầm định và tường minh:
 
 .. testcode::
 
@@ -2256,11 +1724,11 @@ The following example illustrates the implicit and explicit approaches:
        x, y = list(map(float, s.split(b";")))
        return Point(x, y)
 
-   # Register the adapter and converter
+   # Đăng ký adapter và converter
    sqlite3.register_adapter(Point, adapt_point)
    sqlite3.register_converter("point", convert_point)
 
-   # 1) Parse using declared types
+   # 1) Phân tích cú pháp bằng các kiểu đã khai báo
    p = Point(4.0, -3.2)
    con = sqlite3.connect(":memory:", detect_types=sqlite3.PARSE_DECLTYPES)
    cur = con.execute("CREATE TABLE test(p point)")
@@ -2271,7 +1739,7 @@ The following example illustrates the implicit and explicit approaches:
    cur.close()
    con.close()
 
-   # 2) Parse using column names
+   # 2) Phân tích bằng tên cột
    con = sqlite3.connect(":memory:", detect_types=sqlite3.PARSE_COLNAMES)
    cur = con.execute("CREATE TABLE test(p)")
 
@@ -2290,10 +1758,10 @@ The following example illustrates the implicit and explicit approaches:
 
 .. _sqlite3-adapter-converter-recipes:
 
-Adapter and converter recipes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các công thức adapter và converter
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This section shows recipes for common adapters and converters.
+Phần này trình bày các công thức cho những adapter và converter phổ biến.
 
 .. testcode::
 
@@ -2343,8 +1811,8 @@ This section shows recipes for common adapters and converters.
    assert adapt_datetime_iso(when) == "2019-05-18T15:17:08.123456"
    assert convert_datetime(b"2019-05-18T15:17:08.123456") == when
 
-   # Using current time as fromtimestamp() returns local date/time.
-   # Dropping microseconds as adapt_datetime_epoch truncates fractional second part.
+   # Sử dụng thời gian hiện tại vì fromtimestamp() trả về ngày/giờ cục bộ.
+   # Loại bỏ micro giây vì adapt_datetime_epoch cắt bớt phần giây lẻ.
    now = dt.datetime.now().replace(microsecond=0)
    current_timestamp = int(now.timestamp())
 
@@ -2354,21 +1822,15 @@ This section shows recipes for common adapters and converters.
 
 .. _sqlite3-connection-shortcuts:
 
-How to use connection shortcut methods
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Cách sử dụng các phương thức tắt của connection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Using the :meth:`~Connection.execute`,
-:meth:`~Connection.executemany`, and :meth:`~Connection.executescript`
-methods of the :class:`Connection` class, your code can
-be written more concisely because you don't have to create the (often
-superfluous) :class:`Cursor` objects explicitly. Instead, the :class:`Cursor`
-objects are created implicitly and these shortcut methods return the cursor
-objects. This way, you can execute a ``SELECT`` statement and iterate over it
-directly using only a single call on the :class:`Connection` object.
+Sử dụng :meth:`~Connection.execute`,
+Với các phương thức :meth:`~Connection.executemany` và :meth:`~Connection.executescript` của lớp :class:`Connection`, mã của bạn có thể được viết ngắn gọn hơn vì bạn không phải tạo rõ ràng các đối tượng :class:`Cursor` (thường là không cần thiết). Thay vào đó, các đối tượng :class:`Cursor` được tạo ngầm và những phương thức shortcut này trả về các đối tượng cursor. Nhờ đó, bạn có thể thực thi một câu lệnh ``SELECT`` và lặp trực tiếp trên đó chỉ bằng một lần gọi đối tượng :class:`Connection`.
 
 .. testcode::
 
-   # Create and fill the table.
+   # Tạo và điền dữ liệu vào bảng.
    con = sqlite3.connect(":memory:")
    con.execute("CREATE TABLE lang(name, first_appeared)")
    data = [
@@ -2377,14 +1839,14 @@ directly using only a single call on the :class:`Connection` object.
    ]
    con.executemany("INSERT INTO lang(name, first_appeared) VALUES(?, ?)", data)
 
-   # Print the table contents
+   # In nội dung bảng
    for row in con.execute("SELECT name, first_appeared FROM lang"):
        print(row)
 
    print("I just deleted", con.execute("DELETE FROM lang").rowcount, "rows")
 
-   # close() is not a shortcut method and it's not called automatically;
-   # the connection object should be closed manually
+   # close() không phải là phương thức shortcut và không được tự động gọi;
+   # đối tượng connection phải được đóng thủ công
    con.close()
 
 .. testoutput::
@@ -2397,48 +1859,35 @@ directly using only a single call on the :class:`Connection` object.
 
 .. _sqlite3-connection-context-manager:
 
-How to use the connection context manager
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Cách sử dụng connection context manager
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A :class:`Connection` object can be used as a context manager that
-automatically commits or rolls back open transactions when leaving the body of
-the context manager.
-If the body of the :keyword:`with` statement finishes without exceptions,
-the transaction is committed.
-If this commit fails,
-or if the body of the ``with`` statement raises an uncaught exception,
-the transaction is rolled back.
-If :attr:`~Connection.autocommit` is ``False``,
-a new transaction is implicitly opened after committing or rolling back.
+Một đối tượng :class:`Connection` có thể được dùng làm context manager để tự động commit hoặc rollback các giao dịch đang mở khi rời khỏi phần thân của context manager. Nếu phần thân của câu lệnh :keyword:`with` kết thúc mà không có ngoại lệ, giao dịch sẽ được commit. Nếu thao tác commit này thất bại hoặc nếu phần thân của câu lệnh ``with`` phát sinh một ngoại lệ không được bắt, giao dịch sẽ được rollback. Nếu :attr:`~Connection.autocommit` là ``False``, một giao dịch mới sẽ được mở ngầm sau khi commit hoặc rollback.
 
-If there is no open transaction upon leaving the body of the ``with`` statement,
-or if :attr:`~Connection.autocommit` is ``True``,
-the context manager does nothing.
+Nếu không có transaction nào đang mở khi rời khỏi phần thân của câu lệnh ``with``, hoặc nếu :attr:`~Connection.autocommit` là ``True``, context manager sẽ không làm gì.
 
 .. note::
-   The context manager neither implicitly opens a new transaction
-   nor closes the connection. If you need a closing context manager, consider
-   using :meth:`contextlib.closing`.
+   Context manager không tự động mở transaction mới cũng không đóng connection. Nếu cần một context manager có chức năng đóng, hãy cân nhắc sử dụng :meth:`contextlib.closing`.
 
 .. testcode::
 
    con = sqlite3.connect(":memory:")
    con.execute("CREATE TABLE lang(id INTEGER PRIMARY KEY, name VARCHAR UNIQUE)")
 
-   # Successful, con.commit() is called automatically afterwards
+   # Nếu thành công, con.commit() sẽ được gọi tự động sau đó
    with con:
        con.execute("INSERT INTO lang(name) VALUES(?)", ("Python",))
 
-   # con.rollback() is called after the with block finishes with an exception,
-   # the exception is still raised and must be caught
+   # con.rollback() được gọi sau khi khối with kết thúc do có exception,
+   # exception vẫn được raise và phải được catch
    try:
        with con:
            con.execute("INSERT INTO lang(name) VALUES(?)", ("Python",))
    except sqlite3.IntegrityError:
        print("couldn't add Python twice")
 
-   # Connection object used as context manager only commits or rollbacks transactions,
-   # so the connection object should be closed manually
+   # Đối tượng Connection được dùng làm context manager chỉ commit hoặc rollback các transaction,
+   # do đó đối tượng connection phải được đóng thủ công
    con.close()
 
 .. testoutput::
@@ -2449,12 +1898,12 @@ the context manager does nothing.
 
 .. _sqlite3-uri-tricks:
 
-How to work with SQLite URIs
+Cách làm việc với SQLite URI
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Some useful URI tricks include:
+Một số thủ thuật URI hữu ích bao gồm:
 
-* Open a database in read-only mode:
+* Mở cơ sở dữ liệu ở chế độ chỉ đọc:
 
 .. doctest::
 
@@ -2464,8 +1913,7 @@ Some useful URI tricks include:
    OperationalError: attempt to write a readonly database
    >>> con.close()
 
-* Do not implicitly create a new database file if it does not already exist;
-  will raise :exc:`~sqlite3.OperationalError` if unable to create a new file:
+* Không tự động tạo tệp cơ sở dữ liệu mới nếu tệp đó chưa tồn tại; sẽ phát sinh :exc:`~sqlite3.OperationalError` nếu không thể tạo tệp mới:
 
 .. doctest::
 
@@ -2474,7 +1922,7 @@ Some useful URI tricks include:
    OperationalError: unable to open database file
 
 
-* Create a shared named in-memory database:
+* Tạo cơ sở dữ liệu trong bộ nhớ có tên dùng chung:
 
 .. testcode::
 
@@ -2490,38 +1938,29 @@ Some useful URI tricks include:
    con1.close()
    con2.close()
 
-More information about this feature, including a list of parameters,
-can be found in the `SQLite URI documentation`_.
+Bạn có thể tìm thêm thông tin về tính năng này, bao gồm danh sách các tham số, trong tài liệu `SQLite URI documentation <SQLite URI documentation_>`_.
 
 .. _SQLite URI documentation: https://www.sqlite.org/uri.html
 
 
 .. _sqlite3-howto-row-factory:
 
-How to create and use row factories
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Cách tạo và sử dụng row factory
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-By default, :mod:`!sqlite3` represents each row as a :class:`tuple`.
-If a :class:`!tuple` does not suit your needs,
-you can use the :class:`sqlite3.Row` class
-or a custom :attr:`~Cursor.row_factory`.
+Theo mặc định, :mod:`!sqlite3` biểu diễn mỗi hàng dưới dạng :class:`tuple`. Nếu :class:`!tuple` không đáp ứng nhu cầu của bạn, bạn có thể sử dụng class :class:`sqlite3.Row` hoặc một :attr:`~Cursor.row_factory` tùy chỉnh.
 
-While :attr:`!row_factory` exists as an attribute both on the
-:class:`Cursor` and the :class:`Connection`,
-it is recommended to set :class:`Connection.row_factory`,
-so all cursors created from the connection will use the same row factory.
+Mặc dù :attr:`!row_factory` là một thuộc tính của cả
+:class:`Cursor` và :class:`Connection`, bạn nên thiết lập :class:`Connection.row_factory` để tất cả cursor được tạo từ connection đều sử dụng cùng một row factory.
 
-:class:`!Row` provides indexed and case-insensitive named access to columns,
-with minimal memory overhead and performance impact over a :class:`!tuple`.
-To use :class:`!Row` as a row factory,
-assign it to the :attr:`!row_factory` attribute:
+:class:`!Row` cung cấp khả năng truy cập các cột theo chỉ mục và theo tên không phân biệt chữ hoa chữ thường, với mức tiêu tốn bộ nhớ và ảnh hưởng hiệu năng tối thiểu so với :class:`!tuple`. Để sử dụng :class:`!Row` làm row factory, hãy gán nó cho thuộc tính :attr:`!row_factory`:
 
 .. doctest::
 
    >>> con = sqlite3.connect(":memory:")
    >>> con.row_factory = sqlite3.Row
 
-Queries now return :class:`!Row` objects:
+Các truy vấn giờ đây trả về các đối tượng :class:`!Row`:
 
 .. doctest::
 
@@ -2529,23 +1968,19 @@ Queries now return :class:`!Row` objects:
    >>> row = res.fetchone()
    >>> row.keys()
    ['name', 'radius']
-   >>> row[0]         # Access by index.
+   >>> row[0]         # Truy cập theo chỉ mục.
    'Earth'
-   >>> row["name"]    # Access by name.
+   >>> row["name"]    # Truy cập theo tên.
    'Earth'
-   >>> row["RADIUS"]  # Column names are case-insensitive.
+   >>> row["RADIUS"]  # Tên cột không phân biệt chữ hoa chữ thường.
    6378
    >>> con.close()
 
 .. note::
 
-    The ``FROM`` clause can be omitted in the ``SELECT`` statement, as in the
-    above example. In such cases, SQLite returns a single row with columns
-    defined by expressions, e.g. literals, with the given aliases
-    ``expr AS alias``.
+    Mệnh đề ``FROM`` có thể được bỏ qua trong câu lệnh ``SELECT``, như trong ví dụ trên. Trong những trường hợp này, SQLite trả về một hàng duy nhất với các cột được xác định bởi các biểu thức, chẳng hạn như các giá trị literal, cùng với các bí danh đã cho ``expr AS alias``.
 
-You can create a custom :attr:`~Cursor.row_factory`
-that returns each row as a :class:`dict`, with column names mapped to values:
+Bạn có thể tạo một :attr:`~Cursor.row_factory` tùy chỉnh để trả về mỗi hàng dưới dạng :class:`dict`, trong đó tên cột được ánh xạ tới các giá trị:
 
 .. testcode::
 
@@ -2553,7 +1988,7 @@ that returns each row as a :class:`dict`, with column names mapped to values:
        fields = [column[0] for column in cursor.description]
        return {key: value for key, value in zip(fields, row)}
 
-Using it, queries now return a :class:`!dict` instead of a :class:`!tuple`:
+Khi sử dụng nó, các truy vấn giờ đây trả về một :class:`!dict` thay vì một :class:`!tuple`:
 
 .. doctest::
 
@@ -2564,7 +1999,7 @@ Using it, queries now return a :class:`!dict` instead of a :class:`!tuple`:
    {'a': 1, 'b': 2}
    >>> con.close()
 
-The following row factory returns a :term:`named tuple`:
+Row factory sau đây trả về một :term:`named tuple`:
 
 .. testcode::
 
@@ -2575,7 +2010,7 @@ The following row factory returns a :term:`named tuple`:
        cls = namedtuple("Row", fields)
        return cls._make(row)
 
-:func:`!namedtuple_factory` can be used as follows:
+Có thể sử dụng :func:`!namedtuple_factory` như sau:
 
 .. doctest::
 
@@ -2585,43 +2020,30 @@ The following row factory returns a :term:`named tuple`:
    >>> row = cur.fetchone()
    >>> row
    Row(a=1, b=2)
-   >>> row[0]  # Indexed access.
+   >>> row[0]  # Truy cập theo chỉ mục.
    1
-   >>> row.b   # Attribute access.
+   >>> row.b   # Truy cập thuộc tính.
    2
    >>> con.close()
 
-With some adjustments, the above recipe can be adapted to use a
-:class:`~dataclasses.dataclass`, or any other custom class,
-instead of a :class:`~collections.namedtuple`.
+Sau một số điều chỉnh, công thức trên có thể được điều chỉnh để sử dụng một
+:class:`~dataclasses.dataclass`, hoặc bất kỳ lớp tùy chỉnh nào khác, thay vì một :class:`~collections.namedtuple`.
 
 
 .. _sqlite3-howto-encoding:
 
-How to handle non-UTF-8 text encodings
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Cách xử lý mã hóa văn bản không phải UTF-8
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-By default, :mod:`!sqlite3` uses :class:`str` to adapt SQLite values
-with the ``TEXT`` data type.
-This works well for UTF-8 encoded text, but it might fail for other encodings
-and invalid UTF-8.
-You can use a custom :attr:`~Connection.text_factory` to handle such cases.
+Theo mặc định, :mod:`!sqlite3` sử dụng :class:`str` để điều chỉnh các giá trị SQLite có kiểu dữ liệu ``TEXT``. Cách này hoạt động tốt với văn bản được mã hóa UTF-8, nhưng có thể không thành công với các mã hóa khác và UTF-8 không hợp lệ. Bạn có thể sử dụng một :attr:`~Connection.text_factory` tùy chỉnh để xử lý những trường hợp như vậy.
 
-Because of SQLite's `flexible typing`_, it is not uncommon to encounter table
-columns with the ``TEXT`` data type containing non-UTF-8 encodings,
-or even arbitrary data.
-To demonstrate, let's assume we have a database with ISO-8859-2 (Latin-2)
-encoded text, for example a table of Czech-English dictionary entries.
-Assuming we now have a :class:`Connection` instance :py:data:`!con`
-connected to this database,
-we can decode the Latin-2 encoded text using this :attr:`~Connection.text_factory`:
+Do `kiểu dữ liệu linh hoạt <flexible typing_>`_ của SQLite, không hiếm khi gặp các cột bảng có kiểu dữ liệu ``TEXT`` chứa mã hóa không phải UTF-8, hoặc thậm chí dữ liệu tùy ý. Để minh họa, hãy giả sử chúng ta có một cơ sở dữ liệu chứa văn bản được mã hóa bằng ISO-8859-2 (Latin-2), chẳng hạn như một bảng các mục từ điển Séc-Anh. Giả sử hiện tại chúng ta có một thực thể :class:`Connection` :py:data:`!con` được kết nối với cơ sở dữ liệu này, chúng ta có thể giải mã văn bản được mã hóa Latin-2 bằng :attr:`~Connection.text_factory` này:
 
 .. testcode::
 
    con.text_factory = lambda data: str(data, encoding="latin2")
 
-For invalid UTF-8 or arbitrary data in stored in ``TEXT`` table columns,
-you can use the following technique, borrowed from the :ref:`unicode-howto`:
+Đối với UTF-8 không hợp lệ hoặc dữ liệu tùy ý được lưu trong các cột bảng ``TEXT``, bạn có thể sử dụng kỹ thuật sau đây, được lấy từ :ref:`unicode-howto`:
 
 .. testcode::
 
@@ -2629,8 +2051,7 @@ you can use the following technique, borrowed from the :ref:`unicode-howto`:
 
 .. note::
 
-   The :mod:`!sqlite3` module API does not support strings
-   containing surrogates.
+   API của module :mod:`!sqlite3` không hỗ trợ các chuỗi chứa surrogate.
 
 .. seealso::
 
@@ -2639,108 +2060,68 @@ you can use the following technique, borrowed from the :ref:`unicode-howto`:
 
 .. _sqlite3-explanation:
 
-Explanation
------------
+Giải thích
+----------
 
 .. _sqlite3-transaction-control:
 .. _sqlite3-controlling-transactions:
 
-Transaction control
+Kiểm soát giao dịch
 ^^^^^^^^^^^^^^^^^^^
 
-:mod:`!sqlite3` offers multiple methods of controlling whether,
-when and how database transactions are opened and closed.
-:ref:`sqlite3-transaction-control-autocommit` is recommended,
-while :ref:`sqlite3-transaction-control-isolation-level`
-retains the pre-Python 3.12 behaviour.
+:mod:`!sqlite3` cung cấp nhiều phương thức để kiểm soát việc các giao dịch cơ sở dữ liệu có được mở và đóng hay không, thời điểm mở và đóng, cũng như cách thức thực hiện.
+:ref:`sqlite3-transaction-control-autocommit` được khuyến nghị, còn :ref:`sqlite3-transaction-control-isolation-level` vẫn giữ nguyên hành vi trước Python 3.12.
 
 .. _sqlite3-transaction-control-autocommit:
 
-Transaction control via the ``autocommit`` attribute
-""""""""""""""""""""""""""""""""""""""""""""""""""""
+Kiểm soát giao dịch thông qua thuộc tính ``autocommit``
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-The recommended way of controlling transaction behaviour is through
-the :attr:`Connection.autocommit` attribute,
-which should preferably be set using the *autocommit* parameter
-of :func:`connect`.
+Cách được khuyến nghị để kiểm soát hành vi giao dịch là thông qua thuộc tính :attr:`Connection.autocommit`, thuộc tính này nên được thiết lập bằng tham số *autocommit* của :func:`connect`.
 
-It is suggested to set *autocommit* to ``False``,
-which implies :pep:`249`-compliant transaction control.
-This means:
+Nên đặt *autocommit* thành ``False``, điều này ngụ ý cơ chế kiểm soát giao dịch tuân thủ :pep:`249`. Điều này có nghĩa là:
 
-* :mod:`!sqlite3` ensures that a transaction is always open,
-  so :func:`connect`, :meth:`Connection.commit`, and :meth:`Connection.rollback`
-  will implicitly open a new transaction
-  (immediately after closing the pending one, for the latter two).
-  :mod:`!sqlite3` uses ``BEGIN DEFERRED`` statements when opening transactions.
-* Transactions should be committed explicitly using :meth:`!commit`.
-* Transactions should be rolled back explicitly using :meth:`!rollback`.
-* An implicit rollback is performed if the database is
-  :meth:`~Connection.close`-ed with pending changes.
+* :mod:`!sqlite3` đảm bảo rằng luôn có một giao dịch đang mở, vì vậy :func:`connect`, :meth:`Connection.commit` và :meth:`Connection.rollback` sẽ ngầm mở một giao dịch mới (ngay sau khi đóng giao dịch đang chờ đối với hai thao tác sau).
+  :mod:`!sqlite3` sử dụng các câu lệnh ``BEGIN DEFERRED`` khi mở giao dịch.
+* Các giao dịch nên được commit một cách tường minh bằng :meth:`!commit`.
+* Các giao dịch nên được rollback một cách tường minh bằng :meth:`!rollback`.
+* Một thao tác rollback ngầm được thực hiện nếu cơ sở dữ liệu bị
+  :meth:`~Connection.close`-ed khi còn các thay đổi chưa được ghi nhận.
 
-Set *autocommit* to ``True`` to enable SQLite's `autocommit mode`_.
-In this mode, :meth:`Connection.commit` and :meth:`Connection.rollback`
-have no effect.
-Note that SQLite's autocommit mode is distinct from
-the :pep:`249`-compliant :attr:`Connection.autocommit` attribute;
-use :attr:`Connection.in_transaction` to query
-the low-level SQLite autocommit mode.
+Đặt *autocommit* thành ``True`` để bật `chế độ autocommit <autocommit mode_>`_ của SQLite. Trong chế độ này, :meth:`Connection.commit` và :meth:`Connection.rollback` không có tác dụng. Lưu ý rằng chế độ autocommit của SQLite khác với thuộc tính :pep:`249`-compliant :attr:`Connection.autocommit`; sử dụng :attr:`Connection.in_transaction` để truy vấn chế độ autocommit cấp thấp của SQLite.
 
-Set *autocommit* to :data:`LEGACY_TRANSACTION_CONTROL`
-to leave transaction control behaviour to the
-:attr:`Connection.isolation_level` attribute.
-See :ref:`sqlite3-transaction-control-isolation-level` for more information.
+Đặt *autocommit* thành :data:`LEGACY_TRANSACTION_CONTROL` để giao việc kiểm soát giao dịch cho
+thuộc tính :attr:`Connection.isolation_level`. Xem :ref:`sqlite3-transaction-control-isolation-level` để biết thêm thông tin.
 
 
 .. _sqlite3-transaction-control-isolation-level:
 
-Transaction control via the ``isolation_level`` attribute
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Kiểm soát giao dịch thông qua thuộc tính ``isolation_level``
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. note::
 
-   The recommended way of controlling transactions is via the
-   :attr:`~Connection.autocommit` attribute.
-   See :ref:`sqlite3-transaction-control-autocommit`.
+   Cách được khuyến nghị để kiểm soát giao dịch là thông qua
+   thuộc tính :attr:`~Connection.autocommit`. Xem :ref:`sqlite3-transaction-control-autocommit`.
 
-If :attr:`Connection.autocommit` is set to
-:data:`LEGACY_TRANSACTION_CONTROL` (the default),
-transaction behaviour is controlled using
-the :attr:`Connection.isolation_level` attribute.
-Otherwise, :attr:`!isolation_level` has no effect.
+Nếu :attr:`Connection.autocommit` được đặt thành
+:data:`LEGACY_TRANSACTION_CONTROL` (mặc định), hành vi giao dịch được kiểm soát bằng thuộc tính :attr:`Connection.isolation_level`. Nếu không, :attr:`!isolation_level` không có tác dụng.
 
-If the connection attribute :attr:`~Connection.isolation_level`
-is not ``None``,
-new transactions are implicitly opened before
-:meth:`~Cursor.execute` and :meth:`~Cursor.executemany` executes
-``INSERT``, ``UPDATE``, ``DELETE``, or ``REPLACE`` statements;
-for other statements, no implicit transaction handling is performed.
-Use the :meth:`~Connection.commit` and :meth:`~Connection.rollback` methods
-to respectively commit and roll back pending transactions.
-You can choose the underlying `SQLite transaction behaviour`_ —
-that is, whether and what type of ``BEGIN`` statements :mod:`!sqlite3`
-implicitly executes –
-via the :attr:`~Connection.isolation_level` attribute.
+Nếu thuộc tính kết nối :attr:`~Connection.isolation_level` không phải là ``None``, các giao dịch mới sẽ được mở ngầm trước khi
+:meth:`~Cursor.execute` và :meth:`~Cursor.executemany` thực thi các câu lệnh ``INSERT``, ``UPDATE``, ``DELETE`` hoặc ``REPLACE``; với các câu lệnh khác, không thực hiện xử lý giao dịch ngầm. Sử dụng các phương thức :meth:`~Connection.commit` và :meth:`~Connection.rollback` để lần lượt commit và rollback các giao dịch đang chờ xử lý. Bạn có thể chọn `hành vi giao dịch SQLite <SQLite transaction behaviour_>`_ bên dưới — tức là liệu và loại câu lệnh ``BEGIN`` nào mà :mod:`!sqlite3` thực thi ngầm – thông qua thuộc tính :attr:`~Connection.isolation_level`.
 
-If :attr:`~Connection.isolation_level` is set to ``None``,
-no transactions are implicitly opened at all.
-This leaves the underlying SQLite library in `autocommit mode`_,
-but also allows the user to perform their own transaction handling
-using explicit SQL statements.
-The underlying SQLite library autocommit mode can be queried using the
-:attr:`~Connection.in_transaction` attribute.
+Nếu :attr:`~Connection.isolation_level` được đặt thành ``None``, hoàn toàn không có giao dịch nào được mở ngầm. Điều này đặt thư viện SQLite bên dưới ở `chế độ autocommit <autocommit mode_>`_, nhưng cũng cho phép người dùng tự xử lý giao dịch bằng các câu lệnh SQL tường minh. Có thể truy vấn chế độ autocommit của thư viện SQLite bên dưới bằng
+thuộc tính :attr:`~Connection.in_transaction`.
 
-The :meth:`~Cursor.executescript` method implicitly commits
-any pending transaction before execution of the given SQL script,
-regardless of the value of :attr:`~Connection.isolation_level`.
+Phương thức :meth:`~Cursor.executescript` ngầm commit mọi giao dịch đang chờ xử lý trước khi thực thi tập lệnh SQL đã cho, bất kể giá trị của :attr:`~Connection.isolation_level`.
 
 .. versionchanged:: 3.6
    :mod:`!sqlite3` used to implicitly commit an open transaction before DDL
-   statements.  This is no longer the case.
+   các câu lệnh. Điều này không còn đúng nữa.
 
 .. versionchanged:: 3.12
-   The recommended way of controlling transactions is now via the
-   :attr:`~Connection.autocommit` attribute.
+   Cách được khuyến nghị để kiểm soát transaction hiện nay là thông qua
+   :attr:`~Connection.autocommit` thuộc tính.
 
 .. _autocommit mode:
    https://www.sqlite.org/lang_transaction.html#implicit_versus_explicit_transactions
@@ -2755,3 +2136,9 @@ regardless of the value of :attr:`~Connection.isolation_level`.
    os.remove("dump.sql")
    os.remove("example.db")
    os.remove("tutorial.db")
+
+.. _`SQLite`: https://sqlite.org/
+.. _`SQLite database existing only in memory`: https://sqlite.org/inmemorydb.html
+.. _`threading mode`: https://sqlite.org/threadsafe.html
+.. _`deterministic`: https://sqlite.org/deterministic.html
+.. _`SQLite API`: https://sqlite.org/rescode.html

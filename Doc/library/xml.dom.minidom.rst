@@ -1,77 +1,61 @@
-:mod:`!xml.dom.minidom` --- Minimal DOM implementation
-======================================================
+:mod:`!xml.dom.minidom` --- Triển khai DOM tối giản
+===================================================
 
 .. module:: xml.dom.minidom
-   :synopsis: Minimal Document Object Model (DOM) implementation.
+   :synopsis: Triển khai Document Object Model (DOM) tối giản.
 
 .. moduleauthor:: Paul Prescod <paul@prescod.net>
 .. sectionauthor:: Paul Prescod <paul@prescod.net>
 .. sectionauthor:: Martin v. Löwis <martin@v.loewis.de>
 
-**Source code:** :source:`Lib/xml/dom/minidom.py`
+**Mã nguồn:** :source:`Lib/xml/dom/minidom.py`
 
 --------------
 
-:mod:`!xml.dom.minidom` is a minimal implementation of the Document Object
-Model interface, with an API similar to that in other languages.  It is intended
-to be simpler than the full DOM and also significantly smaller.  Users who are
-not already proficient with the DOM should consider using the
-:mod:`xml.etree.ElementTree` module for their XML processing instead.
+:mod:`!xml.dom.minidom` là một triển khai tối giản của giao diện Document Object Model, với API tương tự các API trong những ngôn ngữ khác. Nó được thiết kế đơn giản hơn DOM đầy đủ và cũng nhỏ gọn hơn đáng kể. Những người chưa thành thạo DOM nên cân nhắc sử dụng
+:mod:`xml.etree.ElementTree` mô-đun để xử lý XML thay vào đó.
 
 
 .. note::
 
-   If you need to parse untrusted or unauthenticated data, see
+   Nếu bạn cần phân tích dữ liệu không đáng tin cậy hoặc chưa được xác thực, hãy xem
    :ref:`xml-security`.
 
 
-DOM applications typically start by parsing some XML into a DOM.  With
-:mod:`!xml.dom.minidom`, this is done through the parse functions::
+Các ứng dụng DOM thường bắt đầu bằng cách phân tích một số XML thành DOM. Với
+Đối với :mod:`!xml.dom.minidom`, việc này được thực hiện thông qua các hàm parse::
 
    from xml.dom.minidom import parse, parseString
 
-   dom1 = parse('c:\\temp\\mydata.xml')  # parse an XML file by name
+   dom1 = parse('c:\\temp\\mydata.xml')  # phân tích một tệp XML theo tên
 
    datasource = open('c:\\temp\\mydata.xml')
-   dom2 = parse(datasource)  # parse an open file
+   dom2 = parse(datasource)  # phân tích một tệp đang mở
 
    dom3 = parseString('<myxml>Some data<empty/> some more data</myxml>')
 
-The :func:`parse` function can take either a filename or an open file object.
+Hàm :func:`parse` có thể nhận tên tệp hoặc một đối tượng tệp đang mở.
 
 
 .. function:: parse(filename_or_file, parser=None, bufsize=None)
 
-   Return a :class:`Document` from the given input. *filename_or_file* may be
-   either a file name, or a file-like object. *parser*, if given, must be a SAX2
-   parser object. This function will change the document handler of the parser and
-   activate namespace support; other parser configuration (like setting an entity
-   resolver) must have been done in advance.
+   Trả về một :class:`Document` từ đầu vào đã cho. *filename_or_file* có thể là tên tệp hoặc một đối tượng giống tệp. *parser*, nếu được cung cấp, phải là một đối tượng trình phân tích SAX2. Hàm này sẽ thay đổi document handler của trình phân tích và kích hoạt hỗ trợ namespace; các cấu hình trình phân tích khác (chẳng hạn như thiết lập entity resolver) phải được thực hiện trước.
 
-If you have XML in a string, you can use the :func:`parseString` function
-instead:
+Nếu bạn có XML trong một chuỗi, thay vào đó bạn có thể sử dụng hàm :func:`parseString`:
 
 
 .. function:: parseString(string, parser=None)
 
-   Return a :class:`Document` that represents the *string*. This method creates an
-   :class:`io.StringIO` object for the string and passes that on to :func:`parse`.
+   Trả về một :class:`Document` biểu diễn *string*. Phương thức này tạo một
+   đối tượng :class:`io.StringIO` cho chuỗi và truyền đối tượng đó cho :func:`parse`.
 
-Both functions return a :class:`Document` object representing the content of the
-document.
+Cả hai hàm đều trả về một đối tượng :class:`Document` đại diện cho nội dung của tài liệu.
 
-What the :func:`parse` and :func:`parseString` functions do is connect an XML
-parser with a "DOM builder" that can accept parse events from any SAX parser and
-convert them into a DOM tree.  The names of the functions are perhaps misleading,
-but are easy to grasp when learning the interfaces.  The parsing of the document
-will be completed before these functions return; it's simply that these
-functions do not provide a parser implementation themselves.
+Hai hàm :func:`parse` và :func:`parseString` kết nối một trình phân tích XML với một "DOM builder" có thể tiếp nhận các sự kiện phân tích từ bất kỳ trình phân tích SAX nào và chuyển đổi chúng thành một cây DOM. Tên của các hàm này có thể gây hiểu nhầm, nhưng sẽ dễ nắm bắt khi tìm hiểu các interface. Việc phân tích tài liệu sẽ hoàn tất trước khi các hàm này trả về; chỉ là bản thân các hàm này không cung cấp một triển khai trình phân tích.
 
-You can also create a :class:`Document` by calling a method on a "DOM
-Implementation" object.  You can get this object either by calling the
-:func:`getDOMImplementation` function in the :mod:`xml.dom` package or the
-:mod:`!xml.dom.minidom` module.  Once you have a :class:`Document`, you
-can add child nodes to it to populate the DOM::
+Bạn cũng có thể tạo một :class:`Document` bằng cách gọi một phương thức trên đối tượng "DOM Implementation". Bạn có thể lấy đối tượng này bằng cách gọi hàm
+:func:`getDOMImplementation` trong package :mod:`xml.dom` hoặc
+module :mod:`!xml.dom.minidom`. Khi đã có một :class:`Document`, bạn có thể thêm các nút con vào đó để tạo nội dung cho DOM::
 
    from xml.dom.minidom import getDOMImplementation
 
@@ -82,211 +66,146 @@ can add child nodes to it to populate the DOM::
    text = newdoc.createTextNode('Some textual content.')
    top_element.appendChild(text)
 
-Once you have a DOM document object, you can access the parts of your XML
-document through its properties and methods.  These properties are defined in
-the DOM specification.  The main property of the document object is the
-:attr:`documentElement` property.  It gives you the main element in the XML
-document: the one that holds all others.  Here is an example program::
+Khi đã có một đối tượng tài liệu DOM, bạn có thể truy cập các phần của tài liệu XML thông qua các thuộc tính và phương thức của nó. Các thuộc tính này được định nghĩa trong đặc tả DOM. Thuộc tính chính của đối tượng tài liệu là
+Thuộc tính :attr:`documentElement`. Nó cung cấp cho bạn phần tử chính trong tài liệu XML: phần tử chứa tất cả các phần tử khác. Đây là một chương trình ví dụ::
 
    dom3 = parseString("<myxml>Some data</myxml>")
    assert dom3.documentElement.tagName == "myxml"
 
-When you are finished with a DOM tree, you may optionally call the
-:meth:`unlink` method to encourage early cleanup of the now-unneeded
-objects.  :meth:`unlink` is an :mod:`!xml.dom.minidom`\ -specific
-extension to the DOM API that renders the node and its descendants
-essentially useless.  Otherwise, Python's garbage collector will
-eventually take care of the objects in the tree.
+Khi đã hoàn tất với một cây DOM, bạn có thể tùy ý gọi
+phương thức :meth:`unlink` để khuyến khích dọn dẹp sớm các đối tượng hiện không còn cần thiết. :meth:`unlink` là một phần mở rộng của DOM API dành riêng cho :mod:`!xml.dom.minidom`\ , khiến nút và các nút con của nó về cơ bản không còn tác dụng. Nếu không, bộ thu gom rác của Python cuối cùng sẽ xử lý các đối tượng trong cây.
 
 .. seealso::
 
-   `Document Object Model (DOM) Level 1 Specification <https://www.w3.org/TR/REC-DOM-Level-1/>`_
-      The W3C recommendation for the DOM supported by :mod:`!xml.dom.minidom`.
+   `Đặc tả Mô hình Đối tượng Tài liệu (DOM) Cấp 1 <https://www.w3.org/TR/REC-DOM-Level-1/>`_
+      Khuyến nghị của W3C về DOM được :mod:`!xml.dom.minidom` hỗ trợ.
 
 
 .. _minidom-objects:
 
-DOM Objects
------------
+Các đối tượng DOM
+-----------------
 
-The definition of the DOM API for Python is given as part of the :mod:`xml.dom`
-module documentation.  This section lists the differences between the API and
+Định nghĩa DOM API cho Python được cung cấp trong tài liệu về module :mod:`xml.dom`. Phần này liệt kê những điểm khác biệt giữa API và
 :mod:`!xml.dom.minidom`.
 
 
 .. method:: Node.unlink()
 
-   Break internal references within the DOM so that it will be garbage collected on
-   versions of Python without cyclic GC.  Even when cyclic GC is available, using
-   this can make large amounts of memory available sooner, so calling this on DOM
-   objects as soon as they are no longer needed is good practice.  This only needs
-   to be called on the :class:`Document` object, but may be called on child nodes
-   to discard children of that node.
+   Ngắt các tham chiếu nội bộ trong DOM để DOM được bộ thu gom rác giải phóng trên các phiên bản Python không có cyclic GC. Ngay cả khi có cyclic GC, việc sử dụng phương thức này có thể giúp giải phóng một lượng lớn bộ nhớ sớm hơn, vì vậy gọi phương thức này trên các đối tượng DOM ngay khi không còn cần đến chúng là một thực hành tốt. Chỉ cần gọi phương thức này trên đối tượng :class:`Document`, nhưng cũng có thể gọi trên các nút con để loại bỏ các nút con của nút đó.
 
-   You can avoid calling this method explicitly by using the :keyword:`with`
-   statement. The following code will automatically unlink *dom* when the
-   :keyword:`!with` block is exited::
+   Bạn có thể tránh gọi phương thức này một cách rõ ràng bằng cách sử dụng câu lệnh :keyword:`with`. Đoạn mã sau sẽ tự động ngắt liên kết của *dom* khi
+   khối :keyword:`!with` kết thúc::
 
       with xml.dom.minidom.parse(datasource) as dom:
-          ... # Work with dom.
+          ... # Làm việc với dom.
 
 
 .. method:: Node.writexml(writer, indent="", addindent="", newl="", \
                           encoding=None, standalone=None)
 
-   Write XML to the writer object.  The writer receives texts but not bytes as input,
-   it should have a :meth:`write` method which matches that of the file object
-   interface.  The *indent* parameter is the indentation of the current node.
-   The *addindent* parameter is the incremental indentation to use for subnodes
-   of the current one.  The *newl* parameter specifies the string to use to
-   terminate newlines.
+   Ghi XML vào đối tượng writer. writer nhận đầu vào là văn bản chứ không phải byte; đối tượng này phải có phương thức :meth:`write` tương ứng với phương thức của giao diện đối tượng tệp. Tham số *indent* là mức thụt lề của nút hiện tại. Tham số *addindent* là mức thụt lề tăng thêm cho các nút con của nút hiện tại. Tham số *newl* chỉ định chuỗi dùng để kết thúc các dòng mới.
 
-   For the :class:`Document` node, an additional keyword argument *encoding* can
-   be used to specify the encoding field of the XML header.
+   Đối với nút :class:`Document`, có thể sử dụng thêm đối số từ khóa *encoding* để chỉ định trường encoding của phần tiêu đề XML.
 
-   Similarly, explicitly stating the *standalone* argument causes the
-   standalone document declarations to be added to the prologue of the XML
-   document.
-   If the value is set to ``True``, ``standalone="yes"`` is added,
-   otherwise it is set to ``"no"``.
-   Not stating the argument will omit the declaration from the document.
+   Tương tự, việc nêu rõ đối số *standalone* sẽ khiến các khai báo tài liệu standalone được thêm vào phần mở đầu của tài liệu XML. Nếu giá trị được đặt thành ``True``, ``standalone="yes"`` sẽ được thêm vào; nếu không, giá trị sẽ được đặt thành ``"no"``. Nếu không nêu đối số này, khai báo sẽ bị lược bỏ khỏi tài liệu.
 
    .. versionchanged:: 3.8
-      The :meth:`writexml` method now preserves the attribute order specified
-      by the user.
+      Phương thức :meth:`writexml` hiện bảo toàn thứ tự thuộc tính do người dùng chỉ định.
 
    .. versionchanged:: 3.9
-      The *standalone* parameter was added.
+      Tham số *standalone* đã được thêm vào.
 
 .. method:: Node.toxml(encoding=None, standalone=None)
 
-   Return a string or byte string containing the XML represented by
-   the DOM node.
+   Trả về một chuỗi hoặc chuỗi byte chứa XML được biểu diễn bởi nút DOM.
 
-   With an explicit *encoding* [1]_ argument, the result is a byte
-   string in the specified encoding.
-   With no *encoding* argument, the result is a Unicode string, and the
-   XML declaration in the resulting string does not specify an
-   encoding. Encoding this string in an encoding other than UTF-8 is
-   likely incorrect, since UTF-8 is the default encoding of XML.
+   Với đối số *encoding* [1]_ được chỉ định rõ ràng, kết quả là một chuỗi byte sử dụng encoding đã chỉ định. Nếu không có đối số *encoding*, kết quả là một chuỗi Unicode và khai báo XML trong chuỗi kết quả không chỉ định encoding. Việc encoding chuỗi này bằng encoding khác UTF-8 nhiều khả năng là không chính xác, vì UTF-8 là encoding mặc định của XML.
 
-   The *standalone* argument behaves exactly as in :meth:`writexml`.
+   Đối số *standalone* hoạt động chính xác như trong :meth:`writexml`.
 
    .. versionchanged:: 3.8
-      The :meth:`toxml` method now preserves the attribute order specified
-      by the user.
+      Phương thức :meth:`toxml` hiện bảo toàn thứ tự thuộc tính do người dùng chỉ định.
 
    .. versionchanged:: 3.9
-      The *standalone* parameter was added.
+      Tham số *standalone* đã được thêm vào.
 
 .. method:: Node.toprettyxml(indent="\t", newl="\n", encoding=None, \
                              standalone=None)
 
-   Return a pretty-printed version of the document. *indent* specifies the
-   indentation string and defaults to a tabulator; *newl* specifies the string
-   emitted at the end of each line and defaults to ``\n``.
+   Trả về phiên bản được định dạng đẹp của tài liệu. *indent* chỉ định chuỗi thụt lề và mặc định là một ký tự tab; *newl* chỉ định chuỗi được xuất ở cuối mỗi dòng và mặc định là ``\n``.
 
-   The *encoding* argument behaves like the corresponding argument of
+   Đối số *encoding* hoạt động giống như đối số tương ứng của
    :meth:`toxml`.
 
-   The *standalone* argument behaves exactly as in :meth:`writexml`.
+   Đối số *standalone* hoạt động chính xác như trong :meth:`writexml`.
 
    .. versionchanged:: 3.8
-      The :meth:`toprettyxml` method now preserves the attribute order specified
-      by the user.
+      Phương thức :meth:`toprettyxml` hiện bảo toàn thứ tự thuộc tính do người dùng chỉ định.
 
    .. versionchanged:: 3.9
-      The *standalone* parameter was added.
+      Tham số *standalone* đã được thêm vào.
 
 .. _dom-example:
 
-DOM Example
------------
+Ví dụ về DOM
+------------
 
-This example program is a fairly realistic example of a simple program. In this
-particular case, we do not take much advantage of the flexibility of the DOM.
+Chương trình ví dụ này là một ví dụ khá thực tế về một chương trình đơn giản. Trong trường hợp cụ thể này, chúng ta không tận dụng nhiều tính linh hoạt của DOM.
 
 .. literalinclude:: ../includes/minidom-example.py
 
 
 .. _minidom-and-dom:
 
-minidom and the DOM standard
-----------------------------
+minidom và tiêu chuẩn DOM
+-------------------------
 
-The :mod:`!xml.dom.minidom` module is essentially a DOM 1.0-compatible DOM with
-some DOM 2 features (primarily namespace features).
+Module :mod:`!xml.dom.minidom` về cơ bản là một DOM tương thích với DOM 1.0, cùng một số tính năng của DOM 2 (chủ yếu là các tính năng về namespace).
 
-Usage of the DOM interface in Python is straight-forward.  The following mapping
-rules apply:
+Việc sử dụng giao diện DOM trong Python khá đơn giản. Các quy tắc ánh xạ sau được áp dụng:
 
-* Interfaces are accessed through instance objects. Applications should not
-  instantiate the classes themselves; they should use the creator functions
-  available on the :class:`Document` object. Derived interfaces support all
-  operations (and attributes) from the base interfaces, plus any new operations.
+* Các giao diện được truy cập thông qua các đối tượng instance. Ứng dụng không nên tự khởi tạo các class; thay vào đó, chúng nên sử dụng các hàm creator có sẵn trên đối tượng :class:`Document`. Các giao diện dẫn xuất hỗ trợ mọi thao tác (và thuộc tính) từ các giao diện cơ sở, cùng với mọi thao tác mới.
 
-* Operations are used as methods. Since the DOM uses only :keyword:`in`
-  parameters, the arguments are passed in normal order (from left to right).
-  There are no optional arguments. ``void`` operations return ``None``.
+* Các thao tác được sử dụng dưới dạng các phương thức. Vì DOM chỉ sử dụng các tham số :keyword:`in`, các đối số được truyền theo thứ tự thông thường (từ trái sang phải). Không có đối số tùy chọn. Các thao tác ``void`` trả về ``None``.
 
-* IDL attributes map to instance attributes. For compatibility with the OMG IDL
-  language mapping for Python, an attribute ``foo`` can also be accessed through
-  accessor methods :meth:`_get_foo` and :meth:`_set_foo`.  ``readonly``
-  attributes must not be changed; this is not enforced at runtime.
+* Các thuộc tính IDL ánh xạ tới các thuộc tính của instance. Để tương thích với ánh xạ ngôn ngữ OMG IDL cho Python, một thuộc tính ``foo`` cũng có thể được truy cập thông qua các phương thức accessor :meth:`_get_foo` và :meth:`_set_foo`. Các thuộc tính ``readonly`` không được thay đổi; điều này không được thực thi tại runtime.
 
-* The types ``short int``, ``unsigned int``, ``unsigned long long``, and
-  ``boolean`` all map to Python integer objects.
+* Các kiểu ``short int``, ``unsigned int``, ``unsigned long long`` và ``boolean`` đều ánh xạ tới các đối tượng số nguyên Python.
 
-* The type ``DOMString`` maps to Python strings. :mod:`!xml.dom.minidom` supports
-  either bytes or strings, but will normally produce strings.
-  Values of type ``DOMString`` may also be ``None`` where allowed to have the IDL
-  ``null`` value by the DOM specification from the W3C.
+* Kiểu ``DOMString`` ánh xạ tới các chuỗi Python. :mod:`!xml.dom.minidom` hỗ trợ cả bytes và chuỗi, nhưng thông thường sẽ tạo ra các chuỗi. Các giá trị kiểu ``DOMString`` cũng có thể là ``None`` khi đặc tả DOM của W3C cho phép giá trị IDL ``null``.
 
-* ``const`` declarations map to variables in their respective scope (e.g.
-  ``xml.dom.minidom.Node.PROCESSING_INSTRUCTION_NODE``); they must not be changed.
+* Các khai báo ``const`` ánh xạ tới các biến trong phạm vi tương ứng của chúng (ví dụ: ``xml.dom.minidom.Node.PROCESSING_INSTRUCTION_NODE``); chúng không được thay đổi.
 
-* ``DOMException`` is currently not supported in :mod:`!xml.dom.minidom`.
-  Instead, :mod:`!xml.dom.minidom` uses standard Python exceptions such as
-  :exc:`TypeError` and :exc:`AttributeError`.
+* ``DOMException`` hiện chưa được hỗ trợ trong :mod:`!xml.dom.minidom`. Thay vào đó, :mod:`!xml.dom.minidom` sử dụng các exception chuẩn của Python như
+  :exc:`TypeError` và :exc:`AttributeError`.
 
-* Each of the :class:`~xml.dom.NodeList` and :class:`~xml.dom.NamedNodeMap`
-  interfaces has two implementations, which provide additional methods and
-  operations.
+* Mỗi interface :class:`~xml.dom.NodeList` và :class:`~xml.dom.NamedNodeMap` đều có hai implementation, cung cấp các phương thức và thao tác bổ sung.
 
-  :attr:`~xml.dom.Node.childNodes` is a subclass of :class:`list`, or, for
-  nodes which cannot have children, a subclass of :class:`tuple`.
-  It supports iteration, concatenation, indexing and slicing.
+  :attr:`~xml.dom.Node.childNodes` là một lớp con của :class:`list`, hoặc, đối với các node không thể có node con, là một lớp con của :class:`tuple`. Nó hỗ trợ phép lặp, phép nối, lập chỉ mục và cắt lát.
 
-  :attr:`~xml.dom.Node.attributes` supports ``len()``, the :keyword:`in`
-  operator, subscription by a name or by a ``(namespaceURI, localName)``
-  tuple, assignment and deletion, and the methods :meth:`!get`, :meth:`!keys`,
-  :meth:`!keysNS`, :meth:`!values`, :meth:`!items` and :meth:`!itemsNS`.
-  :attr:`~xml.dom.DocumentType.entities` and
-  :attr:`~xml.dom.DocumentType.notations` are read-only and support only
-  ``len()`` and subscription by a name.
+  :attr:`~xml.dom.Node.attributes` hỗ trợ ``len()``, toán tử :keyword:`in`, phép truy cập phần tử theo tên hoặc theo một tuple ``(namespaceURI, localName)``, phép gán và xóa, cùng các phương thức :meth:`!get`, :meth:`!keys`,
+  :meth:`!keysNS`, :meth:`!values`, :meth:`!items` và :meth:`!itemsNS`.
+  :attr:`~xml.dom.DocumentType.entities` và
+  :attr:`~xml.dom.DocumentType.notations` là chỉ đọc và chỉ hỗ trợ ``len()`` cùng phép truy cập phần tử theo tên.
 
-* :attr:`~xml.dom.Document.strictErrorChecking` and
-  :attr:`~xml.dom.Attr.specified` are always ``False``.
+* :attr:`~xml.dom.Document.strictErrorChecking` và
+  :attr:`~xml.dom.Attr.specified` luôn là ``False``.
 
-* :meth:`~xml.dom.Element.removeAttribute` and
-  :meth:`~xml.dom.Element.removeAttributeNS` raise
-  :exc:`~xml.dom.NotFoundErr` if there is no matching attribute,
-  while the DOM specifies that this has no effect.
+* :meth:`~xml.dom.Element.removeAttribute` và
+  :meth:`~xml.dom.Element.removeAttributeNS` phát sinh
+  :exc:`~xml.dom.NotFoundErr` nếu không có thuộc tính tương ứng, trong khi DOM quy định rằng thao tác này không có tác dụng.
 
-The following interfaces have no implementation in :mod:`!xml.dom.minidom`:
+Các interface sau đây chưa được triển khai trong :mod:`!xml.dom.minidom`:
 
 * :class:`DOMTimeStamp`
 
 * :class:`EntityReference`
 
-Most of these reflect information in the XML document that is not of general
-utility to most DOM users.
+Hầu hết những thông tin này phản ánh dữ liệu trong tài liệu XML nhưng không có nhiều giá trị sử dụng chung đối với phần lớn người dùng DOM.
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [1] The encoding name included in the XML output should conform to
-   the appropriate standards. For example, "UTF-8" is valid, but
-   "UTF8" is not valid in an XML document's declaration, even though
-   Python accepts it as an encoding name.
-   See https://www.w3.org/TR/2006/REC-xml11-20060816/#NT-EncodingDecl
-   and https://www.iana.org/assignments/character-sets/character-sets.xhtml.
+.. [1] Tên encoding có trong đầu ra XML phải tuân thủ các tiêu chuẩn thích hợp. Ví dụ: "UTF-8" là hợp lệ, nhưng "UTF8" không hợp lệ trong phần khai báo của tài liệu XML, mặc dù Python chấp nhận nó làm tên encoding. Xem https://www.w3.org/TR/2006/REC-xml11-20060816/#NT-EncodingDecl và https://www.iana.org/assignments/character-sets/character-sets.xhtml.
+
+.. _`Document Object Model (DOM) Level 1 Specification`: https://www.w3.org/TR/REC-DOM-Level-1/

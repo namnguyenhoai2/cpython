@@ -1,8 +1,8 @@
-:mod:`!itertools` --- Functions creating iterators for efficient looping
-========================================================================
+:mod:`!itertools` --- Các hàm tạo iterator để lặp hiệu quả
+==========================================================
 
 .. module:: itertools
-   :synopsis: Functions creating iterators for efficient looping.
+   :synopsis: Các hàm tạo iterator để lặp hiệu quả.
 
 .. moduleauthor:: Raymond Hettinger <python@rcn.com>
 .. sectionauthor:: Raymond Hettinger <python@rcn.com>
@@ -17,87 +17,96 @@
 
 --------------
 
-This module implements a number of :term:`iterator` building blocks inspired
-by constructs from APL, Haskell, and SML.  Each has been recast in a form
-suitable for Python.
+Module này triển khai một số :term:`iterator` khối xây dựng lấy cảm hứng từ các cấu trúc trong APL, Haskell và SML. Mỗi khối được chuyển thành dạng phù hợp với Python.
 
-The module standardizes a core set of fast, memory efficient tools that are
-useful by themselves or in combination.  Together, they form an "iterator
-algebra" making it possible to construct specialized tools succinctly and
-efficiently in pure Python.
+Module này chuẩn hóa một tập hợp cốt lõi gồm các công cụ nhanh, tiết kiệm bộ nhớ, hữu ích khi sử dụng riêng lẻ hoặc kết hợp với nhau. Khi kết hợp, chúng tạo thành một "đại số iterator" giúp xây dựng các công cụ chuyên biệt một cách ngắn gọn và hiệu quả chỉ bằng Python thuần.
 
-For instance, SML provides a tabulation tool: ``tabulate(f)`` which produces a
-sequence ``f(0), f(1), ...``.  The same effect can be achieved in Python
-by combining :func:`map` and :func:`count` to form ``map(f, count())``.
+Ví dụ, SML cung cấp một công cụ lập bảng: ``tabulate(f)`` tạo ra một dãy ``f(0), f(1), ...``. Trong Python, có thể đạt được hiệu ứng tương tự bằng cách kết hợp :func:`map` và :func:`count` để tạo thành ``map(f, count())``.
 
-**General iterators:**
+**Các iterator tổng quát:**
 
-============================    ============================    =================================================   =============================================================
-Iterator                        Arguments                       Results                                             Example
-============================    ============================    =================================================   =============================================================
-:func:`accumulate`              p [,func]                       p0, p0+p1, p0+p1+p2, ...                            ``accumulate([1,2,3,4,5]) → 1 3 6 10 15``
-:func:`batched`                 p, n                            (p0, p1, ..., p_n-1), ...                           ``batched('ABCDEFG', n=3) → ABC DEF G``
-:func:`chain`                   p, q, ...                       p0, p1, ... plast, q0, q1, ...                      ``chain('ABC', 'DEF') → A B C D E F``
-:func:`chain.from_iterable`     iterable                        p0, p1, ... plast, q0, q1, ...                      ``chain.from_iterable(['ABC', 'DEF']) → A B C D E F``
-:func:`compress`                data, selectors                 (d[0] if s[0]), (d[1] if s[1]), ...                 ``compress('ABCDEF', [1,0,1,0,1,1]) → A C E F``
-:func:`count`                   [start[, step]]                 start, start+step, start+2*step, ...                ``count(10) → 10 11 12 13 14 ...``
-:func:`cycle`                   p                               p0, p1, ... plast, p0, p1, ...                      ``cycle('ABCD') → A B C D A B C D ...``
-:func:`dropwhile`               predicate, seq                  seq[n], seq[n+1], starting when predicate fails     ``dropwhile(lambda x: x<5, [1,4,6,3,8]) → 6 3 8``
-:func:`filterfalse`             predicate, seq                  elements of seq where predicate(elem) fails         ``filterfalse(lambda x: x<5, [1,4,6,3,8]) → 6 8``
-:func:`groupby`                 iterable[, key]                 sub-iterators grouped by value of key(v)            ``groupby(['A','B','DEF'], len) → (1, A B) (3, DEF)``
-:func:`islice`                  seq, [start,] stop [, step]     elements from seq[start:stop:step]                  ``islice('ABCDEFG', 2, None) → C D E F G``
-:func:`pairwise`                iterable                        (p[0], p[1]), (p[1], p[2])                          ``pairwise('ABCDEFG') → AB BC CD DE EF FG``
-:func:`repeat`                  elem [,n]                       elem, elem, elem, ... endlessly or up to n times    ``repeat(10, 3) → 10 10 10``
-:func:`starmap`                 func, seq                       func(\*seq[0]), func(\*seq[1]), ...                 ``starmap(pow, [(2,5), (3,2), (10,3)]) → 32 9 1000``
-:func:`takewhile`               predicate, seq                  seq[0], seq[1], until predicate fails               ``takewhile(lambda x: x<5, [1,4,6,3,8]) → 1 4``
-:func:`tee`                     it, n                           it1, it2, ... itn  splits one iterator into n       ``tee('ABC', 2) → A B C, A B C``
-:func:`zip_longest`             p, q, ...                       (p[0], q[0]), (p[1], q[1]), ...                     ``zip_longest('ABCD', 'xy', fillvalue='-') → Ax By C- D-``
-============================    ============================    =================================================   =============================================================
++-----------------------------+-----------------------------+--------------------------------------------------------+------------------------------------------------------------+
+| Iterator                    | Đối số                      | Kết quả                                                | Ví dụ                                                      |
++=============================+=============================+========================================================+============================================================+
+| :func:`accumulate`          | p [,func]                   | p0, p0+p1, p0+p1+p2, ...                               | ``accumulate([1,2,3,4,5]) → 1 3 6 10 15``                  |
++-----------------------------+-----------------------------+--------------------------------------------------------+------------------------------------------------------------+
+| :func:`batched`             | p, n                        | (p0, p1, ..., p_n-1), ...                              | ``batched('ABCDEFG', n=3) → ABC DEF G``                    |
++-----------------------------+-----------------------------+--------------------------------------------------------+------------------------------------------------------------+
+| :func:`chain`               | p, q, ...                   | p0, p1, ... plast, q0, q1, ...                         | ``chain('ABC', 'DEF') → A B C D E F``                      |
++-----------------------------+-----------------------------+--------------------------------------------------------+------------------------------------------------------------+
+| :func:`chain.from_iterable` | iterable                    | p0, p1, ... plast, q0, q1, ...                         | ``chain.from_iterable(['ABC', 'DEF']) → A B C D E F``      |
++-----------------------------+-----------------------------+--------------------------------------------------------+------------------------------------------------------------+
+| :func:`compress`            | data, selectors             | (d[0] if s[0]), (d[1] if s[1]), ...                    | ``compress('ABCDEF', [1,0,1,0,1,1]) → A C E F``            |
++-----------------------------+-----------------------------+--------------------------------------------------------+------------------------------------------------------------+
+| :func:`count`               | [start[, step]]             | start, start+step, start+2*step, ...                   | ``count(10) → 10 11 12 13 14 ...``                         |
++-----------------------------+-----------------------------+--------------------------------------------------------+------------------------------------------------------------+
+| :func:`cycle`               | p                           | p0, p1, ... plast, p0, p1, ...                         | ``cycle('ABCD') → A B C D A B C D ...``                    |
++-----------------------------+-----------------------------+--------------------------------------------------------+------------------------------------------------------------+
+| :func:`dropwhile`           | predicate, seq              | seq[n], seq[n+1], bắt đầu khi predicate không thỏa mãn | ``dropwhile(lambda x: x<5, [1,4,6,3,8]) → 6 3 8``          |
++-----------------------------+-----------------------------+--------------------------------------------------------+------------------------------------------------------------+
+| :func:`filterfalse`         | predicate, seq              | các phần tử của seq mà predicate(elem) không thỏa mãn  | ``filterfalse(lambda x: x<5, [1,4,6,3,8]) → 6 8``          |
++-----------------------------+-----------------------------+--------------------------------------------------------+------------------------------------------------------------+
+| :func:`groupby`             | iterable[, key]             | các sub-iterator được nhóm theo giá trị của key(v)     | ``groupby(['A','B','DEF'], len) → (1, A B) (3, DEF)``      |
++-----------------------------+-----------------------------+--------------------------------------------------------+------------------------------------------------------------+
+| :func:`islice`              | seq, [start,] stop [, step] | các phần tử từ seq[start:stop:step]                    | ``islice('ABCDEFG', 2, None) → C D E F G``                 |
++-----------------------------+-----------------------------+--------------------------------------------------------+------------------------------------------------------------+
+| :func:`pairwise`            | iterable                    | (p[0], p[1]), (p[1], p[2])                             | ``pairwise('ABCDEFG') → AB BC CD DE EF FG``                |
++-----------------------------+-----------------------------+--------------------------------------------------------+------------------------------------------------------------+
+| :func:`repeat`              | elem [,n]                   | elem, elem, elem, ... vô hạn hoặc tối đa n lần         | ``repeat(10, 3) → 10 10 10``                               |
++-----------------------------+-----------------------------+--------------------------------------------------------+------------------------------------------------------------+
+| :func:`starmap`             | func, seq                   | func(\*seq[0]), func(\*seq[1]), ...                    | ``starmap(pow, [(2,5), (3,2), (10,3)]) → 32 9 1000``       |
++-----------------------------+-----------------------------+--------------------------------------------------------+------------------------------------------------------------+
+| :func:`takewhile`           | predicate, seq              | seq[0], seq[1], cho đến khi predicate không còn đúng   | ``takewhile(lambda x: x<5, [1,4,6,3,8]) → 1 4``            |
++-----------------------------+-----------------------------+--------------------------------------------------------+------------------------------------------------------------+
+| :func:`tee`                 | it, n                       | it1, it2, ... itn  chia một iterator thành n iterator  | ``tee('ABC', 2) → A B C, A B C``                           |
++-----------------------------+-----------------------------+--------------------------------------------------------+------------------------------------------------------------+
+| :func:`zip_longest`         | p, q, ...                   | (p[0], q[0]), (p[1], q[1]), ...                        | ``zip_longest('ABCD', 'xy', fillvalue='-') → Ax By C- D-`` |
++-----------------------------+-----------------------------+--------------------------------------------------------+------------------------------------------------------------+
 
-**Combinatoric iterators:**
+**Các iterator tổ hợp:**
 
-==============================================   ====================       =============================================================
-Iterator                                         Arguments                  Results
-==============================================   ====================       =============================================================
-:func:`product`                                  p, q, ... [repeat=1]       cartesian product, equivalent to a nested for-loop
-:func:`permutations`                             p[, r]                     r-length tuples, all possible orderings, no repeated elements
-:func:`combinations`                             p, r                       r-length tuples, in sorted order, no repeated elements
-:func:`combinations_with_replacement`            p, r                       r-length tuples, in sorted order, with repeated elements
-==============================================   ====================       =============================================================
++---------------------------------------+----------------------+------------------------------------------------------------------+
+| Iterator                              | Đối số               | Kết quả                                                          |
++=======================================+======================+==================================================================+
+| :func:`product`                       | p, q, ... [repeat=1] | tích Descartes, tương đương với một nested for-loop              |
++---------------------------------------+----------------------+------------------------------------------------------------------+
+| :func:`permutations`                  | p[, r]               | các tuple có độ dài r, mọi thứ tự có thể, không lặp phần tử      |
++---------------------------------------+----------------------+------------------------------------------------------------------+
+| :func:`combinations`                  | p, r                 | các tuple có độ dài r, theo thứ tự đã sắp xếp, không lặp phần tử |
++---------------------------------------+----------------------+------------------------------------------------------------------+
+| :func:`combinations_with_replacement` | p, r                 | các tuple có độ dài r, theo thứ tự đã sắp xếp, có lặp phần tử    |
++---------------------------------------+----------------------+------------------------------------------------------------------+
 
-==============================================   =============================================================
-Examples                                         Results
-==============================================   =============================================================
-``product('ABCD', repeat=2)``                    ``AA AB AC AD BA BB BC BD CA CB CC CD DA DB DC DD``
-``permutations('ABCD', 2)``                      ``AB AC AD BA BC BD CA CB CD DA DB DC``
-``combinations('ABCD', 2)``                      ``AB AC AD BC BD CD``
-``combinations_with_replacement('ABCD', 2)``     ``AA AB AC AD BB BC BD CC CD DD``
-==============================================   =============================================================
++----------------------------------------------+-----------------------------------------------------+
+| Ví dụ                                        | Kết quả                                             |
++==============================================+=====================================================+
+| ``product('ABCD', repeat=2)``                | ``AA AB AC AD BA BB BC BD CA CB CC CD DA DB DC DD`` |
++----------------------------------------------+-----------------------------------------------------+
+| ``permutations('ABCD', 2)``                  | ``AB AC AD BA BC BD CA CB CD DA DB DC``             |
++----------------------------------------------+-----------------------------------------------------+
+| ``combinations('ABCD', 2)``                  | ``AB AC AD BC BD CD``                               |
++----------------------------------------------+-----------------------------------------------------+
+| ``combinations_with_replacement('ABCD', 2)`` | ``AA AB AC AD BB BC BD CC CD DD``                   |
++----------------------------------------------+-----------------------------------------------------+
 
 
 .. _itertools-functions:
 
-Itertool Functions
-------------------
+Các hàm Itertool
+----------------
 
-The following functions all construct and return iterators. Some provide
-streams of infinite length, so they should only be accessed by functions or
-loops that truncate the stream.
+Các hàm sau đều tạo và trả về iterator. Một số hàm cung cấp các stream có độ dài vô hạn, vì vậy chỉ nên truy cập chúng bằng các hàm hoặc vòng lặp có khả năng cắt ngắn stream.
 
 
 .. function:: accumulate(iterable[, function, *, initial=None])
 
-    Make an iterator that returns accumulated sums or accumulated
-    results from other binary functions.
+    Tạo một iterator trả về các tổng tích lũy hoặc các kết quả tích lũy từ những hàm nhị phân khác.
 
-    The *function* defaults to addition.  The *function* should accept
-    two arguments, an accumulated total and a value from the *iterable*.
+    *Hàm* mặc định thực hiện phép cộng. *Hàm* phải chấp nhận hai đối số: tổng đã tích lũy và một giá trị từ *iterable*.
 
-    If an *initial* value is provided, the accumulation will start with
-    that value and the output will have one more element than the input
-    iterable.
+    Nếu cung cấp một giá trị *initial*, quá trình tích lũy sẽ bắt đầu bằng giá trị đó và đầu ra sẽ có nhiều hơn iterable đầu vào một phần tử.
 
-    Roughly equivalent to::
+    Tương đương về cơ bản với::
 
         def accumulate(iterable, function=operator.add, *, initial=None):
             'Return running totals'
@@ -118,50 +127,39 @@ loops that truncate the stream.
                 total = function(total, element)
                 yield total
 
-    To compute a running minimum, set *function* to :func:`min`.
-    For a running maximum, set *function* to :func:`max`.
-    Or for a running product, set *function* to :func:`operator.mul`.
-    To build an `amortization table
-    <https://www.ramseysolutions.com/real-estate/amortization-schedule>`_,
-    accumulate the interest and apply payments:
+    Để tính giá trị nhỏ nhất lũy tiến, hãy đặt *hàm* thành :func:`min`. Để tính giá trị lớn nhất lũy tiến, hãy đặt *hàm* thành :func:`max`. Hoặc để tính tích lũy tiến, hãy đặt *hàm* thành :func:`operator.mul`. Để xây dựng `bảng khấu hao <https://www.ramseysolutions.com/real-estate/amortization-schedule>`_, hãy cộng dồn tiền lãi và áp dụng các khoản thanh toán:
 
     .. doctest::
 
       >>> data = [3, 4, 6, 2, 1, 9, 0, 7, 5, 8]
-      >>> list(accumulate(data, max))              # running maximum
+      >>> list(accumulate(data, max))              # giá trị lớn nhất lũy tiến
       [3, 4, 6, 6, 6, 9, 9, 9, 9, 9]
-      >>> list(accumulate(data, operator.mul))     # running product
+      >>> list(accumulate(data, operator.mul))     # tích lũy tiến
       [3, 12, 72, 144, 144, 1296, 0, 0, 0, 0]
 
-      # Amortize a 5% loan of 1000 with 10 annual payments of 90
+      # Tính lịch trả khoản vay 5% trị giá 1000 với 10 khoản thanh toán hằng năm, mỗi khoản 90
       >>> update = lambda balance, payment: round(balance * 1.05) - payment
       >>> list(accumulate(repeat(90, 10), update, initial=1_000))
       [1000, 960, 918, 874, 828, 779, 728, 674, 618, 559, 497]
 
-    See :func:`functools.reduce` for a similar function that returns only the
-    final accumulated value.
+    Xem :func:`functools.reduce` để biết một hàm tương tự chỉ trả về giá trị tích lũy cuối cùng.
 
     .. versionadded:: 3.2
 
     .. versionchanged:: 3.3
-       Added the optional *function* parameter.
+       Đã thêm tham số *function* tùy chọn.
 
     .. versionchanged:: 3.8
-       Added the optional *initial* parameter.
+       Đã thêm tham số *initial* tùy chọn.
 
 
 .. function:: batched(iterable, n, *, strict=False)
 
-   Batch data from the *iterable* into tuples of length *n*. The last
-   batch may be shorter than *n*.
+   Gộp dữ liệu theo lô từ *iterable* thành các tuple có độ dài *n*. Lô cuối cùng có thể ngắn hơn *n*.
 
-   If *strict* is true, will raise a :exc:`ValueError` if the final
-   batch is shorter than *n*.
+   Nếu *strict* là true, sẽ phát sinh một :exc:`ValueError` nếu lô cuối cùng ngắn hơn *n*.
 
-   Loops over the input iterable and accumulates data into tuples up to
-   size *n*.  The input is consumed lazily, just enough to fill a batch.
-   The result is yielded as soon as the batch is full or when the input
-   iterable is :term:`exhausted`:
+   Lặp qua iterable đầu vào và tích lũy dữ liệu thành các tuple có kích thước *n*. Iterable đầu vào được tiêu thụ theo kiểu lazy, vừa đủ để lấp đầy một lô. Kết quả được yield ngay khi lô đầy hoặc khi iterable đầu vào đã :term:`exhausted`:
 
    .. doctest::
 
@@ -170,7 +168,7 @@ loops that truncate the stream.
       >>> unflattened
       [('roses', 'red'), ('violets', 'blue'), ('sugar', 'sweet')]
 
-   Roughly equivalent to::
+   Tương đương về cơ bản với::
 
       def batched(iterable, n, *, strict=False):
           # batched('ABCDEFG', 3) → ABC DEF G
@@ -185,15 +183,12 @@ loops that truncate the stream.
    .. versionadded:: 3.12
 
    .. versionchanged:: 3.13
-      Added the *strict* option.
+      Đã thêm tùy chọn *strict*.
 
 
 .. function:: chain(*iterables)
 
-   Make an iterator that returns elements from the first iterable until
-   it is :term:`exhausted`, then proceeds to the next iterable, until all of the
-   iterables are exhausted.  This combines multiple data sources into a
-   single iterator.  Roughly equivalent to::
+   Tạo một iterator trả về các phần tử từ iterable đầu tiên cho đến khi nó :term:`exhausted`, sau đó chuyển sang iterable tiếp theo cho đến khi tất cả các iterable đều cạn kiệt. Cách này kết hợp nhiều nguồn dữ liệu thành một iterator duy nhất. Về cơ bản tương đương với::
 
       def chain(*iterables):
           # chain('ABC', 'DEF') → A B C D E F
@@ -203,8 +198,7 @@ loops that truncate the stream.
 
 .. classmethod:: chain.from_iterable(iterable)
 
-   Alternate constructor for :func:`chain`.  Gets chained inputs from a
-   single iterable argument that is evaluated lazily.  Roughly equivalent to::
+   Hàm khởi tạo thay thế cho :func:`chain`. Nhận các đầu vào được nối từ một đối số iterable duy nhất, đối số này được đánh giá một cách lười biếng. Về cơ bản tương đương với::
 
       def from_iterable(iterables):
           # chain.from_iterable(['ABC', 'DEF']) → A B C D E F
@@ -214,22 +208,15 @@ loops that truncate the stream.
 
 .. function:: combinations(iterable, r)
 
-   Return *r* length subsequences of elements from the input *iterable*.
+   Trả về các dãy con có độ dài *r* của các phần tử từ *iterable* đầu vào.
 
-   The output is a subsequence of :func:`product` keeping only entries that
-   are subsequences of the *iterable*.  The length of the output is given
-   by :func:`math.comb` which computes ``n! / r! / (n - r)!`` when ``0 ≤ r
-   ≤ n`` or zero when ``r > n``.
+   Đầu ra là một dãy con của :func:`product`, chỉ giữ lại các mục là dãy con của *iterable*. Độ dài của đầu ra được xác định bởi :func:`math.comb`, tính ``n! / r! / (n - r)!`` khi ``0 ≤ r ≤ n`` hoặc bằng không khi ``r > n``.
 
-   The combination tuples are emitted in lexicographic order according to
-   the order of the input *iterable*. If the input *iterable* is sorted,
-   the output tuples will be produced in sorted order.
+   Các tuple tổ hợp được tạo theo thứ tự từ điển dựa trên thứ tự của *iterable* đầu vào. Nếu *iterable* đầu vào được sắp xếp, các tuple đầu ra sẽ được tạo theo thứ tự đã sắp xếp.
 
-   Elements are treated as unique based on their position, not on their
-   value.  If the input elements are unique, there will be no repeated
-   values within each combination.
+   Các phần tử được xem là duy nhất dựa trên vị trí của chúng, không dựa trên giá trị. Nếu các phần tử đầu vào là duy nhất, sẽ không có giá trị lặp lại trong mỗi tổ hợp.
 
-   Roughly equivalent to::
+   Tương đương về cơ bản với::
 
         def combinations(iterable, r):
             # combinations('ABCD', 2) → AB AC AD BC BD CD
@@ -256,23 +243,15 @@ loops that truncate the stream.
 
 .. function:: combinations_with_replacement(iterable, r)
 
-   Return *r* length subsequences of elements from the input *iterable*
-   allowing individual elements to be repeated more than once.
+   Trả về các subsequence có độ dài *r* gồm các phần tử từ *iterable*, cho phép lặp lại từng phần tử nhiều hơn một lần.
 
-   The output is a subsequence of :func:`product` that keeps only entries
-   that are subsequences (with possible repeated elements) of the
-   *iterable*.  The number of subsequence returned is ``(n + r - 1)! / r! /
-   (n - 1)!`` when ``n > 0``.
+   Đầu ra là một subsequence của :func:`product`, chỉ giữ lại các mục là subsequence (có thể chứa các phần tử lặp lại) của *iterable*. Số lượng subsequence được trả về là ``(n + r - 1)! / r! / (n - 1)!`` khi ``n > 0``.
 
-   The combination tuples are emitted in lexicographic order according to
-   the order of the input *iterable*. if the input *iterable* is sorted,
-   the output tuples will be produced in sorted order.
+   Các tuple tổ hợp được phát ra theo thứ tự từ điển dựa trên thứ tự của *iterable*. Nếu *iterable* đầu vào đã được sắp xếp, các tuple đầu ra cũng sẽ được tạo theo thứ tự đã sắp xếp.
 
-   Elements are treated as unique based on their position, not on their
-   value.  If the input elements are unique, the generated combinations
-   will also be unique.
+   Các phần tử được xem là duy nhất dựa trên vị trí của chúng, không phải dựa trên giá trị. Nếu các phần tử đầu vào là duy nhất, các tổ hợp được tạo cũng sẽ là duy nhất.
 
-   Roughly equivalent to::
+   Tương đương về cơ bản với::
 
         def combinations_with_replacement(iterable, r):
             # combinations_with_replacement('ABC', 2) → AA AB AC BB BC CC
@@ -298,10 +277,7 @@ loops that truncate the stream.
 
 .. function:: compress(data, selectors)
 
-   Make an iterator that returns elements from *data* where the
-   corresponding element in *selectors* is true.  Stops when either the
-   *data* or *selectors* iterables have been :term:`exhausted`.  Roughly
-   equivalent to::
+   Tạo một iterator trả về các phần tử từ *data* mà phần tử tương ứng trong *selectors* là true. Dừng khi một trong hai iterable *data* hoặc *selectors* đã :term:`exhausted`. Tương đương gần đúng với::
 
        def compress(data, selectors):
            # compress('ABCDEF', [1,0,1,0,1,1]) → A C E F
@@ -312,10 +288,7 @@ loops that truncate the stream.
 
 .. function:: count(start=0, step=1)
 
-   Make an iterator that returns evenly spaced values beginning with
-   *start*. Can be used with :func:`map` to generate consecutive data
-   points or with :func:`zip` to add sequence numbers.  Roughly
-   equivalent to::
+   Tạo một iterator trả về các giá trị cách đều nhau, bắt đầu với *start*. Có thể dùng với :func:`map` để tạo các điểm dữ liệu liên tiếp hoặc với :func:`zip` để thêm số thứ tự. Gần tương đương với::
 
       def count(start=0, step=1):
           # count(10) → 10 11 12 13 14 ...
@@ -325,19 +298,15 @@ loops that truncate the stream.
               yield n
               n += step
 
-   When counting with floating-point numbers, better accuracy can sometimes be
-   achieved by substituting multiplicative code such as: ``(start + step * i
-   for i in count())``.
+   Khi đếm bằng số dấu phẩy động, đôi khi có thể đạt độ chính xác cao hơn bằng cách thay thế bằng mã nhân, chẳng hạn như: ``(start + step * i for i in count())``.
 
    .. versionchanged:: 3.1
-      Added *step* argument and allowed non-integer arguments.
+      Đã thêm đối số *step* và cho phép các đối số không nguyên.
 
 
 .. function:: cycle(iterable)
 
-   Make an iterator returning elements from the *iterable* and saving a
-   copy of each.  When the iterable is :term:`exhausted`, return elements from
-   the saved copy.  Repeats indefinitely.  Roughly equivalent to::
+   Tạo một iterator trả về các phần tử từ *iterable* và lưu một bản sao của từng phần tử. Khi iterable là :term:`exhausted`, trả về các phần tử từ bản sao đã lưu. Lặp lại vô hạn. Gần tương đương với::
 
       def cycle(iterable):
           # cycle('ABCD') → A B C D A B C D A B C D ...
@@ -351,15 +320,12 @@ loops that truncate the stream.
               for element in saved:
                   yield element
 
-   This itertool may require significant auxiliary storage (depending on
-   the length of the iterable).
+   itertool này có thể yêu cầu lượng bộ nhớ phụ đáng kể (tùy thuộc vào độ dài của iterable).
 
 
 .. function:: dropwhile(predicate, iterable)
 
-   Make an iterator that drops elements from the *iterable* while the
-   *predicate* is true and afterwards returns every element.  Roughly
-   equivalent to::
+   Tạo một iterator loại bỏ các phần tử khỏi *iterable* trong khi *predicate* là true, sau đó trả về mọi phần tử. Gần tương đương với::
 
       def dropwhile(predicate, iterable):
           # dropwhile(lambda x: x<5, [1,4,6,3,8]) → 6 3 8
@@ -373,16 +339,12 @@ loops that truncate the stream.
           for x in iterator:
               yield x
 
-   Note this does not produce *any* output until the predicate first
-   becomes false, so this itertool may have a lengthy start-up time.
+   Lưu ý rằng hàm này không tạo ra *bất kỳ* kết quả nào cho đến khi predicate lần đầu trở thành false, vì vậy itertool này có thể mất nhiều thời gian khởi động.
 
 
 .. function:: filterfalse(predicate, iterable)
 
-   Make an iterator that filters elements from the *iterable* returning
-   only those for which the *predicate* returns a false value.  If
-   *predicate* is ``None``, returns the items that are false.  Roughly
-   equivalent to::
+   Tạo một iterator lọc các phần tử từ *iterable*, chỉ trả về những phần tử mà *predicate* trả về giá trị false. Nếu *predicate* là ``None``, trả về các phần tử có giá trị false. Gần tương đương với::
 
       def filterfalse(predicate, iterable):
           # filterfalse(lambda x: x<5, [1,4,6,3,8]) → 6 8
@@ -397,31 +359,20 @@ loops that truncate the stream.
 
 .. function:: groupby(iterable, key=None)
 
-   Make an iterator that returns consecutive keys and groups from the *iterable*.
-   The *key* is a function computing a key value for each element.  If not
-   specified or is ``None``, *key* defaults to an identity function and returns
-   the element unchanged.  Generally, the iterable needs to already be sorted on
-   the same key function.
+   Tạo một iterator trả về các key và group liên tiếp từ *iterable*. *key* là một hàm tính giá trị key cho từng phần tử. Nếu không được chỉ định hoặc là ``None``, *key* mặc định là một hàm identity và trả về nguyên vẹn phần tử. Nhìn chung, iterable cần được sắp xếp theo cùng một hàm key từ trước.
 
-   The operation of :func:`groupby` is similar to the ``uniq`` filter in Unix.  It
-   generates a break or new group every time the value of the key function changes
-   (which is why it is usually necessary to have sorted the data using the same key
-   function).  That behavior differs from SQL's GROUP BY which aggregates common
-   elements regardless of their input order.
+   Hoạt động của :func:`groupby` tương tự như ``uniq`` filter trong Unix. Nó tạo ra một điểm ngắt hoặc group mới mỗi khi giá trị của hàm key thay đổi (đó là lý do thường cần sắp xếp dữ liệu bằng cùng một hàm key). Hành vi này khác với GROUP BY của SQL, vốn tổng hợp các phần tử giống nhau bất kể thứ tự đầu vào của chúng.
 
-   The returned group is itself an iterator that shares the underlying iterable
-   with :func:`groupby`.  Because the source is shared, when the :func:`groupby`
-   object is advanced, the previous group is no longer visible.  So, if that data
-   is needed later, it should be stored as a list::
+   Group được trả về bản thân nó là một iterator dùng chung iterable nền với :func:`groupby`. Vì source được dùng chung, khi đối tượng :func:`groupby` được tiến lên, group trước đó sẽ không còn hiển thị. Vì vậy, nếu cần dùng dữ liệu đó sau này, bạn nên lưu nó dưới dạng list::
 
       groups = []
       uniquekeys = []
       data = sorted(data, key=keyfunc)
       for k, g in groupby(data, keyfunc):
-          groups.append(list(g))      # Store group iterator as a list
+          groups.append(list(g))      # Lưu group iterator dưới dạng list
           uniquekeys.append(k)
 
-   :func:`groupby` is roughly equivalent to::
+   :func:`groupby` gần tương đương với::
 
       def groupby(iterable, key=None):
           # [k for k, g in groupby('AAAABBBCCDAABBB')] → A B C D A B
@@ -459,21 +410,16 @@ loops that truncate the stream.
 .. function:: islice(iterable, stop)
               islice(iterable, start, stop[, step])
 
-   Make an iterator that returns selected elements from the iterable.
-   Works like sequence slicing but does not support negative values for
-   *start*, *stop*, or *step*.
+   Tạo một iterator trả về các phần tử được chọn từ iterable. Hoạt động giống như cắt sequence nhưng không hỗ trợ các giá trị âm cho *start*, *stop* hoặc *step*.
 
-   If *start* is zero or ``None``, iteration starts at zero.  Otherwise,
-   elements from the iterable are skipped until *start* is reached.
+   Nếu *start* bằng không hoặc ``None``, quá trình lặp bắt đầu từ số không. Nếu không, các phần tử từ iterable sẽ được bỏ qua cho đến khi đạt đến *start*.
 
-   If *stop* is ``None``, iteration continues until the input is
-   :term:`exhausted`, if at all.  Otherwise, it stops at the specified position.
+   Nếu *stop* là ``None``, quá trình lặp tiếp tục cho đến khi đầu vào là
+   :term:`exhausted`, nếu có. Nếu không, quá trình lặp dừng tại vị trí được chỉ định.
 
-   If *step* is ``None``, the step defaults to one.  Elements are returned
-   consecutively unless *step* is set higher than one which results in
-   items being skipped.
+   Nếu *step* là ``None``, step mặc định là một. Các phần tử được trả về liên tiếp, trừ khi *step* được đặt lớn hơn một, khiến một số phần tử bị bỏ qua.
 
-   Roughly equivalent to::
+   Tương đương về cơ bản với::
 
       def islice(iterable, *args):
           # islice('ABCDEFG', 2) → A B
@@ -495,20 +441,16 @@ loops that truncate the stream.
                   yield element
                   next_i += step
 
-   If the input is an iterator, then fully consuming the *islice*
-   advances the input iterator by ``max(start, stop)`` steps regardless
-   of the *step* value.
+   Nếu đầu vào là một iterator, việc tiêu thụ hoàn toàn *islice* sẽ tiến iterator đầu vào thêm ``max(start, stop)`` bước, bất kể giá trị *step*.
 
 
 .. function:: pairwise(iterable)
 
-   Return successive overlapping pairs taken from the input *iterable*.
+   Trả về các cặp chồng lấn liên tiếp được lấy từ *iterable* đầu vào.
 
-   The number of 2-tuples in the output iterator will be one fewer than the
-   number of inputs.  It will be empty if the input iterable has fewer than
-   two values.
+   Số lượng bộ 2 phần tử trong iterator đầu ra sẽ ít hơn số lượng đầu vào một phần tử. Iterator này sẽ rỗng nếu iterable đầu vào có ít hơn hai giá trị.
 
-   Roughly equivalent to::
+   Tương đương về cơ bản với::
 
         def pairwise(iterable):
             # pairwise('ABCDEFG') → AB BC CD DE EF FG
@@ -525,27 +467,17 @@ loops that truncate the stream.
 
 .. function:: permutations(iterable, r=None)
 
-   Return successive *r* length `permutations of elements
-   <https://www.britannica.com/science/permutation>`_ from the *iterable*.
+   Trả về lần lượt các hoán vị có độ dài *r* `của các phần tử <https://www.britannica.com/science/permutation>`_ từ *iterable*.
 
-   If *r* is not specified or is ``None``, then *r* defaults to the length
-   of the *iterable* and all possible full-length permutations
-   are generated.
+   Nếu *r* không được chỉ định hoặc là ``None``, thì *r* mặc định bằng độ dài của *iterable* và tất cả các hoán vị có độ dài đầy đủ có thể được tạo ra.
 
-   The output is a subsequence of :func:`product` where entries with
-   repeated elements have been filtered out.  The length of the output is
-   given by :func:`math.perm` which computes ``n! / (n - r)!`` when
-   ``0 ≤ r ≤ n`` or zero when ``r > n``.
+   Đầu ra là một dãy con của :func:`product`, trong đó các phần tử bị lặp đã được lọc bỏ. Độ dài của đầu ra được cho bởi :func:`math.perm`, giá trị này tính ``n! / (n - r)!`` khi ``0 ≤ r ≤ n`` hoặc bằng 0 khi ``r > n``.
 
-   The permutation tuples are emitted in lexicographic order according to
-   the order of the input *iterable*.  If the input *iterable* is sorted,
-   the output tuples will be produced in sorted order.
+   Các tuple hoán vị được xuất theo thứ tự từ điển dựa trên thứ tự của *iterable* đầu vào. Nếu *iterable* đầu vào được sắp xếp, các tuple đầu ra sẽ được tạo theo thứ tự đã sắp xếp.
 
-   Elements are treated as unique based on their position, not on their
-   value.  If the input elements are unique, there will be no repeated
-   values within a permutation.
+   Các phần tử được xem là duy nhất dựa trên vị trí của chúng, không phải giá trị của chúng. Nếu các phần tử đầu vào là duy nhất, sẽ không có giá trị nào bị lặp lại trong một hoán vị.
 
-   Roughly equivalent to::
+   Tương đương về cơ bản với::
 
         def permutations(iterable, r=None):
             # permutations('ABCD', 2) → AB AC AD BA BC BD CA CB CD DA DB DC
@@ -578,23 +510,15 @@ loops that truncate the stream.
 
 .. function:: product(*iterables, repeat=1)
 
-   `Cartesian product <https://en.wikipedia.org/wiki/Cartesian_product>`_
-   of the input iterables.
+   `Tích Descartes <https://en.wikipedia.org/wiki/Cartesian_product>`_ của các iterable đầu vào.
 
-   Roughly equivalent to nested for-loops in a generator expression. For example,
-   ``product(A, B)`` returns the same as ``((x,y) for x in A for y in B)``.
+   Tương đương về cơ bản với các vòng lặp for lồng nhau trong một biểu thức generator. Ví dụ, ``product(A, B)`` trả về kết quả giống như ``((x,y) for x in A for y in B)``.
 
-   The nested loops cycle like an odometer with the rightmost element advancing
-   on every iteration.  This pattern creates a lexicographic ordering so that if
-   the input's iterables are sorted, the product tuples are emitted in sorted
-   order.
+   Các vòng lặp lồng nhau hoạt động như một công tơ mét, trong đó phần tử ngoài cùng bên phải tiến lên sau mỗi lần lặp. Mẫu này tạo ra thứ tự từ điển, vì vậy nếu các iterable đầu vào đã được sắp xếp, các tuple sản phẩm cũng được xuất ra theo thứ tự đã sắp xếp.
 
-   To compute the product of an iterable with itself, specify the number of
-   repetitions with the optional *repeat* keyword argument.  For example,
-   ``product(A, repeat=4)`` means the same as ``product(A, A, A, A)``.
+   Để tính tích của một iterable với chính nó, hãy chỉ định số lần lặp lại bằng đối số từ khóa tùy chọn *repeat*. Ví dụ, ``product(A, repeat=4)`` có nghĩa tương đương với ``product(A, A, A, A)``.
 
-   This function is roughly equivalent to the following code, except that the
-   actual implementation does not build up intermediate results in memory::
+   Hàm này gần tương đương với đoạn mã sau, ngoại trừ việc phần triển khai thực tế không xây dựng các kết quả trung gian trong bộ nhớ::
 
        def product(*iterables, repeat=1):
            # product('ABCD', 'xy') → Ax Ay Bx By Cx Cy Dx Dy
@@ -611,17 +535,14 @@ loops that truncate the stream.
            for prod in result:
                yield tuple(prod)
 
-   Before :func:`product` runs, it completely consumes the input iterables,
-   keeping pools of values in memory to generate the products.  Accordingly,
-   it is only useful with finite inputs.
+   Trước khi :func:`product` chạy, nó sẽ tiêu thụ hoàn toàn các iterable đầu vào, giữ các pool giá trị trong bộ nhớ để tạo ra các tích. Vì vậy, nó chỉ hữu ích với các đầu vào hữu hạn.
 
 
 .. function:: repeat(object[, times])
 
-   Make an iterator that returns *object* over and over again. Runs indefinitely
-   unless the *times* argument is specified.
+   Tạo một iterator trả về *object* lặp đi lặp lại. Chạy vô hạn trừ khi chỉ định đối số *times*.
 
-   Roughly equivalent to::
+   Tương đương về cơ bản với::
 
       def repeat(object, times=None):
           # repeat(10, 3) → 10 10 10
@@ -632,8 +553,7 @@ loops that truncate the stream.
               for i in range(times):
                   yield object
 
-   A common use for *repeat* is to supply a stream of constant values to *map*
-   or *zip*:
+   Một cách sử dụng phổ biến của *repeat* là cung cấp một luồng các giá trị hằng cho *map* hoặc *zip*:
 
    .. doctest::
 
@@ -643,13 +563,9 @@ loops that truncate the stream.
 
 .. function:: starmap(function, iterable)
 
-   Make an iterator that computes the *function* using arguments obtained
-   from the *iterable*.  Used instead of :func:`map` when argument
-   parameters have already been "pre-zipped" into tuples.
+   Tạo một iterator tính toán *function* bằng các đối số lấy từ *iterable*. Dùng thay cho :func:`map` khi các tham số đối số đã được "pre-zipped" thành các tuple.
 
-   The difference between :func:`map` and :func:`starmap` parallels the
-   distinction between ``function(a,b)`` and ``function(*c)``. Roughly
-   equivalent to::
+   Sự khác biệt giữa :func:`map` và :func:`starmap` tương tự như sự phân biệt giữa ``function(a,b)`` và ``function(*c)``. Gần tương đương với::
 
       def starmap(function, iterable):
           # starmap(pow, [(2,5), (3,2), (10,3)]) → 32 9 1000
@@ -659,8 +575,7 @@ loops that truncate the stream.
 
 .. function:: takewhile(predicate, iterable)
 
-   Make an iterator that returns elements from the *iterable* as long as
-   the *predicate* is true.  Roughly equivalent to::
+   Tạo một iterator trả về các phần tử từ *iterable* chừng nào *predicate* còn đúng. Gần tương đương với::
 
       def takewhile(predicate, iterable):
           # takewhile(lambda x: x<5, [1,4,6,3,8]) → 1 4
@@ -669,20 +584,14 @@ loops that truncate the stream.
                   break
               yield x
 
-   Note, the element that first fails the predicate condition is
-   consumed from the input iterator and there is no way to access it.
-   This could be an issue if an application wants to further consume the
-   input iterator after *takewhile* has been run to :term:`exhaustion <exhausted>`.
-   To work around this problem, consider using `more-itertools before_and_after()
-   <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.before_and_after>`__
-   instead.
+   Lưu ý rằng phần tử đầu tiên không thỏa điều kiện của predicate sẽ bị lấy khỏi input iterator và không có cách nào truy cập phần tử đó. Đây có thể là vấn đề nếu một ứng dụng muốn tiếp tục lấy dữ liệu từ input iterator sau khi *takewhile* đã chạy đến :term:`exhaustion <exhausted>`. Để khắc phục vấn đề này, hãy cân nhắc sử dụng `more-itertools before_and_after() <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.before_and_after>`__ thay thế.
 
 
 .. function:: tee(iterable, n=2)
 
-   Return *n* independent iterators from a single iterable.
+   Trả về *n* iterator độc lập từ một iterable duy nhất.
 
-   Roughly equivalent to::
+   Tương đương về cơ bản với::
 
         def tee(iterable, n=2):
             if n < 0:
@@ -717,13 +626,9 @@ loops that truncate the stream.
                 value, self.link = link
                 return value
 
-   When the input *iterable* is already a tee iterator object, all
-   members of the return tuple are constructed as if they had been
-   produced by the upstream :func:`tee` call.  This "flattening step"
-   allows nested :func:`tee` calls to share the same underlying data
-   chain and to have a single update step rather than a chain of calls.
+   Khi đầu vào *iterable* đã là một đối tượng tee iterator, mọi thành phần của tuple trả về đều được tạo như thể chúng được tạo bởi lời gọi :func:`tee` ở upstream. "Bước làm phẳng" này cho phép các lời gọi :func:`tee` lồng nhau dùng chung một chuỗi dữ liệu nền và chỉ cần một bước cập nhật thay vì một chuỗi lời gọi.
 
-   The flattening property makes tee iterators efficiently peekable:
+   Tính chất làm phẳng giúp tee iterator có thể peek một cách hiệu quả:
 
    .. testcode::
 
@@ -735,35 +640,29 @@ loops that truncate the stream.
    .. doctest::
 
       >>> iterator = iter('abcdef')
-      >>> [iterator] = tee(iterator, 1)   # Make the input peekable
-      >>> next(iterator)                  # Move the iterator forward
+      >>> [iterator] = tee(iterator, 1)   # Cho đầu vào có thể peek
+      >>> next(iterator)                  # Tiến iterator về phía trước
       'a'
-      >>> lookahead(iterator)             # Check next value
+      >>> lookahead(iterator)             # Kiểm tra giá trị tiếp theo
       'b'
-      >>> next(iterator)                  # Continue moving forward
+      >>> next(iterator)                  # Tiếp tục di chuyển về phía trước
       'b'
 
-   ``tee`` iterators are not threadsafe. A :exc:`RuntimeError` may be
-   raised when simultaneously using iterators returned by the same :func:`tee`
-   call, even if the original *iterable* is threadsafe.
+   ``tee`` iterator không an toàn khi sử dụng trong nhiều thread. Có thể phát sinh :exc:`RuntimeError` khi đồng thời sử dụng các iterator được trả về bởi cùng một lệnh gọi :func:`tee`, ngay cả khi *iterable* ban đầu không gặp vấn đề này.
 
-   This itertool may require significant auxiliary storage (depending on how
-   much temporary data needs to be stored). In general, if one iterator uses
-   most or all of the data before another iterator starts, it is faster to use
-   :func:`list` instead of :func:`tee`.
+   itertool này có thể yêu cầu lượng bộ nhớ lưu trữ phụ trợ đáng kể (tùy thuộc vào lượng dữ liệu tạm thời cần lưu trữ). Nhìn chung, nếu một iterator sử dụng hầu hết hoặc toàn bộ dữ liệu trước khi một iterator khác bắt đầu, thì sử dụng
+   :func:`list` thay vì :func:`tee` sẽ nhanh hơn.
 
 
 .. function:: zip_longest(*iterables, fillvalue=None)
 
-   Make an iterator that aggregates elements from each of the
-   *iterables*.
+   Tạo một iterator tổng hợp các phần tử từ từng *iterables*.
 
-   If the iterables are of uneven length, missing values are filled-in
-   with *fillvalue*.  If not specified, *fillvalue* defaults to ``None``.
+   Nếu các iterable có độ dài không bằng nhau, các giá trị còn thiếu sẽ được điền bằng *fillvalue*. Nếu không được chỉ định, *fillvalue* mặc định là ``None``.
 
-   Iteration continues until the longest iterable is :term:`exhausted`.
+   Việc lặp tiếp tục cho đến khi iterable dài nhất là :term:`exhausted`.
 
-   Roughly equivalent to::
+   Tương đương về cơ bản với::
 
       def zip_longest(*iterables, fillvalue=None):
           # zip_longest('ABCD', 'xy', fillvalue='-') → Ax By C- D-
@@ -787,46 +686,25 @@ loops that truncate the stream.
                   values.append(value)
               yield tuple(values)
 
-   If one of the iterables is potentially infinite, then the :func:`zip_longest`
-   function should be wrapped with something that limits the number of calls
-   (for example :func:`islice` or :func:`takewhile`).
+   Nếu một trong các iterable có khả năng là vô hạn, thì hàm :func:`zip_longest` nên được bọc bằng một thành phần giới hạn số lần gọi (ví dụ :func:`islice` hoặc :func:`takewhile`).
 
 
 .. _itertools-recipes:
 
-Itertools Recipes
------------------
+Các công thức itertools
+-----------------------
 
-This section shows recipes for creating an extended toolset using the existing
-itertools as building blocks.
+Phần này trình bày các công thức để tạo một bộ công cụ mở rộng bằng cách sử dụng các itertools hiện có làm khối xây dựng.
 
-The primary purpose of the itertools recipes is educational.  The recipes show
-various ways of thinking about individual tools — for example, that
-``chain.from_iterable`` is related to the concept of flattening.  The recipes
-also give ideas about ways that the tools can be combined — for example, how
-``starmap()`` and ``repeat()`` can work together.  The recipes also show patterns
-for using itertools with the :mod:`operator` and :mod:`collections` modules as
-well as with the built-in itertools such as ``map()``, ``filter()``,
-``reversed()``, and ``enumerate()``.
+Mục đích chính của các công thức itertools là phục vụ việc học. Các công thức cho thấy nhiều cách khác nhau để tư duy về từng công cụ — ví dụ, ``chain.from_iterable`` có liên quan đến khái niệm làm phẳng. Các công thức cũng đưa ra ý tưởng về cách kết hợp các công cụ — ví dụ, cách ``starmap()`` và ``repeat()`` có thể hoạt động cùng nhau. Các công thức cũng trình bày các mẫu sử dụng itertools với các module :mod:`operator` và :mod:`collections`, cũng như với các itertools tích hợp sẵn như ``map()``, ``filter()``, ``reversed()`` và ``enumerate()``.
 
-A secondary purpose of the recipes is to serve as an incubator.  The
-``accumulate()``, ``compress()``, and ``pairwise()`` itertools started out as
-recipes.  Currently, the ``sliding_window()``, ``derangements()``, and ``sieve()``
-recipes are being tested to see whether they prove their worth.
+Mục đích thứ hai của các công thức là làm vườn ươm. Các itertools ``accumulate()``, ``compress()`` và ``pairwise()`` ban đầu là các công thức. Hiện tại, các công thức ``sliding_window()``, ``derangements()`` và ``sieve()`` đang được thử nghiệm để xem chúng có chứng minh được giá trị hay không.
 
-Substantially all of these recipes and many, many others can be installed from
-the :pypi:`more-itertools` project found
-on the Python Package Index::
+Phần lớn các recipe này và rất nhiều recipe khác có thể được cài đặt từ dự án :pypi:`more-itertools` trên Python Package Index::
 
     python -m pip install more-itertools
 
-Many of the recipes offer the same high performance as the underlying toolset.
-Superior memory performance is kept by processing elements one at a time rather
-than bringing the whole iterable into memory all at once. Code volume is kept
-small by linking the tools together in a `functional style
-<https://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf>`_.  High speed
-is retained by preferring "vectorized" building blocks over the use of for-loops
-and :term:`generators <generator>` which incur interpreter overhead.
+Nhiều recipe mang lại hiệu năng cao tương đương với bộ công cụ nền tảng. Hiệu quả bộ nhớ vượt trội được duy trì bằng cách xử lý từng phần tử một thay vì đưa toàn bộ iterable vào bộ nhớ cùng lúc. Khối lượng mã được giữ ở mức nhỏ bằng cách liên kết các công cụ với nhau theo `phong cách functional <https://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf>`_. Tốc độ cao được duy trì bằng cách ưu tiên các khối xây dựng "vectorized" thay vì sử dụng vòng lặp for và :term:`generator <generator>`, vốn gây ra overhead cho interpreter.
 
 .. testcode::
 
@@ -841,7 +719,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
    from operator import getitem, is_not, itemgetter, mul, neg, truediv
 
 
-   # ==== Basic one liners ====
+   # ==== Các dòng lệnh cơ bản ====
 
    def take(n, iterable):
        "Return first n items of the iterable as a list."
@@ -878,7 +756,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
 
    def consume(iterator, n=None):
        "Advance the iterator n-steps ahead. If n is None, consume entirely."
-       # Use functions that consume iterators at C speed.
+       # Sử dụng các hàm tiêu thụ iterator ở tốc độ C.
        if n is None:
            deque(iterator, maxlen=0)
        else:
@@ -904,7 +782,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
        return len(take(2, groupby(iterable, key))) <= 1
 
 
-   # ==== Data pipelines ====
+   # ==== Quy trình dữ liệu ====
 
    def unique_justseen(iterable, key=None):
        "Yield unique elements, preserving order. Remember only the element just seen."
@@ -964,7 +842,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
    def roundrobin(*iterables):
        "Visit input iterables in a cycle until each is exhausted."
        # roundrobin('ABC', 'D', 'EF') → A D E B F C
-       # Algorithm credited to George Sakkis
+       # Thuật toán do George Sakkis đề xuất
        iterators = map(iter, iterables)
        for num_active in range(len(iterables), 0, -1):
            iterators = cycle(islice(iterators, num_active))
@@ -979,7 +857,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
    def derangements(iterable, r=None):
        "Produce r length permutations without fixed points."
        # derangements('ABCD') → BADC BCDA BDAC CADB CDAB CDBA DABC DCAB DCBA
-       # Algorithm credited to Stefan Pochmann
+       # Thuật toán do Stefan Pochmann đề xuất
        seq = tuple(iterable)
        pos = tuple(range(len(seq)))
        have_moved = map(map, repeat(is_not), repeat(pos), permutations(pos, r=r))
@@ -1005,7 +883,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
 
    def iter_except(function, exception, first=None):
        "Convert a call-until-exception interface to an iterator interface."
-       # iter_except(d.popitem, KeyError) → non-blocking dictionary iterator
+       # iter_except(d.popitem, KeyError) → iterator dictionary không chặn
        with suppress(exception):
            if first is not None:
                yield first()
@@ -1013,7 +891,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
                yield function()
 
 
-   # ==== Mathematical operations ====
+   # ==== Các phép toán toán học ====
 
    def multinomial(*counts):
        "Number of distinct arrangements of a multiset."
@@ -1033,7 +911,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
        return sumprod(*tee(iterable))
 
 
-   # ==== Matrix operations ====
+   # ==== Các phép toán ma trận ====
 
    def reshape(matrix, columns):
        "Reshape a 2-D matrix to have a given number of columns."
@@ -1052,7 +930,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
        return batched(starmap(sumprod, product(m1, transpose(m2))), n)
 
 
-   # ==== Polynomial arithmetic ====
+   # ==== Số học đa thức ====
 
    def convolve(signal, kernel):
        """Discrete linear convolution of two iterables.
@@ -1066,9 +944,9 @@ and :term:`generators <generator>` which incur interpreter overhead.
        Video:    https://www.youtube.com/watch?v=KuXjwB4LzSA
        """
        # convolve([1, -1, -20], [1, -3]) → 1 -4 -17 60
-       # convolve(data, [0.25, 0.25, 0.25, 0.25]) → Moving average (blur)
-       # convolve(data, [1/2, 0, -1/2]) → 1st derivative estimate
-       # convolve(data, [1, -2, 1]) → 2nd derivative estimate
+       # convolve(data, [0.25, 0.25, 0.25, 0.25]) → Trung bình trượt (làm mờ)
+       # convolve(data, [1/2, 0, -1/2]) → Ước lượng đạo hàm cấp 1
+       # convolve(data, [1, -2, 1]) → Ước lượng đạo hàm cấp 2
        kernel = tuple(kernel)[::-1]
        n = len(kernel)
        padded_signal = chain(repeat(0, n-1), signal, repeat(0, n-1))
@@ -1089,7 +967,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
 
        Computes with better numeric stability than Horner's method.
        """
-       # Evaluate x³ -4x² -17x + 60 at x = 5
+       # Tính giá trị của x³ -4x² -17x + 60 tại x = 5
        # polynomial_eval([1, -4, -17, 60], x=5) → 0
        n = len(coefficients)
        if not n:
@@ -1109,7 +987,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
        return list(map(mul, coefficients, powers))
 
 
-   # ==== Number theory ====
+   # ==== Lý thuyết số ====
 
    def sieve(n):
        "Primes less than n."
@@ -1143,13 +1021,13 @@ and :term:`generators <generator>` which incur interpreter overhead.
    def totient(n):
        "Count of natural numbers up to n that are coprime to n."
        # https://mathworld.wolfram.com/TotientFunction.html
-       # totient(12) → 4 because len([1, 5, 7, 11]) == 4
+       # totient(12) → 4 vì len([1, 5, 7, 11]) == 4
        for prime in set(factor(n)):
            n -= n // prime
        return n
 
 
-   # ==== Running statistics ====
+   # ==== Thống kê lũy tiến ====
 
    def running_mean(iterable):
        "Average of values seen so far."
@@ -1171,7 +1049,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
        # running_median([37, 33, 38, 28]) → 37 35 37 35
        read = iter(iterable).__next__
        lo = []  # max-heap
-       hi = []  # min-heap the same size as or one smaller than lo
+       hi = []  # min-heap có cùng kích thước với lo hoặc nhỏ hơn lo một phần tử
        with suppress(StopIteration):
            while True:
                heappush_max(lo, heappushpop(hi, read()))
@@ -1181,7 +1059,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
 
    def running_statistics(iterable):
        "Aggregate statistics for values seen so far."
-       # Generate tuples:  (size, minimum, median, maximum, mean)
+       # Tạo các tuple:  (size, minimum, median, maximum, mean)
        t0, t1, t2, t3 = tee(iterable, 4)
        return zip(
            count(1),
@@ -1234,9 +1112,9 @@ and :term:`generators <generator>` which incur interpreter overhead.
     2 ['b', 'd', 'f']
     3 ['g']
 
-    # Find runs of consecutive numbers using groupby.  The key to the solution
-    # is differencing with a range so that consecutive numbers all appear in
-    # same group.
+    # Tìm các dãy số liên tiếp bằng groupby.  Mấu chốt của lời giải
+    # là lấy hiệu với một range để tất cả các số liên tiếp đều xuất hiện trong
+    # cùng một nhóm.
     >>> data = [ 1,  4,5,6, 10, 15,16,17,18, 22, 25,26,27,28]
     >>> for k, g in groupby(enumerate(data), lambda t:t[0]-t[1]):
     ...     print(list(map(operator.itemgetter(1), g)))
@@ -1252,7 +1130,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
 
     >>> take(10, count())
     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    >>> # Verify that the input is consumed lazily
+    >>> # Xác minh rằng đầu vào được tiêu thụ theo kiểu lazy
     >>> it = iter('abcdef')
     >>> take(3, it)
     ['a', 'b', 'c']
@@ -1280,7 +1158,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
 
     >>> list(tail(3, 'ABCDEFG'))
     ['E', 'F', 'G']
-    >>> # Verify the input is consumed greedily
+    >>> # Xác minh rằng đầu vào được tiêu thụ theo kiểu greedy
     >>> input_iterator = iter('ABCDEFG')
     >>> output_iterator = tail(3, input_iterator)
     >>> list(input_iterator)
@@ -1289,10 +1167,10 @@ and :term:`generators <generator>` which incur interpreter overhead.
 
     >>> it = iter(range(10))
     >>> consume(it, 3)
-    >>> # Verify the input is consumed lazily
+    >>> # Xác minh rằng đầu vào được tiêu thụ theo kiểu lazy
     >>> next(it)
     3
-    >>> # Verify the input is consumed completely
+    >>> # Xác minh rằng đầu vào được tiêu thụ hoàn toàn
     >>> consume(it)
     >>> next(it, 'Done')
     'Done'
@@ -1302,7 +1180,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
     'd'
     >>> nth('abcde', 9) is None
     True
-    >>> # Verify that the input is consumed lazily
+    >>> # Xác minh rằng đầu vào được tiêu thụ theo kiểu lazy
     >>> it = iter('abcde')
     >>> nth(it, 2)
     'c'
@@ -1314,9 +1192,9 @@ and :term:`generators <generator>` which incur interpreter overhead.
     [True, True, True, False, False]
     >>> [all_equal(s, key=str.casefold) for s in ('', 'A', 'AaAa', 'AAAB', 'AAABA')]
     [True, True, True, False, False]
-    >>> # Verify that the input is consumed lazily and that only
-    >>> # one element of a second equivalence class is used to disprove
-    >>> # the assertion that all elements are equal.
+    >>> # Xác minh rằng đầu vào được tiêu thụ theo kiểu lazy và chỉ
+    >>> # một phần tử của lớp tương đương thứ hai được dùng để bác bỏ
+    >>> # khẳng định rằng tất cả các phần tử đều bằng nhau.
     >>> it = iter('aaabbbccc')
     >>> all_equal(it)
     False
@@ -1339,7 +1217,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
 
     >>> list(ncycles('abc', 3))
     ['a', 'b', 'c', 'a', 'b', 'c', 'a', 'b', 'c']
-    >>> # Verify greedy consumption of input iterator
+    >>> # Xác minh việc tiêu thụ tham lam iterator đầu vào
     >>> input_iterator = iter('abc')
     >>> output_iterator = ncycles(input_iterator, 3)
     >>> list(input_iterator)
@@ -1373,7 +1251,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
 
     >>> list(transpose([(1, 2, 3), (11, 22, 33)]))
     [(1, 11), (2, 22), (3, 33)]
-    >>> # Verify that the inputs are consumed lazily
+    >>> # Xác minh rằng các đầu vào được tiêu thụ theo cách lazy
     >>> input1 = iter([1, 2, 3])
     >>> input2 = iter([11, 22, 33])
     >>> output_iterator = transpose([input1, input2])
@@ -1398,7 +1276,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
     [20, 20, -16, 8, -12, 8, -12, -16]
     >>> list(convolve(data, [1, -2, 1]))
     [20, 0, -36, 24, -20, 20, -20, -4, 16]
-    >>> # Verify signal is consumed lazily and the kernel greedily
+    >>> # Xác minh rằng signal được tiêu thụ theo cách lazy còn kernel được tiêu thụ tham lam
     >>> signal_iterator = iter([10, 20, 30, 40, 50])
     >>> kernel_iterator = iter([1, 2, 3])
     >>> output_iterator = convolve(signal_iterator, kernel_iterator)
@@ -1480,7 +1358,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
     [1, 4]
     >>> list(iter_index(iter('AABCADEAF'), 'A', 1, 7))
     [1, 4]
-    >>> # Verify that ValueErrors not swallowed (gh-107208)
+    >>> # Xác minh rằng các ValueError không bị nuốt (gh-107208)
     >>> def assert_no_value(iterable, forbidden_value):
     ...     for item in iterable:
     ...         if item == forbidden_value:
@@ -1491,17 +1369,17 @@ and :term:`generators <generator>` which incur interpreter overhead.
     Traceback (most recent call last):
     ...
     ValueError
-    >>> # Verify that both paths can find identical NaN values
+    >>> # Xác minh rằng cả hai đường đi đều có thể tìm thấy các giá trị NaN giống hệt nhau
     >>> x = float('NaN')
     >>> y = float('NaN')
     >>> list(iter_index([0, x, x, y, 0], x))
     [1, 2]
     >>> list(iter_index(iter([0, x, x, y, 0]), x))
     [1, 2]
-    >>> # Test list input. Lists do not support None for the stop argument
+    >>> # Kiểm thử đầu vào dạng list. List không hỗ trợ None cho đối số stop
     >>> list(iter_index(list('AABCADEAF'), 'A'))
     [0, 1, 4, 7]
-    >>> # Verify that input is consumed lazily
+    >>> # Kiểm tra rằng input được xử lý theo cơ chế lazy
     >>> input_iterator = iter('AABCADEAF')
     >>> output_iterator = iter_index(input_iterator, 'A')
     >>> next(output_iterator)
@@ -1514,17 +1392,17 @@ and :term:`generators <generator>` which incur interpreter overhead.
     'DEAF'
 
 
-    >>> # Verify that the target value can be a sequence.
+    >>> # Kiểm tra rằng giá trị đích có thể là một sequence.
     >>> seq = [[10, 20], [30, 40], 30, 40, [30, 40], 50]
     >>> target = [30, 40]
     >>> list(iter_index(seq, target))
     [1, 4]
 
 
-    >>> # Verify faithfulness to type specific index() method behaviors.
-    >>> # For example, bytes and str perform continuous-subsequence searches
-    >>> # that do not match the general behavior specified
-    >>> # in collections.abc.Sequence.index().
+    >>> # Kiểm tra tính nhất quán với hành vi của phương thức index() riêng theo từng kiểu dữ liệu.
+    >>> # Ví dụ: bytes và str thực hiện tìm kiếm các chuỗi con liên tiếp
+    >>> # không khớp với hành vi chung được chỉ định
+    >>> # trong collections.abc.Sequence.index().
     >>> seq = 'abracadabra'
     >>> target = 'ab'
     >>> list(iter_index(seq, target))
@@ -1558,21 +1436,21 @@ and :term:`generators <generator>` which incur interpreter overhead.
     >>> any(map(is_prime, carmichael))
     False
     >>> # https://www.wolframalpha.com/input?i=is+128884753939+prime
-    >>> is_prime(128_884_753_939)           # large prime
+    >>> is_prime(128_884_753_939)           # số nguyên tố lớn
     True
-    >>> is_prime(999953 * 999983)           # large semiprime
+    >>> is_prime(999953 * 999983)           # số bán nguyên tố lớn
     False
-    >>> is_prime(1_000_000_000_000_007)     # factor() example
+    >>> is_prime(1_000_000_000_000_007)     # ví dụ factor()
     False
-    >>> is_prime(1_000_000_000_000_403)     # factor() example
+    >>> is_prime(1_000_000_000_000_403)     # ví dụ factor()
     True
 
 
-    >>> list(factor(99))                    # Code example 1
+    >>> list(factor(99))                    # Ví dụ mã 1
     [3, 3, 11]
-    >>> list(factor(1_000_000_000_000_007)) # Code example 2
+    >>> list(factor(1_000_000_000_000_007)) # Ví dụ mã 2
     [47, 59, 360620266859]
-    >>> list(factor(1_000_000_000_000_403)) # Code example 3
+    >>> list(factor(1_000_000_000_000_403)) # Ví dụ mã 3
     [1000000000000403]
     >>> list(factor(0))
     []
@@ -1596,13 +1474,13 @@ and :term:`generators <generator>` which incur interpreter overhead.
     [3, 3]
     >>> list(factor(10))
     [2, 5]
-    >>> list(factor(128_884_753_939))       # large prime
+    >>> list(factor(128_884_753_939))       # số nguyên tố lớn
     [128884753939]
-    >>> list(factor(999953 * 999983))       # large semiprime
+    >>> list(factor(999953 * 999983))       # số bán nguyên tố lớn
     [999953, 999983]
-    >>> list(factor(6 ** 20)) == [2] * 20 + [3] * 20   # large power
+    >>> list(factor(6 ** 20)) == [2] * 20 + [3] * 20   # lũy thừa lớn
     True
-    >>> list(factor(909_909_090_909))       # large multiterm composite
+    >>> list(factor(909_909_090_909))       # hợp số lớn có nhiều thừa số
     [3, 3, 7, 13, 13, 751, 113797]
     >>> math.prod([3, 3, 7, 13, 13, 751, 113797])
     909909090909
@@ -1626,11 +1504,11 @@ and :term:`generators <generator>` which incur interpreter overhead.
     >>> reference_totient = lambda n: sum(math.gcd(t, n) == 1 for t in range(1, n+1))
     >>> all(totient(n) == reference_totient(n) for n in range(1000))
     True
-    >>> totient(128_884_753_939) == 128_884_753_938  # large prime
+    >>> totient(128_884_753_939) == 128_884_753_938  # số nguyên tố lớn
     True
-    >>> totient(999953 * 999983) == 999952 * 999982  # large semiprime
+    >>> totient(999953 * 999983) == 999952 * 999982  # số bán nguyên tố lớn
     True
-    >>> totient(6 ** 20) == 1 * 2**19 * 2 * 3**19    # repeated primes
+    >>> totient(6 ** 20) == 1 * 2**19 * 2 * 3**19    # các số nguyên tố lặp lại
     True
 
 
@@ -1704,7 +1582,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
     >>> ranges = [range(5, 1000), range(4, 3000), range(0), range(3, 2000), range(2, 5000), range(1, 3500)]
     >>> collections.Counter(roundrobin(*ranges)) == collections.Counter(chain(*ranges))
     True
-    >>> # Verify that the inputs are consumed lazily
+    >>> # Xác minh rằng các đầu vào được tiêu thụ theo cách lazy
     >>> input_iterators = list(map(iter, ['abcd', 'ef', '', 'ghijk', 'l', 'mnopqr']))
     >>> output_iterator = roundrobin(*input_iterators)
     >>> ''.join(islice(output_iterator, 10))
@@ -1727,10 +1605,10 @@ and :term:`generators <generator>` which incur interpreter overhead.
     'B C D'
     >>> ' '.join(map(''.join, derangements('ABCD', 0)))
     ''
-    >>> # Compare number of derangements to https://oeis.org/A000166
+    >>> # So sánh số lượng hoán vị không điểm cố định với https://oeis.org/A000166
     >>> [len(list(derangements(range(n)))) for n in range(10)]
     [1, 0, 1, 2, 9, 44, 265, 1854, 14833, 133496]
-    >>> # Verify that identical objects are treated as unique by position
+    >>> # Xác minh rằng các đối tượng giống hệt nhau được xem là duy nhất dựa trên vị trí
     >>> identical = 'X'
     >>> distinct = 'x'
     >>> seq1 = ('A', identical, 'B', identical)
@@ -1761,7 +1639,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
     ['A', 'B', 'C', 'D']
     >>> list(unique_everseen('ABBcCAD', str.casefold))
     ['A', 'B', 'c', 'D']
-    >>> # Verify that the input is consumed lazily
+    >>> # Xác minh rằng đầu vào được tiêu thụ theo kiểu lazy
     >>> input_iterator = iter('AAAABBBCCDAABBB')
     >>> output_iterator = unique_everseen(input_iterator)
     >>> next(output_iterator)
@@ -1776,7 +1654,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
     ['A', 'B', 'C', 'A', 'D']
     >>> list(unique_justseen('ABBcCAD', str.casefold))
     ['A', 'B', 'c', 'A', 'D']
-    >>> # Verify that the input is consumed lazily
+    >>> # Xác minh rằng đầu vào được tiêu thụ theo kiểu lazy
     >>> input_iterator = iter('AAAABBBCCDAABBB')
     >>> output_iterator = unique_justseen(input_iterator)
     >>> next(output_iterator)
@@ -1813,7 +1691,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
 
     >>> first_true('ABC0DEF1', '9', str.isdigit)
     '0'
-    >>> # Verify that inputs are consumed lazily
+    >>> # Xác minh rằng các đầu vào được tiêu thụ một cách lười biếng
     >>> it = iter('ABC0DEF1')
     >>> first_true(it, predicate=str.isdigit)
     '0'
@@ -1852,7 +1730,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
 .. testcode::
     :hide:
 
-    # Old recipes and their tests which are guaranteed to continue to work.
+    # Các công thức cũ và các bài kiểm thử của chúng được đảm bảo sẽ tiếp tục hoạt động.
 
     def tabulate(function, start=0):
         "Return function(0), function(1), ..."
@@ -1904,7 +1782,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
            >>> all_upper, remainder = before_and_after(str.isupper, it)
            >>> ''.join(all_upper)
            'ABC'
-           >>> ''.join(remainder)     # takewhile() would lose the 'd'
+           >>> ''.join(remainder)     # takewhile() sẽ làm mất chữ 'd'
            'dEfGhI'
 
            Note that the true iterator must be fully consumed
@@ -1928,7 +1806,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
 
         If *predicate* is slow, consider wrapping it with functools.lru_cache().
         """
-        # partition(is_odd, range(10)) → 0 2 4 6 8   and  1 3 5 7 9
+        # partition(is_odd, range(10)) → 0 2 4 6 8   và  1 3 5 7 9
         t1, t2 = tee(iterable)
         return filterfalse(predicate, t1), filter(predicate, t2)
 
@@ -1988,7 +1866,7 @@ and :term:`generators <generator>` which incur interpreter overhead.
     [0, 2, 4, 6, 8]
     >>> list(odds)
     [1, 3, 5, 7, 9]
-    >>> # Verify that the input is consumed lazily
+    >>> # Xác minh rằng đầu vào được tiêu thụ theo kiểu lazy
     >>> input_iterator = iter(range(10))
     >>> evens, odds = partition(is_odd, input_iterator)
     >>> next(odds)
@@ -1999,3 +1877,8 @@ and :term:`generators <generator>` which incur interpreter overhead.
     0
     >>> list(input_iterator)
     [4, 5, 6, 7, 8, 9]
+
+.. _`amortization table`: https://www.ramseysolutions.com/real-estate/amortization-schedule
+.. _`permutations of elements`: https://www.britannica.com/science/permutation
+.. _`Cartesian product`: https://en.wikipedia.org/wiki/Cartesian_product
+.. _`functional style`: https://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf

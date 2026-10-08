@@ -1,47 +1,35 @@
-:mod:`!msvcrt` --- Useful routines from the MS VC++ runtime
-===========================================================
+:mod:`!msvcrt` --- Các routine hữu ích từ runtime MS VC++
+=========================================================
 
 .. module:: msvcrt
-   :synopsis: Miscellaneous useful routines from the MS VC++ runtime.
+   :synopsis: Các routine hữu ích khác từ runtime MS VC++.
 
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 
 --------------
 
-These functions provide access to some useful capabilities on Windows platforms.
-Some higher-level modules use these functions to build the Windows
-implementations of their services. For example, the :mod:`getpass` module uses
-this in the implementation of the :func:`getpass` function.
+Các hàm này cung cấp quyền truy cập vào một số khả năng hữu ích trên các nền tảng Windows. Một số module cấp cao hơn sử dụng các hàm này để xây dựng phần triển khai các dịch vụ của chúng trên Windows. Ví dụ: module :mod:`getpass` sử dụng module này trong phần triển khai hàm :func:`getpass`.
 
-Further documentation on these functions can be found in the Platform API
-documentation.
+Bạn có thể tìm thấy tài liệu bổ sung về các hàm này trong tài liệu Platform API.
 
-The module implements both the normal and wide char variants of the console I/O
-api. The normal API deals only with ASCII characters and is of limited use
-for internationalized applications. The wide char API should be used where
-ever possible.
+Module này triển khai cả các biến thể console I/O API dùng ký tự thông thường và ký tự wide. API thông thường chỉ xử lý các ký tự ASCII và có phạm vi sử dụng hạn chế đối với các ứng dụng quốc tế hóa. Nên sử dụng wide char API bất cứ khi nào có thể.
 
 .. availability:: Windows.
 
 .. versionchanged:: 3.3
-   Operations in this module now raise :exc:`OSError` where :exc:`IOError`
-   was raised.
+   Các thao tác trong module này hiện sẽ phát sinh :exc:`OSError` ở những nơi trước đây phát sinh :exc:`IOError`.
 
 
 .. _msvcrt-files:
 
-File Operations
----------------
+Các thao tác với tệp
+--------------------
 
 
 .. function:: locking(fd, mode, nbytes)
 
-   Lock part of a file based on file descriptor *fd* from the C runtime. Raises
-   :exc:`OSError` on failure. The locked region of the file extends from the
-   current file position for *nbytes* bytes, and may continue beyond the end of the
-   file. *mode* must be one of the :const:`!LK_\*` constants listed below. Multiple
-   regions in a file may be locked at the same time, but may not overlap. Adjacent
-   regions are not merged; they must be unlocked individually.
+   Khóa một phần tệp dựa trên bộ mô tả tệp *fd* từ C runtime. Gây ra
+   :exc:`OSError` khi không thành công. Vùng bị khóa của tệp bắt đầu từ vị trí hiện tại trong tệp với độ dài *nbytes* byte và có thể kéo dài vượt quá phần cuối tệp. *mode* phải là một trong các hằng số :const:`!LK_\*` được liệt kê bên dưới. Có thể khóa đồng thời nhiều vùng trong một tệp, nhưng các vùng đó không được chồng lấp. Các vùng liền kề không được hợp nhất; chúng phải được mở khóa riêng lẻ.
 
    .. audit-event:: msvcrt.locking fd,mode,nbytes msvcrt.locking
 
@@ -49,222 +37,193 @@ File Operations
 .. data:: LK_LOCK
           LK_RLCK
 
-   Locks the specified bytes. If the bytes cannot be locked, the program
-   immediately tries again after 1 second. If, after 10 attempts, the bytes cannot
-   be locked, :exc:`OSError` is raised.
+   Khóa các byte được chỉ định. Nếu không thể khóa các byte này, chương trình sẽ thử lại ngay sau 1 giây. Nếu sau 10 lần thử mà vẫn không thể khóa các byte, :exc:`OSError` sẽ được phát sinh.
 
 
 .. data:: LK_NBLCK
           LK_NBRLCK
 
-   Locks the specified bytes. If the bytes cannot be locked, :exc:`OSError` is
-   raised.
+   Khóa các byte được chỉ định. Nếu không thể khóa các byte này, :exc:`OSError` sẽ được phát sinh.
 
 
 .. data:: LK_UNLCK
 
-   Unlocks the specified bytes, which must have been previously locked.
+   Mở khóa các byte được chỉ định; trước đó các byte này phải đã được khóa.
 
 
 .. function:: setmode(fd, flags)
 
-   Set the line-end translation mode for the file descriptor *fd*. To set it to
-   text mode, *flags* should be :const:`os.O_TEXT`; for binary, it should be
+   Đặt chế độ dịch cuối dòng cho bộ mô tả tệp *fd*. Để đặt thành chế độ văn bản, *flags* phải là :const:`os.O_TEXT`; đối với nhị phân, nó phải là
    :const:`os.O_BINARY`.
 
 
 .. function:: open_osfhandle(handle, flags)
 
-   Create a C runtime file descriptor from the file handle *handle*. The *flags*
-   parameter should be a bitwise OR of :const:`os.O_APPEND`,
-   :const:`os.O_RDONLY`, :const:`os.O_TEXT` and :const:`os.O_NOINHERIT`.
-   The returned file descriptor may be used as a parameter
-   to :func:`os.fdopen` to create a file object.
+   Tạo bộ mô tả tệp của C runtime từ handle tệp *handle*. Tham số *flags* phải là phép OR theo bit của :const:`os.O_APPEND`,
+   :const:`os.O_RDONLY`, :const:`os.O_TEXT` và :const:`os.O_NOINHERIT`. Bộ mô tả tệp được trả về có thể được dùng làm tham số cho :func:`os.fdopen` để tạo một đối tượng tệp.
 
-   The file descriptor is inheritable by default. Pass :const:`os.O_NOINHERIT`
-   flag to make it non inheritable.
+   Theo mặc định, bộ mô tả tệp có thể được kế thừa. Truyền cờ :const:`os.O_NOINHERIT` để làm cho nó không thể được kế thừa.
 
    .. audit-event:: msvcrt.open_osfhandle handle,flags msvcrt.open_osfhandle
 
 
 .. function:: get_osfhandle(fd)
 
-   Return the file handle for the file descriptor *fd*. Raises :exc:`OSError` if
-   *fd* is not recognized.
+   Trả về handle tệp tương ứng với bộ mô tả tệp *fd*. Gây ra :exc:`OSError` nếu *fd* không được nhận diện.
 
    .. audit-event:: msvcrt.get_osfhandle fd msvcrt.get_osfhandle
 
 
 .. _msvcrt-console:
 
-Console I/O
------------
+I/O bàn điều khiển
+------------------
 
 
 .. function:: kbhit()
 
-   Returns a nonzero value if a keypress is waiting to be read. Otherwise,
-   return 0.
+   Trả về giá trị khác 0 nếu đang chờ đọc một lần nhấn phím. Nếu không, trả về 0.
 
 
 .. function:: getch()
 
-   Read a keypress and return the resulting character as a byte string.
-   Nothing is echoed to the console. This call will block if a keypress
-   is not already available, but will not wait for :kbd:`Enter` to be
-   pressed. If the pressed key was a special function key, this will
-   return ``'\000'`` or ``'\xe0'``; the next call will return the keycode.
-   The :kbd:`Control-C` keypress cannot be read with this function.
+   Đọc một lần nhấn phím và trả về ký tự tương ứng dưới dạng chuỗi byte. Không có gì được hiển thị trên console. Lệnh gọi này sẽ chặn nếu chưa có lần nhấn phím nào sẵn sàng, nhưng sẽ không chờ phím :kbd:`Enter` được nhấn. Nếu phím được nhấn là một phím chức năng đặc biệt, hàm này sẽ trả về ``'\000'`` hoặc ``'\xe0'``; lần gọi tiếp theo sẽ trả về mã phím. Không thể đọc lần nhấn phím :kbd:`Control-C` bằng hàm này.
 
 
 .. function:: getwch()
 
-   Wide char variant of :func:`getch`, returning a Unicode value.
+   Biến thể wide char của :func:`getch`, trả về một giá trị Unicode.
 
 
 .. function:: getche()
 
-   Similar to :func:`getch`, but the keypress will be echoed if it represents a
-   printable character.
+   Tương tự :func:`getch`, nhưng lần nhấn phím sẽ được hiển thị nếu biểu thị một ký tự có thể in được.
 
 
 .. function:: getwche()
 
-   Wide char variant of :func:`getche`, returning a Unicode value.
+   Biến thể wide char của :func:`getche`, trả về một giá trị Unicode.
 
 
 .. function:: putch(char)
 
-   Print the byte string *char* to the console without buffering.
+   In chuỗi byte *char* ra console mà không đệm.
 
 
 .. function:: putwch(unicode_char)
 
-   Wide char variant of :func:`putch`, accepting a Unicode value.
+   Biến thể wide char của :func:`putch`, nhận một giá trị Unicode.
 
 
 .. function:: ungetch(char)
 
-   Cause the byte string *char* to be "pushed back" into the console buffer;
-   it will be the next character read by :func:`getch` or :func:`getche`.
+   Khiến chuỗi byte *char* được “đẩy ngược” vào bộ đệm console; đây sẽ là ký tự tiếp theo được :func:`getch` hoặc :func:`getche` đọc.
 
 
 .. function:: ungetwch(unicode_char)
 
-   Wide char variant of :func:`ungetch`, accepting a Unicode value.
+   Biến thể wide char của :func:`ungetch`, chấp nhận một giá trị Unicode.
 
 
 .. _msvcrt-other:
 
-Other Functions
----------------
+Các hàm khác
+------------
 
 
 .. function:: heapmin()
 
-   Force the :c:func:`malloc` heap to clean itself up and return unused blocks to
-   the operating system. On failure, this raises :exc:`OSError`.
+   Buộc heap :c:func:`malloc` tự dọn dẹp và trả các block chưa sử dụng về cho hệ điều hành. Nếu thất bại, hàm này sẽ raise :exc:`OSError`.
 
 
 .. function:: set_error_mode(mode)
 
-   Changes the location where the C runtime writes an error message for an error
-   that might end the program. *mode* must be one of the :const:`!OUT_\*`
-   constants listed below  or :const:`REPORT_ERRMODE`. Returns the old setting
-   or -1 if an error occurs. Only available in
-   :ref:`debug build of Python <debug-build>`.
+   Thay đổi vị trí mà C runtime ghi thông báo lỗi đối với một lỗi có thể khiến chương trình kết thúc. *mode* phải là một trong các hằng số :const:`!OUT_\*` được liệt kê dưới đây  hoặc :const:`REPORT_ERRMODE`. Trả về thiết lập cũ hoặc -1 nếu xảy ra lỗi. Chỉ khả dụng trong
+   :ref:`bản build debug của Python <debug-build>`.
 
 
 .. data:: OUT_TO_DEFAULT
 
-   Error sink is determined by the app's type. Only available in
-   :ref:`debug build of Python <debug-build>`.
+   Nơi nhận lỗi được xác định bởi loại ứng dụng. Chỉ khả dụng trong
+   :ref:`bản build debug của Python <debug-build>`.
 
 
 .. data:: OUT_TO_STDERR
 
-   Error sink is a standard error. Only available in
-   :ref:`debug build of Python <debug-build>`.
+   Error sink là lỗi chuẩn. Chỉ khả dụng trong
+   :ref:`bản build debug của Python <debug-build>`.
 
 
 .. data:: OUT_TO_MSGBOX
 
-   Error sink is a message box. Only available in
-   :ref:`debug build of Python <debug-build>`.
+   Error sink là hộp thông báo. Chỉ khả dụng trong
+   :ref:`bản build debug của Python <debug-build>`.
 
 
 .. data:: REPORT_ERRMODE
 
-   Report the current error mode value. Only available in
-   :ref:`debug build of Python <debug-build>`.
+   Báo cáo giá trị chế độ lỗi hiện tại. Chỉ khả dụng trong
+   :ref:`bản build debug của Python <debug-build>`.
 
 
 .. function:: CrtSetReportMode(type, mode)
 
-   Specifies the destination or destinations for a specific report type
-   generated by :c:func:`!_CrtDbgReport` in the MS VC++ runtime. *type* must be
-   one of the :const:`!CRT_\*` constants listed below. *mode* must be one of the
-   :const:`!CRTDBG_\*` constants listed below. Only available in
-   :ref:`debug build of Python <debug-build>`.
+   Chỉ định đích hoặc các đích cho một loại báo cáo cụ thể được tạo bởi :c:func:`!_CrtDbgReport` trong runtime MS VC++. *type* phải là một trong các hằng số :const:`!CRT_\*` được liệt kê bên dưới. *mode* phải là một trong các
+   :const:`!CRTDBG_\*` các hằng số được liệt kê dưới đây. Chỉ khả dụng trong
+   :ref:`bản build debug của Python <debug-build>`.
 
 
 .. function:: CrtSetReportFile(type, file)
 
-   After you use :func:`CrtSetReportMode` to specify :const:`CRTDBG_MODE_FILE`,
-   you can specify the file handle to receive the message text. *type* must be
-   one of the :const:`!CRT_\*` constants listed below. *file* should be the file
-   handle your want specified. Only available in
-   :ref:`debug build of Python <debug-build>`.
+   Sau khi sử dụng :func:`CrtSetReportMode` để chỉ định :const:`CRTDBG_MODE_FILE`, bạn có thể chỉ định file handle để nhận nội dung thông báo. *type* phải là một trong các hằng số :const:`!CRT_\*` được liệt kê dưới đây. *file* phải là file handle mà bạn muốn chỉ định. Chỉ khả dụng trong
+   :ref:`bản build debug của Python <debug-build>`.
 
 
 .. data:: CRT_WARN
 
-   Warnings, messages, and information that doesn't need immediate attention.
+   Cảnh báo, thông báo và thông tin không cần được xử lý ngay lập tức.
 
 
 .. data:: CRT_ERROR
 
-   Errors, unrecoverable problems, and issues that require immediate attention.
+   Lỗi, sự cố không thể khôi phục và các vấn đề cần được xử lý ngay lập tức.
 
 
 .. data:: CRT_ASSERT
 
-   Assertion failures.
+   Lỗi xác nhận.
 
 
 .. data:: CRTDBG_MODE_DEBUG
 
-   Writes the message to the debugger's output window.
+   Ghi thông báo vào cửa sổ đầu ra của trình gỡ lỗi.
 
 
 .. data:: CRTDBG_MODE_FILE
 
-   Writes the message to a user-supplied file handle. :func:`CrtSetReportFile`
-   should be called to define the specific file or stream to use as
-   the destination.
+   Ghi thông báo vào file handle do người dùng cung cấp. :func:`CrtSetReportFile` nên được gọi để xác định file hoặc stream cụ thể dùng làm đích.
 
 
 .. data:: CRTDBG_MODE_WNDW
 
-   Creates a message box to display the message along with the ``Abort``,
-   ``Retry``, and ``Ignore`` buttons.
+   Tạo một message box để hiển thị thông báo cùng với các nút ``Abort``, ``Retry`` và ``Ignore``.
 
 
 .. data:: CRTDBG_REPORT_MODE
 
-   Returns current *mode* for the specified *type*.
+   Trả về *chế độ* hiện tại cho *loại* được chỉ định.
 
 
 .. data:: CRT_ASSEMBLY_VERSION
 
-   The CRT Assembly version, from the :file:`crtassem.h` header file.
+   Phiên bản CRT Assembly, từ file header :file:`crtassem.h`.
 
 
 .. data:: VC_ASSEMBLY_PUBLICKEYTOKEN
 
-   The VC Assembly public key token, from the :file:`crtassem.h` header file.
+   Mã token public key của VC Assembly, từ file header :file:`crtassem.h`.
 
 
 .. data:: LIBRARIES_ASSEMBLY_NAME_PREFIX
 
-   The Libraries Assembly name prefix, from the :file:`crtassem.h` header file.
+   Tiền tố tên Libraries Assembly, từ file header :file:`crtassem.h`.

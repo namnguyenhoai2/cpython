@@ -1,8 +1,8 @@
-:mod:`!functools` --- Higher-order functions and operations on callable objects
+:mod:`!functools` --- Các hàm bậc cao và các thao tác trên đối tượng có thể gọi
 ===============================================================================
 
 .. module:: functools
-   :synopsis: Higher-order functions and operations on callable objects.
+   :synopsis: Các hàm bậc cao và các thao tác trên đối tượng có thể gọi.
 
 .. moduleauthor:: Peter Harris <scav@blueyonder.co.uk>
 .. moduleauthor:: Raymond Hettinger <python@rcn.com>
@@ -11,7 +11,7 @@
 .. moduleauthor:: Pablo Galindo <pablogsal@gmail.com>
 .. sectionauthor:: Peter Harris <scav@blueyonder.co.uk>
 
-**Source code:** :source:`Lib/functools.py`
+**Mã nguồn:** :source:`Lib/functools.py`
 
 .. testsetup:: default
 
@@ -20,54 +20,42 @@
 
 --------------
 
-The :mod:`!functools` module is for higher-order functions: functions that act on
-or return other functions. In general, any callable object can be treated as a
-function for the purposes of this module.
+Module :mod:`!functools` dành cho các hàm bậc cao: những hàm thao tác trên hoặc trả về các hàm khác. Nhìn chung, mọi đối tượng có thể gọi đều có thể được xem như một hàm trong phạm vi của module này.
 
-The :mod:`!functools` module defines the following functions:
+Module :mod:`!functools` định nghĩa các hàm sau:
 
 .. decorator:: cache(user_function)
 
-   Simple lightweight unbounded function cache.  Sometimes called
-   `"memoize" <https://en.wikipedia.org/wiki/Memoization>`_.
+   Bộ nhớ đệm hàm đơn giản, nhẹ và không giới hạn. Đôi khi được gọi là `"memoize" <https://en.wikipedia.org/wiki/Memoization>`_.
 
-   Returns the same as ``lru_cache(maxsize=None)``, creating a thin
-   wrapper around a dictionary lookup for the function arguments.  Because it
-   never needs to evict old values, this is smaller and faster than
-   :deco:`lru_cache` with a size limit.
+   Trả về kết quả giống như ``lru_cache(maxsize=None)``, đồng thời tạo một lớp bọc mỏng quanh thao tác tra cứu từ điển cho các đối số của hàm. Vì không bao giờ cần loại bỏ các giá trị cũ, cách này nhỏ gọn và nhanh hơn
+   :deco:`lru_cache` với giới hạn kích thước.
 
-   For example::
+   Ví dụ::
 
         @cache
         def factorial(n):
             return n * factorial(n-1) if n else 1
 
-        >>> factorial(10)   # no previously cached result, makes 11 recursive calls
+        >>> factorial(10)   # không có kết quả được lưu trong bộ nhớ đệm trước đó, thực hiện 11 lần gọi đệ quy
         3628800
-        >>> factorial(5)    # no new calls, just returns the cached result
+        >>> factorial(5)    # không có lệnh gọi mới, chỉ trả về kết quả đã lưu trong bộ nhớ đệm
         120
-        >>> factorial(12)   # two new recursive calls, factorial(10) is cached
+        >>> factorial(12)   # hai lần gọi đệ quy mới, factorial(10) đã được lưu trong bộ nhớ đệm
         479001600
 
-   The cache is threadsafe so that the wrapped function can be used in
-   multiple threads.  This means that the underlying data structure will
-   remain coherent during concurrent updates.
+   Bộ nhớ đệm an toàn trong môi trường đa luồng, vì vậy hàm được bao bọc có thể được sử dụng trong nhiều luồng. Điều này có nghĩa là cấu trúc dữ liệu bên dưới vẫn nhất quán trong quá trình cập nhật đồng thời.
 
-   It is possible for the wrapped function to be called more than once if
-   another thread makes an additional call before the initial call has been
-   completed and cached.
+   Hàm được bao bọc có thể được gọi nhiều hơn một lần nếu một luồng khác thực hiện thêm một lệnh gọi trước khi lệnh gọi ban đầu hoàn tất và được lưu vào bộ nhớ đệm.
 
    .. versionadded:: 3.9
 
 
 .. decorator:: cached_property(func)
 
-   Transform a method of a class into a property whose value is computed once
-   and then cached as a normal attribute for the life of the instance. Similar
-   to :deco:`property`, with the addition of caching. Useful for expensive
-   computed properties of instances that are otherwise effectively immutable.
+   Chuyển một phương thức của lớp thành một thuộc tính có giá trị được tính một lần, sau đó được lưu vào bộ nhớ đệm dưới dạng thuộc tính thông thường trong suốt vòng đời của instance. Tương tự :deco:`property`, nhưng có thêm cơ chế caching. Hữu ích cho các thuộc tính được tính toán tốn kém của những instance vốn dĩ gần như bất biến.
 
-   Example::
+   Ví dụ::
 
        class DataSet:
 
@@ -78,72 +66,41 @@ The :mod:`!functools` module defines the following functions:
            def stdev(self):
                return statistics.stdev(self._data)
 
-   The mechanics of :deco:`cached_property` are somewhat different from
-   :deco:`property`.  A regular property blocks attribute writes unless a
-   setter is defined. In contrast, a *cached_property* allows writes.
+   Cơ chế của :deco:`cached_property` hơi khác so với
+   :deco:`property`. Một property thông thường ngăn việc ghi thuộc tính trừ khi đã định nghĩa setter. Ngược lại, một *cached_property* cho phép ghi.
 
-   The *cached_property* decorator only runs on lookups and only when an
-   attribute of the same name doesn't exist.  When it does run, the
-   *cached_property* writes to the attribute with the same name. Subsequent
-   attribute reads and writes take precedence over the *cached_property*
-   method and it works like a normal attribute.
+   Decorator *cached_property* chỉ được thực thi khi tra cứu và chỉ khi chưa tồn tại thuộc tính cùng tên. Khi được thực thi, *cached_property* ghi vào thuộc tính cùng tên. Các thao tác đọc và ghi thuộc tính sau đó được ưu tiên hơn phương thức *cached_property* và nó hoạt động như một thuộc tính thông thường.
 
-   The cached value can be cleared by deleting the attribute.  This
-   allows the *cached_property* method to run again.
+   Có thể xóa giá trị đã được lưu trong bộ nhớ đệm bằng cách xóa thuộc tính. Điều này cho phép phương thức *cached_property* được thực thi lại.
 
-   The *cached_property* does not prevent a possible race condition in
-   multi-threaded usage. The getter function could run more than once on the
-   same instance, with the latest run setting the cached value. If the cached
-   property is idempotent or otherwise not harmful to run more than once on an
-   instance, this is fine. If synchronization is needed, implement the necessary
-   locking inside the decorated getter function or around the cached property
-   access.
+   *cached_property* không ngăn được khả năng xảy ra race condition khi sử dụng đa luồng. Hàm getter có thể chạy nhiều hơn một lần trên cùng một instance, trong đó lần chạy mới nhất sẽ thiết lập giá trị được lưu trong bộ nhớ đệm. Nếu cached property là idempotent hoặc việc chạy nhiều hơn một lần trên một instance không gây hại theo cách khác, thì điều này không sao. Nếu cần đồng bộ hóa, hãy triển khai cơ chế locking cần thiết bên trong hàm getter được decorated hoặc xung quanh thao tác truy cập cached property.
 
-   Note, this decorator interferes with the operation of :pep:`412`
-   key-sharing dictionaries.  This means that instance dictionaries
-   can take more space than usual.
+   Lưu ý rằng decorator này ảnh hưởng đến hoạt động của các từ điển chia sẻ khóa :pep:`412`. Điều này có nghĩa là từ điển của instance có thể chiếm nhiều không gian hơn bình thường.
 
-   Also, this decorator requires that the ``__dict__`` attribute on each instance
-   be a mutable mapping. This means it will not work with some types, such as
-   metaclasses (since the ``__dict__`` attributes on type instances are
-   read-only proxies for the class namespace), and those that specify
-   ``__slots__`` without including ``__dict__`` as one of the defined slots
-   (as such classes don't provide a ``__dict__`` attribute at all).
+   Ngoài ra, decorator này yêu cầu thuộc tính ``__dict__`` trên mỗi instance phải là một ánh xạ có thể thay đổi. Điều này có nghĩa là nó sẽ không hoạt động với một số kiểu, chẳng hạn như metaclass (vì các thuộc tính ``__dict__`` trên các instance của type là proxy chỉ đọc cho namespace của class), và những kiểu chỉ định ``__slots__`` mà không đưa ``__dict__`` vào một trong các slot đã định nghĩa (vì các class như vậy hoàn toàn không cung cấp thuộc tính ``__dict__``).
 
-   If a mutable mapping is not available or if space-efficient key sharing is
-   desired, an effect similar to :deco:`cached_property` can also be achieved by
-   stacking :deco:`property` on top of :deco:`lru_cache`. See
-   :ref:`faq-cache-method-calls` for more details on how this differs from :deco:`cached_property`.
+   Nếu không có ánh xạ có thể thay đổi hoặc nếu muốn chia sẻ khóa tiết kiệm không gian, bạn cũng có thể đạt được hiệu ứng tương tự như :deco:`cached_property` bằng cách xếp :deco:`property` lên trên :deco:`lru_cache`. Xem
+   :ref:`faq-cache-method-calls` để biết thêm chi tiết về điểm khác biệt giữa nó và :deco:`cached_property`.
 
    .. versionadded:: 3.8
 
    .. versionchanged:: 3.12
-      Prior to Python 3.12, :deco:`!cached_property` included an undocumented lock to
-      ensure that in multi-threaded usage the getter function was guaranteed to
-      run only once per instance. However, the lock was per-property, not
-      per-instance, which could result in unacceptably high lock contention. In
-      Python 3.12+ this locking is removed.
+      Trước Python 3.12, :deco:`!cached_property` có một lock không được tài liệu hóa để đảm bảo rằng khi sử dụng trong môi trường đa luồng, hàm getter chỉ được chạy một lần cho mỗi instance. Tuy nhiên, lock này áp dụng cho mỗi property chứ không phải mỗi instance, nên có thể dẫn đến tranh chấp lock cao đến mức không thể chấp nhận được. Trong Python 3.12 trở lên, cơ chế khóa này đã bị loại bỏ.
 
 
 .. function:: cmp_to_key(func)
 
-   Transform an old-style comparison function to a :term:`key function`.  Used
-   with tools that accept key functions (such as :func:`sorted`, :func:`min`,
+   Chuyển đổi một hàm so sánh kiểu cũ thành một :term:`key function`. Được sử dụng với các công cụ chấp nhận hàm key (chẳng hạn như :func:`sorted`, :func:`min`,
    :func:`max`, :func:`heapq.nlargest`, :func:`heapq.nsmallest`,
-   :func:`itertools.groupby`).  This function is primarily used as a transition
-   tool for programs being converted from Python 2 which supported the use of
-   comparison functions.
+   :func:`itertools.groupby`). Hàm này chủ yếu được dùng như một công cụ chuyển đổi cho các chương trình đang được chuyển từ Python 2, phiên bản hỗ trợ việc sử dụng các hàm so sánh.
 
-   A comparison function is any callable that accepts two arguments, compares them,
-   and returns a negative number for less-than, zero for equality, or a positive
-   number for greater-than.  A key function is a callable that accepts one
-   argument and returns another value to be used as the sort key.
+   Hàm comparison là bất kỳ đối tượng callable nào nhận hai đối số, so sánh chúng và trả về một số âm nếu nhỏ hơn, bằng 0 nếu bằng nhau hoặc một số dương nếu lớn hơn. Hàm key là một đối tượng callable nhận một đối số và trả về một giá trị khác để dùng làm khóa sắp xếp.
 
-   Example::
+   Ví dụ::
 
-       sorted(iterable, key=cmp_to_key(locale.strcoll))  # locale-aware sort order
+       sorted(iterable, key=cmp_to_key(locale.strcoll))  # thứ tự sắp xếp phụ thuộc locale
 
-   For sorting examples and a brief sorting tutorial, see :ref:`sortinghowto`.
+   Để xem các ví dụ về sắp xếp và hướng dẫn ngắn về sắp xếp, hãy xem :ref:`sortinghowto`.
 
    .. versionadded:: 3.2
 
@@ -151,92 +108,52 @@ The :mod:`!functools` module defines the following functions:
 .. decorator:: lru_cache(user_function)
                lru_cache(maxsize=128, typed=False)
 
-   Decorator to wrap a function with a memoizing callable that saves up to the
-   *maxsize* most recent calls.  It can save time when an expensive or I/O bound
-   function is periodically called with the same arguments.
+   Decorator bọc một hàm bằng một đối tượng callable có cơ chế ghi nhớ, lưu tối đa *maxsize* lời gọi gần đây nhất. Decorator này có thể tiết kiệm thời gian khi một hàm tốn nhiều chi phí hoặc bị giới hạn bởi I/O được gọi định kỳ với cùng các đối số.
 
-   The cache is threadsafe so that the wrapped function can be used in
-   multiple threads.  This means that the underlying data structure will
-   remain coherent during concurrent updates.
+   Bộ nhớ đệm an toàn trong môi trường đa luồng, vì vậy hàm được bao bọc có thể được sử dụng trong nhiều luồng. Điều này có nghĩa là cấu trúc dữ liệu bên dưới vẫn nhất quán trong quá trình cập nhật đồng thời.
 
-   It is possible for the wrapped function to be called more than once if
-   another thread makes an additional call before the initial call has been
-   completed and cached.
+   Hàm được bao bọc có thể được gọi nhiều hơn một lần nếu một luồng khác thực hiện thêm một lệnh gọi trước khi lệnh gọi ban đầu hoàn tất và được lưu vào bộ nhớ đệm.
 
-   Since a dictionary is used to cache results, the positional and keyword
-   arguments to the function must be :term:`hashable`.
+   Vì một dictionary được dùng để lưu kết quả vào cache, các đối số vị trí và từ khóa của hàm phải là :term:`hashable`.
 
-   Distinct argument patterns may be considered to be distinct calls with
-   separate cache entries.  For example, ``f(a=1, b=2)`` and ``f(b=2, a=1)``
-   differ in their keyword argument order and may have two separate cache
-   entries.
+   Các mẫu đối số khác nhau có thể được xem là những lần gọi khác nhau với các mục cache riêng biệt. Ví dụ: ``f(a=1, b=2)`` và ``f(b=2, a=1)`` khác nhau về thứ tự đối số từ khóa và có thể có hai mục cache riêng biệt.
 
-   If *user_function* is specified, it must be a callable. This allows the
-   *lru_cache* decorator to be applied directly to a user function, leaving
-   the *maxsize* at its default value of 128::
+   Nếu chỉ định *user_function*, giá trị này phải là một callable. Điều này cho phép áp dụng decorator *lru_cache* trực tiếp cho một user function, giữ *maxsize* ở giá trị mặc định là 128.::
 
        @lru_cache
        def count_vowels(sentence):
            return sum(sentence.count(vowel) for vowel in 'AEIOUaeiou')
 
-   If *maxsize* is set to ``None``, the LRU feature is disabled and the cache can
-   grow without bound.
+   Nếu *maxsize* được đặt thành ``None``, tính năng LRU sẽ bị vô hiệu hóa và cache có thể tăng không giới hạn.
 
-   If *typed* is set to true, function arguments of different types will be
-   cached separately.  If *typed* is false, the implementation will usually
-   regard them as equivalent calls and only cache a single result. (Some
-   types such as *str* and *int* may be cached separately even when *typed*
-   is false.)
+   Nếu *typed* được đặt thành true, các đối số hàm thuộc những kiểu khác nhau sẽ được lưu vào cache riêng biệt. Nếu *typed* là false, implementation thường xem chúng là những lần gọi tương đương và chỉ lưu vào cache một kết quả duy nhất. (Một số kiểu như *str* và *int* có thể vẫn được lưu vào cache riêng biệt ngay cả khi *typed* là false.)
 
-   Note, type specificity applies only to the function's immediate arguments
-   rather than their contents.  The scalar arguments, ``Decimal(42)`` and
-   ``Fraction(42)`` are treated as distinct calls with distinct results.
-   In contrast, the tuple arguments ``('answer', Decimal(42))`` and
-   ``('answer', Fraction(42))`` are treated as equivalent.
+   Lưu ý rằng tính đặc thù theo kiểu chỉ áp dụng cho các đối số trực tiếp của hàm, không áp dụng cho nội dung của chúng. Các đối số vô hướng, ``Decimal(42)`` và ``Fraction(42)``, được xem là những lần gọi khác nhau với các kết quả khác nhau. Ngược lại, các đối số tuple ``('answer', Decimal(42))`` và ``('answer', Fraction(42))`` được xem là tương đương.
 
-   The wrapped function is instrumented with a :func:`!cache_parameters`
-   function that returns a new :class:`dict` showing the values for *maxsize*
-   and *typed*.  This is for information purposes only.  Mutating the values
-   has no effect.
+   Hàm được bọc có thêm một hàm :func:`!cache_parameters` trả về một :class:`dict` mới, hiển thị các giá trị của *maxsize* và *typed*.  Thông tin này chỉ nhằm mục đích tham khảo.  Việc thay đổi các giá trị không có tác dụng.
 
    .. method:: lru_cache.cache_info()
       :no-typesetting:
 
-   To help measure the effectiveness of the cache and tune the *maxsize*
-   parameter, the wrapped function is instrumented with a :func:`!cache_info`
-   function that returns a :term:`named tuple` showing *hits*, *misses*,
-   *maxsize* and *currsize*.
+   Để giúp đo lường hiệu quả của cache và điều chỉnh tham số *maxsize*, hàm được bọc có thêm một hàm :func:`!cache_info` trả về một :term:`named tuple` hiển thị *hits*, *misses*, *maxsize* và *currsize*.
 
    .. method:: lru_cache.cache_clear()
       :no-typesetting:
 
-   The decorator also provides a :func:`!cache_clear` function for clearing or
-   invalidating the cache.
+   Decorator này cũng cung cấp một hàm :func:`!cache_clear` để xóa hoặc vô hiệu hóa cache.
 
-   The original underlying function is accessible through the
-   :attr:`__wrapped__` attribute.  This is useful for introspection, for
-   bypassing the cache, or for rewrapping the function with a different cache.
+   Hàm gốc bên dưới có thể được truy cập thông qua
+   thuộc tính :attr:`__wrapped__`.  Điều này hữu ích cho việc introspection, bỏ qua cache hoặc bọc lại hàm bằng một cache khác.
 
-   The cache keeps references to the arguments and return values until they age
-   out of the cache or until the cache is cleared.
+   Cache giữ các tham chiếu đến các đối số và giá trị trả về cho đến khi chúng hết hạn khỏi cache hoặc cache được xóa.
 
-   If a method is cached, the ``self`` instance argument is included in the
-   cache.  See :ref:`faq-cache-method-calls`
+   Nếu một method được cache, đối số instance ``self`` sẽ được đưa vào cache.  Xem :ref:`faq-cache-method-calls`
 
-   An `LRU (least recently used) cache
-   <https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_Recently_Used_(LRU)>`_
-   works best when the most recent calls are the best predictors of upcoming
-   calls (for example, the most popular articles on a news server tend to
-   change each day).  The cache's size limit assures that the cache does not
-   grow without bound on long-running processes such as web servers.
+   Một `bộ nhớ đệm LRU (ít được sử dụng gần đây nhất) <https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_Recently_Used_(LRU)>`_ hoạt động tốt nhất khi các lần gọi gần đây nhất là yếu tố dự đoán tốt nhất cho các lần gọi sắp tới (ví dụ: các bài viết phổ biến nhất trên một máy chủ tin tức thường thay đổi mỗi ngày). Giới hạn kích thước của bộ nhớ đệm đảm bảo rằng bộ nhớ đệm không tăng không giới hạn trong các tiến trình chạy lâu như máy chủ web.
 
-   In general, the LRU cache should only be used when you want to reuse
-   previously computed values.  Accordingly, it doesn't make sense to cache
-   functions with side-effects, functions that need to create
-   distinct mutable objects on each call (such as generators and async functions),
-   or impure functions such as time() or random().
+   Nhìn chung, chỉ nên sử dụng bộ nhớ đệm LRU khi bạn muốn tái sử dụng các giá trị đã được tính toán trước đó. Vì vậy, việc lưu vào bộ nhớ đệm các hàm có tác dụng phụ, các hàm cần tạo ra những đối tượng có thể thay đổi riêng biệt trong mỗi lần gọi (chẳng hạn như generator và hàm async), hoặc các hàm không thuần túy như time() hay random() là không hợp lý.
 
-   Example of an LRU cache for static web content::
+   Ví dụ về bộ nhớ đệm LRU cho nội dung web tĩnh::
 
         @lru_cache(maxsize=32)
         def get_pep(num):
@@ -255,11 +172,7 @@ The :mod:`!functools` module defines the following functions:
         >>> get_pep.cache_info()
         CacheInfo(hits=3, misses=8, maxsize=32, currsize=8)
 
-   Example of efficiently computing
-   `Fibonacci numbers <https://en.wikipedia.org/wiki/Fibonacci_number>`_
-   using a cache to implement a
-   `dynamic programming <https://en.wikipedia.org/wiki/Dynamic_programming>`_
-   technique::
+   Ví dụ về cách tính hiệu quả `các số Fibonacci <https://en.wikipedia.org/wiki/Fibonacci_number>`_ bằng cách sử dụng bộ nhớ đệm để triển khai kỹ thuật `lập trình động <https://en.wikipedia.org/wiki/Dynamic_programming>`_::
 
         @lru_cache(maxsize=None)
         def fib(n):
@@ -276,25 +189,22 @@ The :mod:`!functools` module defines the following functions:
    .. versionadded:: 3.2
 
    .. versionchanged:: 3.3
-      Added the *typed* option.
+      Đã thêm tùy chọn *typed*.
 
    .. versionchanged:: 3.8
-      Added the *user_function* option.
+      Đã thêm tùy chọn *user_function*.
 
    .. versionchanged:: 3.9
-      Added the function :func:`!cache_parameters`
+      Đã thêm hàm :func:`!cache_parameters`
 
 .. decorator:: total_ordering
 
-   Given a class defining one or more rich comparison ordering methods, this
-   class decorator supplies the rest.  This simplifies the effort involved
-   in specifying all of the possible rich comparison operations:
+   Với một lớp định nghĩa một hoặc nhiều phương thức sắp thứ tự so sánh mở rộng, class decorator này sẽ cung cấp các phương thức còn lại. Điều này giúp đơn giản hóa công sức cần thiết để chỉ định tất cả các phép toán so sánh mở rộng có thể có:
 
-   The class must define one of :meth:`~object.__lt__`, :meth:`~object.__le__`,
-   :meth:`~object.__gt__`, or :meth:`~object.__ge__`.
-   In addition, the class should supply an :meth:`~object.__eq__` method.
+   Lớp phải định nghĩa một trong :meth:`~object.__lt__`, :meth:`~object.__le__`,
+   :meth:`~object.__gt__`, hoặc :meth:`~object.__ge__`. Ngoài ra, lớp nên cung cấp một phương thức :meth:`~object.__eq__`.
 
-   For example::
+   Ví dụ::
 
        @total_ordering
        class Student:
@@ -314,42 +224,26 @@ The :mod:`!functools` module defines the following functions:
 
    .. note::
 
-      While this decorator makes it easy to create well behaved totally
-      ordered types, it *does* come at the cost of slower execution and
-      more complex stack traces for the derived comparison methods. If
-      performance benchmarking indicates this is a bottleneck for a given
-      application, implementing all six rich comparison methods instead is
-      likely to provide an easy speed boost.
+      Mặc dù decorator này giúp dễ dàng tạo các kiểu có thứ tự hoàn toàn hoạt động đúng, nhưng nó *có* cái giá là tốc độ thực thi chậm hơn và stack trace phức tạp hơn đối với các phương thức so sánh được tạo ra. Nếu việc benchmark hiệu năng cho thấy đây là điểm nghẽn của một ứng dụng cụ thể, việc triển khai cả sáu phương thức so sánh mở rộng thay vào đó có thể mang lại cải thiện tốc độ dễ dàng.
 
    .. note::
 
-      This decorator makes no attempt to override methods that have been
-      declared in the class *or its superclasses*. Meaning that if a
-      superclass defines a comparison operator, *total_ordering* will not
-      implement it again, even if the original method is abstract.
+      Decorator này không cố gắng ghi đè các phương thức đã được khai báo trong lớp *hoặc các lớp cha của nó*. Điều đó có nghĩa là nếu một lớp cha định nghĩa một toán tử so sánh, *total_ordering* sẽ không triển khai lại toán tử đó, ngay cả khi phương thức ban đầu là abstract.
 
    .. versionadded:: 3.2
 
    .. versionchanged:: 3.4
-      Returning ``NotImplemented`` from the underlying comparison function for
-      unrecognised types is now supported.
+      Hiện đã hỗ trợ việc trả về ``NotImplemented`` từ hàm so sánh bên dưới đối với các kiểu không được nhận dạng.
 
 .. data:: Placeholder
 
-   A singleton object used as a sentinel to reserve a place
-   for positional arguments when calling :func:`partial`
-   and :func:`partialmethod`.
+   Một đối tượng singleton được dùng làm sentinel để dành chỗ cho các đối số vị trí khi gọi :func:`partial` và :func:`partialmethod`.
 
    .. versionadded:: 3.14
 
 .. function:: partial(func, /, *args, **keywords)
 
-   Return a new :ref:`partial object<partial-objects>` which when called
-   will behave like *func* called with the positional arguments *args*
-   and keyword arguments *keywords*. If more arguments are supplied to the
-   call, they are appended to *args*. If additional keyword arguments are
-   supplied, they extend and override *keywords*.
-   Roughly equivalent to::
+   Trả về một đối tượng :ref:`partial object <partial-objects>` mới; khi được gọi, đối tượng này sẽ hoạt động như thể *func* được gọi với các đối số vị trí *args* và các đối số từ khóa *keywords*. Nếu cung cấp thêm đối số khi gọi, chúng sẽ được thêm vào *args*. Nếu cung cấp thêm đối số từ khóa, chúng sẽ mở rộng và ghi đè *keywords*. Về cơ bản tương đương với::
 
       def partial(func, /, *args, **keywords):
           def newfunc(*more_args, **more_keywords):
@@ -359,11 +253,7 @@ The :mod:`!functools` module defines the following functions:
           newfunc.keywords = keywords
           return newfunc
 
-   The :func:`!partial` function is used for partial function application which "freezes"
-   some portion of a function's arguments and/or keywords resulting in a new object
-   with a simplified signature.  For example, :func:`partial` can be used to create
-   a callable that behaves like the :func:`int` function where the *base* argument
-   defaults to ``2``:
+   Hàm :func:`!partial` được dùng để áp dụng hàm từng phần (partial function application), tức là “đóng băng” một phần các đối số và/hoặc đối số từ khóa của một hàm, từ đó tạo ra một đối tượng mới với chữ ký đơn giản hơn. Ví dụ, có thể dùng :func:`partial` để tạo một đối tượng có thể gọi hoạt động như hàm :func:`int`, trong đó đối số *base* mặc định là ``2``:
 
    .. doctest::
 
@@ -372,12 +262,9 @@ The :mod:`!functools` module defines the following functions:
       >>> basetwo('10010')
       18
 
-   If :data:`Placeholder` sentinels are present in *args*, they will be filled first
-   when :func:`!partial` is called. This makes it possible to pre-fill any positional
-   argument with a call to :func:`!partial`; without :data:`!Placeholder`,
-   only the chosen number of leading positional arguments can be pre-filled.
+   Nếu có các sentinel :data:`Placeholder` trong *args*, chúng sẽ được điền trước khi :func:`!partial` được gọi. Nhờ đó, có thể điền trước bất kỳ đối số vị trí nào bằng một lệnh gọi tới :func:`!partial`; nếu không có :data:`!Placeholder`, chỉ có thể điền trước số đối số vị trí đầu tiên đã chọn.
 
-   If any :data:`!Placeholder` sentinels are present, all must be filled at call time:
+   Nếu có bất kỳ sentinel :data:`!Placeholder` nào, tất cả chúng phải được điền tại thời điểm gọi:
 
    .. doctest::
 
@@ -385,15 +272,11 @@ The :mod:`!functools` module defines the following functions:
       >>> say_to_world('Hello', 'dear')
       Hello dear world!
 
-   Calling ``say_to_world('Hello')`` raises a :exc:`TypeError`, because
-   only one positional argument is provided, but there are two placeholders
-   that must be filled in.
+   Việc gọi ``say_to_world('Hello')`` sẽ phát sinh :exc:`TypeError`, vì chỉ có một đối số vị trí được cung cấp, trong khi có hai placeholder cần được điền.
 
-   If :func:`!partial` is applied to an existing
-   :ref:`partial object <partial-objects>`, :data:`!Placeholder` sentinels of the
-   input object are filled in with new positional arguments.
-   A placeholder can be retained by inserting a new
-   :data:`!Placeholder` sentinel to the place held by a previous :data:`!Placeholder`:
+   Nếu :func:`!partial` được áp dụng cho một
+   :ref:`đối tượng partial <partial-objects>`, các :data:`!Placeholder` sentinel của đối tượng đầu vào được điền bằng các đối số vị trí mới. Có thể giữ lại một placeholder bằng cách chèn một
+   :data:`!Placeholder` sentinel mới vào vị trí mà một :data:`!Placeholder` trước đó chiếm giữ:
 
    .. doctest::
 
@@ -409,33 +292,24 @@ The :mod:`!functools` module defines the following functions:
       >>> remove_first_dear(message)
       'Hello, dear world!'
 
-   :data:`!Placeholder` cannot be passed to :func:`!partial` as a keyword argument.
+   :data:`!Placeholder` không thể được truyền cho :func:`!partial` dưới dạng đối số từ khóa.
 
    .. versionchanged:: 3.14
-      Added support for :data:`Placeholder` in positional arguments.
+      Đã bổ sung hỗ trợ cho :data:`Placeholder` trong các đối số vị trí.
 
 .. class:: partialmethod(func, /, *args, **keywords)
 
-   Return a new :class:`partialmethod` descriptor which behaves
-   like :class:`partial` except that it is designed to be used as a method
-   definition rather than being directly callable.
+   Trả về một descriptor :class:`partialmethod` mới, hoạt động giống như :class:`partial`, ngoại trừ việc nó được thiết kế để dùng làm định nghĩa phương thức thay vì có thể gọi trực tiếp.
 
-   *func* must be a :term:`descriptor` or a callable (objects which are both,
-   like normal functions, are handled as descriptors).
+   *func* phải là một :term:`descriptor` hoặc một callable (các đối tượng đồng thời thuộc cả hai loại, như các hàm thông thường, được xử lý dưới dạng descriptor).
 
-   When *func* is a descriptor (such as a normal Python function,
-   :func:`classmethod`, :func:`staticmethod`, :func:`~abc.abstractmethod` or
-   another instance of :class:`partialmethod`), calls to ``__get__`` are
-   delegated to the underlying descriptor, and an appropriate
-   :ref:`partial object<partial-objects>` returned as the result.
+   Khi *func* là một descriptor (chẳng hạn như một hàm Python thông thường,
+   :func:`classmethod`, :func:`staticmethod`, :func:`~abc.abstractmethod` hoặc một thực thể khác của :class:`partialmethod`), các lệnh gọi đến ``__get__`` được ủy quyền cho descriptor bên dưới, và một
+   :ref:`partial object <partial-objects>` thích hợp được trả về làm kết quả.
 
-   When *func* is a non-descriptor callable, an appropriate bound method is
-   created dynamically. This behaves like a normal Python function when
-   used as a method: the *self* argument will be inserted as the first
-   positional argument, even before the *args* and *keywords* supplied to
-   the :class:`partialmethod` constructor.
+   Khi *func* là một callable không phải descriptor, một bound method thích hợp sẽ được tạo động. Cách này hoạt động như một hàm Python thông thường khi được sử dụng làm method: đối số *self* sẽ được chèn vào làm đối số vị trí đầu tiên, thậm chí trước cả *args* và *keywords* được cung cấp cho hàm khởi tạo :class:`partialmethod`.
 
-   Example::
+   Ví dụ::
 
       >>> class Cell:
       ...     def __init__(self):
@@ -460,16 +334,9 @@ The :mod:`!functools` module defines the following functions:
 
 .. function:: reduce(function, iterable, /[, initial])
 
-   Apply *function* of two arguments cumulatively to the items of *iterable*, from
-   left to right, so as to reduce the iterable to a single value.  For example,
-   ``reduce(lambda x, y: x+y, [1, 2, 3, 4, 5])`` calculates ``((((1+2)+3)+4)+5)``.
-   The left argument, *x*, is the accumulated value and the right argument, *y*, is
-   the update value from the *iterable*.  If the optional *initial* is present,
-   it is placed before the items of the iterable in the calculation, and serves as
-   a default when the iterable is empty.  If *initial* is not given and
-   *iterable* contains only one item, the first item is returned.
+   Áp dụng *function* có hai đối số lần lượt cho các phần tử của *iterable*, từ trái sang phải, để rút gọn iterable thành một giá trị duy nhất. Ví dụ: ``reduce(lambda x, y: x+y, [1, 2, 3, 4, 5])`` tính ``((((1+2)+3)+4)+5)``. Đối số bên trái, *x*, là giá trị tích lũy, còn đối số bên phải, *y*, là giá trị cập nhật từ *iterable*. Nếu có *initial* tùy chọn, giá trị này được đặt trước các phần tử của iterable trong phép tính và đóng vai trò là giá trị mặc định khi iterable rỗng. Nếu không cung cấp *initial* và *iterable* chỉ chứa một phần tử, phần tử đầu tiên sẽ được trả về.
 
-   Roughly equivalent to::
+   Gần tương đương với::
 
       initial_missing = object()
 
@@ -483,20 +350,16 @@ The :mod:`!functools` module defines the following functions:
               value = function(value, element)
           return value
 
-   See :func:`itertools.accumulate` for an iterator that yields all intermediate
-   values.
+   Xem :func:`itertools.accumulate` để biết iterator trả về tất cả các giá trị trung gian.
 
    .. versionchanged:: 3.14
-      *initial* is now supported as a keyword argument.
+      *initial* hiện được hỗ trợ dưới dạng đối số từ khóa.
 
 .. decorator:: singledispatch
 
-   Transform a function into a :term:`single-dispatch <single
-   dispatch>` :term:`generic function`.
+   Chuyển một hàm thành một :term:`single-dispatch <single dispatch>` :term:`generic function`.
 
-   To define a generic function, decorate it with the ``@singledispatch``
-   decorator. When defining a function using ``@singledispatch``, note that the
-   dispatch happens on the type of the first argument::
+   Để định nghĩa một hàm generic, hãy trang trí hàm đó bằng decorator ``@singledispatch``. Khi định nghĩa một hàm bằng ``@singledispatch``, hãy lưu ý rằng việc dispatch diễn ra dựa trên kiểu của đối số đầu tiên::
 
      >>> from functools import singledispatch
      >>> @singledispatch
@@ -508,10 +371,7 @@ The :mod:`!functools` module defines the following functions:
    .. method:: singledispatch.register()
       :no-typesetting:
 
-   To add overloaded implementations to the function, use the :func:`!register`
-   attribute of the generic function, which can be used as a decorator.  For
-   functions annotated with types, the decorator will infer the type of the
-   first argument automatically::
+   Để thêm các triển khai overloaded vào hàm, hãy sử dụng thuộc tính :func:`!register` của hàm generic; thuộc tính này có thể được dùng làm decorator. Với các hàm được chú thích kiểu, decorator sẽ tự động suy ra kiểu của đối số đầu tiên::
 
      >>> @fun.register
      ... def _(arg: int, verbose=False):
@@ -526,7 +386,7 @@ The :mod:`!functools` module defines the following functions:
      ...     for i, elem in enumerate(arg):
      ...         print(i, elem)
 
-   :class:`typing.Union` can also be used::
+   :class:`typing.Union` cũng có thể được sử dụng::
 
     >>> @fun.register
     ... def _(arg: int | float, verbose=False):
@@ -543,8 +403,7 @@ The :mod:`!functools` module defines the following functions:
     ...         print(i, elem)
     ...
 
-   For code which doesn't use type annotations, the appropriate type
-   argument can be passed explicitly to the decorator itself::
+   Đối với mã không sử dụng type annotation, có thể truyền rõ ràng đối số kiểu thích hợp cho chính decorator::
 
      >>> @fun.register(complex)
      ... def _(arg, verbose=False):
@@ -553,10 +412,7 @@ The :mod:`!functools` module defines the following functions:
      ...     print(arg.real, arg.imag)
      ...
 
-   For code that dispatches on a collections type (e.g., ``list``), but wants
-   to typehint the items of the collection (e.g., ``list[int]``), the
-   dispatch type should be passed explicitly to the decorator itself with the
-   typehint going into the function definition::
+   Đối với mã dispatch dựa trên kiểu collections (ví dụ: ``list``), nhưng muốn chỉ định type hint cho các phần tử của collection (ví dụ: ``list[int]``), kiểu dispatch cần được truyền rõ ràng cho chính decorator, còn type hint được đặt trong phần định nghĩa hàm::
 
      >>> @fun.register(list)
      ... def _(arg: list[int], verbose=False):
@@ -567,23 +423,16 @@ The :mod:`!functools` module defines the following functions:
 
    .. note::
 
-      At runtime the function will dispatch on an instance of a list regardless
-      of the type contained within the list i.e. ``[1,2,3]`` will be
-      dispatched the same as ``["foo", "bar", "baz"]``. The annotation
-      provided in this example is for static type checkers only and has no
-      runtime impact.
+      Trong runtime, hàm sẽ dispatch trên một instance của list bất kể kiểu dữ liệu được chứa trong list, tức là ``[1,2,3]`` sẽ được dispatch giống như ``["foo", "bar", "baz"]``. Annotation được cung cấp trong ví dụ này chỉ dành cho static type checker và không ảnh hưởng đến runtime.
 
-   To enable registering :term:`lambdas<lambda>` and pre-existing functions,
-   the :func:`~singledispatch.register` attribute can also be used in a functional form::
+   Để cho phép đăng ký :term:`lambdas <lambda>` và các hàm có sẵn, thuộc tính :func:`~singledispatch.register` cũng có thể được sử dụng dưới dạng functional::
 
      >>> def nothing(arg, verbose=False):
      ...     print("Nothing.")
      ...
      >>> fun.register(type(None), nothing)
 
-   The :func:`~singledispatch.register` attribute returns the undecorated function. This
-   enables decorator stacking, :mod:`pickling<pickle>`, and the creation
-   of unit tests for each variant independently::
+   Thuộc tính :func:`~singledispatch.register` trả về hàm chưa được áp dụng decorator. Điều này cho phép xếp chồng decorator, :mod:`pickling<pickle>`, và tạo unit test cho từng biến thể một cách độc lập::
 
      >>> @fun.register(float)
      ... @fun.register(Decimal)
@@ -595,8 +444,7 @@ The :mod:`!functools` module defines the following functions:
      >>> fun_num is fun
      False
 
-   When called, the generic function dispatches on the type of the first
-   argument::
+   Khi được gọi, generic function sẽ dispatch dựa trên kiểu của đối số đầu tiên::
 
      >>> fun("Hello, world.")
      Hello, world.
@@ -615,15 +463,9 @@ The :mod:`!functools` module defines the following functions:
      >>> fun(1.23)
      0.615
 
-   Where there is no registered implementation for a specific type, its
-   method resolution order is used to find a more generic implementation.
-   The original function decorated with ``@singledispatch`` is registered
-   for the base :class:`object` type, which means it is used if no better
-   implementation is found.
+   Khi không có implementation nào được đăng ký cho một kiểu cụ thể, method resolution order của kiểu đó được sử dụng để tìm một implementation tổng quát hơn. Hàm gốc được áp dụng ``@singledispatch`` được đăng ký cho kiểu :class:`object` cơ sở, nghĩa là nó sẽ được sử dụng nếu không tìm thấy implementation phù hợp hơn.
 
-   If an implementation is registered to an :term:`abstract base class`,
-   virtual subclasses of the base class will be dispatched to that
-   implementation::
+   Nếu một implementation được đăng ký cho :term:`abstract base class`, các virtual subclass của base class sẽ được dispatch đến implementation đó::
 
      >>> from collections.abc import Mapping
      >>> @fun.register
@@ -636,16 +478,14 @@ The :mod:`!functools` module defines the following functions:
      >>> fun({"a": "b"})
      a => b
 
-   To check which implementation the generic function will choose for
-   a given type, use the ``dispatch()`` attribute::
+   Để kiểm tra generic function sẽ chọn implementation nào cho một kiểu nhất định, hãy sử dụng thuộc tính ``dispatch()``::
 
      >>> fun.dispatch(float)
      <function fun_num at 0x1035a2840>
-     >>> fun.dispatch(dict)    # note: default implementation
+     >>> fun.dispatch(dict)    # ghi chú: triển khai mặc định
      <function fun at 0x103fe0000>
 
-   To access all registered implementations, use the read-only ``registry``
-   attribute::
+   Để truy cập tất cả các triển khai đã đăng ký, hãy sử dụng thuộc tính chỉ đọc ``registry``::
 
     >>> fun.registry.keys()
     dict_keys([<class 'NoneType'>, <class 'int'>, <class 'object'>,
@@ -659,22 +499,18 @@ The :mod:`!functools` module defines the following functions:
    .. versionadded:: 3.4
 
    .. versionchanged:: 3.7
-      The :func:`~singledispatch.register` attribute now supports using type annotations.
+      Thuộc tính :func:`~singledispatch.register` hiện hỗ trợ sử dụng type annotations.
 
    .. versionchanged:: 3.11
-      The :func:`~singledispatch.register` attribute now supports
-      :class:`typing.Union` as a type annotation.
+      Thuộc tính :func:`~singledispatch.register` hiện hỗ trợ
+      :class:`typing.Union` làm type annotation.
 
 
 .. class:: singledispatchmethod(func)
 
-   Transform a method into a :term:`single-dispatch <single
-   dispatch>` :term:`generic function`.
+   Chuyển một phương thức thành một :term:`single-dispatch <single dispatch>` :term:`generic function`.
 
-   To define a generic method, decorate it with the ``@singledispatchmethod``
-   decorator. When defining a method using ``@singledispatchmethod``, note
-   that the dispatch happens on the type of the first non-*self* or non-*cls*
-   argument::
+   Để định nghĩa một phương thức generic, hãy trang trí phương thức đó bằng decorator ``@singledispatchmethod``. Khi định nghĩa một phương thức bằng ``@singledispatchmethod``, hãy lưu ý rằng việc dispatch diễn ra dựa trên kiểu của đối số đầu tiên không phải *self* hoặc không phải *cls*::
 
     class Negator:
         @singledispatchmethod
@@ -689,11 +525,8 @@ The :mod:`!functools` module defines the following functions:
         def _(self, arg: bool):
             return not arg
 
-   ``@singledispatchmethod`` supports nesting with other decorators such as
-   :deco:`classmethod`. Note that to allow for
-   ``dispatcher.register``, ``singledispatchmethod`` must be the *outer most*
-   decorator. Here is the ``Negator`` class with the ``neg`` methods bound to
-   the class, rather than an instance of the class::
+   ``@singledispatchmethod`` hỗ trợ việc lồng với các decorator khác, chẳng hạn như
+   :deco:`classmethod`. Lưu ý rằng để cho phép ``dispatcher.register``, ``singledispatchmethod`` phải là decorator *ngoài cùng*. Đây là lớp ``Negator`` với các phương thức ``neg`` được liên kết với lớp, thay vì với một thể hiện của lớp::
 
     class Negator:
         @singledispatchmethod
@@ -711,63 +544,37 @@ The :mod:`!functools` module defines the following functions:
         def _(cls, arg: bool):
             return not arg
 
-   The same pattern can be used for other similar decorators:
-   :deco:`staticmethod`, :deco:`~abc.abstractmethod`, and others.
+   Có thể sử dụng cùng một mẫu cho các decorator tương tự khác:
+   :deco:`staticmethod`, :deco:`~abc.abstractmethod` và các decorator khác.
 
    .. versionadded:: 3.8
 
 
 .. function:: update_wrapper(wrapper, wrapped, assigned=WRAPPER_ASSIGNMENTS, updated=WRAPPER_UPDATES)
 
-   Update a *wrapper* function to look like the *wrapped* function. The optional
-   arguments are tuples to specify which attributes of the original function are
-   assigned directly to the matching attributes on the wrapper function and which
-   attributes of the wrapper function are updated with the corresponding attributes
-   from the original function. The default values for these arguments are the
-   module level constants ``WRAPPER_ASSIGNMENTS`` (which assigns to the wrapper
-   function's :attr:`~function.__module__`, :attr:`~function.__name__`,
+   Cập nhật một hàm *wrapper* để trông giống hàm *wrapped*. Các đối số tùy chọn là các tuple dùng để chỉ định những thuộc tính nào của hàm gốc được gán trực tiếp cho các thuộc tính tương ứng trên hàm wrapper, và những thuộc tính nào của hàm wrapper được cập nhật bằng các thuộc tính tương ứng từ hàm gốc. Giá trị mặc định cho các đối số này là các hằng số cấp mô-đun ``WRAPPER_ASSIGNMENTS`` (gán cho hàm wrapper các thuộc tính :attr:`~function.__module__`, :attr:`~function.__name__` và
    :attr:`~function.__qualname__`, :attr:`~function.__annotations__`,
-   :attr:`~function.__type_params__`, and :attr:`~function.__doc__`, the
-   documentation string) and ``WRAPPER_UPDATES`` (which updates the wrapper
-   function's :attr:`~function.__dict__`, i.e. the instance dictionary).
+   :attr:`~function.__type_params__`, và :attr:`~function.__doc__`, chuỗi tài liệu) và ``WRAPPER_UPDATES`` (cập nhật :attr:`~function.__dict__` của hàm wrapper, tức là dictionary của instance).
 
-   To allow access to the original function for introspection and other purposes
-   (e.g. bypassing a caching decorator such as :deco:`lru_cache`), this function
-   automatically adds a ``__wrapped__`` attribute to the wrapper that refers to
-   the function being wrapped.
+   Để cho phép truy cập vào hàm gốc nhằm phục vụ việc introspection và các mục đích khác (ví dụ: bỏ qua một caching decorator như :deco:`lru_cache`), hàm này tự động thêm thuộc tính ``__wrapped__`` vào wrapper, thuộc tính này tham chiếu đến hàm đang được bọc.
 
-   The main intended use for this function is in :term:`decorator` functions which
-   wrap the decorated function and return the wrapper. If the wrapper function is
-   not updated, the metadata of the returned function will reflect the wrapper
-   definition rather than the original function definition, which is typically less
-   than helpful.
+   Mục đích sử dụng chính của hàm này là trong các hàm :term:`decorator`, vốn bọc hàm được trang trí và trả về wrapper. Nếu hàm wrapper không được cập nhật, metadata của hàm được trả về sẽ phản ánh định nghĩa của wrapper thay vì định nghĩa của hàm gốc, điều này thường không hữu ích lắm.
 
-   :func:`update_wrapper` may be used with callables other than functions. Any
-   attributes named in *assigned* or *updated* that are missing from the object
-   being wrapped are ignored (i.e. this function will not attempt to set them
-   on the wrapper function). :exc:`AttributeError` is still raised if the
-   wrapper function itself is missing any attributes named in *updated*.
+   :func:`update_wrapper` có thể được sử dụng với các callable không phải là hàm. Mọi thuộc tính được nêu tên trong *assigned* hoặc *updated* nhưng bị thiếu trong đối tượng được bọc đều sẽ bị bỏ qua (nghĩa là hàm này sẽ không cố gắng đặt chúng trên hàm wrapper). :exc:`AttributeError` vẫn được phát sinh nếu bản thân hàm wrapper thiếu bất kỳ thuộc tính nào được nêu tên trong *updated*.
 
    .. versionchanged:: 3.2
-      The ``__wrapped__`` attribute is now automatically added.
-      The :attr:`~function.__annotations__` attribute is now copied by default.
-      Missing attributes no longer trigger an :exc:`AttributeError`.
+      Thuộc tính ``__wrapped__`` hiện được tự động thêm vào. Thuộc tính :attr:`~function.__annotations__` hiện được sao chép theo mặc định. Các thuộc tính bị thiếu không còn gây ra :exc:`AttributeError`.
 
    .. versionchanged:: 3.4
-      The ``__wrapped__`` attribute now always refers to the wrapped
-      function, even if that function defined a ``__wrapped__`` attribute.
-      (see :issue:`17482`)
+      Thuộc tính ``__wrapped__`` hiện luôn tham chiếu đến hàm được bọc, ngay cả khi hàm đó đã định nghĩa thuộc tính ``__wrapped__``. (xem :issue:`17482`)
 
    .. versionchanged:: 3.12
-      The :attr:`~function.__type_params__` attribute is now copied by default.
+      Thuộc tính :attr:`~function.__type_params__` hiện được sao chép theo mặc định.
 
 
 .. decorator:: wraps(wrapped, assigned=WRAPPER_ASSIGNMENTS, updated=WRAPPER_UPDATES)
 
-   This is a convenience function for invoking :func:`update_wrapper` as a
-   function decorator when defining a wrapper function.  It is equivalent to
-   ``partial(update_wrapper, wrapped=wrapped, assigned=assigned, updated=updated)``.
-   For example::
+   Đây là một hàm tiện ích để gọi :func:`update_wrapper` như một function decorator khi định nghĩa hàm wrapper. Nó tương đương với ``partial(update_wrapper, wrapped=wrapped, assigned=assigned, updated=updated)``. Ví dụ::
 
       >>> from functools import wraps
       >>> def my_decorator(f):
@@ -790,38 +597,34 @@ The :mod:`!functools` module defines the following functions:
       >>> example.__doc__
       'Docstring'
 
-   Without the use of this decorator factory, the name of the example function
-   would have been ``'wrapper'``, and the docstring of the original :func:`!example`
-   would have been lost.
+   Nếu không sử dụng decorator factory này, tên của hàm ví dụ sẽ là ``'wrapper'``, và docstring của :func:`!example` gốc sẽ bị mất.
 
 
 .. _partial-objects:
 
-:class:`partial` Objects
-------------------------
+:class:`partial` Đối tượng
+--------------------------
 
-:class:`partial` objects are callable objects created by :func:`partial`. They
-have three read-only attributes:
+Các đối tượng :class:`partial` là những đối tượng có thể gọi được, được tạo bởi :func:`partial`. Chúng có ba thuộc tính chỉ đọc:
 
 
 .. attribute:: partial.func
 
-   A callable object or function.  Calls to the :class:`partial` object will be
-   forwarded to :attr:`func` with new arguments and keywords.
+   Một đối tượng hoặc hàm có thể gọi được. Các lệnh gọi đến đối tượng :class:`partial` sẽ được chuyển tiếp đến :attr:`func` cùng với các đối số và từ khóa mới.
 
 
 .. attribute:: partial.args
 
-   The leftmost positional arguments that will be prepended to the positional
-   arguments provided to a :class:`partial` object call.
+   Các đối số vị trí ở ngoài cùng bên trái sẽ được thêm vào trước các đối số vị trí được cung cấp khi gọi đối tượng :class:`partial`.
 
 
 .. attribute:: partial.keywords
 
-   The keyword arguments that will be supplied when the :class:`partial` object is
-   called.
+   Các đối số từ khóa sẽ được cung cấp khi đối tượng :class:`partial` được gọi.
 
-:class:`partial` objects are like :ref:`function objects <user-defined-funcs>` in that they are
-callable, weak referenceable, and can have attributes.  There are some important
-differences.  For instance, the :attr:`~definition.__name__` and :attr:`~definition.__doc__` attributes
-are not created automatically.
+Các đối tượng :class:`partial` tương tự như :ref:`đối tượng hàm <user-defined-funcs>` ở chỗ chúng có thể gọi được, có thể được tham chiếu yếu và có thể có các thuộc tính. Tuy nhiên, có một số khác biệt quan trọng. Chẳng hạn, các thuộc tính :attr:`~definition.__name__` và :attr:`~definition.__doc__` không được tự động tạo.
+
+.. _`"memoize"`: https://en.wikipedia.org/wiki/Memoization
+.. _`LRU (least recently used) cache`: https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_Recently_Used_(LRU)
+.. _`Fibonacci numbers`: https://en.wikipedia.org/wiki/Fibonacci_number
+.. _`dynamic programming`: https://en.wikipedia.org/wiki/Dynamic_programming

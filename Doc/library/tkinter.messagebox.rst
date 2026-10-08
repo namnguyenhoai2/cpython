@@ -1,133 +1,98 @@
-:mod:`!tkinter.messagebox` --- Tkinter message prompts
-======================================================
+:mod:`!tkinter.messagebox` --- Lời nhắc thông báo Tkinter
+=========================================================
 
 .. module:: tkinter.messagebox
-   :synopsis: Various types of alert dialogs
+   :synopsis: Nhiều loại hộp thoại cảnh báo
 
-**Source code:** :source:`Lib/tkinter/messagebox.py`
+**Mã nguồn:** :source:`Lib/tkinter/messagebox.py`
 
 --------------
 
-The :mod:`!tkinter.messagebox` module provides a template base class as well as
-a variety of convenience methods for commonly used configurations.
-The message boxes are modal: each blocks until the user responds, then returns
-a value that depends on the function.
-The ``show*`` functions and :meth:`Message.show` return the symbolic name of
-the button the user pressed, as a string (such as :data:`OK` or :data:`YES`).
-Common message box styles and layouts include but are not limited to:
+Mô-đun :mod:`!tkinter.messagebox` cung cấp một lớp cơ sở mẫu cùng nhiều phương thức tiện ích cho các cấu hình thường dùng. Các hộp thông báo là modal: mỗi hộp sẽ chặn cho đến khi người dùng phản hồi, sau đó trả về một giá trị phụ thuộc vào hàm. Các hàm ``show*`` và :meth:`Message.show` trả về tên ký hiệu của nút mà người dùng đã nhấn dưới dạng chuỗi (chẳng hạn như :data:`OK` hoặc :data:`YES`). Các kiểu và bố cục hộp thông báo phổ biến bao gồm nhưng không chỉ giới hạn ở:
 
 .. figure:: tk_msg.png
 
 .. class:: Message(master=None, **options)
 
-   Create a message window with an application-specified message, an icon
-   and a set of buttons.
-   Each of the buttons in the message window is identified by a unique symbolic name (see the *type* options).
+   Tạo một cửa sổ thông báo với thông báo, biểu tượng và tập hợp nút do ứng dụng chỉ định. Mỗi nút trong cửa sổ thông báo được xác định bằng một tên ký hiệu duy nhất (xem các tùy chọn *type*).
 
-   The following options are supported:
+   Các tùy chọn sau được hỗ trợ:
 
       *command*
-         Specifies the function to invoke when the user closes the dialog.
-         The name of the button clicked by the user to close the dialog is
-         passed as argument.
-         This is only available on macOS.
+         Chỉ định hàm cần gọi khi người dùng đóng hộp thoại. Tên của nút mà người dùng nhấp để đóng hộp thoại được truyền dưới dạng đối số. Tùy chọn này chỉ khả dụng trên macOS.
 
       *default*
-         Gives the :ref:`symbolic name <messagebox-buttons>` of the default button
-         for this message window (:data:`OK`, :data:`CANCEL`, and so on).
-         If this option is not specified, the first button in the dialog will
-         be made the default.
+         Cung cấp :ref:`tên tượng trưng <messagebox-buttons>` của nút mặc định cho cửa sổ thông báo này (:data:`OK`, :data:`CANCEL`, v.v.). Nếu không chỉ định tùy chọn này, nút đầu tiên trong hộp thoại sẽ được đặt làm nút mặc định.
 
       *detail*
-         Specifies an auxiliary message to the main message given by the
-         *message* option.
-         The message detail will be presented beneath the main message and,
-         where supported by the OS, in a less emphasized font than the main
-         message.
+         Chỉ định thông báo bổ sung cho thông báo chính được cung cấp bởi tùy chọn *message*. Chi tiết thông báo sẽ được hiển thị bên dưới thông báo chính và, nếu được hệ điều hành hỗ trợ, bằng phông chữ ít được nhấn mạnh hơn thông báo chính.
 
       *icon*
-         Specifies an :ref:`icon <messagebox-icons>` to display.
-         If this option is not specified, then the :data:`INFO` icon will be
-         displayed.
+         Chỉ định :ref:`icon <messagebox-icons>` cần hiển thị. Nếu không chỉ định tùy chọn này, biểu tượng :data:`INFO` sẽ được hiển thị.
 
       *message*
-         Specifies the message to display in this message box.
-         The default value is an empty string.
+         Chỉ định thông báo sẽ hiển thị trong hộp thoại thông báo này. Giá trị mặc định là chuỗi rỗng.
 
       *parent*
-         Makes the specified window the logical parent of the message box.
-         The message box is displayed on top of its parent window.
+         Đặt cửa sổ được chỉ định làm cửa sổ cha logic của hộp thoại thông báo. Hộp thoại thông báo được hiển thị bên trên cửa sổ cha.
 
       *title*
-         Specifies a string to display as the title of the message box.
-         This option is ignored on macOS, where platform guidelines forbid
-         the use of a title on this kind of dialog.
+         Chỉ định một chuỗi để hiển thị làm tiêu đề của hộp thoại thông báo. Tùy chọn này bị bỏ qua trên macOS, nơi các nguyên tắc của nền tảng không cho phép sử dụng tiêu đề cho loại hộp thoại này.
 
       *type*
-         Arranges for a :ref:`predefined set of buttons <messagebox-types>`
-         to be displayed.
+         Sắp xếp để :ref:`một tập hợp nút được xác định trước <messagebox-types>` hiển thị.
 
    .. note::
 
-      Tk 8.6 added the *command* option.
+      Tk 8.6 đã bổ sung tùy chọn *command*.
 
    .. method:: show(**options)
 
-      Display a message window and wait for the user to select one of the buttons. Then return the symbolic name of the selected button.
-      Keyword arguments can override options specified in the constructor.
+      Hiển thị cửa sổ thông báo và chờ người dùng chọn một trong các nút. Sau đó trả về tên ký hiệu của nút đã chọn. Các đối số từ khóa có thể ghi đè các tùy chọn được chỉ định trong hàm khởi tạo.
 
 
-**Information message box**
+**Hộp thoại thông tin**
 
 .. function:: showinfo(title=None, message=None, **options)
 
-   Creates and displays an information message box with the specified title
-   and message.
+   Tạo và hiển thị hộp thoại thông tin với tiêu đề và thông báo được chỉ định.
 
-**Warning message boxes**
+**Hộp thoại cảnh báo**
 
 .. function:: showwarning(title=None, message=None, **options)
 
-   Creates and displays a warning message box with the specified title
-   and message.
+   Tạo và hiển thị hộp thoại cảnh báo với tiêu đề và thông báo được chỉ định.
 
 .. function:: showerror(title=None, message=None, **options)
 
-   Creates and displays an error message box with the specified title
-   and message.
+   Tạo và hiển thị hộp thông báo lỗi với tiêu đề và thông báo được chỉ định.
 
-**Question message boxes**
+**Hộp thoại câu hỏi**
 
 .. function:: askquestion(title=None, message=None, *, type=YESNO, **options)
 
-   Ask a question. By default shows buttons :data:`YES` and :data:`NO`.
-   Returns the symbolic name of the selected button.
+   Đặt một câu hỏi. Theo mặc định, hiển thị các nút :data:`YES` và :data:`NO`. Trả về tên ký hiệu của nút được chọn.
 
 .. function:: askokcancel(title=None, message=None, **options)
 
-   Ask if operation should proceed. Shows buttons :data:`OK` and :data:`CANCEL`.
-   Returns ``True`` if the answer is ok and ``False`` otherwise.
+   Hỏi xem có nên tiếp tục thao tác hay không. Hiển thị các nút :data:`OK` và :data:`CANCEL`. Trả về ``True`` nếu câu trả lời là ok và ``False`` trong các trường hợp khác.
 
 .. function:: askretrycancel(title=None, message=None, **options)
 
-   Ask if operation should be retried. Shows buttons :data:`RETRY` and :data:`CANCEL`.
-   Return ``True`` if the answer is retry and ``False`` otherwise.
+   Hỏi xem có nên thử lại thao tác hay không. Hiển thị các nút :data:`RETRY` và :data:`CANCEL`. Trả về ``True`` nếu câu trả lời là retry và ``False`` trong các trường hợp khác.
 
 .. function:: askyesno(title=None, message=None, **options)
 
-   Ask a question. Shows buttons :data:`YES` and :data:`NO`.
-   Returns ``True`` if the answer is yes and ``False`` otherwise.
+   Đặt một câu hỏi. Hiển thị các nút :data:`YES` và :data:`NO`. Trả về ``True`` nếu câu trả lời là yes và ``False`` trong các trường hợp khác.
 
 .. function:: askyesnocancel(title=None, message=None, **options)
 
-   Ask a question. Shows buttons :data:`YES`, :data:`NO` and :data:`CANCEL`.
-   Return ``True`` if the answer is yes, ``None`` if cancelled, and ``False``
-   otherwise.
+   Đặt một câu hỏi. Hiển thị các nút :data:`YES`, :data:`NO` và :data:`CANCEL`. Trả về ``True`` nếu câu trả lời là yes, ``None`` nếu bị hủy và ``False`` trong các trường hợp khác.
 
 
 .. _messagebox-buttons:
 
-Symbolic names of buttons:
+Tên ký hiệu của các nút:
 
 .. data:: ABORT
    :value: 'abort'
@@ -146,47 +111,47 @@ Symbolic names of buttons:
 
 .. _messagebox-types:
 
-Predefined sets of buttons:
+Các tập hợp nút được định nghĩa sẵn:
 
 .. data:: ABORTRETRYIGNORE
    :value: 'abortretryignore'
 
-   Displays three buttons whose symbolic names are :data:`ABORT`,
-   :data:`RETRY` and :data:`IGNORE`.
+   Hiển thị ba nút có tên ký hiệu là :data:`ABORT`,
+   :data:`RETRY` và :data:`IGNORE`.
 
 .. data:: OK
    :value: 'ok'
    :noindex:
 
-   Displays one button whose symbolic name is :data:`OK`.
+   Hiển thị một nút có tên ký hiệu là :data:`OK`.
 
 .. data:: OKCANCEL
    :value: 'okcancel'
 
-   Displays two buttons whose symbolic names are :data:`OK` and
+   Hiển thị hai nút có tên ký hiệu là :data:`OK` và
    :data:`CANCEL`.
 
 .. data:: RETRYCANCEL
    :value: 'retrycancel'
 
-   Displays two buttons whose symbolic names are :data:`RETRY` and
+   Hiển thị hai nút có tên ký hiệu là :data:`RETRY` và
    :data:`CANCEL`.
 
 .. data:: YESNO
    :value: 'yesno'
 
-   Displays two buttons whose symbolic names are :data:`YES` and
+   Hiển thị hai nút có tên tượng trưng là :data:`YES` và
    :data:`NO`.
 
 .. data:: YESNOCANCEL
    :value: 'yesnocancel'
 
-   Displays three buttons whose symbolic names are :data:`YES`,
-   :data:`NO` and :data:`CANCEL`.
+   Hiển thị ba nút có tên tượng trưng là :data:`YES`,
+   :data:`NO` và :data:`CANCEL`.
 
 .. _messagebox-icons:
 
-Icon images:
+Hình ảnh biểu tượng:
 
 .. data:: ERROR
    :value: 'error'

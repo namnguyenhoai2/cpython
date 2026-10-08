@@ -1,503 +1,384 @@
-:mod:`!xml.sax.handler` --- Base classes for SAX handlers
-=========================================================
+:mod:`!xml.sax.handler` --- Các lớp cơ sở cho trình xử lý SAX
+=============================================================
 
 .. module:: xml.sax.handler
-   :synopsis: Base classes for SAX event handlers.
+   :synopsis: Các lớp cơ sở cho trình xử lý sự kiện SAX.
 
 .. moduleauthor:: Lars Marius Garshol <larsga@garshol.priv.no>
 .. sectionauthor:: Martin v. Löwis <martin@v.loewis.de>
 
-**Source code:** :source:`Lib/xml/sax/handler.py`
+**Mã nguồn:** :source:`Lib/xml/sax/handler.py`
 
 --------------
 
-The SAX API defines five kinds of handlers: content handlers, DTD handlers,
-error handlers, entity resolvers and lexical handlers. Applications normally
-only need to implement those interfaces whose events they are interested in;
-they can implement the interfaces in a single object or in multiple objects.
-Handler implementations should inherit from the base classes provided in the
-module :mod:`!xml.sax.handler`, so that all methods get default implementations.
+API SAX định nghĩa năm loại trình xử lý: trình xử lý nội dung, trình xử lý DTD, trình xử lý lỗi, bộ phân giải thực thể và trình xử lý lexical. Thông thường, ứng dụng chỉ cần triển khai những giao diện mà nó quan tâm đến sự kiện; các giao diện này có thể được triển khai trong một đối tượng duy nhất hoặc trong nhiều đối tượng. Các cài đặt trình xử lý nên kế thừa từ những lớp cơ sở được cung cấp trong mô-đun :mod:`!xml.sax.handler`, để tất cả các phương thức đều có cài đặt mặc định.
 
 
 .. class:: ContentHandler
 
-   This is the main callback interface in SAX, and the one most important to
-   applications. The order of events in this interface mirrors the order of the
-   information in the document.
+   Đây là giao diện callback chính trong SAX và là giao diện quan trọng nhất đối với ứng dụng. Thứ tự các sự kiện trong giao diện này phản ánh thứ tự của thông tin trong tài liệu.
 
 
 .. class:: DTDHandler
 
-   Handle DTD events.
+   Xử lý các sự kiện DTD.
 
-   This interface specifies only those DTD events required for basic parsing
-   (unparsed entities and attributes).
+   Giao diện này chỉ chỉ định những sự kiện DTD cần thiết cho việc phân tích cú pháp cơ bản (thực thể chưa phân tích và thuộc tính).
 
 
 .. class:: EntityResolver
 
-   Basic interface for resolving entities. If you create an object implementing
-   this interface, then register the object with your Parser, the parser will call
-   the method in your object to resolve all external entities.
+   Giao diện cơ bản để phân giải các thực thể. Nếu bạn tạo một đối tượng triển khai giao diện này, sau đó đăng ký đối tượng với Parser của mình, parser sẽ gọi phương thức trong đối tượng để phân giải tất cả các thực thể bên ngoài.
 
 
 .. class:: ErrorHandler
 
-   Interface used by the parser to present error and warning messages to the
-   application.  The methods of this object control whether errors are immediately
-   converted to exceptions or are handled in some other way.
+   Giao diện được parser sử dụng để trình bày các thông báo lỗi và cảnh báo cho ứng dụng. Các phương thức của đối tượng này kiểm soát việc lỗi được chuyển đổi ngay thành ngoại lệ hay được xử lý theo cách khác.
 
 
 .. class:: LexicalHandler
 
-   Interface used by the parser to represent low frequency events which may not
-   be of interest to many applications.
+   Giao diện được parser sử dụng để biểu diễn các sự kiện có tần suất thấp mà nhiều ứng dụng có thể không quan tâm.
 
-In addition to these classes, :mod:`!xml.sax.handler` provides symbolic constants
-for the feature and property names.
+Ngoài các lớp này, :mod:`!xml.sax.handler` cung cấp các hằng số tượng trưng cho tên tính năng và thuộc tính.
 
 
 .. data:: feature_namespaces
 
-   | value: ``"http://xml.org/sax/features/namespaces"``
-   | true: Perform Namespace processing.
-   | false: Optionally do not perform Namespace processing (implies
-     namespace-prefixes; default).
-   | access: (parsing) read-only; (not parsing) read/write
+   | giá trị: ``"http://xml.org/sax/features/namespaces"``
+   | true: Thực hiện xử lý Namespace.
+   | false: Tùy chọn không thực hiện xử lý Namespace (ngụ ý namespace-prefixes; mặc định).
+   | quyền truy cập: (đang phân tích cú pháp) chỉ đọc; (không phân tích cú pháp) đọc/ghi
 
 
 .. data:: feature_namespace_prefixes
 
-   | value: ``"http://xml.org/sax/features/namespace-prefixes"``
-   | true: Report the original prefixed names and attributes used for Namespace
-     declarations.
-   | false: Do not report attributes used for Namespace declarations, and
-     optionally do not report original prefixed names (default).
-   | access: (parsing) read-only; (not parsing) read/write
+   | giá trị: ``"http://xml.org/sax/features/namespace-prefixes"``
+   | true: Báo cáo các tên có tiền tố và thuộc tính ban đầu được sử dụng cho các khai báo Namespace.
+   | false: Không báo cáo các thuộc tính được sử dụng cho các khai báo Namespace và tùy chọn không báo cáo các tên có tiền tố ban đầu (mặc định).
+   | quyền truy cập: (đang phân tích cú pháp) chỉ đọc; (không phân tích cú pháp) đọc/ghi
 
-   The parser based on :mod:`xml.parsers.expat` does not support this feature.
+   Trình phân tích cú pháp dựa trên :mod:`xml.parsers.expat` không hỗ trợ tính năng này.
 
 
 .. data:: feature_string_interning
 
-   | value: ``"http://xml.org/sax/features/string-interning"``
-   | true: All element names, prefixes, attribute names, Namespace URIs, and
-     local names are interned in a dictionary
-     (see :data:`property_interning_dict`).
-   | false: Names are not necessarily interned, although they may be (default).
-   | access: (parsing) read-only; (not parsing) read/write
+   | giá trị: ``"http://xml.org/sax/features/string-interning"``
+   | true: Tên của tất cả phần tử, tiền tố, tên thuộc tính, URI Namespace và tên cục bộ đều được intern trong một từ điển (xem :data:`property_interning_dict`).
+   | false: Tên không nhất thiết được intern, mặc dù chúng có thể được intern (mặc định).
+   | quyền truy cập: (đang phân tích cú pháp) chỉ đọc; (không phân tích cú pháp) đọc/ghi
 
 
 .. data:: feature_validation
 
    | value: ``"http://xml.org/sax/features/validation"``
-   | true: Report all validation errors (implies external-general-entities and
-     external-parameter-entities).
-   | false: Do not report validation errors.
-   | access: (parsing) read-only; (not parsing) read/write
+   | true: Báo cáo tất cả lỗi validation (bao gồm external-general-entities và external-parameter-entities).
+   | false: Không báo cáo lỗi validation.
+   | quyền truy cập: (đang phân tích cú pháp) chỉ đọc; (không phân tích cú pháp) đọc/ghi
 
-   The parser based on :mod:`xml.parsers.expat` does not support this feature,
-   because Expat is a non-validating parser.
+   Bộ phân tích cú pháp dựa trên :mod:`xml.parsers.expat` không hỗ trợ tính năng này vì Expat là bộ phân tích cú pháp không kiểm tra tính hợp lệ.
 
 
 .. data:: feature_external_ges
 
    .. warning::
 
-      Enabling opens a vulnerability to
-      `external entity attacks <https://en.wikipedia.org/wiki/XML_external_entity_attack>`_
-      if the parser is used with user-provided XML content.
-      Please reflect on your `threat model <https://en.wikipedia.org/wiki/Threat_model>`_
-      before enabling this feature.
+      Việc bật tính năng này sẽ tạo ra lỗ hổng trước `các cuộc tấn công thực thể bên ngoài <https://en.wikipedia.org/wiki/XML_external_entity_attack>`_ nếu bộ phân tích cú pháp được sử dụng với nội dung XML do người dùng cung cấp. Vui lòng xem xét `mô hình mối đe dọa <https://en.wikipedia.org/wiki/Threat_model>`_ của bạn trước khi bật tính năng này.
 
    | value: ``"http://xml.org/sax/features/external-general-entities"``
-   | true: Include all external general (text) entities.
-   | false: Do not include external general entities.
-   | access: (parsing) read-only; (not parsing) read/write
+   | true: Bao gồm tất cả thực thể tổng quát (văn bản) bên ngoài.
+   | false: Không bao gồm các thực thể tổng quát bên ngoài.
+   | quyền truy cập: (đang phân tích cú pháp) chỉ đọc; (không phân tích cú pháp) đọc/ghi
 
 
 .. data:: feature_external_pes
 
    | value: ``"http://xml.org/sax/features/external-parameter-entities"``
-   | true: Include all external parameter entities, including the external DTD
-     subset.
-   | false: Do not include any external parameter entities, even the external
-     DTD subset.
-   | access: (parsing) read-only; (not parsing) read/write
+   | true: Bao gồm tất cả các thực thể tham số bên ngoài, bao gồm cả tập con DTD bên ngoài.
+   | false: Không bao gồm bất kỳ thực thể tham số bên ngoài nào, kể cả tập con DTD bên ngoài.
+   | quyền truy cập: (đang phân tích cú pháp) chỉ đọc; (không phân tích cú pháp) đọc/ghi
 
-   The parser based on :mod:`xml.parsers.expat` does not support this feature.
+   Trình phân tích cú pháp dựa trên :mod:`xml.parsers.expat` không hỗ trợ tính năng này.
 
 
 .. data:: all_features
 
-   List of all features.
+   Danh sách tất cả các tính năng.
 
 
 .. data:: property_lexical_handler
 
-   | value: ``"http://xml.org/sax/properties/lexical-handler"``
-   | data type: :class:`~xml.sax.handler.LexicalHandler`
-   | description: An optional extension handler for lexical events like
-     comments.
-   | access: read/write
+   | giá trị: ``"http://xml.org/sax/properties/lexical-handler"``
+   | kiểu dữ liệu: :class:`~xml.sax.handler.LexicalHandler`
+   | mô tả: Một trình xử lý mở rộng tùy chọn cho các sự kiện lexical như chú thích.
+   | quyền truy cập: đọc/ghi
 
 
 .. data:: property_declaration_handler
 
-   | value: ``"http://xml.org/sax/properties/declaration-handler"``
-   | data type: an object implementing the SAX2 ``DeclHandler`` interface
-   | description: An optional extension handler for DTD-related events other
-     than notations and unparsed entities.
-   | access: read/write
+   | giá trị: ``"http://xml.org/sax/properties/declaration-handler"``
+   | kiểu dữ liệu: một đối tượng triển khai giao diện ``DeclHandler`` của SAX2
+   | mô tả: Một trình xử lý mở rộng tùy chọn cho các sự kiện liên quan đến DTD, ngoại trừ ký hiệu và thực thể chưa phân tích.
+   | quyền truy cập: đọc/ghi
 
-   No parser in the standard library supports this property,
-   and the standard library provides no such handler.
+   Không có parser nào trong thư viện chuẩn hỗ trợ thuộc tính này và thư viện chuẩn cũng không cung cấp trình xử lý như vậy.
 
 
 .. data:: property_dom_node
 
-   | value: ``"http://xml.org/sax/properties/dom-node"``
-   | data type: :class:`xml.dom.Node`
-   | description: When parsing, the current DOM node being visited if this is
-     a DOM iterator; when not parsing, the root DOM node for iteration.
-   | access: (parsing) read-only; (not parsing) read/write
+   | giá trị: ``"http://xml.org/sax/properties/dom-node"``
+   | kiểu dữ liệu: :class:`xml.dom.Node`
+   | mô tả: Khi đang phân tích cú pháp, node DOM hiện tại đang được duyệt nếu đây là một DOM iterator; khi không phân tích cú pháp, node DOM gốc để lặp.
+   | quyền truy cập: (đang phân tích cú pháp) chỉ đọc; (không phân tích cú pháp) đọc/ghi
 
-   No parser in the standard library supports this property.
+   Không có parser nào trong thư viện chuẩn hỗ trợ thuộc tính này.
 
 
 .. data:: property_xml_string
 
-   | value: ``"http://xml.org/sax/properties/xml-string"``
-   | data type: Bytes
-   | description: The literal string of characters that was the source for the
-     current event.
-   | access: read-only, and only during a handler callback
+   | giá trị: ``"http://xml.org/sax/properties/xml-string"``
+   | kiểu dữ liệu: Bytes
+   | mô tả: Chuỗi ký tự nguyên bản là nguồn của sự kiện hiện tại.
+   | quyền truy cập: chỉ đọc và chỉ trong callback của handler
 
 
 .. data:: property_encoding
 
-   | value: ``"http://www.python.org/sax/properties/encoding"``
-   | data type: String
-   | description: The name of the encoding to assume for input data.
-   | access: read/write
+   | giá trị: ``"http://www.python.org/sax/properties/encoding"``
+   | kiểu dữ liệu: String
+   | mô tả: Tên của encoding cần giả định cho dữ liệu đầu vào.
+   | quyền truy cập: đọc/ghi
 
-   No parser in the standard library supports this property.
+   Không có parser nào trong thư viện chuẩn hỗ trợ thuộc tính này.
 
 
 .. data:: property_interning_dict
 
-   | value: ``"http://www.python.org/sax/properties/interning-dict"``
-   | data type: Dictionary
-   | description: The dictionary used to intern names,
-     or ``None`` if names are not interned.
-     Setting it enables interning, as does the
-     :data:`feature_string_interning` feature.
-   | access: read/write
+   | giá trị: ``"http://www.python.org/sax/properties/interning-dict"``
+   | kiểu dữ liệu: Dictionary
+   | mô tả: Từ điển dùng để intern tên, hoặc ``None`` nếu tên không được intern. Việc đặt giá trị này sẽ bật tính năng interning, cũng như
+     tính năng :data:`feature_string_interning`.
+   | quyền truy cập: đọc/ghi
 
 
 .. data:: all_properties
 
-   List of all known property names.
+   Danh sách tất cả tên thuộc tính đã biết.
 
 
 .. _content-handler-objects:
 
-ContentHandler Objects
-----------------------
+Đối tượng ContentHandler
+------------------------
 
-Users are expected to subclass :class:`ContentHandler` to support their
-application.  The following methods are called by the parser on the appropriate
-events in the input document:
+Người dùng được kỳ vọng sẽ tạo lớp con của :class:`ContentHandler` để hỗ trợ ứng dụng của mình. Các phương thức sau được parser gọi khi xảy ra những sự kiện tương ứng trong tài liệu đầu vào:
 
 
 .. method:: ContentHandler.setDocumentLocator(locator)
 
-   Called by the parser to give the application a locator for locating the origin
-   of document events.
+   Được parser gọi để cung cấp cho ứng dụng một locator nhằm xác định nguồn gốc của các sự kiện trong tài liệu.
 
-   SAX parsers are strongly encouraged (though not absolutely required) to supply a
-   locator: if it does so, it must supply the locator to the application by
-   invoking this method before invoking any of the other methods in the
-   DocumentHandler interface.
+   Các SAX parser được khuyến khích mạnh mẽ (mặc dù không bắt buộc tuyệt đối) cung cấp một locator: nếu cung cấp, parser phải cung cấp locator cho ứng dụng bằng cách gọi phương thức này trước khi gọi bất kỳ phương thức nào khác trong interface DocumentHandler.
 
-   The locator allows the application to determine the end position of any
-   document-related event, even if the parser is not reporting an error. Typically,
-   the application will use this information for reporting its own errors (such as
-   character content that does not match an application's business rules). The
-   information returned by the locator is probably not sufficient for use with a
-   search engine.
+   Locator cho phép ứng dụng xác định vị trí kết thúc của bất kỳ sự kiện nào liên quan đến tài liệu, ngay cả khi parser không báo lỗi. Thông thường, ứng dụng sẽ sử dụng thông tin này để báo cáo các lỗi của chính mình (chẳng hạn như nội dung ký tự không khớp với các quy tắc nghiệp vụ của ứng dụng). Thông tin do locator trả về có thể không đủ để sử dụng với công cụ tìm kiếm.
 
-   Note that the locator will return correct information only during the invocation
-   of the events in this interface. The application should not attempt to use it at
-   any other time.
+   Lưu ý rằng locator chỉ trả về thông tin chính xác trong khi các sự kiện thuộc interface này đang được gọi. Ứng dụng không nên cố gắng sử dụng locator vào bất kỳ thời điểm nào khác.
 
 
 .. method:: ContentHandler.startDocument()
 
-   Receive notification of the beginning of a document.
+   Nhận thông báo về thời điểm bắt đầu một tài liệu.
 
-   The SAX parser will invoke this method only once, before any other methods in
-   this interface or in DTDHandler (except for :meth:`setDocumentLocator`).
+   SAX parser sẽ chỉ gọi phương thức này một lần, trước bất kỳ phương thức nào khác trong interface này hoặc trong DTDHandler (ngoại trừ :meth:`setDocumentLocator`).
 
 
 .. method:: ContentHandler.endDocument()
 
-   Receive notification of the end of a document.
+   Nhận thông báo khi tài liệu kết thúc.
 
-   The SAX parser will invoke this method only once, and it will be the last method
-   invoked during the parse. The parser shall not invoke this method until it has
-   either abandoned parsing (because of an unrecoverable error) or reached the end
-   of input.
+   Trình phân tích SAX sẽ gọi phương thức này chỉ một lần và đây sẽ là phương thức cuối cùng được gọi trong quá trình phân tích. Trình phân tích sẽ không gọi phương thức này cho đến khi nó đã hủy bỏ việc phân tích (do gặp lỗi không thể khắc phục) hoặc đến cuối dữ liệu đầu vào.
 
 
 .. method:: ContentHandler.startPrefixMapping(prefix, uri)
 
-   Begin the scope of a prefix-URI Namespace mapping.
+   Bắt đầu phạm vi của ánh xạ Namespace prefix-URI.
 
-   The information from this event is not necessary for normal Namespace
-   processing: the SAX XML reader will automatically replace prefixes for element
-   and attribute names when the ``feature_namespaces`` feature is enabled (the
-   default).
+   Thông tin từ sự kiện này không cần thiết cho việc xử lý Namespace thông thường: trình đọc XML SAX sẽ tự động thay thế các prefix cho tên phần tử và thuộc tính khi tính năng ``feature_namespaces`` được bật (mặc định).
 
-   There are cases, however, when applications need to use prefixes in character
-   data or in attribute values, where they cannot safely be expanded automatically;
-   the :meth:`startPrefixMapping` and :meth:`endPrefixMapping` events supply the
-   information to the application to expand prefixes in those contexts itself, if
-   necessary.
+   Tuy nhiên, có những trường hợp ứng dụng cần sử dụng prefix trong dữ liệu ký tự hoặc trong giá trị thuộc tính, nơi chúng không thể được tự động mở rộng một cách an toàn; các sự kiện :meth:`startPrefixMapping` và :meth:`endPrefixMapping` cung cấp thông tin để ứng dụng tự mở rộng prefix trong những ngữ cảnh đó, nếu cần.
 
    .. XXX This is not really the default, is it? MvL
 
-   Note that :meth:`startPrefixMapping` and :meth:`endPrefixMapping` events are not
-   guaranteed to be properly nested relative to each-other: all
-   :meth:`startPrefixMapping` events will occur before the corresponding
-   :meth:`startElement` event, and all :meth:`endPrefixMapping` events will occur
-   after the corresponding :meth:`endElement` event, but their order is not
-   guaranteed.
+   Lưu ý rằng các sự kiện :meth:`startPrefixMapping` và :meth:`endPrefixMapping` không được đảm bảo là lồng đúng cách so với nhau: tất cả
+   các sự kiện :meth:`startPrefixMapping` sẽ xảy ra trước sự kiện tương ứng
+   sự kiện :meth:`startElement`, và tất cả các sự kiện :meth:`endPrefixMapping` sẽ xảy ra sau sự kiện :meth:`endElement` tương ứng, nhưng thứ tự của chúng không được đảm bảo.
 
 
 .. method:: ContentHandler.endPrefixMapping(prefix)
 
-   End the scope of a prefix-URI mapping.
+   Kết thúc phạm vi của ánh xạ prefix-URI.
 
-   See :meth:`startPrefixMapping` for details. This event will always occur after
-   the corresponding :meth:`endElement` event, but the order of
-   :meth:`endPrefixMapping` events is not otherwise guaranteed.
+   Xem :meth:`startPrefixMapping` để biết chi tiết. Sự kiện này sẽ luôn xảy ra sau sự kiện :meth:`endElement` tương ứng, nhưng thứ tự của
+   các sự kiện :meth:`endPrefixMapping` không được đảm bảo theo cách nào khác.
 
 
 .. method:: ContentHandler.startElement(name, attrs)
 
-   Signals the start of an element in non-namespace mode.
+   Báo hiệu bắt đầu một phần tử ở chế độ không có namespace.
 
-   The *name* parameter contains the raw XML 1.0 name of the element type as a
-   string and the *attrs* parameter holds an object of the
-   :ref:`Attributes <attributes-objects>` interface containing the attributes of
-   the element.  The object passed as *attrs* may be re-used by the parser; holding
-   on to a reference to it is not a reliable way to keep a copy of the attributes.
-   To keep a copy of the attributes, use the :meth:`copy` method of the *attrs*
-   object.
+   Tham số *name* chứa tên XML 1.0 thô của kiểu phần tử dưới dạng chuỗi, còn tham số *attrs* chứa một đối tượng của
+   giao diện :ref:`Attributes <attributes-objects>` chứa các thuộc tính của phần tử. Đối tượng được truyền dưới dạng *attrs* có thể được parser tái sử dụng; việc giữ tham chiếu đến đối tượng này không phải là cách đáng tin cậy để lưu một bản sao của các thuộc tính. Để lưu một bản sao của các thuộc tính, hãy sử dụng phương thức :meth:`copy` của đối tượng *attrs*.
 
 
 .. method:: ContentHandler.endElement(name)
 
-   Signals the end of an element in non-namespace mode.
+   Báo hiệu kết thúc một phần tử ở chế độ không gian tên.
 
-   The *name* parameter contains the name of the element type, just as with the
-   :meth:`startElement` event.
+   Tham số *name* chứa tên của kiểu phần tử, giống như với
+   :meth:`startElement` sự kiện.
 
 
 .. method:: ContentHandler.startElementNS(name, qname, attrs)
 
-   Signals the start of an element in namespace mode.
+   Báo hiệu bắt đầu một phần tử ở chế độ không gian tên.
 
-   The *name* parameter contains the name of the element type as a ``(uri,
-   localname)`` tuple, the *qname* parameter contains the raw XML 1.0 name used in
-   the source document, and the *attrs* parameter holds an instance of the
-   :ref:`AttributesNS <attributes-ns-objects>` interface
-   containing the attributes of the element.  If no namespace is associated with
-   the element, the *uri* component of *name* will be ``None``.  The object passed
-   as *attrs* may be re-used by the parser; holding on to a reference to it is not
-   a reliable way to keep a copy of the attributes.  To keep a copy of the
-   attributes, use the :meth:`copy` method of the *attrs* object.
+   Tham số *name* chứa tên của kiểu phần tử dưới dạng một ``(uri, localname)`` tuple, tham số *qname* chứa tên XML 1.0 thô được sử dụng trong tài liệu nguồn, còn tham số *attrs* chứa một thể hiện của
+   giao diện :ref:`AttributesNS <attributes-ns-objects>` chứa các thuộc tính của phần tử.  Nếu không gian tên nào được liên kết với phần tử, thành phần *uri* của *name* sẽ là ``None``. Đối tượng được truyền dưới dạng *attrs* có thể được parser tái sử dụng; việc giữ tham chiếu đến đối tượng này không phải là cách đáng tin cậy để giữ một bản sao của các thuộc tính.  Để giữ một bản sao của các thuộc tính, hãy sử dụng phương thức :meth:`copy` của đối tượng *attrs*.
 
-   Parsers may set the *qname* parameter to ``None``, unless the
-   ``feature_namespace_prefixes`` feature is activated.
+   Các parser có thể đặt tham số *qname* thành ``None``, trừ khi ``feature_namespace_prefixes`` feature được kích hoạt.
 
 
 .. method:: ContentHandler.endElementNS(name, qname)
 
-   Signals the end of an element in namespace mode.
+   Báo hiệu kết thúc một phần tử trong chế độ namespace.
 
-   The *name* parameter contains the name of the element type, just as with the
-   :meth:`startElementNS` method, likewise the *qname* parameter.
+   Tham số *name* chứa tên của kiểu phần tử, giống như với
+   phương thức :meth:`startElementNS`, tương tự như tham số *qname*.
 
 
 .. method:: ContentHandler.characters(content)
 
-   Receive notification of character data.
+   Nhận thông báo về dữ liệu ký tự.
 
-   The Parser will call this method to report each chunk of character data. SAX
-   parsers may return all contiguous character data in a single chunk, or they may
-   split it into several chunks; however, all of the characters in any single event
-   must come from the same external entity so that the Locator provides useful
-   information.
+   Parser sẽ gọi phương thức này để báo cáo từng phần dữ liệu ký tự. Các trình phân tích SAX có thể trả về toàn bộ dữ liệu ký tự liền kề trong một phần duy nhất hoặc chia dữ liệu thành nhiều phần; tuy nhiên, tất cả ký tự trong một sự kiện phải đến từ cùng một thực thể bên ngoài để Locator cung cấp thông tin hữu ích.
 
-   *content* may be a string or bytes instance; the ``expat`` reader module
-   always produces strings.
+   *content* có thể là một string hoặc một instance bytes; mô-đun reader ``expat`` luôn tạo ra các string.
 
    .. note::
 
-      The earlier SAX 1 interface provided by the Python XML Special Interest Group
-      used a more Java-like interface for this method.  Since most parsers used from
-      Python did not take advantage of the older interface, the simpler signature was
-      chosen to replace it.  To convert old code to the new interface, use *content*
-      instead of slicing content with the old *offset* and *length* parameters.
+      Giao diện SAX 1 trước đây do Python XML Special Interest Group cung cấp sử dụng giao diện cho phương thức này gần với Java hơn. Vì hầu hết các parser được sử dụng từ Python không tận dụng giao diện cũ, chữ ký đơn giản hơn đã được chọn để thay thế nó. Để chuyển mã cũ sang giao diện mới, hãy sử dụng *content* thay vì cắt content bằng các tham số *offset* và *length* cũ.
 
 
 .. method:: ContentHandler.ignorableWhitespace(whitespace)
 
-   Receive notification of ignorable whitespace in element content.
+   Nhận thông báo về khoảng trắng có thể bỏ qua trong nội dung phần tử.
 
-   Validating Parsers must use this method to report each chunk of ignorable
-   whitespace (see the W3C XML 1.0 recommendation, section 2.10): non-validating
-   parsers may also use this method if they are capable of parsing and using
-   content models.
+   Các Parser có xác thực phải sử dụng phương thức này để báo cáo từng đoạn khoảng trắng có thể bỏ qua (xem khuyến nghị W3C XML 1.0, mục 2.10): các parser không xác thực cũng có thể sử dụng phương thức này nếu chúng có khả năng phân tích cú pháp và sử dụng các content model.
 
-   SAX parsers may return all contiguous whitespace in a single chunk, or they may
-   split it into several chunks; however, all of the characters in any single event
-   must come from the same external entity, so that the Locator provides useful
-   information.
+   Các parser SAX có thể trả về toàn bộ khoảng trắng liên tiếp trong một đoạn duy nhất hoặc chia thành nhiều đoạn; tuy nhiên, tất cả ký tự trong mỗi sự kiện phải xuất phát từ cùng một external entity để Locator cung cấp thông tin hữu ích.
 
 
 .. method:: ContentHandler.processingInstruction(target, data)
 
-   Receive notification of a processing instruction.
+   Nhận thông báo về một processing instruction.
 
-   The Parser will invoke this method once for each processing instruction found:
-   note that processing instructions may occur before or after the main document
-   element.
+   Parser sẽ gọi phương thức này một lần cho mỗi processing instruction được tìm thấy: lưu ý rằng processing instruction có thể xuất hiện trước hoặc sau phần tử tài liệu chính.
 
-   A SAX parser should never report an XML declaration (XML 1.0, section 2.8) or a
-   text declaration (XML 1.0, section 4.3.1) using this method.
+   Một parser SAX không bao giờ được báo cáo XML declaration (XML 1.0, mục 2.8) hoặc text declaration (XML 1.0, mục 4.3.1) bằng phương thức này.
 
 
 .. method:: ContentHandler.skippedEntity(name)
 
-   Receive notification of a skipped entity.
+   Nhận thông báo về một entity bị bỏ qua.
 
-   The Parser will invoke this method once for each entity skipped. Non-validating
-   processors may skip entities if they have not seen the declarations (because,
-   for example, the entity was declared in an external DTD subset). All processors
-   may skip external entities, depending on the values of the
-   ``feature_external_ges`` and the ``feature_external_pes`` properties.
+   Parser sẽ gọi phương thức này một lần cho mỗi entity bị bỏ qua. Các processor không kiểm tra tính hợp lệ có thể bỏ qua các entity nếu chưa thấy các khai báo (chẳng hạn vì entity được khai báo trong một external DTD subset). Tất cả processor đều có thể bỏ qua các external entity, tùy thuộc vào giá trị của thuộc tính ``feature_external_ges`` và ``feature_external_pes``.
 
 
 .. _dtd-handler-objects:
 
-DTDHandler Objects
-------------------
+Các đối tượng DTDHandler
+------------------------
 
-:class:`DTDHandler` instances provide the following methods:
+Các instance :class:`DTDHandler` cung cấp những phương thức sau:
 
 
 .. method:: DTDHandler.notationDecl(name, publicId, systemId)
 
-   Handle a notation declaration event.
+   Xử lý một sự kiện khai báo notation.
 
 
 .. method:: DTDHandler.unparsedEntityDecl(name, publicId, systemId, ndata)
 
-   Handle an unparsed entity declaration event.
+   Xử lý một sự kiện khai báo unparsed entity.
 
 
 .. _entity-resolver-objects:
 
-EntityResolver Objects
-----------------------
+Các đối tượng EntityResolver
+----------------------------
 
 
 .. method:: EntityResolver.resolveEntity(publicId, systemId)
 
-   Resolve the system identifier of an entity and return either the system
-   identifier to read from as a string, or an InputSource to read from. The default
-   implementation returns *systemId*.
+   Phân giải system identifier của một entity và trả về system identifier cần đọc dưới dạng chuỗi hoặc một InputSource để đọc. Cài đặt mặc định trả về *systemId*.
 
 
 .. _sax-error-handler:
 
-ErrorHandler Objects
---------------------
+Đối tượng ErrorHandler
+----------------------
 
-Objects with this interface are used to receive error and warning information
-from the :class:`~xml.sax.xmlreader.XMLReader`.  If you create an object that
-implements this interface, then register the object with your
-:class:`~xml.sax.xmlreader.XMLReader`, the parser
-will call the methods in your object to report all warnings and errors. There
-are three levels of errors available: warnings, (possibly) recoverable errors,
-and unrecoverable errors.  All methods take a :exc:`~xml.sax.SAXParseException` as the
-only parameter.  Errors and warnings may be converted to an exception by raising
-the passed-in exception object.
+Các đối tượng có interface này được dùng để tiếp nhận thông tin lỗi và cảnh báo từ :class:`~xml.sax.xmlreader.XMLReader`. Nếu bạn tạo một đối tượng triển khai interface này, sau đó đăng ký đối tượng với
+:class:`~xml.sax.xmlreader.XMLReader`, parser sẽ gọi các phương thức trong đối tượng của bạn để báo cáo tất cả cảnh báo và lỗi. Có ba cấp độ lỗi: cảnh báo, lỗi (có thể) khôi phục được và lỗi không thể khôi phục. Tất cả các phương thức đều nhận một :exc:`~xml.sax.SAXParseException` làm tham số duy nhất. Lỗi và cảnh báo có thể được chuyển thành exception bằng cách raise đối tượng exception được truyền vào.
 
 
 .. method:: ErrorHandler.error(exception)
 
-   Called when the parser encounters a recoverable error.  If this method does not
-   raise an exception, parsing may continue, but further document information
-   should not be expected by the application.  Allowing the parser to continue may
-   allow additional errors to be discovered in the input document.
+   Được gọi khi parser gặp lỗi có thể khôi phục. Nếu phương thức này không raise exception, quá trình phân tích có thể tiếp tục, nhưng ứng dụng không nên kỳ vọng nhận thêm thông tin nào về tài liệu. Việc cho phép parser tiếp tục có thể giúp phát hiện thêm lỗi trong tài liệu đầu vào.
 
 
 .. method:: ErrorHandler.fatalError(exception)
 
-   Called when the parser encounters an error it cannot recover from; parsing is
-   expected to terminate when this method returns.
+   Được gọi khi parser gặp một lỗi không thể khôi phục; quá trình phân tích dự kiến sẽ kết thúc khi phương thức này trả về.
 
 
 .. method:: ErrorHandler.warning(exception)
 
-   Called when the parser presents minor warning information to the application.
-   Parsing is expected to continue when this method returns, and document
-   information will continue to be passed to the application. Raising an exception
-   in this method will cause parsing to end.
+   Được gọi khi parser cung cấp thông tin cảnh báo nhỏ cho ứng dụng. Quá trình phân tích dự kiến sẽ tiếp tục khi phương thức này trả về và thông tin về tài liệu sẽ tiếp tục được truyền đến ứng dụng. Việc raise exception trong phương thức này sẽ khiến quá trình phân tích kết thúc.
 
 
 .. _lexical-handler-objects:
 
-LexicalHandler Objects
-----------------------
-Optional SAX2 handler for lexical events.
+Đối tượng LexicalHandler
+------------------------
+Trình xử lý SAX2 tùy chọn cho các sự kiện lexical.
 
-This handler is used to obtain lexical information about an XML
-document. Lexical information includes information describing the
-document encoding used and XML comments embedded in the document, as
-well as section boundaries for the DTD and for any CDATA sections.
-The lexical handlers are used in the same manner as content handlers.
+Trình xử lý này được dùng để nhận thông tin lexical về một tài liệu XML. Thông tin lexical bao gồm thông tin mô tả encoding của tài liệu và các chú thích XML được nhúng trong tài liệu, cũng như ranh giới phần của DTD và mọi phần CDATA. Các trình xử lý lexical được sử dụng theo cách tương tự như các trình xử lý nội dung.
 
-Set the LexicalHandler of an XMLReader by using the setProperty method
-with the property identifier
-``'http://xml.org/sax/properties/lexical-handler'``.
+Đặt LexicalHandler của XMLReader bằng cách sử dụng phương thức setProperty với mã định danh thuộc tính ``'http://xml.org/sax/properties/lexical-handler'``.
 
 
 .. method:: LexicalHandler.comment(content)
 
-   Reports a comment anywhere in the document (including the DTD and
-   outside the document element).
+   Báo cáo một chú thích ở bất kỳ vị trí nào trong tài liệu (bao gồm DTD và bên ngoài phần tử tài liệu).
 
 .. method:: LexicalHandler.startDTD(name, public_id, system_id)
 
-   Reports the start of the DTD declarations if the document has an
-   associated DTD.
+   Báo cáo phần bắt đầu của các khai báo DTD nếu tài liệu có DTD liên kết.
 
 .. method:: LexicalHandler.endDTD()
 
-   Reports the end of DTD declaration.
+   Báo cáo phần kết thúc của khai báo DTD.
 
 .. method:: LexicalHandler.startCDATA()
 
-   Reports the start of a CDATA marked section.
+   Báo cáo phần bắt đầu của một section được đánh dấu CDATA.
 
-   The contents of the CDATA marked section will be reported through
-   the characters handler.
+   Nội dung của phần được đánh dấu CDATA sẽ được truyền đến trình xử lý characters.
 
 .. method:: LexicalHandler.endCDATA()
 
-   Reports the end of a CDATA marked section.
+   Báo cáo phần kết thúc của một phần được đánh dấu CDATA.
+
+.. _`external entity attacks`: https://en.wikipedia.org/wiki/XML_external_entity_attack
+.. _`threat model`: https://en.wikipedia.org/wiki/Threat_model

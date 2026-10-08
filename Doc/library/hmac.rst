@@ -1,152 +1,117 @@
-:mod:`!hmac` --- Keyed-Hashing for Message Authentication
-=========================================================
+:mod:`!hmac` --- Băm có khóa để xác thực thông điệp
+===================================================
 
 .. module:: hmac
-   :synopsis: Keyed-Hashing for Message Authentication (HMAC) implementation
+   :synopsis: Triển khai thuật toán Băm có khóa để xác thực thông điệp (HMAC)
 
 .. moduleauthor:: Gerhard Häring <ghaering@users.sourceforge.net>
 .. sectionauthor:: Gerhard Häring <ghaering@users.sourceforge.net>
 
-**Source code:** :source:`Lib/hmac.py`
+**Mã nguồn:** :source:`Lib/hmac.py`
 
 --------------
 
-This module implements the HMAC algorithm as described by :rfc:`2104`.
-The interface allows to use any hash function with a *fixed* digest size.
-In particular, extendable output functions such as SHAKE-128 or SHAKE-256
-cannot be used with HMAC.
+Module này triển khai thuật toán HMAC như được mô tả trong :rfc:`2104`. Giao diện cho phép sử dụng bất kỳ hàm băm nào có kích thước digest *cố định*. Cụ thể, không thể sử dụng các hàm đầu ra có thể mở rộng như SHAKE-128 hoặc SHAKE-256 với HMAC.
 
 
 .. function:: new(key, msg=None, digestmod)
 
-   Return a new hmac object.  *key* is a bytes or bytearray object giving the
-   secret key.  If *msg* is present, the method call ``update(msg)`` is made.
-   *digestmod* is the digest name, digest constructor or module for the HMAC
-   object to use.  It may be any name suitable to :func:`hashlib.new`.
-   Despite its argument position, it is required.
+   Trả về một đối tượng hmac mới. *key* là đối tượng bytes hoặc bytearray chứa khóa bí mật. Nếu có *msg*, lệnh gọi phương thức ``update(msg)`` sẽ được thực hiện. *digestmod* là tên digest, hàm khởi tạo digest hoặc module dùng cho đối tượng HMAC. Nó có thể là bất kỳ tên nào phù hợp với :func:`hashlib.new`. Mặc dù nằm ở vị trí đối số này, tham số này là bắt buộc.
 
    .. versionchanged:: 3.4
-      Parameter *key* can be a bytes or bytearray object.
-      Parameter *msg* can be of any type supported by :mod:`hashlib`.
-      Parameter *digestmod* can be the name of a hash algorithm.
+      Tham số *key* có thể là một đối tượng bytes hoặc bytearray. Tham số *msg* có thể thuộc bất kỳ kiểu nào được :mod:`hashlib` hỗ trợ. Tham số *digestmod* có thể là tên của một thuật toán băm.
 
    .. versionchanged:: 3.8
-      The *digestmod* argument is now required.  Pass it as a keyword
-      argument to avoid awkwardness when you do not have an initial *msg*.
+      Đối số *digestmod* hiện là bắt buộc. Hãy truyền đối số này dưới dạng đối số từ khóa để tránh bất tiện khi bạn không có *msg* ban đầu.
 
 
 .. function:: digest(key, msg, digest)
 
-   Return digest of *msg* for given secret *key* and *digest*. The
-   function is equivalent to ``HMAC(key, msg, digest).digest()``, but
-   uses an optimized C or inline implementation, which is faster for messages
-   that fit into memory. The parameters *key*, *msg*, and *digest* have
-   the same meaning as in :func:`~hmac.new`.
+   Trả về digest của *msg* cho secret *key* và *digest* đã cho. Hàm này tương đương với ``HMAC(key, msg, digest).digest()``, nhưng sử dụng triển khai C được tối ưu hóa hoặc triển khai inline, nhanh hơn đối với các message vừa với bộ nhớ. Các tham số *key*, *msg* và *digest* có cùng ý nghĩa như trong :func:`~hmac.new`.
 
-   CPython implementation detail, the optimized C implementation is only used
-   when *digest* is a string and name of a digest algorithm, which is
-   supported by OpenSSL.
+   Theo chi tiết triển khai của CPython, triển khai C được tối ưu hóa chỉ được sử dụng khi *digest* là chuỗi và là tên của một thuật toán digest được OpenSSL hỗ trợ.
 
    .. versionadded:: 3.7
 
 
 .. class:: HMAC
 
-   An HMAC object has the following methods:
+   Một đối tượng HMAC có các phương thức sau:
 
 .. method:: HMAC.update(msg)
 
-   Update the hmac object with *msg*.  Repeated calls are equivalent to a
-   single call with the concatenation of all the arguments:
-   ``m.update(a); m.update(b)`` is equivalent to ``m.update(a + b)``.
+   Cập nhật đối tượng hmac với *msg*. Các lần gọi lặp lại tương đương với một lần gọi duy nhất có phần nối của tất cả các đối số: ``m.update(a); m.update(b)`` tương đương với ``m.update(a + b)``.
 
    .. versionchanged:: 3.4
-      Parameter *msg* can be of any type supported by :mod:`hashlib`.
+      Tham số *msg* có thể thuộc bất kỳ kiểu nào được :mod:`hashlib` hỗ trợ.
 
 
 .. method:: HMAC.digest()
 
-   Return the digest of the bytes passed to the :meth:`update` method so far.
-   This bytes object will be the same length as the *digest_size* of the digest
-   given to the constructor.  It may contain non-ASCII bytes, including NUL
-   bytes.
+   Trả về digest của các byte đã được truyền cho phương thức :meth:`update` cho đến thời điểm hiện tại. Đối tượng bytes này sẽ có cùng độ dài với *digest_size* của digest được truyền cho hàm khởi tạo. Nó có thể chứa các byte không phải ASCII, bao gồm cả byte NUL.
 
    .. warning::
 
-      When comparing the output of :meth:`digest` to an externally supplied
-      digest during a verification routine, it is recommended to use the
-      :func:`compare_digest` function instead of the ``==`` operator
-      to reduce the vulnerability to timing attacks.
+      Khi so sánh đầu ra của :meth:`digest` với một digest được cung cấp từ bên ngoài trong quy trình xác minh, bạn nên sử dụng
+      hàm :func:`compare_digest` thay vì toán tử ``==`` để giảm mức độ dễ bị tấn công theo thời gian.
 
 
 .. method:: HMAC.hexdigest()
 
-   Like :meth:`digest` except the digest is returned as a string twice the
-   length containing only hexadecimal digits.  This may be used to exchange the
-   value safely in email or other non-binary environments.
+   Tương tự như :meth:`digest`, ngoại trừ việc digest được trả về dưới dạng chuỗi có độ dài gấp đôi và chỉ chứa các chữ số thập lục phân. Có thể dùng cách này để trao đổi giá trị an toàn qua email hoặc trong các môi trường phi nhị phân khác.
 
    .. warning::
 
-      When comparing the output of :meth:`hexdigest` to an externally supplied
-      digest during a verification routine, it is recommended to use the
-      :func:`compare_digest` function instead of the ``==`` operator
-      to reduce the vulnerability to timing attacks.
+      Khi so sánh đầu ra của :meth:`hexdigest` với digest được cung cấp từ bên ngoài trong quy trình xác minh, bạn nên sử dụng
+      hàm :func:`compare_digest` thay vì toán tử ``==`` để giảm mức độ dễ bị tấn công theo thời gian.
 
 
 .. method:: HMAC.copy()
 
-   Return a copy ("clone") of the hmac object.  This can be used to efficiently
-   compute the digests of strings that share a common initial substring.
+   Trả về một bản sao ("clone") của đối tượng hmac. Có thể dùng bản sao này để tính digest một cách hiệu quả cho các chuỗi có cùng chuỗi con ban đầu.
 
 
-A hash object has the following attributes:
+Một đối tượng hash có các thuộc tính sau:
 
 .. attribute:: HMAC.digest_size
 
-   The size of the resulting HMAC digest in bytes.
+   Kích thước tính theo byte của digest HMAC thu được.
 
 .. attribute:: HMAC.block_size
 
-   The internal block size of the hash algorithm in bytes.
+   Kích thước khối nội bộ của thuật toán băm, tính bằng byte.
 
    .. versionadded:: 3.4
 
 .. attribute:: HMAC.name
 
-   The canonical name of this HMAC, always lowercase, e.g. ``hmac-md5``.
+   Tên chuẩn của HMAC này, luôn viết thường, ví dụ ``hmac-md5``.
 
    .. versionadded:: 3.4
 
 
 .. versionchanged:: 3.10
-   Removed the undocumented attributes ``HMAC.digest_cons``, ``HMAC.inner``,
-   and ``HMAC.outer``.
+   Đã xóa các thuộc tính chưa được ghi lại ``HMAC.digest_cons``, ``HMAC.inner`` và ``HMAC.outer``.
 
-This module also provides the following helper function:
+Mô-đun này cũng cung cấp hàm trợ giúp sau:
 
 .. function:: compare_digest(a, b)
 
-   Return ``a == b``.  This function uses an approach designed to prevent
-   timing analysis by avoiding content-based short circuiting behaviour,
-   making it appropriate for cryptography.  *a* and *b* must both be of the
-   same type: either :class:`str` (ASCII only, as e.g. returned by
-   :meth:`HMAC.hexdigest`), or a :term:`bytes-like object`.
+   Trả về ``a == b``. Hàm này sử dụng một phương pháp được thiết kế để ngăn việc phân tích thời gian bằng cách tránh hành vi đoản mạch dựa trên nội dung, khiến hàm phù hợp cho mật mã. *a* và *b* phải cùng một kiểu: либо :class:`str` (chỉ ASCII, chẳng hạn như giá trị được trả về bởi
+   :meth:`HMAC.hexdigest`), hoặc một :term:`bytes-like object`.
 
    .. note::
 
-      If *a* and *b* are of different lengths, or if an error occurs,
-      a timing attack could theoretically reveal information about the
-      types and lengths of *a* and *b*—but not their values.
+      Nếu *a* và *b* có độ dài khác nhau, hoặc nếu xảy ra lỗi, về lý thuyết một cuộc tấn công timing có thể tiết lộ thông tin về kiểu và độ dài của *a* và *b*—nhưng không tiết lộ giá trị của chúng.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.10
 
-      The function uses OpenSSL's ``CRYPTO_memcmp()`` internally when
-      available.
+      Hàm này sử dụng ``CRYPTO_memcmp()`` của OpenSSL ở bên trong khi có sẵn.
 
 
 .. seealso::
 
-   Module :mod:`hashlib`
-      The Python module providing secure hash functions.
+   Mô-đun :mod:`hashlib`
+      Mô-đun Python cung cấp các hàm băm bảo mật.

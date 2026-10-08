@@ -1,120 +1,93 @@
-:mod:`!http.cookies` --- HTTP state management
-==============================================
+:mod:`!http.cookies` --- Quản lý trạng thái HTTP
+================================================
 
 .. module:: http.cookies
-   :synopsis: Support for HTTP state management (cookies).
+   :synopsis: Hỗ trợ quản lý trạng thái HTTP (cookie).
 
 .. moduleauthor:: Timothy O'Malley <timo@alum.mit.edu>
 .. sectionauthor:: Moshe Zadka <moshez@zadka.site.co.il>
 
-**Source code:** :source:`Lib/http/cookies.py`
+**Mã nguồn:** :source:`Lib/http/cookies.py`
 
 --------------
 
-The :mod:`!http.cookies` module defines classes for abstracting the concept of
-cookies, an HTTP state management mechanism. It supports both simple string-only
-cookies, and provides an abstraction for having any serializable data-type as
-cookie value.
+Mô-đun :mod:`!http.cookies` định nghĩa các lớp để trừu tượng hóa khái niệm cookie, một cơ chế quản lý trạng thái HTTP. Mô-đun này hỗ trợ cả cookie chỉ chứa chuỗi đơn giản và cung cấp một lớp trừu tượng cho phép sử dụng bất kỳ kiểu dữ liệu nào có thể tuần tự hóa làm giá trị cookie.
 
-The module formerly strictly applied the parsing rules described in the
-:rfc:`2109` and :rfc:`2068` specifications.  It has since been discovered that
-MSIE 3.0x didn't follow the character rules outlined in those specs; many
-current-day browsers and servers have also relaxed parsing rules when it comes
-to cookie handling.  As a result, this module now uses parsing rules that are a
-bit less strict than they once were.
+Mô-đun này trước đây áp dụng nghiêm ngặt các quy tắc phân tích cú pháp được mô tả trong
+:rfc:`2109` và các đặc tả :rfc:`2068`. Kể từ đó, người ta phát hiện rằng MSIE 3.0x không tuân theo các quy tắc về ký tự được nêu trong những đặc tả đó; nhiều trình duyệt và máy chủ hiện nay cũng đã nới lỏng các quy tắc phân tích cú pháp khi xử lý cookie. Do đó, mô-đun này hiện sử dụng các quy tắc phân tích cú pháp ít nghiêm ngặt hơn một chút so với trước đây.
 
-The character set, :data:`string.ascii_letters`, :data:`string.digits` and
-``!#$%&'*+-.^_`|~:`` denote the set of valid characters allowed by this module
-in a cookie name (as :attr:`~Morsel.key`).
+Tập ký tự, :data:`string.ascii_letters`, :data:`string.digits` và ``!#$%&'*+-.^_`|~:`` biểu thị tập hợp các ký tự hợp lệ được mô-đun này cho phép trong tên cookie (dưới dạng :attr:`~Morsel.key`).
 
 .. versionchanged:: 3.3
-   Allowed ':' as a valid cookie name character.
+   Cho phép ':' là một ký tự hợp lệ trong tên cookie.
 
 
 .. note::
 
-   On encountering an invalid cookie, :exc:`CookieError` is raised, so if your
-   cookie data comes from a browser you should always prepare for invalid data
-   and catch :exc:`CookieError` on parsing.
+   Khi gặp cookie không hợp lệ, :exc:`CookieError` sẽ được phát sinh, vì vậy nếu dữ liệu cookie của bạn đến từ trình duyệt, bạn luôn nên chuẩn bị cho dữ liệu không hợp lệ và bắt :exc:`CookieError` khi phân tích cú pháp.
 
 
 .. exception:: CookieError
 
-   Exception failing because of :rfc:`2109` invalidity: incorrect attributes,
-   incorrect :mailheader:`Set-Cookie` header, etc.
+   Ngoại lệ xảy ra do :rfc:`2109` không hợp lệ: thuộc tính không chính xác, header :mailheader:`Set-Cookie` không chính xác, v.v.
 
 
 .. class:: BaseCookie([input])
 
-   This class is a dictionary-like object whose keys are strings and whose values
-   are :class:`Morsel` instances. Note that upon setting a key to a value, the
-   value is first converted to a :class:`Morsel` containing the key and the value.
+   Lớp này là một đối tượng tương tự dictionary, có các khóa là chuỗi và các giá trị là các instance của :class:`Morsel`. Lưu ý rằng khi gán một giá trị cho một khóa, giá trị trước tiên được chuyển đổi thành một :class:`Morsel` chứa khóa và giá trị đó.
 
-   If *input* is given, it is passed to the :meth:`load` method.
+   Nếu cung cấp *input*, giá trị này sẽ được truyền cho phương thức :meth:`load`.
 
 
 .. class:: SimpleCookie([input])
 
-   This class derives from :class:`BaseCookie` and overrides :meth:`~BaseCookie.value_decode`
-   and :meth:`~BaseCookie.value_encode`. :class:`!SimpleCookie` supports
-   strings as cookie values. When setting the value, :class:`!SimpleCookie`
-   calls the builtin :func:`str` to convert
-   the value to a string. Values received from HTTP are kept as strings.
+   Lớp này kế thừa từ :class:`BaseCookie` và ghi đè :meth:`~BaseCookie.value_decode` cùng :meth:`~BaseCookie.value_encode`. :class:`!SimpleCookie` hỗ trợ chuỗi làm giá trị cookie. Khi thiết lập giá trị, :class:`!SimpleCookie` gọi hàm dựng sẵn :func:`str` để chuyển đổi giá trị thành chuỗi. Các giá trị nhận được từ HTTP được giữ nguyên dưới dạng chuỗi.
 
 .. seealso::
 
    Module :mod:`http.cookiejar`
-      HTTP cookie handling for web *clients*.  The :mod:`http.cookiejar` and
-      :mod:`!http.cookies` modules do not depend on each other.
+      Xử lý cookie HTTP cho các *client web*.  :mod:`http.cookiejar` và
+      :mod:`!http.cookies` module không phụ thuộc lẫn nhau.
 
-   :rfc:`2109` - HTTP State Management Mechanism
-      This is the state management specification implemented by this module.
+   :rfc:`2109` - Cơ chế quản lý trạng thái HTTP
+      Đây là đặc tả quản lý trạng thái được module này triển khai.
 
 
 .. _cookie-objects:
 
-Cookie Objects
---------------
+Đối tượng Cookie
+----------------
 
 
 .. method:: BaseCookie.value_decode(val)
 
-   Return a tuple ``(real_value, coded_value)`` from a string representation.
-   ``real_value`` can be any type. This method does no decoding in
-   :class:`BaseCookie` --- it exists so it can be overridden.
+   Trả về một tuple ``(real_value, coded_value)`` từ biểu diễn chuỗi. ``real_value`` có thể thuộc bất kỳ kiểu nào. Phương thức này không thực hiện giải mã trong
+   :class:`BaseCookie` --- nó tồn tại để có thể được ghi đè.
 
 
 .. method:: BaseCookie.value_encode(val)
 
-   Return a tuple ``(real_value, coded_value)``. *val* can be any type, but
-   ``coded_value`` will always be converted to a string.
-   This method does no encoding in :class:`BaseCookie` --- it exists so it can
-   be overridden.
+   Trả về một tuple ``(real_value, coded_value)``. *val* có thể thuộc bất kỳ kiểu nào, nhưng ``coded_value`` sẽ luôn được chuyển đổi thành một chuỗi. Phương thức này không thực hiện mã hóa trong :class:`BaseCookie` --- nó tồn tại để có thể được ghi đè.
 
-   In general, it should be the case that :meth:`value_encode` and
-   :meth:`value_decode` are inverses on the range of *value_decode*.
+   Nhìn chung, :meth:`value_encode` và
+   :meth:`value_decode` là các phép nghịch đảo trên miền giá trị của *value_decode*.
 
 
 .. method:: BaseCookie.output(attrs=None, header='Set-Cookie:', sep='\r\n')
 
-   Return a string representation suitable to be sent as HTTP headers. *attrs* and
-   *header* are sent to each :class:`Morsel`'s :meth:`~Morsel.output` method. *sep* is used
-   to join the headers together, and is by default the combination ``'\r\n'``
-   (CRLF).
+   Trả về một biểu diễn chuỗi phù hợp để gửi dưới dạng HTTP header. *attrs* và *header* được gửi đến từng :class:`Morsel` bằng phương thức :meth:`~Morsel.output`. *sep* được dùng để nối các header lại với nhau và theo mặc định là tổ hợp ``'\r\n'`` (CRLF).
 
 
 .. method:: BaseCookie.js_output(attrs=None)
 
-   Return an embeddable JavaScript snippet, which, if run on a browser which
-   supports JavaScript, will act the same as if the HTTP headers was sent.
+   Trả về một đoạn mã JavaScript có thể nhúng; nếu được chạy trên trình duyệt hỗ trợ JavaScript, đoạn mã này sẽ hoạt động giống như khi các HTTP header được gửi.
 
-   The meaning for *attrs* is the same as in :meth:`output`.
+   Ý nghĩa của *attrs* giống như trong :meth:`output`.
 
 
 .. method:: BaseCookie.load(rawdata)
 
-   If *rawdata* is a string, parse it as an ``HTTP_COOKIE`` and add the values
-   found there as :class:`Morsel`\ s. If it is a dictionary, it is equivalent to::
+   Nếu *rawdata* là một chuỗi, hãy phân tích cú pháp chuỗi đó như một ``HTTP_COOKIE`` và thêm các giá trị tìm thấy ở đó dưới dạng :class:`Morsel`\ s. Nếu đó là một dictionary, thì tương đương với::
 
       for k, v in rawdata.items():
           cookie[k] = v
@@ -122,149 +95,118 @@ Cookie Objects
 
 .. _morsel-objects:
 
-Morsel Objects
---------------
+Đối tượng Morsel
+----------------
 
 
 .. class:: Morsel
 
-   Abstract a key/value pair, which has some :rfc:`2109` attributes.
+   Trừu tượng hóa một cặp khóa/giá trị, có một số thuộc tính :rfc:`2109`.
 
-   Morsels are dictionary-like objects, whose set of keys is constant --- the valid
-   :rfc:`2109` attributes, which are:
+   Morsel là các đối tượng giống như dictionary, có tập hợp khóa cố định --- các
+   thuộc tính :rfc:`2109` hợp lệ gồm:
 
      .. attribute:: expires
-                    path
-                    comment
-                    domain
-                    max-age
-                    secure
-                    version
-                    httponly
-                    samesite
-                    partitioned
+                    path comment domain max-age secure version httponly samesite partitioned
 
-   The attribute :attr:`httponly` specifies that the cookie is only transferred
-   in HTTP requests, and is not accessible through JavaScript. This is intended
-   to mitigate some forms of cross-site scripting.
+   Thuộc tính :attr:`httponly` chỉ định rằng cookie chỉ được truyền trong các yêu cầu HTTP và không thể được truy cập thông qua JavaScript. Điều này nhằm giảm thiểu một số hình thức tấn công cross-site scripting.
 
-   The attribute :attr:`samesite` controls when the browser sends the cookie with
-   cross-site requests. This helps to mitigate CSRF attacks. Valid values are
-   "Strict" (only sent with same-site requests), "Lax" (sent with same-site
-   requests and top-level navigations), and "None" (sent with same-site and
-   cross-site requests). When using "None", the "secure" attribute must also
-   be set, as required by modern browsers.
+   Thuộc tính :attr:`samesite` kiểm soát thời điểm trình duyệt gửi cookie cùng các yêu cầu cross-site. Điều này giúp giảm thiểu các cuộc tấn công CSRF. Các giá trị hợp lệ là "Strict" (chỉ được gửi cùng các yêu cầu same-site), "Lax" (được gửi cùng các yêu cầu same-site và các thao tác điều hướng cấp cao nhất), và "None" (được gửi cùng các yêu cầu same-site và cross-site). Khi sử dụng "None", cũng phải đặt thuộc tính "secure", theo yêu cầu của các trình duyệt hiện đại.
 
-   The attribute :attr:`partitioned` indicates to user agents that these
-   cross-site cookies *should* only be available in the same top-level context
-   that the cookie was first set in. For this to be accepted by the user agent,
-   you **must** also set ``Secure``.
+   Thuộc tính :attr:`partitioned` cho user agent biết rằng các cookie cross-site này *chỉ nên* khả dụng trong cùng ngữ cảnh cấp cao nhất nơi cookie được thiết lập lần đầu. Để user agent chấp nhận điều này, bạn **phải** đồng thời thiết lập ``Secure``.
 
-   In addition, it is recommended to use the ``__Host`` prefix when setting
-   partitioned cookies to make them bound to the hostname and not the
-   registrable domain. Read
-   `CHIPS (Cookies Having Independent Partitioned State)`_
-   for full details and examples.
+   Ngoài ra, bạn nên sử dụng tiền tố ``__Host`` khi thiết lập các cookie được phân vùng để ràng buộc chúng với hostname thay vì registrable domain. Đọc `CHIPS (Cookies Having Independent Partitioned State) <CHIPS (Cookies Having Independent Partitioned State)_>`_ để biết đầy đủ chi tiết và ví dụ.
 
    .. _CHIPS (Cookies Having Independent Partitioned State): https://github.com/privacycg/CHIPS/blob/main/README.md
 
-   The keys are case-insensitive and their default value is ``''``.
+   Các khóa không phân biệt chữ hoa chữ thường và giá trị mặc định của chúng là ``''``.
 
    .. versionchanged:: 3.5
       :meth:`!__eq__` now takes :attr:`~Morsel.key` and :attr:`~Morsel.value`
-      into account.
+      có tính đến.
 
    .. versionchanged:: 3.7
-      Attributes :attr:`~Morsel.key`, :attr:`~Morsel.value` and
-      :attr:`~Morsel.coded_value` are read-only.  Use :meth:`~Morsel.set` for
-      setting them.
+      Các thuộc tính :attr:`~Morsel.key`, :attr:`~Morsel.value` và
+      :attr:`~Morsel.coded_value` chỉ được đọc. Dùng :meth:`~Morsel.set` để thiết lập chúng.
 
    .. versionchanged:: 3.8
-      Added support for the :attr:`samesite` attribute.
+      Đã thêm hỗ trợ cho thuộc tính :attr:`samesite`.
 
    .. versionchanged:: 3.14
-      Added support for the :attr:`partitioned` attribute.
+      Đã bổ sung hỗ trợ cho thuộc tính :attr:`partitioned`.
 
 
 .. attribute:: Morsel.value
 
-   The value of the cookie.
+   Giá trị của cookie.
 
 
 .. attribute:: Morsel.coded_value
 
-   The encoded value of the cookie --- this is what should be sent.
+   Giá trị đã mã hóa của cookie --- đây là giá trị cần được gửi đi.
 
 
 .. attribute:: Morsel.key
 
-   The name of the cookie.
+   Tên của cookie.
 
 
 .. method:: Morsel.set(key, value, coded_value)
 
-   Set the *key*, *value* and *coded_value* attributes.
+   Thiết lập các thuộc tính *key*, *value* và *coded_value*.
 
 
 .. method:: Morsel.isReservedKey(K)
 
-   Whether *K* is a member of the set of keys of a :class:`Morsel`.
+   *K* có phải là một phần tử trong tập hợp các khóa của :class:`Morsel` hay không.
 
 
 .. method:: Morsel.output(attrs=None, header='Set-Cookie:')
 
-   Return a string representation of the Morsel, suitable to be sent as an HTTP
-   header. By default, all the attributes are included, unless *attrs* is given, in
-   which case it should be a list of attributes to use. *header* is by default
-   ``"Set-Cookie:"``.
+   Trả về biểu diễn chuỗi của Morsel, phù hợp để gửi dưới dạng HTTP header. Theo mặc định, tất cả các thuộc tính đều được включ, trừ khi cung cấp *attrs*, trong trường hợp đó, giá trị này phải là danh sách các thuộc tính cần sử dụng. *header* theo mặc định là ``"Set-Cookie:"``.
 
 
 .. method:: Morsel.js_output(attrs=None)
 
-   Return an embeddable JavaScript snippet, which, if run on a browser which
-   supports JavaScript, will act the same as if the HTTP header was sent.
+   Trả về một đoạn mã JavaScript có thể nhúng; nếu được chạy trên trình duyệt hỗ trợ JavaScript, đoạn mã này sẽ hoạt động giống như khi tiêu đề HTTP được gửi.
 
-   The meaning for *attrs* is the same as in :meth:`output`.
+   Ý nghĩa của *attrs* giống như trong :meth:`output`.
 
 
 .. method:: Morsel.OutputString(attrs=None)
 
-   Return a string representing the Morsel, without any surrounding HTTP or
-   JavaScript.
+   Trả về một chuỗi biểu diễn Morsel, không có bất kỳ HTTP hoặc JavaScript bao quanh nào.
 
-   The meaning for *attrs* is the same as in :meth:`output`.
+   Ý nghĩa của *attrs* giống như trong :meth:`output`.
 
 
 .. method:: Morsel.update(values)
 
-   Update the values in the Morsel dictionary with the values in the dictionary
-   *values*.  Raise an error if any of the keys in the *values* dict is not a
-   valid :rfc:`2109` attribute.
+   Cập nhật các giá trị trong từ điển Morsel bằng các giá trị trong từ điển *values*. Phát sinh lỗi nếu bất kỳ khóa nào trong từ điển *values* không phải là thuộc tính :rfc:`2109` hợp lệ.
 
    .. versionchanged:: 3.5
-      an error is raised for invalid keys.
+      sẽ phát sinh lỗi đối với các khóa không hợp lệ.
 
 
 .. method:: Morsel.copy(value)
 
-   Return a shallow copy of the Morsel object.
+   Trả về một bản sao nông của đối tượng Morsel.
 
    .. versionchanged:: 3.5
-      return a Morsel object instead of a dict.
+      trả về một đối tượng Morsel thay vì một dict.
 
 
 .. method:: Morsel.setdefault(key, value=None)
 
-   Raise an error if key is not a valid :rfc:`2109` attribute, otherwise
-   behave the same as :meth:`dict.setdefault`.
+   Phát sinh lỗi nếu key không phải là thuộc tính :rfc:`2109` hợp lệ; nếu không thì hoạt động giống như :meth:`dict.setdefault`.
 
 
 .. _cookie-example:
 
-Example
--------
+Ví dụ
+-----
 
-The following example demonstrates how to use the :mod:`!http.cookies` module.
+Ví dụ sau đây minh họa cách sử dụng module :mod:`!http.cookies`.
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -273,10 +215,10 @@ The following example demonstrates how to use the :mod:`!http.cookies` module.
    >>> C = cookies.SimpleCookie()
    >>> C["fig"] = "newton"
    >>> C["sugar"] = "wafer"
-   >>> print(C) # generate HTTP headers
+   >>> print(C) # tạo các HTTP header
    Set-Cookie: fig=newton
    Set-Cookie: sugar=wafer
-   >>> print(C.output()) # same thing
+   >>> print(C.output()) # tương tự
    Set-Cookie: fig=newton
    Set-Cookie: sugar=wafer
    >>> C = cookies.SimpleCookie()
@@ -287,7 +229,7 @@ The following example demonstrates how to use the :mod:`!http.cookies` module.
    >>> print(C.output(attrs=[], header="Cookie:"))
    Cookie: rocky=road
    >>> C = cookies.SimpleCookie()
-   >>> C.load("chips=ahoy; vienna=finger") # load from a string (HTTP header)
+   >>> C.load("chips=ahoy; vienna=finger") # nạp từ một chuỗi (HTTP header)
    >>> print(C)
    Set-Cookie: chips=ahoy
    Set-Cookie: vienna=finger
@@ -305,7 +247,7 @@ The following example demonstrates how to use the :mod:`!http.cookies` module.
    >>> C["twix"].value
    'none for you'
    >>> C = cookies.SimpleCookie()
-   >>> C["number"] = 7 # equivalent to C["number"] = str(7)
+   >>> C["number"] = 7 # tương đương với C["number"] = str(7)
    >>> C["string"] = "seven"
    >>> C["number"].value
    '7'

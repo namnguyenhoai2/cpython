@@ -1,16 +1,12 @@
 .. _persistence:
 
-****************
-Data Persistence
-****************
+***********************
+Lưu trữ dữ liệu lâu dài
+***********************
 
-The modules described in this chapter support storing Python data in a
-persistent form on disk.  The :mod:`pickle` and :mod:`marshal` modules can turn
-many Python data types into a stream of bytes and then recreate the objects from
-the bytes.  The various DBM-related modules support a family of hash-based file
-formats that store a mapping of strings to other strings.
+Các module được mô tả trong chương này hỗ trợ lưu trữ dữ liệu Python dưới dạng bền vững trên đĩa. Các module :mod:`pickle` và :mod:`marshal` có thể chuyển nhiều kiểu dữ liệu Python thành một luồng byte, sau đó tạo lại các đối tượng từ những byte đó. Các module liên quan đến DBM hỗ trợ một nhóm định dạng tệp dựa trên bảng băm, dùng để lưu ánh xạ từ chuỗi sang các chuỗi khác.
 
-The list of modules described in this chapter is:
+Danh sách các module được mô tả trong chương này là:
 
 
 .. toctree::

@@ -1,10 +1,10 @@
-:mod:`!timeit` --- Measure execution time of small code snippets
-================================================================
+:mod:`!timeit` --- Đo thời gian thực thi các đoạn mã nhỏ
+========================================================
 
 .. module:: timeit
-   :synopsis: Measure the execution time of small code snippets.
+   :synopsis: Đo thời gian thực thi các đoạn mã nhỏ.
 
-**Source code:** :source:`Lib/timeit.py`
+**Mã nguồn:** :source:`Lib/timeit.py`
 
 .. index::
    single: Benchmarking
@@ -12,18 +12,13 @@
 
 --------------
 
-This module provides a simple way to time small bits of Python code. It has both
-a :ref:`timeit-command-line-interface` as well as a :ref:`callable <python-interface>`
-one.  It avoids a number of common traps for measuring execution times.
-See also Tim Peters' introduction to the "Algorithms" chapter in the second
-edition of *Python Cookbook*, published by O'Reilly.
+Mô-đun này cung cấp một cách đơn giản để đo thời gian thực thi các đoạn mã Python nhỏ. Mô-đun có cả :ref:`timeit-command-line-interface` và một :ref:`callable <python-interface>`. Mô-đun tránh được một số sai lầm phổ biến khi đo thời gian thực thi. Xem thêm phần giới thiệu của Tim Peters trong chương "Algorithms" của ấn bản thứ hai của *Python Cookbook*, do O'Reilly xuất bản.
 
 
-Basic Examples
---------------
+Các ví dụ cơ bản
+----------------
 
-The following example shows how the :ref:`timeit-command-line-interface`
-can be used to compare three different expressions:
+Ví dụ sau đây cho thấy cách sử dụng :ref:`timeit-command-line-interface` để so sánh ba biểu thức khác nhau:
 
 .. code-block:: shell-session
 
@@ -34,7 +29,7 @@ can be used to compare three different expressions:
    $ python -m timeit "'-'.join(map(str, range(100)))"
    10000 loops, best of 5: 23.2 usec per loop
 
-This can be achieved from the :ref:`python-interface` with::
+Bạn có thể thực hiện việc này từ :ref:`python-interface` bằng::
 
    >>> import timeit
    >>> timeit.timeit('"-".join(str(n) for n in range(100))', number=10000)
@@ -44,53 +39,45 @@ This can be achieved from the :ref:`python-interface` with::
    >>> timeit.timeit('"-".join(map(str, range(100)))', number=10000)
    0.23702679807320237
 
-A callable can also be passed from the :ref:`python-interface`::
+Một callable cũng có thể được truyền từ :ref:`python-interface`::
 
    >>> timeit.timeit(lambda: "-".join(map(str, range(100))), number=10000)
    0.19665591977536678
 
-Note however that :func:`.timeit` will automatically determine the number of
-repetitions only when the command-line interface is used.  In the
-:ref:`timeit-examples` section you can find more advanced examples.
+Tuy nhiên, lưu ý rằng :func:`.timeit` sẽ tự động xác định số lần lặp chỉ khi sử dụng giao diện dòng lệnh.  Trong
+:ref:`timeit-examples` bạn có thể tìm thấy các ví dụ nâng cao hơn.
 
 
 .. _python-interface:
 
-Python Interface
+Giao diện Python
 ----------------
 
-The module defines three convenience functions and a public class:
+Mô-đun này định nghĩa ba hàm tiện ích và một lớp công khai:
 
 
 .. function:: timeit(stmt='pass', setup='pass', timer=<default timer>, number=1000000, globals=None)
 
-   Create a :class:`Timer` instance with the given statement, *setup* code and
-   *timer* function and run its :meth:`.timeit` method with *number* executions.
-   The optional *globals* argument specifies a namespace in which to execute the
-   code.
+   Tạo một thực thể :class:`Timer` với câu lệnh, mã *setup* và hàm *timer* đã cho, rồi chạy phương thức :meth:`.timeit` của nó với *number* lần thực thi. Đối số tùy chọn *globals* chỉ định một namespace để thực thi mã.
 
    .. versionchanged:: 3.5
-      The optional *globals* parameter was added.
+      Tham số tùy chọn *globals* đã được thêm vào.
 
 
 .. function:: repeat(stmt='pass', setup='pass', timer=<default timer>, repeat=5, number=1000000, globals=None)
 
-   Create a :class:`Timer` instance with the given statement, *setup* code and
-   *timer* function and run its :meth:`.repeat` method with the given *repeat*
-   count and *number* executions.  The optional *globals* argument specifies a
-   namespace in which to execute the code.
+   Tạo một thực thể :class:`Timer` với câu lệnh đã cho, mã *setup* và hàm *timer*, rồi chạy phương thức :meth:`.repeat` của nó với số lần *repeat* và số lần thực thi *number* đã cho. Đối số tùy chọn *globals* chỉ định một namespace để thực thi mã.
 
    .. versionchanged:: 3.5
-      The optional *globals* parameter was added.
+      Tham số tùy chọn *globals* đã được thêm vào.
 
    .. versionchanged:: 3.7
-      Default value of *repeat* changed from 3 to 5.
+      Giá trị mặc định của *repeat* đã thay đổi từ 3 thành 5.
 
 
 .. function:: default_timer()
 
-   The default timer, which is always time.perf_counter(), returns float seconds.
-   An alternative, time.perf_counter_ns, returns integer nanoseconds.
+   Timer mặc định, luôn là time.perf_counter(), trả về số giây kiểu float. Một lựa chọn khác, time.perf_counter_ns, trả về số nano giây kiểu integer.
 
    .. versionchanged:: 3.3
       :func:`time.perf_counter` is now the default timer.
@@ -98,184 +85,133 @@ The module defines three convenience functions and a public class:
 
 .. class:: Timer(stmt='pass', setup='pass', timer=<timer function>, globals=None)
 
-   Class for timing execution speed of small code snippets.
+   Lớp dùng để đo tốc độ thực thi của các đoạn mã nhỏ.
 
-   The constructor takes a statement to be timed, an additional statement used
-   for setup, and a timer function.  Both statements default to ``'pass'``;
-   the timer function is platform-dependent (see the module doc string).
-   *stmt* and *setup* may also contain multiple statements separated by ``;``
-   or newlines, as long as they don't contain multi-line string literals.  The
-   statement will by default be executed within timeit's namespace; this behavior
-   can be controlled by passing a namespace to *globals*.
+   Hàm khởi tạo nhận một câu lệnh cần đo thời gian, một câu lệnh bổ sung dùng để thiết lập và một hàm timer. Cả hai câu lệnh đều mặc định là ``'pass'``; hàm timer phụ thuộc vào nền tảng (xem doc string của module). *stmt* và *setup* cũng có thể chứa nhiều câu lệnh được phân tách bằng ``;`` hoặc các dòng mới, miễn là chúng không chứa các string literal nhiều dòng. Theo mặc định, câu lệnh sẽ được thực thi trong namespace của timeit; có thể kiểm soát hành vi này bằng cách truyền một namespace cho *globals*.
 
-   To measure the execution time of the first statement, use the :meth:`.timeit`
-   method.  The :meth:`.repeat` and :meth:`.autorange` methods are convenience
-   methods to call :meth:`.timeit` multiple times.
+   Để đo thời gian thực thi của câu lệnh đầu tiên, hãy sử dụng phương thức :meth:`.timeit`. Phương thức :meth:`.repeat` và :meth:`.autorange` là các phương thức tiện ích để gọi :meth:`.timeit` nhiều lần.
 
-   The execution time of *setup* is excluded from the overall timed execution run.
+   Thời gian thực thi của *setup* không được tính vào toàn bộ lần chạy thực thi được đo thời gian.
 
-   The *stmt* and *setup* parameters can also take objects that are callable
-   without arguments.  This will embed calls to them in a timer function that
-   will then be executed by :meth:`.timeit`.  Note that the timing overhead is a
-   little larger in this case because of the extra function calls.
+   Các tham số *stmt* và *setup* cũng có thể nhận các đối tượng có thể được gọi mà không cần đối số. Khi đó, các lệnh gọi đến chúng sẽ được nhúng vào một hàm timer, rồi hàm này sẽ được thực thi bởi :meth:`.timeit`. Lưu ý rằng trong trường hợp này, overhead đo thời gian sẽ lớn hơn một chút do có thêm các lệnh gọi hàm.
 
    .. versionchanged:: 3.5
-      The optional *globals* parameter was added.
+      Tham số tùy chọn *globals* đã được thêm vào.
 
    .. method:: Timer.timeit(number=1000000)
 
-      Time *number* executions of the main statement.  This executes the setup
-      statement once, and then returns the time it takes to execute the main
-      statement a number of times.  The default timer returns seconds as a float.
-      The argument is the number of times through the loop, defaulting to one
-      million.  The main statement, the setup statement and the timer function
-      to be used are passed to the constructor.
+      Đo thời gian thực thi *number* lần của câu lệnh chính. Thao tác này thực thi câu lệnh setup một lần, sau đó trả về thời gian cần để thực thi câu lệnh chính một số lần. Timer mặc định trả về số giây dưới dạng số thực. Đối số là số lần lặp, mặc định là một triệu. Câu lệnh chính, câu lệnh setup và hàm timer cần sử dụng được truyền cho constructor.
 
       .. note::
 
-         By default, :meth:`.timeit` temporarily turns off :term:`garbage
-         collection` during the timing.  The advantage of this approach is that
-         it makes independent timings more comparable.  The disadvantage is
-         that GC may be an important component of the performance of the
-         function being measured.  If so, GC can be re-enabled as the first
-         statement in the *setup* string.  For example::
+         Theo mặc định, :meth:`.timeit` tạm thời tắt :term:`garbage collection` trong khi đo thời gian. Ưu điểm của cách tiếp cận này là giúp các phép đo thời gian độc lập có tính so sánh cao hơn. Nhược điểm là GC có thể là một thành phần quan trọng trong hiệu năng của hàm được đo. Nếu vậy, có thể bật lại GC làm câu lệnh đầu tiên trong chuỗi *setup*. Ví dụ::
 
             timeit.Timer('for i in range(10): oct(i)', 'gc.enable()').timeit()
 
 
    .. method:: Timer.autorange(callback=None)
 
-      Automatically determine how many times to call :meth:`.timeit`.
+      Tự động xác định số lần cần gọi :meth:`.timeit`.
 
-      This is a convenience function that calls :meth:`.timeit` repeatedly
-      so that the total time >= 0.2 second, returning the eventual
-      (number of loops, time taken for that number of loops). It calls
-      :meth:`.timeit` with increasing numbers from the sequence 1, 2, 5,
-      10, 20, 50, ... until the time taken is at least 0.2 seconds.
+      Tự động gọi :meth:`.timeit` nhiều lần để tổng thời gian >= 0.2 giây, rồi trả về (số vòng lặp, thời gian cần cho số vòng lặp đó) cuối cùng. Hàm này gọi
+      :meth:`.timeit` với các số tăng dần theo dãy 1, 2, 5, 10, 20, 50, ... cho đến khi thời gian thực thi ít nhất là 0.2 giây.
 
-      If *callback* is given and is not ``None``, it will be called after
-      each trial with two arguments: ``callback(number, time_taken)``.
+      Nếu *callback* được cung cấp và không phải là ``None``, hàm này sẽ được gọi sau mỗi lần chạy thử với hai đối số: ``callback(number, time_taken)``.
 
       .. versionadded:: 3.6
 
 
    .. method:: Timer.repeat(repeat=5, number=1000000)
 
-      Call :meth:`.timeit` a few times.
+      Gọi :meth:`.timeit` vài lần.
 
-      This is a convenience function that calls the :meth:`.timeit` repeatedly,
-      returning a list of results.  The first argument specifies how many times
-      to call :meth:`.timeit`.  The second argument specifies the *number*
-      argument for :meth:`.timeit`.
+      Đây là một hàm tiện ích gọi :meth:`.timeit` lặp đi lặp lại và trả về một danh sách kết quả. Đối số đầu tiên chỉ định số lần gọi :meth:`.timeit`. Đối số thứ hai chỉ định đối số *number* cho :meth:`.timeit`.
 
       .. note::
 
-         It's tempting to calculate mean and standard deviation from the result
-         vector and report these.  However, this is not very useful.
-         In a typical case, the lowest value gives a lower bound for how fast
-         your machine can run the given code snippet; higher values in the
-         result vector are typically not caused by variability in Python's
-         speed, but by other processes interfering with your timing accuracy.
-         So the :func:`min` of the result is probably the only number you
-         should be interested in.  After that, you should look at the entire
-         vector and apply common sense rather than statistics.
+         Việc tính giá trị trung bình và độ lệch chuẩn từ vector kết quả rồi báo cáo các giá trị này có vẻ hấp dẫn. Tuy nhiên, cách này không hữu ích lắm. Trong trường hợp điển hình, giá trị thấp nhất cung cấp một cận dưới cho tốc độ mà máy của bạn có thể chạy đoạn mã đã cho; các giá trị cao hơn trong vector kết quả thường không phải do tốc độ của Python biến thiên, mà do các tiến trình khác can thiệp vào độ chính xác đo thời gian của bạn. Vì vậy, :func:`min` của kết quả có lẽ là con số duy nhất bạn cần quan tâm. Sau đó, bạn nên xem toàn bộ vector và vận dụng suy luận thông thường thay vì thống kê.
 
       .. versionchanged:: 3.7
-         Default value of *repeat* changed from 3 to 5.
+         Giá trị mặc định của *repeat* đã thay đổi từ 3 thành 5.
 
 
    .. method:: Timer.print_exc(file=None)
 
-      Helper to print a traceback from the timed code.
+      Hàm trợ giúp để in traceback từ đoạn mã được đo thời gian.
 
-      Typical use::
+      Cách sử dụng điển hình::
 
-         t = Timer(...)       # outside the try/except
+         t = Timer(...)       # bên ngoài try/except
          try:
-             t.timeit(...)    # or t.repeat(...)
+             t.timeit(...)    # hoặc t.repeat(...)
          except Exception:
              t.print_exc()
 
-      The advantage over the standard traceback is that source lines in the
-      compiled template will be displayed.  The optional *file* argument directs
-      where the traceback is sent; it defaults to :data:`sys.stderr`.
+      Ưu điểm so với traceback tiêu chuẩn là các dòng mã nguồn trong template đã biên dịch sẽ được hiển thị. Đối số tùy chọn *file* xác định nơi gửi traceback; mặc định là :data:`sys.stderr`.
 
 
 .. _timeit-command-line-interface:
 
-Command-Line Interface
-----------------------
+Giao diện dòng lệnh
+-------------------
 
-When called as a program from the command line, the following form is used::
+Khi được gọi dưới dạng một chương trình từ dòng lệnh, sử dụng dạng sau::
 
    python -m timeit [-n N] [-r N] [-u U] [-s S] [-p] [-v] [-h] [statement ...]
 
-Where the following options are understood:
+Các tùy chọn sau được hỗ trợ:
 
 .. program:: timeit
 
 .. option:: -n N, --number=N
 
-   how many times to execute 'statement'
+   số lần thực thi 'statement'
 
 .. option:: -r N, --repeat=N
 
-   how many times to repeat the timer (default 5)
+   số lần lặp lại timer (mặc định là 5)
 
 .. option:: -s S, --setup=S
 
-   statement to be executed once initially (default ``pass``)
+   statement sẽ được thực thi một lần ban đầu (mặc định là ``pass``)
 
 .. option:: -p, --process
 
-   measure process time, not wallclock time, using :func:`time.process_time`
-   instead of :func:`time.perf_counter`, which is the default
+   đo thời gian process, không phải thời gian thực, bằng :func:`time.process_time` thay vì :func:`time.perf_counter`, là giá trị mặc định
 
    .. versionadded:: 3.3
 
 .. option:: -u, --unit=U
 
-   specify a time unit for timer output; can select ``nsec``, ``usec``, ``msec``, or ``sec``
+   chỉ định đơn vị thời gian cho đầu ra của timer; có thể chọn ``nsec``, ``usec``, ``msec`` hoặc ``sec``
 
    .. versionadded:: 3.5
 
 .. option:: -v, --verbose
 
-   print raw timing results; repeat for more digits precision
+   in kết quả đo thời gian thô; lặp lại để có độ chính xác cao hơn
 
 .. option:: -h, --help
 
-   print a short usage message and exit
+   in thông báo hướng dẫn sử dụng ngắn gọn rồi thoát
 
-A multi-line statement may be given by specifying each line as a separate
-statement argument; indented lines are possible by enclosing an argument in
-quotes and using leading spaces.  Multiple :option:`-s` options are treated
-similarly.
+Có thể cung cấp một câu lệnh nhiều dòng bằng cách chỉ định mỗi dòng như một đối số câu lệnh riêng; có thể thụt lề các dòng bằng cách đặt một đối số trong dấu ngoặc kép và sử dụng các khoảng trắng ở đầu. Nhiều tùy chọn :option:`-s` được xử lý tương tự.
 
-If :option:`-n` is not given, a suitable number of loops is calculated by trying
-increasing numbers from the sequence 1, 2, 5, 10, 20, 50, ... until the total
-time is at least 0.2 seconds.
+Nếu không cung cấp :option:`-n`, chương trình sẽ tính số vòng lặp phù hợp bằng cách thử các số tăng dần trong dãy 1, 2, 5, 10, 20, 50, ... cho đến khi tổng thời gian đạt ít nhất 0,2 giây.
 
-:func:`default_timer` measurements can be affected by other programs running on
-the same machine, so the best thing to do when accurate timing is necessary is
-to repeat the timing a few times and use the best time.  The :option:`-r`
-option is good for this; the default of 5 repetitions is probably enough in
-most cases.  You can use :func:`time.process_time` to measure CPU time.
+Các phép đo :func:`default_timer` có thể bị ảnh hưởng bởi những chương trình khác đang chạy trên cùng máy, vì vậy khi cần đo thời gian chính xác, cách tốt nhất là lặp lại phép đo vài lần và sử dụng thời gian tốt nhất. Tùy chọn :option:`-r` phù hợp cho việc này; mặc định 5 lần lặp có lẽ là đủ trong hầu hết trường hợp. Bạn có thể sử dụng :func:`time.process_time` để đo thời gian CPU.
 
 .. note::
 
-   There is a certain baseline overhead associated with executing a pass statement.
-   The code here doesn't try to hide it, but you should be aware of it.  The
-   baseline overhead can be measured by invoking the program without arguments,
-   and it might differ between Python versions.
+   Việc thực thi một câu lệnh pass có một phần overhead cơ sở nhất định. Đoạn mã này không cố che giấu phần overhead đó, nhưng bạn nên lưu ý đến nó. Có thể đo overhead cơ sở bằng cách gọi chương trình mà không có đối số; giá trị này có thể khác nhau giữa các phiên bản Python.
 
 
 .. _timeit-examples:
 
-Examples
---------
+Ví dụ
+-----
 
-It is possible to provide a setup statement that is executed only once at the beginning:
+Bạn có thể cung cấp một câu lệnh setup chỉ được thực thi một lần ở đầu:
 
 .. code-block:: shell-session
 
@@ -284,12 +220,7 @@ It is possible to provide a setup statement that is executed only once at the be
    $ python -m timeit -s "text = 'sample string'; char = 'g'" "text.find(char)"
    1000000 loops, best of 5: 0.342 usec per loop
 
-In the output, there are three fields. The loop count, which tells you how many
-times the statement body was run per timing loop repetition. The repetition
-count ('best of 5') which tells you how many times the timing loop was
-repeated, and finally the time the statement body took on average within the
-best repetition of the timing loop. That is, the time the fastest repetition
-took divided by the loop count.
+Trong kết quả đầu ra có ba trường. Trường thứ nhất là số vòng lặp, cho biết phần thân câu lệnh được chạy bao nhiêu lần trong mỗi lần lặp đo thời gian. Trường thứ hai là số lần lặp ("tốt nhất trong 5 lần"), cho biết vòng lặp đo thời gian được lặp lại bao nhiêu lần. Cuối cùng là thời gian trung bình mà phần thân câu lệnh mất trong lần lặp tốt nhất của vòng lặp đo thời gian. Nói cách khác, đó là thời gian của lần lặp nhanh nhất chia cho số vòng lặp.
 
 ::
 
@@ -299,7 +230,7 @@ took divided by the loop count.
    >>> timeit.timeit('text.find(char)', setup='text = "sample string"; char = "g"')
    1.7246671520006203
 
-The same can be done using the :class:`Timer` class and its methods::
+Bạn cũng có thể thực hiện tương tự bằng cách sử dụng lớp :class:`Timer` và các phương thức của lớp đó::
 
    >>> import timeit
    >>> t = timeit.Timer('char in text', setup='text = "sample string"; char = "g"')
@@ -309,9 +240,7 @@ The same can be done using the :class:`Timer` class and its methods::
    [0.40183617287970225, 0.37027556854118704, 0.38344867356679524, 0.3712595970846668, 0.37866875250654886]
 
 
-The following examples show how to time expressions that contain multiple lines.
-Here we compare the cost of using :func:`hasattr` vs. :keyword:`try`/:keyword:`except`
-to test for missing and present object attributes:
+Các ví dụ sau đây cho thấy cách đo thời gian của những biểu thức chứa nhiều dòng. Ở đây, chúng ta so sánh chi phí của việc sử dụng :func:`hasattr` với :keyword:`try`/:keyword:`except` để kiểm tra các thuộc tính đối tượng bị thiếu và hiện có:
 
 .. code-block:: shell-session
 
@@ -328,7 +257,7 @@ to test for missing and present object attributes:
 ::
 
    >>> import timeit
-   >>> # attribute is missing
+   >>> # thuộc tính bị thiếu
    >>> s = """\
    ... try:
    ...     str.__bool__
@@ -341,7 +270,7 @@ to test for missing and present object attributes:
    >>> timeit.timeit(stmt=s, number=100000)
    0.5829014980008651
    >>>
-   >>> # attribute is present
+   >>> # thuộc tính hiện có
    >>> s = """\
    ... try:
    ...     int.__bool__
@@ -355,8 +284,7 @@ to test for missing and present object attributes:
    0.08588060699912603
 
 
-To give the :mod:`!timeit` module access to functions you define, you can pass a
-*setup* parameter which contains an import statement::
+Để cấp cho module :mod:`!timeit` quyền truy cập vào các hàm bạn định nghĩa, bạn có thể truyền một tham số *setup* chứa một câu lệnh import::
 
    def test():
        """Stupid test function"""
@@ -366,9 +294,7 @@ To give the :mod:`!timeit` module access to functions you define, you can pass a
        import timeit
        print(timeit.timeit("test()", setup="from __main__ import test"))
 
-Another option is to pass :func:`globals` to the  *globals* parameter, which will cause the code
-to be executed within your current global namespace.  This can be more convenient
-than individually specifying imports::
+Một tùy chọn khác là truyền :func:`globals` vào tham số *globals*, khiến mã được thực thi trong namespace toàn cục hiện tại của bạn. Cách này có thể thuận tiện hơn so với việc chỉ định từng import riêng lẻ::
 
    def f(x):
        return x**2

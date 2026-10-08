@@ -1,13 +1,13 @@
-==================================
-:mod:`!turtle` --- Turtle graphics
-==================================
+================================
+:mod:`!turtle` --- Đồ họa Turtle
+================================
 
 .. module:: turtle
-   :synopsis: An educational framework for simple graphics applications
+   :synopsis: Một framework giáo dục dành cho các ứng dụng đồ họa đơn giản
 
 .. sectionauthor:: Gregor Lingl <gregor.lingl@aon.at>
 
-**Source code:** :source:`Lib/turtle.py`
+**Mã nguồn:** :source:`Lib/turtle.py`
 
 .. testsetup:: default
    :skipif: _tkinter is None
@@ -23,130 +23,103 @@
 
 --------------
 
-.. sidebar:: Turtle star
+.. sidebar:: Ngôi sao Turtle
 
-   Turtle can draw intricate shapes using programs that repeat simple
-   moves.
+   Turtle có thể vẽ các hình dạng phức tạp bằng những chương trình lặp lại các bước di chuyển đơn giản.
 
    .. image:: turtle-star.png
-      :alt: A yellow starburst of thin spikes with a red outline, drawn by turtle.
+      :alt: Một ngôi sao bùng nổ màu vàng với các tia mảnh và đường viền màu đỏ, được vẽ bằng turtle.
       :align: center
 
-Imagine a robotic turtle starting at (0, 0) in the x-y plane.
-After an ``import turtle``, give it the command ``turtle.forward(15)``, and it
-moves (on-screen!) 15 pixels in the direction it is facing, drawing a line as
-it moves. Give it the command ``turtle.right(25)``, and it rotates in-place 25
-degrees clockwise.
+Hãy tưởng tượng một chú turtle robot bắt đầu tại (0, 0) trên mặt phẳng x-y. Sau một ``import turtle``, hãy ra lệnh ``turtle.forward(15)`` cho nó, và nó sẽ di chuyển (trên màn hình!) 15 pixel theo hướng đang quay mặt tới, đồng thời vẽ một đường thẳng khi di chuyển. Ra lệnh ``turtle.right(25)`` cho nó, và nó sẽ xoay tại chỗ 25 độ theo chiều kim đồng hồ.
 
-Turtle graphics is an implementation of `the drawing tools introduced in Logo
-<https://en.wikipedia.org/wiki/Turtle_(robot)>`__ in 1967. It was created as an
-educational tool, and its instant, visible feedback makes it an effective way
-for learners to encounter programming concepts. It is also a convenient way to
-produce simple graphical output without bringing in external libraries.
+Đồ họa Turtle là một cách triển khai `các công cụ vẽ được giới thiệu trong Logo <https://en.wikipedia.org/wiki/Turtle_(robot)>`__ vào năm 1967. Nó được tạo ra như một công cụ giáo dục, và phản hồi tức thì, trực quan giúp nó trở thành một cách hiệu quả để người học tiếp cận các khái niệm lập trình. Đây cũng là một cách thuận tiện để tạo ra đầu ra đồ họa đơn giản mà không cần sử dụng các thư viện bên ngoài.
 
-This document includes four main sections:
+Tài liệu này gồm bốn phần chính:
 
-* :ref:`turtle-tutorial` teaches the basics of turtle drawing.
-* :ref:`turtle-reference` describes the functions, methods and classes this
-  module defines.
-* :ref:`turtle-howtos` detail how to handle specific tasks.
-* :ref:`turtle-explanation` provides background on the object-oriented
-  interface.
+* :ref:`turtle-tutorial` hướng dẫn những kiến thức cơ bản về vẽ bằng Turtle.
+* :ref:`turtle-reference` mô tả các hàm, phương thức và lớp mà module này định nghĩa.
+* :ref:`turtle-howtos` trình bày chi tiết cách xử lý các tác vụ cụ thể.
+* :ref:`turtle-explanation` cung cấp thông tin nền tảng về giao diện hướng đối tượng.
 
 .. note::
 
-   Turtle graphics requires the :mod:`tkinter` :term:`optional module`.
-   The python.org installers for Windows and macOS include it, but some
-   Linux distributions and other platforms may package it separately. If
-   ``import turtle`` fails with an error mentioning ``_tkinter``, look for
-   documentation from your distributor (that is, whoever provided Python to you).
-   Check this in advance if you're planning to use turtle graphics with a learner.
+   Đồ họa Turtle yêu cầu :mod:`tkinter` :term:`optional module`. Các trình cài đặt python.org dành cho Windows và macOS có sẵn thành phần này, nhưng một số bản phân phối Linux và các nền tảng khác có thể đóng gói riêng. Nếu ``import turtle`` không thành công với lỗi đề cập đến ``_tkinter``, hãy tìm tài liệu từ nhà phân phối của bạn (tức là bên đã cung cấp Python cho bạn). Hãy kiểm tra điều này trước nếu bạn dự định sử dụng đồ họa Turtle với người học.
 
 
 .. _turtle-tutorial:
 .. _get-started:
 .. _get-started-as-quickly-as-possible:
 
-Tutorial
-========
+Hướng dẫn
+=========
 
-New users should start here. In this tutorial we'll explore some of the
-basics of turtle drawing.
+Người dùng mới nên bắt đầu từ đây. Trong hướng dẫn này, chúng ta sẽ tìm hiểu một số kiến thức cơ bản về vẽ bằng turtle.
 
 
-Starting a turtle environment
------------------------------
+Khởi động môi trường turtle
+---------------------------
 
-In a Python shell, import all the objects of the ``turtle`` module::
+Trong Python shell, import tất cả các đối tượng của module ``turtle``::
 
     from turtle import *
 
-If you run into a ``No module named '_tkinter'`` error, you'll have to
-install the :mod:`Tk interface package <tkinter>` on your system.
+Nếu gặp lỗi ``No module named '_tkinter'``, bạn sẽ phải cài đặt :mod:`Tk interface package <tkinter>` trên hệ thống của mình.
 
 
-Basic drawing
--------------
+Vẽ cơ bản
+---------
 
-Send the turtle forward 100 steps::
+Điều khiển turtle tiến về phía trước 100 bước::
 
    forward(100)
 
-You should see (most likely, in a new window on your display) a line
-drawn by the turtle, heading East. Change the direction of the turtle,
-so that it turns 120 degrees left (anti-clockwise)::
+Bạn sẽ thấy (rất có thể là trong một cửa sổ mới trên màn hình) một đường thẳng do turtle vẽ, hướng về phía Đông. Hãy thay đổi hướng của turtle để nó quay 120 độ sang trái (ngược chiều kim đồng hồ)::
 
    left(120)
 
-Let's continue by drawing a triangle::
+Hãy tiếp tục bằng cách vẽ một hình tam giác::
 
    forward(100)
    left(120)
    forward(100)
 
-Notice how the turtle, represented by an arrow, points in different
-directions as you steer it.
+Hãy chú ý cách turtle, được biểu diễn bằng một mũi tên, chỉ theo các hướng khác nhau khi bạn điều khiển nó.
 
-Experiment with those commands, and also with ``backward()`` and
-``right()``. Many commands also have shorter aliases, such as ``fd()`` for
+Hãy thử nghiệm với những lệnh đó, cũng như ``backward()`` và ``right()``. Nhiều lệnh còn có các alias ngắn hơn, chẳng hạn như ``fd()`` cho
 :func:`forward`.
 
 
-Pen control
-^^^^^^^^^^^
+Điều khiển bút
+^^^^^^^^^^^^^^
 
-Try changing the color - for example, ``color('blue')`` - and
-width of the line - for example, ``width(3)`` - and then drawing again.
+Hãy thử thay đổi màu — chẳng hạn như ``color('blue')`` — và độ rộng của đường — chẳng hạn như ``width(3)`` — rồi vẽ lại.
 
-You can also move the turtle around without drawing, by lifting up the pen:
-``up()`` before moving. To start drawing again, use ``down()``.
+Bạn cũng có thể di chuyển turtle mà không vẽ bằng cách nhấc bút lên: ``up()`` trước khi di chuyển. Để bắt đầu vẽ lại, hãy sử dụng ``down()``.
 
 
-The turtle's position
-^^^^^^^^^^^^^^^^^^^^^
+Vị trí của rùa
+^^^^^^^^^^^^^^
 
-Send your turtle back to its starting-point (useful if it has disappeared
-off-screen)::
+Đưa rùa trở về điểm bắt đầu (hữu ích nếu rùa đã biến mất khỏi màn hình)::
 
    home()
 
-The home position is at the center of the turtle's screen. If you ever need to
-know them, get the turtle's x-y coordinates with::
+Vị trí home nằm ở chính giữa màn hình của rùa. Nếu cần biết vị trí này, hãy lấy tọa độ x-y của rùa bằng::
 
     pos()
 
-Home is at ``(0, 0)``.
+Home nằm tại ``(0, 0)``.
 
-And after a while, it will probably help to clear the window so we can start
-anew::
+Và sau một lúc, có lẽ bạn sẽ muốn xóa cửa sổ để chúng ta có thể bắt đầu lại::
 
    clearscreen()
 
 
-Making algorithmic patterns
+Tạo các mẫu hình thuật toán
 ---------------------------
 
-Using loops, it's possible to build up geometric patterns::
+Bằng cách sử dụng các vòng lặp, bạn có thể tạo nên các mẫu hình hình học::
 
     for steps in range(100):
         for c in ('blue', 'red', 'green'):
@@ -155,20 +128,18 @@ Using loops, it's possible to build up geometric patterns::
             right(30)
 
 
-\ - which of course, are limited only by the imagination!
+\  - tất nhiên, chỉ bị giới hạn bởi trí tưởng tượng!
 
-Let's draw the star shape at the top of this page. We want red lines,
-filled in with yellow::
+Hãy vẽ hình ngôi sao ở đầu trang này. Chúng ta muốn các đường màu đỏ, được tô màu vàng::
 
     color('red')
     fillcolor('yellow')
 
-Just as ``up()`` and ``down()`` determine whether lines will be drawn,
-filling can be turned on and off::
+Cũng như ``up()`` và ``down()`` xác định liệu các đường có được vẽ hay không, việc tô màu cũng có thể được bật và tắt::
 
     begin_fill()
 
-Next we'll create a loop::
+Tiếp theo, chúng ta sẽ tạo một vòng lặp::
 
     start = pos()
 
@@ -178,44 +149,40 @@ Next we'll create a loop::
         if distance(start) < 1:
             break
 
-``distance(start) < 1`` is a good way to know when the turtle is back at its
-start position.
+``distance(start) < 1`` là một cách hữu ích để biết khi nào turtle quay lại vị trí bắt đầu.
 
-Finally, complete the filling::
+Cuối cùng, hãy hoàn tất việc tô màu::
 
     end_fill()
 
-(Note that filling only actually takes place when you give the
-``end_fill()`` command.)
+(Lưu ý rằng việc tô màu chỉ thực sự diễn ra khi bạn đưa ra lệnh ``end_fill()``.)
 
 
 .. _turtle-reference:
 .. _turtle-graphics-reference:
 
-Reference
+Tham khảo
 =========
 
 .. _turtle-methods:
 .. _methods-of-rawturtle-turtle-and-corresponding-functions:
 
-Turtle methods and functions
-----------------------------
+Các phương thức và hàm của Turtle
+---------------------------------
 
-Most of the examples in this section refer to a Turtle instance called
-``turtle``.
+Hầu hết các ví dụ trong phần này đều tham chiếu đến một thực thể Turtle có tên là ``turtle``.
 
 .. _turtle-motion:
 
-Move and draw
-^^^^^^^^^^^^^
+Di chuyển và vẽ
+^^^^^^^^^^^^^^^
 
 .. function:: forward(distance)
               fd(distance)
 
-   :param distance: a number
+   :param distance: một số
 
-   Move the turtle forward by the specified *distance*, in the direction the
-   turtle is headed.
+   Di chuyển rùa về phía trước theo *khoảng cách* được chỉ định, theo hướng rùa đang hướng tới.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -231,13 +198,11 @@ Move and draw
 
 
 .. function:: back(distance)
-              bk(distance)
-              backward(distance)
+              bk(distance) backward(distance)
 
-   :param distance: a number
+   :param distance: một số
 
-   Move the turtle backward by *distance*, opposite to the direction the
-   turtle is headed. The turtle's heading does not change.
+   Di chuyển turtle lùi lại một khoảng *distance*, ngược với hướng turtle đang hướng tới. Hướng của turtle không thay đổi.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -258,12 +223,10 @@ Move and draw
 .. function:: right(angle)
               rt(angle)
 
-   :param angle: a number
+   :param angle: một số
 
-   Turn the turtle right by the specified *angle*. The angle is measured in
-   degrees by default; the unit can be changed with :func:`degrees` or
-   :func:`radians`. How the heading is measured depends on the turtle mode,
-   see :func:`mode`.
+   Xoay turtle sang phải theo *angle* được chỉ định. Theo mặc định, góc được đo bằng độ; có thể thay đổi đơn vị bằng :func:`degrees` hoặc
+   :func:`radians`. Cách đo hướng phụ thuộc vào chế độ của turtle, xem :func:`mode`.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -284,12 +247,10 @@ Move and draw
 .. function:: left(angle)
               lt(angle)
 
-   :param angle: a number
+   :param angle: một số
 
-   Turn the turtle left by the specified *angle*. The angle is measured in
-   degrees by default; the unit can be changed with :func:`degrees` or
-   :func:`radians`. How the heading is measured depends on the turtle mode,
-   see :func:`mode`.
+   Xoay turtle sang trái theo *góc* được chỉ định. Theo mặc định, góc được đo bằng độ; đơn vị có thể được thay đổi bằng :func:`degrees` hoặc
+   :func:`radians`. Cách đo hướng phụ thuộc vào chế độ của turtle, xem :func:`mode`.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -308,16 +269,13 @@ Move and draw
 
 
 .. function:: goto(x, y=None)
-              setpos(x, y=None)
-              setposition(x, y=None)
+              setpos(x, y=None) setposition(x, y=None)
 
-   :param x: a number or a pair/vector of numbers
-   :param y: a number or ``None``
+   :param x: một số hoặc một cặp/vector số
+   :param y: một số hoặc ``None``
 
-   Move the turtle to an absolute position. If *y* is ``None``, *x* must be a
-   pair of coordinates or a :class:`Vec2D`, for example as returned by
-   :func:`pos`. If the pen is down, a line is drawn. The turtle's heading does
-   not change.
+   Di chuyển turtle đến một vị trí tuyệt đối. Nếu *y* là ``None``, *x* phải là một cặp tọa độ hoặc một :class:`Vec2D`, chẳng hạn như giá trị được trả về bởi
+   :func:`pos`. Nếu bút đang hạ, một đường thẳng sẽ được vẽ. Hướng của turtle không thay đổi.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -344,16 +302,11 @@ Move and draw
 
 .. function:: teleport(x, y=None, *, fill_gap=False)
 
-   :param x: a number or ``None``
-   :param y: a number or ``None``
-   :param fill_gap: a boolean
+   :param x: một số hoặc ``None``
+   :param y: một số hoặc ``None``
+   :param fill_gap: một giá trị boolean
 
-   Move turtle to an absolute position. Unlike goto(x, y), a line will not
-   be drawn. The turtle's orientation does not change. If currently
-   filling, the polygon(s) teleported from will be filled after leaving,
-   and filling will begin again after teleporting. This can be disabled
-   with fill_gap=True, which makes the imaginary line traveled during
-   teleporting act as a fill barrier like in goto(x, y).
+   Di chuyển turtle đến một vị trí tuyệt đối. Không giống như goto(x, y), thao tác này sẽ không vẽ đường thẳng. Hướng của turtle không thay đổi. Nếu hiện đang tô, đa giác mà turtle được dịch chuyển khỏi đó sẽ được tô sau khi rời đi, và việc tô sẽ bắt đầu lại sau khi dịch chuyển. Có thể vô hiệu hóa hành vi này bằng fill_gap=True, khiến đường tưởng tượng mà turtle đi qua trong khi dịch chuyển hoạt động như một rào chắn đối với việc tô, giống như trong goto(x, y).
 
    .. doctest::
       :skipif: _tkinter is None
@@ -382,9 +335,9 @@ Move and draw
 
 .. function:: setx(x)
 
-   :param x: a number
+   :param x: một số
 
-   Set the turtle's x coordinate to *x*. The y coordinate is unchanged.
+   Đặt tọa độ x của rùa thành *x*. Tọa độ y không thay đổi.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -404,9 +357,9 @@ Move and draw
 
 .. function:: sety(y)
 
-   :param y: a number
+   :param y: một số
 
-   Set the turtle's y coordinate to *y*. The x coordinate is unchanged.
+   Đặt tọa độ y của rùa thành *y*. Tọa độ x không thay đổi.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -427,19 +380,21 @@ Move and draw
 .. function:: setheading(to_angle)
               seth(to_angle)
 
-   :param to_angle: a number
+   :param to_angle: một số
 
-   Set the turtle's heading to *to_angle*. Here are some common directions in
-   degrees:
+   Đặt hướng của rùa thành *to_angle*. Dưới đây là một số hướng phổ biến tính theo độ:
 
-   =================== ====================
-    standard mode           logo mode
-   =================== ====================
-      0 - east                0 - north
-     90 - north              90 - east
-    180 - west              180 - south
-    270 - south             270 - west
-   =================== ====================
+   +---------------+-------------+
+   | standard mode | chế độ logo |
+   +===============+=============+
+   | 0 - đông      | 0 - bắc     |
+   +---------------+-------------+
+   | 90 - bắc      | 90 - đông   |
+   +---------------+-------------+
+   | 180 - tây     | 180 - nam   |
+   +---------------+-------------+
+   | 270 - nam     | 270 - tây   |
+   +---------------+-------------+
 
    .. doctest::
       :skipif: _tkinter is None
@@ -451,8 +406,7 @@ Move and draw
 
 .. function:: home()
 
-   Move the turtle to the origin, coordinates (0,0). The turtle's heading is
-   set to its start orientation, which depends on the turtle mode, see
+   Di chuyển rùa đến gốc tọa độ, tọa độ (0,0). Hướng của rùa được đặt thành hướng ban đầu, phụ thuộc vào chế độ của rùa, xem
    :func:`mode`.
 
    .. doctest::
@@ -478,21 +432,13 @@ Move and draw
 
 .. function:: circle(radius, extent=None, steps=None)
 
-   :param radius: a number
-   :param extent: a number or ``None``
-   :param steps: an integer or ``None``
+   :param radius: một số
+   :param extent: một số hoặc ``None``
+   :param steps: một số nguyên hoặc ``None``
 
-   Draw a circle with the given *radius*. The center is *radius* units left
-   of the turtle; *extent*, an angle, determines which part of the circle is
-   drawn. If *extent* is not given, draw the entire circle. If *extent* is
-   not a full circle, one endpoint of the arc is the current pen position.
-   Draw the arc in counterclockwise direction if *radius* is positive,
-   otherwise in clockwise direction. Finally, the turtle's heading is changed
-   by *extent*.
+   Vẽ một đường tròn với *radius* đã cho. Tâm nằm cách rùa *radius* đơn vị về bên trái; *extent*, một góc, xác định phần nào của đường tròn được vẽ. Nếu không cung cấp *extent*, hãy vẽ toàn bộ đường tròn. Nếu *extent* không phải là một đường tròn đầy đủ, một đầu mút của cung là vị trí hiện tại của bút. Vẽ cung theo hướng ngược chiều kim đồng hồ nếu *radius* dương, nếu không thì theo chiều kim đồng hồ. Cuối cùng, hướng của rùa được thay đổi một lượng *extent*.
 
-   As the circle is approximated by an inscribed regular polygon, *steps*
-   determines the number of steps to use. If not given, it will be calculated
-   automatically. May be used to draw regular polygons.
+   Khi đường tròn được xấp xỉ bằng một đa giác đều nội tiếp, *steps* xác định số bước cần sử dụng. Nếu không được cung cấp, giá trị này sẽ được tự động tính. Có thể dùng để vẽ các đa giác đều.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -507,7 +453,7 @@ Move and draw
       (-0.00,0.00)
       >>> turtle.heading()
       0.0
-      >>> turtle.circle(120, 180)  # draw a semicircle
+      >>> turtle.circle(120, 180)  # vẽ một nửa đường tròn
       >>> turtle.position()
       (0.00,240.00)
       >>> turtle.heading()
@@ -515,16 +461,12 @@ Move and draw
 
 
 .. function:: dot()
-              dot(size)
-              dot(color, /)
-              dot(size, color, /)
-              dot(size, r, g, b, /)
+              dot(size) dot(color, /) dot(size, color, /) dot(size, r, g, b, /)
 
-   :param size: an integer >= 1 (if given)
-   :param color: a colorstring or a numeric color tuple
+   :param size: một số nguyên >= 1 (nếu được cung cấp)
+   :param color: một colorstring hoặc một tuple màu dạng số
 
-   Draw a circular dot with diameter *size*, using *color*.  If *size* is
-   not given, the maximum of ``pensize+4`` and ``2*pensize`` is used.
+   Vẽ một chấm hình tròn có đường kính *size*, sử dụng *color*. Nếu không cung cấp *size*, giá trị lớn hơn giữa ``pensize+4`` và ``2*pensize`` sẽ được sử dụng.
 
 
    .. doctest::
@@ -541,9 +483,7 @@ Move and draw
 
 .. function:: stamp()
 
-   Stamp a copy of the turtle shape onto the canvas at the current turtle
-   position.  Return a stamp_id for that stamp, which can be used to delete
-   it by calling ``clearstamp(stamp_id)``.
+   Đóng dấu một bản sao của hình dạng turtle lên canvas tại vị trí hiện tại của turtle. Trả về một stamp_id cho dấu đó, có thể dùng để xóa dấu bằng cách gọi ``clearstamp(stamp_id)``.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -555,10 +495,10 @@ Move and draw
 
 .. function:: clearstamp(stampid)
 
-   :param stampid: an integer, must be return value of previous
+   :param stampid: một số nguyên, phải là giá trị trả về của thao tác trước đó
                    :func:`stamp` call
 
-   Delete stamp with given *stampid*.
+   Xóa con dấu có *stampid* đã cho.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -577,11 +517,9 @@ Move and draw
 
 .. function:: clearstamps(n=None)
 
-   :param n: an integer (or ``None``)
+   :param n: một số nguyên (hoặc ``None``)
 
-   Delete all or first/last *n* of turtle's stamps.  If *n* is ``None``, delete
-   all stamps, if *n* > 0 delete first *n* stamps, else if *n* < 0 delete
-   last *n* stamps.
+   Xóa tất cả hoặc *n* con dấu đầu/cuối của rùa. Nếu *n* là ``None``, hãy xóa tất cả các con dấu; nếu *n* > 0, hãy xóa *n* con dấu đầu tiên; nếu không, nếu *n* < 0, hãy xóa *n* con dấu cuối cùng.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -596,8 +534,7 @@ Move and draw
 
 .. function:: undo()
 
-   Undo (repeatedly) the last turtle action(s).  Number of available
-   undo actions is determined by the size of the undobuffer.
+   Hoàn tác (lặp lại) hành động cuối cùng của rùa. Số hành động có thể hoàn tác được xác định bởi kích thước của undobuffer.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -611,13 +548,11 @@ Move and draw
 
 .. function:: speed(speed=None)
 
-   :param speed: an integer in the range 0..10 or a speedstring (see below)
+   :param speed: một số nguyên trong phạm vi 0..10 hoặc một speedstring (xem bên dưới)
 
-   Set the turtle's speed to an integer value in the range 0..10.  If no
-   argument is given, return current speed.
+   Đặt tốc độ của turtle thành một giá trị nguyên trong khoảng 0..10. Nếu không cung cấp đối số, trả về tốc độ hiện tại.
 
-   If input is a number greater than 10 or smaller than 0.5, speed is set
-   to 0.  Speedstrings are mapped to speedvalues as follows:
+   Nếu đầu vào là một số lớn hơn 10 hoặc nhỏ hơn 0.5, tốc độ được đặt thành 0. Các chuỗi tốc độ được ánh xạ thành các giá trị tốc độ như sau:
 
    * "fastest":  0
    * "fast":  10
@@ -625,12 +560,9 @@ Move and draw
    * "slow":  3
    * "slowest":  1
 
-   Speeds from 1 to 10 enforce increasingly faster animation of line drawing
-   and turtle turning.
+   Các giá trị từ 1 đến 10 buộc hoạt ảnh vẽ đường và xoay turtle diễn ra ngày càng nhanh.
 
-   Attention: *speed* = 0 means that *no* animation takes
-   place. forward/back makes turtle jump and likewise left/right make the
-   turtle turn instantly.
+   Lưu ý: *tốc độ* = 0 có nghĩa là *không* có animation nào diễn ra. forward/back khiến turtle nhảy, tương tự, left/right khiến turtle xoay ngay lập tức.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -645,13 +577,13 @@ Move and draw
       9
 
 
-Tell Turtle's state
-^^^^^^^^^^^^^^^^^^^
+Cho biết trạng thái của Turtle
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. function:: position()
               pos()
 
-   Return the turtle's current location (x,y) as a :class:`Vec2D` vector.
+   Trả về vị trí hiện tại (x,y) của turtle dưới dạng :class:`Vec2D` vector.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -662,13 +594,10 @@ Tell Turtle's state
 
 .. function:: towards(x, y=None)
 
-   :param x: a number or a pair/vector of numbers or a turtle instance
-   :param y: a number if *x* is a number, else ``None``
+   :param x: một số hoặc một cặp/vector các số hoặc một instance của turtle
+   :param y: một số nếu *x* là một số, nếu không thì ``None``
 
-   Return the angle of the line from the turtle's position to (x,y). If *y* is
-   ``None``, *x* must be a pair of coordinates, a :class:`Vec2D`, for example
-   as returned by :func:`pos`, or another turtle. The angle is measured from
-   the turtle's start orientation, which depends on the turtle mode, see
+   Trả về góc của đường thẳng từ vị trí của turtle đến (x,y). Nếu *y* là ``None``, *x* phải là một cặp tọa độ, một :class:`Vec2D`, ví dụ như được trả về bởi :func:`pos`, hoặc một turtle khác. Góc được đo từ hướng ban đầu của turtle, phụ thuộc vào chế độ turtle; xem
    :func:`mode`.
 
    .. doctest::
@@ -681,7 +610,7 @@ Tell Turtle's state
 
 .. function:: xcor()
 
-   Return the turtle's x coordinate.
+   Trả về tọa độ x của turtle.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -697,7 +626,7 @@ Tell Turtle's state
 
 .. function:: ycor()
 
-   Return the turtle's y coordinate.
+   Trả về tọa độ y của turtle.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -713,8 +642,7 @@ Tell Turtle's state
 
 .. function:: heading()
 
-   Return the turtle's current heading. The value depends on the turtle mode,
-   see :func:`mode`.
+   Trả về hướng hiện tại của turtle. Giá trị này phụ thuộc vào chế độ turtle, xem :func:`mode`.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -727,12 +655,10 @@ Tell Turtle's state
 
 .. function:: distance(x, y=None)
 
-   :param x: a number or a pair/vector of numbers or a turtle instance
-   :param y: a number if *x* is a number, else ``None``
+   :param x: một số hoặc một cặp/vector các số hoặc một instance của turtle
+   :param y: một số nếu *x* là một số, nếu không thì ``None``
 
-   Return the distance from the turtle to (x,y) in turtle step units. If *y* is
-   ``None``, *x* must be a pair of coordinates, a :class:`Vec2D`, for example
-   as returned by :func:`pos`, or another turtle.
+   Trả về khoảng cách từ turtle đến (x,y) theo đơn vị bước của turtle. Nếu *y* là ``None``, *x* phải là một cặp tọa độ, một :class:`Vec2D`, ví dụ như được trả về bởi :func:`pos`, hoặc một turtle khác.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -748,15 +674,14 @@ Tell Turtle's state
       77.0
 
 
-Settings for measurement
-^^^^^^^^^^^^^^^^^^^^^^^^
+Cài đặt đo lường
+^^^^^^^^^^^^^^^^
 
 .. function:: degrees(fullcircle=360.0)
 
-   :param fullcircle: a number
+   :param fullcircle: một số
 
-   Set the angle measurement units to degrees. The number of degrees in a full
-   circle is set to *fullcircle*, which defaults to 360.
+   Đặt đơn vị đo góc thành độ. Số độ trong một vòng tròn đầy đủ được đặt thành *fullcircle*, mặc định là 360.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -766,8 +691,8 @@ Settings for measurement
       >>> turtle.heading()
       90.0
 
-      >>> # Change angle measurement unit to grad (also known as gon,
-      >>> # grade, or gradian and equals 1/100-th of the right angle.)
+      >>> # Thay đổi đơn vị đo góc thành grad (còn gọi là gon,
+      >>> # grade hoặc gradian và bằng 1/100 góc vuông.)
       >>> turtle.degrees(400.0)
       >>> turtle.heading()
       100.0
@@ -778,8 +703,7 @@ Settings for measurement
 
 .. function:: radians()
 
-   Set the angle measurement units to radians.  Equivalent to
-   ``degrees(2 * math.pi)``.
+   Đặt đơn vị đo góc thành radian. Tương đương với ``degrees(2 * math.pi)``.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -799,66 +723,58 @@ Settings for measurement
       >>> turtle.degrees(360)
 
 
-Pen control
-^^^^^^^^^^^
+Điều khiển bút
+^^^^^^^^^^^^^^
 
-Drawing state
+Trạng thái vẽ
 ~~~~~~~~~~~~~
 
 .. function:: pendown()
-              pd()
-              down()
+              pd() down()
 
-   Pull the pen down -- drawing when moving.
+   Hạ bút -- vẽ khi di chuyển.
 
 
 .. function:: penup()
-              pu()
-              up()
+              pu() up()
 
-   Pull the pen up -- no drawing when moving.
+   Nhấc bút -- không vẽ khi di chuyển.
 
 
 .. function:: pensize(width=None)
               width(width=None)
 
-   :param width: a positive number
+   :param width: một số dương
 
-   Set the line thickness to *width* or return it.  If resizemode is set to
-   "auto" and turtleshape is a polygon, that polygon is drawn with the same line
-   thickness.  If no argument is given, the current pensize is returned.
+   Đặt độ dày đường kẻ thành *width* hoặc trả về độ dày đó. Nếu resizemode được đặt thành "auto" và turtleshape là một đa giác, đa giác đó sẽ được vẽ với cùng độ dày đường kẻ. Nếu không cung cấp đối số, pensize hiện tại sẽ được trả về.
 
    .. doctest::
       :skipif: _tkinter is None
 
       >>> turtle.pensize()
       1
-      >>> turtle.pensize(10)   # from here on lines of width 10 are drawn
+      >>> turtle.pensize(10)   # từ đây trở đi, các đường kẻ có độ rộng 10 sẽ được vẽ
 
 
 .. function:: pen(pen=None, **pendict)
 
-   :param pen: a dictionary with some or all of the below listed keys
-   :param pendict: one or more keyword-arguments with the below listed keys as keywords
+   :param pen: một dictionary có một số hoặc tất cả các khóa được liệt kê bên dưới
+   :param pendict: một hoặc nhiều keyword-arguments với các khóa được liệt kê bên dưới làm keyword
 
-   Return or set the pen's attributes in a "pen-dictionary" with the following
-   key/value pairs:
+   Trả về hoặc đặt các thuộc tính của pen trong một "pen-dictionary" với các cặp khóa/giá trị sau:
 
    * "shown": True/False
    * "pendown": True/False
-   * "pencolor": color-string or color-tuple
-   * "fillcolor": color-string or color-tuple
-   * "pensize": positive number
-   * "speed": number in range 0..10
-   * "resizemode": "auto" or "user" or "noresize"
-   * "stretchfactor": (positive number, positive number)
-   * "outline": positive number
+   * "pencolor": chuỗi màu hoặc bộ màu
+   * "fillcolor": chuỗi màu hoặc bộ màu
+   * "pensize": số dương
+   * "speed": số trong khoảng 0..10
+   * "resizemode": "auto" hoặc "user" hoặc "noresize"
+   * "stretchfactor": (số dương, số dương)
+   * "outline": số dương
    * "tilt": number
 
-   This dictionary can be used as argument for a subsequent call to :func:`pen`
-   to restore the former pen-state.  Moreover one or more of these attributes
-   can be provided as keyword-arguments.  This can be used to set several pen
-   attributes in one statement.
+   Từ điển này có thể được dùng làm đối số cho lần gọi :func:`pen` tiếp theo để khôi phục trạng thái bút trước đó. Ngoài ra, có thể cung cấp một hoặc nhiều thuộc tính này dưới dạng keyword argument. Cách này cho phép thiết lập nhiều thuộc tính bút trong một câu lệnh.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -881,7 +797,7 @@ Drawing state
 
 .. function:: isdown()
 
-   Return ``True`` if pen is down, ``False`` if it's up.
+   Trả về ``True`` nếu bút đang hạ, ``False`` nếu bút đang nhấc.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -894,37 +810,29 @@ Drawing state
       True
 
 
-Color control
-~~~~~~~~~~~~~
+Điều khiển màu
+~~~~~~~~~~~~~~
 
 .. function:: pencolor()
-              pencolor(color, /)
-              pencolor(r, g, b, /)
+              pencolor(color, /) pencolor(r, g, b, /)
 
-   Return or set the pencolor.
+   Trả về hoặc thiết lập pencolor.
 
-   Four input formats are allowed:
+   Có bốn định dạng đầu vào được cho phép:
 
    ``pencolor()``
-      Return the current pencolor as color specification string or
-      as a tuple (see example).  May be used as input to another
-      color/pencolor/fillcolor/bgcolor call.
+      Trả về pencolor hiện tại dưới dạng chuỗi đặc tả màu hoặc tuple (xem ví dụ). Có thể dùng làm đầu vào cho một lệnh gọi color/pencolor/fillcolor/bgcolor khác.
 
    ``pencolor(colorstring)``
-      Set pencolor to *colorstring*, which is a Tk color specification string,
-      such as ``"red"``, ``"yellow"``, or ``"#33cc8c"``.
+      Đặt pencolor thành *colorstring*, là một chuỗi đặc tả màu Tk, chẳng hạn như ``"red"``, ``"yellow"`` hoặc ``"#33cc8c"``.
 
    ``pencolor((r, g, b))``
-      Set pencolor to the RGB color represented by the tuple of *r*, *g*, and
-      *b*.  Each of *r*, *g*, and *b* must be in the range 0..colormode, where
-      colormode is either 1.0 or 255 (see :func:`colormode`).
+      Đặt pencolor thành màu RGB được biểu diễn bởi tuple gồm *r*, *g* và *b*. Mỗi giá trị trong *r*, *g* và *b* phải nằm trong phạm vi 0..colormode, trong đó colormode là 1.0 hoặc 255 (xem :func:`colormode`).
 
    ``pencolor(r, g, b)``
-      Set pencolor to the RGB color represented by *r*, *g*, and *b*.  Each of
-      *r*, *g*, and *b* must be in the range 0..colormode.
+      Đặt pencolor thành màu RGB được biểu diễn bởi *r*, *g* và *b*. Mỗi giá trị trong *r*, *g* và *b* phải nằm trong phạm vi 0..colormode.
 
-   If turtleshape is a polygon, the outline of that polygon is drawn with the
-   newly set pencolor.
+   Nếu turtleshape là một đa giác, đường viền của đa giác đó sẽ được vẽ bằng pencolor mới được đặt.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -949,33 +857,25 @@ Color control
 
 
 .. function:: fillcolor()
-              fillcolor(color, /)
-              fillcolor(r, g, b, /)
+              fillcolor(color, /) fillcolor(r, g, b, /)
 
-   Return or set the fillcolor.
+   Trả về hoặc đặt fillcolor.
 
-   Four input formats are allowed:
+   Có bốn định dạng đầu vào được cho phép:
 
    ``fillcolor()``
-      Return the current fillcolor as color specification string, possibly
-      in tuple format (see example).  May be used as input to another
-      color/pencolor/fillcolor/bgcolor call.
+      Trả về fillcolor hiện tại dưới dạng chuỗi đặc tả màu, có thể ở định dạng tuple (xem ví dụ). Có thể dùng chuỗi này làm đầu vào cho một lệnh gọi color/pencolor/fillcolor/bgcolor khác.
 
    ``fillcolor(colorstring)``
-      Set fillcolor to *colorstring*, which is a Tk color specification string,
-      such as ``"red"``, ``"yellow"``, or ``"#33cc8c"``.
+      Đặt fillcolor thành *colorstring*, đây là một chuỗi đặc tả màu Tk, chẳng hạn như ``"red"``, ``"yellow"`` hoặc ``"#33cc8c"``.
 
    ``fillcolor((r, g, b))``
-      Set fillcolor to the RGB color represented by the tuple of *r*, *g*, and
-      *b*.  Each of *r*, *g*, and *b* must be in the range 0..colormode, where
-      colormode is either 1.0 or 255 (see :func:`colormode`).
+      Đặt fillcolor thành màu RGB được biểu diễn bởi tuple gồm *r*, *g* và *b*. Mỗi giá trị trong *r*, *g* và *b* phải nằm trong phạm vi 0..colormode, trong đó colormode là 1.0 hoặc 255 (xem :func:`colormode`).
 
    ``fillcolor(r, g, b)``
-      Set fillcolor to the RGB color represented by *r*, *g*, and *b*.  Each of
-      *r*, *g*, and *b* must be in the range 0..colormode.
+      Đặt fillcolor thành màu RGB được biểu diễn bởi *r*, *g* và *b*. Mỗi giá trị trong *r*, *g* và *b* phải nằm trong phạm vi 0..colormode.
 
-   If turtleshape is a polygon, the interior of that polygon is drawn
-   with the newly set fillcolor.
+   Nếu turtleshape là một đa giác, phần bên trong đa giác đó sẽ được vẽ bằng fillcolor mới được đặt.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -985,7 +885,7 @@ Color control
       'violet'
       >>> turtle.pencolor()
       (50.0, 193.0, 143.0)
-      >>> turtle.fillcolor((50, 193, 143))  # Integers, not floats
+      >>> turtle.fillcolor((50, 193, 143))  # Số nguyên, không phải số thực
       >>> turtle.fillcolor()
       (50.0, 193.0, 143.0)
       >>> turtle.fillcolor('#ffffff')
@@ -994,30 +894,23 @@ Color control
 
 
 .. function:: color()
-              color(color, /)
-              color(r, g, b, /)
-              color(pencolor, fillcolor, /)
+              color(color, /) color(r, g, b, /) color(pencolor, fillcolor, /)
 
-   Return or set pencolor and fillcolor.
+   Trả về hoặc thiết lập pencolor và fillcolor.
 
-   Several input formats are allowed.  They use 0 to 3 arguments as
-   follows:
+   Cho phép sử dụng một số định dạng đầu vào. Chúng sử dụng từ 0 đến 3 đối số như sau:
 
    ``color()``
-      Return the current pencolor and the current fillcolor as a pair of color
-      specification strings or tuples as returned by :func:`pencolor` and
+      Trả về pencolor hiện tại và fillcolor hiện tại dưới dạng một cặp chuỗi hoặc tuple đặc tả màu như được trả về bởi :func:`pencolor` và
       :func:`fillcolor`.
 
    ``color(colorstring)``, ``color((r,g,b))``, ``color(r,g,b)``
-      Inputs as in :func:`pencolor`, set both, fillcolor and pencolor, to the
-      given value.
+      Đầu vào như trong :func:`pencolor`, thiết lập cả fillcolor và pencolor thành giá trị đã cho.
 
    ``color(colorstring1, colorstring2)``, ``color((r1,g1,b1), (r2,g2,b2))``
-      Equivalent to ``pencolor(colorstring1)`` and ``fillcolor(colorstring2)``
-      and analogously if the other input format is used.
+      Tương đương với ``pencolor(colorstring1)`` và ``fillcolor(colorstring2)``, và tương tự nếu sử dụng định dạng đầu vào khác.
 
-   If turtleshape is a polygon, outline and interior of that polygon is drawn
-   with the newly set colors.
+   Nếu turtleshape là một đa giác, đường viền và phần bên trong của đa giác đó sẽ được vẽ bằng các màu mới được thiết lập.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1030,11 +923,11 @@ Color control
       ((40.0, 80.0, 120.0), (160.0, 200.0, 240.0))
 
 
-See also: Screen method :func:`colormode`.
+Xem thêm: Screen method :func:`colormode`.
 
 
-Filling
-~~~~~~~
+Tô màu
+~~~~~~
 
 .. doctest::
    :skipif: _tkinter is None
@@ -1044,7 +937,7 @@ Filling
 
 .. function:: filling()
 
-   Return fillstate (``True`` if filling, ``False`` else).
+   Trả về fillstate (``True`` nếu đang tô màu, ``False`` nếu không).
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1057,7 +950,7 @@ Filling
 
 .. function:: fill()
 
-   Fill the shape drawn in the ``with turtle.fill():`` block.
+   Tô hình được vẽ trong khối ``with turtle.fill():``.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1066,8 +959,7 @@ Filling
       >>> with turtle.fill():
       ...     turtle.circle(80)
 
-   Using :func:`!fill` is equivalent to adding the :func:`begin_fill` before the
-   fill-block and :func:`end_fill` after the fill-block:
+   Sử dụng :func:`!fill` tương đương với việc thêm :func:`begin_fill` trước khối tô và :func:`end_fill` sau khối tô:
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1082,17 +974,14 @@ Filling
 
 .. function:: begin_fill()
 
-   To be called just before drawing a shape to be filled.
+   Được gọi ngay trước khi vẽ một hình cần được tô.
 
 
 .. function:: end_fill()
 
-   Fill the shape drawn after the last call to :func:`begin_fill`.
+   Tô hình được vẽ sau lần gọi :func:`begin_fill` gần nhất.
 
-   Whether or not overlap regions for self-intersecting polygons
-   or multiple shapes are filled depends on the operating system graphics,
-   type of overlap, and number of overlaps.  For example, the Turtle star
-   above may be either all yellow or have some white regions.
+   Việc các vùng chồng lấp của đa giác tự giao nhau hoặc nhiều hình có được tô màu hay không phụ thuộc vào hệ thống đồ họa của hệ điều hành, kiểu chồng lấp và số vùng chồng lấp. Ví dụ, ngôi sao Turtle ở trên có thể hoàn toàn màu vàng hoặc có một số vùng màu trắng.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1103,13 +992,12 @@ Filling
       >>> turtle.end_fill()
 
 
-More drawing control
-~~~~~~~~~~~~~~~~~~~~
+Kiểm soát việc vẽ nâng cao hơn
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: reset()
 
-   Delete the turtle's drawings from the screen, re-center the turtle and set
-   variables to the default values.
+   Xóa các hình vẽ của turtle khỏi màn hình, đưa turtle về giữa màn hình và đặt các biến về giá trị mặc định.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1129,21 +1017,17 @@ More drawing control
 
 .. function:: clear()
 
-   Delete the turtle's drawings from the screen.  Do not move turtle.  State and
-   position of the turtle as well as drawings of other turtles are not affected.
+   Xóa các hình vẽ của turtle khỏi màn hình. Không di chuyển turtle. Trạng thái và vị trí của turtle cũng như hình vẽ của các turtle khác không bị ảnh hưởng.
 
 
 .. function:: write(arg, move=False, align="left", font=("Arial", 8, "normal"))
 
-   :param arg: object to be written to the TurtleScreen
+   :param arg: đối tượng sẽ được ghi vào TurtleScreen
    :param move: True/False
-   :param align: one of the strings "left", "center" or right"
-   :param font: a triple (fontname, fontsize, fonttype)
+   :param align: một trong các chuỗi "left", "center" hoặc right"
+   :param font: một bộ ba (fontname, fontsize, fonttype)
 
-   Write text - the string representation of *arg* - at the current turtle
-   position according to *align* ("left", "center" or "right") and with the given
-   font.  If *move* is true, the pen is moved to the bottom-right corner of the
-   text.  By default, *move* is ``False``.
+   Viết văn bản - biểu diễn chuỗi của *arg* - tại vị trí hiện tại của turtle theo *align* ("left", "center" hoặc "right") và với font đã cho. Nếu *move* là true, bút sẽ được di chuyển đến góc dưới bên phải của văn bản. Theo mặc định, *move* là ``False``.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1152,18 +1036,16 @@ More drawing control
       >>> turtle.write((0,0), True)
 
 
-Turtle state
-^^^^^^^^^^^^
+Trạng thái turtle
+^^^^^^^^^^^^^^^^^
 
-Visibility
-~~~~~~~~~~
+Khả năng hiển thị
+~~~~~~~~~~~~~~~~~
 
 .. function:: hideturtle()
               ht()
 
-   Make the turtle invisible.  It's a good idea to do this while you're in the
-   middle of doing some complex drawing, because hiding the turtle speeds up the
-   drawing observably.
+   Làm cho turtle trở nên vô hình. Bạn nên làm điều này khi đang thực hiện một số thao tác vẽ phức tạp, vì việc ẩn turtle giúp tăng tốc độ vẽ đáng kể.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1174,7 +1056,7 @@ Visibility
 .. function:: showturtle()
               st()
 
-   Make the turtle visible.
+   Hiển thị rùa.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1184,7 +1066,7 @@ Visibility
 
 .. function:: isvisible()
 
-   Return ``True`` if the Turtle is shown, ``False`` if it's hidden.
+   Trả về ``True`` nếu Turtle đang được hiển thị, ``False`` nếu nó đang bị ẩn.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1197,18 +1079,14 @@ Visibility
       True
 
 
-Appearance
-~~~~~~~~~~
+Diện mạo
+~~~~~~~~
 
 .. function:: shape(name=None)
 
-   :param name: a string which is a valid shapename
+   :param name: một chuỗi là shapename hợp lệ
 
-   Set turtle shape to shape with given *name* or, if name is not given, return
-   name of current shape.  Shape with *name* must exist in the TurtleScreen's
-   shape dictionary.  Initially there are the following polygon shapes: "arrow",
-   "turtle", "circle", "square", "triangle", "classic".  To learn about how to
-   deal with shapes see Screen method :func:`register_shape`.
+   Đặt hình dạng của rùa thành hình dạng có *name* đã cho hoặc, nếu không cung cấp name, trả về name của hình dạng hiện tại. Hình dạng có *name* phải tồn tại trong từ điển hình dạng của TurtleScreen. Ban đầu có các hình đa giác sau: "arrow", "turtle", "circle", "square", "triangle", "classic". Để tìm hiểu cách xử lý hình dạng, hãy xem phương thức Screen :func:`register_shape`.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1222,19 +1100,16 @@ Appearance
 
 .. function:: resizemode(rmode=None)
 
-   :param rmode: one of the strings "auto", "user", "noresize"
+   :param rmode: một trong các chuỗi "auto", "user", "noresize"
 
-   Set resizemode to one of the values: "auto", "user", "noresize".  If *rmode*
-   is not given, return current resizemode.  Different resizemodes have the
-   following effects:
+   Đặt resizemode thành một trong các giá trị: "auto", "user", "noresize". Nếu không cung cấp *rmode*, trả về resizemode hiện tại. Các resizemode khác nhau có những tác động sau:
 
-   - "auto": adapts the appearance of the turtle corresponding to the value of pensize.
-   - "user": adapts the appearance of the turtle according to the values of
-     stretchfactor and outlinewidth (outline), which are set by
+   - "auto": điều chỉnh diện mạo của turtle tương ứng với giá trị của pensize.
+   - "user": điều chỉnh diện mạo của turtle theo các giá trị của stretchfactor và outlinewidth (outline), được thiết lập bởi
      :func:`shapesize`.
-   - "noresize": no adaption of the turtle's appearance takes place.
+   - "noresize": không thực hiện điều chỉnh diện mạo của turtle.
 
-   ``resizemode("user")`` is called by :func:`shapesize` when used with arguments.
+   ``resizemode("user")`` được :func:`shapesize` gọi khi được sử dụng với các đối số.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1249,16 +1124,11 @@ Appearance
 .. function:: shapesize(stretch_wid=None, stretch_len=None, outline=None)
               turtlesize(stretch_wid=None, stretch_len=None, outline=None)
 
-   :param stretch_wid: positive number
-   :param stretch_len: positive number
-   :param outline: positive number
+   :param stretch_wid: số dương
+   :param stretch_len: số dương
+   :param outline: số dương
 
-   Return or set the pen's attributes x/y-stretchfactors and/or outline.  Set
-   resizemode to "user".  If and only if resizemode is set to "user", the turtle
-   will be displayed stretched according to its stretchfactors: *stretch_wid* is
-   stretchfactor perpendicular to its orientation, *stretch_len* is
-   stretchfactor in direction of its orientation, *outline* determines the width
-   of the shape's outline.
+   Trả về hoặc đặt các thuộc tính của pen là x/y-stretchfactors và/hoặc outline. Đặt resizemode thành "user". Khi và chỉ khi resizemode được đặt thành "user", turtle sẽ được hiển thị với độ kéo giãn theo các stretchfactor của nó: *stretch_wid* là stretchfactor vuông góc với hướng của nó, *stretch_len* là stretchfactor theo hướng của nó, *outline* xác định độ rộng outline của hình dạng.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1276,14 +1146,9 @@ Appearance
 
 .. function:: shearfactor(shear=None)
 
-   :param shear: number (optional)
+   :param shear: number (tùy chọn)
 
-   Set or return the current shearfactor. Shear the turtleshape according to
-   the given shearfactor shear, which is the tangent of the shear angle.
-   Do *not* change the turtle's heading (direction of movement).
-   If shear is not given: return the current shearfactor, i. e. the
-   tangent of the shear angle, by which lines parallel to the
-   heading of the turtle are sheared.
+   Đặt hoặc trả về shearfactor hiện tại. Làm nghiêng turtleshape theo shear đã cho, trong đó shear là tangent của góc nghiêng. *not* thay đổi heading (hướng di chuyển) của turtle. Nếu không cung cấp shear: trả về shearfactor hiện tại, tức là tangent của góc nghiêng, theo đó các đường thẳng song song với heading của turtle bị làm nghiêng.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1299,8 +1164,7 @@ Appearance
 
    :param angle: a number
 
-   Rotate the turtleshape by *angle* from its current tilt-angle, but do *not*
-   change the turtle's heading (direction of movement).
+   Xoay turtleshape một góc *angle* tính từ góc nghiêng hiện tại, nhưng *not* thay đổi heading (hướng di chuyển) của turtle.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1316,15 +1180,9 @@ Appearance
 
 .. function:: tiltangle(angle=None)
 
-   :param angle: a number (optional)
+   :param angle: a number (tùy chọn)
 
-   Set or return the current tilt-angle. If angle is given, rotate the
-   turtleshape to point in the direction specified by angle,
-   regardless of its current tilt-angle. Do *not* change the turtle's
-   heading (direction of movement).
-   If angle is not given: return the current tilt-angle, i. e. the angle
-   between the orientation of the turtleshape and the heading of the
-   turtle (its direction of movement).
+   Đặt hoặc trả về góc nghiêng hiện tại. Nếu angle được cung cấp, xoay turtleshape để hướng theo hướng được chỉ định bởi angle, bất kể góc nghiêng hiện tại của nó. Không *not* thay đổi heading của turtle (hướng di chuyển). Nếu không cung cấp angle: trả về góc nghiêng hiện tại, tức là góc giữa hướng của turtleshape và heading của turtle (hướng di chuyển của nó).
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1339,21 +1197,14 @@ Appearance
 
 .. function:: shapetransform(t11=None, t12=None, t21=None, t22=None)
 
-   :param t11: a number (optional)
-   :param t12: a number (optional)
-   :param t21: a number (optional)
-   :param t12: a number (optional)
+   :param t11: a number (tùy chọn)
+   :param t12: a number (tùy chọn)
+   :param t21: a number (tùy chọn)
+   :param t12: a number (tùy chọn)
 
-   Set or return the current transformation matrix of the turtle shape.
+   Đặt hoặc trả về ma trận biến đổi hiện tại của turtleshape.
 
-   If none of the matrix elements are given, return the transformation
-   matrix as a tuple of 4 elements.
-   Otherwise set the given elements and transform the turtleshape
-   according to the matrix consisting of first row t11, t12 and
-   second row t21, t22. The determinant t11 * t22 - t12 * t21 must not be
-   zero, otherwise an error is raised.
-   Modify stretchfactor, shearfactor and tiltangle according to the
-   given matrix.
+   Nếu không cung cấp phần tử ma trận nào, trả về ma trận biến đổi dưới dạng một tuple gồm 4 phần tử. Nếu không, đặt các phần tử đã cho và biến đổi turtleshape theo ma trận gồm hàng đầu tiên là t11, t12 và hàng thứ hai là t21, t22. Định thức t11 * t22 - t12 * t21 không được bằng 0; nếu không, sẽ phát sinh lỗi. Sửa đổi stretchfactor, shearfactor và tiltangle theo ma trận đã cho.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1368,8 +1219,7 @@ Appearance
 
 .. function:: get_shapepoly()
 
-   Return the current shape polygon as tuple of coordinate pairs. This
-   can be used to define a new shape or components of a compound shape.
+   Trả về đa giác hình dạng hiện tại dưới dạng tuple gồm các cặp tọa độ. Có thể sử dụng nó để định nghĩa một hình dạng mới hoặc các thành phần của một hình dạng phức hợp.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1380,21 +1230,17 @@ Appearance
       ((50, -20), (30, 20), (-50, 20), (-30, -20))
 
 
-Using events
-^^^^^^^^^^^^
+Sử dụng sự kiện
+^^^^^^^^^^^^^^^
 
 .. function:: onclick(fun, btn=1, add=None)
    :noindex:
 
-   :param fun: a function with two arguments which will be called with the
-               coordinates of the clicked point on the canvas
-   :param btn: number of the mouse-button, defaults to 1 (left mouse button)
-   :param add: ``True`` or ``False`` -- if ``True``, a new binding will be
-               added, otherwise it will replace a former binding
+   :param fun: một hàm có hai đối số, được gọi với tọa độ của điểm được nhấp trên canvas
+   :param btn: số của nút chuột, mặc định là 1 (nút chuột trái)
+   :param add: ``True`` hoặc ``False`` -- nếu ``True``, một binding mới sẽ được thêm vào, nếu không nó sẽ thay thế binding trước đó
 
-   Bind *fun* to mouse-click events on this turtle.  If *fun* is ``None``,
-   existing bindings are removed.  Example for the anonymous turtle, i.e. the
-   procedural way:
+   Liên kết *fun* với các sự kiện nhấp chuột trên turtle này. Nếu *fun* là ``None``, các binding hiện có sẽ bị xóa. Ví dụ cho turtle ẩn danh, tức là theo cách thủ tục:
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1402,20 +1248,17 @@ Using events
       >>> def turn(x, y):
       ...     left(180)
       ...
-      >>> onclick(turn)  # Now clicking into the turtle will turn it.
-      >>> onclick(None)  # event-binding will be removed
+      >>> onclick(turn)  # Bây giờ, khi nhấp vào turtle, nó sẽ xoay.
+      >>> onclick(None)  # liên kết sự kiện sẽ bị xóa
 
 
 .. function:: onrelease(fun, btn=1, add=None)
 
-   :param fun: a function with two arguments which will be called with the
-               coordinates of the clicked point on the canvas
-   :param btn: number of the mouse-button, defaults to 1 (left mouse button)
-   :param add: ``True`` or ``False`` -- if ``True``, a new binding will be
-               added, otherwise it will replace a former binding
+   :param fun: một hàm có hai đối số, được gọi với tọa độ của điểm được nhấp trên canvas
+   :param btn: số của nút chuột, mặc định là 1 (nút chuột trái)
+   :param add: ``True`` hoặc ``False`` -- nếu ``True``, một binding mới sẽ được thêm vào, nếu không nó sẽ thay thế binding trước đó
 
-   Bind *fun* to mouse-button-release events on this turtle.  If *fun* is
-   ``None``, existing bindings are removed.
+   Liên kết *fun* với các sự kiện nhả nút chuột trên turtle này. Nếu *fun* là ``None``, các liên kết hiện có sẽ bị xóa.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1427,41 +1270,35 @@ Using events
       ...         self.fillcolor("")
       ...
       >>> turtle = MyTurtle()
-      >>> turtle.onclick(turtle.glow)     # clicking on turtle turns fillcolor red,
-      >>> turtle.onrelease(turtle.unglow) # releasing turns it to transparent.
+      >>> turtle.onclick(turtle.glow)     # nhấp vào turtle sẽ đổi fillcolor thành đỏ,
+      >>> turtle.onrelease(turtle.unglow) # nhả nút chuột sẽ đổi nó thành trong suốt.
 
 
 .. function:: ondrag(fun, btn=1, add=None)
 
-   :param fun: a function with two arguments which will be called with the
-               coordinates of the clicked point on the canvas
-   :param btn: number of the mouse-button, defaults to 1 (left mouse button)
-   :param add: ``True`` or ``False`` -- if ``True``, a new binding will be
-               added, otherwise it will replace a former binding
+   :param fun: một hàm có hai đối số, được gọi với tọa độ của điểm được nhấp trên canvas
+   :param btn: số của nút chuột, mặc định là 1 (nút chuột trái)
+   :param add: ``True`` hoặc ``False`` -- nếu ``True``, một binding mới sẽ được thêm vào, nếu không nó sẽ thay thế binding trước đó
 
-   Bind *fun* to mouse-move events on this turtle.  If *fun* is ``None``,
-   existing bindings are removed.
+   Gắn *fun* với các sự kiện di chuyển chuột trên turtle này. Nếu *fun* là ``None``, các liên kết hiện có sẽ bị xóa.
 
-   Remark: Every sequence of mouse-move-events on a turtle is preceded by a
-   mouse-click event on that turtle.
+   Lưu ý: Mọi chuỗi sự kiện di chuyển chuột trên một turtle đều bắt đầu bằng một sự kiện nhấp chuột trên turtle đó.
 
    .. doctest::
       :skipif: _tkinter is None
 
       >>> turtle.ondrag(turtle.goto)
 
-   Subsequently, clicking and dragging the Turtle will move it across
-   the screen thereby producing handdrawings (if pen is down).
+   Sau đó, việc nhấp và kéo Turtle sẽ di chuyển nó trên màn hình, qua đó tạo ra các hình vẽ bằng tay (nếu bút đang hạ).
 
 
-Special Turtle methods
-^^^^^^^^^^^^^^^^^^^^^^
+Các phương thức đặc biệt của Turtle
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. function:: poly()
 
-   Record the vertices of a polygon drawn in the ``with turtle.poly():`` block.
-   The first and last vertices will be connected.
+   Ghi lại các đỉnh của một đa giác được vẽ trong khối ``with turtle.poly():``. Đỉnh đầu tiên và đỉnh cuối cùng sẽ được nối với nhau.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1476,19 +1313,17 @@ Special Turtle methods
 
 .. function:: begin_poly()
 
-   Start recording the vertices of a polygon.  Current turtle position is first
-   vertex of polygon.
+   Bắt đầu ghi lại các đỉnh của một đa giác. Vị trí hiện tại của turtle là đỉnh đầu tiên của đa giác.
 
 
 .. function:: end_poly()
 
-   Stop recording the vertices of a polygon.  Current turtle position is last
-   vertex of polygon.  This will be connected with the first vertex.
+   Dừng ghi lại các đỉnh của một đa giác. Vị trí hiện tại của turtle là đỉnh cuối cùng của đa giác. Đỉnh này sẽ được nối với đỉnh đầu tiên.
 
 
 .. function:: get_poly()
 
-   Return the last recorded polygon.
+   Trả về đa giác được ghi lại gần nhất.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1507,8 +1342,7 @@ Special Turtle methods
 
 .. function:: clone()
 
-   Create and return a clone of the turtle with same position, heading and
-   turtle properties.
+   Tạo và trả về một bản sao của turtle với cùng vị trí, hướng và các thuộc tính của turtle.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1520,8 +1354,7 @@ Special Turtle methods
 .. function:: getturtle()
               getpen()
 
-   Return the Turtle object itself.  Only reasonable use: as a function to
-   return the "anonymous turtle":
+   Trả về chính đối tượng Turtle. Cách sử dụng hợp lý duy nhất: dùng như một hàm để trả về "anonymous turtle":
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1534,8 +1367,7 @@ Special Turtle methods
 
 .. function:: getscreen()
 
-   Return the :class:`TurtleScreen` object the turtle is drawing on.
-   TurtleScreen methods can then be called for that object.
+   Trả về đối tượng :class:`TurtleScreen` mà turtle đang vẽ lên. Sau đó có thể gọi các phương thức TurtleScreen cho đối tượng đó.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1548,12 +1380,9 @@ Special Turtle methods
 
 .. function:: setundobuffer(size)
 
-   :param size: an integer or ``None``
+   :param size: một số nguyên hoặc ``None``
 
-   Set or disable undobuffer.  If *size* is an integer, an empty undobuffer of
-   given size is installed.  *size* gives the maximum number of turtle actions
-   that can be undone by the :func:`undo` method/function.  If *size* is
-   ``None``, the undobuffer is disabled.
+   Thiết lập hoặc vô hiệu hóa undobuffer. Nếu *size* là một số nguyên, một undobuffer trống với kích thước đã cho sẽ được cài đặt. *size* cung cấp số thao tác turtle tối đa có thể được hoàn tác bằng phương thức/hàm :func:`undo`. Nếu *size* là ``None``, undobuffer sẽ bị vô hiệu hóa.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1563,7 +1392,7 @@ Special Turtle methods
 
 .. function:: undobufferentries()
 
-   Return number of entries in the undobuffer.
+   Trả về số mục trong undobuffer.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1575,18 +1404,16 @@ Special Turtle methods
 
 .. _compoundshapes:
 
-Compound shapes
-^^^^^^^^^^^^^^^
+Các hình dạng compound
+^^^^^^^^^^^^^^^^^^^^^^
 
-To use compound turtle shapes, which consist of several polygons of different
-color, you must use the helper class :class:`Shape` explicitly as described
-below:
+Để sử dụng các hình dạng turtle compound, bao gồm nhiều đa giác có màu khác nhau, bạn phải sử dụng rõ ràng lớp trợ giúp :class:`Shape` như mô tả dưới đây:
 
-1. Create an empty Shape object of type "compound".
-2. Add as many components to this object as desired, using the
-   :meth:`~Shape.addcomponent` method.
+1. Tạo một đối tượng Shape trống thuộc kiểu "compound".
+2. Thêm bao nhiêu component tùy ý vào đối tượng này bằng cách sử dụng
+   phương thức :meth:`~Shape.addcomponent`.
 
-   For example:
+   Ví dụ:
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1597,7 +1424,7 @@ below:
       >>> poly2 = ((0,0),(10,-5),(-10,-5))
       >>> s.addcomponent(poly2, "blue", "red")
 
-3. Now add the Shape to the Screen's shapelist and use it:
+3. Bây giờ, thêm Shape vào shapelist của Screen và sử dụng nó:
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1608,19 +1435,16 @@ below:
 
 .. note::
 
-   The :class:`Shape` class is used internally by the :func:`register_shape`
-   method in different ways.  The application programmer has to deal with the
-   Shape class *only* when using compound shapes like shown above!
+   Lớp :class:`Shape` được phương thức :func:`register_shape` sử dụng nội bộ theo nhiều cách khác nhau. Lập trình viên ứng dụng chỉ phải xử lý lớp Shape *chỉ* khi sử dụng các compound shape như minh họa ở trên!
 
 
 .. _methods-of-turtlescreen-screen:
 .. _methods-of-turtlescreen-screen-and-corresponding-functions:
 
-Screen methods and functions
-----------------------------
+Các phương thức và hàm của Screen
+---------------------------------
 
-Most of the examples in this section refer to a TurtleScreen instance called
-``screen``.
+Hầu hết các ví dụ trong phần này đều đề cập đến một instance TurtleScreen có tên là ``screen``.
 
 .. doctest::
    :skipif: _tkinter is None
@@ -1628,35 +1452,27 @@ Most of the examples in this section refer to a TurtleScreen instance called
 
    >>> screen = Screen()
 
-Window control
-^^^^^^^^^^^^^^
+Điều khiển cửa sổ
+^^^^^^^^^^^^^^^^^
 
 .. function:: bgcolor()
-              bgcolor(color, /)
-              bgcolor(r, g, b, /)
+              bgcolor(color, /) bgcolor(r, g, b, /)
 
-   Return or set the background color of the TurtleScreen.
+   Trả về hoặc đặt màu nền của TurtleScreen.
 
-   Four input formats are allowed:
+   Có thể sử dụng bốn định dạng đầu vào:
 
    ``bgcolor()``
-      Return the current background color as color specification string or
-      as a tuple (see example).  May be used as input to another
-      color/pencolor/fillcolor/bgcolor call.
+      Trả về màu nền hiện tại dưới dạng chuỗi đặc tả màu hoặc tuple (xem ví dụ). Có thể dùng làm đầu vào cho một lệnh gọi color/pencolor/fillcolor/bgcolor khác.
 
    ``bgcolor(colorstring)``
-      Set the background color to *colorstring*, which is a Tk color
-      specification string, such as ``"red"``, ``"yellow"``, or ``"#33cc8c"``.
+      Đặt màu nền thành *colorstring*, là một chuỗi đặc tả màu Tk, chẳng hạn như ``"red"``, ``"yellow"`` hoặc ``"#33cc8c"``.
 
    ``bgcolor((r, g, b))``
-      Set the background color to the RGB color represented by the tuple of
-      *r*, *g*, and *b*.
-      Each of *r*, *g*, and *b* must be in the range 0..colormode, where
-      colormode is either 1.0 or 255 (see :func:`colormode`).
+      Đặt màu nền thành màu RGB được biểu diễn bằng tuple gồm *r*, *g* và *b*. Mỗi giá trị *r*, *g* và *b* phải nằm trong phạm vi 0..colormode, trong đó colormode là 1.0 hoặc 255 (xem :func:`colormode`).
 
    ``bgcolor(r, g, b)``
-      Set the background color to the RGB color represented by *r*, *g*, and *b*.  Each of
-      *r*, *g*, and *b* must be in the range 0..colormode.
+      Đặt màu nền thành màu RGB được biểu diễn bởi *r*, *g* và *b*. Mỗi giá trị *r*, *g* và *b* phải nằm trong phạm vi 0..colormode.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1671,13 +1487,9 @@ Window control
 
 .. function:: bgpic(picname=None)
 
-   :param picname: a string, name of an image file (PNG, GIF, PGM, and PPM)
-                   or ``"nopic"``, or ``None``
+   :param picname: một chuỗi, tên của tệp hình ảnh (PNG, GIF, PGM và PPM), hoặc ``"nopic"``, hoặc ``None``
 
-   Set background image or return name of current backgroundimage.  If *picname*
-   is a filename, set the corresponding image as background.  If *picname* is
-   ``"nopic"``, delete background image, if present.  If *picname* is ``None``,
-   return the filename of the current backgroundimage. ::
+   Đặt ảnh nền hoặc trả về tên của ảnh nền hiện tại. Nếu *picname* là tên tệp, đặt hình ảnh tương ứng làm nền. Nếu *picname* là ``"nopic"``, xóa ảnh nền nếu có. Nếu *picname* là ``None``, trả về tên tệp của ảnh nền hiện tại.::
 
       >>> screen.bgpic()
       'nopic'
@@ -1690,43 +1502,33 @@ Window control
    :noindex:
 
    .. note::
-      This TurtleScreen method is available as a global function only under the
-      name ``clearscreen``.  The global function ``clear`` is a different one
-      derived from the Turtle method ``clear``.
+      Phương thức TurtleScreen này chỉ khả dụng dưới dạng hàm global với tên ``clearscreen``. Hàm global ``clear`` là một hàm khác được dẫn xuất từ phương thức Turtle ``clear``.
 
 
 .. function:: clearscreen()
 
-   Delete all drawings and all turtles from the TurtleScreen.  Reset the now
-   empty TurtleScreen to its initial state: white background, no background
-   image, no event bindings and tracing on.
+   Xóa tất cả bản vẽ và tất cả turtle khỏi TurtleScreen. Đặt lại TurtleScreen hiện đang trống về trạng thái ban đầu: nền trắng, không có ảnh nền, không có liên kết sự kiện và bật tracing.
 
 
 .. function:: reset()
    :noindex:
 
    .. note::
-      This TurtleScreen method is available as a global function only under the
-      name ``resetscreen``.  The global function ``reset`` is another one
-      derived from the Turtle method ``reset``.
+      Phương thức TurtleScreen này chỉ khả dụng dưới dạng hàm global với tên ``resetscreen``. Hàm global ``reset`` là một hàm khác được dẫn xuất từ phương thức Turtle ``reset``.
 
 
 .. function:: resetscreen()
 
-   Reset all Turtles on the Screen to their initial state.
+   Đặt lại tất cả Turtle trên Screen về trạng thái ban đầu.
 
 
 .. function:: screensize(canvwidth=None, canvheight=None, bg=None)
 
-   :param canvwidth: positive integer, new width of canvas in pixels
-   :param canvheight: positive integer, new height of canvas in pixels
-   :param bg: colorstring or color-tuple, new background color
+   :param canvwidth: số nguyên dương, chiều rộng mới của canvas tính bằng pixel
+   :param canvheight: số nguyên dương, chiều cao mới của canvas tính bằng pixel
+   :param bg: colorstring hoặc color-tuple, màu nền mới
 
-   If no arguments are given, return current (canvaswidth, canvasheight).  Else
-   resize the canvas the turtles are drawing on.  Do not alter the drawing
-   window.  To observe hidden parts of the canvas, use the scrollbars. With this
-   method, one can make visible those parts of a drawing which were outside the
-   canvas before.
+   Nếu không cung cấp đối số nào, trả về (canvaswidth, canvasheight) hiện tại. Nếu không, thay đổi kích thước canvas mà các turtle đang vẽ lên. Không thay đổi cửa sổ vẽ. Để quan sát các phần bị ẩn của canvas, hãy sử dụng các thanh cuộn. Với phương thức này, ta có thể hiển thị những phần của hình vẽ trước đây nằm bên ngoài canvas.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1737,22 +1539,19 @@ Window control
       >>> screen.screensize()
       (2000, 1500)
 
-   e.g. to search for an erroneously escaped turtle ;-)
+   ví dụ: để tìm một turtle bị escape sai ;-)​
 
 
 .. function:: setworldcoordinates(llx, lly, urx, ury)
 
-   :param llx: a number, x-coordinate of lower left corner of canvas
-   :param lly: a number, y-coordinate of lower left corner of canvas
-   :param urx: a number, x-coordinate of upper right corner of canvas
-   :param ury: a number, y-coordinate of upper right corner of canvas
+   :param llx: một số, tọa độ x của góc dưới bên trái canvas
+   :param lly: một số, tọa độ y của góc dưới bên trái canvas
+   :param urx: một số, tọa độ x của góc trên bên phải của canvas
+   :param ury: một số, tọa độ y của góc trên bên phải của canvas
 
-   Set up user-defined coordinate system and switch to mode "world" if
-   necessary.  This performs a ``screen.reset()``.  If mode "world" is already
-   active, all drawings are redrawn according to the new coordinates.
+   Thiết lập hệ tọa độ do người dùng định nghĩa và chuyển sang chế độ "world" nếu cần. Thao tác này thực hiện một ``screen.reset()``. Nếu chế độ "world" đã được kích hoạt, tất cả hình vẽ sẽ được vẽ lại theo các tọa độ mới.
 
-   **ATTENTION**: in user-defined coordinate systems angles may appear
-   distorted.
+   **CHÚ Ý**: trong các hệ tọa độ do người dùng định nghĩa, các góc có thể bị biến dạng.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1763,7 +1562,7 @@ Window control
       ...     left(10)
       ...
       >>> for _ in range(8):
-      ...     left(45); fd(2)   # a regular octagon
+      ...     left(45); fd(2)   # một hình bát giác đều
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1774,14 +1573,12 @@ Window control
       ...      t.reset()
 
 
-Animation control
-^^^^^^^^^^^^^^^^^
+Điều khiển hoạt ảnh
+^^^^^^^^^^^^^^^^^^^
 
 .. function:: no_animation()
 
-   Temporarily disable turtle animation. The code written inside the
-   ``no_animation`` block will not be animated;
-   once the code block is exited, the drawing will appear.
+   Tạm thời vô hiệu hóa hoạt ảnh của turtle. Mã được viết bên trong khối ``no_animation`` sẽ không được tạo hoạt ảnh; khi thoát khỏi khối mã, hình vẽ sẽ xuất hiện.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1796,13 +1593,11 @@ Animation control
 
 .. function:: delay(delay=None)
 
-   :param delay: positive integer
+   :param delay: số nguyên dương
 
-   Set or return the drawing *delay* in milliseconds.  (This is approximately
-   the time interval between two consecutive canvas updates.)  The longer the
-   drawing delay, the slower the animation.
+   Đặt hoặc trả về *độ trễ* vẽ tính bằng mili giây.  (Đây xấp xỉ là khoảng thời gian giữa hai lần cập nhật canvas liên tiếp.)  Độ trễ vẽ càng dài thì animation càng chậm.
 
-   Optional argument:
+   Đối số tùy chọn:
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1816,14 +1611,10 @@ Animation control
 
 .. function:: tracer(n=None, delay=None)
 
-   :param n: nonnegative integer
-   :param delay: nonnegative integer
+   :param n: số nguyên không âm
+   :param delay: số nguyên không âm
 
-   Turn turtle animation on/off and set delay for update drawings.  If
-   *n* is given, only each n-th regular screen update is really
-   performed.  (Can be used to accelerate the drawing of complex
-   graphics.)  When called without arguments, returns the currently
-   stored value of n. Second argument sets delay value (see
+   Bật/tắt animation của turtle và đặt độ trễ cho các bản vẽ được cập nhật.  Nếu cung cấp *n*, chỉ mỗi lần cập nhật màn hình thứ n mới thực sự được thực hiện.  (Có thể dùng để tăng tốc quá trình vẽ đồ họa phức tạp.)  Khi được gọi mà không có đối số, hàm trả về giá trị n hiện được lưu. Đối số thứ hai đặt giá trị độ trễ (xem
    :func:`delay`).
 
    .. doctest::
@@ -1839,29 +1630,26 @@ Animation control
 
 .. function:: update()
 
-   Perform a TurtleScreen update. To be used when tracer is turned off.
+   Thực hiện cập nhật TurtleScreen. Dùng khi tracer bị tắt.
 
-See also the RawTurtle/Turtle method :func:`speed`.
+Xem thêm phương thức RawTurtle/Turtle :func:`speed`.
 
 
-Using screen events
-^^^^^^^^^^^^^^^^^^^
+Sử dụng sự kiện màn hình
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. function:: listen(xdummy=None, ydummy=None)
 
-   Set focus on TurtleScreen (in order to collect key-events).  Dummy arguments
-   are provided in order to be able to pass :func:`listen` to the onclick method.
+   Đặt tiêu điểm cho TurtleScreen (để thu thập các sự kiện phím). Các đối số giả được cung cấp để có thể truyền :func:`listen` vào phương thức onclick.
 
 
 .. function:: onkey(fun, key)
               onkeyrelease(fun, key)
 
-   :param fun: a function with no arguments or ``None``
-   :param key: a string: key (e.g. "a") or key-symbol (e.g. "space")
+   :param fun: một hàm không có đối số hoặc ``None``
+   :param key: một chuỗi: phím (ví dụ: "a") hoặc ký hiệu phím (ví dụ: "space")
 
-   Bind *fun* to key-release event of key.  If *fun* is ``None``, event bindings
-   are removed. Remark: in order to be able to register key-events, TurtleScreen
-   must have the focus. (See method :func:`listen`.)
+   Liên kết *fun* với sự kiện nhả phím của key. Nếu *fun* là ``None``, các liên kết sự kiện sẽ bị gỡ bỏ. Lưu ý: để có thể đăng ký các sự kiện phím, TurtleScreen phải được đặt tiêu điểm. (Xem phương thức :func:`listen`.)
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1876,13 +1664,10 @@ Using screen events
 
 .. function:: onkeypress(fun, key=None)
 
-   :param fun: a function with no arguments or ``None``
-   :param key: a string: key (e.g. "a") or key-symbol (e.g. "space")
+   :param fun: một hàm không có đối số hoặc ``None``
+   :param key: một chuỗi: phím (ví dụ: "a") hoặc ký hiệu phím (ví dụ: "space")
 
-   Bind *fun* to key-press event of key if key is given,
-   or to any key-press-event if no key is given.
-   Remark: in order to be able to register key-events, TurtleScreen
-   must have focus. (See method :func:`listen`.)
+   Gắn *fun* với sự kiện nhấn phím của key nếu key được cung cấp, hoặc với mọi sự kiện nhấn phím nếu không cung cấp key. Lưu ý: để có thể đăng ký các sự kiện bàn phím, TurtleScreen phải được focus. (Xem phương thức :func:`listen`.)
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1897,37 +1682,31 @@ Using screen events
 .. function:: onclick(fun, btn=1, add=None)
               onscreenclick(fun, btn=1, add=None)
 
-   :param fun: a function with two arguments which will be called with the
-               coordinates of the clicked point on the canvas
-   :param btn: number of the mouse-button, defaults to 1 (left mouse button)
-   :param add: ``True`` or ``False`` -- if ``True``, a new binding will be
-               added, otherwise it will replace a former binding
+   :param fun: một hàm có hai đối số, được gọi với tọa độ của điểm được nhấp trên canvas
+   :param btn: số hiệu nút chuột, mặc định là 1 (nút chuột trái)
+   :param add: ``True`` hoặc ``False`` -- nếu ``True``, một binding mới sẽ được thêm vào; nếu không, nó sẽ thay thế binding trước đó
 
-   Bind *fun* to mouse-click events on this screen.  If *fun* is ``None``,
-   existing bindings are removed.
+   Gắn *fun* với các sự kiện nhấp chuột trên màn hình này. Nếu *fun* là ``None``, các liên kết hiện có sẽ bị xóa.
 
-   Example for a TurtleScreen instance named ``screen`` and a Turtle instance
-   named ``turtle``:
+   Ví dụ với một thực thể TurtleScreen có tên là ``screen`` và một thực thể Turtle có tên là ``turtle``:
 
    .. doctest::
       :skipif: _tkinter is None
 
-      >>> screen.onclick(turtle.goto) # Subsequently clicking into the TurtleScreen will
-      >>>                             # make the turtle move to the clicked point.
-      >>> screen.onclick(None)        # remove event binding again
+      >>> screen.onclick(turtle.goto) # Sau đó, khi nhấp vào TurtleScreen, sẽ
+      >>>                             # khiến turtle di chuyển đến điểm được nhấp.
+      >>> screen.onclick(None)        # xóa lại liên kết sự kiện
 
    .. note::
-      This TurtleScreen method is available as a global function only under the
-      name ``onscreenclick``.  The global function ``onclick`` is another one
-      derived from the Turtle method ``onclick``.
+      Phương thức TurtleScreen này chỉ khả dụng dưới dạng hàm toàn cục với tên ``onscreenclick``. Hàm toàn cục ``onclick`` là một hàm khác được dẫn xuất từ phương thức Turtle ``onclick``.
 
 
 .. function:: ontimer(fun, t=0)
 
-   :param fun: a function with no arguments
-   :param t: a number >= 0
+   :param fun: một hàm không có đối số
+   :param t: một số >= 0
 
-   Install a timer that calls *fun* after *t* milliseconds.
+   Cài đặt một timer gọi *fun* sau *t* mili giây.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -1938,93 +1717,76 @@ Using screen events
       ...         fd(50)
       ...         lt(60)
       ...         screen.ontimer(f, 250)
-      >>> f()   ### makes the turtle march around
+      >>> f()   ### khiến rùa di chuyển vòng quanh
       >>> running = False
 
 
 .. function:: mainloop()
               done()
 
-   Starts event loop - calling Tkinter's mainloop function.
-   Must be the last statement in a turtle graphics program.
-   Must *not* be used if a script is run from within IDLE in -n mode
-   (No subprocess) - for interactive use of turtle graphics. ::
+   Bắt đầu vòng lặp sự kiện - gọi hàm mainloop của Tkinter. Phải là câu lệnh cuối cùng trong chương trình đồ họa turtle. Phải *không* được sử dụng nếu chạy một script từ bên trong IDLE ở chế độ -n (Không có subprocess) - để sử dụng turtle graphics theo cách tương tác.::
 
       >>> screen.mainloop()
 
 
-Input methods
-^^^^^^^^^^^^^
+Các phương thức nhập
+^^^^^^^^^^^^^^^^^^^^
 
 .. function:: textinput(title, prompt)
 
-   :param title: string
-   :param prompt: string
+   :param title: chuỗi
+   :param prompt: chuỗi
 
-   Pop up a dialog window for input of a string. Parameter title is
-   the title of the dialog window, prompt is a text mostly describing
-   what information to input.
-   Return the string input. If the dialog is canceled, return ``None``. ::
+   Hiển thị một cửa sổ hộp thoại để nhập một chuỗi. Tham số title là tiêu đề của cửa sổ hộp thoại, còn prompt là văn bản chủ yếu mô tả thông tin cần nhập. Trả về chuỗi đã nhập. Nếu hộp thoại bị hủy, trả về ``None``.::
 
       >>> screen.textinput("NIM", "Name of first player:")
 
 
 .. function:: numinput(title, prompt, default=None, minval=None, maxval=None)
 
-   :param title: string
-   :param prompt: string
-   :param default: number (optional)
-   :param minval: number (optional)
-   :param maxval: number (optional)
+   :param title: chuỗi
+   :param prompt: chuỗi
+   :param default: number (tùy chọn)
+   :param minval: number (tùy chọn)
+   :param maxval: number (tùy chọn)
 
-   Pop up a dialog window for input of a number. title is the title of the
-   dialog window, prompt is a text mostly describing what numerical information
-   to input. default: default value, minval: minimum value for input,
-   maxval: maximum value for input.
-   The number input must be in the range minval .. maxval if these are
-   given. If not, a hint is issued and the dialog remains open for
-   correction.
-   Return the number input. If the dialog is canceled,  return ``None``. ::
+   Mở hộp thoại để nhập một số. title là tiêu đề của hộp thoại, prompt là văn bản chủ yếu mô tả thông tin số cần nhập. default: giá trị mặc định, minval: giá trị nhỏ nhất cho đầu vào, maxval: giá trị lớn nhất cho đầu vào. Đầu vào số phải nằm trong phạm vi minval .. maxval nếu các giá trị này được cung cấp. Nếu không, một gợi ý sẽ được đưa ra và hộp thoại vẫn mở để sửa lại. Trả về số đã nhập. Nếu hộp thoại bị hủy, trả về ``None``.::
 
       >>> screen.numinput("Poker", "Your stakes:", 1000, minval=10, maxval=10000)
 
 
-Settings and special methods
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Cài đặt và các phương thức đặc biệt
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. function:: mode(mode=None)
 
-   :param mode: one of the strings "standard", "logo" or "world"
+   :param mode: một trong các chuỗi "standard", "logo" hoặc "world"
 
-   Set turtle mode ("standard", "logo" or "world") and perform reset.  If mode
-   is not given, current mode is returned.
+   Đặt chế độ turtle ("standard", "logo" hoặc "world") và thực hiện reset. Nếu không cung cấp mode, trả về mode hiện tại.
 
-   Mode "standard" is compatible with old :mod:`!turtle`.  Mode "logo" is
-   compatible with most Logo turtle graphics.  Mode "world" uses user-defined
-   "world coordinates". **Attention**: in this mode angles appear distorted if
-   ``x/y`` unit-ratio doesn't equal 1.
+   Chế độ "standard" tương thích với :mod:`!turtle` cũ. Chế độ "logo" tương thích với hầu hết đồ họa turtle của Logo. Chế độ "world" sử dụng "tọa độ world" do người dùng định nghĩa. **Lưu ý**: trong chế độ này, các góc sẽ bị méo nếu ``x/y`` unit-ratio không bằng 1.
 
-   ============ ========================= ===================
-       Mode      Initial turtle heading     positive angles
-   ============ ========================= ===================
-    "standard"    to the right (east)       counterclockwise
-      "logo"        upward    (north)         clockwise
-   ============ ========================= ===================
+   +------------+-------------------------+-------------------------+
+   | Mode       | Initial turtle heading  | các góc dương           |
+   +============+=========================+=========================+
+   | "standard" | sang phải (hướng đông)  | ngược chiều kim đồng hồ |
+   +------------+-------------------------+-------------------------+
+   | "logo"     | lên trên    (hướng bắc) | theo chiều kim đồng hồ  |
+   +------------+-------------------------+-------------------------+
 
    .. doctest::
       :skipif: _tkinter is None
 
-      >>> mode("logo")   # resets turtle heading to north
+      >>> mode("logo")   # đặt lại hướng của turtle về phía bắc
       >>> mode()
       'logo'
 
 
 .. function:: colormode(cmode=None)
 
-   :param cmode: one of the values 1.0 or 255
+   :param cmode: một trong hai giá trị 1.0 hoặc 255
 
-   Return the colormode or set it to 1.0 or 255.  Subsequently *r*, *g*, *b*
-   values of color triples have to be in the range 0..*cmode*.
+   Trả về colormode hoặc đặt nó thành 1.0 hoặc 255. Sau đó, các giá trị *r*, *g*, *b* của các bộ ba màu phải nằm trong phạm vi 0..*cmode*.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -2044,8 +1806,7 @@ Settings and special methods
 
 .. function:: getcanvas()
 
-   Return the Canvas of this TurtleScreen.  Useful for insiders who know what to
-   do with a Tkinter Canvas.
+   Trả về Canvas của TurtleScreen này. Hữu ích cho những người dùng chuyên sâu biết cách làm việc với Tkinter Canvas.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -2057,7 +1818,7 @@ Settings and special methods
 
 .. function:: getshapes()
 
-   Return a list of names of all currently available turtle shapes.
+   Trả về danh sách tên của tất cả các hình turtle hiện có.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -2069,48 +1830,40 @@ Settings and special methods
 .. function:: register_shape(name, shape=None)
               addshape(name, shape=None)
 
-   There are four different ways to call this function:
+   Có bốn cách khác nhau để gọi hàm này:
 
-   (1) *name* is the name of an image file (PNG, GIF, PGM, and PPM) and *shape* is ``None``: Install the
-       corresponding image shape. ::
+   (1) *name* là tên của một tệp hình ảnh (PNG, GIF, PGM và PPM) còn *shape* là ``None``: Cài đặt shape tương ứng của hình ảnh.::
 
        >>> screen.register_shape("turtle.gif")
 
        .. note::
-          Image shapes *do not* rotate when turning the turtle, so they do not
-          display the heading of the turtle!
+          Các shape hình ảnh *không* xoay khi xoay turtle, vì vậy chúng không hiển thị hướng của turtle!
 
-   (2) *name* is an arbitrary string and *shape* is the name of an image file (PNG, GIF, PGM, and PPM): Install the
-       corresponding image shape. ::
+   (2) *name* là một chuỗi tùy ý còn *shape* là tên của một tệp hình ảnh (PNG, GIF, PGM và PPM): Cài đặt shape tương ứng của hình ảnh.::
 
        >>> screen.register_shape("turtle", "turtle.gif")
 
        .. note::
-          Image shapes *do not* rotate when turning the turtle, so they do not
-          display the heading of the turtle!
+          Các shape hình ảnh *không* xoay khi xoay turtle, vì vậy chúng không hiển thị hướng của turtle!
 
-   (3) *name* is an arbitrary string and *shape* is a tuple of pairs of
-       coordinates: Install the corresponding polygon shape.
+   (3) *name* là một chuỗi tùy ý còn *shape* là một tuple gồm các cặp tọa độ: Cài đặt polygon shape tương ứng.
 
        .. doctest::
           :skipif: _tkinter is None
 
           >>> screen.register_shape("triangle", ((5,-3), (0,5), (-5,-3)))
 
-   (4) *name* is an arbitrary string and *shape* is a (compound) :class:`Shape`
-       object: Install the corresponding compound shape.
+   (4) *name* là một chuỗi tùy ý còn *shape* là một đối tượng :class:`Shape` (compound): Cài đặt compound shape tương ứng.
 
-   Add a turtle shape to TurtleScreen's shapelist.  Only thusly registered
-   shapes can be used by issuing the command ``shape(shapename)``.
+   Thêm một shape của turtle vào shapelist của TurtleScreen. Chỉ những shape được đăng ký theo cách này mới có thể được sử dụng bằng cách chạy lệnh ``shape(shapename)``.
 
    .. versionchanged:: 3.14
-      Added support for PNG, PGM, and PPM image formats.
-      Both a shape name and an image file name can be specified.
+      Đã thêm hỗ trợ cho các định dạng ảnh PNG, PGM và PPM. Có thể chỉ định cả tên shape và tên tệp ảnh.
 
 
 .. function:: turtles()
 
-   Return the list of turtles on the screen.
+   Trả về danh sách các turtle trên màn hình.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -2121,7 +1874,7 @@ Settings and special methods
 
 .. function:: window_height()
 
-   Return the height of the turtle window. ::
+   Trả về chiều cao của cửa sổ turtle.::
 
       >>> screen.window_height()
       480
@@ -2129,7 +1882,7 @@ Settings and special methods
 
 .. function:: window_width()
 
-   Return the width of the turtle window. ::
+   Trả về chiều rộng của cửa sổ turtle.::
 
       >>> screen.window_width()
       640
@@ -2138,35 +1891,29 @@ Settings and special methods
 .. _screenspecific:
 .. _methods-specific-to-screen-not-inherited-from-turtlescreen:
 
-Screen-only methods
-^^^^^^^^^^^^^^^^^^^
+Các phương thức chỉ dành cho Screen
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. function:: bye()
 
-   Shut the turtlegraphics window.
+   Đóng cửa sổ turtlegraphics.
 
 
 .. function:: exitonclick()
 
-   Bind ``bye()`` method to mouse clicks on the Screen.
+   Gắn phương thức ``bye()`` với các lần nhấp chuột trên Screen.
 
 
-   If the value "using_IDLE" in the configuration dictionary is ``False``
-   (default value), also enter mainloop.  Remark: If IDLE with the ``-n`` switch
-   (no subprocess) is used, this value should be set to ``True`` in
-   :file:`turtle.cfg`.  In this case IDLE's own mainloop is active also for the
-   client script.
+   Nếu giá trị "using_IDLE" trong từ điển cấu hình là ``False`` (giá trị mặc định), cũng đi vào mainloop. Lưu ý: Nếu sử dụng IDLE với switch ``-n`` (không có subprocess), giá trị này nên được đặt thành ``True`` trong
+   :file:`turtle.cfg`. Trong trường hợp này, mainloop của chính IDLE cũng hoạt động cho client script.
 
 
 .. function:: save(filename, overwrite=False)
 
-   Save the current turtle drawing (and turtles) as a PostScript file.
+   Lưu bản vẽ turtle hiện tại (và các turtle) dưới dạng tệp PostScript.
 
-   :param filename: the path of the saved PostScript file
-   :param overwrite: if ``False`` and there already exists a file with the given
-                     filename, then the function will raise a
-                     ``FileExistsError``. If it is ``True``, the file will be
-                     overwritten.
+   :param filename: đường dẫn của tệp PostScript đã lưu
+   :param overwrite: nếu ``False`` và đã tồn tại một tệp có tên tệp được chỉ định, hàm sẽ raise một ``FileExistsError``. Nếu là ``True``, tệp sẽ bị ghi đè.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -2178,36 +1925,28 @@ Screen-only methods
 
 .. function:: setup(width=_CFG["width"], height=_CFG["height"], startx=_CFG["leftright"], starty=_CFG["topbottom"])
 
-   Set the size and position of the main window.  Default values of arguments
-   are stored in the configuration dictionary and can be changed via a
-   :file:`turtle.cfg` file.
+   Đặt kích thước và vị trí của cửa sổ chính. Giá trị mặc định của các đối số được lưu trong từ điển cấu hình và có thể thay đổi thông qua một
+   tệp :file:`turtle.cfg`.
 
-   :param width: if an integer, a size in pixels, if a float, a fraction of the
-                 screen; default is 50% of screen
-   :param height: if an integer, the height in pixels, if a float, a fraction of
-                  the screen; default is 75% of screen
-   :param startx: if positive, starting position in pixels from the left
-                  edge of the screen, if negative from the right edge, if ``None``,
-                  center window horizontally
-   :param starty: if positive, starting position in pixels from the top
-                  edge of the screen, if negative from the bottom edge, if ``None``,
-                  center window vertically
+   :param width: nếu là số nguyên, kích thước tính bằng pixel; nếu là số thực, một phần của màn hình; mặc định là 50% màn hình
+   :param height: nếu là số nguyên, chiều cao tính bằng pixel; nếu là số thực, một phần của màn hình; mặc định là 75% màn hình
+   :param startx: nếu dương, vị trí bắt đầu tính bằng pixel từ mép trái màn hình; nếu âm, tính từ mép phải; nếu ``None``, căn giữa cửa sổ theo chiều ngang
+   :param starty: nếu dương, vị trí bắt đầu tính bằng pixel từ mép trên màn hình; nếu âm, tính từ mép dưới; nếu ``None``, căn giữa cửa sổ theo chiều dọc
 
    .. doctest::
       :skipif: _tkinter is None
 
       >>> screen.setup (width=200, height=200, startx=0, starty=0)
-      >>>              # sets window to 200x200 pixels, in upper left of screen
+      >>>              # đặt cửa sổ thành 200x200 pixel ở góc trên bên trái màn hình
       >>> screen.setup(width=.75, height=0.5, startx=None, starty=None)
-      >>>              # sets window to 75% of screen by 50% of screen and centers
+      >>>              # đặt cửa sổ có kích thước bằng 75% màn hình theo chiều cao và 50% màn hình theo chiều rộng, rồi căn giữa
 
 
 .. function:: title(titlestring)
 
-   :param titlestring: a string that is shown in the titlebar of the turtle
-                       graphics window
+   :param titlestring: một chuỗi được hiển thị trên thanh tiêu đề của cửa sổ đồ họa turtle
 
-   Set title of turtle window to *titlestring*.
+   Đặt tiêu đề cửa sổ turtle thành *titlestring*.
 
    .. doctest::
       :skipif: _tkinter is None
@@ -2215,70 +1954,67 @@ Screen-only methods
       >>> screen.title("Welcome to the turtle zoo!")
 
 
-Public classes
---------------
+Các lớp công khai
+-----------------
 
 
 .. class:: RawTurtle(canvas)
            RawPen(canvas)
 
-   :param canvas: a :class:`!tkinter.Canvas`, a :class:`ScrolledCanvas` or a
+   :param canvas: một :class:`!tkinter.Canvas`, một :class:`ScrolledCanvas` hoặc một
                   :class:`TurtleScreen`
 
-   Create a turtle.  The turtle has all methods described above as "methods of
-   Turtle/RawTurtle".
+   Tạo một turtle. Turtle có tất cả các phương thức được mô tả ở trên dưới dạng "methods of Turtle/RawTurtle".
 
 
 .. class:: Turtle()
 
-   Subclass of RawTurtle, has the same interface but draws on a default
-   :class:`Screen` object created automatically when needed for the first time.
+   Lớp con của RawTurtle, có cùng interface nhưng vẽ trên một
+   đối tượng :class:`Screen` được tạo tự động khi cần lần đầu tiên.
 
 
 .. class:: TurtleScreen(cv)
 
-   :param cv: a :class:`!tkinter.Canvas`
+   :param cv: một :class:`!tkinter.Canvas`
 
-   Provides screen oriented methods like :func:`bgcolor` etc. that are described
-   above.
+   Cung cấp các phương thức định hướng màn hình như :func:`bgcolor` cùng nhiều phương thức khác được mô tả ở trên.
 
 .. class:: Screen()
 
-   Subclass of TurtleScreen, with :ref:`four methods added <screenspecific>`.
+   Lớp con của TurtleScreen, được bổ sung :ref:`bốn phương thức <screenspecific>`.
 
 
 .. class:: ScrolledCanvas(master)
 
-   :param master: some Tkinter widget to contain the ScrolledCanvas, i.e.
-      a Tkinter-canvas with scrollbars added
+   :param master: một widget Tkinter nào đó để chứa ScrolledCanvas, tức là một canvas Tkinter có thêm các thanh cuộn
 
-   Used by class Screen, which thus automatically provides a ScrolledCanvas as
-   playground for the turtles.
+   Được lớp Screen sử dụng, vì vậy lớp này tự động cung cấp một ScrolledCanvas làm không gian thực hành cho các turtle.
 
 .. class:: Shape(type_, data)
 
-   :param type\_: one of the strings "polygon", "image", "compound"
+   :param type\_: một trong các chuỗi "polygon", "image", "compound"
 
-   Data structure modeling shapes.  The pair ``(type_, data)`` must follow this
-   specification:
+   Cấu trúc dữ liệu mô hình hóa các hình dạng. Cặp ``(type_, data)`` phải tuân theo đặc tả sau:
 
 
-   =========== ===========
-   *type_*     *data*
-   =========== ===========
-   "polygon"   a polygon-tuple, i.e. a tuple of pairs of coordinates
-   "image"     an image  (in this form only used internally!)
-   "compound"  ``None`` (a compound shape has to be constructed using the
-               :meth:`addcomponent` method)
-   =========== ===========
+   +------------+------------------------------------------------------------------+
+   | *type_*    | *dữ liệu*                                                        |
+   +============+==================================================================+
+   | "polygon"  | một polygon-tuple, tức là một tuple gồm các cặp tọa độ           |
+   +------------+------------------------------------------------------------------+
+   | "image"    | một image (ở dạng này chỉ được sử dụng nội bộ!)                  |
+   +------------+------------------------------------------------------------------+
+   | "compound" | ``None`` (một hình dạng compound phải được tạo bằng cách sử dụng |
+   |            | :meth:`addcomponent` phương thức)                                |
+   +------------+------------------------------------------------------------------+
 
    .. method:: addcomponent(poly, fill, outline=None)
 
-      :param poly: a polygon, i.e. a tuple of pairs of numbers
-      :param fill: a color the *poly* will be filled with
-      :param outline: a color for the poly's outline (if given)
+      :param poly: một đa giác, tức là một tuple gồm các cặp số
+      :param fill: một màu mà *poly* sẽ được tô bằng
+      :param outline: một màu cho đường viền của poly (nếu được cung cấp)
 
-      Example:
+      Ví dụ:
 
       .. doctest::
          :skipif: _tkinter is None
@@ -2286,36 +2022,33 @@ Public classes
          >>> poly = ((0,0),(10,-5),(0,10),(-10,-5))
          >>> s = Shape("compound")
          >>> s.addcomponent(poly, "red", "blue")
-         >>> # ... add more components and then use register_shape()
+         >>> # ... thêm các component khác rồi sử dụng register_shape()
 
-      See :ref:`compoundshapes`.
+      Xem :ref:`compoundshapes`.
 
 
 .. class:: Vec2D(x, y)
 
-   A two-dimensional vector class, used as a helper class for implementing
-   turtle graphics.  May be useful for turtle graphics programs too.  Derived
-   from tuple, so a vector is a tuple!
+   Một lớp vector hai chiều, được dùng làm lớp trợ giúp để triển khai đồ họa turtle. Cũng có thể hữu ích cho các chương trình đồ họa turtle. Được kế thừa từ tuple, vì vậy một vector cũng là một tuple!
 
-   Provides (for *a*, *b* vectors, *k* number):
+   Cung cấp (với các vector *a* và *b*, số *k*):
 
-   * ``a + b`` vector addition
-   * ``a - b`` vector subtraction
-   * ``a * b`` inner product
-   * ``k * a`` and ``a * k`` multiplication with scalar
-   * ``abs(a)`` absolute value of a
-   * ``a.rotate(angle)`` rotation
+   * ``a + b`` phép cộng vector
+   * ``a - b`` phép trừ vector
+   * ``a * b`` tích vô hướng
+   * ``k * a`` phép nhân với scalar của a và ``a * k``
+   * ``abs(a)`` giá trị tuyệt đối của a
+   * ``a.rotate(angle)`` phép xoay
 
 
-Exceptions
-----------
+Ngoại lệ
+--------
 
-The :mod:`!turtle` module defines the following exception:
+Mô-đun :mod:`!turtle` định nghĩa ngoại lệ sau:
 
 .. exception:: TurtleGraphicsError
 
-   Raised for invalid arguments or operations.
-   For example, a malformed color string:
+   Được phát sinh khi đối số hoặc thao tác không hợp lệ. Ví dụ: một chuỗi màu không đúng định dạng:
 
    .. doctest::
       :skipif: _tkinter is None
@@ -2330,18 +2063,16 @@ The :mod:`!turtle` module defines the following exception:
 .. _turtle-how-to:
 .. _how-to:
 
-How-to guides
-=============
+Hướng dẫn thực hiện
+===================
 
-This section covers some typical turtle use-cases and approaches.
+Phần này trình bày một số trường hợp sử dụng và cách tiếp cận điển hình với turtle.
 
 
-Automatically begin and end filling
------------------------------------
+Tự động bắt đầu và kết thúc việc tô màu
+---------------------------------------
 
-Starting with Python 3.14, you can use the :func:`fill` :term:`context manager`
-instead of :func:`begin_fill` and :func:`end_fill` to automatically begin and
-end fill. Here is an example::
+Bắt đầu từ Python 3.14, bạn có thể sử dụng :func:`fill` :term:`context manager` thay cho :func:`begin_fill` và :func:`end_fill` để tự động bắt đầu và kết thúc việc tô. Dưới đây là một ví dụ::
 
    with fill():
        for i in range(4):
@@ -2350,7 +2081,7 @@ end fill. Here is an example::
 
    forward(200)
 
-The code above is equivalent to::
+Đoạn mã trên tương đương với::
 
    begin_fill()
    for i in range(4):
@@ -2361,26 +2092,18 @@ The code above is equivalent to::
    forward(200)
 
 
-Use the ``turtle`` module namespace
------------------------------------
+Sử dụng không gian tên mô-đun ``turtle``
+----------------------------------------
 
-Using ``from turtle import *`` is convenient - but be warned that it imports a
-rather large collection of objects, and if you're doing anything but turtle
-graphics you run the risk of a name conflict (this becomes even more an issue
-if you're using turtle graphics in a script where other modules might be
-imported).
+Sử dụng ``from turtle import *`` rất tiện lợi - nhưng hãy lưu ý rằng cách này nhập một tập hợp khá lớn các đối tượng, và nếu bạn làm bất cứ việc gì ngoài đồ họa turtle, bạn có nguy cơ xảy ra xung đột tên (điều này càng đáng lưu ý hơn nếu bạn sử dụng đồ họa turtle trong một script có thể nhập các mô-đun khác).
 
-The solution is to use ``import turtle`` - ``fd()`` becomes
-``turtle.fd()``, ``width()`` becomes ``turtle.width()`` and so on. (If typing
-"turtle" over and over again becomes tedious, use for example ``import turtle
-as t`` instead.)
+Giải pháp là sử dụng ``import turtle`` - ``fd()`` trở thành ``turtle.fd()``, ``width()`` trở thành ``turtle.width()`` và cứ tiếp tục như vậy. (Nếu việc gõ "turtle" lặp đi lặp lại trở nên tẻ nhạt, bạn có thể sử dụng chẳng hạn như ``import turtle as t``.)
 
 
-Use turtle graphics in a script
--------------------------------
+Sử dụng đồ họa turtle trong một script
+--------------------------------------
 
-It's recommended to use the ``turtle`` module namespace as described
-immediately above, for example::
+Bạn nên sử dụng không gian tên mô-đun ``turtle`` như mô tả ngay ở trên, chẳng hạn như::
 
     import turtle as t
     from random import random
@@ -2391,31 +2114,23 @@ immediately above, for example::
         t.right(angle)
         t.fd(steps)
 
-Another step is also required though - as soon as the script ends, Python
-will also close the turtle's window. Add::
+Tuy nhiên, cũng cần thực hiện thêm một bước - ngay khi script kết thúc, Python cũng sẽ đóng cửa sổ turtle. Hãy thêm::
 
     t.mainloop()
 
-to the end of the script. The script will now wait to be dismissed and
-will not exit until it is terminated, for example by closing the turtle
-graphics window.
+vào cuối script. Giờ đây, script sẽ chờ được đóng và sẽ không thoát cho đến khi bị kết thúc, chẳng hạn bằng cách đóng cửa sổ turtle graphics.
 
 
-Use object-oriented turtle graphics
------------------------------------
+Sử dụng turtle graphics theo hướng đối tượng
+--------------------------------------------
 
-.. seealso:: :ref:`Explanation of the object-oriented interface <turtle-explanation>`
+.. seealso:: :ref:`Giải thích về interface hướng đối tượng <turtle-explanation>`
 
-Other than for very basic introductory purposes, or for trying things out
-as quickly as possible, it's more usual and much more powerful to use the
-object-oriented approach to turtle graphics. For example, this allows
-multiple turtles on screen at once.
+Ngoài những mục đích nhập môn rất cơ bản hoặc để thử nghiệm nhanh nhất có thể, cách sử dụng turtle graphics theo hướng đối tượng phổ biến hơn và mạnh mẽ hơn nhiều. Ví dụ, cách này cho phép hiển thị nhiều turtle trên màn hình cùng lúc.
 
-In this approach, the various turtle commands are methods of objects (mostly of
-``Turtle`` objects). You *can* use the object-oriented approach in the shell,
-but it would be more typical in a Python script.
+Trong cách tiếp cận này, các lệnh turtle khác nhau là các method của các object (chủ yếu là các object ``Turtle``). Bạn *có thể* sử dụng cách tiếp cận hướng đối tượng trong shell, nhưng cách này thường được dùng hơn trong một Python script.
 
-The example above then becomes::
+Khi đó, ví dụ trên sẽ trở thành::
 
     from turtle import Turtle
     from random import random
@@ -2429,11 +2144,9 @@ The example above then becomes::
 
     t.screen.mainloop()
 
-Note the last line. ``t.screen`` is an instance of the :class:`Screen`
-that a Turtle instance exists on; it's created automatically along with
-the turtle.
+Lưu ý dòng cuối cùng. ``t.screen`` là một thể hiện của :class:`Screen` mà một thể hiện Turtle tồn tại trên đó; nó được tự động tạo cùng với turtle.
 
-The turtle's screen can be customised, for example::
+Màn hình của turtle có thể được tùy chỉnh, chẳng hạn như::
 
     t.screen.title('Object-oriented turtle demo')
     t.screen.bgcolor("orange")
@@ -2441,17 +2154,14 @@ The turtle's screen can be customised, for example::
 
 .. _help-and-configuration:
 
-How to use help
----------------
+Cách sử dụng trợ giúp
+---------------------
 
-The public methods of the Screen and Turtle classes are documented extensively
-via docstrings.  So these can be used as online-help via the Python help
-facilities:
+Các phương thức public của các lớp Screen và Turtle được ghi chép đầy đủ qua docstring. Vì vậy, bạn có thể sử dụng chúng làm trợ giúp trực tuyến thông qua các tiện ích help của Python:
 
-- When using IDLE, tooltips show the signatures and first lines of the
-  docstrings of typed in function-/method calls.
+- Khi sử dụng IDLE, chú giải công cụ sẽ hiển thị signature và những dòng đầu tiên của docstring trong các lời gọi hàm/phương thức được nhập.
 
-- Calling :func:`help` on methods or functions displays the docstrings::
+- Gọi :func:`help` trên các phương thức hoặc hàm sẽ hiển thị docstring::
 
      >>> help(Screen.bgcolor)
      Help on method bgcolor in module turtle:
@@ -2482,8 +2192,7 @@ facilities:
 
          >>> turtle.penup()
 
-- The docstrings of the functions which are derived from methods have a modified
-  form::
+- Docstring của các hàm được tạo từ các phương thức có dạng đã được sửa đổi::
 
      >>> help(bgcolor)
      Help on function bgcolor in module turtle:
@@ -2516,51 +2225,36 @@ facilities:
          Example:
          >>> penup()
 
-These modified docstrings are created automatically together with the function
-definitions that are derived from the methods at import time.
+Các docstring đã sửa đổi này được tự động tạo cùng với các định nghĩa hàm được suy ra từ các method tại thời điểm import.
 
 
-Translation of docstrings into different languages
---------------------------------------------------
+Dịch docstring sang các ngôn ngữ khác nhau
+------------------------------------------
 
-There is a utility to create a dictionary the keys of which are the method names
-and the values of which are the docstrings of the public methods of the classes
-Screen and Turtle.
+Có một tiện ích để tạo một dictionary, trong đó các khóa là tên method còn các giá trị là docstring của các method public thuộc các class Screen và Turtle.
 
 .. function:: write_docstringdict(filename="turtle_docstringdict")
 
-   :param filename: a string, used as filename
+   :param filename: một chuỗi, được dùng làm tên tệp
 
-   Create and write docstring-dictionary to a Python script with the given
-   filename.  This function has to be called explicitly (it is not used by the
-   turtle graphics classes).  The docstring dictionary will be written to the
-   Python script :file:`{filename}.py`.  It is intended to serve as a template
-   for translation of the docstrings into different languages.
+   Tạo và ghi dictionary docstring vào một script Python với tên tệp đã cho. Hàm này phải được gọi một cách tường minh (không được các class turtle graphics sử dụng). Dictionary docstring sẽ được ghi vào script Python :file:`{filename}.py`. Script này nhằm làm mẫu để dịch các docstring sang các ngôn ngữ khác nhau.
 
-If you (or your students) want to use :mod:`!turtle` with online help in your
-native language, you have to translate the docstrings and save the resulting
-file as e.g. :file:`turtle_docstringdict_german.py`.
+Nếu bạn (hoặc học sinh của bạn) muốn sử dụng :mod:`!turtle` với phần trợ giúp trực tuyến bằng ngôn ngữ bản địa của mình, bạn phải dịch các docstring và lưu tệp kết quả, chẳng hạn như :file:`turtle_docstringdict_german.py`.
 
-If you have an appropriate entry in your :file:`turtle.cfg` file this dictionary
-will be read in at import time and will replace the original English docstrings.
+Nếu có mục nhập phù hợp trong tệp :file:`turtle.cfg` của bạn, dictionary này sẽ được đọc tại thời điểm import và thay thế các docstring tiếng Anh gốc.
 
-At the time of this writing there are docstring dictionaries in German and in
-Italian.  (Requests please to glingl@aon.at.)
+Tại thời điểm viết tài liệu này, đã có các từ điển docstring bằng tiếng Đức và tiếng Ý. (Vui lòng gửi yêu cầu đến glingl@aon.at.)
 
 
 
-How to configure Screen and Turtles
------------------------------------
+Cách cấu hình Screen và Turtles
+-------------------------------
 
-The built-in default configuration mimics the appearance and behaviour of the
-old turtle module in order to retain best possible compatibility with it.
+Cấu hình mặc định tích hợp sẵn mô phỏng diện mạo và hành vi của module turtle cũ nhằm duy trì khả năng tương thích tốt nhất có thể với module đó.
 
-If you want to use a different configuration which better reflects the features
-of this module or which better fits to your needs, e.g. for use in a classroom,
-you can prepare a configuration file ``turtle.cfg`` which will be read at import
-time and modify the configuration according to its settings.
+Nếu muốn sử dụng một cấu hình khác phản ánh tốt hơn các tính năng của module này hoặc phù hợp hơn với nhu cầu của bạn, chẳng hạn để sử dụng trong lớp học, bạn có thể chuẩn bị một tệp cấu hình ``turtle.cfg``, tệp này sẽ được đọc tại thời điểm import và cấu hình sẽ được điều chỉnh theo các thiết lập trong đó.
 
-The built in configuration would correspond to the following ``turtle.cfg``:
+Cấu hình tích hợp sẵn tương ứng với ``turtle.cfg`` sau đây:
 
 .. code-block:: ini
 
@@ -2585,169 +2279,118 @@ The built in configuration would correspond to the following ``turtle.cfg``:
    title = Python Turtle Graphics
    using_IDLE = False
 
-Short explanation of selected entries:
+Giải thích ngắn gọn về một số mục được chọn:
 
-- The first four lines correspond to the arguments of the :func:`Screen.setup <setup>`
-  method.
-- Line 5 and 6 correspond to the arguments of the method
+- Bốn dòng đầu tiên tương ứng với các đối số của phương thức :func:`Screen.setup <setup>`.
+- Dòng 5 và 6 tương ứng với các đối số của method
   :func:`Screen.screensize <screensize>`.
-- *shape* can be any of the built-in shapes, e.g: arrow, turtle, etc.  For more
-  info try ``help(shape)``.
-- If you want to use no fill color (i.e. make the turtle transparent), you have
-  to write ``fillcolor = ""`` (but all nonempty strings must not have quotes in
-  the cfg file).
-- If you want to reflect the turtle its state, you have to use ``resizemode =
-  auto``.
-- If you set e.g. ``language = italian`` the docstringdict
-  :file:`turtle_docstringdict_italian.py` will be loaded at import time (if
-  present on the import path, e.g. in the same directory as :mod:`!turtle`).
-- The entries *exampleturtle* and *examplescreen* define the names of these
-  objects as they occur in the docstrings.  The transformation of
-  method-docstrings to function-docstrings will delete these names from the
-  docstrings.
-- *using_IDLE*: Set this to ``True`` if you regularly work with IDLE and its ``-n``
-  switch ("no subprocess").  This will prevent :func:`exitonclick` to enter the
-  mainloop.
+- *shape* có thể là bất kỳ shape dựng sẵn nào, ví dụ: arrow, turtle, v.v. Để biết thêm thông tin, hãy thử ``help(shape)``.
+- Nếu bạn muốn không sử dụng màu tô (tức là làm cho turtle trong suốt), bạn phải viết ``fillcolor = ""`` (nhưng mọi chuỗi không rỗng đều không được có dấu ngoặc kép trong tệp cfg).
+- Nếu bạn muốn phản ánh trạng thái của turtle, bạn phải sử dụng ``resizemode = auto``.
+- Nếu bạn đặt, chẳng hạn, ``language = italian`` cho docstringdict
+  :file:`turtle_docstringdict_italian.py` sẽ được tải tại thời điểm import (nếu có trong import path, ví dụ: cùng thư mục với :mod:`!turtle`).
+- Các mục *exampleturtle* và *examplescreen* xác định tên của các đối tượng này khi chúng xuất hiện trong docstring. Việc chuyển đổi method-docstring thành function-docstring sẽ xóa các tên này khỏi docstring.
+- *using_IDLE*: Đặt giá trị này thành ``True`` nếu bạn thường xuyên làm việc với IDLE và switch ``-n`` của nó ("no subprocess"). Điều này sẽ ngăn :func:`exitonclick` đi vào mainloop.
 
-There can be a :file:`turtle.cfg` file in the directory where :mod:`!turtle` is
-stored and an additional one in the current working directory.  The latter will
-override the settings of the first one.
+Có thể có một tệp :file:`turtle.cfg` trong thư mục lưu trữ :mod:`!turtle` và một tệp bổ sung trong thư mục làm việc hiện tại. Tệp sau sẽ ghi đè các thiết lập của tệp đầu tiên.
 
-The :file:`Lib/turtledemo` directory contains a :file:`turtle.cfg` file.  You can
-study it as an example and see its effects when running the demos (preferably
-not from within the demo-viewer).
+Thư mục :file:`Lib/turtledemo` chứa một tệp :file:`turtle.cfg`. Bạn có thể xem tệp này như một ví dụ và quan sát tác động của nó khi chạy các bản demo (tốt nhất không chạy từ bên trong trình xem demo).
 
 
 .. _turtle-explanation:
 
-Explanation
-===========
+Giải thích
+==========
 
-A turtle object draws on a screen object, and there a number of key classes in
-the turtle object-oriented interface that can be used to create them and relate
-them to each other.
+Một đối tượng turtle vẽ trên một đối tượng screen, và có một số lớp then chốt trong interface hướng đối tượng của turtle có thể được dùng để tạo các đối tượng này và thiết lập mối quan hệ giữa chúng.
 
-A :class:`Turtle` instance will automatically create a :class:`Screen`
-instance if one is not already present.
+Một instance :class:`Turtle` sẽ tự động tạo một instance :class:`Screen` nếu chưa có instance nào.
 
-``Turtle`` is a subclass of :class:`RawTurtle`, which *doesn't* automatically
-create a drawing surface - a *canvas* will need to be provided or created for
-it. The *canvas* can be a :class:`!tkinter.Canvas`, :class:`ScrolledCanvas`
-or :class:`TurtleScreen`.
+``Turtle`` là một subclass của :class:`RawTurtle`, lớp này *không* tự động tạo drawing surface - cần cung cấp hoặc tạo một *canvas* cho nó. *canvas* có thể là một :class:`!tkinter.Canvas`, :class:`ScrolledCanvas` hoặc :class:`TurtleScreen`.
 
 
-:class:`TurtleScreen` is the basic drawing surface for a
-turtle. :class:`Screen` is a subclass of ``TurtleScreen``, and
-includes :ref:`some additional methods <screenspecific>` for managing its
-appearance (including size and title) and behaviour. ``TurtleScreen``'s
-constructor needs a :class:`!tkinter.Canvas` or a
-:class:`ScrolledCanvas` as an argument.
+:class:`TurtleScreen` là bề mặt vẽ cơ bản dành cho turtle. :class:`Screen` là một lớp con của ``TurtleScreen``, đồng thời bao gồm :ref:`một số phương thức bổ sung <screenspecific>` để quản lý giao diện (bao gồm kích thước và tiêu đề) cũng như hành vi của nó. Hàm khởi tạo của ``TurtleScreen`` cần một :class:`!tkinter.Canvas` hoặc
+:class:`ScrolledCanvas` làm đối số.
 
-The functional interface for turtle graphics uses the various methods of
-``Turtle`` and ``TurtleScreen``/``Screen``. Behind the scenes, a screen
-object is automatically created whenever a function derived from a ``Screen``
-method is called. Similarly, a turtle object is automatically created
-whenever any of the functions derived from a Turtle method is called.
+Giao diện hàm dành cho đồ họa turtle sử dụng nhiều phương thức khác nhau của ``Turtle`` và ``TurtleScreen``/``Screen``. Phía sau, một đối tượng screen được tự động tạo mỗi khi một hàm bắt nguồn từ phương thức ``Screen`` được gọi. Tương tự, một đối tượng turtle được tự động tạo mỗi khi bất kỳ hàm nào bắt nguồn từ một phương thức của Turtle được gọi.
 
-To use multiple turtles on a screen, the object-oriented interface must be
-used.
+Để sử dụng nhiều turtle trên một screen, phải sử dụng giao diện hướng đối tượng.
 
 
-:mod:`!turtledemo` --- Demo scripts
-===================================
+:mod:`!turtledemo` --- Các tập lệnh minh họa
+============================================
 
 .. module:: turtledemo
-   :synopsis: A viewer for example turtle scripts
+   :synopsis: Trình xem các tập lệnh turtle mẫu
 
-The :mod:`!turtledemo` package includes a set of demo scripts.  These
-scripts can be run and viewed using the supplied demo viewer as follows::
+Gói :mod:`!turtledemo` bao gồm một tập hợp các tập lệnh minh họa. Có thể chạy và xem các tập lệnh này bằng trình xem minh họa được cung cấp như sau::
 
    python -m turtledemo
 
-Alternatively, you can run the demo scripts individually.  For example, ::
+Ngoài ra, bạn có thể chạy riêng từng tập lệnh demo. Ví dụ:::
 
    python -m turtledemo.bytedesign
 
-The :mod:`!turtledemo` package directory contains:
+Thư mục gói :mod:`!turtledemo` chứa:
 
-- A demo viewer :file:`__main__.py` which can be used to view the sourcecode
-  of the scripts and run them at the same time.
-- Multiple scripts demonstrating different features of the :mod:`!turtle`
-  module.  Examples can be accessed via the Examples menu.  They can also
-  be run standalone.
-- A :file:`turtle.cfg` file which serves as an example of how to write
-  and use such files.
+- Một trình xem demo :file:`__main__.py`, có thể dùng để xem mã nguồn của các tập lệnh và chạy chúng đồng thời.
+- Nhiều tập lệnh minh họa các tính năng khác nhau của mô-đun :mod:`!turtle`. Bạn có thể truy cập các ví dụ thông qua menu Examples. Bạn cũng có thể chạy chúng độc lập.
+- Một tệp :file:`turtle.cfg`, dùng làm ví dụ về cách viết và sử dụng các tệp như vậy.
 
-The demo scripts are:
+Các tập lệnh demo là:
 
 .. currentmodule:: turtle
 
 .. tabularcolumns:: |l|L|L|
 
-+------------------------+------------------------------+--------------------------------------+
-| Name                   | Description                  | Features                             |
-+========================+==============================+======================================+
-| ``bytedesign``         | complex classical            | :func:`tracer`, :func:`delay`,       |
-|                        | turtle graphics pattern      | :func:`update`                       |
-+------------------------+------------------------------+--------------------------------------+
-| ``chaos``              | graphs Verhulst dynamics,    | world coordinates                    |
-|                        | shows that computer's        |                                      |
-|                        | computations can generate    |                                      |
-|                        | results sometimes against the|                                      |
-|                        | common sense expectations    |                                      |
-+------------------------+------------------------------+--------------------------------------+
-| ``clock``              | analog clock showing time    | turtles as clock's                   |
-|                        | of your computer             | hands, :func:`ontimer`               |
-+------------------------+------------------------------+--------------------------------------+
-| ``colormixer``         | experiment with r, g, b      | :func:`ondrag`                       |
-+------------------------+------------------------------+--------------------------------------+
-| ``forest``             | 3 breadth-first trees        | randomization                        |
-+------------------------+------------------------------+--------------------------------------+
-| ``fractalcurves``      | Hilbert & Koch curves        | recursion                            |
-+------------------------+------------------------------+--------------------------------------+
-| ``lindenmayer``        | ethnomathematics             | L-System                             |
-|                        | (indian kolams)              |                                      |
-+------------------------+------------------------------+--------------------------------------+
-| ``minimal_hanoi``      | Towers of Hanoi              | Rectangular Turtles                  |
-|                        |                              | as Hanoi discs                       |
-|                        |                              | (:func:`shape`, :func:`shapesize`)   |
-+------------------------+------------------------------+--------------------------------------+
-| ``nim``                | play the classical nim game  | turtles as nimsticks,                |
-|                        | with three heaps of sticks   | event driven (mouse,                 |
-|                        | against the computer.        | keyboard)                            |
-+------------------------+------------------------------+--------------------------------------+
-| ``paint``              | super minimalistic           | :func:`onclick`                      |
-|                        | drawing program              |                                      |
-+------------------------+------------------------------+--------------------------------------+
-| ``peace``              | elementary                   | turtle: appearance                   |
-|                        |                              | and animation                        |
-+------------------------+------------------------------+--------------------------------------+
-| ``penrose``            | aperiodic tiling with        | :func:`stamp`                        |
-|                        | kites and darts              |                                      |
-+------------------------+------------------------------+--------------------------------------+
-| ``planet_and_moon``    | simulation of                | compound shapes,                     |
-|                        | gravitational system         | :class:`Vec2D`                       |
-+------------------------+------------------------------+--------------------------------------+
-| ``rosette``            | a pattern from the wikipedia | :func:`clone`,                       |
-|                        | article on turtle graphics   | :func:`undo`                         |
-+------------------------+------------------------------+--------------------------------------+
-| ``round_dance``        | dancing turtles rotating     | compound shapes, :func:`clone`       |
-|                        | pairwise in opposite         | :func:`shapesize`, :func:`tilt`,     |
-|                        | direction                    | :func:`get_shapepoly`, :func:`update`|
-+------------------------+------------------------------+--------------------------------------+
-| ``sorting_animate``    | visual demonstration of      | simple alignment,                    |
-|                        | different sorting methods    | randomization                        |
-+------------------------+------------------------------+--------------------------------------+
-| ``tree``               | a (graphical) breadth        | :func:`clone`                        |
-|                        | first tree (using generators)|                                      |
-+------------------------+------------------------------+--------------------------------------+
-| ``two_canvases``       | simple design                | turtles on two                       |
-|                        |                              | canvases                             |
-+------------------------+------------------------------+--------------------------------------+
-| ``yinyang``            | another elementary example   | :func:`circle`                       |
-+------------------------+------------------------------+--------------------------------------+
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| Tên                 | Mô tả                                                                                                                                   | Tính năng                                                              |
++=====================+=========================================================================================================================================+========================================================================+
+| ``bytedesign``      | mẫu đồ họa turtle cổ điển phức tạp                                                                                                      | :func:`tracer`, :func:`delay`,                                         |
+|                     |                                                                                                                                         | :func:`update`                                                         |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| ``chaos``           | mô phỏng động lực học Verhulst, cho thấy các phép tính của máy tính đôi khi có thể tạo ra những kết quả trái với dự đoán theo lẽ thường | tọa độ thế giới                                                        |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| ``clock``           | đồng hồ analog hiển thị thời gian trên máy tính của bạn                                                                                 | các turtle làm kim đồng hồ, :func:`ontimer`                            |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| ``colormixer``      | thử nghiệm với r, g, b                                                                                                                  | :func:`ondrag`                                                         |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| ``forest``          | 3 cây duyệt theo chiều rộng                                                                                                             | ngẫu nhiên hóa                                                         |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| ``fractalcurves``   | đường cong Hilbert & Koch                                                                                                               | đệ quy                                                                 |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| ``lindenmayer``     | toán học dân tộc (kolam Ấn Độ)                                                                                                          | L-System                                                               |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| ``minimal_hanoi``   | Tháp Hà Nội                                                                                                                             | Turtle hình chữ nhật làm đĩa Hà Nội (:func:`shape`, :func:`shapesize`) |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| ``nim``             | chơi trò nim cổ điển với ba đống que đấu với máy tính.                                                                                  | turtle làm que nim, điều khiển theo sự kiện (chuột, bàn phím)          |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| ``paint``           | chương trình vẽ tối giản                                                                                                                | :func:`onclick`                                                        |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| ``peace``           | cơ bản                                                                                                                                  | turtle: diện mạo và hoạt ảnh                                           |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| ``penrose``         | mặt lát tuần hoàn với các hình diều và phi tiêu                                                                                         | :func:`stamp`                                                          |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| ``planet_and_moon`` | mô phỏng hệ hấp dẫn                                                                                                                     | các hình phức hợp,                                                     |
+|                     |                                                                                                                                         | :class:`Vec2D`                                                         |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| ``rosette``         | một mẫu từ bài viết Wikipedia về đồ họa turtle                                                                                          | :func:`clone`,                                                         |
+|                     |                                                                                                                                         | :func:`undo`                                                           |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| ``round_dance``     | các turtle nhảy múa, xoay theo từng cặp theo hướng ngược nhau                                                                           | các hình phức hợp, :func:`clone`                                       |
+|                     |                                                                                                                                         | :func:`shapesize`, :func:`tilt`,                                       |
+|                     |                                                                                                                                         | :func:`get_shapepoly`, :func:`update`                                  |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| ``sorting_animate`` | minh họa trực quan các phương pháp sắp xếp khác nhau                                                                                    | căn chỉnh đơn giản, ngẫu nhiên hóa                                     |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| ``tree``            | một cây duyệt theo chiều rộng (dạng đồ họa) (sử dụng generator)                                                                         | :func:`clone`                                                          |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| ``two_canvases``    | thiết kế đơn giản                                                                                                                       | các turtle trên hai canvas                                             |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
+| ``yinyang``         | một ví dụ cơ bản khác                                                                                                                   | :func:`circle`                                                         |
++---------------------+-----------------------------------------------------------------------------------------------------------------------------------------+------------------------------------------------------------------------+
 
-Have fun!
+Chúc bạn vui vẻ!
 
 
 .. doctest::

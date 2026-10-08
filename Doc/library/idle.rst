@@ -1,11 +1,11 @@
 .. _idle:
 
-IDLE --- Python editor and shell
-================================
+IDLE --- trình soạn thảo và shell Python
+========================================
 
 .. moduleauthor:: Guido van Rossum <guido@python.org>
 
-**Source code:** :source:`Lib/idlelib/`
+**Mã nguồn:** :source:`Lib/idlelib/`
 
 .. index::
    single: IDLE
@@ -13,206 +13,170 @@ IDLE --- Python editor and shell
    single: Integrated Development Environment
 
 ..
-   Remember to update Lib/idlelib/help.html with idlelib.help.copy_strip() when modifying this file.
+   Hãy nhớ cập nhật Lib/idlelib/help.html bằng idlelib.help.copy_strip() khi sửa đổi tệp này.
 
 --------------
 
-IDLE is Python's Integrated Development and Learning Environment.
+IDLE là Môi trường Phát triển và Học tập Tích hợp của Python.
 
-IDLE has the following features:
+IDLE có các tính năng sau:
 
-* cross-platform: works mostly the same on Windows, Unix, and macOS
+* đa nền tảng: hoạt động gần như giống nhau trên Windows, Unix và macOS
 
-* Python shell window (interactive interpreter) with colorizing
-  of code input, output, and error messages
+* cửa sổ shell Python (trình thông dịch tương tác) với khả năng tô màu mã đầu vào, đầu ra và thông báo lỗi
 
-* multi-window text editor with multiple undo, Python colorizing,
-  smart indent, call tips, auto completion, and other features
+* trình soạn thảo văn bản đa cửa sổ với tính năng hoàn tác nhiều cấp, tô màu cú pháp Python, thụt lề thông minh, gợi ý lời gọi, tự động hoàn thành và các tính năng khác
 
-* search within any window, replace within editor windows, and search
-  through multiple files (grep)
+* tìm kiếm trong bất kỳ cửa sổ nào, thay thế trong các cửa sổ trình soạn thảo và tìm kiếm qua nhiều tệp (grep)
 
-* debugger with persistent breakpoints, stepping, and viewing
-  of global and local namespaces
+* trình debugger với các điểm dừng được duy trì, khả năng thực hiện từng bước và xem các namespace toàn cục và cục bộ
 
-* configuration, browsers, and other dialogs
+* các hộp thoại cấu hình, trình duyệt và những hộp thoại khác
 
-The IDLE application is implemented in the :mod:`idlelib` package.
+Ứng dụng IDLE được triển khai trong gói :mod:`idlelib`.
 
 .. include:: ../includes/optional-module.rst
 
-Menus
------
+Menu
+----
 
-IDLE has two main window types, the Shell window and the Editor window.  It is
-possible to have multiple editor windows simultaneously.  On Windows and
-Linux, each has its own top menu.  Each menu documented below indicates
-which window type it is associated with.
+IDLE có hai loại cửa sổ chính: cửa sổ Shell và cửa sổ Editor. Có thể mở đồng thời nhiều cửa sổ Editor. Trên Windows và Linux, mỗi cửa sổ có menu trên cùng riêng. Mỗi menu được mô tả bên dưới đều cho biết loại cửa sổ mà nó liên kết.
 
-Output windows, such as used for Edit => Find in Files, are a subtype of editor
-window.  They currently have the same top menu but a different
-default title and context menu.
+Các cửa sổ output, chẳng hạn như cửa sổ được dùng cho Edit => Find in Files, là một kiểu con của cửa sổ editor. Hiện tại, chúng có cùng menu trên cùng nhưng có tiêu đề mặc định và menu ngữ cảnh khác.
 
-On macOS, there is one application menu.  It dynamically changes according
-to the window currently selected.  It has an IDLE menu, and some entries
-described below are moved around to conform to Apple guidelines.
+Trên macOS, có một menu ứng dụng duy nhất. Menu này tự động thay đổi tùy theo cửa sổ hiện được chọn. Menu có menu IDLE, và một số mục được mô tả bên dưới được sắp xếp lại để tuân theo hướng dẫn của Apple.
 
 File menu (Shell and Editor)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 New File
-   Create a new file editing window.
+   Tạo một cửa sổ chỉnh sửa tệp mới.
 
 Open...
-   Open an existing file with an Open dialog.
+   Mở một tệp hiện có bằng hộp thoại Open.
 
 Open Module...
-   Open an existing module (searches sys.path).
+   Mở một module hiện có (tìm kiếm trong sys.path).
 
 Recent Files
-   Open a list of recent files.  Click one to open it.
+   Mở danh sách các tệp gần đây. Nhấp vào một tệp để mở.
 
 .. index::
    single: Module browser
    single: Path browser
 
 Module Browser
-   Show functions, classes, and methods in the current Editor file in a
-   tree structure.  In the shell, open a module first.
+   Hiển thị các function, class và method trong tệp Editor hiện tại dưới dạng cấu trúc cây. Trong shell, trước tiên hãy mở một module.
 
 Path Browser
-   Show sys.path directories, modules, functions, classes and methods in a
-   tree structure.
+   Hiển thị các thư mục, module, hàm, lớp và phương thức trong sys.path dưới dạng cấu trúc cây.
 
 Save
-   Save the current window to the associated file, if there is one.  Windows
-   that have been changed since being opened or last saved have a \* before
-   and after the window title.  If there is no associated file,
-   do Save As instead.
+   Lưu cửa sổ hiện tại vào tệp liên kết, nếu có. Các cửa sổ đã được thay đổi kể từ khi mở hoặc kể từ lần lưu gần nhất sẽ có \* ở trước và sau tiêu đề cửa sổ. Nếu không có tệp liên kết, hãy sử dụng Save As.
 
 Save As...
-   Save the current window with a Save As dialog.  The file saved becomes the
-   new associated file for the window. (If your file manager is set to hide
-   extensions, the current extension will be omitted in the file name box.
-   If the new filename has no '.', '.py' and '.txt' will be added for Python
-   and text files, except that on macOS Aqua,'.py' is added for all files.)
+   Lưu cửa sổ hiện tại bằng hộp thoại Save As. Tệp được lưu sẽ trở thành tệp liên kết mới của cửa sổ. (Nếu trình quản lý tệp được đặt để ẩn phần mở rộng, phần mở rộng hiện tại sẽ bị lược bỏ trong ô tên tệp. Nếu tên tệp mới không có '.', '.py' và '.txt' sẽ được thêm vào tương ứng cho tệp Python và tệp văn bản, ngoại trừ trên macOS Aqua, '.py' sẽ được thêm vào mọi tệp.)
 
 Save Copy As...
-   Save the current window to different file without changing the associated
-   file.  (See Save As note above about filename extensions.)
+   Lưu cửa sổ hiện tại vào một tệp khác mà không thay đổi tệp liên kết. (Xem lưu ý về phần mở rộng tên tệp trong Save As ở trên.)
 
 Print Window
-   Print the current window to the default printer.
+   In cửa sổ hiện tại bằng máy in mặc định.
 
 Close Window
-   Close the current window (if an unsaved editor, ask to save; if an unsaved
-   Shell, ask to quit execution).  Calling ``exit()`` or ``close()`` in the Shell
-   window also closes Shell.  If this is the only window, also exit IDLE.
+   Đóng cửa sổ hiện tại (nếu là editor chưa lưu, yêu cầu lưu; nếu là Shell chưa lưu, yêu cầu thoát quá trình thực thi). Việc gọi ``exit()`` hoặc ``close()`` trong cửa sổ Shell cũng đóng Shell. Nếu đây là cửa sổ duy nhất, đồng thời thoát IDLE.
 
 Exit IDLE
-   Close all windows and quit IDLE (ask to save unsaved edit windows).
+   Đóng tất cả cửa sổ và thoát IDLE (yêu cầu lưu các cửa sổ chỉnh sửa chưa lưu).
 
 Edit menu (Shell and Editor)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Undo
-   Undo the last change to the current window.  A maximum of 1000 changes may
-   be undone.
+Hoàn tác
+   Hoàn tác thay đổi gần nhất đối với cửa sổ hiện tại. Có thể hoàn tác tối đa 1000 thay đổi.
 
-Redo
-   Redo the last undone change to the current window.
+Làm lại
+   Làm lại thay đổi gần nhất đã được hoàn tác đối với cửa sổ hiện tại.
 
-Select All
-   Select the entire contents of the current window.
+Chọn tất cả
+   Chọn toàn bộ nội dung của cửa sổ hiện tại.
 
-Cut
-   Copy selection into the system-wide clipboard; then delete the selection.
+Cắt
+   Sao chép vùng chọn vào clipboard dùng chung của hệ thống; sau đó xóa vùng chọn.
 
 Copy
-   Copy selection into the system-wide clipboard.
+   Sao chép vùng chọn vào clipboard dùng chung của hệ thống.
 
 Paste
-   Insert contents of the system-wide clipboard into the current window.
+   Chèn nội dung của clipboard dùng chung của hệ thống vào cửa sổ hiện tại.
 
-The clipboard functions are also available in context menus.
+Các chức năng clipboard cũng có trong các menu ngữ cảnh.
 
 Find...
-   Open a search dialog with many options
+   Mở hộp thoại tìm kiếm với nhiều tùy chọn
 
 Find Again
-   Repeat the last search, if there is one.
+   Lặp lại lần tìm kiếm gần nhất, nếu có.
 
 Find Selection
-   Search for the currently selected string, if there is one.
+   Tìm kiếm chuỗi hiện đang được chọn, nếu có.
 
 Find in Files...
-   Open a file search dialog.  Put results in a new output window.
+   Mở hộp thoại tìm kiếm tệp. Đưa kết quả vào một cửa sổ đầu ra mới.
 
 Replace...
-   Open a search-and-replace dialog.
+   Mở hộp thoại tìm kiếm và thay thế.
 
 Go to Line
-   Move the cursor to the beginning of the line requested and make that
-   line visible.  A request past the end of the file goes to the end.
-   Clear any selection and update the line and column status.
+   Di chuyển con trỏ đến đầu dòng được yêu cầu và làm cho dòng đó hiển thị. Yêu cầu vượt quá cuối tệp sẽ chuyển đến cuối tệp. Xóa mọi vùng chọn và cập nhật trạng thái dòng và cột.
 
 Show Completions
-   Open a scrollable list allowing selection of existing names. See
-   :ref:`Completions <completions>` in the Editing and Navigation section below.
+   Mở danh sách có thể cuộn, cho phép chọn các tên hiện có. Xem
+   :ref:`Completions <completions>` trong phần Editing and Navigation bên dưới.
 
 Expand Word
-   Expand a prefix you have typed to match a full word in the same window;
-   repeat to get a different expansion.
+   Mở rộng tiền tố bạn đã nhập để khớp với một từ đầy đủ trong cùng cửa sổ; lặp lại để nhận một cách mở rộng khác.
 
 Show Call Tip
-   After an unclosed parenthesis for a function, open a small window with
-   function parameter hints.  See :ref:`Calltips <calltips>` in the
-   Editing and Navigation section below.
+   Sau một dấu ngoặc đơn chưa đóng của một hàm, mở một cửa sổ nhỏ với các gợi ý về tham số của hàm. Xem :ref:`Calltips <calltips>` trong phần Editing and Navigation bên dưới.
 
 Show Surrounding Parens
-   Highlight the surrounding parenthesis.
+   Tô sáng dấu ngoặc đơn bao quanh.
 
 .. _format-menu:
 
 Format menu (Editor window only)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Format Paragraph
-   Rewrap the text block containing the text insert cursor.
-   Avoid code lines.  See :ref:`Format block<format-block>` in the
-   Editing and Navigation section below.
+Định dạng đoạn văn
+   Định dạng lại khối văn bản chứa con trỏ chèn văn bản. Tránh các dòng mã. Xem :ref:`Định dạng khối <format-block>` trong phần Chỉnh sửa và Điều hướng bên dưới.
 
-Indent Region
-   Shift selected lines right by the indent width (default 4 spaces).
+Thụt lề vùng
+   Dịch các dòng đã chọn sang phải theo độ rộng thụt lề (mặc định là 4 dấu cách).
 
-Dedent Region
-   Shift selected lines left by the indent width (default 4 spaces).
+Bỏ thụt lề vùng
+   Dịch các dòng đã chọn sang trái theo độ rộng thụt lề (mặc định là 4 dấu cách).
 
-Comment Out Region
-   Insert ## in front of selected lines.
+Bỏ ghi chú vùng
+   Chèn ## vào trước các dòng đã chọn.
 
 Uncomment Region
-   Remove leading # or ## from selected lines.
+   Xóa # hoặc ## ở đầu các dòng đã chọn.
 
 Tabify Region
-   Turn *leading* stretches of spaces into tabs. (Note: We recommend using
-   4 space blocks to indent Python code.)
+   Chuyển các đoạn *ở đầu* gồm dấu cách thành tab. (Lưu ý: Chúng tôi khuyến nghị sử dụng các khối 4 dấu cách để thụt lề mã Python.)
 
 Untabify Region
-   Turn *all* tabs into the correct number of spaces.
+   Chuyển *tất cả* tab thành số lượng dấu cách thích hợp.
 
 Toggle Tabs
-   Open a dialog to switch between indenting with spaces and tabs.
+   Mở một hộp thoại để chuyển đổi giữa việc thụt lề bằng dấu cách và tab.
 
 New Indent Width
-   Open a dialog to change indent width. The accepted default by the Python
-   community is 4 spaces.
+   Mở một hộp thoại để thay đổi độ rộng thụt lề. Giá trị mặc định được cộng đồng Python chấp nhận là 4 dấu cách.
 
 Strip Trailing Whitespace
-   Remove trailing space and other whitespace characters after the last
-   non-whitespace character of a line by applying :meth:`str.rstrip` to each line,
-   including lines within multiline strings.  Except for Shell windows,
-   remove extra newlines at the end of the file.
+   Xóa dấu cách ở cuối dòng và các ký tự khoảng trắng khác sau ký tự cuối cùng không phải khoảng trắng của một dòng bằng cách áp dụng :meth:`str.rstrip` cho từng dòng, bao gồm cả các dòng trong chuỗi nhiều dòng. Ngoại trừ các cửa sổ Shell, hãy xóa các dòng mới thừa ở cuối tệp.
 
 .. index::
    single: Run script
@@ -223,139 +187,101 @@ Run menu (Editor window only)
 .. _run-module:
 
 Run Module
-   Do :ref:`Check Module <check-module>`.  If no error, restart the shell to clean the
-   environment, then execute the module.  Output is displayed in the Shell
-   window.  Note that output requires use of ``print`` or ``write``.
-   When execution is complete, the Shell retains focus and displays a prompt.
-   At this point, one may interactively explore the result of execution.
-   This is similar to executing a file with ``python -i file`` at a command
-   line.
+   Thực hiện :ref:`Check Module <check-module>`. Nếu không có lỗi, hãy khởi động lại Shell để làm sạch môi trường, sau đó thực thi module. Kết quả được hiển thị trong Shell window. Lưu ý rằng để hiển thị kết quả, cần sử dụng ``print`` hoặc ``write``. Khi quá trình thực thi hoàn tất, Shell vẫn được chọn và hiển thị dấu nhắc. Lúc này, bạn có thể tương tác để khám phá kết quả thực thi. Điều này tương tự như thực thi một tệp bằng ``python -i file`` trên dòng lệnh.
 
 .. _run-custom:
 
 Run... Customized
-   Same as :ref:`Run Module <run-module>`, but run the module with customized
-   settings.  *Command Line Arguments* extend :data:`sys.argv` as if passed
-   on a command line. The module can be run in the Shell without restarting.
+   Tương tự như :ref:`Run Module <run-module>`, nhưng thực thi module với các thiết lập tùy chỉnh. *Command Line Arguments* mở rộng :data:`sys.argv` như thể chúng được truyền trên dòng lệnh. Có thể thực thi module trong Shell mà không cần khởi động lại.
 
 .. _check-module:
 
 Check Module
-   Check the syntax of the module currently open in the Editor window. If the
-   module has not been saved IDLE will either prompt the user to save or
-   autosave, as selected in the General tab of the Idle Settings dialog.  If
-   there is a syntax error, the approximate location is indicated in the
-   Editor window.
+   Kiểm tra cú pháp của module hiện đang mở trong Editor window. Nếu module chưa được lưu, IDLE sẽ nhắc người dùng lưu hoặc tự động lưu, tùy theo lựa chọn trong tab General của hộp thoại Idle Settings. Nếu có lỗi cú pháp, vị trí gần đúng sẽ được chỉ báo trong Editor window.
 
 .. _python-shell:
 
 Python Shell
-   Open or wake up the Python Shell window.
+   Mở hoặc đánh thức cửa sổ Python Shell.
 
 
 Shell menu (Shell window only)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 View Last Restart
-  Scroll the shell window to the last Shell restart.
+  Cuộn cửa sổ shell đến lần khởi động lại Shell gần nhất.
 
 Restart Shell
-  Restart the shell to clean the environment and reset display and exception handling.
+  Khởi động lại shell để làm sạch môi trường và đặt lại phần hiển thị cũng như việc xử lý ngoại lệ.
 
 Previous History
-  Cycle through earlier commands in history which match the current entry.
+  Duyệt qua các lệnh trước đó trong lịch sử khớp với mục nhập hiện tại.
 
 Next History
-  Cycle through later commands in history which match the current entry.
+  Duyệt qua các lệnh sau đó trong lịch sử khớp với mục nhập hiện tại.
 
 Interrupt Execution
-  Stop a running program.
+  Dừng chương trình đang chạy.
 
 Debug menu (Shell window only)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Go to File/Line
-   Look on the current line. with the cursor, and the line above for a filename
-   and line number.  If found, open the file if not already open, and show the
-   line.  Use this to view source lines referenced in an exception traceback
-   and lines found by Find in Files. Also available in the context menu of
-   the Shell window and Output windows.
+   Tìm trên dòng hiện tại có con trỏ và dòng phía trên để tìm tên tệp và số dòng. Nếu tìm thấy, hãy mở tệp nếu tệp chưa được mở và hiển thị dòng đó. Sử dụng tính năng này để xem các dòng mã nguồn được tham chiếu trong traceback của ngoại lệ và các dòng được Find in Files tìm thấy. Tính năng này cũng có trong menu ngữ cảnh của cửa sổ Shell và các cửa sổ Output.
 
 .. index::
    single: debugger
    single: stack viewer
 
 Debugger (toggle)
-   When activated, code entered in the Shell or run from an Editor will run
-   under the debugger.  In the Editor, breakpoints can be set with the context
-   menu.  This feature is still incomplete and somewhat experimental.
+   Khi được kích hoạt, mã được nhập trong Shell hoặc chạy từ một Editor sẽ chạy dưới debugger. Trong Editor, có thể đặt breakpoint bằng menu ngữ cảnh. Tính năng này vẫn chưa hoàn thiện và còn mang tính thử nghiệm.
 
 Stack Viewer
-   Show the stack traceback of the last exception in a tree widget, with
-   access to locals and globals.
+   Hiển thị traceback của stack cho ngoại lệ gần nhất trong một widget dạng cây, cùng quyền truy cập vào các biến cục bộ và biến toàn cục.
 
 Auto-open Stack Viewer
-   Toggle automatically opening the stack viewer on an unhandled exception.
+   Bật hoặc tắt việc tự động mở stack viewer khi xảy ra ngoại lệ không được xử lý.
 
-Options menu (Shell and Editor)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Trình đơn Options (Shell và Editor)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Configure IDLE
-   Open a configuration dialog and change preferences for the following:
-   fonts, indentation, keybindings, text color themes, startup windows and
-   size, additional help sources, and extensions.  On macOS, open the
-   configuration dialog by selecting Preferences in the application
-   menu. For more details, see
-   :ref:`Setting preferences <preferences>` under Help and preferences.
+Cấu hình IDLE
+   Mở hộp thoại cấu hình và thay đổi tùy chọn cho các mục sau: phông chữ, thụt lề, keybinding, giao diện màu văn bản, cửa sổ khởi động và kích thước, các nguồn trợ giúp bổ sung, cùng các phần mở rộng. Trên macOS, mở hộp thoại cấu hình bằng cách chọn Preferences trong trình đơn ứng dụng. Để biết thêm chi tiết, xem
+   :ref:`Thiết lập tùy chọn <preferences>` trong Help and preferences.
 
-Most configuration options apply to all windows or all future windows.
-The option items below only apply to the active window.
+Hầu hết các tùy chọn cấu hình đều áp dụng cho tất cả cửa sổ hoặc tất cả cửa sổ được mở sau đó. Các mục tùy chọn bên dưới chỉ áp dụng cho cửa sổ đang hoạt động.
 
 Show/Hide Code Context (Editor Window only)
-   Open a pane at the top of the edit window which shows the block context
-   of the code which has scrolled above the top of the window.  See
-   :ref:`Code Context <code-context>` in the Editing and Navigation section
-   below.
+   Mở một ngăn ở đầu cửa sổ soạn thảo, hiển thị ngữ cảnh khối của phần mã đã cuộn lên phía trên đầu cửa sổ. Xem
+   :ref:`Code Context <code-context>` trong phần Editing and Navigation bên dưới.
 
 Show/Hide Line Numbers (Editor Window only)
-   Open a column to the left of the edit window which shows the number
-   of each line of text.  The default is off, which may be changed in the
-   preferences (see :ref:`Setting preferences <preferences>`).
+   Mở một cột ở bên trái cửa sổ chỉnh sửa để hiển thị số của từng dòng văn bản.  Theo mặc định, tùy chọn này bị tắt và có thể thay đổi trong phần tùy chọn (xem :ref:`Setting preferences <preferences>`).
 
 Zoom/Restore Height
-   Toggles the window between normal size and maximum height. The initial size
-   defaults to 40 lines by 80 chars unless changed on the General tab of the
-   Configure IDLE dialog.  The maximum height for a screen is determined by
-   momentarily maximizing a window the first time one is zoomed on the screen.
-   Changing screen settings may invalidate the saved height.  This toggle has
-   no effect when a window is maximized.
+   Chuyển đổi cửa sổ giữa kích thước bình thường và chiều cao tối đa. Kích thước ban đầu mặc định là 40 dòng x 80 ký tự, trừ khi được thay đổi trong tab General của hộp thoại Configure IDLE.  Chiều cao tối đa của màn hình được xác định bằng cách tạm thời phóng to một cửa sổ vào lần đầu tiên cửa sổ được zoom trên màn hình. Việc thay đổi cài đặt màn hình có thể làm mất hiệu lực chiều cao đã lưu.  Tùy chọn chuyển đổi này không có tác dụng khi cửa sổ đã được phóng to.
 
 Window menu (Shell and Editor)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Lists the names of all open windows; select one to bring it to the foreground
-(deiconifying it if necessary).
+Liệt kê tên của tất cả các cửa sổ đang mở; chọn một cửa sổ để đưa nó lên phía trước (bỏ trạng thái thu nhỏ nếu cần).
 
 Help menu (Shell and Editor)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 About IDLE
-   Display version, copyright, license, credits, and more.
+   Hiển thị phiên bản, bản quyền, giấy phép, thông tin ghi công và nhiều nội dung khác.
 
 IDLE Help
-   Display this IDLE document, detailing the menu options, basic editing and
-   navigation, and other tips.
+   Hiển thị tài liệu IDLE này, trình bày các tùy chọn menu, cách chỉnh sửa và điều hướng cơ bản cùng các mẹo khác.
 
 Python Docs
-   Access local Python documentation, if installed, or start a web browser
-   and open docs.python.org showing the latest Python documentation.
+   Truy cập tài liệu Python cục bộ nếu đã được cài đặt hoặc khởi động trình duyệt web và mở docs.python.org để hiển thị tài liệu Python mới nhất.
 
-Turtle Demo
-   Run the turtledemo module with example Python code and turtle drawings.
+Bản trình diễn Turtle
+   Chạy module turtledemo với mã Python mẫu và các hình vẽ bằng turtle.
 
-Additional help sources may be added here with the Configure IDLE dialog under
-the General tab. See the :ref:`Help sources <help-sources>` subsection below
-for more on Help menu choices.
+Có thể thêm các nguồn trợ giúp khác tại đây bằng hộp thoại Configure IDLE trong thẻ General. Xem tiểu mục :ref:`Help sources <help-sources>` bên dưới để biết thêm về các lựa chọn trong menu Help.
 
 .. index::
    single: Cut
@@ -365,682 +291,375 @@ for more on Help menu choices.
    single: Clear Breakpoint
    single: breakpoints
 
-Context menus
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Menu ngữ cảnh
+^^^^^^^^^^^^^
 
-Open a context menu by right-clicking in a window (Control-click on macOS).
-Context menus have the standard clipboard functions also on the Edit menu.
+Mở menu ngữ cảnh bằng cách nhấp chuột phải trong một cửa sổ (Control-click trên macOS). Menu ngữ cảnh cũng có các chức năng clipboard tiêu chuẩn như trong menu Edit.
 
-Cut
-   Copy selection into the system-wide clipboard; then delete the selection.
+Cắt
+   Sao chép phần được chọn vào clipboard trên toàn hệ thống, sau đó xóa phần được chọn.
 
 Copy
-   Copy selection into the system-wide clipboard.
+   Sao chép vùng chọn vào clipboard trên toàn hệ thống.
 
 Paste
-   Insert contents of the system-wide clipboard into the current window.
+   Chèn nội dung của clipboard trên toàn hệ thống vào cửa sổ hiện tại.
 
-Editor windows also have breakpoint functions.  Lines with a breakpoint set are
-specially marked.  Breakpoints only have an effect when running under the
-debugger.  Breakpoints for a file are saved in the user's ``.idlerc``
-directory.
+Các cửa sổ trình soạn thảo cũng có các chức năng breakpoint. Các dòng đã đặt breakpoint sẽ được đánh dấu đặc biệt. Breakpoint chỉ có tác dụng khi chạy dưới trình gỡ lỗi. Breakpoint của một tệp được lưu trong thư mục ``.idlerc`` của người dùng.
 
 Set Breakpoint
-   Set a breakpoint on the current line.
+   Đặt breakpoint trên dòng hiện tại.
 
 Clear Breakpoint
-   Clear the breakpoint on that line.
+   Xóa breakpoint trên dòng đó.
 
-Shell and Output windows also have the following.
+Các cửa sổ Shell và Output cũng có các mục sau.
 
 Go to file/line
-   Same as in Debug menu.
+   Giống như trong menu Debug.
 
-The Shell window also has an output squeezing facility explained in the *Python
-Shell window* subsection below.
+Cửa sổ Shell cũng có chức năng thu gọn output được giải thích trong phần *Python Shell window* bên dưới.
 
 Squeeze
-   If the cursor is over an output line, squeeze all the output between
-   the code above and the prompt below down to a 'Squeezed text' label.
+   Nếu con trỏ nằm trên một dòng output, thu gọn toàn bộ output nằm giữa đoạn code ở trên và prompt ở dưới thành nhãn 'Squeezed text'.
 
 
 .. _editing-and-navigation:
 
-Editing and Navigation
-----------------------
+Chỉnh sửa và điều hướng
+-----------------------
 
-Editor windows
-^^^^^^^^^^^^^^
+Cửa sổ editor
+^^^^^^^^^^^^^
 
-IDLE may open editor windows when it starts, depending on settings
-and how you start IDLE.  Thereafter, use the File menu.  There can be only
-one open editor window for a given file.
+IDLE có thể mở các cửa sổ editor khi khởi động, tùy thuộc vào cài đặt và cách bạn khởi động IDLE. Sau đó, hãy sử dụng menu File. Chỉ có thể mở một cửa sổ editor cho một tệp nhất định.
 
-The title bar contains the name of the file, the full path, and the version
-of Python and IDLE running the window.  The status bar contains the line
-number ('Ln') and column number ('Col').  Line numbers start with 1;
-column numbers with 0.
+Thanh tiêu đề chứa tên tệp, đường dẫn đầy đủ, cùng phiên bản Python và IDLE đang chạy cửa sổ đó. Thanh trạng thái chứa số dòng ('Ln') và số cột ('Col'). Số dòng bắt đầu từ 1; số cột bắt đầu từ 0.
 
-IDLE assumes that files with a known .py* extension contain Python code
-and that other files do not.  Run Python code with the Run menu.
+IDLE giả định rằng các tệp có phần mở rộng .py* đã biết chứa mã Python, còn các tệp khác thì không. Chạy mã Python bằng menu Run.
 
-Key bindings
-^^^^^^^^^^^^
+Liên kết phím
+^^^^^^^^^^^^^
 
-The IDLE insertion cursor is a thin vertical bar between character
-positions.  When characters are entered, the insertion cursor and
-everything to its right moves right one character and
-the new character is entered in the new space.
+Con trỏ chèn của IDLE là một thanh dọc mảnh nằm giữa các vị trí ký tự. Khi nhập ký tự, con trỏ chèn và mọi thứ ở bên phải nó dịch sang phải một ký tự, còn ký tự mới được nhập vào khoảng trống mới.
 
-Several non-character keys move the cursor and possibly
-delete characters.  Deletion does not puts text on the clipboard,
-but IDLE has an undo list.  Wherever this doc discusses keys,
-'C' refers to the :kbd:`Control` key on Windows and
-Unix and the :kbd:`Command` key on macOS.  (And all such discussions
-assume that the keys have not been re-bound to something else.)
+Một số phím không phải ký tự sẽ di chuyển con trỏ và có thể xóa ký tự. Việc xóa không đưa văn bản vào clipboard, nhưng IDLE có danh sách hoàn tác. Trong tài liệu này, khi nói về các phím, 'C' đề cập đến phím :kbd:`Control` trên Windows và Unix, và phím :kbd:`Command` trên macOS. (Mọi nội dung đề cập như vậy đều giả định rằng các phím chưa được liên kết lại với chức năng khác.)
 
-* Arrow keys move the cursor one character or line.
+* Các phím mũi tên di chuyển con trỏ một ký tự hoặc một dòng.
 
-* :kbd:`C-LeftArrow` and :kbd:`C-RightArrow` moves left or right one word.
+* :kbd:`C-LeftArrow` và :kbd:`C-RightArrow` di chuyển sang trái hoặc phải một từ.
 
-* :kbd:`Home` and :kbd:`End` go to the beginning or end of the line.
+* :kbd:`Home` và :kbd:`End` di chuyển đến đầu hoặc cuối dòng.
 
-* :kbd:`Page Up` and :kbd:`Page Down` go up or down one screen.
+* :kbd:`Page Up` và :kbd:`Page Down` di chuyển lên hoặc xuống một màn hình.
 
-* :kbd:`C-Home` and :kbd:`C-End` go to beginning or end of the file.
+* :kbd:`C-Home` và :kbd:`C-End` di chuyển đến đầu hoặc cuối tệp.
 
-* :kbd:`Backspace` and :kbd:`Del` (or :kbd:`C-d`) delete the previous
-  or next character.
+* :kbd:`Backspace` và :kbd:`Del` (hoặc :kbd:`C-d`) xóa ký tự trước hoặc sau.
 
-* :kbd:`C-Backspace` and :kbd:`C-Del` delete one word left or right.
+* :kbd:`C-Backspace` và :kbd:`C-Del` xóa một từ ở bên trái hoặc bên phải.
 
-* :kbd:`C-k` deletes ('kills') everything to the right.
+* :kbd:`C-k` xóa ('kill') mọi thứ ở bên phải.
 
-Standard keybindings (like :kbd:`C-c` to copy and :kbd:`C-v` to paste)
-may work.  Keybindings are selected in the Configure IDLE dialog.
+Các keybinding tiêu chuẩn (như :kbd:`C-c` để sao chép và :kbd:`C-v` để dán) có thể hoạt động. Keybinding được chọn trong hộp thoại Configure IDLE.
 
-Automatic indentation
-^^^^^^^^^^^^^^^^^^^^^
+Tự động thụt lề
+^^^^^^^^^^^^^^^
 
-After a block-opening statement, the next line is indented by 4 spaces (in the
-Python Shell window by one tab).  After certain keywords (break, return etc.)
-the next line is dedented.  In leading indentation, :kbd:`Backspace` deletes up
-to 4 spaces if they are there. :kbd:`Tab` inserts spaces (in the Python
-Shell window one tab), number depends on Indent width. Currently, tabs
-are restricted to four spaces due to Tcl/Tk limitations.
+Sau một câu lệnh mở khối, dòng tiếp theo được thụt vào 4 dấu cách (trong cửa sổ Python Shell là một tab). Sau một số từ khóa nhất định (break, return, v.v.), dòng tiếp theo sẽ được bỏ thụt lề. Ở phần thụt lề đầu dòng, :kbd:`Backspace` xóa tối đa 4 dấu cách nếu có. :kbd:`Tab` chèn dấu cách (trong cửa sổ Python Shell là một tab), số lượng phụ thuộc vào Indent width. Hiện tại, tab bị giới hạn ở bốn dấu cách do các hạn chế của Tcl/Tk.
 
-See also the indent/dedent region commands on the
+Xem thêm các lệnh vùng thụt lề/bỏ thụt lề trên
 :ref:`Format menu <format-menu>`.
 
-Search and Replace
-^^^^^^^^^^^^^^^^^^
+Tìm kiếm và thay thế
+^^^^^^^^^^^^^^^^^^^^
 
-Any selection becomes a search target.  However, only selections within
-a line work because searches are only performed within lines with the
-terminal newline removed.  If ``[x] Regular expression`` is checked, the
-target is interpreted according to the Python re module.
+Mọi vùng chọn đều trở thành mục tiêu tìm kiếm. Tuy nhiên, chỉ các vùng chọn trong một dòng mới hoạt động vì việc tìm kiếm chỉ được thực hiện trong các dòng đã loại bỏ ký tự xuống dòng ở cuối. Nếu ``[x] Regular expression`` được chọn, mục tiêu sẽ được diễn giải theo module re của Python.
 
 .. _completions:
 
-Completions
-^^^^^^^^^^^
+Tính năng tự động hoàn thành
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Completions are supplied, when requested and available, for module
-names, attributes of classes or functions, or filenames.  Each request
-method displays a completion box with existing names.  (See tab
-completions below for an exception.) For any box, change the name
-being completed and the item highlighted in the box by
-typing and deleting characters; by hitting :kbd:`Up`, :kbd:`Down`,
-:kbd:`PageUp`, :kbd:`PageDown`, :kbd:`Home`, and :kbd:`End` keys;
-and by a single click within the box.  Close the box with :kbd:`Escape`,
-:kbd:`Enter`, and double :kbd:`Tab` keys or clicks outside the box.
-A double click within the box selects and closes.
+Tính năng tự động hoàn thành sẽ cung cấp các gợi ý khi được yêu cầu và khả dụng, cho tên module, thuộc tính của class hoặc function, hoặc tên tệp. Mỗi phương thức yêu cầu sẽ hiển thị một hộp gợi ý kèm các tên hiện có. (Xem phần tự động hoàn thành bằng phím tab bên dưới để biết ngoại lệ.) Đối với mọi hộp, hãy thay đổi tên đang được tự động hoàn thành và mục được tô sáng trong hộp bằng cách nhập và xóa ký tự; bằng cách nhấn :kbd:`Up`, :kbd:`Down`,
+:kbd:`PageUp`, :kbd:`PageDown`, :kbd:`Home`, và :kbd:`End`; và bằng cách nhấp một lần vào bên trong hộp. Đóng hộp bằng :kbd:`Escape`,
+:kbd:`Enter`, và nhấn đúp phím :kbd:`Tab` hoặc nhấp đúp bên ngoài hộp. Nhấp đúp bên trong hộp sẽ chọn mục và đóng hộp.
 
-One way to open a box is to type a key character and wait for a
-predefined interval.  This defaults to 2 seconds; customize it
-in the settings dialog.  (To prevent auto popups, set the delay to a
-large number of milliseconds, such as 100000000.) For imported module
-names or class or function attributes, type '.'.
-For filenames in the root directory, type :data:`os.sep` or
-:data:`os.altsep` immediately after an opening quote.  (On Windows,
-one can specify a drive first.)  Move into subdirectories by typing a
-directory name and a separator.
+Một cách để mở hộp là nhập một ký tự khóa rồi chờ trong khoảng thời gian được định trước. Mặc định là 2 giây; hãy tùy chỉnh trong hộp thoại cài đặt. (Để ngăn cửa sổ bật lên tự động, hãy đặt độ trễ thành một số mili giây lớn, chẳng hạn như 100000000.) Đối với tên module được import hoặc các thuộc tính của class hay function, hãy nhập '.'. Đối với tên tệp trong thư mục gốc, hãy nhập :data:`os.sep` hoặc
+:data:`os.altsep` ngay sau dấu ngoặc kép mở. (Trên Windows, có thể chỉ định ổ đĩa trước.) Di chuyển vào các thư mục con bằng cách nhập tên thư mục và dấu phân cách.
 
-Instead of waiting, or after a box is closed, open a completion box
-immediately with Show Completions on the Edit menu.  The default hot
-key is :kbd:`C-space`.  If one types a prefix for the desired name
-before opening the box, the first match or near miss is made visible.
-The result is the same as if one enters a prefix
-after the box is displayed.  Show Completions after a quote completes
-filenames in the current directory instead of a root directory.
+Thay vì chờ, hoặc sau khi một hộp đã đóng, hãy mở ngay hộp hoàn thành bằng Show Completions trong menu Edit. Phím tắt mặc định là :kbd:`C-space`. Nếu nhập tiền tố của tên mong muốn trước khi mở hộp, kết quả khớp đầu tiên hoặc gần đúng sẽ được hiển thị. Kết quả giống như khi nhập tiền tố sau khi hộp được hiển thị. Show Completions sau một dấu ngoặc kép sẽ hoàn thành tên tệp trong thư mục hiện tại thay vì thư mục gốc.
 
-Hitting :kbd:`Tab` after a prefix usually has the same effect as Show
-Completions.  (With no prefix, it indents.)  However, if there is only
-one match to the prefix, that match is immediately added to the editor
-text without opening a box.
+Nhấn :kbd:`Tab` sau một tiền tố thường có tác dụng giống như Show Completions. (Khi không có tiền tố, thao tác này sẽ thụt lề.) Tuy nhiên, nếu tiền tố chỉ khớp với một kết quả, kết quả đó sẽ được thêm ngay vào văn bản của trình soạn thảo mà không mở hộp.
 
-Invoking 'Show Completions', or hitting :kbd:`Tab` after a prefix,
-outside of a string and without a preceding '.' opens a box with
-keywords, builtin names, and available module-level names.
+Gọi 'Show Completions' hoặc nhấn :kbd:`Tab` sau một tiền tố, bên ngoài chuỗi và không có dấu '.' đứng trước, sẽ mở một hộp chứa các từ khóa, tên dựng sẵn và các tên cấp module hiện có.
 
-When editing code in an editor (as oppose to Shell), increase the
-available module-level names by running your code
-and not restarting the Shell thereafter.  This is especially useful
-after adding imports at the top of a file.  This also increases
-possible attribute completions.
+Khi chỉnh sửa code trong trình soạn thảo (trái với Shell), hãy tăng số tên cấp module hiện có bằng cách chạy code và sau đó không khởi động lại Shell. Điều này đặc biệt hữu ích sau khi thêm các lệnh import ở đầu tệp. Thao tác này cũng làm tăng số khả năng hoàn thành thuộc tính.
 
-Completion boxes initially exclude names beginning with '_' or, for
-modules, not included in '__all__'.  The hidden names can be accessed
-by typing '_' after '.', either before or after the box is opened.
+Ban đầu, các hộp hoàn thành loại trừ những tên bắt đầu bằng '_' hoặc, đối với module, những tên không được đưa vào '__all__'. Có thể truy cập các tên ẩn bằng cách nhập '_' sau '.', trước hoặc sau khi mở hộp.
 
 .. _calltips:
 
-Calltips
-^^^^^^^^
+Gợi ý lệnh gọi
+^^^^^^^^^^^^^^
 
-A calltip is shown automatically when one types :kbd:`(` after the name
-of an *accessible* function.  A function name expression may include
-dots and subscripts.  A calltip remains until it is clicked, the cursor
-is moved out of the argument area, or :kbd:`)` is typed.  Whenever the
-cursor is in the argument part of a definition, select Edit and "Show
-Call Tip" on the menu or enter its shortcut to display a calltip.
+Gợi ý lệnh gọi tự động hiển thị khi nhập :kbd:`(` sau tên của một hàm *accessible*. Biểu thức tên hàm có thể bao gồm dấu chấm và chỉ số. Gợi ý lệnh gọi vẫn hiển thị cho đến khi được nhấp vào, con trỏ được di chuyển ra khỏi vùng đối số hoặc nhập :kbd:`)`. Khi con trỏ nằm trong phần đối số của một định nghĩa, hãy chọn Edit rồi "Show Call Tip" trên menu hoặc nhập phím tắt tương ứng để hiển thị gợi ý lệnh gọi.
 
-The calltip consists of the function's signature and docstring up to
-the latter's first blank line or the fifth non-blank line.  (Some builtin
-functions lack an accessible signature.)  A '/' or '*' in the signature
-indicates that the preceding or following arguments are passed by
-position or name (keyword) only.  Details are subject to change.
+Gợi ý lệnh gọi bao gồm chữ ký của hàm và docstring cho đến dòng trống đầu tiên hoặc dòng không trống thứ năm của docstring. (Một số hàm builtin không có chữ ký có thể truy cập.) Dấu '/' hoặc '*' trong chữ ký cho biết các đối số đứng trước hoặc sau nó chỉ được truyền theo vị trí hoặc chỉ được truyền theo tên (keyword). Các chi tiết có thể thay đổi.
 
-In Shell, the accessible functions depends on what modules have been
-imported into the user process, including those imported by Idle itself,
-and which definitions have been run, all since the last restart.
+Trong Shell, các hàm có thể truy cập phụ thuộc vào những module đã được import vào tiến trình của người dùng, bao gồm cả các module do chính Idle import, và những định nghĩa đã được chạy, kể từ lần khởi động lại gần nhất.
 
-For example, restart the Shell and enter ``itertools.count(``.  A calltip
-appears because Idle imports itertools into the user process for its own
-use.  (This could change.)  Enter ``turtle.write(`` and nothing appears.
-Idle does not itself import turtle.  The menu entry and shortcut also do
-nothing.  Enter ``import turtle``.  Thereafter, ``turtle.write(``
-will display a calltip.
+Ví dụ, hãy khởi động lại Shell và nhập ``itertools.count(``. Gợi ý lệnh gọi xuất hiện vì Idle import itertools vào tiến trình của người dùng để tự sử dụng. (Điều này có thể thay đổi.) Nhập ``turtle.write(`` thì không có gì xuất hiện. Bản thân Idle không import turtle. Mục menu và phím tắt cũng không có tác dụng. Nhập ``import turtle``. Sau đó, ``turtle.write(`` sẽ hiển thị gợi ý lệnh gọi.
 
-In an editor, import statements have no effect until one runs the file.
-One might want to run a file after writing import statements, after
-adding function definitions, or after opening an existing file.
+Trong trình soạn thảo, các câu lệnh import không có tác dụng cho đến khi chạy tệp. Bạn có thể muốn chạy tệp sau khi viết các câu lệnh import, sau khi thêm các định nghĩa hàm hoặc sau khi mở một tệp hiện có.
 
 .. _format-block:
 
 Format block
 ^^^^^^^^^^^^
 
-Reformat Paragraph rewraps a block ('paragraph') of contiguous equally
-indented non-blank comments, a similar block of text within a multiline
-string, or a selected subset of either.
-If needed, add a blank line to separate string from code.
-Partial lines in a selection expand to complete lines.
-The resulting lines have the same indent as before
-but have maximum total length of N columns (characters).
-Change the default N of 72 on the Window tab of IDLE Settings.
+Reformat Paragraph định dạng lại một khối ('paragraph') gồm các comment không trống, liên tiếp và có cùng mức thụt lề, một khối văn bản tương tự bên trong chuỗi nhiều dòng hoặc một phần được chọn của một trong hai loại trên. Nếu cần, hãy thêm một dòng trống để phân tách chuỗi với mã. Các dòng chưa đầy đủ trong vùng chọn sẽ được mở rộng thành các dòng hoàn chỉnh. Các dòng kết quả có cùng mức thụt lề như trước, nhưng có tổng độ dài tối đa là N cột (ký tự). Thay đổi giá trị N mặc định là 72 trong thẻ Window của IDLE Settings.
 
 .. _code-context:
 
 Code Context
 ^^^^^^^^^^^^
 
-Within an editor window containing Python code, code context can be toggled
-in order to show or hide a pane at the top of the window.  When shown, this
-pane freezes the opening lines for block code, such as those beginning with
-``class``, ``def``, or ``if`` keywords, that would have otherwise scrolled
-out of view.  The size of the pane will be expanded and contracted as needed
-to show the all current levels of context, up to the maximum number of
-lines defined in the Configure IDLE dialog (which defaults to 15).  If there
-are no current context lines and the feature is toggled on, a single blank
-line will display.  Clicking on a line in the context pane will move that
-line to the top of the editor.
+Trong một cửa sổ trình soạn thảo chứa mã Python, có thể bật hoặc tắt code context để hiển thị hoặc ẩn một ngăn ở đầu cửa sổ. Khi được hiển thị, ngăn này cố định các dòng mở đầu của những khối mã, chẳng hạn như các dòng bắt đầu bằng từ khóa ``class``, ``def`` hoặc ``if``, vốn nếu không sẽ cuộn khỏi tầm nhìn. Kích thước của ngăn sẽ được mở rộng hoặc thu hẹp khi cần để hiển thị tất cả các cấp context hiện tại, tối đa đến số dòng được xác định trong hộp thoại Configure IDLE (mặc định là 15). Nếu không có dòng context hiện tại nào và tính năng này được bật, một dòng trống duy nhất sẽ được hiển thị. Nhấp vào một dòng trong ngăn context sẽ đưa dòng đó lên đầu trình soạn thảo.
 
-The text and background colors for the context pane can be configured under
-the Highlights tab in the Configure IDLE dialog.
+Có thể cấu hình màu văn bản và màu nền của ngăn context trong thẻ Highlights của hộp thoại Configure IDLE.
 
-Shell window
+Cửa sổ Shell
 ^^^^^^^^^^^^
 
-In IDLE's Shell, enter, edit, and recall complete statements. (Most
-consoles and terminals only work with a single physical line at a time).
+Trong Shell của IDLE, hãy nhập, chỉnh sửa và gọi lại các câu lệnh hoàn chỉnh. (Hầu hết console và terminal chỉ làm việc với một dòng vật lý tại một thời điểm).
 
-Submit a single-line statement for execution by hitting :kbd:`Return`
-with the cursor anywhere on the line.  If a line is extended with
-Backslash (:kbd:`\\`), the cursor must be on the last physical line.
-Submit a multi-line compound statement by entering a blank line after
-the statement.
+Gửi một câu lệnh một dòng để thực thi bằng cách nhấn :kbd:`Return` khi con trỏ ở bất kỳ vị trí nào trên dòng. Nếu một dòng được mở rộng bằng Backslash (:kbd:`\\`), con trỏ phải nằm trên dòng vật lý cuối cùng. Gửi một câu lệnh phức hợp nhiều dòng bằng cách nhập một dòng trống sau câu lệnh.
 
-When one pastes code into Shell, it is not compiled and possibly executed
-until one hits :kbd:`Return`, as specified above.
-One may edit pasted code first.
-If one pastes more than one statement into Shell, the result will be a
-:exc:`SyntaxError` when multiple statements are compiled as if they were one.
+Khi dán mã vào Shell, mã chưa được biên dịch và có thể thực thi cho đến khi nhấn :kbd:`Return`, như đã nêu ở trên. Bạn có thể chỉnh sửa mã đã dán trước. Nếu dán nhiều hơn một câu lệnh vào Shell, kết quả sẽ là một
+:exc:`SyntaxError` khi nhiều câu lệnh được biên dịch như thể chúng là một.
 
-Lines containing ``RESTART`` mean that the user execution process has been
-re-started.  This occurs when the user execution process has crashed,
-when one requests a restart on the Shell menu, or when one runs code
-in an editor window.
+Các dòng chứa ``RESTART`` cho biết tiến trình thực thi của người dùng đã được khởi động lại. Điều này xảy ra khi tiến trình thực thi của người dùng bị lỗi, khi yêu cầu khởi động lại trên menu Shell hoặc khi chạy mã trong cửa sổ trình soạn thảo.
 
-The editing features described in previous subsections work when entering
-code interactively.  IDLE's Shell window also responds to the following:
+Các tính năng chỉnh sửa được mô tả trong những tiểu mục trước cũng hoạt động khi nhập mã tương tác. Cửa sổ Shell của IDLE cũng phản hồi với các thao tác sau:
 
-* :kbd:`C-c` attempts to interrupt statement execution (but may fail).
+* :kbd:`C-c` cố gắng ngắt việc thực thi câu lệnh (nhưng có thể không thành công).
 
-* :kbd:`C-d` closes Shell if typed at a ``>>>`` prompt.
+* :kbd:`C-d` đóng Shell nếu được nhập tại lời nhắc ``>>>``.
 
-* :kbd:`Alt-p` and :kbd:`Alt-n` (:kbd:`C-p` and :kbd:`C-n` on macOS)
-  retrieve to the current prompt the previous or next previously
-  entered statement that matches anything already typed.
+* :kbd:`Alt-p` và :kbd:`Alt-n` (:kbd:`C-p` và :kbd:`C-n` trên macOS) truy xuất vào lời nhắc hiện tại câu lệnh đã nhập trước đó hoặc tiếp theo khớp với bất kỳ nội dung nào đã được nhập.
 
-* :kbd:`Return` while the cursor is on any previous statement
-  appends the latter to anything already typed at the prompt.
+* :kbd:`Return` khi con trỏ đang ở bất kỳ câu lệnh trước nào sẽ nối câu lệnh đó vào mọi nội dung đã nhập tại dấu nhắc.
 
-Text colors
+Màu văn bản
 ^^^^^^^^^^^
 
-Idle defaults to black on white text, but colors text with special meanings.
-For the shell, these are shell output, shell error, user output, and
-user error.  For Python code, at the shell prompt or in an editor, these are
-keywords, builtin class and function names, names following ``class`` and
-``def``, strings, and comments. For any text window, these are the cursor (when
-present), found text (when possible), and selected text.
+Theo mặc định, IDLE hiển thị văn bản màu đen trên nền trắng, nhưng sẽ tô màu văn bản mang những ý nghĩa đặc biệt. Đối với shell, đó là đầu ra của shell, lỗi của shell, đầu ra của người dùng và lỗi của người dùng. Đối với mã Python, tại dấu nhắc shell hoặc trong trình soạn thảo, đó là từ khóa, tên class và function dựng sẵn, tên đứng sau ``class`` và ``def``, chuỗi và chú thích. Đối với mọi cửa sổ văn bản, đó là con trỏ (khi có), văn bản được tìm thấy (khi có thể) và văn bản được chọn.
 
-IDLE also highlights the :ref:`soft keywords <soft-keywords>` :keyword:`match`,
-:keyword:`case <match>`, and :keyword:`_ <wildcard-patterns>` in
-pattern-matching statements. However, this highlighting is not perfect and
-will be incorrect in some rare cases, including some ``_``-s in ``case``
-patterns.
+IDLE cũng tô sáng :ref:`các soft keyword <soft-keywords>` :keyword:`match`,
+:keyword:`case <match>`, và :keyword:`_ <wildcard-patterns>` trong các câu lệnh pattern-matching. Tuy nhiên, việc tô sáng này không hoàn hảo và sẽ không chính xác trong một số trường hợp hiếm gặp, bao gồm một số ``_``-s trong các pattern ``case``.
 
-Text coloring is done in the background, so uncolorized text is occasionally
-visible.  To change the color scheme, use the Configure IDLE dialog
-Highlighting tab.  The marking of debugger breakpoint lines in the editor and
-text in popups and dialogs is not user-configurable.
+Việc tô màu văn bản được thực hiện ở chế độ nền, vì vậy đôi khi bạn sẽ thấy văn bản chưa được tô màu. Để thay đổi bảng màu, hãy sử dụng tab Highlighting trong hộp thoại Configure IDLE. Việc đánh dấu các dòng breakpoint của debugger trong trình soạn thảo, cũng như văn bản trong các cửa sổ bật lên và hộp thoại, không thể được người dùng cấu hình.
 
 
-Startup and Code Execution
---------------------------
+Khởi động và thực thi mã
+------------------------
 
-Upon startup with the ``-s`` option, IDLE will execute the file referenced by
-the environment variables :envvar:`IDLESTARTUP` or :envvar:`PYTHONSTARTUP`.
-IDLE first checks for ``IDLESTARTUP``; if ``IDLESTARTUP`` is present the file
-referenced is run.  If ``IDLESTARTUP`` is not present, IDLE checks for
-``PYTHONSTARTUP``.  Files referenced by these environment variables are
-convenient places to store functions that are used frequently from the IDLE
-shell, or for executing import statements to import common modules.
+Khi khởi động với tùy chọn ``-s``, IDLE sẽ thực thi tệp được tham chiếu bởi biến môi trường :envvar:`IDLESTARTUP` hoặc :envvar:`PYTHONSTARTUP`. Trước tiên, IDLE kiểm tra ``IDLESTARTUP``; nếu ``IDLESTARTUP`` hiện diện, tệp được tham chiếu sẽ được chạy. Nếu ``IDLESTARTUP`` không hiện diện, IDLE sẽ kiểm tra ``PYTHONSTARTUP``. Các tệp được tham chiếu bởi những biến môi trường này là nơi thuận tiện để lưu trữ các hàm thường được sử dụng từ IDLE shell hoặc để thực thi các câu lệnh import nhằm nhập các module thường dùng.
 
-In addition, ``Tk`` also loads a startup file if it is present.  Note that the
-Tk file is loaded unconditionally.  This additional file is ``.Idle.py`` and is
-looked for in the user's home directory.  Statements in this file will be
-executed in the Tk namespace, so this file is not useful for importing
-functions to be used from IDLE's Python shell.
+Ngoài ra, ``Tk`` cũng tải một tệp khởi động nếu tệp đó hiện diện. Lưu ý rằng tệp Tk luôn được tải. Tệp bổ sung này là ``.Idle.py`` và được tìm trong thư mục chính của người dùng. Các câu lệnh trong tệp này sẽ được thực thi trong namespace Tk, vì vậy tệp này không hữu ích cho việc nhập các hàm để sử dụng từ Python shell của IDLE.
 
 .. _idlelib-cli:
 
-Command-line usage
-^^^^^^^^^^^^^^^^^^
+Cách sử dụng dòng lệnh
+^^^^^^^^^^^^^^^^^^^^^^
 
 .. program:: idle
 
-IDLE can be invoked from the command line with various options. The general syntax is:
+Có thể gọi IDLE từ dòng lệnh với nhiều tùy chọn khác nhau. Cú pháp tổng quát là:
 
 .. code-block:: bash
 
    python -m idlelib [options] [file ...]
 
-The following options are available:
+Các tùy chọn sau đây hiện có:
 
 .. option:: -c <command>
 
-   Run the specified Python command in the shell window.
-   For example, pass ``-c "print('Hello, World!')"``.
-   On Windows, the outer quotes must be double quotes as shown.
+   Chạy lệnh Python được chỉ định trong cửa sổ shell. Ví dụ, truyền ``-c "print('Hello, World!')"``. Trên Windows, dấu ngoặc kép bên ngoài phải là dấu ngoặc kép như minh họa.
 
 .. option:: -d
 
-   Enable the debugger and open the shell window.
+   Bật debugger và mở cửa sổ shell.
 
 .. option:: -e
 
-   Open an editor window.
+   Mở cửa sổ trình soạn thảo.
 
 .. option:: -h
 
-   Print a help message with legal combinations of options and exit.
+   In thông báo trợ giúp kèm các tổ hợp tùy chọn hợp lệ rồi thoát.
 
 .. option:: -i
 
-   Open a shell window.
+   Mở cửa sổ shell.
 
 .. option:: -r <file>
 
-   Run the specified file in the shell window.
+   Chạy tệp được chỉ định trong cửa sổ shell.
 
 .. option:: -s
 
-   Run the startup file (as defined by the environment variables :envvar:`IDLESTARTUP` or :envvar:`PYTHONSTARTUP`) before opening the shell window.
+   Chạy tệp khởi động (như được xác định bởi các biến môi trường :envvar:`IDLESTARTUP` hoặc :envvar:`PYTHONSTARTUP`) trước khi mở cửa sổ shell.
 
 .. option:: -t <title>
 
-   Set the title of the shell window.
+   Đặt tiêu đề cho cửa sổ shell.
 
 .. option:: -
 
-   Read and execute standard input in the shell window. This option must be the last one before any arguments.
+   Đọc và thực thi đầu vào chuẩn trong cửa sổ shell. Tùy chọn này phải là tùy chọn cuối cùng trước mọi đối số.
 
-If arguments are provided:
+Nếu có cung cấp đối số:
 
-- If ``-``, ``-c``, or ``-r`` is used, all arguments are placed in ``sys.argv[1:]``,
-  and ``sys.argv[0]`` is set to ``''``, ``'-c'``, or ``'-r'`` respectively.
-  No editor window is opened, even if that is the default set in the *Options* dialog.
-- Otherwise, arguments are treated as files to be opened for editing, and ``sys.argv`` reflects the arguments passed to IDLE itself.
+- Nếu ``-``, ``-c`` hoặc ``-r`` được sử dụng, tất cả các đối số sẽ được đặt trong ``sys.argv[1:]``, và ``sys.argv[0]`` được đặt thành lần lượt là ``''``, ``'-c'`` hoặc ``'-r'``. Cửa sổ trình soạn thảo sẽ không được mở, ngay cả khi đó là thiết lập mặc định trong hộp thoại *Options*.
+- Nếu không, các đối số được coi là những tệp cần mở để chỉnh sửa, còn ``sys.argv`` phản ánh các đối số được truyền cho chính IDLE.
 
 
-Startup failure
-^^^^^^^^^^^^^^^
+Lỗi khởi động
+^^^^^^^^^^^^^
 
-IDLE uses a socket to communicate between the IDLE GUI process and the user
-code execution process.  A connection must be established whenever the Shell
-starts or restarts.  (The latter is indicated by a divider line that says
-'RESTART'). If the user process fails to connect to the GUI process, it
-usually displays a ``Tk`` error box with a 'cannot connect' message
-that directs the user here.  It then exits.
+IDLE sử dụng một socket để giao tiếp giữa tiến trình GUI của IDLE và tiến trình thực thi mã của người dùng. Kết nối phải được thiết lập mỗi khi Shell khởi động hoặc khởi động lại. (Việc khởi động lại được biểu thị bằng một đường phân cách có nội dung 'RESTART'). Nếu tiến trình của người dùng không kết nối được với tiến trình GUI, tiến trình này thường hiển thị một hộp lỗi ``Tk`` với thông báo 'cannot connect' hướng dẫn người dùng đến đây. Sau đó, tiến trình sẽ thoát.
 
-One specific connection failure on Unix systems results from
-misconfigured masquerading rules somewhere in a system's network setup.
-When IDLE is started from a terminal, one will see a message starting
-with ``** Invalid host:``.
-The valid value is ``127.0.0.1 (idlelib.rpc.LOCALHOST)``.
-One can diagnose with ``tcpconnect -irv 127.0.0.1 6543`` in one
-terminal window and ``tcplisten <same args>`` in another.
+Một lỗi kết nối cụ thể trên các hệ thống Unix bắt nguồn từ việc cấu hình sai các quy tắc masquerading ở đâu đó trong thiết lập mạng của hệ thống. Khi IDLE được khởi động từ một terminal, bạn sẽ thấy một thông báo bắt đầu bằng ``** Invalid host:``. Giá trị hợp lệ là ``127.0.0.1 (idlelib.rpc.LOCALHOST)``. Có thể chẩn đoán bằng ``tcpconnect -irv 127.0.0.1 6543`` trong một cửa sổ terminal và ``tcplisten <same args>`` trong một cửa sổ khác.
 
-A common cause of failure is a user-written file with the same name as a
-standard library module, such as *random.py* and *tkinter.py*. When such a
-file is located in the same directory as a file that is about to be run,
-IDLE cannot import the stdlib file.  The current fix is to rename the
-user file.
+Một nguyên nhân phổ biến gây lỗi là tệp do người dùng viết có cùng tên với một module của thư viện chuẩn, chẳng hạn như *random.py* và *tkinter.py*. Khi một tệp như vậy nằm trong cùng thư mục với tệp sắp được chạy, IDLE không thể import tệp của thư viện chuẩn. Cách khắc phục hiện tại là đổi tên tệp do người dùng viết.
 
-Though less common than in the past, an antivirus or firewall program may
-stop the connection.  If the program cannot be taught to allow the
-connection, then it must be turned off for IDLE to work.  It is safe to
-allow this internal connection because no data is visible on external
-ports.  A similar problem is a network mis-configuration that blocks
-connections.
+Mặc dù hiện nay ít phổ biến hơn trước, chương trình antivirus hoặc firewall có thể chặn kết nối. Nếu không thể cấu hình chương trình cho phép kết nối, bạn phải tắt chương trình đó thì IDLE mới hoạt động. Cho phép kết nối nội bộ này là an toàn vì không có dữ liệu nào hiển thị trên các cổng bên ngoài. Một vấn đề tương tự là cấu hình mạng không chính xác, khiến các kết nối bị chặn.
 
-Python installation issues occasionally stop IDLE: multiple versions can
-clash, or a single installation might need admin access.  If one undo the
-clash, or cannot or does not want to run as admin, it might be easiest to
-completely remove Python and start over.
+Đôi khi các vấn đề trong quá trình cài đặt Python khiến IDLE không khởi động được: nhiều phiên bản có thể xung đột, hoặc một bản cài đặt có thể cần quyền quản trị viên. Nếu không thể khắc phục xung đột, hoặc không thể hay không muốn chạy với quyền quản trị viên, cách dễ nhất có thể là gỡ bỏ hoàn toàn Python rồi bắt đầu lại.
 
-A zombie pythonw.exe process could be a problem.  On Windows, use Task
-Manager to check for one and stop it if there is.  Sometimes a restart
-initiated by a program crash or Keyboard Interrupt (control-C) may fail
-to connect.  Dismissing the error box or using Restart Shell on the Shell
-menu may fix a temporary problem.
+Một tiến trình pythonw.exe bị treo có thể gây ra vấn đề. Trên Windows, hãy dùng Task Manager để kiểm tra và dừng tiến trình đó nếu có. Đôi khi việc khởi động lại do chương trình bị lỗi hoặc Keyboard Interrupt (control-C) gây ra có thể không kết nối được. Đóng hộp thoại lỗi hoặc sử dụng Restart Shell trong menu Shell có thể khắc phục sự cố tạm thời.
 
-When IDLE first starts, it attempts to read user configuration files in
-``~/.idlerc/`` (~ is one's home directory).  If there is a problem, an error
-message should be displayed.  Leaving aside random disk glitches, this can
-be prevented by never editing the files by hand.  Instead, use the
-configuration dialog, under Options.  Once there is an error in a user
-configuration file, the best solution may be to delete it and start over
-with the settings dialog.
+Khi IDLE khởi động lần đầu, chương trình cố đọc các tệp cấu hình người dùng trong ``~/.idlerc/`` (~ là thư mục chính của người dùng). Nếu có vấn đề, một thông báo lỗi sẽ được hiển thị. Ngoài các lỗi đĩa ngẫu nhiên, bạn có thể ngăn tình trạng này bằng cách không bao giờ chỉnh sửa các tệp theo cách thủ công. Thay vào đó, hãy sử dụng hộp thoại cấu hình trong Options. Khi một tệp cấu hình người dùng đã có lỗi, giải pháp tốt nhất có thể là xóa tệp đó rồi bắt đầu lại bằng hộp thoại cài đặt.
 
-If IDLE quits with no message, and it was not started from a console, try
-starting it from a console or terminal (``python -m idlelib``) and see if
-this results in an error message.
+Nếu IDLE thoát mà không hiển thị thông báo, và không được khởi động từ console, hãy thử khởi động chương trình từ console hoặc terminal (``python -m idlelib``) để xem có xuất hiện thông báo lỗi hay không.
 
-On Unix-based systems with tcl/tk older than ``8.6.11`` (see
-``About IDLE``) certain characters of certain fonts can cause
-a tk failure with a message to the terminal.  This can happen either
-if one starts IDLE to edit a file with such a character or later
-when entering such a character.  If one cannot upgrade tcl/tk,
-then re-configure IDLE to use a font that works better.
+Trên các hệ thống dựa trên Unix có tcl/tk cũ hơn ``8.6.11`` (xem ``About IDLE``), một số ký tự trong một số phông chữ có thể khiến tk gặp lỗi và hiển thị thông báo trên terminal. Điều này có thể xảy ra khi bạn khởi động IDLE để chỉnh sửa một tệp chứa ký tự như vậy hoặc sau đó khi nhập ký tự đó. Nếu không thể nâng cấp tcl/tk, hãy cấu hình lại IDLE để sử dụng một phông chữ hoạt động tốt hơn.
 
-Running user code
-^^^^^^^^^^^^^^^^^
+Chạy mã người dùng
+^^^^^^^^^^^^^^^^^^
 
-With rare exceptions, the result of executing Python code with IDLE is
-intended to be the same as executing the same code by the default method,
-directly with Python in a text-mode system console or terminal window.
-However, the different interface and operation occasionally affect
-visible results.  For instance, ``sys.modules`` starts with more entries,
-and ``threading.active_count()`` returns 2 instead of 1.
+Ngoại trừ một số trường hợp hiếm gặp, kết quả thực thi mã Python bằng IDLE được dự định là giống với kết quả thực thi cùng đoạn mã bằng phương thức mặc định, trực tiếp với Python trong bảng điều khiển hệ thống ở chế độ văn bản hoặc cửa sổ terminal. Tuy nhiên, giao diện và cách vận hành khác nhau đôi khi ảnh hưởng đến các kết quả hiển thị. Chẳng hạn, ``sys.modules`` bắt đầu với nhiều mục hơn, còn ``threading.active_count()`` trả về 2 thay vì 1.
 
-By default, IDLE runs user code in a separate OS process rather than in
-the user interface process that runs the shell and editor.  In the execution
-process, it replaces ``sys.stdin``, ``sys.stdout``, and ``sys.stderr``
-with objects that get input from and send output to the Shell window.
-The original values stored in ``sys.__stdin__``, ``sys.__stdout__``, and
-``sys.__stderr__`` are not touched, but may be ``None``.
+Theo mặc định, IDLE chạy mã người dùng trong một quy trình OS riêng thay vì trong quy trình giao diện người dùng chạy shell và editor. Trong quy trình thực thi, IDLE thay thế ``sys.stdin``, ``sys.stdout`` và ``sys.stderr`` bằng các đối tượng nhận đầu vào từ và gửi đầu ra đến cửa sổ Shell. Các giá trị ban đầu được lưu trong ``sys.__stdin__``, ``sys.__stdout__`` và ``sys.__stderr__`` không bị tác động, nhưng có thể được ``None``.
 
-Sending print output from one process to a text widget in another is
-slower than printing to a system terminal in the same process.
-This has the most effect when printing multiple arguments, as the string
-for each argument, each separator, the newline are sent separately.
-For development, this is usually not a problem, but if one wants to
-print faster in IDLE, format and join together everything one wants
-displayed together and then print a single string.  Both format strings
-and :meth:`str.join` can help combine fields and lines.
+Việc gửi đầu ra của print từ một quy trình đến một tiện ích văn bản trong quy trình khác chậm hơn so với việc in ra terminal hệ thống trong cùng một quy trình. Điều này ảnh hưởng nhiều nhất khi in nhiều đối số, vì chuỗi cho từng đối số, từng dấu phân cách và ký tự xuống dòng được gửi riêng. Trong quá trình phát triển, điều này thường không thành vấn đề, nhưng nếu muốn in nhanh hơn trong IDLE, hãy định dạng và nối tất cả nội dung muốn hiển thị cùng nhau, sau đó in một chuỗi duy nhất. Cả chuỗi định dạng và :meth:`str.join` đều có thể giúp kết hợp các trường và dòng.
 
-IDLE's standard stream replacements are not inherited by subprocesses
-created in the execution process, whether directly by user code or by
-modules such as multiprocessing.  If such subprocess use ``input`` from
-sys.stdin or ``print`` or ``write`` to sys.stdout or sys.stderr,
-IDLE should be started in a command line window.  (On Windows,
-use ``python`` or ``py`` rather than ``pythonw`` or ``pyw``.)
-The secondary subprocess
-will then be attached to that window for input and output.
+Các thay thế luồng tiêu chuẩn của IDLE không được kế thừa bởi các subprocess được tạo trong quy trình thực thi, dù được tạo trực tiếp bởi mã người dùng hay bởi các module như multiprocessing. Nếu subprocess đó sử dụng ``input`` từ sys.stdin hoặc ``print`` hay ``write`` đến sys.stdout hoặc sys.stderr, IDLE nên được khởi động trong cửa sổ dòng lệnh. (Trên Windows, hãy dùng ``python`` hoặc ``py`` thay vì ``pythonw`` hoặc ``pyw``.) Khi đó, subprocess phụ sẽ được gắn vào cửa sổ này để nhận đầu vào và xuất đầu ra.
 
-If ``sys`` is reset by user code, such as with ``importlib.reload(sys)``,
-IDLE's changes are lost and input from the keyboard and output to the screen
-will not work correctly.
+Nếu ``sys`` bị mã người dùng đặt lại, chẳng hạn bằng ``importlib.reload(sys)``, các thay đổi của IDLE sẽ mất và việc nhận đầu vào từ bàn phím cũng như xuất đầu ra lên màn hình sẽ không hoạt động chính xác.
 
-When Shell has the focus, it controls the keyboard and screen.  This is
-normally transparent, but functions that directly access the keyboard
-and screen will not work.  These include system-specific functions that
-determine whether a key has been pressed and if so, which.
+Khi Shell được focus, nó điều khiển bàn phím và màn hình. Điều này thường diễn ra trong suốt, nhưng các hàm truy cập trực tiếp vào bàn phím và màn hình sẽ không hoạt động. Những hàm này bao gồm các hàm dành riêng cho hệ thống, dùng để xác định xem một phím đã được nhấn hay chưa và nếu có thì đó là phím nào.
 
-The IDLE code running in the execution process adds frames to the call stack
-that would not be there otherwise.  IDLE wraps ``sys.getrecursionlimit`` and
-``sys.setrecursionlimit`` to reduce the effect of the additional stack
-frames.
+Mã IDLE chạy trong quy trình thực thi thêm các frame vào call stack, vốn sẽ không tồn tại nếu không có IDLE. IDLE bọc ``sys.getrecursionlimit`` và ``sys.setrecursionlimit`` để giảm ảnh hưởng của các frame bổ sung này.
 
-When user code raises SystemExit either directly or by calling sys.exit,
-IDLE returns to a Shell prompt instead of exiting.
+Khi mã người dùng trực tiếp nâng SystemExit hoặc gọi sys.exit, IDLE sẽ quay lại dấu nhắc Shell thay vì thoát.
 
-User output in Shell
-^^^^^^^^^^^^^^^^^^^^
+Đầu ra của người dùng trong Shell
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When a program outputs text, the result is determined by the
-corresponding output device.  When IDLE executes user code, ``sys.stdout``
-and ``sys.stderr`` are connected to the display area of IDLE's Shell.  Some of
-its features are inherited from the underlying Tk Text widget.  Others
-are programmed additions.  Where it matters, Shell is designed for development
-rather than production runs.
+Khi một chương trình xuất văn bản, kết quả được xác định bởi thiết bị đầu ra tương ứng. Khi IDLE thực thi mã người dùng, ``sys.stdout`` và ``sys.stderr`` được kết nối với vùng hiển thị của Shell trong IDLE. Một số tính năng của nó được kế thừa từ widget Tk Text bên dưới. Các tính năng khác là những phần bổ sung được lập trình. Khi có liên quan, Shell được thiết kế cho quá trình phát triển thay vì chạy trong môi trường production.
 
-For instance, Shell never throws away output.  A program that sends unlimited
-output to Shell will eventually fill memory, resulting in a memory error.
-In contrast, some system text windows only keep the last n lines of output.
-A Windows console, for instance, keeps a user-settable 1 to 9999 lines,
-with 300 the default.
+Chẳng hạn, Shell không bao giờ loại bỏ đầu ra. Một chương trình gửi lượng đầu ra không giới hạn đến Shell cuối cùng sẽ lấp đầy bộ nhớ, dẫn đến lỗi bộ nhớ. Ngược lại, một số cửa sổ văn bản hệ thống chỉ giữ lại n dòng đầu ra cuối cùng. Chẳng hạn, console Windows giữ từ 1 đến 9999 dòng do người dùng thiết lập, mặc định là 300 dòng.
 
-A Tk Text widget, and hence IDLE's Shell, displays characters (codepoints) in
-the BMP (Basic Multilingual Plane) subset of Unicode.  Which characters are
-displayed with a proper glyph and which with a replacement box depends on the
-operating system and installed fonts.  Tab characters cause the following text
-to begin after the next tab stop. (They occur every 8 'characters').  Newline
-characters cause following text to appear on a new line.  Other control
-characters are ignored or displayed as a space, box, or something else,
-depending on the operating system and font.  (Moving the text cursor through
-such output with arrow keys may exhibit some surprising spacing behavior.) ::
+Một widget Tk Text, và do đó cả Shell của IDLE, hiển thị các ký tự (codepoint) trong tập con BMP (Basic Multilingual Plane) của Unicode. Những ký tự nào được hiển thị bằng glyph phù hợp và những ký tự nào được hiển thị bằng ô thay thế phụ thuộc vào hệ điều hành và các font đã cài đặt. Ký tự tab khiến văn bản tiếp theo bắt đầu sau điểm dừng tab kế tiếp. (Chúng xuất hiện sau mỗi 8 'ký tự'.) Ký tự xuống dòng khiến văn bản tiếp theo xuất hiện trên dòng mới. Các ký tự điều khiển khác bị bỏ qua hoặc được hiển thị dưới dạng khoảng trắng, ô vuông hoặc một dạng khác, tùy thuộc vào hệ điều hành và font. (Việc di chuyển con trỏ văn bản qua đầu ra như vậy bằng các phím mũi tên có thể cho thấy hành vi giãn cách khá bất ngờ.)::
 
-   >>> s = 'a\tb\a<\x02><\r>\bc\nd'  # Enter 22 chars.
+   >>> s = 'a\tb\a<\x02><\r>\bc\nd'  # Nhập 22 ký tự.
    >>> len(s)
    14
-   >>> s  # Display repr(s)
+   >>> s  # Hiển thị repr(s)
    'a\tb\x07<\x02><\r>\x08c\nd'
-   >>> print(s, end='')  # Display s as is.
-   # Result varies by OS and font.  Try it.
+   >>> print(s, end='')  # Hiển thị s nguyên trạng.
+   # Kết quả thay đổi tùy theo hệ điều hành và font. Hãy thử.
 
-The ``repr`` function is used for interactive echo of expression
-values.  It returns an altered version of the input string in which
-control codes, some BMP codepoints, and all non-BMP codepoints are
-replaced with escape codes. As demonstrated above, it allows one to
-identify the characters in a string, regardless of how they are displayed.
+Hàm ``repr`` được dùng để echo tương tác các giá trị biểu thức. Hàm này trả về một phiên bản đã biến đổi của chuỗi đầu vào, trong đó các mã điều khiển, một số codepoint BMP và tất cả codepoint không thuộc BMP được thay thế bằng các mã escape. Như minh họa ở trên, hàm này cho phép xác định các ký tự trong một chuỗi, bất kể chúng được hiển thị như thế nào.
 
-Normal and error output are generally kept separate (on separate lines)
-from code input and each other.  They each get different highlight colors.
+Đầu ra thông thường và đầu ra lỗi thường được giữ riêng (trên các dòng riêng biệt) với đầu vào mã và với nhau. Mỗi loại có màu highlight khác nhau.
 
-For SyntaxError tracebacks, the normal '^' marking where the error was
-detected is replaced by coloring the text with an error highlight.
-When code run from a file causes other exceptions, one may right click
-on a traceback line to jump to the corresponding line in an IDLE editor.
-The file will be opened if necessary.
+Đối với traceback SyntaxError, dấu '^' thông thường đánh dấu vị trí phát hiện lỗi được thay thế bằng cách tô màu văn bản bằng highlight lỗi. Khi mã chạy từ một tệp gây ra các exception khác, bạn có thể nhấp chuột phải vào một dòng traceback để chuyển đến dòng tương ứng trong trình chỉnh sửa IDLE. Tệp sẽ được mở nếu cần.
 
-Shell has a special facility for squeezing output lines down to a
-'Squeezed text' label.  This is done automatically
-for output over N lines (N = 50 by default).
-N can be changed in the PyShell section of the General
-page of the Settings dialog.  Output with fewer lines can be squeezed by
-right clicking on the output.  This can be useful lines long enough to slow
-down scrolling.
+Shell có một tính năng đặc biệt để thu gọn các dòng đầu ra thành nhãn 'Squeezed text'. Việc này được thực hiện tự động đối với đầu ra có hơn N dòng (N = 50 theo mặc định). Có thể thay đổi N trong phần PyShell của trang General trong hộp thoại Settings. Có thể thu gọn đầu ra có ít dòng hơn bằng cách nhấp chuột phải vào đầu ra. Tính năng này có thể hữu ích với những dòng đủ dài để làm chậm việc cuộn.
 
-Squeezed output is expanded in place by double-clicking the label.
-It can also be sent to the clipboard or a separate view window by
-right-clicking the label.
+Đầu ra đã thu gọn được mở rộng tại chỗ bằng cách nhấp đúp vào nhãn. Bạn cũng có thể gửi đầu ra này vào clipboard hoặc một cửa sổ hiển thị riêng bằng cách nhấp chuột phải vào nhãn.
 
-Developing tkinter applications
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Phát triển ứng dụng tkinter
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-IDLE is intentionally different from standard Python in order to
-facilitate development of tkinter programs.  Enter ``import tkinter as tk;
-root = tk.Tk()`` in standard Python and nothing appears.  Enter the same
-in IDLE and a tk window appears.  In standard Python, one must also enter
-``root.update()`` to see the window.  IDLE does the equivalent in the
-background, about 20 times a second, which is about every 50 milliseconds.
-Next enter ``b = tk.Button(root, text='button'); b.pack()``.  Again,
-nothing visibly changes in standard Python until one enters ``root.update()``.
+IDLE được thiết kế khác với Python tiêu chuẩn để hỗ trợ việc phát triển các chương trình tkinter. Nhập ``import tkinter as tk; root = tk.Tk()`` trong Python tiêu chuẩn thì không có gì xuất hiện. Nhập cùng lệnh đó trong IDLE thì một cửa sổ tk xuất hiện. Trong Python tiêu chuẩn, bạn cũng phải nhập ``root.update()`` để thấy cửa sổ. IDLE thực hiện thao tác tương đương ở chế độ nền, khoảng 20 lần mỗi giây, tức là khoảng mỗi 50 mili giây. Tiếp theo, nhập ``b = tk.Button(root, text='button'); b.pack()``. Một lần nữa, trong Python tiêu chuẩn sẽ không có gì thay đổi rõ ràng cho đến khi nhập ``root.update()``.
 
-Most tkinter programs run ``root.mainloop()``, which usually does not
-return until the tk app is destroyed.  If the program is run with
-``python -i`` or from an IDLE editor, a ``>>>`` shell prompt does not
-appear until ``mainloop()`` returns, at which time there is nothing left
-to interact with.
+Hầu hết các chương trình tkinter đều chạy ``root.mainloop()``, thường sẽ không trả về cho đến khi ứng dụng tk bị hủy. Nếu chương trình được chạy bằng ``python -i`` hoặc từ trình soạn thảo IDLE, lời nhắc shell ``>>>`` sẽ không xuất hiện cho đến khi ``mainloop()`` trả về; khi đó không còn gì để tương tác.
 
-When running a tkinter program from an IDLE editor, one can comment out
-the mainloop call.  One then gets a shell prompt immediately and can
-interact with the live application.  One just has to remember to
-re-enable the mainloop call when running in standard Python.
+Khi chạy một chương trình tkinter từ trình soạn thảo IDLE, bạn có thể chú thích lệnh gọi mainloop. Khi đó, lời nhắc shell xuất hiện ngay lập tức và bạn có thể tương tác với ứng dụng đang hoạt động. Chỉ cần nhớ bật lại lệnh gọi mainloop khi chạy trong Python tiêu chuẩn.
 
-Running without a subprocess
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Chạy mà không có subprocess
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-By default, IDLE executes user code in a separate subprocess via a socket,
-which uses the internal loopback interface.  This connection is not
-externally visible and no data is sent to or received from the internet.
-If firewall software complains anyway, you can ignore it.
+Theo mặc định, IDLE thực thi mã người dùng trong một subprocess riêng thông qua socket, sử dụng giao diện loopback nội bộ. Kết nối này không thể nhìn thấy từ bên ngoài và không có dữ liệu nào được gửi đến hoặc nhận từ internet. Nếu phần mềm tường lửa vẫn cảnh báo, bạn có thể bỏ qua.
 
-If the attempt to make the socket connection fails, Idle will notify you.
-Such failures are sometimes transient, but if persistent, the problem
-may be either a firewall blocking the connection or misconfiguration of
-a particular system.  Until the problem is fixed, one can run Idle with
-the -n command line switch.
+Nếu không thể thiết lập kết nối socket, Idle sẽ thông báo cho bạn. Những lỗi như vậy đôi khi chỉ là tạm thời, nhưng nếu kéo dài, vấn đề có thể là do tường lửa chặn kết nối hoặc hệ thống cụ thể được cấu hình không đúng. Cho đến khi khắc phục được vấn đề, bạn có thể chạy Idle với tùy chọn dòng lệnh -n.
 
-If IDLE is started with the -n command line switch it will run in a
-single process and will not create the subprocess which runs the RPC
-Python execution server.  This can be useful if Python cannot create
-the subprocess or the RPC socket interface on your platform.  However,
-in this mode user code is not isolated from IDLE itself.  Also, the
-environment is not restarted when Run/Run Module (F5) is selected.  If
-your code has been modified, you must reload() the affected modules and
-re-import any specific items (e.g. from foo import baz) if the changes
-are to take effect.  For these reasons, it is preferable to run IDLE
-with the default subprocess if at all possible.
+Nếu IDLE được khởi động với tùy chọn dòng lệnh -n, chương trình sẽ chạy trong một tiến trình duy nhất và không tạo tiến trình con để chạy máy chủ thực thi Python RPC. Điều này có thể hữu ích nếu Python không thể tạo tiến trình con hoặc giao diện socket RPC trên nền tảng của bạn. Tuy nhiên, ở chế độ này, mã người dùng không được cách ly khỏi chính IDLE. Ngoài ra, môi trường sẽ không được khởi động lại khi chọn Run/Run Module (F5). Nếu mã của bạn đã được sửa đổi, bạn phải reload() các module bị ảnh hưởng và import lại mọi mục cụ thể (ví dụ: from foo import baz) để các thay đổi có hiệu lực. Vì những lý do này, nếu có thể, bạn nên chạy IDLE với tiến trình con mặc định.
 
 .. deprecated:: 3.4
 
 
-Help and Preferences
+Trợ giúp và tùy chọn
 --------------------
 
 .. _help-sources:
 
-Help sources
-^^^^^^^^^^^^
+Nguồn trợ giúp
+^^^^^^^^^^^^^^
 
-Help menu entry "IDLE Help" displays a formatted html version of the
-IDLE chapter of the Library Reference.  The result, in a read-only
-tkinter text window, is close to what one sees in a web browser.
-Navigate through the text with a mousewheel,
-the scrollbar, or up and down arrow keys held down.
-Or click the TOC (Table of Contents) button and select a section
-header in the opened box.
+Mục "IDLE Help" trong menu Help hiển thị phiên bản html đã định dạng của chương IDLE trong Library Reference. Kết quả được hiển thị trong cửa sổ văn bản tkinter chỉ đọc, gần giống với nội dung bạn thấy trong trình duyệt web. Di chuyển qua văn bản bằng con lăn chuột, thanh cuộn hoặc giữ các phím mũi tên lên và xuống. Hoặc nhấp vào nút TOC (Table of Contents) rồi chọn tiêu đề phần trong hộp được mở ra.
 
-Help menu entry "Python Docs" opens the extensive sources of help,
-including tutorials, available at ``docs.python.org/x.y``, where 'x.y'
-is the currently running Python version.  If your system
-has an off-line copy of the docs (this may be an installation option),
-that will be opened instead.
+Mục "Python Docs" trong menu Help mở các nguồn trợ giúp phong phú, bao gồm cả tutorial, có tại ``docs.python.org/x.y``, trong đó 'x.y' là phiên bản Python đang chạy. Nếu hệ thống của bạn có bản sao ngoại tuyến của tài liệu (đây có thể là một tùy chọn khi cài đặt), bản sao đó sẽ được mở thay thế.
 
-Selected URLs can be added or removed from the help menu at any time using the
-General tab of the Configure IDLE dialog.
+Bạn có thể thêm hoặc xóa các URL đã chọn khỏi menu trợ giúp bất cứ lúc nào bằng tab General của hộp thoại Configure IDLE.
 
 .. _preferences:
 
-Setting preferences
-^^^^^^^^^^^^^^^^^^^
+Thiết lập tùy chọn
+^^^^^^^^^^^^^^^^^^
 
-The font preferences, highlighting, keys, and general preferences can be
-changed via Configure IDLE on the Option menu.
-Non-default user settings are saved in a ``.idlerc`` directory in the user's
-home directory.  Problems caused by bad user configuration files are solved
-by editing or deleting one or more of the files in ``.idlerc``.
+Có thể thay đổi tùy chọn phông chữ, tô sáng, phím và tùy chọn chung thông qua Configure IDLE trong menu Option. Các cài đặt người dùng không mặc định được lưu trong thư mục ``.idlerc`` trong thư mục chính của người dùng. Có thể khắc phục các vấn đề do tệp cấu hình người dùng không hợp lệ gây ra bằng cách chỉnh sửa hoặc xóa một hay nhiều tệp trong ``.idlerc``.
 
-On the Font tab, see the text sample for the effect of font face and size
-on multiple characters in multiple languages.  Edit the sample to add
-other characters of personal interest.  Use the sample to select
-monospaced fonts.  If particular characters have problems in Shell or an
-editor, add them to the top of the sample and try changing first size
-and then font.
+Trên tab Font, hãy xem mẫu văn bản để thấy ảnh hưởng của kiểu và kích thước phông chữ lên nhiều ký tự trong nhiều ngôn ngữ. Chỉnh sửa mẫu để thêm các ký tự khác mà bạn quan tâm. Dùng mẫu để chọn các phông chữ đơn cách. Nếu một số ký tự gặp vấn đề trong Shell hoặc trình soạn thảo, hãy thêm chúng vào đầu mẫu rồi thử thay đổi kích thước trước, sau đó thay đổi phông chữ.
 
-On the Highlights and Keys tab, select a built-in or custom color theme
-and key set.  To use a newer built-in color theme or key set with older
-IDLEs, save it as a new custom theme or key set and it well be accessible
-to older IDLEs.
+Trên tab Highlights and Keys, hãy chọn một chủ đề màu và bộ phím tích hợp sẵn hoặc tùy chỉnh. Để sử dụng chủ đề màu hoặc bộ phím tích hợp sẵn mới hơn với các phiên bản IDLE cũ hơn, hãy lưu chúng dưới dạng chủ đề màu hoặc bộ phím tùy chỉnh mới để các phiên bản IDLE cũ hơn có thể truy cập.
 
-IDLE on macOS
-^^^^^^^^^^^^^
+IDLE trên macOS
+^^^^^^^^^^^^^^^
 
-Under System Preferences: Dock, one can set "Prefer tabs when opening
-documents" to "Always".  This setting is not compatible with the tk/tkinter
-GUI framework used by IDLE, and it breaks a few IDLE features.
+Trong System Preferences: Dock, bạn có thể đặt "Prefer tabs when opening documents" thành "Always". Cài đặt này không tương thích với framework GUI tk/tkinter được IDLE sử dụng và làm hỏng một vài tính năng của IDLE.
 
-Extensions
-^^^^^^^^^^
+Tiện ích mở rộng
+^^^^^^^^^^^^^^^^
 
-IDLE contains an extension facility.  Preferences for extensions can be
-changed with the Extensions tab of the preferences dialog. See the
-beginning of config-extensions.def in the idlelib directory for further
-information.  The only current default extension is zzdummy, an example
-also used for testing.
+IDLE có một cơ chế tiện ích mở rộng. Có thể thay đổi tùy chọn cho các tiện ích mở rộng bằng tab Extensions của hộp thoại tùy chọn. Xem phần đầu của config-extensions.def trong thư mục idlelib để biết thêm thông tin. Tiện ích mở rộng mặc định duy nhất hiện tại là zzdummy, một ví dụ cũng được dùng để kiểm thử.
 
 
-idlelib --- implementation of IDLE application
-----------------------------------------------
+idlelib --- triển khai ứng dụng IDLE
+------------------------------------
 
 .. module:: idlelib
-   :synopsis: Implementation package for the IDLE shell/editor.
+   :synopsis: Gói triển khai cho shell/editor IDLE.
 
-**Source code:** :source:`Lib/idlelib`
+**Mã nguồn:** :source:`Lib/idlelib`
 
 --------------
 
-The Lib/idlelib package implements the IDLE application.  See the rest
-of this page for how to use IDLE.
+Gói Lib/idlelib triển khai ứng dụng IDLE. Xem phần còn lại của trang này để biết cách sử dụng IDLE.
 
-The files in idlelib are described in idlelib/README.txt.  Access it
-either in idlelib or click Help => About IDLE on the IDLE menu.  This
-file also maps IDLE menu items to the code that implements the item.
-Except for files listed under 'Startup', the idlelib code is 'private' in
-sense that feature changes can be backported (see :pep:`434`).
+Các tệp trong idlelib được mô tả trong idlelib/README.txt. Bạn có thể truy cập tệp này từ idlelib hoặc nhấp vào Help => About IDLE trong menu IDLE. Tệp này cũng ánh xạ các mục menu IDLE tới mã triển khai mục đó. Ngoại trừ các tệp được liệt kê trong phần 'Startup', mã idlelib là 'private' theo nghĩa các thay đổi về tính năng có thể được backport (xem :pep:`434`).

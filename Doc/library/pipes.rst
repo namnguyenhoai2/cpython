@@ -1,17 +1,16 @@
-:mod:`!pipes` --- Interface to shell pipelines
+:mod:`!pipes` --- Giao diện với pipeline shell
 ==============================================
 
 .. module:: pipes
-   :synopsis: Removed in 3.13.
+   :synopsis: Đã bị xóa trong phiên bản 3.13.
    :deprecated:
 
 .. deprecated-removed:: 3.11 3.13
 
-This module is no longer part of the Python standard library.
-It was :ref:`removed in Python 3.13 <whatsnew313-pep594>` after
-being deprecated in Python 3.11.  The removal was decided in :pep:`594`.
+Mô-đun này không còn là một phần của thư viện chuẩn Python. Mô-đun đã được :ref:`xóa trong Python 3.13 <whatsnew313-pep594>` sau khi bị đánh dấu không dùng nữa trong Python 3.11. Việc xóa mô-đun đã được quyết định trong :pep:`594`.
 
-Applications should use the :mod:`subprocess` module instead.
+Ứng dụng nên sử dụng mô-đun :mod:`subprocess` thay thế.
 
-The last version of Python that provided the :mod:`!pipes` module was
-`Python 3.12 <https://docs.python.org/3.12/library/pipes.html>`_.
+Phiên bản Python cuối cùng cung cấp mô-đun :mod:`!pipes` là `Python 3.12 <https://docs.python.org/3.12/library/pipes.html>`_.
+
+.. _`Python 3.12`: https://docs.python.org/3.12/library/pipes.html

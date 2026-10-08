@@ -1,49 +1,40 @@
-:mod:`!selectors` --- High-level I/O multiplexing
-=================================================
+:mod:`!selectors` --- Ghép kênh I/O cấp cao
+===========================================
 
 .. module:: selectors
-   :synopsis: High-level I/O multiplexing.
+   :synopsis: Ghép kênh I/O cấp cao.
 
 .. versionadded:: 3.4
 
-**Source code:** :source:`Lib/selectors.py`
+**Mã nguồn:** :source:`Lib/selectors.py`
 
 --------------
 
-Introduction
-------------
+Giới thiệu
+----------
 
-This module allows high-level and efficient I/O multiplexing, built upon the
-:mod:`select` module primitives. Users are encouraged to use this module
-instead, unless they want precise control over the OS-level primitives used.
+Module này cung cấp khả năng ghép kênh I/O cấp cao và hiệu quả, được xây dựng dựa trên các
+:mod:`select` nguyên thủy của module. Người dùng nên sử dụng module này thay thế, trừ khi họ muốn kiểm soát chính xác các nguyên thủy ở cấp hệ điều hành được sử dụng.
 
-It defines a :class:`BaseSelector` abstract base class, along with several
-concrete implementations (:class:`KqueueSelector`, :class:`EpollSelector`...),
-that can be used to wait for I/O readiness notification on multiple file
-objects. In the following, "file object" refers to any object with a
-:meth:`~io.IOBase.fileno` method, or a raw file descriptor. See :term:`file object`.
+Module định nghĩa một lớp cơ sở trừu tượng :class:`BaseSelector`, cùng với một số triển khai cụ thể (:class:`KqueueSelector`, :class:`EpollSelector`...), có thể được dùng để chờ thông báo về trạng thái sẵn sàng I/O trên nhiều đối tượng tệp. Trong phần sau, "đối tượng tệp" đề cập đến bất kỳ đối tượng nào có một
+:meth:`~io.IOBase.fileno` phương thức hoặc một file descriptor thô. Xem :term:`file object`.
 
-:class:`DefaultSelector` is an alias to the most efficient implementation
-available on the current platform: this should be the default choice for most
-users.
+:class:`DefaultSelector` là bí danh của implementation hiệu quả nhất hiện có trên nền tảng hiện tại: đây nên là lựa chọn mặc định cho hầu hết người dùng.
 
 .. note::
-   The type of file objects supported depends on the platform: on Windows,
-   sockets are supported, but not pipes, whereas on Unix, both are supported
-   (some other types may be supported as well, such as fifos or special file
-   devices).
+   Loại đối tượng tệp được hỗ trợ phụ thuộc vào nền tảng: trên Windows, socket được hỗ trợ nhưng pipe thì không, trong khi trên Unix, cả hai đều được hỗ trợ (một số loại khác cũng có thể được hỗ trợ, chẳng hạn như fifo hoặc thiết bị tệp đặc biệt).
 
 .. seealso::
 
    :mod:`select`
-      Low-level I/O multiplexing module.
+      Module multiplexing I/O cấp thấp.
 
 .. include:: ../includes/wasm-notavail.rst
 
-Classes
--------
+Các class
+---------
 
-Classes hierarchy::
+Phân cấp class::
 
    BaseSelector
    +-- SelectSelector
@@ -53,200 +44,165 @@ Classes hierarchy::
    +-- KqueueSelector
 
 
-In the following, *events* is a bitwise mask indicating which I/O events should
-be waited for on a given file object. It can be a combination of the module's
-constants below:
+Trong phần sau, *events* là một bitwise mask cho biết cần chờ những sự kiện I/O nào trên một đối tượng tệp nhất định. Nó có thể là sự kết hợp của các hằng số dưới đây trong module:
 
-   +-----------------------+-----------------------------------------------+
-   | Constant              | Meaning                                       |
-   +=======================+===============================================+
-   | .. data:: EVENT_READ  | Available for read                            |
-   +-----------------------+-----------------------------------------------+
-   | .. data:: EVENT_WRITE | Available for write                           |
-   +-----------------------+-----------------------------------------------+
+   +-----------------------+------------+
+   | Hằng số               | Ý nghĩa    |
+   +=======================+============+
+   | .. data:: EVENT_READ  | Có thể đọc |
+   +-----------------------+------------+
+   | .. data:: EVENT_WRITE | Có thể ghi |
+   +-----------------------+------------+
 
 
 .. class:: SelectorKey
 
-   A :class:`SelectorKey` is a :class:`~collections.namedtuple` used to
-   associate a file object to its underlying file descriptor, selected event
-   mask and attached data. It is returned by several :class:`BaseSelector`
-   methods.
+   :class:`SelectorKey` là một :class:`~collections.namedtuple` dùng để liên kết một đối tượng tệp với file descriptor cơ bản, event mask đã chọn và dữ liệu đính kèm. Nó được một số phương thức :class:`BaseSelector` trả về.
 
    .. attribute:: fileobj
 
-      File object registered.
+      Đối tượng tệp đã được đăng ký.
 
    .. attribute:: fd
 
-      Underlying file descriptor.
+      File descriptor cơ bản.
 
    .. attribute:: events
 
-      Events that must be waited for on this file object.
+      Các sự kiện phải chờ trên đối tượng tệp này.
 
    .. attribute:: data
 
-      Optional opaque data associated to this file object: for example, this
-      could be used to store a per-client session ID.
+      Dữ liệu opaque tùy chọn được liên kết với đối tượng tệp này: ví dụ, dữ liệu này có thể được dùng để lưu trữ session ID riêng cho từng client.
 
 
 .. class:: BaseSelector
 
-   A :class:`BaseSelector` is used to wait for I/O event readiness on multiple
-   file objects. It supports file stream registration, unregistration, and a
-   method to wait for I/O events on those streams, with an optional timeout.
-   It's an abstract base class, so cannot be instantiated. Use
-   :class:`DefaultSelector` instead, or one of :class:`SelectSelector`,
-   :class:`KqueueSelector` etc. if you want to specifically use an
-   implementation, and your platform supports it.
-   :class:`BaseSelector` and its concrete implementations support the
-   :term:`context manager` protocol.
+   Một :class:`BaseSelector` được dùng để chờ trạng thái sẵn sàng của sự kiện I/O trên nhiều đối tượng tệp. Nó hỗ trợ đăng ký và hủy đăng ký các stream tệp, cũng như một phương thức chờ các sự kiện I/O trên những stream đó, với thời gian chờ tùy chọn. Đây là một abstract base class nên không thể được khởi tạo. Thay vào đó, hãy dùng
+   :class:`DefaultSelector`, hoặc một trong các :class:`SelectSelector`,
+   :class:`KqueueSelector` v.v. nếu bạn muốn sử dụng cụ thể một implementation và nền tảng của bạn hỗ trợ implementation đó.
+   :class:`BaseSelector` và các implementation cụ thể của nó hỗ trợ
+   protocol :term:`context manager`.
 
    .. method:: register(fileobj, events, data=None)
       :abstractmethod:
 
-      Register a file object for selection, monitoring it for I/O events.
+      Đăng ký một đối tượng tệp để chọn, đồng thời theo dõi đối tượng đó để phát hiện các sự kiện I/O.
 
-      *fileobj* is the file object to monitor.  It may either be an integer
-      file descriptor or an object with a ``fileno()`` method.
-      *events* is a bitwise mask of events to monitor.
-      *data* is an opaque object.
+      *fileobj* là đối tượng tệp cần theo dõi. Đối tượng này có thể là một bộ mô tả tệp dạng số nguyên hoặc một đối tượng có phương thức ``fileno()``. *events* là mặt nạ bit của các sự kiện cần theo dõi. *data* là một đối tượng không công khai cấu trúc.
 
-      This returns a new :class:`SelectorKey` instance, or raises a
-      :exc:`ValueError` in case of invalid event mask or file descriptor, or
-      :exc:`KeyError` if the file object is already registered.
+      Phương thức này trả về một thực thể :class:`SelectorKey` mới hoặc phát sinh một
+      :exc:`ValueError` trong trường hợp mặt nạ sự kiện hoặc bộ mô tả tệp không hợp lệ, hoặc
+      :exc:`KeyError` nếu đối tượng tệp đã được đăng ký.
 
    .. method:: unregister(fileobj)
       :abstractmethod:
 
-      Unregister a file object from selection, removing it from monitoring. A
-      file object shall be unregistered prior to being closed.
+      Hủy đăng ký một đối tượng tệp khỏi hoạt động chọn, loại bỏ đối tượng đó khỏi danh sách theo dõi. Phải hủy đăng ký đối tượng tệp trước khi đóng đối tượng.
 
-      *fileobj* must be a file object previously registered.
+      *fileobj* phải là một đối tượng tệp đã được đăng ký trước đó.
 
-      This returns the associated :class:`SelectorKey` instance, or raises a
-      :exc:`KeyError` if *fileobj* is not registered.  It will raise
-      :exc:`ValueError` if *fileobj* is invalid (e.g. it has no ``fileno()``
-      method or its ``fileno()`` method has an invalid return value).
+      Phương thức này trả về instance :class:`SelectorKey` tương ứng hoặc phát sinh một
+      :exc:`KeyError` nếu *fileobj* chưa được đăng ký. Phương thức sẽ phát sinh
+      :exc:`ValueError` nếu *fileobj* không hợp lệ (ví dụ: không có phương thức ``fileno()`` hoặc phương thức ``fileno()`` trả về giá trị không hợp lệ).
 
    .. method:: modify(fileobj, events, data=None)
 
-      Change a registered file object's monitored events or attached data.
+      Thay đổi các sự kiện được theo dõi hoặc dữ liệu đính kèm của đối tượng file đã đăng ký.
 
-      This is equivalent to ``BaseSelector.unregister(fileobj)`` followed
-      by ``BaseSelector.register(fileobj, events, data)``, except that it
-      can be implemented more efficiently.
+      Tương đương với ``BaseSelector.unregister(fileobj)`` theo sau bởi ``BaseSelector.register(fileobj, events, data)``, nhưng có thể được triển khai hiệu quả hơn.
 
-      This returns a new :class:`SelectorKey` instance, or raises a
-      :exc:`ValueError` in case of invalid event mask or file descriptor, or
-      :exc:`KeyError` if the file object is not registered.
+      Phương thức này trả về một thực thể :class:`SelectorKey` mới hoặc phát sinh một
+      :exc:`ValueError` trong trường hợp mặt nạ sự kiện hoặc bộ mô tả tệp không hợp lệ, hoặc
+      :exc:`KeyError` nếu đối tượng tệp chưa được đăng ký.
 
    .. method:: select(timeout=None)
       :abstractmethod:
 
-      Wait until some registered file objects become ready, or the timeout
-      expires.
+      Chờ cho đến khi một số đối tượng tệp đã đăng ký sẵn sàng hoặc thời gian chờ hết hạn.
 
-      If ``timeout > 0``, this specifies the maximum wait time, in seconds.
-      If ``timeout <= 0``, the call won't block, and will report the currently
-      ready file objects.
-      If *timeout* is ``None``, the call will block until a monitored file object
-      becomes ready.
+      Nếu ``timeout > 0``, tùy chọn này chỉ định thời gian chờ tối đa, tính bằng giây. Nếu ``timeout <= 0``, lệnh gọi sẽ không chặn và sẽ báo cáo các đối tượng tệp hiện đang sẵn sàng. Nếu *timeout* là ``None``, lệnh gọi sẽ chặn cho đến khi một đối tượng tệp được theo dõi sẵn sàng.
 
-      This returns a list of ``(key, events)`` tuples, one for each ready file
-      object.
+      Phương thức này trả về một danh sách gồm các tuple ``(key, events)``, mỗi tuple tương ứng với một đối tượng tệp đang sẵn sàng.
 
-      *key* is the :class:`SelectorKey` instance corresponding to a ready file
-      object.
-      *events* is a bitmask of events ready on this file object.
+      *key* là instance :class:`SelectorKey` tương ứng với một đối tượng tệp đang sẵn sàng. *events* là bitmask biểu thị các sự kiện đang sẵn sàng trên đối tượng tệp này.
 
       .. note::
-          This method can return before any file object becomes ready or the
-          timeout has elapsed if the current process receives a signal: in this
-          case, an empty list will be returned.
+          Phương thức này có thể trả về trước khi bất kỳ đối tượng tệp nào sẵn sàng hoặc trước khi thời gian chờ hết hạn nếu tiến trình hiện tại nhận được một signal: trong trường hợp này, một danh sách rỗng sẽ được trả về.
 
       .. versionchanged:: 3.5
-         The selector is now retried with a recomputed timeout when interrupted
-         by a signal if the signal handler did not raise an exception (see
-         :pep:`475` for the rationale), instead of returning an empty list
-         of events before the timeout.
+         Selector sẽ được thử lại với thời gian chờ được tính toán lại khi bị gián đoạn bởi một signal nếu signal handler không phát sinh ngoại lệ (xem
+         :pep:`475` để biết lý do), thay vì trả về một danh sách sự kiện rỗng trước khi hết thời gian chờ.
 
    .. method:: close()
 
-      Close the selector.
+      Đóng selector.
 
-      This must be called to make sure that any underlying resource is freed.
-      The selector shall not be used once it has been closed.
+      Phải gọi phương thức này để đảm bảo mọi tài nguyên nền tảng được giải phóng. Không được sử dụng selector sau khi đã đóng.
 
    .. method:: get_key(fileobj)
 
-      Return the key associated with a registered file object.
+      Trả về key được liên kết với một file object đã đăng ký.
 
-      This returns the :class:`SelectorKey` instance associated to this file
-      object, or raises :exc:`KeyError` if the file object is not registered.
+      Phương thức này trả về instance :class:`SelectorKey` được liên kết với file object này hoặc phát sinh :exc:`KeyError` nếu file object chưa được đăng ký.
 
    .. method:: get_map()
       :abstractmethod:
 
-      Return a mapping of file objects to selector keys.
+      Trả về một mapping từ file object đến selector key.
 
-      This returns a :class:`~collections.abc.Mapping` instance mapping
-      registered file objects to their associated :class:`SelectorKey`
-      instance.
+      Phương thức này trả về một instance :class:`~collections.abc.Mapping` ánh xạ các file object đã đăng ký tới instance :class:`SelectorKey` tương ứng của chúng.
 
 
 .. class:: DefaultSelector()
 
-   The default selector class, using the most efficient implementation
-   available on the current platform. This should be the default choice for
-   most users.
+   Lớp selector mặc định, sử dụng triển khai hiệu quả nhất hiện có trên nền tảng hiện tại. Đây nên là lựa chọn mặc định cho hầu hết người dùng.
 
 
 .. class:: SelectSelector()
 
-   :func:`select.select`-based selector.
+   selector dựa trên :func:`select.select`.
 
 
 .. class:: PollSelector()
 
-   :func:`select.poll`-based selector.
+   selector dựa trên :func:`select.poll`.
 
 
 .. class:: EpollSelector()
 
-   :func:`select.epoll`-based selector.
+   selector dựa trên :func:`select.epoll`.
 
    .. method:: fileno()
 
-      This returns the file descriptor used by the underlying
-      :func:`select.epoll` object.
+      Phương thức này trả về file descriptor được sử dụng bởi
+      đối tượng :func:`select.epoll`.
 
 .. class:: DevpollSelector()
 
-   :func:`select.devpoll`-based selector.
+   selector dựa trên :func:`select.devpoll`.
 
    .. method:: fileno()
 
-      This returns the file descriptor used by the underlying
-      :func:`select.devpoll` object.
+      Phương thức này trả về file descriptor được sử dụng bởi
+      :func:`select.devpoll` đối tượng.
 
    .. versionadded:: 3.5
 
 .. class:: KqueueSelector()
 
-   :func:`select.kqueue`-based selector.
+   Bộ chọn dựa trên :func:`select.kqueue`.
 
    .. method:: fileno()
 
-      This returns the file descriptor used by the underlying
-      :func:`select.kqueue` object.
+      Phương thức này trả về file descriptor được sử dụng bởi
+      :func:`select.kqueue` đối tượng.
 
 
-Examples
---------
+Ví dụ
+-----
 
-Here is a simple echo server implementation::
+Dưới đây là một triển khai máy chủ echo đơn giản::
 
    import selectors
    import socket
@@ -254,16 +210,16 @@ Here is a simple echo server implementation::
    sel = selectors.DefaultSelector()
 
    def accept(sock, mask):
-       conn, addr = sock.accept()  # Should be ready
+       conn, addr = sock.accept()  # Sẽ sẵn sàng
        print('accepted', conn, 'from', addr)
        conn.setblocking(False)
        sel.register(conn, selectors.EVENT_READ, read)
 
    def read(conn, mask):
-       data = conn.recv(1000)  # Should be ready
+       data = conn.recv(1000)  # Sẽ sẵn sàng
        if data:
            print('echoing', repr(data), 'to', conn)
-           conn.send(data)  # Hope it won't block
+           conn.send(data)  # Hy vọng nó sẽ không chặn
        else:
            print('closing', conn)
            sel.unregister(conn)

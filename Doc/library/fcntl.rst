@@ -1,8 +1,8 @@
-:mod:`!fcntl` --- The ``fcntl`` and ``ioctl`` system calls
-==========================================================
+:mod:`!fcntl` --- Các lệnh gọi hệ thống ``fcntl`` và ``ioctl``
+==============================================================
 
 .. module:: fcntl
-   :synopsis: The fcntl() and ioctl() system calls.
+   :synopsis: Các lệnh gọi hệ thống fcntl() và ioctl().
 
 .. sectionauthor:: Jaap Vermeulen
 
@@ -12,160 +12,77 @@
 
 ----------------
 
-This module performs file and I/O control on file descriptors. It is an
-interface to the :c:func:`fcntl` and :c:func:`ioctl` Unix routines.
-See the :manpage:`fcntl(2)` and :manpage:`ioctl(2)` Unix manual pages
-for full details.
+Mô-đun này thực hiện việc điều khiển tệp và I/O trên các bộ mô tả tệp. Đây là giao diện cho các hàm Unix :c:func:`fcntl` và :c:func:`ioctl`. Xem các trang hướng dẫn Unix :manpage:`fcntl(2)` và :manpage:`ioctl(2)` để biết đầy đủ chi tiết.
 
 .. availability:: Unix, not WASI.
 
-All functions in this module take a file descriptor *fd* as their first
-argument.  This can be an integer file descriptor, such as returned by
-``sys.stdin.fileno()``, or an :class:`io.IOBase` object, such as ``sys.stdin``
-itself, which provides a :meth:`~io.IOBase.fileno` that returns a genuine file
-descriptor.
+Tất cả các hàm trong mô-đun này nhận một bộ mô tả tệp *fd* làm đối số đầu tiên. Đây có thể là một bộ mô tả tệp dạng số nguyên, chẳng hạn như bộ mô tả được trả về bởi ``sys.stdin.fileno()``, hoặc một đối tượng :class:`io.IOBase`, chẳng hạn như chính ``sys.stdin``, cung cấp một :meth:`~io.IOBase.fileno` trả về một bộ mô tả tệp thực sự.
 
 .. versionchanged:: 3.3
-   Operations in this module used to raise an :exc:`IOError` where they now
-   raise an :exc:`OSError`.
+   Các thao tác trong mô-đun này trước đây phát sinh :exc:`IOError`, còn hiện nay phát sinh :exc:`OSError`.
 
 .. versionchanged:: 3.8
-   The :mod:`!fcntl` module now contains ``F_ADD_SEALS``, ``F_GET_SEALS``, and
-   ``F_SEAL_*`` constants for sealing of :func:`os.memfd_create` file
-   descriptors.
+   Mô-đun :mod:`!fcntl` hiện chứa các hằng ``F_ADD_SEALS``, ``F_GET_SEALS`` và ``F_SEAL_*`` để niêm phong các bộ mô tả tệp :func:`os.memfd_create`.
 
 .. versionchanged:: 3.9
-   On macOS, the :mod:`!fcntl` module exposes the ``F_GETPATH`` constant,
-   which obtains the path of a file from a file descriptor.
-   On Linux(>=3.15), the :mod:`!fcntl` module exposes the ``F_OFD_GETLK``,
-   ``F_OFD_SETLK`` and ``F_OFD_SETLKW`` constants, which are used when working
-   with open file description locks.
+   Trên macOS, mô-đun :mod:`!fcntl` cung cấp hằng ``F_GETPATH``, dùng để lấy đường dẫn của một tệp từ bộ mô tả tệp. Trên Linux(>=3.15), mô-đun :mod:`!fcntl` cung cấp các hằng ``F_OFD_GETLK``, ``F_OFD_SETLK`` và ``F_OFD_SETLKW``, được sử dụng khi làm việc với các khóa mô tả tệp đang mở.
 
 .. versionchanged:: 3.10
-   On Linux >= 2.6.11, the :mod:`!fcntl` module exposes the ``F_GETPIPE_SZ`` and
-   ``F_SETPIPE_SZ`` constants, which allow to check and modify a pipe's size
-   respectively.
+   Trên Linux >= 2.6.11, module :mod:`!fcntl` cung cấp các hằng số ``F_GETPIPE_SZ`` và ``F_SETPIPE_SZ``, lần lượt cho phép kiểm tra và thay đổi kích thước của pipe.
 
 .. versionchanged:: 3.11
-   On FreeBSD, the :mod:`!fcntl` module exposes the ``F_DUP2FD`` and
-   ``F_DUP2FD_CLOEXEC`` constants, which allow to duplicate a file descriptor,
-   the latter setting ``FD_CLOEXEC`` flag in addition.
+   Trên FreeBSD, module :mod:`!fcntl` cung cấp các hằng số ``F_DUP2FD`` và ``F_DUP2FD_CLOEXEC``, cho phép sao chép một file descriptor; hằng số sau đồng thời đặt cờ ``FD_CLOEXEC``.
 
 .. versionchanged:: 3.12
-   On Linux >= 4.5, the :mod:`!fcntl` module exposes the ``FICLONE`` and
-   ``FICLONERANGE`` constants, which allow to share some data of one file with
-   another file by reflinking on some filesystems (e.g., btrfs, OCFS2, and
-   XFS). This behavior is commonly referred to as "copy-on-write".
+   Trên Linux >= 4.5, module :mod:`!fcntl` cung cấp các hằng số ``FICLONE`` và ``FICLONERANGE``, cho phép chia sẻ một phần dữ liệu của tệp này với tệp khác bằng cách reflink trên một số filesystem (ví dụ: btrfs, OCFS2 và XFS). Hành vi này thường được gọi là "copy-on-write".
 
 .. versionchanged:: 3.13
-   On Linux >= 2.6.32, the :mod:`!fcntl` module exposes the
-   ``F_GETOWN_EX``, ``F_SETOWN_EX``, ``F_OWNER_TID``, ``F_OWNER_PID``, ``F_OWNER_PGRP`` constants, which allow to direct I/O availability signals
-   to a specific thread, process, or process group.
-   On Linux >= 4.13, the :mod:`!fcntl` module exposes the
-   ``F_GET_RW_HINT``, ``F_SET_RW_HINT``, ``F_GET_FILE_RW_HINT``,
-   ``F_SET_FILE_RW_HINT``, and ``RWH_WRITE_LIFE_*`` constants, which allow
-   to inform the kernel about the relative expected lifetime of writes on
-   a given inode or via a particular open file description.
-   On Linux >= 5.1 and NetBSD, the :mod:`!fcntl` module exposes the
-   ``F_SEAL_FUTURE_WRITE`` constant for use with ``F_ADD_SEALS`` and
-   ``F_GET_SEALS`` operations.
-   On FreeBSD, the :mod:`!fcntl` module exposes the ``F_READAHEAD``, ``F_ISUNIONSTACK``, and ``F_KINFO`` constants.
-   On macOS and FreeBSD, the :mod:`!fcntl` module exposes the ``F_RDAHEAD``
-   constant.
-   On NetBSD and AIX, the :mod:`!fcntl` module exposes the ``F_CLOSEM``
-   constant.
-   On NetBSD, the :mod:`!fcntl` module exposes the ``F_MAXFD`` constant.
-   On macOS and NetBSD, the :mod:`!fcntl` module exposes the ``F_GETNOSIGPIPE``
-   and ``F_SETNOSIGPIPE`` constant.
+   Trên Linux >= 2.6.32, module :mod:`!fcntl` cung cấp các hằng số ``F_GETOWN_EX``, ``F_SETOWN_EX``, ``F_OWNER_TID``, ``F_OWNER_PID``, ``F_OWNER_PGRP``, cho phép chuyển các tín hiệu về khả năng I/O đến một thread, process hoặc process group cụ thể. Trên Linux >= 4.13, module :mod:`!fcntl` cung cấp các hằng số ``F_GET_RW_HINT``, ``F_SET_RW_HINT``, ``F_GET_FILE_RW_HINT``, ``F_SET_FILE_RW_HINT`` và ``RWH_WRITE_LIFE_*``, cho phép thông báo cho kernel về thời gian tồn tại tương đối dự kiến của các thao tác ghi trên một inode nhất định hoặc thông qua một open file description cụ thể. Trên Linux >= 5.1 và NetBSD, module :mod:`!fcntl` cung cấp hằng số ``F_SEAL_FUTURE_WRITE`` để sử dụng với các thao tác ``F_ADD_SEALS`` và ``F_GET_SEALS``. Trên FreeBSD, module :mod:`!fcntl` cung cấp các hằng số ``F_READAHEAD``, ``F_ISUNIONSTACK`` và ``F_KINFO``. Trên macOS và FreeBSD, module :mod:`!fcntl` cung cấp hằng số ``F_RDAHEAD``. Trên NetBSD và AIX, module :mod:`!fcntl` cung cấp hằng số ``F_CLOSEM``. Trên NetBSD, module :mod:`!fcntl` cung cấp hằng số ``F_MAXFD``. Trên macOS và NetBSD, module :mod:`!fcntl` cung cấp các hằng số ``F_GETNOSIGPIPE`` và ``F_SETNOSIGPIPE``.
 
 .. versionchanged:: 3.14
-   On Linux >= 6.1, the :mod:`!fcntl` module exposes the ``F_DUPFD_QUERY``
-   to query a file descriptor pointing to the same file.
+   Trên Linux >= 6.1, module :mod:`!fcntl` cung cấp ``F_DUPFD_QUERY`` để truy vấn một file descriptor trỏ đến cùng một tệp.
 
-The module defines the following functions:
+Module định nghĩa các hàm sau:
 
 
 .. function:: fcntl(fd, cmd, arg=0, /)
 
-   Perform the operation *cmd* on file descriptor *fd* (file objects providing
-   a :meth:`~io.IOBase.fileno` method are accepted as well).  The values used
-   for *cmd* are operating system dependent, and are available as constants
-   in the :mod:`!fcntl` module, using the same names as used in the relevant C
-   header files. The argument *arg* can either be an integer value, a
-   :term:`bytes-like object`, or a string.
-   The type and size of *arg* must match the type and size of
-   the argument of the operation as specified in the relevant C documentation.
+   Thực hiện thao tác *cmd* trên file descriptor *fd* (các đối tượng tệp cung cấp phương thức :meth:`~io.IOBase.fileno` cũng được chấp nhận). Các giá trị được sử dụng cho *cmd* phụ thuộc vào hệ điều hành và có sẵn dưới dạng các hằng số trong module :mod:`!fcntl`, sử dụng cùng tên như trong các tệp header C tương ứng. Đối số *arg* có thể là một giá trị số nguyên, một
+   :term:`bytes-like object`, hoặc một chuỗi. Kiểu và kích thước của *arg* phải khớp với kiểu và kích thước của đối số của operation như được chỉ định trong tài liệu C tương ứng.
 
-   When *arg* is an integer, the function returns the integer
-   return value of the C :c:func:`fcntl` call.
+   Khi *arg* là một số nguyên, hàm trả về giá trị trả về dạng số nguyên của lệnh gọi C :c:func:`fcntl`.
 
-   When the argument is bytes-like object, it represents a binary structure,
-   for example, created by :func:`struct.pack`.
-   A string value is encoded to binary using the UTF-8 encoding.
-   The binary data is copied to a buffer whose address is
-   passed to the C :c:func:`fcntl` call.  The return value after a successful
-   call is the contents of the buffer, converted to a :class:`bytes` object.
-   The length of the returned object will be the same as the length of the
-   *arg* argument. This is limited to 1024 bytes.
+   Khi đối số là bytes-like object, nó biểu diễn một cấu trúc nhị phân, chẳng hạn như cấu trúc được tạo bởi :func:`struct.pack`. Một giá trị chuỗi được mã hóa thành nhị phân bằng encoding UTF-8. Dữ liệu nhị phân được sao chép vào một buffer có địa chỉ được truyền cho lệnh gọi C :c:func:`fcntl`. Giá trị trả về sau khi lệnh gọi thành công là nội dung của buffer, được chuyển đổi thành đối tượng :class:`bytes`. Độ dài của đối tượng được trả về sẽ bằng độ dài của đối số *arg*. Kích thước này bị giới hạn ở 1024 byte.
 
-   If the :c:func:`fcntl` call fails, an :exc:`OSError` is raised.
+   Nếu lệnh gọi :c:func:`fcntl` thất bại, một :exc:`OSError` sẽ được phát sinh.
 
    .. note::
-      If the type or the size of *arg* does not match the type or size
-      of the argument of the operation (for example, if an integer is
-      passed when a pointer is expected, or the information returned in
-      the buffer by the operating system is larger than 1024 bytes),
-      this is most likely to result in a segmentation violation or
-      a more subtle data corruption.
+      Nếu kiểu hoặc kích thước của *arg* không khớp với kiểu hoặc kích thước của đối số của operation (ví dụ: truyền một số nguyên khi cần một con trỏ, hoặc thông tin do hệ điều hành trả về trong buffer lớn hơn 1024 byte), điều này rất có thể dẫn đến lỗi phân đoạn hoặc làm hỏng dữ liệu theo cách khó nhận biết hơn.
 
    .. audit-event:: fcntl.fcntl fd,cmd,arg fcntl.fcntl
 
    .. versionchanged:: 3.14
-      Add support of arbitrary :term:`bytes-like objects <bytes-like object>`,
-      not only :class:`bytes`.
+      Thêm hỗ trợ cho các :term:`bytes-like objects <bytes-like object>` tùy ý, không chỉ :class:`bytes`.
 
 
 .. function:: ioctl(fd, request, arg=0, mutate_flag=True, /)
 
-   This function is identical to the :func:`~fcntl.fcntl` function, except
-   that the argument handling is even more complicated.
+   Hàm này giống hệt hàm :func:`~fcntl.fcntl`, ngoại trừ việc xử lý đối số còn phức tạp hơn.
 
-   The *request* parameter is limited to values that can fit in 32-bits
-   or 64-bits, depending on the platform.
-   Additional constants of interest for use as the *request* argument can be
-   found in the :mod:`termios` module, under the same names as used in
-   the relevant C header files.
+   Tham số *request* chỉ nhận các giá trị có thể chứa được trong 32 bit hoặc 64 bit, tùy thuộc vào nền tảng. Các hằng số bổ sung đáng chú ý để sử dụng làm đối số *request* có thể được tìm thấy trong mô-đun :mod:`termios`, với cùng tên như trong các tệp header C tương ứng.
 
-   The parameter *arg* can be an integer, a :term:`bytes-like object`,
-   or a string.
-   The type and size of *arg* must match the type and size of
-   the argument of the operation as specified in the relevant C documentation.
+   Tham số *arg* có thể là một số nguyên, một :term:`bytes-like object`, hoặc một chuỗi. Kiểu và kích thước của *arg* phải khớp với kiểu và kích thước của đối số cho thao tác, như được chỉ định trong tài liệu C tương ứng.
 
-   If *arg* does not support the read-write buffer interface or
-   the *mutate_flag* is false, behavior is as for the :func:`~fcntl.fcntl`
-   function.
+   Nếu *arg* không hỗ trợ giao diện read-write buffer hoặc *mutate_flag* là false, hành vi sẽ giống như đối với hàm :func:`~fcntl.fcntl`.
 
-   If *arg* supports the read-write buffer interface (like :class:`bytearray`)
-   and *mutate_flag* is true (the default), then the buffer is (in effect) passed
-   to the underlying :c:func:`!ioctl` system call, the latter's return code is
-   passed back to the calling Python, and the buffer's new contents reflect the
-   action of the :c:func:`ioctl`.  This is a slight simplification, because if the
-   supplied buffer is less than 1024 bytes long it is first copied into a static
-   buffer 1024 bytes long which is then passed to :func:`ioctl` and copied back
-   into the supplied buffer.
+   Nếu *arg* hỗ trợ giao diện read-write buffer (giống như :class:`bytearray`) và *mutate_flag* là true (giá trị mặc định), thì buffer về cơ bản được truyền cho system call :c:func:`!ioctl` bên dưới, mã trả về của system call này được chuyển lại cho Python đang gọi, còn nội dung mới của buffer phản ánh tác động của :c:func:`ioctl`. Đây là một đơn giản hóa nhỏ, vì nếu buffer được cung cấp có độ dài dưới 1024 byte thì trước tiên nó được sao chép vào một buffer tĩnh dài 1024 byte, sau đó buffer này được truyền cho :func:`ioctl` và sao chép ngược lại vào buffer được cung cấp.
 
-   If the :c:func:`ioctl` call fails, an :exc:`OSError` exception is raised.
+   Nếu lệnh gọi :c:func:`ioctl` thất bại, một ngoại lệ :exc:`OSError` sẽ được phát sinh.
 
    .. note::
-      If the type or size of *arg* does not match the type or size
-      of the operation's argument (for example, if an integer is
-      passed when a pointer is expected, or the information returned in
-      the buffer by the operating system is larger than 1024 bytes,
-      or the size of the mutable bytes-like object is too small),
-      this is most likely to result in a segmentation violation or
-      a more subtle data corruption.
+      Nếu kiểu hoặc kích thước của *arg* không khớp với kiểu hoặc kích thước của đối số của thao tác (ví dụ: truyền một số nguyên trong khi cần một con trỏ, hoặc thông tin do hệ điều hành trả về trong buffer lớn hơn 1024 byte, hoặc kích thước của đối tượng tương tự bytes có thể thay đổi quá nhỏ), điều này rất có thể dẫn đến lỗi vi phạm phân đoạn hoặc hỏng dữ liệu khó nhận biết hơn.
 
-   An example::
+   Ví dụ::
 
       >>> import array, fcntl, struct, termios, os
       >>> os.getpgrp()
@@ -181,67 +98,53 @@ The module defines the following functions:
    .. audit-event:: fcntl.ioctl fd,request,arg fcntl.ioctl
 
    .. versionchanged:: 3.14
-      The GIL is always released during a system call.
-      System calls failing with EINTR are automatically retried.
+      GIL luôn được giải phóng trong khi thực hiện một lời gọi hệ thống. Các lời gọi hệ thống thất bại với EINTR sẽ được tự động thử lại.
 
 .. function:: flock(fd, operation, /)
 
-   Perform the lock operation *operation* on file descriptor *fd* (file objects providing
-   a :meth:`~io.IOBase.fileno` method are accepted as well). See the Unix manual
-   :manpage:`flock(2)` for details.  (On some systems, this function is emulated
-   using :c:func:`fcntl`.)
+   Thực hiện thao tác khóa *operation* trên bộ mô tả tệp *fd* (các đối tượng tệp cung cấp phương thức :meth:`~io.IOBase.fileno` cũng được chấp nhận). Xem hướng dẫn sử dụng Unix
+   :manpage:`flock(2)` để biết chi tiết. (Trên một số hệ thống, hàm này được mô phỏng bằng :c:func:`fcntl`.)
 
-   If the :c:func:`flock` call fails, an :exc:`OSError` exception is raised.
+   Nếu lời gọi :c:func:`flock` thất bại, một ngoại lệ :exc:`OSError` sẽ được phát sinh.
 
    .. audit-event:: fcntl.flock fd,operation fcntl.flock
 
 
 .. function:: lockf(fd, cmd, len=0, start=0, whence=0, /)
 
-   This is essentially a wrapper around the :func:`~fcntl.fcntl` locking calls.
-   *fd* is the file descriptor (file objects providing a :meth:`~io.IOBase.fileno`
-   method are accepted as well) of the file to lock or unlock, and *cmd*
-   is one of the following values:
+   Về cơ bản, đây là một wrapper quanh các lời gọi khóa :func:`~fcntl.fcntl`. *fd* là bộ mô tả tệp (các đối tượng tệp cung cấp phương thức :meth:`~io.IOBase.fileno` cũng được chấp nhận) của tệp cần khóa hoặc mở khóa, còn *cmd* là một trong các giá trị sau:
 
    .. data:: LOCK_UN
 
-      Release an existing lock.
+      Giải phóng một khóa hiện có.
 
    .. data:: LOCK_SH
 
-      Acquire a shared lock.
+      Lấy một khóa dùng chung.
 
    .. data:: LOCK_EX
 
-      Acquire an exclusive lock.
+      Có được một khóa độc quyền.
 
    .. data:: LOCK_NB
 
-      Bitwise OR with any of the other three ``LOCK_*`` constants to make
-      the request non-blocking.
+      Dùng phép OR theo bit với bất kỳ hằng số nào trong ba hằng số ``LOCK_*`` còn lại để làm cho yêu cầu không chặn.
 
-   If :const:`!LOCK_NB` is used and the lock cannot be acquired, an
-   :exc:`OSError` will be raised and the exception will have an *errno*
-   attribute set to :const:`~errno.EACCES` or :const:`~errno.EAGAIN` (depending on the
-   operating system; for portability, check for both values).  On at least some
-   systems, :const:`!LOCK_EX` can only be used if the file descriptor refers to a
-   file opened for writing.
+   Nếu sử dụng :const:`!LOCK_NB` và không thể có được khóa, một
+   :exc:`OSError` sẽ được phát sinh và ngoại lệ sẽ có thuộc tính *errno* được đặt thành :const:`~errno.EACCES` hoặc :const:`~errno.EAGAIN` (tùy thuộc vào hệ điều hành; để đảm bảo tính khả chuyển, hãy kiểm tra cả hai giá trị). Trên ít nhất một số hệ thống, :const:`!LOCK_EX` chỉ có thể được sử dụng nếu file descriptor tham chiếu đến một tệp được mở để ghi.
 
-   *len* is the number of bytes to lock, *start* is the byte offset at
-   which the lock starts, relative to *whence*, and *whence* is as with
-   :func:`io.IOBase.seek`, specifically:
+   *len* là số byte cần khóa, *start* là vị trí byte bắt đầu khóa, tương đối với *whence*, và *whence* được xác định như trong
+   :func:`io.IOBase.seek`, cụ thể là:
 
-   * ``0`` -- relative to the start of the file (:const:`os.SEEK_SET`)
-   * ``1`` -- relative to the current buffer position (:const:`os.SEEK_CUR`)
-   * ``2`` -- relative to the end of the file (:const:`os.SEEK_END`)
+   * ``0`` -- tương đối với phần đầu tệp (:const:`os.SEEK_SET`)
+   * ``1`` -- tương đối với vị trí hiện tại trong buffer (:const:`os.SEEK_CUR`)
+   * ``2`` -- tương đối với cuối tệp (:const:`os.SEEK_END`)
 
-   The default for *start* is 0, which means to start at the beginning of the file.
-   The default for *len* is 0 which means to lock to the end of the file.  The
-   default for *whence* is also 0.
+   Giá trị mặc định của *start* là 0, nghĩa là bắt đầu từ đầu tệp. Giá trị mặc định của *len* là 0, nghĩa là khóa đến cuối tệp. Giá trị mặc định của *whence* cũng là 0.
 
    .. audit-event:: fcntl.lockf fd,cmd,len,start,whence fcntl.lockf
 
-Examples (all on a SVR4 compliant system)::
+Các ví dụ (tất cả đều trên hệ thống tương thích với SVR4)::
 
    import struct, fcntl, os
 
@@ -251,16 +154,10 @@ Examples (all on a SVR4 compliant system)::
    lockdata = struct.pack('hhllhh', fcntl.F_WRLCK, 0, 0, 0, 0, 0)
    rv = fcntl.fcntl(f, fcntl.F_SETLKW, lockdata)
 
-Note that in the first example the return value variable *rv* will hold an
-integer value; in the second example it will hold a :class:`bytes` object.  The
-structure lay-out for the *lockdata* variable is system dependent --- therefore
-using the :func:`flock` call may be better.
+Lưu ý rằng trong ví dụ đầu tiên, biến lưu giá trị trả về *rv* sẽ chứa một giá trị số nguyên; trong ví dụ thứ hai, nó sẽ chứa một đối tượng :class:`bytes`. Bố cục cấu trúc của biến *lockdata* phụ thuộc vào hệ thống — do đó, việc sử dụng lời gọi :func:`flock` có thể tốt hơn.
 
 
 .. seealso::
 
-   Module :mod:`os`
-      If the locking flags :const:`~os.O_SHLOCK` and :const:`~os.O_EXLOCK` are
-      present in the :mod:`os` module (on BSD only), the :func:`os.open`
-      function provides an alternative to the :func:`lockf` and :func:`flock`
-      functions.
+   Mô-đun :mod:`os`
+      Nếu các cờ khóa :const:`~os.O_SHLOCK` và :const:`~os.O_EXLOCK` hiện diện trong mô-đun :mod:`os` (chỉ trên BSD), hàm :func:`os.open` cung cấp một giải pháp thay thế cho các hàm :func:`lockf` và :func:`flock`.

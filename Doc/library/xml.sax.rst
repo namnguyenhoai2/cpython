@@ -1,197 +1,137 @@
-:mod:`!xml.sax` --- Support for SAX2 parsers
-============================================
+:mod:`!xml.sax` --- Hỗ trợ các bộ phân tích SAX2
+================================================
 
 .. module:: xml.sax
-   :synopsis: Package containing SAX2 base classes and convenience functions.
+   :synopsis: Gói chứa các lớp cơ sở SAX2 và các hàm tiện ích.
 
 .. moduleauthor:: Lars Marius Garshol <larsga@garshol.priv.no>
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 .. sectionauthor:: Martin v. Löwis <martin@v.loewis.de>
 
-**Source code:** :source:`Lib/xml/sax/__init__.py`
+**Mã nguồn:** :source:`Lib/xml/sax/__init__.py`
 
 --------------
 
-The :mod:`!xml.sax` package provides a number of modules which implement the
-Simple API for XML (SAX) interface for Python.  The package itself provides the
-SAX exceptions and the convenience functions which will be most used by users of
-the SAX API.
+Gói :mod:`!xml.sax` cung cấp một số mô-đun triển khai giao diện Simple API for XML (SAX) cho Python. Bản thân gói này cung cấp các ngoại lệ SAX và những hàm tiện ích được người dùng API SAX sử dụng nhiều nhất.
 
 
 .. note::
 
-   If you need to parse untrusted or unauthenticated data, see
+   Nếu bạn cần phân tích dữ liệu không đáng tin cậy hoặc chưa được xác thực, hãy xem
    :ref:`xml-security`.
 
 .. versionchanged:: 3.7.1
 
-   The SAX parser no longer processes general external entities by default
-   to increase security. Before, the parser created network connections
-   to fetch remote files or loaded local files from the file
-   system for DTD and entities. The feature can be enabled again with method
-   :meth:`~xml.sax.xmlreader.XMLReader.setFeature` on the parser object
-   and argument :data:`~xml.sax.handler.feature_external_ges`.
+   Theo mặc định, bộ phân tích SAX không còn xử lý các thực thể bên ngoài tổng quát nhằm tăng cường bảo mật. Trước đây, bộ phân tích tạo kết nối mạng để tải các tệp từ xa hoặc tải các tệp cục bộ từ hệ thống tệp cho DTD và các thực thể. Có thể bật lại tính năng này bằng phương thức
+   :meth:`~xml.sax.xmlreader.XMLReader.setFeature` trên đối tượng parser và đối số :data:`~xml.sax.handler.feature_external_ges`.
 
-The convenience functions and data are:
+Các hàm tiện ích và dữ liệu là:
 
 
 .. function:: make_parser(parser_list=())
 
-   Create and return a SAX :class:`~xml.sax.xmlreader.XMLReader` object.  The
-   first parser found will
-   be used.  If *parser_list* is provided, it must be an iterable of strings which
-   name modules that have a function named :func:`create_parser`.  Modules listed
-   in *parser_list* will be used before modules in the default list of parsers.
+   Tạo và trả về một đối tượng :class:`~xml.sax.xmlreader.XMLReader` SAX. Trình phân tích cú pháp đầu tiên được tìm thấy sẽ được sử dụng. Nếu cung cấp *parser_list*, đối số này phải là một iterable gồm các chuỗi chỉ tên những module có một hàm tên là :func:`create_parser`. Các module được liệt kê trong *parser_list* sẽ được sử dụng trước các module trong danh sách trình phân tích cú pháp mặc định.
 
    .. versionchanged:: 3.8
-      The *parser_list* argument can be any iterable, not just a list.
+      Đối số *parser_list* có thể là bất kỳ iterable nào, không chỉ là một list.
 
 
 .. function:: parse(filename_or_stream, handler, errorHandler=handler.ErrorHandler())
 
-   Create a SAX parser and use it to parse a document.  The document, passed in as
-   *filename_or_stream*, can be a system identifier (a string identifying the
-   input source -- typically a file name or a URL),
-   a :term:`path-like <path-like object>` object, or a file object.
-   A system identifier which does not refer to an existing file
-   is opened with :func:`urllib.request.urlopen`.
-   The *handler*
-   parameter needs to be a SAX :class:`~handler.ContentHandler` instance.  If
-   *errorHandler* is given, it must be a SAX :class:`~handler.ErrorHandler`
-   instance; if
-   omitted,  :exc:`SAXParseException` will be raised on all errors.  There is no
-   return value; all work must be done by the *handler* passed in.
+   Tạo một trình phân tích cú pháp SAX và sử dụng nó để phân tích một tài liệu. Tài liệu được truyền vào dưới dạng *filename_or_stream* có thể là một system identifier (một chuỗi xác định nguồn đầu vào -- thường là tên tệp hoặc URL), một đối tượng :term:`path-like <path-like object>`, hoặc một đối tượng tệp. System identifier không trỏ đến một tệp hiện có sẽ được mở bằng :func:`urllib.request.urlopen`. Tham số *handler* phải là một instance :class:`~handler.ContentHandler` SAX. Nếu cung cấp *errorHandler*, tham số này phải là một instance :class:`~handler.ErrorHandler` SAX; nếu bỏ qua, :exc:`SAXParseException` sẽ được nêu ra cho mọi lỗi. Hàm không trả về giá trị nào; mọi công việc phải được thực hiện bởi *handler* được truyền vào.
 
 
 .. function:: parseString(string, handler, errorHandler=handler.ErrorHandler())
 
-   Similar to :func:`parse`, but parses from a buffer *string* received as a
-   parameter.  *string* must be a :class:`str` instance or a
+   Tương tự :func:`parse`, nhưng phân tích cú pháp từ một buffer *string* được nhận dưới dạng tham số. *string* phải là một instance :class:`str` hoặc một
    :term:`bytes-like object`.
 
    .. versionchanged:: 3.5
-      Added support of :class:`str` instances.
+      Đã bổ sung hỗ trợ cho các instance :class:`str`.
 
 
 .. data:: default_parser_list
 
-   The list of the names of modules which are tried by :func:`make_parser`
-   after the modules named in its *parser_list* argument.
-   It contains ``'xml.sax.expatreader'``, or, if the
-   :envvar:`!PY_SAX_PARSER` environment variable is set and the environment
-   is not ignored, the comma-separated list of module names taken from it.
+   Danh sách tên các module được :func:`make_parser` thử sau các module được nêu trong đối số *parser_list*. Danh sách này chứa ``'xml.sax.expatreader'``, hoặc, nếu
+   khi biến môi trường :envvar:`!PY_SAX_PARSER` được đặt và môi trường không bị bỏ qua, danh sách tên module được phân tách bằng dấu phẩy lấy từ biến đó.
 
-A typical SAX application uses three kinds of objects: readers, handlers and
-input sources.  "Reader" in this context is another term for parser, i.e. some
-piece of code that reads the bytes or characters from the input source, and
-produces a sequence of events. The events then get distributed to the handler
-objects, i.e. the reader invokes a method on the handler.  A SAX application
-must therefore obtain a reader object, create or open the input sources, create
-the handlers, and connect these objects all together.  As the final step of
-preparation, the reader is called to parse the input. During parsing, methods on
-the handler objects are called based on structural and syntactic events from the
-input data.
+Một ứng dụng SAX điển hình sử dụng ba loại đối tượng: reader, handler và input source. “Reader” trong ngữ cảnh này là một thuật ngữ khác chỉ parser, tức một đoạn mã đọc các byte hoặc ký tự từ input source và tạo ra một chuỗi sự kiện. Sau đó, các sự kiện được phân phối đến các đối tượng handler; cụ thể là reader gọi một phương thức trên handler. Vì vậy, một ứng dụng SAX phải lấy một đối tượng reader, tạo hoặc mở các input source, tạo các handler và kết nối tất cả những đối tượng này với nhau. Ở bước chuẩn bị cuối cùng, reader được gọi để phân tích cú pháp input. Trong quá trình phân tích cú pháp, các phương thức trên những đối tượng handler được gọi dựa trên các sự kiện về cấu trúc và cú pháp từ dữ liệu input.
 
-For these objects, only the interfaces are relevant; they are normally not
-instantiated by the application itself.  Since Python does not have an explicit
-notion of interface, they are formally introduced as classes, but applications
-may use implementations which do not inherit from the provided classes.  The
+Đối với những đối tượng này, chỉ các interface là đáng quan tâm; thông thường, chính ứng dụng không khởi tạo chúng. Vì Python không có khái niệm rõ ràng về interface, chúng được giới thiệu chính thức dưới dạng các class, nhưng ứng dụng có thể sử dụng các triển khai không kế thừa từ những class được cung cấp. Các
 :class:`~xml.sax.xmlreader.InputSource`, :class:`~xml.sax.xmlreader.Locator`,
-:class:`~xml.sax.xmlreader.Attributes`, :class:`~xml.sax.xmlreader.AttributesNS`,
-and :class:`~xml.sax.xmlreader.XMLReader` interfaces are defined in the
-module :mod:`xml.sax.xmlreader`.  The handler interfaces are defined in
-:mod:`xml.sax.handler`.  For convenience,
-:class:`~xml.sax.xmlreader.InputSource` (which is often
-instantiated directly) and the handler classes are also available from
-:mod:`!xml.sax`.  These interfaces are described below.
+interface :class:`~xml.sax.xmlreader.Attributes`, :class:`~xml.sax.xmlreader.AttributesNS` và :class:`~xml.sax.xmlreader.XMLReader` được định nghĩa trong module :mod:`xml.sax.xmlreader`. Các interface handler được định nghĩa trong
+:mod:`xml.sax.handler`. Để thuận tiện,
+:class:`~xml.sax.xmlreader.InputSource` (thường được khởi tạo trực tiếp) và các class handler cũng có sẵn từ
+:mod:`!xml.sax`. Các interface này được mô tả dưới đây.
 
-In addition to these classes, :mod:`!xml.sax` provides the following exception
-classes.
+Ngoài các lớp này, :mod:`!xml.sax` cung cấp các lớp ngoại lệ sau.
 
 
 .. exception:: SAXException(msg, exception=None)
 
-   Encapsulate an XML error or warning.  This class can contain basic error or
-   warning information from either the XML parser or the application: it can be
-   subclassed to provide additional functionality or to add localization.  Note
-   that although the handlers defined in the
-   :class:`~xml.sax.handler.ErrorHandler` interface
-   receive instances of this exception, it is not required to actually raise the
-   exception --- it is also useful as a container for information.
+   Đóng gói một lỗi hoặc cảnh báo XML. Lớp này có thể chứa thông tin lỗi hoặc cảnh báo cơ bản từ trình phân tích cú pháp XML hoặc ứng dụng; lớp này có thể được phân lớp để cung cấp thêm chức năng hoặc bổ sung khả năng bản địa hóa. Lưu ý rằng mặc dù các trình xử lý được định nghĩa trong
+   giao diện :class:`~xml.sax.handler.ErrorHandler` nhận các thực thể của ngoại lệ này, nhưng không bắt buộc phải thực sự phát sinh ngoại lệ; ngoại lệ này cũng hữu ích như một vùng chứa thông tin.
 
-   When instantiated, *msg* should be a human-readable description of the error.
-   The optional *exception* parameter, if given, should be ``None`` or an exception
-   that was caught by the parsing code and is being passed along as information.
+   Khi được khởi tạo, *msg* phải là mô tả lỗi mà con người có thể đọc được. Tham số *exception* tùy chọn, nếu được cung cấp, phải là ``None`` hoặc một ngoại lệ đã được mã phân tích cú pháp bắt và đang được truyền tiếp dưới dạng thông tin.
 
-   This is the base class for the other SAX exception classes.
+   Đây là lớp cơ sở cho các lớp ngoại lệ SAX khác.
 
 
 .. exception:: SAXParseException(msg, exception, locator)
 
-   Subclass of :exc:`SAXException` raised on parse errors. Instances of this
-   class are passed to the methods of the SAX
-   :class:`~xml.sax.handler.ErrorHandler` interface to provide information
-   about the parse error.  This class supports the SAX
-   :class:`~xml.sax.xmlreader.Locator` interface as well as the
-   :class:`SAXException` interface.
+   Lớp con của :exc:`SAXException`, được phát sinh khi xảy ra lỗi phân tích cú pháp. Các thực thể của lớp này được truyền đến các phương thức của SAX
+   giao diện :class:`~xml.sax.handler.ErrorHandler` để cung cấp thông tin về lỗi phân tích cú pháp. Lớp này hỗ trợ SAX
+   :class:`~xml.sax.xmlreader.Locator` giao diện cũng như
+   :class:`SAXException` giao diện.
 
 
 .. exception:: SAXNotRecognizedException(msg, exception=None)
 
-   Subclass of :exc:`SAXException` raised when a SAX
-   :class:`~xml.sax.xmlreader.XMLReader` is
-   confronted with an unrecognized feature or property.  SAX applications and
-   extensions may use this class for similar purposes.
+   Lớp con của :exc:`SAXException` được phát sinh khi một SAX
+   :class:`~xml.sax.xmlreader.XMLReader` gặp phải một tính năng hoặc thuộc tính không được nhận dạng. Các ứng dụng và phần mở rộng SAX có thể sử dụng lớp này cho các mục đích tương tự.
 
 
 .. exception:: SAXNotSupportedException(msg, exception=None)
 
-   Subclass of :exc:`SAXException` raised when a SAX
-   :class:`~xml.sax.xmlreader.XMLReader` is asked to
-   enable a feature that is not supported, or to set a property to a value that the
-   implementation does not support.  SAX applications and extensions may use this
-   class for similar purposes.
+   Lớp con của :exc:`SAXException` được phát sinh khi một SAX
+   :class:`~xml.sax.xmlreader.XMLReader` được yêu cầu bật một tính năng không được hỗ trợ hoặc đặt một thuộc tính thành giá trị mà phần triển khai không hỗ trợ. Các ứng dụng và phần mở rộng SAX có thể sử dụng lớp này cho các mục đích tương tự.
 
 
 .. exception:: SAXReaderNotAvailable(msg, exception=None)
 
-   Subclass of :exc:`SAXNotSupportedException` raised when no parser is
-   available.  A parser module raises it when it is imported or during
-   parsing if the parser it provides cannot be used, and :func:`make_parser`
-   raises it if no module from the tried ones provides a usable parser.
+   Lớp con của :exc:`SAXNotSupportedException` được phát sinh khi không có parser nào khả dụng. Một module parser sẽ phát sinh ngoại lệ này khi được import hoặc trong quá trình parsing nếu parser mà nó cung cấp không thể được sử dụng, còn :func:`make_parser` sẽ phát sinh ngoại lệ này nếu không có module nào trong số các module đã thử cung cấp parser có thể sử dụng.
 
 
 .. seealso::
 
-   `SAX: The Simple API for XML <http://www.saxproject.org/>`_
-      This site is the focal point for the definition of the SAX API.  It provides a
-      Java implementation and online documentation.  Links to implementations and
-      historical information are also available.
+   `SAX: API đơn giản cho XML <http://www.saxproject.org/>`_
+      Trang web này là trung tâm định nghĩa SAX API. Trang cung cấp một bản triển khai bằng Java và tài liệu trực tuyến. Bạn cũng có thể tìm thấy các liên kết đến những bản triển khai và thông tin lịch sử.
 
-   Module :mod:`xml.sax.handler`
-      Definitions of the interfaces for application-provided objects.
+   Mô-đun :mod:`xml.sax.handler`
+      Định nghĩa các interface cho những đối tượng do ứng dụng cung cấp.
 
-   Module :mod:`xml.sax.saxutils`
-      Convenience functions for use in SAX applications.
+   Mô-đun :mod:`xml.sax.saxutils`
+      Các hàm tiện ích để sử dụng trong các ứng dụng SAX.
 
-   Module :mod:`xml.sax.xmlreader`
-      Definitions of the interfaces for parser-provided objects.
+   Mô-đun :mod:`xml.sax.xmlreader`
+      Định nghĩa các interface cho những đối tượng do parser cung cấp.
 
 
 .. _sax-exception-objects:
 
-SAXException Objects
---------------------
+Đối tượng SAXException
+----------------------
 
-The :class:`SAXException` exception class supports the following methods:
+Lớp exception :class:`SAXException` hỗ trợ các phương thức sau:
 
 
 .. method:: SAXException.getMessage()
 
-   Return a human-readable message describing the error condition.
+   Trả về thông báo dễ đọc cho người dùng mô tả điều kiện lỗi.
 
 
 .. method:: SAXException.getException()
 
-   Return an encapsulated exception object, or ``None``.
+   Trả về đối tượng exception được đóng gói hoặc ``None``.
 
+.. _`SAX: The Simple API for XML`: http://www.saxproject.org/

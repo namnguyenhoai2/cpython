@@ -1,12 +1,12 @@
-:mod:`!operator` --- Standard operators as functions
+:mod:`!operator` --- Các toán tử chuẩn dưới dạng hàm
 ====================================================
 
 .. module:: operator
-   :synopsis: Functions corresponding to the standard operators.
+   :synopsis: Các hàm tương ứng với những toán tử chuẩn.
 
 .. sectionauthor:: Skip Montanaro <skip@automatrix.com>
 
-**Source code:** :source:`Lib/operator.py`
+**Mã nguồn:** :source:`Lib/operator.py`
 
 .. testsetup::
 
@@ -15,152 +15,124 @@
 
 --------------
 
-The :mod:`!operator` module exports a set of efficient functions corresponding to
-the intrinsic operators of Python.  For example, ``operator.add(x, y)`` is
-equivalent to the expression ``x+y``. Many function names are those used for
-special methods, without the double underscores.  For backward compatibility,
-many of these have a variant with the double underscores kept. The variants
-without the double underscores are preferred for clarity.
+Mô-đun :mod:`!operator` xuất ra một tập hợp các hàm hiệu quả tương ứng với những toán tử tích hợp sẵn của Python. Ví dụ, ``operator.add(x, y)`` tương đương với biểu thức ``x+y``. Nhiều tên hàm là tên được sử dụng cho các special method, nhưng không có dấu gạch dưới kép. Để duy trì khả năng tương thích ngược, nhiều hàm trong số này có một biến thể vẫn giữ lại dấu gạch dưới kép. Các biến thể không có dấu gạch dưới kép được ưu tiên vì tính rõ ràng.
 
-The functions fall into categories that perform object comparisons, logical
-operations, mathematical operations and sequence operations.
+Các hàm được chia thành những nhóm thực hiện so sánh đối tượng, thao tác logic, thao tác toán học và thao tác trên sequence.
 
-The object comparison functions are useful for all objects, and are named after
-the rich comparison operators they support:
+Các hàm so sánh đối tượng hữu ích cho mọi đối tượng và được đặt tên theo những toán tử so sánh mở rộng mà chúng hỗ trợ:
 
 
 .. function:: lt(a, b)
-              le(a, b)
-              eq(a, b)
-              ne(a, b)
-              ge(a, b)
-              gt(a, b)
-              __lt__(a, b)
-              __le__(a, b)
-              __eq__(a, b)
-              __ne__(a, b)
-              __ge__(a, b)
-              __gt__(a, b)
+              le(a, b) eq(a, b) ne(a, b) ge(a, b) gt(a, b) __lt__(a, b) __le__(a, b) __eq__(a, b) __ne__(a, b) __ge__(a, b) __gt__(a, b)
 
-   Perform "rich comparisons" between *a* and *b*. Specifically, ``lt(a, b)`` is
-   equivalent to ``a < b``, ``le(a, b)`` is equivalent to ``a <= b``, ``eq(a,
-   b)`` is equivalent to ``a == b``, ``ne(a, b)`` is equivalent to ``a != b``,
-   ``gt(a, b)`` is equivalent to ``a > b`` and ``ge(a, b)`` is equivalent to ``a
-   >= b``.  Note that these functions can return any value, which may
-   or may not be interpretable as a Boolean value.  See
-   :ref:`comparisons` for more information about rich comparisons.
+   Thực hiện “các phép so sánh nâng cao (rich comparisons)” giữa *a* và *b*. Cụ thể, ``lt(a, b)`` tương đương với ``a < b``, ``le(a, b)`` tương đương với ``a <= b``, ``eq(a, b)`` tương đương với ``a == b``, ``ne(a, b)`` tương đương với ``a != b``, ``gt(a, b)`` tương đương với ``a > b`` và ``ge(a, b)`` tương đương với ``a >= b``. Lưu ý rằng các hàm này có thể trả về bất kỳ giá trị nào, và giá trị đó có thể được diễn giải thành giá trị Boolean hoặc không. Xem
+   :ref:`comparisons` để biết thêm thông tin về các phép so sánh nâng cao.
 
 
-The logical operations are also generally applicable to all objects, and support
-truth tests, identity tests, and boolean operations:
+Các phép toán logic nhìn chung cũng áp dụng được cho mọi đối tượng, đồng thời hỗ trợ kiểm tra tính đúng sai, kiểm tra định danh và các phép toán Boolean:
 
 
 .. function:: not_(obj)
               __not__(obj)
 
-   Return the outcome of :keyword:`not` *obj*.  (Note that there is no
-   :meth:`!__not__` method for object instances; only the interpreter core defines
-   this operation.  The result is affected by the :meth:`~object.__bool__` and
-   :meth:`~object.__len__` methods.)
+   Trả về kết quả của :keyword:`not` *obj*. (Lưu ý rằng không có
+   :meth:`!__not__` phương thức cho các thực thể đối tượng; chỉ lõi trình thông dịch định nghĩa phép toán này. Kết quả bị ảnh hưởng bởi các phương thức :meth:`~object.__bool__` và
+   :meth:`~object.__len__`.)
 
 
 .. function:: truth(obj)
 
-   Return :const:`True` if *obj* is true, and :const:`False` otherwise.  This is
-   equivalent to using the :class:`bool` constructor.
+   Trả về :const:`True` nếu *obj* là true, và :const:`False` nếu không. Điều này tương đương với việc sử dụng constructor :class:`bool`.
 
 
 .. function:: is_(a, b)
 
-   Return ``a is b``.  Tests object identity.
+   Trả về ``a is b``. Kiểm tra object identity.
 
 
 .. function:: is_not(a, b)
 
-   Return ``a is not b``.  Tests object identity.
+   Trả về ``a is not b``. Kiểm tra object identity.
 
 
 .. function:: is_none(a)
 
-   Return ``a is None``.  Tests object identity.
+   Trả về ``a is None``. Kiểm tra object identity.
 
    .. versionadded:: 3.14
 
 
 .. function:: is_not_none(a)
 
-   Return ``a is not None``.  Tests object identity.
+   Trả về ``a is not None``. Kiểm tra object identity.
 
    .. versionadded:: 3.14
 
 
-The mathematical and bitwise operations are the most numerous:
+Các phép toán số học và bitwise là nhiều nhất:
 
 
 .. function:: abs(obj)
               __abs__(obj)
 
-   Return the absolute value of *obj*.
+   Trả về giá trị tuyệt đối của *obj*.
 
 
 .. function:: add(a, b)
               __add__(a, b)
 
-   Return ``a + b``, for *a* and *b* numbers.
+   Trả về ``a + b``, với *a* và *b* là các số.
 
 
 .. function:: and_(a, b)
               __and__(a, b)
 
-   Return ``a & b``.
+   Trả về ``a & b``.
 
 
 .. function:: floordiv(a, b)
               __floordiv__(a, b)
 
-   Return ``a // b``.
+   Trả về ``a // b``.
 
 
 .. function:: index(a)
               __index__(a)
 
-   Return *a* converted to an integer.  Equivalent to ``a.__index__()``.
+   Trả về *a* được chuyển đổi thành số nguyên. Tương đương với ``a.__index__()``.
 
    .. versionchanged:: 3.10
-      The result always has exact type :class:`int`.  Previously, the result
-      could have been an instance of a subclass of ``int``.
+      Kết quả luôn có kiểu chính xác là :class:`int`. Trước đây, kết quả có thể là một instance của lớp con của ``int``.
 
 
 .. function:: inv(obj)
-              invert(obj)
-              __inv__(obj)
-              __invert__(obj)
+              invert(obj) __inv__(obj) __invert__(obj)
 
-   Return ``~obj``.
+   Trả về ``~obj``.
 
 
 .. function:: lshift(a, b)
               __lshift__(a, b)
 
-   Return ``a << b``.
+   Trả về ``a << b``.
 
 
 .. function:: mod(a, b)
               __mod__(a, b)
 
-   Return ``a % b``.
+   Trả về ``a % b``.
 
 
 .. function:: mul(a, b)
               __mul__(a, b)
 
-   Return ``a * b``.
+   Trả về ``a * b``.
 
 
 .. function:: matmul(a, b)
               __matmul__(a, b)
 
-   Return ``a @ b``.
+   Trả về ``a @ b``.
 
    .. versionadded:: 3.5
 
@@ -168,135 +140,126 @@ The mathematical and bitwise operations are the most numerous:
 .. function:: neg(obj)
               __neg__(obj)
 
-   Return *obj* negated (``-obj``).
+   Trả về *obj* đã được phủ định (``-obj``).
 
 
 .. function:: or_(a, b)
               __or__(a, b)
 
-   Return ``a | b``.
+   Trả về ``a | b``.
 
 
 .. function:: pos(obj)
               __pos__(obj)
 
-   Return ``+obj``.
+   Trả về ``+obj``.
 
 
 .. function:: pow(a, b)
               __pow__(a, b)
 
-   Return ``a ** b``.
+   Trả về ``a ** b``.
 
 
 .. function:: rshift(a, b)
               __rshift__(a, b)
 
-   Return ``a >> b``.
+   Trả về ``a >> b``.
 
 
 .. function:: sub(a, b)
               __sub__(a, b)
 
-   Return ``a - b``.
+   Trả về ``a - b``.
 
 
 .. function:: truediv(a, b)
               __truediv__(a, b)
 
-   Return ``a / b`` where 2/3 is .66 rather than 0.  This is also known as
-   "true" division.
+   Trả về ``a / b``, trong đó 2/3 là .66 thay vì 0. Đây còn được gọi là phép chia "true".
 
 
 .. function:: xor(a, b)
               __xor__(a, b)
 
-   Return ``a ^ b``.
+   Trả về ``a ^ b``.
 
 
-Operations which work with sequences (some of them with mappings too) include:
+Các phép toán hoạt động với sequence (một số trong đó cũng hoạt động với mapping) bao gồm:
 
 .. function:: concat(a, b)
               __concat__(a, b)
 
-   Return ``a + b`` for *a* and *b* sequences.
+   Trả về ``a + b`` cho *a* và *b*, cả hai đều là sequence.
 
 
 .. function:: contains(a, b)
               __contains__(a, b)
 
-   Return the outcome of the test ``b in a``. Note the reversed operands.
+   Trả về kết quả của phép kiểm tra ``b in a``. Lưu ý rằng các toán hạng bị đảo ngược.
 
 
 .. function:: countOf(a, b)
 
-   Return the number of occurrences of *b* in *a*.
+   Trả về số lần xuất hiện của *b* trong *a*.
 
 
 .. function:: delitem(a, b)
               __delitem__(a, b)
 
-   Remove the value of *a* at index *b*.
+   Xóa giá trị của *a* tại chỉ mục *b*.
 
 
 .. function:: getitem(a, b)
               __getitem__(a, b)
 
-   Return the value of *a* at index *b*.
+   Trả về giá trị của *a* tại chỉ mục *b*.
 
 
 .. function:: indexOf(a, b)
 
-   Return the index of the first of occurrence of *b* in *a*.
+   Trả về chỉ mục của lần xuất hiện đầu tiên của *b* trong *a*.
 
 
 .. function:: setitem(a, b, c)
               __setitem__(a, b, c)
 
-   Set the value of *a* at index *b* to *c*.
+   Đặt giá trị của *a* tại chỉ mục *b* thành *c*.
 
 
 .. function:: length_hint(obj, default=0)
 
-   Return an estimated length for the object *obj*. First try to return its
-   actual length, then an estimate using :meth:`object.__length_hint__`, and
-   finally return the default value.
+   Trả về độ dài ước tính của đối tượng *obj*. Trước tiên, hãy thử trả về độ dài thực tế của đối tượng, sau đó là giá trị ước tính bằng :meth:`object.__length_hint__`, và cuối cùng trả về giá trị mặc định.
 
    .. versionadded:: 3.4
 
 
-The following operation works with callables:
+Thao tác sau đây làm việc với các callable:
 
 .. function:: call(obj, /, *args, **kwargs)
               __call__(obj, /, *args, **kwargs)
 
-   Return ``obj(*args, **kwargs)``.
+   Trả về ``obj(*args, **kwargs)``.
 
    .. versionadded:: 3.11
 
 
-The :mod:`!operator` module also defines tools for generalized attribute and item
-lookups.  These are useful for making fast field extractors as arguments for
-:func:`map`, :func:`sorted`, :meth:`itertools.groupby`, or other functions that
-expect a function argument.
+Mô-đun :mod:`!operator` cũng định nghĩa các công cụ để tra cứu thuộc tính và mục tổng quát. Những công cụ này hữu ích để tạo các field extractor nhanh làm đối số cho
+:func:`map`, :func:`sorted`, :meth:`itertools.groupby`, hoặc các hàm khác yêu cầu một đối số hàm.
 
 
 .. function:: attrgetter(attr)
               attrgetter(*attrs)
 
-   Return a callable object that fetches *attr* from its operand.
-   If more than one attribute is requested, returns a tuple of attributes.
-   The attribute names can also contain dots. For example:
+   Trả về một đối tượng có thể gọi để lấy *attr* từ toán hạng của nó. Nếu yêu cầu nhiều thuộc tính, hàm sẽ trả về một tuple các thuộc tính. Tên thuộc tính cũng có thể chứa dấu chấm. Ví dụ:
 
-   * After ``f = attrgetter('name')``, the call ``f(b)`` returns ``b.name``.
+   * Sau ``f = attrgetter('name')``, lệnh gọi ``f(b)`` trả về ``b.name``.
 
-   * After ``f = attrgetter('name', 'date')``, the call ``f(b)`` returns
-     ``(b.name, b.date)``.
+   * Sau ``f = attrgetter('name', 'date')``, lệnh gọi ``f(b)`` trả về ``(b.name, b.date)``.
 
-   * After ``f = attrgetter('name.first', 'name.last')``, the call ``f(b)``
-     returns ``(b.name.first, b.name.last)``.
+   * Sau ``f = attrgetter('name.first', 'name.last')``, lệnh gọi ``f(b)`` trả về ``(b.name.first, b.name.last)``.
 
-   Equivalent to::
+   Tương đương với::
 
       def attrgetter(*items):
           if any(not isinstance(item, str) for item in items):
@@ -319,16 +282,13 @@ expect a function argument.
 .. function:: itemgetter(item)
               itemgetter(*items)
 
-   Return a callable object that fetches *item* from its operand using the
-   operand's :meth:`~object.__getitem__` method.  If multiple items are specified,
-   returns a tuple of lookup values.  For example:
+   Trả về một đối tượng có thể gọi để lấy *item* từ toán hạng của nó bằng phương thức :meth:`~object.__getitem__` của toán hạng. Nếu chỉ định nhiều item, hàm sẽ trả về một tuple các giá trị tra cứu. Ví dụ:
 
-   * After ``f = itemgetter(2)``, the call ``f(r)`` returns ``r[2]``.
+   * Sau ``f = itemgetter(2)``, lệnh gọi ``f(r)`` trả về ``r[2]``.
 
-   * After ``g = itemgetter(2, 5, 3)``, the call ``g(r)`` returns
-     ``(r[2], r[5], r[3])``.
+   * Sau ``g = itemgetter(2, 5, 3)``, lệnh gọi ``g(r)`` trả về ``(r[2], r[5], r[3])``.
 
-   Equivalent to::
+   Tương đương với::
 
       def itemgetter(*items):
           if len(items) == 1:
@@ -340,9 +300,7 @@ expect a function argument.
                   return tuple(obj[item] for item in items)
           return g
 
-   The items can be any type accepted by the operand's :meth:`~object.__getitem__`
-   method.  Dictionaries accept any :term:`hashable` value.  Lists, tuples, and
-   strings accept an index or a slice:
+   Các mục có thể thuộc bất kỳ kiểu nào được phương thức :meth:`~object.__getitem__` của toán hạng chấp nhận. Từ điển chấp nhận mọi giá trị :term:`hashable`. Danh sách, tuple và chuỗi chấp nhận một chỉ mục hoặc một lát cắt:
 
       >>> itemgetter(1)('ABCDEFG')
       'B'
@@ -354,8 +312,7 @@ expect a function argument.
       >>> itemgetter('rank')(soldier)
       'captain'
 
-   Example of using :func:`itemgetter` to retrieve specific fields from a
-   tuple record:
+   Ví dụ sử dụng :func:`itemgetter` để lấy các trường cụ thể từ một bản ghi tuple:
 
       >>> inventory = [('apple', 3), ('banana', 2), ('pear', 5), ('orange', 1)]
       >>> getcount = itemgetter(1)
@@ -367,16 +324,13 @@ expect a function argument.
 
 .. function:: methodcaller(name, /, *args, **kwargs)
 
-   Return a callable object that calls the method *name* on its operand.  If
-   additional arguments and/or keyword arguments are given, they will be given
-   to the method as well.  For example:
+   Trả về một đối tượng có thể gọi, đối tượng này gọi phương thức *name* trên toán hạng của nó. Nếu cung cấp thêm các đối số và/hoặc đối số từ khóa, chúng cũng sẽ được truyền cho phương thức. Ví dụ:
 
-   * After ``f = methodcaller('name')``, the call ``f(b)`` returns ``b.name()``.
+   * Sau ``f = methodcaller('name')``, lệnh gọi ``f(b)`` trả về ``b.name()``.
 
-   * After ``f = methodcaller('name', 'foo', bar=1)``, the call ``f(b)``
-     returns ``b.name('foo', bar=1)``.
+   * Sau ``f = methodcaller('name', 'foo', bar=1)``, lệnh gọi ``f(b)`` trả về ``b.name('foo', bar=1)``.
 
-   Equivalent to::
+   Tương đương với::
 
       def methodcaller(name, /, *args, **kwargs):
           def caller(obj):
@@ -386,112 +340,97 @@ expect a function argument.
 
 .. _operator-map:
 
-Mapping Operators to Functions
-------------------------------
+Ánh xạ toán tử thành hàm
+------------------------
 
-This table shows how abstract operations correspond to operator symbols in the
-Python syntax and the functions in the :mod:`!operator` module.
+Bảng này cho thấy các phép toán trừu tượng tương ứng với các ký hiệu toán tử trong cú pháp Python và các hàm trong mô-đun :mod:`!operator`.
 
-+-----------------------+-------------------------+---------------------------------------+
-| Operation             | Syntax                  | Function                              |
-+=======================+=========================+=======================================+
-| Addition              | ``a + b``               | ``add(a, b)``                         |
-+-----------------------+-------------------------+---------------------------------------+
-| Concatenation         | ``seq1 + seq2``         | ``concat(seq1, seq2)``                |
-+-----------------------+-------------------------+---------------------------------------+
-| Containment Test      | ``obj in seq``          | ``contains(seq, obj)``                |
-+-----------------------+-------------------------+---------------------------------------+
-| Division              | ``a / b``               | ``truediv(a, b)``                     |
-+-----------------------+-------------------------+---------------------------------------+
-| Division              | ``a // b``              | ``floordiv(a, b)``                    |
-+-----------------------+-------------------------+---------------------------------------+
-| Bitwise And, or       | ``a & b``               | ``and_(a, b)``                        |
-| Intersection          |                         |                                       |
-+-----------------------+-------------------------+---------------------------------------+
-| Bitwise Exclusive Or, | ``a ^ b``               | ``xor(a, b)``                         |
-| or Symmetric          |                         |                                       |
-| Difference            |                         |                                       |
-+-----------------------+-------------------------+---------------------------------------+
-| Bitwise Inversion, or | ``~ a``                 | ``invert(a)``                         |
-| Complement            |                         |                                       |
-+-----------------------+-------------------------+---------------------------------------+
-| Bitwise Or, or        | ``a | b``               | ``or_(a, b)``                         |
-| Union                 |                         |                                       |
-+-----------------------+-------------------------+---------------------------------------+
-| Exponentiation        | ``a ** b``              | ``pow(a, b)``                         |
-+-----------------------+-------------------------+---------------------------------------+
-| Identity              | ``a is b``              | ``is_(a, b)``                         |
-+-----------------------+-------------------------+---------------------------------------+
-| Identity              | ``a is not b``          | ``is_not(a, b)``                      |
-+-----------------------+-------------------------+---------------------------------------+
-| Identity              | ``a is None``           | ``is_none(a)``                        |
-+-----------------------+-------------------------+---------------------------------------+
-| Identity              | ``a is not None``       | ``is_not_none(a)``                    |
-+-----------------------+-------------------------+---------------------------------------+
-| Indexed Assignment    | ``obj[k] = v``          | ``setitem(obj, k, v)``                |
-+-----------------------+-------------------------+---------------------------------------+
-| Indexed Deletion      | ``del obj[k]``          | ``delitem(obj, k)``                   |
-+-----------------------+-------------------------+---------------------------------------+
-| Indexing              | ``obj[k]``              | ``getitem(obj, k)``                   |
-+-----------------------+-------------------------+---------------------------------------+
-| Left Shift            | ``a << b``              | ``lshift(a, b)``                      |
-+-----------------------+-------------------------+---------------------------------------+
-| Modulo                | ``a % b``               | ``mod(a, b)``                         |
-+-----------------------+-------------------------+---------------------------------------+
-| Multiplication        | ``a * b``               | ``mul(a, b)``                         |
-+-----------------------+-------------------------+---------------------------------------+
-| Matrix Multiplication | ``a @ b``               | ``matmul(a, b)``                      |
-+-----------------------+-------------------------+---------------------------------------+
-| Negation (Arithmetic) | ``- a``                 | ``neg(a)``                            |
-+-----------------------+-------------------------+---------------------------------------+
-| Negation (Logical)    | ``not a``               | ``not_(a)``                           |
-+-----------------------+-------------------------+---------------------------------------+
-| Positive              | ``+ a``                 | ``pos(a)``                            |
-+-----------------------+-------------------------+---------------------------------------+
-| Right Shift           | ``a >> b``              | ``rshift(a, b)``                      |
-+-----------------------+-------------------------+---------------------------------------+
-| Slice Assignment      | ``seq[i:j] = values``   | ``setitem(seq, slice(i, j), values)`` |
-+-----------------------+-------------------------+---------------------------------------+
-| Slice Deletion        | ``del seq[i:j]``        | ``delitem(seq, slice(i, j))``         |
-+-----------------------+-------------------------+---------------------------------------+
-| Slicing               | ``seq[i:j]``            | ``getitem(seq, slice(i, j))``         |
-+-----------------------+-------------------------+---------------------------------------+
-| String Formatting     | ``s % obj``             | ``mod(s, obj)``                       |
-+-----------------------+-------------------------+---------------------------------------+
-| Subtraction           | ``a - b``               | ``sub(a, b)``                         |
-+-----------------------+-------------------------+---------------------------------------+
-| Truth Test            | ``obj``                 | ``truth(obj)``                        |
-+-----------------------+-------------------------+---------------------------------------+
-| Ordering              | ``a < b``               | ``lt(a, b)``                          |
-+-----------------------+-------------------------+---------------------------------------+
-| Ordering              | ``a <= b``              | ``le(a, b)``                          |
-+-----------------------+-------------------------+---------------------------------------+
-| Equality              | ``a == b``              | ``eq(a, b)``                          |
-+-----------------------+-------------------------+---------------------------------------+
-| Difference            | ``a != b``              | ``ne(a, b)``                          |
-+-----------------------+-------------------------+---------------------------------------+
-| Ordering              | ``a >= b``              | ``ge(a, b)``                          |
-+-----------------------+-------------------------+---------------------------------------+
-| Ordering              | ``a > b``               | ``gt(a, b)``                          |
-+-----------------------+-------------------------+---------------------------------------+
++----------------------------------+-----------------------+---------------------------------------+
+| Phép toán                        | Cú pháp               | Hàm                                   |
++==================================+=======================+=======================================+
+| Phép cộng                        | ``a + b``             | ``add(a, b)``                         |
++----------------------------------+-----------------------+---------------------------------------+
+| Phép nối                         | ``seq1 + seq2``       | ``concat(seq1, seq2)``                |
++----------------------------------+-----------------------+---------------------------------------+
+| Kiểm tra chứa                    | ``obj in seq``        | ``contains(seq, obj)``                |
++----------------------------------+-----------------------+---------------------------------------+
+| Phép chia                        | ``a / b``             | ``truediv(a, b)``                     |
++----------------------------------+-----------------------+---------------------------------------+
+| Phép chia                        | ``a // b``            | ``floordiv(a, b)``                    |
++----------------------------------+-----------------------+---------------------------------------+
+| Phép AND bit, hoặc phép giao     | ``a & b``             | ``and_(a, b)``                        |
++----------------------------------+-----------------------+---------------------------------------+
+| Phép XOR bit, hoặc hiệu đối xứng | ``a ^ b``             | ``xor(a, b)``                         |
++----------------------------------+-----------------------+---------------------------------------+
+| Đảo bit, hay phép bù             | ``~ a``               | ``invert(a)``                         |
++----------------------------------+-----------------------+---------------------------------------+
+| Phép OR bit, hay phép hợp        | ``a | b``             | ``or_(a, b)``                         |
++----------------------------------+-----------------------+---------------------------------------+
+| Lũy thừa                         | ``a ** b``            | ``pow(a, b)``                         |
++----------------------------------+-----------------------+---------------------------------------+
+| Phép đồng nhất                   | ``a is b``            | ``is_(a, b)``                         |
++----------------------------------+-----------------------+---------------------------------------+
+| Phép đồng nhất                   | ``a is not b``        | ``is_not(a, b)``                      |
++----------------------------------+-----------------------+---------------------------------------+
+| Phép đồng nhất                   | ``a is None``         | ``is_none(a)``                        |
++----------------------------------+-----------------------+---------------------------------------+
+| Phép đồng nhất                   | ``a is not None``     | ``is_not_none(a)``                    |
++----------------------------------+-----------------------+---------------------------------------+
+| Gán theo chỉ mục                 | ``obj[k] = v``        | ``setitem(obj, k, v)``                |
++----------------------------------+-----------------------+---------------------------------------+
+| Xóa theo chỉ mục                 | ``del obj[k]``        | ``delitem(obj, k)``                   |
++----------------------------------+-----------------------+---------------------------------------+
+| Lập chỉ mục                      | ``obj[k]``            | ``getitem(obj, k)``                   |
++----------------------------------+-----------------------+---------------------------------------+
+| Dịch trái                        | ``a << b``            | ``lshift(a, b)``                      |
++----------------------------------+-----------------------+---------------------------------------+
+| Phép modulo                      | ``a % b``             | ``mod(a, b)``                         |
++----------------------------------+-----------------------+---------------------------------------+
+| Phép nhân                        | ``a * b``             | ``mul(a, b)``                         |
++----------------------------------+-----------------------+---------------------------------------+
+| Phép nhân ma trận                | ``a @ b``             | ``matmul(a, b)``                      |
++----------------------------------+-----------------------+---------------------------------------+
+| Phép lấy đối (số học)            | ``- a``               | ``neg(a)``                            |
++----------------------------------+-----------------------+---------------------------------------+
+| Phép phủ định (logic)            | ``not a``             | ``not_(a)``                           |
++----------------------------------+-----------------------+---------------------------------------+
+| Số dương                         | ``+ a``               | ``pos(a)``                            |
++----------------------------------+-----------------------+---------------------------------------+
+| Dịch phải                        | ``a >> b``            | ``rshift(a, b)``                      |
++----------------------------------+-----------------------+---------------------------------------+
+| Gán lát cắt                      | ``seq[i:j] = values`` | ``setitem(seq, slice(i, j), values)`` |
++----------------------------------+-----------------------+---------------------------------------+
+| Xóa lát cắt                      | ``del seq[i:j]``      | ``delitem(seq, slice(i, j))``         |
++----------------------------------+-----------------------+---------------------------------------+
+| Lát cắt                          | ``seq[i:j]``          | ``getitem(seq, slice(i, j))``         |
++----------------------------------+-----------------------+---------------------------------------+
+| Định dạng chuỗi                  | ``s % obj``           | ``mod(s, obj)``                       |
++----------------------------------+-----------------------+---------------------------------------+
+| Phép trừ                         | ``a - b``             | ``sub(a, b)``                         |
++----------------------------------+-----------------------+---------------------------------------+
+| Kiểm tra giá trị đúng            | ``obj``               | ``truth(obj)``                        |
++----------------------------------+-----------------------+---------------------------------------+
+| Thứ tự                           | ``a < b``             | ``lt(a, b)``                          |
++----------------------------------+-----------------------+---------------------------------------+
+| Thứ tự                           | ``a <= b``            | ``le(a, b)``                          |
++----------------------------------+-----------------------+---------------------------------------+
+| So sánh bằng                     | ``a == b``            | ``eq(a, b)``                          |
++----------------------------------+-----------------------+---------------------------------------+
+| Hiệu                             | ``a != b``            | ``ne(a, b)``                          |
++----------------------------------+-----------------------+---------------------------------------+
+| Thứ tự                           | ``a >= b``            | ``ge(a, b)``                          |
++----------------------------------+-----------------------+---------------------------------------+
+| Thứ tự                           | ``a > b``             | ``gt(a, b)``                          |
++----------------------------------+-----------------------+---------------------------------------+
 
-In-place Operators
-------------------
+Toán tử tại chỗ
+---------------
 
-Many operations have an "in-place" version.  Listed below are functions
-providing a more primitive access to in-place operators than the usual syntax
-does; for example, the :term:`statement` ``x += y`` is equivalent to
-``x = operator.iadd(x, y)``.  Another way to put it is to say that
-``z = operator.iadd(x, y)`` is equivalent to the compound statement
-``z = x; z += y``.
+Nhiều phép toán có một phiên bản "tại chỗ". Dưới đây là các hàm cung cấp cách truy cập nguyên thủy hơn vào các toán tử tại chỗ so với cú pháp thông thường; ví dụ, :term:`statement` ``x += y`` tương đương với ``x = operator.iadd(x, y)``. Nói cách khác, có thể nói rằng ``z = operator.iadd(x, y)`` tương đương với câu lệnh ghép ``z = x; z += y``.
 
-In those examples, note that when an in-place method is called, the computation
-and assignment are performed in two separate steps.  The in-place functions
-listed below only do the first step, calling the in-place method.  The second
-step, assignment, is not handled.
+Trong các ví dụ đó, hãy lưu ý rằng khi một phương thức tại chỗ được gọi, việc tính toán và phép gán được thực hiện trong hai bước riêng biệt. Các hàm tại chỗ được liệt kê dưới đây chỉ thực hiện bước đầu tiên, đó là gọi phương thức tại chỗ. Bước thứ hai, phép gán, không được xử lý.
 
-For immutable targets such as strings, numbers, and tuples, the updated
-value is computed, but not assigned back to the input variable:
+Đối với các đích bất biến như chuỗi, số và tuple, giá trị được cập nhật sẽ được tính toán nhưng không được gán trở lại biến đầu vào:
 
 >>> a = 'hello'
 >>> iadd(a, ' world')
@@ -499,8 +438,7 @@ value is computed, but not assigned back to the input variable:
 >>> a
 'hello'
 
-For mutable targets such as lists and dictionaries, the in-place method
-will perform the update, so no subsequent assignment is necessary:
+Đối với các đích khả biến như list và dictionary, phương thức tại chỗ sẽ thực hiện việc cập nhật, vì vậy không cần phép gán tiếp theo:
 
 >>> s = ['h', 'e', 'l', 'l', 'o']
 >>> iadd(s, [' ', 'w', 'o', 'r', 'l', 'd'])
@@ -511,49 +449,49 @@ will perform the update, so no subsequent assignment is necessary:
 .. function:: iadd(a, b)
               __iadd__(a, b)
 
-   ``a = iadd(a, b)`` is equivalent to ``a += b``.
+   ``a = iadd(a, b)`` tương đương với ``a += b``.
 
 
 .. function:: iand(a, b)
               __iand__(a, b)
 
-   ``a = iand(a, b)`` is equivalent to ``a &= b``.
+   ``a = iand(a, b)`` tương đương với ``a &= b``.
 
 
 .. function:: iconcat(a, b)
               __iconcat__(a, b)
 
-   ``a = iconcat(a, b)`` is equivalent to ``a += b`` for *a* and *b* sequences.
+   ``a = iconcat(a, b)`` tương đương với ``a += b`` đối với các sequence *a* và *b*.
 
 
 .. function:: ifloordiv(a, b)
               __ifloordiv__(a, b)
 
-   ``a = ifloordiv(a, b)`` is equivalent to ``a //= b``.
+   ``a = ifloordiv(a, b)`` tương đương với ``a //= b``.
 
 
 .. function:: ilshift(a, b)
               __ilshift__(a, b)
 
-   ``a = ilshift(a, b)`` is equivalent to ``a <<= b``.
+   ``a = ilshift(a, b)`` tương đương với ``a <<= b``.
 
 
 .. function:: imod(a, b)
               __imod__(a, b)
 
-   ``a = imod(a, b)`` is equivalent to ``a %= b``.
+   ``a = imod(a, b)`` tương đương với ``a %= b``.
 
 
 .. function:: imul(a, b)
               __imul__(a, b)
 
-   ``a = imul(a, b)`` is equivalent to ``a *= b``.
+   ``a = imul(a, b)`` tương đương với ``a *= b``.
 
 
 .. function:: imatmul(a, b)
               __imatmul__(a, b)
 
-   ``a = imatmul(a, b)`` is equivalent to ``a @= b``.
+   ``a = imatmul(a, b)`` tương đương với ``a @= b``.
 
    .. versionadded:: 3.5
 
@@ -561,34 +499,34 @@ will perform the update, so no subsequent assignment is necessary:
 .. function:: ior(a, b)
               __ior__(a, b)
 
-   ``a = ior(a, b)`` is equivalent to ``a |= b``.
+   ``a = ior(a, b)`` tương đương với ``a |= b``.
 
 
 .. function:: ipow(a, b)
               __ipow__(a, b)
 
-   ``a = ipow(a, b)`` is equivalent to ``a **= b``.
+   ``a = ipow(a, b)`` tương đương với ``a **= b``.
 
 
 .. function:: irshift(a, b)
               __irshift__(a, b)
 
-   ``a = irshift(a, b)`` is equivalent to ``a >>= b``.
+   ``a = irshift(a, b)`` tương đương với ``a >>= b``.
 
 
 .. function:: isub(a, b)
               __isub__(a, b)
 
-   ``a = isub(a, b)`` is equivalent to ``a -= b``.
+   ``a = isub(a, b)`` tương đương với ``a -= b``.
 
 
 .. function:: itruediv(a, b)
               __itruediv__(a, b)
 
-   ``a = itruediv(a, b)`` is equivalent to ``a /= b``.
+   ``a = itruediv(a, b)`` tương đương với ``a /= b``.
 
 
 .. function:: ixor(a, b)
               __ixor__(a, b)
 
-   ``a = ixor(a, b)`` is equivalent to ``a ^= b``.
+   ``a = ixor(a, b)`` tương đương với ``a ^= b``.

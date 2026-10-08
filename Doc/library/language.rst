@@ -1,14 +1,12 @@
 .. _language:
 
-************************
-Python Language Services
-************************
+***************************
+Các dịch vụ ngôn ngữ Python
+***************************
 
-Python provides a number of modules to assist in working with the Python
-language.  These modules support tokenizing, parsing, syntax analysis, bytecode
-disassembly, and various other facilities.
+Python cung cấp một số module hỗ trợ làm việc với ngôn ngữ Python. Các module này hỗ trợ việc token hóa, phân tích cú pháp, phân tích syntax, dịch ngược bytecode và nhiều chức năng khác.
 
-These modules include:
+Các module này bao gồm:
 
 
 .. toctree::

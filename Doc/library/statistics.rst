@@ -1,15 +1,15 @@
-:mod:`!statistics` --- Mathematical statistics functions
-========================================================
+:mod:`!statistics` --- Các hàm thống kê toán học
+================================================
 
 .. module:: statistics
-   :synopsis: Mathematical statistics functions
+   :synopsis: Các hàm thống kê toán học
 
 .. moduleauthor:: Steven D'Aprano <steve+python@pearwood.info>
 .. sectionauthor:: Steven D'Aprano <steve+python@pearwood.info>
 
 .. versionadded:: 3.4
 
-**Source code:** :source:`Lib/statistics.py`
+**Mã nguồn:** :source:`Lib/statistics.py`
 
 .. testsetup:: *
 
@@ -19,117 +19,112 @@
 
 --------------
 
-This module provides functions for calculating mathematical statistics of
-numeric (:class:`~numbers.Real`-valued) data.
+Mô-đun này cung cấp các hàm để tính toán thống kê toán học của dữ liệu số (có giá trị :class:`~numbers.Real`).
 
-The module is not intended to be a competitor to third-party libraries such
-as `NumPy <https://numpy.org>`_, `SciPy <https://scipy.org/>`_, or
-proprietary full-featured statistics packages aimed at professional
-statisticians such as Minitab, SAS and Matlab. It is aimed at the level of
-graphing and scientific calculators.
+Mô-đun này không nhằm cạnh tranh với các thư viện bên thứ ba như `NumPy <https://numpy.org>`_, `SciPy <https://scipy.org/>`_, hoặc các gói thống kê độc quyền đầy đủ tính năng dành cho các nhà thống kê chuyên nghiệp như Minitab, SAS và Matlab. Mô-đun này hướng đến mức độ của các máy tính vẽ đồ thị và máy tính khoa học.
 
-Unless explicitly noted, these functions support :class:`int`,
-:class:`float`, :class:`~decimal.Decimal` and :class:`~fractions.Fraction`.
-Behaviour with other types (whether in the numeric tower or not) is
-currently unsupported.  Collections with a mix of types are also undefined
-and implementation-dependent.  If your input data consists of mixed types,
-you may be able to use :func:`map` to ensure a consistent result, for
-example: ``map(float, input_data)``.
+Trừ khi được nêu rõ, các hàm này hỗ trợ :class:`int`,
+:class:`float`, :class:`~decimal.Decimal` và :class:`~fractions.Fraction`. Hành vi với các kiểu khác (dù có thuộc numeric tower hay không) hiện chưa được hỗ trợ. Các collection chứa kết hợp nhiều kiểu cũng không được xác định và phụ thuộc vào cách triển khai. Nếu dữ liệu đầu vào của bạn gồm nhiều kiểu, bạn có thể sử dụng :func:`map` để đảm bảo kết quả nhất quán, ví dụ: ``map(float, input_data)``.
 
-Some datasets use ``NaN`` (not a number) values to represent missing data.
-Since NaNs have unusual comparison semantics, they cause surprising or
-undefined behaviors in the statistics functions that sort data or that count
-occurrences.  The functions affected are ``median()``, ``median_low()``,
-``median_high()``, ``median_grouped()``, ``mode()``, ``multimode()``, and
-``quantiles()``.  The ``NaN`` values should be stripped before calling these
-functions::
+Một số bộ dữ liệu sử dụng các giá trị ``NaN`` (không phải số) để biểu diễn dữ liệu bị thiếu. Vì NaN có ngữ nghĩa so sánh bất thường, chúng gây ra hành vi đáng ngạc nhiên hoặc không xác định trong các hàm thống kê sắp xếp dữ liệu hoặc đếm số lần xuất hiện. Các hàm bị ảnh hưởng là ``median()``, ``median_low()``, ``median_high()``, ``median_grouped()``, ``mode()``, ``multimode()`` và ``quantiles()``. Cần loại bỏ các giá trị ``NaN`` trước khi gọi những hàm này::
 
     >>> from statistics import median
     >>> from math import isnan
     >>> from itertools import filterfalse
 
     >>> data = [20.7, float('NaN'),19.2, 18.3, float('NaN'), 14.4]
-    >>> sorted(data)  # This has surprising behavior
+    >>> sorted(data)  # Điều này có hành vi đáng ngạc nhiên
     [20.7, nan, 14.4, 18.3, 19.2, nan]
-    >>> median(data)  # This result is unexpected
+    >>> median(data)  # Kết quả này không như mong đợi
     16.35
 
-    >>> sum(map(isnan, data))    # Number of missing values
+    >>> sum(map(isnan, data))    # Số lượng giá trị bị thiếu
     2
-    >>> clean = list(filterfalse(isnan, data))  # Strip NaN values
+    >>> clean = list(filterfalse(isnan, data))  # Loại bỏ các giá trị NaN
     >>> clean
     [20.7, 19.2, 18.3, 14.4]
-    >>> sorted(clean)  # Sorting now works as expected
+    >>> sorted(clean)  # Việc sắp xếp giờ đã hoạt động như mong đợi
     [14.4, 18.3, 19.2, 20.7]
-    >>> median(clean)       # This result is now well defined
+    >>> median(clean)       # Kết quả này giờ đã được xác định rõ ràng
     18.75
 
 
-Averages and measures of central location
+Các giá trị trung bình và thước đo vị trí trung tâm
+---------------------------------------------------
+
+Các hàm này tính giá trị trung bình hoặc giá trị điển hình từ một tổng thể hoặc mẫu.
+
++------------------------+------------------------------------------------------------------------------------------------------+
+| :func:`mean`           | Trung bình số học ("trung bình") của dữ liệu.                                                        |
++------------------------+------------------------------------------------------------------------------------------------------+
+| :func:`fmean`          | Trung bình số học dấu phẩy động nhanh, có hỗ trợ trọng số tùy chọn.                                  |
++------------------------+------------------------------------------------------------------------------------------------------+
+| :func:`geometric_mean` | Trung bình hình học của dữ liệu.                                                                     |
++------------------------+------------------------------------------------------------------------------------------------------+
+| :func:`harmonic_mean`  | Trung bình điều hòa của dữ liệu.                                                                     |
++------------------------+------------------------------------------------------------------------------------------------------+
+| :func:`kde`            | Ước tính phân phối mật độ xác suất của dữ liệu.                                                      |
++------------------------+------------------------------------------------------------------------------------------------------+
+| :func:`kde_random`     | Lấy mẫu ngẫu nhiên từ PDF được tạo bởi kde().                                                        |
++------------------------+------------------------------------------------------------------------------------------------------+
+| :func:`median`         | Trung vị (giá trị ở giữa) của dữ liệu.                                                               |
++------------------------+------------------------------------------------------------------------------------------------------+
+| :func:`median_low`     | Trung vị thấp của dữ liệu.                                                                           |
++------------------------+------------------------------------------------------------------------------------------------------+
+| :func:`median_high`    | Trung vị cao của dữ liệu.                                                                            |
++------------------------+------------------------------------------------------------------------------------------------------+
+| :func:`median_grouped` | Trung vị (phân vị thứ 50) của dữ liệu được nhóm.                                                     |
++------------------------+------------------------------------------------------------------------------------------------------+
+| :func:`mode`           | Mode đơn (giá trị xuất hiện phổ biến nhất) của dữ liệu rời rạc hoặc dữ liệu định danh.               |
++------------------------+------------------------------------------------------------------------------------------------------+
+| :func:`multimode`      | Danh sách các mode (các giá trị xuất hiện phổ biến nhất) của dữ liệu rời rạc hoặc dữ liệu định danh. |
++------------------------+------------------------------------------------------------------------------------------------------+
+| :func:`quantiles`      | Chia dữ liệu thành các khoảng có xác suất bằng nhau.                                                 |
++------------------------+------------------------------------------------------------------------------------------------------+
+
+Các thước đo độ phân tán
+------------------------
+
+Các hàm này tính toán một thước đo cho biết tổng thể hoặc mẫu có xu hướng lệch khỏi các giá trị điển hình hoặc trung bình ở mức nào.
+
++-------------------+---------------------------------------------+
+| :func:`pstdev`    | Độ lệch chuẩn của tổng thể đối với dữ liệu. |
++-------------------+---------------------------------------------+
+| :func:`pvariance` | Phương sai của tổng thể đối với dữ liệu.    |
++-------------------+---------------------------------------------+
+| :func:`stdev`     | Độ lệch chuẩn của mẫu đối với dữ liệu.      |
++-------------------+---------------------------------------------+
+| :func:`variance`  | Phương sai của mẫu đối với dữ liệu.         |
++-------------------+---------------------------------------------+
+
+Thống kê cho mối quan hệ giữa hai đầu vào
 -----------------------------------------
 
-These functions calculate an average or typical value from a population
-or sample.
+Các hàm này tính toán các thống kê liên quan đến mối quan hệ giữa hai đầu vào.
 
-=======================  ===============================================================
-:func:`mean`             Arithmetic mean ("average") of data.
-:func:`fmean`            Fast, floating-point arithmetic mean, with optional weighting.
-:func:`geometric_mean`   Geometric mean of data.
-:func:`harmonic_mean`    Harmonic mean of data.
-:func:`kde`              Estimate the probability density distribution of the data.
-:func:`kde_random`       Random sampling from the PDF generated by kde().
-:func:`median`           Median (middle value) of data.
-:func:`median_low`       Low median of data.
-:func:`median_high`      High median of data.
-:func:`median_grouped`   Median (50th percentile) of grouped data.
-:func:`mode`             Single mode (most common value) of discrete or nominal data.
-:func:`multimode`        List of modes (most common values) of discrete or nominal data.
-:func:`quantiles`        Divide data into intervals with equal probability.
-=======================  ===============================================================
-
-Measures of spread
-------------------
-
-These functions calculate a measure of how much the population or sample
-tends to deviate from the typical or average values.
-
-=======================  =============================================
-:func:`pstdev`           Population standard deviation of data.
-:func:`pvariance`        Population variance of data.
-:func:`stdev`            Sample standard deviation of data.
-:func:`variance`         Sample variance of data.
-=======================  =============================================
-
-Statistics for relations between two inputs
--------------------------------------------
-
-These functions calculate statistics regarding relations between two inputs.
-
-=========================  =====================================================
-:func:`covariance`         Sample covariance for two variables.
-:func:`correlation`        Pearson and Spearman's correlation coefficients.
-:func:`linear_regression`  Slope and intercept for simple linear regression.
-=========================  =====================================================
++---------------------------+----------------------------------------------------------+
+| :func:`covariance`        | Hiệp phương sai mẫu cho hai biến.                        |
++---------------------------+----------------------------------------------------------+
+| :func:`correlation`       | Các hệ số tương quan Pearson và Spearman.                |
++---------------------------+----------------------------------------------------------+
+| :func:`linear_regression` | Hệ số góc và hệ số chặn cho hồi quy tuyến tính đơn giản. |
++---------------------------+----------------------------------------------------------+
 
 
-Function details
-----------------
+Chi tiết về hàm
+---------------
 
-Note: The functions do not require the data given to them to be sorted.
-However, for reading convenience, most of the examples show sorted sequences.
+Lưu ý: Các hàm không yêu cầu dữ liệu được cung cấp cho chúng phải được sắp xếp. Tuy nhiên, để thuận tiện khi đọc, hầu hết các ví dụ đều minh họa các dãy đã được sắp xếp.
 
 .. function:: mean(data)
 
-   Return the sample arithmetic mean of *data* which can be a sequence or iterable.
+   Trả về giá trị trung bình số học của *data*, có thể là một sequence hoặc iterable.
 
-   The arithmetic mean is the sum of the data divided by the number of data
-   points.  It is commonly called "the average", although it is only one of many
-   different mathematical averages.  It is a measure of the central location of
-   the data.
+   Trung bình số học là tổng của dữ liệu chia cho số lượng điểm dữ liệu. Nó thường được gọi là "giá trị trung bình", mặc dù đây chỉ là một trong nhiều loại trung bình toán học khác nhau. Đây là một thước đo vị trí trung tâm của dữ liệu.
 
-   If *data* is empty, :exc:`StatisticsError` will be raised.
+   Nếu *data* trống, :exc:`StatisticsError` sẽ được phát sinh.
 
-   Some examples of use:
+   Một số ví dụ sử dụng:
 
    .. doctest::
 
@@ -148,35 +143,24 @@ However, for reading convenience, most of the examples show sorted sequences.
 
    .. note::
 
-      The mean is strongly affected by `outliers
-      <https://en.wikipedia.org/wiki/Outlier>`_ and is not necessarily a
-      typical example of the data points. For a more robust, although less
-      efficient, measure of `central tendency
-      <https://en.wikipedia.org/wiki/Central_tendency>`_, see :func:`median`.
+      Trung bình chịu ảnh hưởng mạnh bởi `outliers <https://en.wikipedia.org/wiki/Outlier>`_ và không nhất thiết là một ví dụ điển hình của các điểm dữ liệu. Để có một thước đo `central tendency <https://en.wikipedia.org/wiki/Central_tendency>`_ mạnh hơn, dù kém hiệu quả hơn, hãy xem :func:`median`.
 
-      The sample mean gives an unbiased estimate of the true population mean,
-      so that when taken on average over all the possible samples,
-      ``mean(sample)`` converges on the true mean of the entire population.  If
-      *data* represents the entire population rather than a sample, then
-      ``mean(data)`` is equivalent to calculating the true population mean μ.
+      Trung bình mẫu đưa ra một ước lượng không chệch cho trung bình tổng thể thực, vì vậy khi lấy trung bình trên tất cả các mẫu có thể có, ``mean(sample)`` hội tụ về trung bình thực của toàn bộ tổng thể. Nếu *data* đại diện cho toàn bộ tổng thể thay vì một mẫu, thì ``mean(data)`` tương đương với việc tính trung bình tổng thể thực μ.
 
 
 .. function:: fmean(data, weights=None)
 
-   Convert *data* to floats and compute the arithmetic mean.
+   Chuyển *data* thành các số thực và tính trung bình số học.
 
-   This runs faster than the :func:`mean` function and it always returns a
-   :class:`float`.  The *data* may be a sequence or iterable.  If the input
-   dataset is empty, raises a :exc:`StatisticsError`.
+   Hàm này chạy nhanh hơn hàm :func:`mean` và luôn trả về một
+   :class:`float`.  *data* có thể là một sequence hoặc iterable.  Nếu dataset đầu vào trống, một :exc:`StatisticsError` sẽ được phát sinh.
 
    .. doctest::
 
       >>> fmean([3.5, 4.0, 5.25])
       4.25
 
-   Optional weighting is supported.  For example, a professor assigns a
-   grade for a course by weighting quizzes at 20%, homework at 20%, a
-   midterm exam at 30%, and a final exam at 30%:
+   Có hỗ trợ weighting tùy chọn.  Ví dụ, một giáo sư chấm điểm cho một khóa học bằng cách tính trọng số cho các bài kiểm tra ngắn là 20%, bài tập về nhà là 20%, bài thi giữa kỳ là 30% và bài thi cuối kỳ là 30%:
 
    .. doctest::
 
@@ -185,29 +169,23 @@ However, for reading convenience, most of the examples show sorted sequences.
       >>> fmean(grades, weights)
       87.6
 
-   If *weights* is supplied, it must be the same length as the *data* or
-   a :exc:`ValueError` will be raised.
+   Nếu cung cấp *weights*, nó phải có cùng độ dài với *data*, nếu không sẽ phát sinh một :exc:`ValueError`.
 
    .. versionadded:: 3.8
 
    .. versionchanged:: 3.11
-      Added support for *weights*.
+      Đã bổ sung hỗ trợ cho *weights*.
 
 
 .. function:: geometric_mean(data)
 
-   Convert *data* to floats and compute the geometric mean.
+   Chuyển *data* thành các số thực và tính geometric mean.
 
-   The geometric mean indicates the central tendency or typical value of the
-   *data* using the product of the values (as opposed to the arithmetic mean
-   which uses their sum).
+   Geometric mean biểu thị xu hướng trung tâm hoặc giá trị điển hình của *data* bằng cách sử dụng tích của các giá trị (trái với arithmetic mean, sử dụng tổng của chúng).
 
-   Raises a :exc:`StatisticsError` if the input dataset is empty,
-   if it contains a zero, or if it contains a negative value.
-   The *data* may be a sequence or iterable.
+   Phát sinh một :exc:`StatisticsError` nếu tập dữ liệu đầu vào trống, nếu chứa số 0 hoặc nếu chứa giá trị âm. *data* có thể là một sequence hoặc iterable.
 
-   No special efforts are made to achieve exact results.
-   (However, this may change in the future.)
+   Không có nỗ lực đặc biệt nào được thực hiện để đạt kết quả chính xác tuyệt đối. (Tuy nhiên, điều này có thể thay đổi trong tương lai.)
 
    .. doctest::
 
@@ -219,83 +197,55 @@ However, for reading convenience, most of the examples show sorted sequences.
 
 .. function:: harmonic_mean(data, weights=None)
 
-   Return the harmonic mean of *data*, a sequence or iterable of
-   real-valued numbers.  If *weights* is omitted or ``None``, then
-   equal weighting is assumed.
+   Trả về trung bình điều hòa của *data*, một sequence hoặc iterable gồm các số có giá trị thực. Nếu *weights* bị bỏ qua hoặc ``None``, thì giả định rằng các giá trị có trọng số bằng nhau.
 
-   The harmonic mean is the reciprocal of the arithmetic :func:`mean` of the
-   reciprocals of the data. For example, the harmonic mean of three values *a*,
-   *b* and *c* will be equivalent to ``3/(1/a + 1/b + 1/c)``.  If one of the
-   values is zero, the result will be zero.
+   Trung bình điều hòa là nghịch đảo của :func:`mean` trung bình cộng của các nghịch đảo của dữ liệu. Ví dụ, trung bình điều hòa của ba giá trị *a*, *b* và *c* sẽ tương đương với ``3/(1/a + 1/b + 1/c)``. Nếu một trong các giá trị bằng 0, kết quả sẽ bằng 0.
 
-   The harmonic mean is a type of average, a measure of the central
-   location of the data.  It is often appropriate when averaging
-   ratios or rates, for example speeds.
+   Trung bình điều hòa là một loại giá trị trung bình, một thước đo vị trí trung tâm của dữ liệu. Phương pháp này thường phù hợp khi tính trung bình các tỷ số hoặc tốc độ, chẳng hạn như tốc độ di chuyển.
 
-   Suppose a car travels 10 km at 40 km/hr, then another 10 km at 60 km/hr.
-   What is the average speed?
+   Giả sử một chiếc xe đi được 10 km với tốc độ 40 km/hr, sau đó đi thêm 10 km với tốc độ 60 km/hr. Tốc độ trung bình là bao nhiêu?
 
    .. doctest::
 
       >>> harmonic_mean([40, 60])
       48.0
 
-   Suppose a car travels 40 km/hr for 5 km, and when traffic clears,
-   speeds-up to 60 km/hr for the remaining 30 km of the journey. What
-   is the average speed?
+   Giả sử một chiếc xe di chuyển với tốc độ 40 km/hr trong quãng đường 5 km, rồi khi giao thông thông thoáng, tăng tốc lên 60 km/hr trong 30 km còn lại của hành trình. Tốc độ trung bình là bao nhiêu?
 
    .. doctest::
 
       >>> harmonic_mean([40, 60], weights=[5, 30])
       56.0
 
-   :exc:`StatisticsError` is raised if *data* is empty, any element
-   is less than zero, or if the weighted sum isn't positive.
+   :exc:`StatisticsError` được phát sinh nếu *data* rỗng, bất kỳ phần tử nào nhỏ hơn 0 hoặc tổng có trọng số không dương.
 
-   The current algorithm has an early-out when it encounters a zero
-   in the input.  This means that the subsequent inputs are not tested
-   for validity.  (This behavior may change in the future.)
+   Thuật toán hiện tại sẽ kết thúc sớm khi gặp giá trị 0 trong đầu vào. Điều này có nghĩa là các đầu vào tiếp theo không được kiểm tra tính hợp lệ. (Hành vi này có thể thay đổi trong tương lai.)
 
    .. versionadded:: 3.6
 
    .. versionchanged:: 3.10
-      Added support for *weights*.
+      Đã bổ sung hỗ trợ cho *weights*.
 
 
 .. function:: kde(data, h, kernel='normal', *, cumulative=False)
 
-   `Kernel Density Estimation (KDE)
-   <https://www.itm-conferences.org/articles/itmconf/pdf/2018/08/itmconf_sam2018_00037.pdf>`_:
-   Create a continuous probability density function or cumulative
-   distribution function from discrete samples.
+   `Ước lượng mật độ kernel (Kernel Density Estimation, KDE) <https://www.itm-conferences.org/articles/itmconf/pdf/2018/08/itmconf_sam2018_00037.pdf>`_: Tạo hàm mật độ xác suất liên tục hoặc hàm phân phối tích lũy từ các mẫu rời rạc.
 
-   The basic idea is to smooth the data using `a kernel function
-   <https://en.wikipedia.org/wiki/Kernel_(statistics)>`_.
-   to help draw inferences about a population from a sample.
+   Ý tưởng cơ bản là làm trơn dữ liệu bằng cách sử dụng `một hàm kernel <https://en.wikipedia.org/wiki/Kernel_(statistics)>`_. để giúp suy luận về một tổng thể từ một mẫu.
 
-   The degree of smoothing is controlled by the scaling parameter *h*
-   which is called the bandwidth.  Smaller values emphasize local
-   features while larger values give smoother results.
+   Mức độ làm trơn được kiểm soát bởi tham số tỷ lệ *h*, được gọi là bandwidth. Các giá trị nhỏ hơn nhấn mạnh những đặc trưng cục bộ, trong khi các giá trị lớn hơn cho kết quả trơn hơn.
 
-   The *kernel* determines the relative weights of the sample data
-   points.  Generally, the choice of kernel shape does not matter
-   as much as the more influential bandwidth smoothing parameter.
+   *kernel* xác định trọng số tương đối của các điểm dữ liệu mẫu. Nhìn chung, việc chọn hình dạng kernel không quan trọng bằng tham số làm trơn bandwidth có ảnh hưởng lớn hơn.
 
-   Kernels that give some weight to every sample point include
-   *normal* (*gauss*), *logistic*, and *sigmoid*.
+   Các kernel gán trọng số cho mọi điểm mẫu bao gồm *normal* (*gauss*), *logistic* và *sigmoid*.
 
-   Kernels that only give weight to sample points within the bandwidth
-   include *rectangular* (*uniform*), *triangular*, *parabolic*
-   (*epanechnikov*), *quartic* (*biweight*), *triweight*, and *cosine*.
+   Các kernel chỉ gán trọng số cho những điểm mẫu nằm trong bandwidth bao gồm *rectangular* (*uniform*), *triangular*, *parabolic* (*epanechnikov*), *quartic* (*biweight*), *triweight* và *cosine*.
 
-   If *cumulative* is true, will return a cumulative distribution function.
+   Nếu *cumulative* là true, hàm sẽ trả về một hàm phân phối tích lũy.
 
-   A :exc:`StatisticsError` will be raised if the *data* sequence is empty.
+   Một :exc:`StatisticsError` sẽ được raised nếu sequence *data* rỗng.
 
-   `Wikipedia has an example
-   <https://en.wikipedia.org/wiki/Kernel_density_estimation#Example>`_
-   where we can use :func:`kde` to generate and plot a probability
-   density function estimated from a small sample:
+   `Wikipedia có một ví dụ <https://en.wikipedia.org/wiki/Kernel_density_estimation#Example>`_ trong đó chúng ta có thể sử dụng :func:`kde` để tạo và vẽ biểu đồ hàm mật độ xác suất được ước tính từ một mẫu nhỏ:
 
    .. doctest::
 
@@ -304,33 +254,26 @@ However, for reading convenience, most of the examples show sorted sequences.
       >>> xarr = [i/100 for i in range(-750, 1100)]
       >>> yarr = [f_hat(x) for x in xarr]
 
-   The points in ``xarr`` and ``yarr`` can be used to make a PDF plot:
+   Các điểm trong ``xarr`` và ``yarr`` có thể được dùng để tạo biểu đồ PDF:
 
    .. image:: kde_example.png
-      :alt: Scatter plot of the estimated probability density function.
+      :alt: Biểu đồ phân tán của hàm mật độ xác suất được ước tính.
 
-   Because the returned ``f_hat`` function is typically called many times,
-   it caches the *data* for performance. To support dynamic datasets, this
-   cache automatically refreshes whenever the length of the *data* changes.
-   This allows new samples to be added as they become available.
+   Vì hàm ``f_hat`` được trả về thường được gọi nhiều lần, nó lưu vào bộ nhớ đệm *data* để cải thiện hiệu suất. Để hỗ trợ các tập dữ liệu động, bộ nhớ đệm này sẽ tự động làm mới bất cứ khi nào độ dài của *data* thay đổi. Điều này cho phép thêm các mẫu mới khi chúng khả dụng.
 
    .. versionadded:: 3.13
 
 
 .. function:: kde_random(data, h, kernel='normal', *, seed=None)
 
-   Return a function that makes a random selection from the estimated
-   probability density function produced by ``kde(data, h, kernel)``.
+   Trả về một hàm thực hiện lựa chọn ngẫu nhiên từ hàm mật độ xác suất ước tính do ``kde(data, h, kernel)`` tạo ra.
 
-   Providing a *seed* allows reproducible selections. In the future, the
-   values may change slightly as more accurate kernel inverse CDF estimates
-   are implemented.  The seed may be an integer, float, str, or bytes.
+   Việc cung cấp *seed* cho phép thực hiện các lựa chọn có thể tái lập. Trong tương lai, các giá trị có thể thay đổi đôi chút khi các ước tính kernel inverse CDF chính xác hơn được triển khai.  Seed có thể là một số nguyên, số thực, chuỗi hoặc bytes.
 
-   A :exc:`StatisticsError` will be raised if the *data* sequence is empty.
+   Một :exc:`StatisticsError` sẽ được raised nếu sequence *data* rỗng.
 
-   Continuing the example for :func:`kde`, we can use
-   :func:`kde_random` to generate new random selections from an
-   estimated probability density function:
+   Tiếp tục ví dụ về :func:`kde`, chúng ta có thể sử dụng
+   :func:`kde_random` để tạo các lựa chọn ngẫu nhiên mới từ một hàm mật độ xác suất ước tính:
 
       >>> data = [-2.1, -1.3, -0.4, 1.9, 5.1, 6.2]
       >>> rand = kde_random(data, h=1.5, seed=8675309)
@@ -343,42 +286,32 @@ However, for reading convenience, most of the examples show sorted sequences.
 
 .. function:: median(data)
 
-   Return the median (middle value) of numeric data, using the common "mean of
-   middle two" method.  If *data* is empty, :exc:`StatisticsError` is raised.
-   *data* can be a sequence or iterable.
+   Trả về trung vị (giá trị ở giữa) của dữ liệu số, sử dụng phương pháp phổ biến "trung bình của hai giá trị ở giữa".  Nếu *data* trống, :exc:`StatisticsError` sẽ được phát sinh. *data* có thể là một sequence hoặc iterable.
 
-   The median is a robust measure of central location and is less affected by
-   the presence of outliers.  When the number of data points is odd, the
-   middle data point is returned:
+   Trung vị là một thước đo bền vững về vị trí trung tâm và ít bị ảnh hưởng hơn bởi sự hiện diện của các giá trị ngoại lệ. Khi số lượng điểm dữ liệu là số lẻ, điểm dữ liệu ở giữa sẽ được trả về:
 
    .. doctest::
 
       >>> median([1, 3, 5])
       3
 
-   When the number of data points is even, the median is interpolated by taking
-   the average of the two middle values:
+   Khi số lượng điểm dữ liệu là số chẵn, trung vị được nội suy bằng cách lấy giá trị trung bình của hai giá trị ở giữa:
 
    .. doctest::
 
       >>> median([1, 3, 5, 7])
       4.0
 
-   This is suited for when your data is discrete, and you don't mind that the
-   median may not be an actual data point.
+   Cách này phù hợp khi dữ liệu của bạn là rời rạc và bạn không ngại việc trung vị có thể không phải là một điểm dữ liệu thực tế.
 
-   If the data is ordinal (supports order operations) but not numeric (doesn't
-   support addition), consider using :func:`median_low` or :func:`median_high`
-   instead.
+   Nếu dữ liệu là thứ bậc (hỗ trợ các phép toán về thứ tự) nhưng không phải dữ liệu số (không hỗ trợ phép cộng), hãy cân nhắc sử dụng :func:`median_low` hoặc :func:`median_high` thay thế.
 
 .. function:: median_low(data)
 
-   Return the low median of numeric data.  If *data* is empty,
-   :exc:`StatisticsError` is raised.  *data* can be a sequence or iterable.
+   Trả về trung vị thấp của dữ liệu số. Nếu *data* trống,
+   :exc:`StatisticsError` sẽ được đưa ra. *data* có thể là một sequence hoặc iterable.
 
-   The low median is always a member of the data set.  When the number of data
-   points is odd, the middle value is returned.  When it is even, the smaller of
-   the two middle values is returned.
+   Trung vị thấp luôn là một phần tử của tập dữ liệu. Khi số lượng điểm dữ liệu là số lẻ, giá trị ở giữa sẽ được trả về. Khi số lượng này là số chẵn, giá trị nhỏ hơn trong hai giá trị ở giữa sẽ được trả về.
 
    .. doctest::
 
@@ -387,18 +320,14 @@ However, for reading convenience, most of the examples show sorted sequences.
       >>> median_low([1, 3, 5, 7])
       3
 
-   Use the low median when your data are discrete and you prefer the median to
-   be an actual data point rather than interpolated.
+   Sử dụng trung vị thấp khi dữ liệu của bạn là rời rạc và bạn muốn trung vị là một điểm dữ liệu thực tế thay vì được nội suy.
 
 
 .. function:: median_high(data)
 
-   Return the high median of data.  If *data* is empty, :exc:`StatisticsError`
-   is raised.  *data* can be a sequence or iterable.
+   Trả về trung vị cao của dữ liệu. Nếu *data* trống, :exc:`StatisticsError` sẽ được phát sinh. *data* có thể là một sequence hoặc iterable.
 
-   The high median is always a member of the data set.  When the number of data
-   points is odd, the middle value is returned.  When it is even, the larger of
-   the two middle values is returned.
+   Trung vị cao luôn là một phần tử của tập dữ liệu. Khi số điểm dữ liệu là số lẻ, giá trị ở giữa được trả về. Khi là số chẵn, giá trị lớn hơn trong hai giá trị ở giữa được trả về.
 
    .. doctest::
 
@@ -407,44 +336,34 @@ However, for reading convenience, most of the examples show sorted sequences.
       >>> median_high([1, 3, 5, 7])
       5
 
-   Use the high median when your data are discrete and you prefer the median to
-   be an actual data point rather than interpolated.
+   Sử dụng trung vị cao khi dữ liệu của bạn là rời rạc và bạn muốn trung vị là một điểm dữ liệu thực tế thay vì được nội suy.
 
 
 .. function:: median_grouped(data, interval=1.0)
 
-   Estimates the median for numeric data that has been `grouped or binned
-   <https://en.wikipedia.org/wiki/Data_binning>`_ around the midpoints
-   of consecutive, fixed-width intervals.
+   Ước tính trung vị cho dữ liệu số đã được `nhóm hoặc chia thành các bin <https://en.wikipedia.org/wiki/Data_binning>`_ quanh trung điểm của các khoảng liên tiếp có độ rộng cố định.
 
-   The *data* can be any iterable of numeric data with each value being
-   exactly the midpoint of a bin.  At least one value must be present.
+   *data* có thể là bất kỳ iterable nào chứa dữ liệu số, trong đó mỗi giá trị chính xác là trung điểm của một bin. Phải có ít nhất một giá trị.
 
-   The *interval* is the width of each bin.
+   *interval* là độ rộng của mỗi bin.
 
-   For example, demographic information may have been summarized into
-   consecutive ten-year age groups with each group being represented
-   by the 5-year midpoints of the intervals:
+   Ví dụ: thông tin nhân khẩu học có thể đã được tóm tắt thành các nhóm tuổi liên tiếp, mỗi nhóm được biểu thị bằng điểm giữa 5 năm của các khoảng tuổi:
 
    .. doctest::
 
       >>> from collections import Counter
       >>> demographics = Counter({
-      ...    25: 172,   # 20 to 30 years old
-      ...    35: 484,   # 30 to 40 years old
-      ...    45: 387,   # 40 to 50 years old
-      ...    55:  22,   # 50 to 60 years old
-      ...    65:   6,   # 60 to 70 years old
+      ...    25: 172,   # 20 đến 30 tuổi
+      ...    35: 484,   # 30 đến 40 tuổi
+      ...    45: 387,   # 40 đến 50 tuổi
+      ...    55:  22,   # 50 đến 60 tuổi
+      ...    65:   6,   # 60 đến 70 tuổi
       ... })
       ...
 
-   The 50th percentile (median) is the 536th person out of the 1071
-   member cohort.  That person is in the 30 to 40 year old age group.
+   Phân vị thứ 50 (trung vị) là người thứ 536 trong nhóm gồm 1071 thành viên. Người đó thuộc nhóm tuổi từ 30 đến 40.
 
-   The regular :func:`median` function would assume that everyone in the
-   tricenarian age group was exactly 35 years old.  A more tenable
-   assumption is that the 484 members of that age group are evenly
-   distributed between 30 and 40.  For that, we use
+   Hàm :func:`median` thông thường sẽ giả định rằng mọi người trong nhóm tuổi ba mươi đều đúng 35 tuổi. Một giả định hợp lý hơn là 484 thành viên của nhóm tuổi đó được phân bố đều trong khoảng từ 30 đến 40. Để làm vậy, chúng ta sử dụng
    :func:`median_grouped`:
 
    .. doctest::
@@ -455,58 +374,40 @@ However, for reading convenience, most of the examples show sorted sequences.
        >>> round(median_grouped(data, interval=10), 1)
        37.5
 
-   The caller is responsible for making sure the data points are separated
-   by exact multiples of *interval*.  This is essential for getting a
-   correct result.  The function does not check this precondition.
+   Bên gọi có trách nhiệm đảm bảo rằng các điểm dữ liệu được phân cách bởi các bội số chính xác của *interval*. Điều này thiết yếu để có được kết quả chính xác. Hàm không kiểm tra điều kiện tiên quyết này.
 
-   Inputs may be any numeric type that can be coerced to a float during
-   the interpolation step.
+   Đầu vào có thể là bất kỳ kiểu số nào có thể được chuyển đổi thành số thực trong bước nội suy.
 
 
 .. function:: mode(data)
 
-   Return the single most common data point from discrete or nominal *data*.
-   The mode (when it exists) is the most typical value and serves as a
-   measure of central location.
+   Trả về điểm dữ liệu phổ biến nhất duy nhất từ *data* rời rạc hoặc định danh. Mode (khi tồn tại) là giá trị điển hình nhất và được dùng làm thước đo vị trí trung tâm.
 
-   If there are multiple modes with the same frequency, returns the first one
-   encountered in the *data*.  If the smallest or largest of those is
-   desired instead, use ``min(multimode(data))`` or ``max(multimode(data))``.
-   If the input *data* is empty, :exc:`StatisticsError` is raised.
+   Nếu có nhiều mode có cùng tần suất, trả về mode đầu tiên được gặp trong *data*. Nếu muốn lấy mode nhỏ nhất hoặc lớn nhất trong số đó, hãy sử dụng ``min(multimode(data))`` hoặc ``max(multimode(data))``. Nếu *data* đầu vào rỗng, :exc:`StatisticsError` sẽ được phát sinh.
 
-   ``mode`` assumes discrete data and returns a single value. This is the
-   standard treatment of the mode as commonly taught in schools:
+   ``mode`` giả định dữ liệu rời rạc và trả về một giá trị duy nhất. Đây là cách xử lý mode tiêu chuẩn thường được giảng dạy ở trường học:
 
    .. doctest::
 
       >>> mode([1, 1, 2, 3, 3, 3, 3, 4])
       3
 
-   The mode is unique in that it is the only statistic in this package that
-   also applies to nominal (non-numeric) data:
+   Mode có tính độc đáo vì đây là thống kê duy nhất trong gói này cũng áp dụng cho dữ liệu định danh (không phải số):
 
    .. doctest::
 
       >>> mode(["red", "blue", "blue", "red", "green", "red", "red"])
       'red'
 
-   Only hashable inputs are supported.  To handle type :class:`set`,
-   consider casting to :class:`frozenset`.  To handle type :class:`list`,
-   consider casting to :class:`tuple`.  For mixed or nested inputs, consider
-   using this slower quadratic algorithm that only depends on equality tests:
-   ``max(data, key=data.count)``.
+   Chỉ hỗ trợ các đầu vào có thể băm (hashable). Để xử lý kiểu :class:`set`, hãy cân nhắc chuyển kiểu sang :class:`frozenset`. Để xử lý kiểu :class:`list`, hãy cân nhắc chuyển kiểu sang :class:`tuple`. Với các đầu vào hỗn hợp hoặc lồng nhau, hãy cân nhắc sử dụng thuật toán bậc hai chậm hơn này, chỉ phụ thuộc vào các phép kiểm tra tính bằng nhau: ``max(data, key=data.count)``.
 
    .. versionchanged:: 3.8
-      Now handles multimodal datasets by returning the first mode encountered.
-      Formerly, it raised :exc:`StatisticsError` when more than one mode was
-      found.
+      Hiện xử lý các tập dữ liệu đa mode bằng cách trả về mode đầu tiên gặp phải. Trước đây, hàm sẽ phát sinh :exc:`StatisticsError` khi tìm thấy nhiều hơn một mode.
 
 
 .. function:: multimode(data)
 
-   Return a list of the most frequently occurring values in the order they
-   were first encountered in the *data*.  Will return more than one result if
-   there are multiple modes or an empty list if the *data* is empty:
+   Trả về danh sách các giá trị xuất hiện thường xuyên nhất theo thứ tự chúng xuất hiện lần đầu trong *data*. Sẽ trả về nhiều hơn một kết quả nếu có nhiều mode hoặc một danh sách rỗng nếu *data* rỗng:
 
    .. doctest::
 
@@ -520,8 +421,7 @@ However, for reading convenience, most of the examples show sorted sequences.
 
 .. function:: pstdev(data, mu=None)
 
-   Return the population standard deviation (the square root of the population
-   variance).  See :func:`pvariance` for arguments and other details.
+   Trả về độ lệch chuẩn của tổng thể (căn bậc hai của phương sai tổng thể). Xem :func:`pvariance` để biết các đối số và thông tin chi tiết khác.
 
    .. doctest::
 
@@ -531,24 +431,15 @@ However, for reading convenience, most of the examples show sorted sequences.
 
 .. function:: pvariance(data, mu=None)
 
-   Return the population variance of *data*, a non-empty sequence or iterable
-   of real-valued numbers.  Variance, or second moment about the mean, is a
-   measure of the variability (spread or dispersion) of data.  A large
-   variance indicates that the data is spread out; a small variance indicates
-   it is clustered closely around the mean.
+   Trả về phương sai tổng thể của *data*, một chuỗi hoặc iterable không rỗng gồm các số có giá trị thực. Phương sai, hay moment bậc hai quanh giá trị trung bình, là thước đo mức độ biến thiên (độ phân tán hoặc độ dàn trải) của dữ liệu. Phương sai lớn cho biết dữ liệu bị phân tán rộng; phương sai nhỏ cho biết dữ liệu tập trung gần giá trị trung bình.
 
-   If the optional second argument *mu* is given, it should be the *population*
-   mean of the *data*.  It can also be used to compute the second moment around
-   a point that is not the mean.  If it is missing or ``None`` (the default),
-   the arithmetic mean is automatically calculated.
+   Nếu cung cấp đối số thứ hai tùy chọn *mu*, đối số này phải là giá trị trung bình *population* của *data*. Đối số này cũng có thể được dùng để tính moment bậc hai quanh một điểm không phải là giá trị trung bình. Nếu bị thiếu hoặc là ``None`` (giá trị mặc định), giá trị trung bình số học sẽ được tự động tính.
 
-   Use this function to calculate the variance from the entire population.  To
-   estimate the variance from a sample, the :func:`variance` function is usually
-   a better choice.
+   Dùng hàm này để tính phương sai từ toàn bộ tổng thể. Để ước tính phương sai từ một mẫu, hàm :func:`variance` thường là lựa chọn phù hợp hơn.
 
-   Raises :exc:`StatisticsError` if *data* is empty.
+   Ném :exc:`StatisticsError` nếu *data* trống.
 
-   Examples:
+   Ví dụ:
 
    .. doctest::
 
@@ -556,8 +447,7 @@ However, for reading convenience, most of the examples show sorted sequences.
       >>> pvariance(data)
       1.25
 
-   If you have already calculated the mean of your data, you can pass it as the
-   optional second argument *mu* to avoid recalculation:
+   Nếu bạn đã tính mean của dữ liệu, bạn có thể truyền giá trị đó làm đối số thứ hai tùy chọn *mu* để tránh tính toán lại:
 
    .. doctest::
 
@@ -565,7 +455,7 @@ However, for reading convenience, most of the examples show sorted sequences.
       >>> pvariance(data, mu)
       1.25
 
-   Decimals and Fractions are supported:
+   Decimal và Fraction được hỗ trợ:
 
    .. doctest::
 
@@ -579,21 +469,14 @@ However, for reading convenience, most of the examples show sorted sequences.
 
    .. note::
 
-      When called with the entire population, this gives the population variance
-      σ².  When called on a sample instead, this is the biased sample variance
-      s², also known as variance with N degrees of freedom.
+      Khi được gọi với toàn bộ tổng thể, hàm này cho ra phương sai tổng thể σ². Khi được gọi trên một mẫu thay vào đó, đây là phương sai mẫu có độ chệch s², còn được gọi là phương sai với N bậc tự do.
 
-      If you somehow know the true population mean μ, you may use this
-      function to calculate the variance of a sample, giving the known
-      population mean as the second argument.  Provided the data points are a
-      random sample of the population, the result will be an unbiased estimate
-      of the population variance.
+      Nếu bằng cách nào đó bạn biết mean tổng thể thực sự μ, bạn có thể sử dụng hàm này để tính phương sai của một mẫu bằng cách truyền mean tổng thể đã biết làm đối số thứ hai. Với điều kiện các điểm dữ liệu là một mẫu ngẫu nhiên của tổng thể, kết quả sẽ là một ước tính không chệch của phương sai tổng thể.
 
 
 .. function:: stdev(data, xbar=None)
 
-   Return the sample standard deviation (the square root of the sample
-   variance).  See :func:`variance` for arguments and other details.
+   Trả về độ lệch chuẩn mẫu (căn bậc hai của phương sai mẫu). Xem :func:`variance` để biết các đối số và thông tin chi tiết khác.
 
    .. doctest::
 
@@ -603,22 +486,15 @@ However, for reading convenience, most of the examples show sorted sequences.
 
 .. function:: variance(data, xbar=None)
 
-   Return the sample variance of *data*, an iterable of at least two real-valued
-   numbers.  Variance, or second moment about the mean, is a measure of the
-   variability (spread or dispersion) of data.  A large variance indicates that
-   the data is spread out; a small variance indicates it is clustered closely
-   around the mean.
+   Trả về phương sai mẫu của *data*, một iterable gồm ít nhất hai số thực. Phương sai, hay moment bậc hai quanh giá trị trung bình, là thước đo mức độ biến thiên (độ phân tán hoặc độ phân tán) của dữ liệu. Phương sai lớn cho biết dữ liệu bị phân tán rộng; phương sai nhỏ cho biết dữ liệu tập trung gần giá trị trung bình.
 
-   If the optional second argument *xbar* is given, it should be the *sample*
-   mean of *data*.  If it is missing or ``None`` (the default), the mean is
-   automatically calculated.
+   Nếu cung cấp đối số thứ hai tùy chọn *xbar*, đối số này phải là giá trị trung bình *sample* của *data*. Nếu đối số này bị thiếu hoặc là ``None`` (giá trị mặc định), giá trị trung bình sẽ được tự động tính.
 
-   Use this function when your data is a sample from a population. To calculate
-   the variance from the entire population, see :func:`pvariance`.
+   Sử dụng hàm này khi dữ liệu của bạn là một mẫu từ một tổng thể. Để tính phương sai của toàn bộ tổng thể, hãy xem :func:`pvariance`.
 
-   Raises :exc:`StatisticsError` if *data* has fewer than two values.
+   Phát sinh :exc:`StatisticsError` nếu *data* có ít hơn hai giá trị.
 
-   Examples:
+   Ví dụ:
 
    .. doctest::
 
@@ -626,8 +502,7 @@ However, for reading convenience, most of the examples show sorted sequences.
       >>> variance(data)
       1.3720238095238095
 
-   If you have already calculated the sample mean of your data, you can pass it
-   as the optional second argument *xbar* to avoid recalculation:
+   Nếu bạn đã tính giá trị trung bình mẫu của dữ liệu, bạn có thể truyền giá trị đó làm đối số thứ hai tùy chọn *xbar* để tránh tính lại:
 
    .. doctest::
 
@@ -635,11 +510,9 @@ However, for reading convenience, most of the examples show sorted sequences.
       >>> variance(data, m)
       1.3720238095238095
 
-   This function does not attempt to verify that you have passed the actual mean
-   as *xbar*.  Using arbitrary values for *xbar* can lead to invalid or
-   impossible results.
+   Hàm này không cố gắng xác minh rằng bạn đã truyền giá trị trung bình thực tế làm *xbar*. Việc sử dụng các giá trị tùy ý cho *xbar* có thể dẫn đến kết quả không hợp lệ hoặc không thể xảy ra.
 
-   Decimal and Fraction values are supported:
+   Các giá trị Decimal và Fraction được hỗ trợ:
 
    .. doctest::
 
@@ -653,57 +526,30 @@ However, for reading convenience, most of the examples show sorted sequences.
 
    .. note::
 
-      This is the sample variance s² with Bessel's correction, also known as
-      variance with N-1 degrees of freedom.  Provided that the data points are
-      representative (e.g. independent and identically distributed), the result
-      should be an unbiased estimate of the true population variance.
+      Đây là phương sai mẫu s² với hiệu chỉnh Bessel, còn được gọi là phương sai với N-1 bậc tự do. Với điều kiện các điểm dữ liệu mang tính đại diện (ví dụ: độc lập và phân phối đồng nhất), kết quả sẽ là một ước lượng không chệch của phương sai tổng thể thực.
 
-      If you somehow know the actual population mean μ you should pass it to the
-      :func:`pvariance` function as the *mu* parameter to get the variance of a
-      sample.
+      Nếu bằng cách nào đó bạn biết giá trị trung bình tổng thể thực tế μ, hãy truyền giá trị đó vào
+      :func:`pvariance` function dưới dạng tham số *mu* để lấy phương sai của một mẫu.
 
 .. function:: quantiles(data, *, n=4, method='exclusive')
 
-   Divide *data* into *n* continuous intervals with equal probability.
-   Returns a list of ``n - 1`` cut points separating the intervals.
+   Chia *data* thành *n* khoảng liên tục có xác suất bằng nhau. Trả về danh sách gồm ``n - 1`` điểm cắt phân tách các khoảng.
 
-   Set *n* to 4 for quartiles (the default).  Set *n* to 10 for deciles.  Set
-   *n* to 100 for percentiles which gives the 99 cuts points that separate
-   *data* into 100 equal sized groups.  Raises :exc:`StatisticsError` if *n*
-   is not least 1.
+   Đặt *n* thành 4 để lấy các tứ phân vị (mặc định). Đặt *n* thành 10 để lấy các thập phân vị. Đặt *n* thành 100 để lấy các phân vị, cho ra 99 điểm cắt phân tách *data* thành 100 nhóm có kích thước bằng nhau. Phát sinh :exc:`StatisticsError` nếu *n* nhỏ hơn 1.
 
-   The *data* can be any iterable containing sample data.  For meaningful
-   results, the number of data points in *data* should be larger than *n*.
-   Raises :exc:`StatisticsError` if there is not at least one data point.
+   *data* có thể là bất kỳ iterable nào chứa dữ liệu mẫu. Để có kết quả có ý nghĩa, số điểm dữ liệu trong *data* phải lớn hơn *n*. Phát sinh :exc:`StatisticsError` nếu không có ít nhất một điểm dữ liệu.
 
-   The cut points are linearly interpolated from the
-   two nearest data points.  For example, if a cut point falls one-third
-   of the distance between two sample values, ``100`` and ``112``, the
-   cut-point will evaluate to ``104``.
+   Các điểm cắt được nội suy tuyến tính từ hai điểm dữ liệu gần nhất. Ví dụ: nếu một điểm cắt nằm cách một phần ba khoảng cách giữa hai giá trị mẫu, ``100`` và ``112``, thì điểm cắt sẽ có giá trị ``104``.
 
-   The *method* for computing quantiles can be varied depending on
-   whether the *data* includes or excludes the lowest and
-   highest possible values from the population.
+   *method* dùng để tính các quantile có thể thay đổi tùy theo việc *data* có bao gồm hay loại trừ các giá trị nhỏ nhất và lớn nhất có thể có trong tổng thể hay không.
 
-   The default *method* is "exclusive" and is used for data sampled from
-   a population that can have more extreme values than found in the
-   samples.  The portion of the population falling below the *i-th* of
-   *m* sorted data points is computed as ``i / (m + 1)``.  Given nine
-   sample values, the method sorts them and assigns the following
-   percentiles: 10%, 20%, 30%, 40%, 50%, 60%, 70%, 80%, 90%.
+   *method* mặc định là "exclusive" và được dùng cho dữ liệu lấy mẫu từ một tổng thể có thể có các giá trị cực đoan hơn những giá trị được tìm thấy trong các mẫu. Tỷ lệ của tổng thể nằm dưới *i-th* trong số *m* điểm dữ liệu đã sắp xếp được tính là ``i / (m + 1)``. Với chín giá trị mẫu, phương pháp này sắp xếp chúng và gán các percentile sau: 10%, 20%, 30%, 40%, 50%, 60%, 70%, 80%, 90%.
 
-   Setting the *method* to "inclusive" is used for describing population
-   data or for samples that are known to include the most extreme values
-   from the population.  The minimum value in *data* is treated as the 0th
-   percentile and the maximum value is treated as the 100th percentile.
-   The portion of the population falling below the *i-th* of *m* sorted
-   data points is computed as ``(i - 1) / (m - 1)``.  Given 11 sample
-   values, the method sorts them and assigns the following percentiles:
-   0%, 10%, 20%, 30%, 40%, 50%, 60%, 70%, 80%, 90%, 100%.
+   Đặt *method* thành "inclusive" được dùng để mô tả dữ liệu của tổng thể hoặc các mẫu được biết là bao gồm những giá trị cực đoan nhất từ tổng thể. Giá trị nhỏ nhất trong *data* được xem là percentile thứ 0 và giá trị lớn nhất được xem là percentile thứ 100. Tỷ lệ của tổng thể nằm dưới *i-th* trong số *m* điểm dữ liệu đã sắp xếp được tính là ``(i - 1) / (m - 1)``. Với 11 giá trị mẫu, phương pháp này sắp xếp chúng và gán các percentile sau: 0%, 10%, 20%, 30%, 40%, 50%, 60%, 70%, 80%, 90%, 100%.
 
    .. doctest::
 
-        # Decile cut points for empirically sampled data
+        # Điểm cắt decile cho dữ liệu được lấy mẫu theo thực nghiệm
         >>> data = [105, 129, 87, 86, 111, 111, 89, 81, 108, 92, 110,
         ...         100, 75, 105, 103, 109, 76, 119, 99, 91, 103, 129,
         ...         106, 101, 84, 111, 74, 87, 86, 103, 103, 106, 86,
@@ -715,19 +561,16 @@ However, for reading convenience, most of the examples show sorted sequences.
    .. versionadded:: 3.8
 
    .. versionchanged:: 3.13
-      No longer raises an exception for an input with only a single data point.
-      This allows quantile estimates to be built up one sample point
-      at a time becoming gradually more refined with each new data point.
+      Không còn phát sinh ngoại lệ khi đầu vào chỉ có một điểm dữ liệu. Điều này cho phép xây dựng các ước tính quantile từng điểm mẫu một, dần được tinh chỉnh với mỗi điểm dữ liệu mới.
 
 .. function:: covariance(x, y, /)
 
-   Return the sample covariance of two inputs *x* and *y*. Covariance
-   is a measure of the joint variability of two inputs.
+   Trả về hiệp phương sai mẫu của hai đầu vào *x* và *y*. Hiệp phương sai là thước đo mức độ biến thiên đồng thời của hai đầu vào.
 
-   Both inputs must be of the same length (no less than two), otherwise
-   :exc:`StatisticsError` is raised.
+   Cả hai đầu vào phải có cùng độ dài (không nhỏ hơn hai), nếu không
+   :exc:`StatisticsError` sẽ được phát sinh.
 
-   Examples:
+   Ví dụ:
 
    .. doctest::
 
@@ -745,45 +588,33 @@ However, for reading convenience, most of the examples show sorted sequences.
 
 .. function:: correlation(x, y, /, *, method='linear')
 
-   Return the `Pearson's correlation coefficient
-   <https://en.wikipedia.org/wiki/Pearson_correlation_coefficient>`_
-   for two inputs. Pearson's correlation coefficient *r* takes values
-   between -1 and +1. It measures the strength and direction of a linear
-   relationship.
+   Trả về `hệ số tương quan Pearson <https://en.wikipedia.org/wiki/Pearson_correlation_coefficient>`_ cho hai đầu vào. Hệ số tương quan Pearson *r* nhận các giá trị từ -1 đến +1. Hệ số này đo độ mạnh và hướng của mối quan hệ tuyến tính.
 
-   If *method* is "ranked", computes `Spearman's rank correlation coefficient
-   <https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient>`_
-   for two inputs. The data is replaced by ranks.  Ties are averaged so that
-   equal values receive the same rank.  The resulting coefficient measures the
-   strength of a monotonic relationship.
+   Nếu *method* là "ranked", tính `hệ số tương quan thứ hạng Spearman <https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient>`_ cho hai đầu vào. Dữ liệu được thay thế bằng thứ hạng. Các giá trị trùng nhau được lấy trung bình để các giá trị bằng nhau nhận cùng một thứ hạng. Hệ số thu được đo độ mạnh của một mối quan hệ đơn điệu.
 
-   Spearman's correlation coefficient is appropriate for ordinal data or for
-   continuous data that doesn't meet the linear proportion requirement for
-   Pearson's correlation coefficient.
+   Hệ số tương quan Spearman phù hợp với dữ liệu thứ bậc hoặc dữ liệu liên tục không đáp ứng yêu cầu về tỷ lệ tuyến tính của hệ số tương quan Pearson.
 
-   Both inputs must be of the same length (no less than two), and need
-   not to be constant, otherwise :exc:`StatisticsError` is raised.
+   Cả hai đầu vào phải có cùng độ dài (không nhỏ hơn hai) và không được là hằng số; nếu không, :exc:`StatisticsError` sẽ được phát sinh.
 
-   Example with `Kepler's laws of planetary motion
-   <https://en.wikipedia.org/wiki/Kepler's_laws_of_planetary_motion>`_:
+   Ví dụ về `các định luật chuyển động hành tinh của Kepler <https://en.wikipedia.org/wiki/Kepler's_laws_of_planetary_motion>`_:
 
    .. doctest::
 
-      >>> # Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and  Neptune
-      >>> orbital_period = [88, 225, 365, 687, 4331, 10_756, 30_687, 60_190]    # days
-      >>> dist_from_sun = [58, 108, 150, 228, 778, 1_400, 2_900, 4_500] # million km
+      >>> # Sao Thủy, Sao Kim, Trái Đất, Sao Hỏa, Sao Mộc, Sao Thổ, Sao Thiên Vương và Sao Hải Vương
+      >>> orbital_period = [88, 225, 365, 687, 4331, 10_756, 30_687, 60_190]    # ngày
+      >>> dist_from_sun = [58, 108, 150, 228, 778, 1_400, 2_900, 4_500] # triệu km
 
-      >>> # Show that a perfect monotonic relationship exists
+      >>> # Cho thấy tồn tại mối quan hệ đơn điệu hoàn hảo
       >>> correlation(orbital_period, dist_from_sun, method='ranked')
       1.0
 
-      >>> # Observe that a linear relationship is imperfect
+      >>> # Quan sát thấy mối quan hệ tuyến tính không hoàn hảo
       >>> round(correlation(orbital_period, dist_from_sun), 4)
       0.9882
 
-      >>> # Demonstrate Kepler's third law: There is a linear correlation
-      >>> # between the square of the orbital period and the cube of the
-      >>> # distance from the sun.
+      >>> # Minh họa định luật thứ ba của Kepler: Có tương quan tuyến tính
+      >>> # giữa bình phương của chu kỳ quỹ đạo và lập phương của
+      >>> # khoảng cách từ Mặt Trời.
       >>> period_squared = [p * p for p in orbital_period]
       >>> dist_cubed = [d * d * d for d in dist_from_sun]
       >>> round(correlation(period_squared, dist_cubed), 4)
@@ -792,33 +623,19 @@ However, for reading convenience, most of the examples show sorted sequences.
    .. versionadded:: 3.10
 
    .. versionchanged:: 3.12
-      Added support for Spearman's rank correlation coefficient.
+      Đã bổ sung hỗ trợ cho hệ số tương quan thứ hạng Spearman.
 
 .. function:: linear_regression(x, y, /, *, proportional=False)
 
-   Return the slope and intercept of `simple linear regression
-   <https://en.wikipedia.org/wiki/Simple_linear_regression>`_
-   parameters estimated using ordinary least squares. Simple linear
-   regression describes the relationship between an independent variable *x* and
-   a dependent variable *y* in terms of this linear function:
+   Trả về hệ số góc và tung độ gốc của các tham số `hồi quy tuyến tính đơn giản <https://en.wikipedia.org/wiki/Simple_linear_regression>`_ được ước tính bằng phương pháp bình phương tối thiểu thông thường. Hồi quy tuyến tính đơn giản mô tả mối quan hệ giữa biến độc lập *x* và biến phụ thuộc *y* theo hàm tuyến tính sau:
 
       *y = slope \* x + intercept + noise*
 
-   where ``slope`` and ``intercept`` are the regression parameters that are
-   estimated, and ``noise`` represents the
-   variability of the data that was not explained by the linear regression
-   (it is equal to the difference between predicted and actual values
-   of the dependent variable).
+   trong đó ``slope`` và ``intercept`` là các tham số hồi quy được ước tính, còn ``noise`` biểu thị độ biến thiên của dữ liệu không được giải thích bởi hồi quy tuyến tính (bằng hiệu giữa các giá trị dự đoán và giá trị thực tế của biến phụ thuộc).
 
-   Both inputs must be of the same length (no less than two), and
-   the independent variable *x* cannot be constant;
-   otherwise a :exc:`StatisticsError` is raised.
+   Cả hai đầu vào phải có cùng độ dài (không nhỏ hơn hai), và biến độc lập *x* không được là hằng số; nếu không, một :exc:`StatisticsError` sẽ được phát sinh.
 
-   For example, we can use the `release dates of the Monty
-   Python films <https://en.wikipedia.org/wiki/Monty_Python#Films>`_
-   to predict the cumulative number of Monty Python films
-   that would have been produced by 2019
-   assuming that they had kept the pace.
+   Ví dụ: chúng ta có thể sử dụng `ngày phát hành các bộ phim Monty Python <https://en.wikipedia.org/wiki/Monty_Python#Films>`_ để dự đoán tổng số bộ phim Monty Python lẽ ra đã được sản xuất vào năm 2019, với giả định rằng họ vẫn duy trì tốc độ đó.
 
    .. doctest::
 
@@ -828,186 +645,123 @@ However, for reading convenience, most of the examples show sorted sequences.
       >>> round(slope * 2019 + intercept)
       16
 
-   If *proportional* is true, the independent variable *x* and the
-   dependent variable *y* are assumed to be directly proportional.
-   The data is fit to a line passing through the origin.
-   Since the *intercept* will always be 0.0, the underlying linear
-   function simplifies to:
+   Nếu *tỷ lệ thuận* là true, biến độc lập *x* và biến phụ thuộc *y* được giả định là tỷ lệ thuận trực tiếp. Dữ liệu được khớp với một đường thẳng đi qua gốc tọa độ. Vì *intercept* sẽ luôn là 0.0, hàm tuyến tính cơ sở được rút gọn thành:
 
       *y = slope \* x + noise*
 
-   Continuing the example from :func:`correlation`, we look to see
-   how well a model based on major planets can predict the orbital
-   distances for dwarf planets:
+   Tiếp tục ví dụ từ :func:`correlation`, chúng ta xem xét mức độ chính xác mà một model dựa trên các hành tinh chính có thể dự đoán khoảng cách quỹ đạo của các hành tinh lùn:
 
    .. doctest::
 
       >>> model = linear_regression(period_squared, dist_cubed, proportional=True)
       >>> slope = model.slope
 
-      >>> # Dwarf planets:   Pluto,  Eris,    Makemake, Haumea, Ceres
-      >>> orbital_periods = [90_560, 204_199, 111_845, 103_410, 1_680]  # days
+      >>> # Các hành tinh lùn:   Pluto,  Eris,    Makemake, Haumea, Ceres
+      >>> orbital_periods = [90_560, 204_199, 111_845, 103_410, 1_680]  # ngày
       >>> predicted_dist = [math.cbrt(slope * (p * p)) for p in orbital_periods]
       >>> list(map(round, predicted_dist))
       [5912, 10166, 6806, 6459, 414]
 
-      >>> [5_906, 10_152, 6_796, 6_450, 414]  # actual distance in million km
+      >>> [5_906, 10_152, 6_796, 6_450, 414]  # khoảng cách thực tế tính bằng triệu km
       [5906, 10152, 6796, 6450, 414]
 
    .. versionadded:: 3.10
 
    .. versionchanged:: 3.11
-      Added support for *proportional*.
+      Đã thêm hỗ trợ cho *tỷ lệ*.
 
-Exceptions
-----------
+Ngoại lệ
+--------
 
-A single exception is defined:
+Một ngoại lệ duy nhất được định nghĩa:
 
 .. exception:: StatisticsError
 
-   Subclass of :exc:`ValueError` for statistics-related exceptions.
+   Lớp con của :exc:`ValueError` dành cho các ngoại lệ liên quan đến thống kê.
 
 
-:class:`NormalDist` objects
----------------------------
+Các đối tượng :class:`NormalDist`
+---------------------------------
 
-:class:`NormalDist` is a tool for creating and manipulating normal
-distributions of a `random variable
-<http://www.stat.yale.edu/Courses/1997-98/101/ranvar.htm>`_.  It is a
-class that treats the mean and standard deviation of data
-measurements as a single entity.
+:class:`NormalDist` là công cụ để tạo và thao tác với các phân phối chuẩn của một `biến ngẫu nhiên <http://www.stat.yale.edu/Courses/1997-98/101/ranvar.htm>`_. Đây là một lớp coi giá trị trung bình và độ lệch chuẩn của các phép đo dữ liệu như một thực thể duy nhất.
 
-Normal distributions arise from the `Central Limit Theorem
-<https://en.wikipedia.org/wiki/Central_limit_theorem>`_ and have a wide range
-of applications in statistics.
+Các phân phối chuẩn xuất hiện từ `Định lý giới hạn trung tâm <https://en.wikipedia.org/wiki/Central_limit_theorem>`_ và có nhiều ứng dụng trong thống kê.
 
 .. class:: NormalDist(mu=0.0, sigma=1.0)
 
-    Returns a new *NormalDist* object where *mu* represents the `arithmetic
-    mean <https://en.wikipedia.org/wiki/Arithmetic_mean>`_ and *sigma*
-    represents the `standard deviation
-    <https://en.wikipedia.org/wiki/Standard_deviation>`_.
+    Trả về một đối tượng *NormalDist* mới, trong đó *mu* biểu thị `trung bình cộng <https://en.wikipedia.org/wiki/Arithmetic_mean>`_ và *sigma* biểu thị `độ lệch chuẩn <https://en.wikipedia.org/wiki/Standard_deviation>`_.
 
-    If *sigma* is negative, raises :exc:`StatisticsError`.
+    Nếu *sigma* là số âm, sẽ ném :exc:`StatisticsError`.
 
     .. attribute:: mean
 
-       A read-only property for the `arithmetic mean
-       <https://en.wikipedia.org/wiki/Arithmetic_mean>`_ of a normal
-       distribution.
+       Một thuộc tính chỉ đọc biểu thị `trung bình cộng <https://en.wikipedia.org/wiki/Arithmetic_mean>`_ của một phân phối chuẩn.
 
     .. attribute:: median
 
-       A read-only property for the `median
-       <https://en.wikipedia.org/wiki/Median>`_ of a normal
-       distribution.
+       Một thuộc tính chỉ đọc biểu thị `trung vị <https://en.wikipedia.org/wiki/Median>`_ của một phân phối chuẩn.
 
     .. attribute:: mode
 
-       A read-only property for the `mode
-       <https://en.wikipedia.org/wiki/Mode_(statistics)>`_ of a normal
-       distribution.
+       Một thuộc tính chỉ đọc biểu thị `mốt <https://en.wikipedia.org/wiki/Mode_(statistics)>`_ của một phân phối chuẩn.
 
     .. attribute:: stdev
 
-       A read-only property for the `standard deviation
-       <https://en.wikipedia.org/wiki/Standard_deviation>`_ of a normal
-       distribution.
+       Một thuộc tính chỉ đọc biểu thị `độ lệch chuẩn <https://en.wikipedia.org/wiki/Standard_deviation>`_ của một phân phối chuẩn.
 
     .. attribute:: variance
 
-       A read-only property for the `variance
-       <https://en.wikipedia.org/wiki/Variance>`_ of a normal
-       distribution. Equal to the square of the standard deviation.
+       Một thuộc tính chỉ đọc biểu thị `phương sai <https://en.wikipedia.org/wiki/Variance>`_ của một phân phối chuẩn. Bằng bình phương của độ lệch chuẩn.
 
     .. classmethod:: NormalDist.from_samples(data)
 
-       Makes a normal distribution instance with *mu* and *sigma* parameters
-       estimated from the *data* using :func:`fmean` and :func:`stdev`.
+       Tạo một thể hiện phân phối chuẩn với các tham số *mu* và *sigma*, được ước tính từ *data* bằng cách sử dụng :func:`fmean` và :func:`stdev`.
 
-       The *data* can be any :term:`iterable` and should consist of values
-       that can be converted to type :class:`float`.  If *data* does not
-       contain at least two elements, raises :exc:`StatisticsError` because it
-       takes at least one point to estimate a central value and at least two
-       points to estimate dispersion.
+       *data* có thể là bất kỳ :term:`iterable` nào và phải bao gồm các giá trị có thể được chuyển đổi thành kiểu :class:`float`. Nếu *data* không chứa ít nhất hai phần tử, sẽ phát sinh :exc:`StatisticsError` vì cần ít nhất một điểm để ước tính giá trị trung tâm và ít nhất hai điểm để ước tính độ phân tán.
 
     .. method:: NormalDist.samples(n, *, seed=None)
 
-       Generates *n* random samples for a given mean and standard deviation.
-       Returns a :class:`list` of :class:`float` values.
+       Tạo *n* mẫu ngẫu nhiên với giá trị trung bình và độ lệch chuẩn đã cho. Trả về một :class:`list` gồm các giá trị :class:`float`.
 
-       If *seed* is given, creates a new instance of the underlying random
-       number generator.  This is useful for creating reproducible results,
-       even in a multi-threading context.
+       Nếu cung cấp *seed*, một thể hiện mới của bộ tạo số ngẫu nhiên nền tảng sẽ được tạo. Điều này hữu ích để tạo ra các kết quả có thể tái lập, ngay cả trong ngữ cảnh đa luồng.
 
        .. versionchanged:: 3.13
 
-       Switched to a faster algorithm.  To reproduce samples from previous
-       versions, use :func:`random.seed` and :func:`random.gauss`.
+       Đã chuyển sang một thuật toán nhanh hơn. Để tái tạo các mẫu từ các phiên bản trước, hãy sử dụng :func:`random.seed` và :func:`random.gauss`.
 
     .. method:: NormalDist.pdf(x)
 
-       Using a `probability density function (pdf)
-       <https://en.wikipedia.org/wiki/Probability_density_function>`_, compute
-       the relative likelihood that a random variable *X* will be near the
-       given value *x*.  Mathematically, it is the limit of the ratio ``P(x <=
-       X < x+dx) / dx`` as *dx* approaches zero.
+       Sử dụng `hàm mật độ xác suất (pdf) <https://en.wikipedia.org/wiki/Probability_density_function>`_, tính khả năng tương đối rằng biến ngẫu nhiên *X* sẽ ở gần giá trị *x* đã cho. Về mặt toán học, đây là giới hạn của tỷ số ``P(x <= X < x+dx) / dx`` khi *dx* tiến đến bằng không.
 
-       The relative likelihood is computed as the probability of a sample
-       occurring in a narrow range divided by the width of the range (hence
-       the word "density").  Since the likelihood is relative to other points,
-       its value can be greater than ``1.0``.
+       Khả năng tương đối được tính bằng xác suất một mẫu xuất hiện trong một khoảng hẹp chia cho độ rộng của khoảng đó (do đó có từ "mật độ"). Vì khả năng này mang tính tương đối so với các điểm khác, giá trị của nó có thể lớn hơn ``1.0``.
 
     .. method:: NormalDist.cdf(x)
 
-       Using a `cumulative distribution function (cdf)
-       <https://en.wikipedia.org/wiki/Cumulative_distribution_function>`_,
-       compute the probability that a random variable *X* will be less than or
-       equal to *x*.  Mathematically, it is written ``P(X <= x)``.
+       Sử dụng `hàm phân phối tích lũy (cdf) <https://en.wikipedia.org/wiki/Cumulative_distribution_function>`_, tính xác suất để biến ngẫu nhiên *X* nhỏ hơn hoặc bằng *x*. Về mặt toán học, được viết là ``P(X <= x)``.
 
     .. method:: NormalDist.inv_cdf(p)
 
-       Compute the inverse cumulative distribution function, also known as the
-       `quantile function <https://en.wikipedia.org/wiki/Quantile_function>`_
-       or the `percent-point
-       <https://web.archive.org/web/20190203145224/https://www.statisticshowto.datasciencecentral.com/inverse-distribution-function/>`_
-       function.  Mathematically, it is written ``x : P(X <= x) = p``.
+       Tính hàm phân phối tích lũy nghịch đảo, còn được gọi là `hàm quantile <https://en.wikipedia.org/wiki/Quantile_function>`_ hoặc hàm `percent-point <https://web.archive.org/web/20190203145224/https://www.statisticshowto.datasciencecentral.com/inverse-distribution-function/>`_. Về mặt toán học, được viết là ``x : P(X <= x) = p``.
 
-       Finds the value *x* of the random variable *X* such that the
-       probability of the variable being less than or equal to that value
-       equals the given probability *p*.
+       Tìm giá trị *x* của biến ngẫu nhiên *X* sao cho xác suất biến này nhỏ hơn hoặc bằng giá trị đó bằng xác suất đã cho *p*.
 
     .. method:: NormalDist.overlap(other)
 
-       Measures the agreement between two normal probability distributions.
-       Returns a value between 0.0 and 1.0 giving `the overlapping area for
-       the two probability density functions
-       <https://www.rasch.org/rmt/rmt101r.htm>`_.
+       Đo mức độ phù hợp giữa hai phân phối xác suất chuẩn. Trả về một giá trị từ 0.0 đến 1.0, biểu thị `diện tích chồng lấp của hai hàm mật độ xác suất <https://www.rasch.org/rmt/rmt101r.htm>`_.
 
     .. method:: NormalDist.quantiles(n=4)
 
-        Divide the normal distribution into *n* continuous intervals with
-        equal probability.  Returns a list of (n - 1) cut points separating
-        the intervals.
+        Chia phân phối chuẩn thành *n* khoảng liên tục có xác suất bằng nhau. Trả về danh sách gồm (n - 1) điểm cắt phân tách các khoảng.
 
-        Set *n* to 4 for quartiles (the default).  Set *n* to 10 for deciles.
-        Set *n* to 100 for percentiles which gives the 99 cuts points that
-        separate the normal distribution into 100 equal sized groups.
+        Đặt *n* bằng 4 cho các tứ phân vị (giá trị mặc định). Đặt *n* bằng 10 cho các phân vị thập phân. Đặt *n* bằng 100 cho các phần trăm vị, tạo ra 99 điểm cắt phân tách phân phối chuẩn thành 100 nhóm có kích thước bằng nhau.
 
     .. method:: NormalDist.zscore(x)
 
-        Compute the
-        `Standard Score <https://www.statisticshowto.com/probability-and-statistics/z-score/>`_
-        describing *x* in terms of the number of standard deviations
-        above or below the mean of the normal distribution:
-        ``(x - mean) / stdev``.
+        Tính `Điểm chuẩn hóa <https://www.statisticshowto.com/probability-and-statistics/z-score/>`_ mô tả *x* theo số độ lệch chuẩn cao hơn hoặc thấp hơn giá trị trung bình của phân phối chuẩn: ``(x - mean) / stdev``.
 
         .. versionadded:: 3.9
 
-    Instances of :class:`NormalDist` support addition, subtraction,
-    multiplication and division by a constant.  These operations
-    are used for translation and scaling.  For example:
+    Các instance của :class:`NormalDist` hỗ trợ phép cộng, phép trừ, phép nhân và phép chia với một hằng số. Các phép toán này được dùng để tịnh tiến và co giãn. Ví dụ:
 
     .. doctest::
 
@@ -1015,14 +769,9 @@ of applications in statistics.
         >>> temperature_february * (9/5) + 32                     # Fahrenheit
         NormalDist(mu=41.0, sigma=4.5)
 
-    Dividing a constant by an instance of :class:`NormalDist` is not supported
-    because the result wouldn't be normally distributed.
+    Không hỗ trợ phép chia một hằng số cho một instance của :class:`NormalDist` vì kết quả sẽ không có phân phối chuẩn.
 
-    Since normal distributions arise from additive effects of independent
-    variables, it is possible to `add and subtract two independent normally
-    distributed random variables
-    <https://en.wikipedia.org/wiki/Sum_of_normally_distributed_random_variables>`_
-    represented as instances of :class:`NormalDist`.  For example:
+    Vì các phân phối chuẩn phát sinh từ các tác động cộng của những biến độc lập, bạn có thể `cộng và trừ hai biến ngẫu nhiên độc lập có phân phối chuẩn <https://en.wikipedia.org/wiki/Sum_of_normally_distributed_random_variables>`_ được biểu diễn dưới dạng các instance của :class:`NormalDist`. Ví dụ:
 
     .. doctest::
 
@@ -1037,20 +786,16 @@ of applications in statistics.
     .. versionadded:: 3.8
 
 
-Examples and Recipes
---------------------
+Các ví dụ và công thức
+----------------------
 
 
-Classic probability problems
-****************************
+Các bài toán xác suất kinh điển
+*******************************
 
-:class:`NormalDist` readily solves classic probability problems.
+:class:`NormalDist` dễ dàng giải quyết các bài toán xác suất kinh điển.
 
-For example, given `historical data for SAT exams
-<https://nces.ed.gov/programs/digest/d17/tables/dt17_226.40.asp>`_ showing
-that scores are normally distributed with a mean of 1060 and a standard
-deviation of 195, determine the percentage of students with test scores
-between 1100 and 1200, after rounding to the nearest whole number:
+Ví dụ, dựa trên `dữ liệu lịch sử về các kỳ thi SAT <https://nces.ed.gov/programs/digest/d17/tables/dt17_226.40.asp>`_ cho thấy điểm số có phân phối chuẩn với giá trị trung bình là 1060 và độ lệch chuẩn là 195, hãy xác định tỷ lệ phần trăm học sinh có điểm kiểm tra từ 1100 đến 1200, sau khi làm tròn đến số nguyên gần nhất:
 
 .. doctest::
 
@@ -1059,8 +804,7 @@ between 1100 and 1200, after rounding to the nearest whole number:
     >>> round(fraction * 100.0, 1)
     18.4
 
-Find the `quartiles <https://en.wikipedia.org/wiki/Quartile>`_ and `deciles
-<https://en.wikipedia.org/wiki/Decile>`_ for the SAT scores:
+Tìm `các tứ phân vị <https://en.wikipedia.org/wiki/Quartile>`_ và `các thập phân vị <https://en.wikipedia.org/wiki/Decile>`_ của điểm SAT:
 
 .. doctest::
 
@@ -1070,12 +814,10 @@ Find the `quartiles <https://en.wikipedia.org/wiki/Quartile>`_ and `deciles
     [810, 896, 958, 1011, 1060, 1109, 1162, 1224, 1310]
 
 
-Monte Carlo inputs for simulations
-**********************************
+Các đầu vào Monte Carlo cho mô phỏng
+************************************
 
-To estimate the distribution for a model that isn't easy to solve
-analytically, :class:`NormalDist` can generate input samples for a `Monte
-Carlo simulation <https://en.wikipedia.org/wiki/Monte_Carlo_method>`_:
+Để ước tính phân phối cho một mô hình không dễ giải bằng phương pháp giải tích, :class:`NormalDist` có thể tạo các mẫu đầu vào cho một `mô phỏng Monte Carlo <https://en.wikipedia.org/wiki/Monte_Carlo_method>`_:
 
 .. doctest::
 
@@ -1089,57 +831,45 @@ Carlo simulation <https://en.wikipedia.org/wiki/Monte_Carlo_method>`_:
     >>> quantiles(map(model, X, Y, Z))       # doctest: +SKIP
     [1.4591308524824727, 1.8035946855390597, 2.175091447274739]
 
-Approximating binomial distributions
-************************************
+Xấp xỉ các phân phối nhị thức
+*****************************
 
-Normal distributions can be used to approximate `Binomial
-distributions <https://mathworld.wolfram.com/BinomialDistribution.html>`_
-when the sample size is large and when the probability of a successful
-trial is near 50%.
+Có thể dùng phân phối chuẩn để xấp xỉ `phân phối nhị thức <https://mathworld.wolfram.com/BinomialDistribution.html>`_ khi kích thước mẫu lớn và xác suất một phép thử thành công gần 50%.
 
-For example, an open source conference has 750 attendees and two rooms with a
-500 person capacity.  There is a talk about Python and another about Ruby.
-In previous conferences, 65% of the attendees preferred to listen to Python
-talks.  Assuming the population preferences haven't changed, what is the
-probability that the Python room will stay within its capacity limits?
+Ví dụ: một hội nghị mã nguồn mở có 750 người tham dự và hai phòng, mỗi phòng có sức chứa 500 người. Có một bài nói chuyện về Python và một bài khác về Ruby. Trong các hội nghị trước, 65% người tham dự thích nghe các bài nói chuyện về Python. Giả sử sở thích của quần thể không thay đổi, xác suất phòng Python vẫn nằm trong giới hạn sức chứa là bao nhiêu?
 
 .. doctest::
 
-    >>> n = 750             # Sample size
-    >>> p = 0.65            # Preference for Python
-    >>> q = 1.0 - p         # Preference for Ruby
-    >>> k = 500             # Room capacity
+    >>> n = 750             # Kích thước mẫu
+    >>> p = 0.65            # Sở thích Python
+    >>> q = 1.0 - p         # Sở thích Ruby
+    >>> k = 500             # Sức chứa phòng
 
-    >>> # Approximation using the cumulative normal distribution
+    >>> # Xấp xỉ bằng phân phối chuẩn tích lũy
     >>> from math import sqrt
     >>> round(NormalDist(mu=n*p, sigma=sqrt(n*p*q)).cdf(k + 0.5), 4)
     0.8402
 
-    >>> # Exact solution using the cumulative binomial distribution
+    >>> # Giải pháp chính xác sử dụng phân phối nhị thức tích lũy
     >>> from math import comb, fsum
     >>> round(fsum(comb(n, r) * p**r * q**(n-r) for r in range(k+1)), 4)
     0.8402
 
-    >>> # Approximation using a simulation
+    >>> # Phép xấp xỉ bằng mô phỏng
     >>> from random import seed, binomialvariate
     >>> seed(8675309)
     >>> mean(binomialvariate(n, p) <= k for i in range(10_000))
     0.8406
 
 
-Naive bayesian classifier
-*************************
+Bộ phân loại Bayes ngây thơ
+***************************
 
-Normal distributions commonly arise in machine learning problems.
+Các phân phối chuẩn thường xuất hiện trong những bài toán machine learning.
 
-Wikipedia has a `nice example of a Naive Bayesian Classifier
-<https://en.wikipedia.org/wiki/Naive_Bayes_classifier#Person_classification>`_.
-The challenge is to predict a person's gender from measurements of normally
-distributed features including height, weight, and foot size.
+Wikipedia có `một ví dụ hay về Bộ phân loại Bayes ngây thơ <https://en.wikipedia.org/wiki/Naive_Bayes_classifier#Person_classification>`_. Thách thức là dự đoán giới tính của một người từ các phép đo của những đặc trưng có phân phối chuẩn, bao gồm chiều cao, cân nặng và cỡ bàn chân.
 
-We're given a training dataset with measurements for eight people.  The
-measurements are assumed to be normally distributed, so we summarize the data
-with :class:`NormalDist`:
+Chúng ta được cung cấp một tập dữ liệu huấn luyện với các phép đo của tám người. Các phép đo được giả định là có phân phối chuẩn, vì vậy chúng ta tóm tắt dữ liệu bằng :class:`NormalDist`:
 
 .. doctest::
 
@@ -1150,19 +880,15 @@ with :class:`NormalDist`:
     >>> foot_size_male = NormalDist.from_samples([12, 11, 12, 10])
     >>> foot_size_female = NormalDist.from_samples([6, 8, 7, 9])
 
-Next, we encounter a new person whose feature measurements are known but whose
-gender is unknown:
+Tiếp theo, chúng ta gặp một người mới đã biết các phép đo đặc trưng nhưng chưa biết giới tính:
 
 .. doctest::
 
-    >>> ht = 6.0        # height
-    >>> wt = 130        # weight
-    >>> fs = 8          # foot size
+    >>> ht = 6.0        # chiều cao
+    >>> wt = 130        # cân nặng
+    >>> fs = 8          # cỡ bàn chân
 
-Starting with a 50% `prior probability
-<https://en.wikipedia.org/wiki/Prior_probability>`_ of being male or female,
-we compute the posterior as the prior times the product of likelihoods for the
-feature measurements given the gender:
+Bắt đầu với `xác suất tiên nghiệm <https://en.wikipedia.org/wiki/Prior_probability>`_ 50% cho khả năng là nam hoặc nữ, chúng ta tính xác suất hậu nghiệm bằng xác suất tiên nghiệm nhân với tích của các likelihood tương ứng với các phép đo đặc trưng khi biết giới tính:
 
 .. doctest::
 
@@ -1174,9 +900,7 @@ feature measurements given the gender:
    >>> posterior_female = (prior_female * height_female.pdf(ht) *
    ...                     weight_female.pdf(wt) * foot_size_female.pdf(fs))
 
-The final prediction goes to the largest posterior. This is known as the
-`maximum a posteriori
-<https://en.wikipedia.org/wiki/Maximum_a_posteriori_estimation>`_ or MAP:
+Dự đoán cuối cùng sẽ là lớp có xác suất hậu nghiệm lớn nhất. Đây được gọi là `maximum a posteriori <https://en.wikipedia.org/wiki/Maximum_a_posteriori_estimation>`_ hay MAP:
 
 .. doctest::
 
@@ -1185,5 +909,40 @@ The final prediction goes to the largest posterior. This is known as the
 
 
 ..
-   # This modelines must appear within the last ten lines of the file.
-   kate: indent-width 3; remove-trailing-space on; replace-tabs on; encoding utf-8;
+   # Các modeline này phải xuất hiện trong mười dòng cuối cùng của tệp. kate: indent-width 3; remove-trailing-space on; replace-tabs on; encoding utf-8;
+
+.. _`NumPy`: https://numpy.org
+.. _`SciPy`: https://scipy.org/
+.. _`outliers`: https://en.wikipedia.org/wiki/Outlier
+.. _`central tendency`: https://en.wikipedia.org/wiki/Central_tendency
+.. _`Kernel Density Estimation (KDE)`: https://www.itm-conferences.org/articles/itmconf/pdf/2018/08/itmconf_sam2018_00037.pdf
+.. _`a kernel function`: https://en.wikipedia.org/wiki/Kernel_(statistics)
+.. _`Wikipedia has an example`: https://en.wikipedia.org/wiki/Kernel_density_estimation#Example
+.. _`grouped or binned`: https://en.wikipedia.org/wiki/Data_binning
+.. _`Pearson's correlation coefficient`: https://en.wikipedia.org/wiki/Pearson_correlation_coefficient
+.. _`Spearman's rank correlation coefficient`: https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient
+.. _`Kepler's laws of planetary motion`: https://en.wikipedia.org/wiki/Kepler's_laws_of_planetary_motion
+.. _`simple linear regression`: https://en.wikipedia.org/wiki/Simple_linear_regression
+.. _`release dates of the Monty Python films`: https://en.wikipedia.org/wiki/Monty_Python#Films
+.. _`random variable`: http://www.stat.yale.edu/Courses/1997-98/101/ranvar.htm
+.. _`Central Limit Theorem`: https://en.wikipedia.org/wiki/Central_limit_theorem
+.. _`arithmetic mean`: https://en.wikipedia.org/wiki/Arithmetic_mean
+.. _`standard deviation`: https://en.wikipedia.org/wiki/Standard_deviation
+.. _`median`: https://en.wikipedia.org/wiki/Median
+.. _`mode`: https://en.wikipedia.org/wiki/Mode_(statistics)
+.. _`variance`: https://en.wikipedia.org/wiki/Variance
+.. _`probability density function (pdf)`: https://en.wikipedia.org/wiki/Probability_density_function
+.. _`cumulative distribution function (cdf)`: https://en.wikipedia.org/wiki/Cumulative_distribution_function
+.. _`quantile function`: https://en.wikipedia.org/wiki/Quantile_function
+.. _`percent-point`: https://web.archive.org/web/20190203145224/https://www.statisticshowto.datasciencecentral.com/inverse-distribution-function/
+.. _`the overlapping area for the two probability density functions`: https://www.rasch.org/rmt/rmt101r.htm
+.. _`Standard Score`: https://www.statisticshowto.com/probability-and-statistics/z-score/
+.. _`add and subtract two independent normally distributed random variables`: https://en.wikipedia.org/wiki/Sum_of_normally_distributed_random_variables
+.. _`historical data for SAT exams`: https://nces.ed.gov/programs/digest/d17/tables/dt17_226.40.asp
+.. _`quartiles`: https://en.wikipedia.org/wiki/Quartile
+.. _`deciles`: https://en.wikipedia.org/wiki/Decile
+.. _`Monte Carlo simulation`: https://en.wikipedia.org/wiki/Monte_Carlo_method
+.. _`Binomial distributions`: https://mathworld.wolfram.com/BinomialDistribution.html
+.. _`nice example of a Naive Bayesian Classifier`: https://en.wikipedia.org/wiki/Naive_Bayes_classifier#Person_classification
+.. _`prior probability`: https://en.wikipedia.org/wiki/Prior_probability
+.. _`maximum a posteriori`: https://en.wikipedia.org/wiki/Maximum_a_posteriori_estimation

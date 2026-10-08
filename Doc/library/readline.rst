@@ -1,27 +1,16 @@
-:mod:`!readline` --- GNU readline interface
+:mod:`!readline` --- giao diện GNU readline
 ===========================================
 
 .. module:: readline
-   :synopsis: GNU readline support for Python.
+   :synopsis: Hỗ trợ GNU readline cho Python.
 
 .. sectionauthor:: Skip Montanaro <skip.montanaro@gmail.com>
 
 --------------
 
-The :mod:`!readline` module defines a number of functions to facilitate
-completion and reading/writing of history files from the Python interpreter.
-This module can be used directly, or via the :mod:`rlcompleter` module, which
-supports completion of Python identifiers at the interactive prompt.  Settings
-made using  this module affect the behaviour of both the interpreter's
-interactive prompt  and the prompts offered by the built-in :func:`input`
-function.
+Mô-đun :mod:`!readline` định nghĩa một số hàm để hỗ trợ việc hoàn tất và đọc/ghi các tệp lịch sử từ trình thông dịch Python. Mô-đun này có thể được sử dụng trực tiếp hoặc thông qua mô-đun :mod:`rlcompleter`, mô-đun hỗ trợ hoàn tất các định danh Python tại dấu nhắc tương tác. Các thiết lập được thực hiện bằng mô-đun này ảnh hưởng đến cả dấu nhắc tương tác của trình thông dịch và các dấu nhắc do hàm tích hợp :func:`input` cung cấp.
 
-Readline keybindings may be configured via an initialization file, typically
-``.inputrc`` in your home directory.  See `Readline Init File
-<https://tiswww.cwru.edu/php/chet/readline/rluserman.html#Readline-Init-File>`_
-in the GNU Readline manual for information about the format and
-allowable constructs of that file, and the capabilities of the
-Readline library in general.
+Các liên kết phím của Readline có thể được cấu hình thông qua một tệp khởi tạo, thường là ``.inputrc`` trong thư mục chính của bạn. Xem `Tệp khởi tạo Readline <https://tiswww.cwru.edu/php/chet/readline/rluserman.html#Readline-Init-File>`_ trong hướng dẫn sử dụng GNU Readline để biết thông tin về định dạng và các cấu trúc được phép trong tệp đó, cũng như các khả năng của thư viện Readline nói chung.
 
 .. include:: ../includes/wasm-mobile-notavail.rst
 
@@ -31,305 +20,222 @@ Readline library in general.
 
 .. note::
 
-  The underlying Readline library API may be implemented by
-  the ``editline`` (``libedit``) library instead of GNU readline.
-  On macOS the :mod:`!readline` module detects which library is being used
-  at run time.
+  API của thư viện Readline nền tảng có thể được triển khai bởi thư viện ``editline`` (``libedit``) thay vì GNU readline. Trên macOS, mô-đun :mod:`!readline` phát hiện thư viện nào đang được sử dụng tại thời điểm chạy.
 
-  The configuration file for ``editline`` is different from that
-  of GNU readline. If you programmatically load configuration strings
-  you can use :data:`backend` to determine which library is being used.
+  Tệp cấu hình của ``editline`` khác với tệp cấu hình của GNU readline. Nếu bạn tải các chuỗi cấu hình theo cách lập trình, bạn có thể sử dụng :data:`backend` để xác định thư viện nào đang được sử dụng.
 
-  If you use ``editline``/``libedit`` readline emulation on macOS, the
-  initialization file located in your home directory is named
-  ``.editrc``. For example, the following content in ``~/.editrc`` will
-  turn ON *vi* keybindings and TAB completion::
+  Nếu bạn sử dụng tính năng mô phỏng readline ``editline``/``libedit`` trên macOS, tệp khởi tạo nằm trong thư mục chính của bạn có tên là ``.editrc``. Ví dụ, nội dung sau trong ``~/.editrc`` sẽ BẬT *vi* các liên kết phím và tính năng hoàn tất bằng TAB::
 
     python:bind -v
     python:bind ^I rl_complete
 
-  Also note that different libraries may use different history file formats.
-  When switching the underlying library, existing history files may become
-  unusable.
+  Cũng lưu ý rằng các thư viện khác nhau có thể sử dụng các định dạng tệp history khác nhau. Khi chuyển đổi thư viện nền, các tệp history hiện có có thể không sử dụng được.
 
 .. data:: backend
 
-   The name of the underlying Readline library being used, either
-   ``"readline"`` or ``"editline"``.
+   Tên của thư viện Readline nền đang được sử dụng, ``"readline"`` hoặc ``"editline"``.
 
    .. versionadded:: 3.13
 
-Init file
----------
+Tệp init
+--------
 
-The following functions relate to the init file and user configuration:
+Các hàm sau đây liên quan đến tệp init và cấu hình người dùng:
 
 
 .. function:: parse_and_bind(string)
 
-   Execute the init line provided in the *string* argument. This calls
-   :c:func:`!rl_parse_and_bind` in the underlying library.
+   Thực thi dòng init được cung cấp trong đối số *string*. Lệnh này gọi
+   :c:func:`!rl_parse_and_bind` trong thư viện nền.
 
 
 .. function:: read_init_file([filename])
 
-   Execute a readline initialization file. The default filename is the last filename
-   used. This calls :c:func:`!rl_read_init_file` in the underlying library.
-   It raises an :ref:`auditing event <auditing>` ``open`` with the file name
-   if given, and :code:`"<readline_init_file>"` otherwise, regardless of
-   which file the library resolves.
+   Thực thi tệp khởi tạo readline. Tên tệp mặc định là tên tệp được sử dụng gần đây nhất. Lệnh này gọi :c:func:`!rl_read_init_file` trong thư viện nền. Lệnh này phát sinh :ref:`sự kiện kiểm tra <auditing>` ``open`` với tên tệp nếu được cung cấp, và :code:`"<readline_init_file>"` nếu không, bất kể thư viện phân giải tệp nào.
 
    .. versionchanged:: 3.14
-      The auditing event was added.
+      Sự kiện kiểm tra đã được thêm.
 
 
-Line buffer
+Bộ đệm dòng
 -----------
 
-The following functions operate on the line buffer:
+Các hàm sau đây hoạt động trên bộ đệm dòng:
 
 
 .. function:: get_line_buffer()
 
-   Return the current contents of the line buffer (:c:data:`!rl_line_buffer`
-   in the underlying library).
+   Trả về nội dung hiện tại của bộ đệm dòng (:c:data:`!rl_line_buffer` trong thư viện bên dưới).
 
 
 .. function:: insert_text(string)
 
-   Insert text into the line buffer at the cursor position.  This calls
-   :c:func:`!rl_insert_text` in the underlying library, but ignores
-   the return value.
+   Chèn văn bản vào bộ đệm dòng tại vị trí con trỏ. Thao tác này gọi
+   :c:func:`!rl_insert_text` trong thư viện bên dưới nhưng bỏ qua giá trị trả về.
 
 
 .. function:: redisplay()
 
-   Change what's displayed on the screen to reflect the current contents of the
-   line buffer.  This calls :c:func:`!rl_redisplay` in the underlying library.
+   Thay đổi nội dung hiển thị trên màn hình để phản ánh nội dung hiện tại của bộ đệm dòng. Thao tác này gọi :c:func:`!rl_redisplay` trong thư viện bên dưới.
 
 
-History file
-------------
+Tệp lịch sử
+-----------
 
-The following functions operate on a history file:
+Các hàm sau đây hoạt động trên một tệp lịch sử:
 
 
 .. function:: read_history_file([filename])
 
-   Load a readline history file, and append it to the history list.
-   The default filename is :file:`~/.history`.  This calls
-   :c:func:`!read_history` in the underlying library
-   and raises an :ref:`auditing event <auditing>` ``open`` with the file
-   name if given and :code:`"~/.history"` otherwise.
+   Tải một tệp lịch sử readline và nối tệp đó vào danh sách lịch sử. Tên tệp mặc định là :file:`~/.history`.  Hàm này gọi
+   :c:func:`!read_history` trong thư viện nền tảng và phát ra một :ref:`sự kiện auditing <auditing>` ``open`` với tên tệp nếu được cung cấp, và :code:`"~/.history"` nếu không.
 
    .. versionchanged:: 3.14
-      The auditing event was added.
+      Sự kiện auditing đã được thêm.
 
 
 .. function:: write_history_file([filename])
 
-   Save the history list to a readline history file, overwriting any
-   existing file.  The default filename is :file:`~/.history`.  This calls
-   :c:func:`!write_history` in the underlying library and raises an
-   :ref:`auditing event <auditing>` ``open`` with the file name if given and
-   :code:`"~/.history"` otherwise.
+   Lưu danh sách lịch sử vào một tệp lịch sử readline, ghi đè mọi tệp hiện có.  Tên tệp mặc định là :file:`~/.history`.  Hàm này gọi
+   :c:func:`!write_history` trong thư viện nền tảng và phát ra một
+   :ref:`sự kiện auditing <auditing>` ``open`` cùng với tên tệp nếu được cung cấp và
+   :code:`"~/.history"` nếu không.
 
    .. versionchanged:: 3.14
-      The auditing event was added.
+      Sự kiện auditing đã được thêm.
 
 
 .. function:: append_history_file(nelements[, filename])
 
-   Append the last *nelements* items of history to a file.  The default filename is
-   :file:`~/.history`.  The file must already exist.  This calls
-   :c:func:`!append_history` in the underlying library.  This function
-   only exists if Python was compiled for a version of the library
-   that supports it. It raises an :ref:`auditing event <auditing>` ``open``
-   with the file name if given and :code:`"~/.history"` otherwise.
+   Nối các mục lịch sử *nelements* cuối cùng vào một tệp.  Tên tệp mặc định là
+   :file:`~/.history`.  Tệp phải tồn tại từ trước.  Lệnh này gọi
+   :c:func:`!append_history` trong thư viện nền tảng.  Hàm này chỉ tồn tại nếu Python được biên dịch cho một phiên bản thư viện hỗ trợ hàm này. Hàm này phát sinh một :ref:`sự kiện auditing <auditing>` ``open`` cùng với tên tệp nếu được cung cấp và :code:`"~/.history"` nếu không.
 
    .. versionadded:: 3.5
 
    .. versionchanged:: 3.14
-      The auditing event was added.
+      Sự kiện auditing đã được thêm.
 
 
 .. function:: get_history_length()
               set_history_length(length)
 
-   Set or return the desired number of lines to save in the history file.
-   The :func:`write_history_file` function uses this value to truncate
-   the history file, by calling :c:func:`!history_truncate_file` in
-   the underlying library.  Negative values imply
-   unlimited history file size.
+   Đặt hoặc trả về số dòng mong muốn được lưu trong tệp lịch sử. Hàm :func:`write_history_file` sử dụng giá trị này để cắt ngắn tệp lịch sử bằng cách gọi :c:func:`!history_truncate_file` trong thư viện bên dưới. Các giá trị âm biểu thị kích thước tệp lịch sử không giới hạn.
 
 
-History list
-------------
+Danh sách lịch sử
+-----------------
 
-The following functions operate on a global history list:
+Các hàm sau đây hoạt động trên một danh sách lịch sử toàn cục:
 
 
 .. function:: clear_history()
 
-   Clear the current history.  This calls :c:func:`!clear_history` in the
-   underlying library.  The Python function only exists if Python was
-   compiled for a version of the library that supports it.
+   Xóa lịch sử hiện tại. Thao tác này gọi :c:func:`!clear_history` trong thư viện bên dưới. Hàm Python chỉ tồn tại nếu Python được biên dịch cho một phiên bản của thư viện có hỗ trợ hàm này.
 
 
 .. function:: get_current_history_length()
 
-   Return the number of items currently in the history.  (This is different from
-   :func:`get_history_length`, which returns the maximum number of lines that will
-   be written to a history file.)
+   Trả về số mục hiện có trong lịch sử. (Điều này khác với
+   :func:`get_history_length`, hàm trả về số dòng tối đa sẽ được ghi vào tệp lịch sử.)
 
 
 .. function:: get_history_item(index)
 
-   Return the current contents of history item at *index*.  The item index
-   is one-based.  This calls :c:func:`!history_get` in the underlying library.
+   Trả về nội dung hiện tại của mục lịch sử tại *index*. Chỉ mục của mục được đánh số bắt đầu từ một. Thao tác này gọi :c:func:`!history_get` trong thư viện nền tảng.
 
 
 .. function:: remove_history_item(pos)
 
-   Remove history item specified by its position from the history.
-   The position is zero-based.  This calls :c:func:`!remove_history` in
-   the underlying library.
+   Xóa mục lịch sử được chỉ định theo vị trí khỏi lịch sử. Vị trí được đánh số bắt đầu từ không. Thao tác này gọi :c:func:`!remove_history` trong thư viện nền tảng.
 
 
 .. function:: replace_history_item(pos, line)
 
-   Replace history item specified by its position with *line*.
-   The position is zero-based.  This calls :c:func:`!replace_history_entry`
-   in the underlying library.
+   Thay thế mục lịch sử được chỉ định theo vị trí bằng *line*. Vị trí được đánh số bắt đầu từ không. Thao tác này gọi :c:func:`!replace_history_entry` trong thư viện nền tảng.
 
 
 .. function:: add_history(line)
 
-   Append *line* to the history buffer, as if it was the last line typed.
-   This calls :c:func:`!add_history` in the underlying library.
+   Thêm *line* vào bộ đệm lịch sử, như thể đó là dòng cuối cùng được nhập. Thao tác này gọi :c:func:`!add_history` trong thư viện nền tảng.
 
 
 .. function:: set_auto_history(enabled)
 
-   Enable or disable automatic calls to :c:func:`!add_history` when reading
-   input via readline.  The *enabled* argument should be a Boolean value
-   that when true, enables auto history, and that when false, disables
-   auto history.
+   Bật hoặc tắt việc tự động gọi :c:func:`!add_history` khi đọc đầu vào thông qua readline. Đối số *enabled* phải là một giá trị Boolean: khi là true, đối số này bật lịch sử tự động; khi là false, đối số này tắt lịch sử tự động.
 
    .. versionadded:: 3.6
 
    .. impl-detail::
-      Auto history is enabled by default, and changes to this do not persist
-      across multiple sessions.
+      Lịch sử tự động được bật theo mặc định và các thay đổi đối với tùy chọn này không được duy trì qua nhiều phiên.
 
 
-Startup hooks
--------------
+Các hook khởi động
+------------------
 
 
 .. function:: set_startup_hook([function])
 
-   Set or remove the function invoked by the :c:data:`!rl_startup_hook`
-   callback of the underlying library.  If *function* is specified, it will
-   be used as the new hook function; if omitted or ``None``, any function
-   already installed is removed.  The hook is called with no
-   arguments just before readline prints the first prompt.
+   Thiết lập hoặc xóa hàm được gọi bởi callback :c:data:`!rl_startup_hook` của thư viện bên dưới. Nếu chỉ định *function*, hàm này sẽ được dùng làm hàm hook mới; nếu bỏ qua hoặc là ``None``, mọi hàm đã được cài đặt trước đó sẽ bị xóa. Hook được gọi không có đối số ngay trước khi readline in lời nhắc đầu tiên.
 
 
 .. function:: set_pre_input_hook([function])
 
-   Set or remove the function invoked by the :c:data:`!rl_pre_input_hook`
-   callback of the underlying library.  If *function* is specified, it will
-   be used as the new hook function; if omitted or ``None``, any
-   function already installed is removed.  The hook is called
-   with no arguments after the first prompt has been printed and just before
-   readline starts reading input characters.  This function only exists
-   if Python was compiled for a version of the library that supports it.
+   Thiết lập hoặc xóa hàm được gọi bởi callback :c:data:`!rl_pre_input_hook` của thư viện bên dưới. Nếu chỉ định *function*, hàm này sẽ được dùng làm hàm hook mới; nếu bỏ qua hoặc là ``None``, mọi hàm đã được cài đặt trước đó sẽ bị xóa. Hook được gọi không có đối số sau khi lời nhắc đầu tiên được in và ngay trước khi readline bắt đầu đọc các ký tự đầu vào. Hàm này chỉ tồn tại nếu Python được biên dịch cho một phiên bản của thư viện có hỗ trợ hàm này.
 
 
 .. _readline-completion:
 
-Completion
-----------
+Hoàn tất
+--------
 
-The following functions relate to implementing a custom word completion
-function.  This is typically operated by the Tab key, and can suggest and
-automatically complete a word being typed.  By default, Readline is set up
-to be used by :mod:`rlcompleter` to complete Python identifiers for
-the interactive interpreter.  If the :mod:`!readline` module is to be used
-with a custom completer, a different set of word delimiters should be set.
+Các hàm sau đây liên quan đến việc triển khai hàm hoàn tất từ tùy chỉnh. Thông thường, chức năng này được kích hoạt bằng phím Tab, có thể gợi ý và tự động hoàn tất một từ đang được nhập. Theo mặc định, Readline được thiết lập để :mod:`rlcompleter` hoàn tất các định danh Python cho trình thông dịch tương tác. Nếu sử dụng module :mod:`!readline` với một completer tùy chỉnh, cần thiết lập một tập dấu phân cách từ khác.
 
 
 .. function:: set_completer([function])
 
-   Set or remove the completer function.  If *function* is specified, it will be
-   used as the new completer function; if omitted or ``None``, any completer
-   function already installed is removed.  The completer function is called as
-   ``function(text, state)``, for *state* in ``0``, ``1``, ``2``, ..., until it
-   returns a non-string value.  It should return the next possible completion
-   starting with *text*.
+   Thiết lập hoặc xóa hàm completer. Nếu chỉ định *function*, hàm này sẽ được dùng làm hàm completer mới; nếu bỏ qua hoặc là ``None``, mọi hàm completer đã được cài đặt trước đó sẽ bị xóa. Hàm completer được gọi như ``function(text, state)``, với *state* trong ``0``, ``1``, ``2``, ... cho đến khi hàm trả về một giá trị không phải chuỗi. Hàm này cần trả về nội dung hoàn tất khả dĩ tiếp theo bắt đầu bằng *text*.
 
-   The installed completer function is invoked by the *entry_func* callback
-   passed to :c:func:`!rl_completion_matches` in the underlying library.
-   The *text* string comes from the first parameter to the
-   :c:data:`!rl_attempted_completion_function` callback of the
-   underlying library.
+   Hàm completer đã cài đặt được gọi bởi callback *entry_func* được truyền cho :c:func:`!rl_completion_matches` trong thư viện bên dưới. Chuỗi *text* xuất phát từ tham số đầu tiên của
+   callback :c:data:`!rl_attempted_completion_function` của thư viện bên dưới.
 
 
 .. function:: get_completer()
 
-   Get the completer function, or ``None`` if no completer function has been set.
+   Lấy hàm completer hoặc ``None`` nếu chưa thiết lập hàm completer.
 
 
 .. function:: get_completion_type()
 
-   Get the type of completion being attempted.  This returns the
-   :c:data:`!rl_completion_type` variable in the underlying library as
-   an integer.
+   Lấy loại completion đang được thực hiện. Giá trị này trả về
+   biến :c:data:`!rl_completion_type` trong thư viện nền tảng dưới dạng số nguyên.
 
 
 .. function:: get_begidx()
               get_endidx()
 
-   Get the beginning or ending index of the completion scope.
-   These indexes are the *start* and *end* arguments passed to the
-   :c:data:`!rl_attempted_completion_function` callback of the
-   underlying library.  The values may be different in the same
-   input editing scenario based on the underlying C readline implementation.
-   Ex: libedit is known to behave differently than libreadline.
+   Lấy chỉ mục bắt đầu hoặc kết thúc của phạm vi completion. Các chỉ mục này là các đối số *start* và *end* được truyền vào
+   callback :c:data:`!rl_attempted_completion_function` của thư viện nền tảng. Các giá trị có thể khác nhau trong cùng một tình huống chỉnh sửa đầu vào, tùy thuộc vào cách triển khai C readline nền tảng. Ví dụ: libedit được biết là hoạt động khác với libreadline.
 
 
 .. function:: set_completer_delims(string)
               get_completer_delims()
 
-   Set or get the word delimiters for completion.  These determine the
-   start of the word to be considered for completion (the completion scope).
-   These functions access the :c:data:`!rl_completer_word_break_characters`
-   variable in the underlying library.
+   Đặt hoặc lấy các dấu phân cách từ cho việc completion. Các dấu này xác định vị trí bắt đầu của từ được xem xét để completion (phạm vi completion). Các hàm này truy cập biến :c:data:`!rl_completer_word_break_characters` trong thư viện bên dưới.
 
 
 .. function:: set_completion_display_matches_hook([function])
 
-   Set or remove the completion display function.  If *function* is
-   specified, it will be used as the new completion display function;
-   if omitted or ``None``, any completion display function already
-   installed is removed.  This sets or clears the
-   :c:data:`!rl_completion_display_matches_hook` callback in the
-   underlying library.  The completion display function is called as
-   ``function(substitution, [matches], longest_match_length)`` once
-   each time matches need to be displayed.
+   Đặt hoặc xóa hàm hiển thị completion. Nếu *function* được chỉ định, hàm này sẽ được dùng làm hàm hiển thị completion mới; nếu bị bỏ qua hoặc là ``None``, mọi hàm hiển thị completion đã được cài đặt sẽ bị xóa. Thao tác này đặt hoặc xóa
+   callback :c:data:`!rl_completion_display_matches_hook` trong thư viện bên dưới. Hàm hiển thị completion được gọi dưới dạng ``function(substitution, [matches], longest_match_length)`` mỗi khi cần hiển thị các kết quả khớp.
 
 
 .. _readline-example:
 
-Example
--------
+Ví dụ
+-----
 
-The following example demonstrates how to use the :mod:`!readline` module's
-history reading and writing functions to automatically load and save a history
-file named :file:`.python_history` from the user's home directory.  The code
-below would normally be executed automatically during interactive sessions
-from the user's :envvar:`PYTHONSTARTUP` file. ::
+Ví dụ sau minh họa cách sử dụng các hàm đọc và ghi history của module :mod:`!readline` để tự động tải và lưu tệp history có tên :file:`.python_history` từ thư mục home của người dùng. Đoạn mã dưới đây thường được thực thi tự động trong các phiên tương tác từ tệp :envvar:`PYTHONSTARTUP` của người dùng.::
 
    import atexit
    import os
@@ -338,18 +244,17 @@ from the user's :envvar:`PYTHONSTARTUP` file. ::
    histfile = os.path.join(os.path.expanduser("~"), ".python_history")
    try:
        readline.read_history_file(histfile)
-       # default history len is -1 (infinite), which may grow unruly
+       # độ dài history mặc định là -1 (vô hạn), có thể tăng đến mức khó kiểm soát
        readline.set_history_length(1000)
    except FileNotFoundError:
        pass
 
    atexit.register(readline.write_history_file, histfile)
 
-This code is actually automatically run when Python is run in
-:ref:`interactive mode <tut-interactive>` (see :ref:`rlcompleter-config`).
+Đoạn mã này thực sự được tự động chạy khi Python được chạy trong
+:ref:`chế độ tương tác <tut-interactive>` (xem :ref:`rlcompleter-config`).
 
-The following example achieves the same goal but supports concurrent interactive
-sessions, by only appending the new history. ::
+Ví dụ sau đây đạt được cùng mục tiêu nhưng hỗ trợ các phiên tương tác đồng thời bằng cách chỉ nối thêm lịch sử mới.::
 
    import atexit
    import os
@@ -369,8 +274,7 @@ sessions, by only appending the new history. ::
        readline.append_history_file(new_h_len - prev_h_len, histfile)
    atexit.register(save, h_len, histfile)
 
-The following example extends the :class:`code.InteractiveConsole` class to
-support history save/restore. ::
+Ví dụ sau đây mở rộng lớp :class:`code.InteractiveConsole` để hỗ trợ lưu/khôi phục lịch sử.::
 
    import atexit
    import code
@@ -398,6 +302,6 @@ support history save/restore. ::
 
 .. note::
 
-   The new :term:`REPL` introduced in version 3.13 doesn't support readline.
-   However, readline can still be used by setting the :envvar:`PYTHON_BASIC_REPL`
-   environment variable.
+   :term:`REPL` mới được giới thiệu trong phiên bản 3.13 không hỗ trợ readline. Tuy nhiên, vẫn có thể sử dụng readline bằng cách đặt biến môi trường :envvar:`PYTHON_BASIC_REPL`.
+
+.. _`Readline Init File`: https://tiswww.cwru.edu/php/chet/readline/rluserman.html#Readline-Init-File

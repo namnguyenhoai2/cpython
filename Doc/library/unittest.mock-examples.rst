@@ -1,4 +1,4 @@
-:mod:`!unittest.mock` --- getting started
+:mod:`!unittest.mock` --- bắt đầu sử dụng
 =========================================
 
 .. moduleauthor:: Michael Foord <michael@python.org>
@@ -23,41 +23,34 @@
         def static_method():
             pass
 
-Using Mock
-----------
+Sử dụng Mock
+------------
 
-Mock patching methods
-~~~~~~~~~~~~~~~~~~~~~
+Patch phương thức bằng Mock
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Common uses for :class:`Mock` objects include:
+Các cách sử dụng phổ biến cho đối tượng :class:`Mock` bao gồm:
 
-* Patching methods
-* Recording method calls on objects
+* Patch phương thức
+* Ghi lại các lệnh gọi phương thức trên đối tượng
 
-You might want to replace a method on an object to check that
-it is called with the correct arguments by another part of the system:
+Bạn có thể muốn thay thế một phương thức trên một đối tượng để kiểm tra rằng phương thức đó được một phần khác của hệ thống gọi với các đối số chính xác:
 
     >>> real = SomeClass()
     >>> real.method = MagicMock(name='method')
     >>> real.method(3, 4, 5, key='value')
     <MagicMock name='method()' id='...'>
 
-Once our mock has been used (``real.method`` in this example) it has methods
-and attributes that allow you to make assertions about how it has been used.
+Sau khi mock của chúng ta đã được sử dụng (``real.method`` trong ví dụ này), nó có các phương thức và thuộc tính cho phép bạn kiểm tra cách nó đã được sử dụng.
 
 .. note::
 
-    In most of these examples the :class:`Mock` and :class:`MagicMock` classes
-    are interchangeable. As the ``MagicMock`` is the more capable class it makes
-    a sensible one to use by default.
+    Trong hầu hết các ví dụ này, hai lớp :class:`Mock` và :class:`MagicMock` có thể thay thế cho nhau. Vì ``MagicMock`` là lớp có nhiều khả năng hơn, nên việc sử dụng lớp này làm mặc định là hợp lý.
 
-Once the mock has been called its :attr:`~Mock.called` attribute is set to
-``True``. More importantly we can use the :meth:`~Mock.assert_called_with` or
-:meth:`~Mock.assert_called_once_with` method to check that it was called with
-the correct arguments.
+Sau khi mock được gọi, thuộc tính :attr:`~Mock.called` của nó được đặt thành ``True``. Quan trọng hơn, chúng ta có thể sử dụng :meth:`~Mock.assert_called_with` hoặc
+phương thức :meth:`~Mock.assert_called_once_with` để kiểm tra rằng nó đã được gọi với các đối số chính xác.
 
-This example tests that calling ``ProductionClass().method`` results in a call to
-the ``something`` method:
+Ví dụ này kiểm tra rằng việc gọi ``ProductionClass().method`` sẽ dẫn đến một lần gọi phương thức ``something``:
 
     >>> class ProductionClass:
     ...     def method(self):
@@ -72,48 +65,34 @@ the ``something`` method:
 
 
 
-Mock for method calls on an object
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Mock cho các lần gọi phương thức trên một đối tượng
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In the last example we patched a method directly on an object to check that it
-was called correctly. Another common use case is to pass an object into a
-method (or some part of the system under test) and then check that it is used
-in the correct way.
+Trong ví dụ trước, chúng ta đã patch trực tiếp một phương thức trên một đối tượng để kiểm tra rằng nó được gọi chính xác. Một trường hợp sử dụng phổ biến khác là truyền một đối tượng vào một phương thức (hoặc một phần nào đó của hệ thống đang được kiểm thử), rồi kiểm tra rằng đối tượng đó được sử dụng đúng cách.
 
-The simple ``ProductionClass`` below has a ``closer`` method. If it is called with
-an object then it calls ``close`` on it.
+``ProductionClass`` đơn giản dưới đây có một phương thức ``closer``. Nếu được gọi với một đối tượng, nó sẽ gọi ``close`` trên đối tượng đó.
 
     >>> class ProductionClass:
     ...     def closer(self, something):
     ...         something.close()
     ...
 
-So to test it we need to pass in an object with a ``close`` method and check
-that it was called correctly.
+Vì vậy, để kiểm thử, chúng ta cần truyền vào một đối tượng có phương thức ``close`` và kiểm tra xem phương thức đó có được gọi đúng cách hay không.
 
     >>> real = ProductionClass()
     >>> mock = Mock()
     >>> real.closer(mock)
     >>> mock.close.assert_called_with()
 
-We don't have to do any work to provide the 'close' method on our mock.
-Accessing close creates it. So, if 'close' hasn't already been called then
-accessing it in the test will create it, but :meth:`~Mock.assert_called_with`
-will raise a failure exception.
+Chúng ta không cần thực hiện thêm thao tác nào để cung cấp phương thức 'close' trên mock. Việc truy cập close sẽ tạo phương thức đó. Vì vậy, nếu 'close' chưa được gọi thì việc truy cập nó trong bài kiểm thử sẽ tạo ra phương thức này, nhưng :meth:`~Mock.assert_called_with` sẽ phát sinh một ngoại lệ báo lỗi.
 
 
-Mocking classes
-~~~~~~~~~~~~~~~
+Mock các lớp
+~~~~~~~~~~~~
 
-A common use case is to mock out classes instantiated by your code under test.
-When you patch a class, then that class is replaced with a mock. Instances
-are created by *calling the class*. This means you access the "mock instance"
-by looking at the return value of the mocked class.
+Một trường hợp sử dụng phổ biến là mock các lớp được khởi tạo bởi code đang được kiểm thử. Khi bạn patch một lớp, lớp đó sẽ được thay thế bằng một mock. Các instance được tạo bằng cách *gọi lớp*. Điều này có nghĩa là bạn truy cập "mock instance" bằng cách xem giá trị trả về của lớp đã được mock.
 
-In the example below we have a function ``some_function`` that instantiates ``Foo``
-and calls a method on it. The call to :func:`patch` replaces the class ``Foo`` with a
-mock. The ``Foo`` instance is the result of calling the mock, so it is configured
-by modifying the mock :attr:`~Mock.return_value`. ::
+Trong ví dụ dưới đây, chúng ta có một hàm ``some_function`` khởi tạo ``Foo`` và gọi một phương thức trên đó. Lệnh gọi :func:`patch` thay thế lớp ``Foo`` bằng một mock. Instance ``Foo`` là kết quả của việc gọi mock, vì vậy instance này được cấu hình bằng cách sửa đổi mock :attr:`~Mock.return_value`.::
 
     >>> def some_function():
     ...     instance = module.Foo()
@@ -126,12 +105,10 @@ by modifying the mock :attr:`~Mock.return_value`. ::
     ...     assert result == 'the result'
 
 
-Naming your mocks
-~~~~~~~~~~~~~~~~~
+Đặt tên cho mock
+~~~~~~~~~~~~~~~~
 
-It can be useful to give your mocks a name. The name is shown in the repr of
-the mock and can be helpful when the mock appears in test failure messages. The
-name is also propagated to attributes or methods of the mock:
+Việc đặt tên cho các mock có thể rất hữu ích. Tên này được hiển thị trong repr của mock và có thể giúp ích khi mock xuất hiện trong các thông báo kiểm thử thất bại. Tên này cũng được truyền cho các thuộc tính hoặc phương thức của mock:
 
     >>> mock = MagicMock(name='foo')
     >>> mock
@@ -140,12 +117,11 @@ name is also propagated to attributes or methods of the mock:
     <MagicMock name='foo.method' id='...'>
 
 
-Tracking all calls
-~~~~~~~~~~~~~~~~~~
+Theo dõi tất cả các lời gọi
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Often you want to track more than a single call to a method. The
-:attr:`~Mock.mock_calls` attribute records all calls
-to child attributes of the mock - and also to their children.
+Thông thường, bạn muốn theo dõi nhiều hơn một lời gọi đến một phương thức. Đối tượng
+:attr:`~Mock.mock_calls` ghi lại tất cả các lời gọi đến các thuộc tính con của mock, cũng như đến các thuộc tính con của chúng.
 
     >>> mock = MagicMock()
     >>> mock.method()
@@ -155,20 +131,15 @@ to child attributes of the mock - and also to their children.
     >>> mock.mock_calls
     [call.method(), call.attribute.method(10, x=53)]
 
-If you make an assertion about ``mock_calls`` and any unexpected methods
-have been called, then the assertion will fail. This is useful because as well
-as asserting that the calls you expected have been made, you are also checking
-that they were made in the right order and with no additional calls:
+Nếu bạn thực hiện một assertion về ``mock_calls`` và bất kỳ phương thức không mong đợi nào đã được gọi, assertion sẽ thất bại. Điều này hữu ích vì ngoài việc xác nhận rằng các lời gọi bạn mong đợi đã được thực hiện, bạn còn kiểm tra rằng chúng được thực hiện đúng thứ tự và không có lời gọi bổ sung nào:
 
-You use the :data:`call` object to construct lists for comparing with
-``mock_calls``:
+Bạn sử dụng đối tượng :data:`call` để tạo các danh sách dùng cho việc so sánh với ``mock_calls``:
 
     >>> expected = [call.method(), call.attribute.method(10, x=53)]
     >>> mock.mock_calls == expected
     True
 
-However, parameters to calls that return mocks are not recorded, which means it is not
-possible to track nested calls where the parameters used to create ancestors are important:
+Tuy nhiên, các tham số của những lời gọi trả về mock không được ghi lại, điều này có nghĩa là không thể theo dõi các lời gọi lồng nhau khi các tham số được dùng để tạo các đối tượng tổ tiên là quan trọng:
 
     >>> m = Mock()
     >>> m.factory(important=True).deliver()
@@ -177,42 +148,39 @@ possible to track nested calls where the parameters used to create ancestors are
     True
 
 
-Setting return values and attributes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Thiết lập giá trị trả về và thuộc tính
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Setting the return values on a mock object is trivially easy:
+Việc thiết lập các giá trị trả về trên một đối tượng mock cực kỳ đơn giản:
 
     >>> mock = Mock()
     >>> mock.return_value = 3
     >>> mock()
     3
 
-Of course you can do the same for methods on the mock:
+Tất nhiên, bạn cũng có thể làm tương tự với các phương thức trên mock:
 
     >>> mock = Mock()
     >>> mock.method.return_value = 3
     >>> mock.method()
     3
 
-The return value can also be set in the constructor:
+Giá trị trả về cũng có thể được thiết lập trong constructor:
 
     >>> mock = Mock(return_value=3)
     >>> mock()
     3
 
-If you need an attribute setting on your mock, just do it:
+Nếu cần thiết lập một thuộc tính trên mock, chỉ cần thực hiện như sau:
 
     >>> mock = Mock()
     >>> mock.x = 3
     >>> mock.x
     3
 
-Sometimes you want to mock up a more complex situation, like for example
-``mock.connection.cursor().execute("SELECT 1")``. If we wanted this call to
-return a list, then we have to configure the result of the nested call.
+Đôi khi bạn muốn mô phỏng một tình huống phức tạp hơn, chẳng hạn như ``mock.connection.cursor().execute("SELECT 1")``. Nếu muốn lệnh gọi này trả về một danh sách, chúng ta phải cấu hình kết quả của lệnh gọi lồng nhau.
 
-We can use :data:`call` to construct the set of calls in a "chained call" like
-this for easy assertion afterwards:
+Chúng ta có thể sử dụng :data:`call` để xây dựng tập hợp các lệnh gọi trong một "lệnh gọi chuỗi" như sau, giúp dễ dàng assertion sau đó:
 
     >>> mock = Mock()
     >>> cursor = mock.connection.cursor.return_value
@@ -225,16 +193,13 @@ this for easy assertion afterwards:
     >>> mock.mock_calls == expected
     True
 
-It is the call to ``.call_list()`` that turns our call object into a list of
-calls representing the chained calls.
+Chính lệnh gọi đến ``.call_list()`` sẽ chuyển đối tượng call của chúng ta thành một danh sách các lệnh gọi biểu diễn các lệnh gọi được chain.
 
 
-Raising exceptions with mocks
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Tạo exception bằng mock
+~~~~~~~~~~~~~~~~~~~~~~~
 
-A useful attribute is :attr:`~Mock.side_effect`. If you set this to an
-exception class or instance then the exception will be raised when the mock
-is called.
+Một thuộc tính hữu ích là :attr:`~Mock.side_effect`. Nếu đặt thuộc tính này thành một exception class hoặc instance, exception sẽ được raise khi mock được gọi.
 
     >>> mock = Mock(side_effect=Exception('Boom!'))
     >>> mock()
@@ -243,14 +208,10 @@ is called.
     Exception: Boom!
 
 
-Side effect functions and iterables
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Các hàm và iterable side effect
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``side_effect`` can also be set to a function or an iterable. The use case for
-``side_effect`` as an iterable is where your mock is going to be called several
-times, and you want each call to return a different value. When you set
-``side_effect`` to an iterable every call to the mock returns the next value
-from the iterable:
+``side_effect`` cũng có thể được đặt thành một hàm hoặc iterable. Trường hợp sử dụng ``side_effect`` dưới dạng iterable là khi mock của bạn sẽ được gọi nhiều lần và bạn muốn mỗi lần gọi trả về một giá trị khác nhau. Khi đặt ``side_effect`` thành một iterable, mỗi lần gọi mock sẽ trả về giá trị tiếp theo từ iterable:
 
     >>> mock = MagicMock(side_effect=[4, 5, 6])
     >>> mock()
@@ -261,10 +222,7 @@ from the iterable:
     6
 
 
-For more advanced use cases, like dynamically varying the return values
-depending on what the mock is called with, ``side_effect`` can be a function.
-The function will be called with the same arguments as the mock. Whatever the
-function returns is what the call returns:
+Đối với các trường hợp sử dụng nâng cao hơn, chẳng hạn như thay đổi động các giá trị trả về tùy thuộc vào đối số được truyền khi gọi mock, ``side_effect`` có thể là một hàm. Hàm này sẽ được gọi với cùng các đối số như mock. Hàm trả về giá trị nào thì lệnh gọi sẽ trả về giá trị đó:
 
     >>> vals = {(1, 2): 1, (2, 3): 2}
     >>> def side_effect(*args):
@@ -277,15 +235,13 @@ function returns is what the call returns:
     2
 
 
-Mocking asynchronous iterators
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Mock asynchronous iterator
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Since Python 3.8, ``AsyncMock`` and ``MagicMock`` have support to mock
-:ref:`async-iterators` through ``__aiter__``. The :attr:`~Mock.return_value`
-attribute of ``__aiter__`` can be used to set the return values to be used for
-iteration.
+Kể từ Python 3.8, ``AsyncMock`` và ``MagicMock`` đã hỗ trợ mô phỏng
+:ref:`async-iterators` đến ``__aiter__``. Thuộc tính :attr:`~Mock.return_value` của ``__aiter__`` có thể được dùng để thiết lập các giá trị trả về dùng cho việc lặp.
 
-    >>> mock = MagicMock()  # AsyncMock also works here
+    >>> mock = MagicMock()  # AsyncMock cũng hoạt động trong trường hợp này
     >>> mock.__aiter__.return_value = [1, 2, 3]
     >>> async def main():
     ...     return [i async for i in mock]
@@ -294,13 +250,11 @@ iteration.
     [1, 2, 3]
 
 
-Mocking asynchronous context manager
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Mô phỏng asynchronous context manager
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Since Python 3.8, ``AsyncMock`` and ``MagicMock`` have support to mock
-:ref:`async-context-managers` through ``__aenter__`` and ``__aexit__``.
-By default, ``__aenter__`` and ``__aexit__`` are ``AsyncMock`` instances that
-return an async function.
+Kể từ Python 3.8, ``AsyncMock`` và ``MagicMock`` đã hỗ trợ mô phỏng
+:ref:`async-context-managers` đến ``__aenter__`` và ``__aexit__``. Theo mặc định, ``__aenter__`` và ``__aexit__`` là các instance ``AsyncMock`` trả về một hàm bất đồng bộ.
 
     >>> class AsyncContextManager:
     ...     async def __aenter__(self):
@@ -308,7 +262,7 @@ return an async function.
     ...     async def __aexit__(self, exc_type, exc, tb):
     ...         pass
     ...
-    >>> mock_instance = MagicMock(AsyncContextManager())  # AsyncMock also works here
+    >>> mock_instance = MagicMock(AsyncContextManager())  # AsyncMock cũng hoạt động trong trường hợp này
     >>> async def main():
     ...     async with mock_instance as result:
     ...         pass
@@ -318,22 +272,12 @@ return an async function.
     >>> mock_instance.__aexit__.assert_awaited_once()
 
 
-Creating a mock from an existing object
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Tạo một mock từ một đối tượng hiện có
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-One problem with over use of mocking is that it couples your tests to the
-implementation of your mocks rather than your real code. Suppose you have a
-class that implements ``some_method``. In a test for another class, you
-provide a mock of this object that *also* provides ``some_method``. If later
-you refactor the first class, so that it no longer has ``some_method`` - then
-your tests will continue to pass even though your code is now broken!
+Một vấn đề với việc lạm dụng mocking là nó khiến các bài kiểm thử của bạn phụ thuộc vào cách triển khai của các mock thay vì mã thực tế. Giả sử bạn có một class triển khai ``some_method``. Trong bài kiểm thử cho một class khác, bạn cung cấp một mock của đối tượng này mà *cũng* cung cấp ``some_method``. Nếu sau này bạn tái cấu trúc class đầu tiên để nó không còn ``some_method`` nữa thì các bài kiểm thử của bạn vẫn tiếp tục đạt, mặc dù mã của bạn hiện đã bị hỏng!
 
-:class:`Mock` allows you to provide an object as a specification for the mock,
-using the *spec* keyword argument. Accessing methods / attributes on the
-mock that don't exist on your specification object will immediately raise an
-attribute error. If you change the implementation of your specification, then
-tests that use that class will start failing immediately without you having to
-instantiate the class in those tests.
+:class:`Mock` cho phép bạn cung cấp một đối tượng làm đặc tả cho mock bằng cách sử dụng đối số từ khóa *spec*. Việc truy cập các method / thuộc tính trên mock không tồn tại trên đối tượng đặc tả sẽ ngay lập tức gây ra lỗi thuộc tính. Nếu bạn thay đổi cách triển khai của đối tượng đặc tả, các bài kiểm thử sử dụng class đó sẽ bắt đầu thất bại ngay lập tức mà bạn không cần phải khởi tạo class trong các bài kiểm thử đó.
 
     >>> mock = Mock(spec=SomeClass)
     >>> mock.old_method()
@@ -341,9 +285,7 @@ instantiate the class in those tests.
        ...
     AttributeError: Mock object has no attribute 'old_method'. Did you mean: 'class_method'?
 
-Using a specification also enables a smarter matching of calls made to the
-mock, regardless of whether some parameters were passed as positional or
-named arguments::
+Việc sử dụng đặc tả cũng cho phép đối sánh thông minh hơn các lời gọi được thực hiện đến mock, bất kể một số tham số được truyền dưới dạng đối số vị trí hay đối số có tên.::
 
    >>> def f(a, b, c): pass
    ...
@@ -352,20 +294,15 @@ named arguments::
    <Mock name='mock()' id='140161580456576'>
    >>> mock.assert_called_with(a=1, b=2, c=3)
 
-If you want this smarter matching to also work with method calls on the mock,
-you can use :ref:`auto-speccing <auto-speccing>`.
+Nếu muốn việc đối sánh thông minh hơn này cũng hoạt động với các lời gọi method trên mock, bạn có thể sử dụng :ref:`auto-speccing <auto-speccing>`.
 
-If you want a stronger form of specification that prevents the setting
-of arbitrary attributes as well as the getting of them then you can use
-*spec_set* instead of *spec*.
+Nếu muốn một dạng đặc tả chặt chẽ hơn, ngăn việc thiết lập các thuộc tính tùy ý cũng như việc lấy chúng, bạn có thể sử dụng *spec_set* thay cho *spec*.
 
 
-Using side_effect to return per file content
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Sử dụng side_effect để trả về nội dung theo từng tệp
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:func:`mock_open` is used to patch :func:`open` method. :attr:`~Mock.side_effect`
-can be used to return a new Mock object per call. This can be used to return different
-contents per file stored in a dictionary::
+:func:`mock_open` được dùng để patch phương thức :func:`open`. :attr:`~Mock.side_effect` có thể được dùng để trả về một đối tượng Mock mới cho mỗi lần gọi. Cách này có thể được dùng để trả về nội dung khác nhau cho từng tệp được lưu trong một dictionary::
 
    DEFAULT = "default"
    data_dict = {"file1": "data1",
@@ -385,29 +322,18 @@ contents per file stored in a dictionary::
            assert file2.read() == "default"
 
 
-Patch decorators
-----------------
+Các decorator patch
+-------------------
 
 .. note::
 
-   With :func:`patch` it matters that you patch objects in the namespace where
-   they are looked up. This is normally straightforward, but for a quick guide
-   read :ref:`where to patch <where-to-patch>`.
+   Với :func:`patch`, điều quan trọng là bạn phải patch các đối tượng trong namespace nơi chúng được tra cứu. Điều này thường khá đơn giản, nhưng để xem hướng dẫn nhanh, hãy đọc :ref:`where to patch <where-to-patch>`.
 
 
-A common need in tests is to patch a class attribute or a module attribute,
-for example patching a builtin or patching a class in a module to test that it
-is instantiated. Modules and classes are effectively global, so patching on
-them has to be undone after the test or the patch will persist into other
-tests and cause hard to diagnose problems.
+Một nhu cầu phổ biến trong các bài kiểm thử là patch thuộc tính của class hoặc thuộc tính của module, chẳng hạn như patch một builtin hoặc patch một class trong module để kiểm tra xem nó có được khởi tạo hay không. Các module và class về cơ bản là global, vì vậy việc patch chúng phải được hoàn tác sau bài kiểm thử; nếu không, patch sẽ tiếp tục tồn tại trong các bài kiểm thử khác và gây ra những vấn đề khó chẩn đoán.
 
-mock provides three convenient decorators for this: :func:`patch`, :func:`patch.object` and
-:func:`patch.dict`. ``patch`` takes a single string, of the form
-``package.module.Class.attribute`` to specify the attribute you are patching. It
-also optionally takes a value that you want the attribute (or class or
-whatever) to be replaced with. 'patch.object' takes an object and the name of
-the attribute you would like patched, plus optionally the value to patch it
-with.
+mock cung cấp ba decorator tiện lợi cho việc này: :func:`patch`, :func:`patch.object` và
+:func:`patch.dict`. ``patch`` nhận một chuỗi duy nhất, có dạng ``package.module.Class.attribute``, để chỉ định thuộc tính bạn đang patch. Nó cũng có thể nhận một giá trị mà bạn muốn thay thế thuộc tính (hoặc class hay đối tượng tương tự) bằng giá trị đó. 'patch.object' nhận một đối tượng và tên của thuộc tính bạn muốn patch, cùng với tùy chọn giá trị dùng để patch thuộc tính đó.
 
 ``patch.object``::
 
@@ -426,8 +352,7 @@ with.
     ...
     >>> test()
 
-If you are patching a module (including :mod:`builtins`) then use :func:`patch`
-instead of :func:`patch.object`:
+Nếu bạn đang patch một module (bao gồm :mod:`builtins`) thì hãy dùng :func:`patch` thay vì :func:`patch.object`:
 
     >>> mock = MagicMock(return_value=sentinel.file_handle)
     >>> with patch('builtins.open', mock):
@@ -436,7 +361,7 @@ instead of :func:`patch.object`:
     >>> mock.assert_called_with('filename', 'r')
     >>> assert handle == sentinel.file_handle, "incorrect file handle returned"
 
-The module name can be 'dotted', in the form ``package.module`` if needed::
+Tên module có thể ở dạng 'dotted', theo mẫu ``package.module`` nếu cần::
 
     >>> @patch('package.module.ClassName.attribute', sentinel.attribute)
     ... def test():
@@ -445,7 +370,7 @@ The module name can be 'dotted', in the form ``package.module`` if needed::
     ...
     >>> test()
 
-A nice pattern is to actually decorate test methods themselves:
+Một pattern hữu ích là thực sự decorate chính các phương thức test:
 
     >>> class MyTest(unittest.TestCase):
     ...     @patch.object(SomeClass, 'attribute', sentinel.attribute)
@@ -456,9 +381,7 @@ A nice pattern is to actually decorate test methods themselves:
     >>> MyTest('test_something').test_something()
     >>> assert SomeClass.attribute == original
 
-If you want to patch with a Mock, you can use :func:`patch` with only one argument
-(or :func:`patch.object` with two arguments). The mock will be created for you and
-passed into the test function / method:
+Nếu bạn muốn patch bằng một Mock, bạn có thể sử dụng :func:`patch` chỉ với một đối số (hoặc :func:`patch.object` với hai đối số). Mock sẽ được tạo cho bạn và truyền vào hàm / phương thức test:
 
     >>> class MyTest(unittest.TestCase):
     ...     @patch.object(SomeClass, 'static_method')
@@ -468,7 +391,7 @@ passed into the test function / method:
     ...
     >>> MyTest('test_something').test_something()
 
-You can stack up multiple patch decorators using this pattern::
+Bạn có thể xếp chồng nhiều patch decorator bằng pattern này::
 
     >>> class MyTest(unittest.TestCase):
     ...     @patch('package.module.ClassName1')
@@ -479,14 +402,9 @@ You can stack up multiple patch decorators using this pattern::
     ...
     >>> MyTest('test_something').test_something()
 
-When you nest patch decorators the mocks are passed in to the decorated
-function in the same order they applied (the normal *Python* order that
-decorators are applied). This means from the bottom up, so in the example
-above the mock for ``test_module.ClassName2`` is passed in first.
+Khi lồng các patch decorator, các mock được truyền vào hàm đã decorate theo cùng thứ tự mà chúng được áp dụng (thứ tự *Python* thông thường khi áp dụng decorator). Điều này có nghĩa là theo thứ tự từ dưới lên, nên trong ví dụ trên, mock cho ``test_module.ClassName2`` được truyền vào trước tiên.
 
-There is also :func:`patch.dict` for setting values in a dictionary just
-during a scope and restoring the dictionary to its original state when the test
-ends:
+Ngoài ra còn có :func:`patch.dict` để thiết lập các giá trị trong một dictionary chỉ trong một scope và khôi phục dictionary về trạng thái ban đầu khi test kết thúc:
 
    >>> foo = {'key': 'value'}
    >>> original = foo.copy()
@@ -495,10 +413,9 @@ ends:
    ...
    >>> assert foo == original
 
-``patch``, ``patch.object`` and ``patch.dict`` can all be used as context managers.
+``patch``, ``patch.object`` và ``patch.dict`` đều có thể được sử dụng làm context manager.
 
-Where you use :func:`patch` to create a mock for you, you can get a reference to the
-mock using the "as" form of the with statement:
+Khi bạn sử dụng :func:`patch` để tạo mock cho mình, bạn có thể lấy tham chiếu đến mock bằng dạng "as" của câu lệnh with:
 
     >>> class ProductionClass:
     ...     def method(self):
@@ -512,68 +429,50 @@ mock using the "as" form of the with statement:
     >>> mock_method.assert_called_with(1, 2, 3)
 
 
-As an alternative ``patch``, ``patch.object`` and ``patch.dict`` can be used as
-class decorators. When used in this way it is the same as applying the
-decorator individually to every method whose name starts with "test".
+Ngoài ``patch``, ``patch.object`` và ``patch.dict`` cũng có thể được sử dụng làm class decorator. Khi được sử dụng theo cách này, chúng tương đương với việc áp dụng decorator riêng lẻ cho mọi phương thức có tên bắt đầu bằng "test".
 
 
 .. _further-examples:
 
-Further examples
-----------------
+Các ví dụ khác
+--------------
 
 
-Here are some more examples for some slightly more advanced scenarios.
+Dưới đây là thêm một số ví dụ cho các tình huống nâng cao hơn một chút.
 
 
-Mocking chained calls
-~~~~~~~~~~~~~~~~~~~~~
+Mock các lời gọi liên tiếp
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Mocking chained calls is actually straightforward with mock once you
-understand the :attr:`~Mock.return_value` attribute. When a mock is called for
-the first time, or you fetch its ``return_value`` before it has been called, a
-new :class:`Mock` is created.
+Mock các lời gọi liên tiếp thực ra khá đơn giản với mock khi bạn hiểu thuộc tính :attr:`~Mock.return_value`. Khi một mock được gọi lần đầu tiên, hoặc bạn lấy ``return_value`` của nó trước khi nó được gọi, một :class:`Mock` mới sẽ được tạo.
 
-This means that you can see how the object returned from a call to a mocked
-object has been used by interrogating the ``return_value`` mock:
+Điều này có nghĩa là bạn có thể xem đối tượng được trả về từ một lời gọi đến một đối tượng được mock đã được sử dụng như thế nào bằng cách kiểm tra mock ``return_value``:
 
     >>> mock = Mock()
     >>> mock().foo(a=2, b=3)
     <Mock name='mock().foo()' id='...'>
     >>> mock.return_value.foo.assert_called_with(a=2, b=3)
 
-From here it is a simple step to configure and then make assertions about
-chained calls. Of course another alternative is writing your code in a more
-testable way in the first place...
+Từ đây, việc cấu hình rồi đưa ra các assertion về những lời gọi được chain là một bước đơn giản. Tất nhiên, một lựa chọn khác là ngay từ đầu viết code theo cách dễ kiểm thử hơn...
 
-So, suppose we have some code that looks a little bit like this:
+Giả sử chúng ta có một đoạn code trông gần giống như sau:
 
     >>> class Something:
     ...     def __init__(self):
     ...         self.backend = BackendProvider()
     ...     def method(self):
     ...         response = self.backend.get_endpoint('foobar').create_call('spam', 'eggs').start_call()
-    ...         # more code
+    ...         # thêm code
 
-Assuming that ``BackendProvider`` is already well tested, how do we test
-``method()``? Specifically, we want to test that the code section ``# more
-code`` uses the response object in the correct way.
+Giả sử ``BackendProvider`` đã được kiểm thử kỹ, làm thế nào để kiểm thử ``method()``? Cụ thể, chúng ta muốn kiểm thử rằng phần code ``# more code`` sử dụng response object theo đúng cách.
 
-As this chain of calls is made from an instance attribute we can monkey patch
-the ``backend`` attribute on a ``Something`` instance. In this particular case
-we are only interested in the return value from the final call to
-``start_call`` so we don't have much configuration to do. Let's assume the
-object it returns is 'file-like', so we'll ensure that our response object
-uses the builtin :func:`open` as its ``spec``.
+Vì chuỗi lời gọi này được thực hiện từ một instance attribute, chúng ta có thể monkey patch attribute ``backend`` trên một instance ``Something``. Trong trường hợp cụ thể này, chúng ta chỉ quan tâm đến giá trị trả về từ lời gọi cuối cùng đến ``start_call``, nên không cần cấu hình nhiều. Giả sử object mà nó trả về có tính chất 'file-like', vì vậy chúng ta sẽ đảm bảo response object sử dụng :func:`open` tích hợp sẵn làm ``spec`` của nó.
 
-To do this we create a mock instance as our mock backend and create a mock
-response object for it. To set the response as the return value for that final
-``start_call`` we could do this::
+Để thực hiện việc này, chúng ta tạo một mock instance làm mock backend và tạo một mock response object cho nó. Để đặt response làm giá trị trả về cho ``start_call`` cuối cùng đó, chúng ta có thể làm như sau::
 
     mock_backend.get_endpoint.return_value.create_call.return_value.start_call.return_value = mock_response
 
-We can do that in a slightly nicer way using the :meth:`~Mock.configure_mock`
-method to directly set the return value for us::
+Chúng ta có thể thực hiện việc đó theo cách gọn hơn một chút bằng cách sử dụng method :meth:`~Mock.configure_mock` để trực tiếp đặt giá trị trả về cho chúng ta::
 
     >>> something = Something()
     >>> mock_response = Mock(spec=open)
@@ -581,39 +480,26 @@ method to directly set the return value for us::
     >>> config = {'get_endpoint.return_value.create_call.return_value.start_call.return_value': mock_response}
     >>> mock_backend.configure_mock(**config)
 
-With these we monkey patch the "mock backend" in place and can make the real
-call::
+Với các đối tượng này, chúng ta monkey patch "mock backend" tại chỗ và có thể thực hiện lời gọi thực::
 
     >>> something.backend = mock_backend
     >>> something.method()
 
-Using :attr:`~Mock.mock_calls` we can check the chained call with a single
-assert. A chained call is several calls in one line of code, so there will be
-several entries in ``mock_calls``. We can use :meth:`call.call_list` to create
-this list of calls for us::
+Bằng cách sử dụng :attr:`~Mock.mock_calls`, chúng ta có thể kiểm tra lời gọi liên kết bằng một assert duy nhất. Một lời gọi liên kết là nhiều lời gọi trong cùng một dòng mã, vì vậy sẽ có nhiều mục trong ``mock_calls``. Chúng ta có thể sử dụng :meth:`call.call_list` để tự tạo danh sách các lời gọi này::
 
     >>> chained = call.get_endpoint('foobar').create_call('spam', 'eggs').start_call()
     >>> call_list = chained.call_list()
     >>> assert mock_backend.mock_calls == call_list
 
 
-Partial mocking
-~~~~~~~~~~~~~~~
+Mock một phần
+~~~~~~~~~~~~~
 
-For some tests, you may want to mock out a call to :meth:`datetime.date.today`
-to return a known date, but don't want to prevent the code under test from
-creating new date objects. Unfortunately :class:`datetime.date` is written in C,
-so you cannot just monkey-patch out the static :meth:`datetime.date.today` method.
+Đối với một số bài kiểm thử, bạn có thể muốn mock một lời gọi đến :meth:`datetime.date.today` để trả về một ngày đã biết, nhưng không muốn ngăn mã đang được kiểm thử tạo các đối tượng ngày mới. Đáng tiếc là :class:`datetime.date` được viết bằng C, vì vậy bạn không thể פשוט monkey patch phương thức tĩnh :meth:`datetime.date.today`.
 
-Instead, you can effectively wrap the date
-class with a mock, while passing through calls to the constructor to the real
-class (and returning real instances).
+Thay vào đó, bạn có thể thực chất bọc lớp date bằng một mock, đồng thời chuyển tiếp các lời gọi đến hàm khởi tạo cho lớp thực (và trả về các instance thực).
 
-The :func:`patch decorator <patch>` is used here to
-mock out the ``date`` class in the module under test. The :attr:`~Mock.side_effect`
-attribute on the mock date class is then set to a lambda function that returns
-a real date. When the mock date class is called a real date will be
-constructed and returned by ``side_effect``. ::
+:func:`patch decorator <patch>` được dùng ở đây để mock lớp ``date`` trong mô-đun đang được kiểm thử. Sau đó, thuộc tính :attr:`~Mock.side_effect` trên lớp date mock được gán cho một hàm lambda trả về một date thực. Khi lớp date mock được gọi, một date thực sẽ được tạo và được ``side_effect`` trả về.::
 
     >>> import datetime as dt
     >>> with patch('mymodule.date') as mock_date:
@@ -623,34 +509,23 @@ constructed and returned by ``side_effect``. ::
     ...     assert mymodule.date.today() == dt.date(2010, 10, 8)
     ...     assert mymodule.date(2009, 6, 8) == dt.date(2009, 6, 8)
 
-Note that we don't patch :class:`datetime.date` globally, we patch ``date`` in the
-module that *uses* it. See :ref:`where to patch <where-to-patch>`.
+Lưu ý rằng chúng ta không patch :class:`datetime.date` trên toàn cục, mà patch ``date`` trong mô-đun mà *sử dụng* nó. Xem :ref:`nơi cần patch <where-to-patch>`.
 
-When ``date.today()`` is called a known date is returned, but calls to the
-``date(...)`` constructor still return normal dates. Without this you can find
-yourself having to calculate an expected result using exactly the same
-algorithm as the code under test, which is a classic testing anti-pattern.
+Khi ``date.today()`` được gọi, một ngày xác định sẽ được trả về, nhưng các lệnh gọi đến constructor ``date(...)`` vẫn trả về các ngày bình thường. Nếu không có điều này, bạn có thể phải tính toán kết quả mong đợi bằng chính xác cùng một thuật toán với mã đang được kiểm thử, đây là một anti-pattern kinh điển trong testing.
 
-Calls to the date constructor are recorded in the ``mock_date`` attributes
-(``call_count`` and friends) which may also be useful for your tests.
+Các lệnh gọi đến date constructor được ghi lại trong các thuộc tính ``mock_date`` (``call_count`` và các thuộc tính tương tự), những thuộc tính này cũng có thể hữu ích cho các bài kiểm thử của bạn.
 
-An alternative way of dealing with mocking dates, or other builtin classes,
-is discussed in `this blog entry
-<https://williambert.online/2011/07/how-to-unit-testing-in-django-with-mocking-and-patching/>`_.
+Một cách khác để xử lý việc mocking ngày tháng hoặc các lớp builtin khác được thảo luận trong `bài viết blog này <https://williambert.online/2011/07/how-to-unit-testing-in-django-with-mocking-and-patching/>`_.
 
 
-Mocking a generator method
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Mocking một phương thức generator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A Python generator is a function or method that uses the :keyword:`yield` statement
-to return a series of values when iterated over [#]_.
+Python generator là một hàm hoặc phương thức sử dụng câu lệnh :keyword:`yield` để trả về một chuỗi giá trị khi được lặp qua [#]_.
 
-A generator method / function is called to return the generator object. It is
-the generator object that is then iterated over. The protocol method for
-iteration is :meth:`~container.__iter__`, so we can
-mock this using a :class:`MagicMock`.
+Một phương thức / hàm generator được gọi để trả về đối tượng generator. Sau đó, chính đối tượng generator này được lặp qua. Phương thức giao thức dùng cho việc lặp là :meth:`~container.__iter__`, vì vậy chúng ta có thể mock phương thức này bằng một :class:`MagicMock`.
 
-Here's an example class with an "iter" method implemented as a generator:
+Dưới đây là một ví dụ về lớp có phương thức "iter" được triển khai dưới dạng generator:
 
     >>> class Foo:
     ...     def iter(self):
@@ -662,32 +537,23 @@ Here's an example class with an "iter" method implemented as a generator:
     [1, 2, 3]
 
 
-How would we mock this class, and in particular its "iter" method?
+Làm thế nào để mock class này, đặc biệt là phương thức "iter" của nó?
 
-To configure the values returned from the iteration (implicit in the call to
-:class:`list`), we need to configure the object returned by the call to ``foo.iter()``.
+Để cấu hình các giá trị được trả về từ quá trình lặp (được ngầm định trong lệnh gọi
+:class:`list`), chúng ta cần cấu hình đối tượng được trả về bởi lệnh gọi đến ``foo.iter()``.
 
     >>> mock_foo = MagicMock()
     >>> mock_foo.iter.return_value = iter([1, 2, 3])
     >>> list(mock_foo.iter())
     [1, 2, 3]
 
-.. [#] There are also generator expressions and more `advanced uses
-    <http://www.dabeaz.com/coroutines/index.html>`_ of generators, but we aren't
-    concerned about them here. A very good introduction to generators and how
-    powerful they are is: `Generator Tricks for Systems Programmers
-    <http://www.dabeaz.com/generators/>`_.
+.. [#] Ngoài ra còn có generator expression và các `cách sử dụng nâng cao <http://www.dabeaz.com/coroutines/index.html>`_ khác của generator, nhưng ở đây chúng ta không quan tâm đến chúng. Một tài liệu giới thiệu rất hay về generator và sức mạnh của chúng là: `Generator Tricks for Systems Programmers <http://www.dabeaz.com/generators/>`_.
 
 
-Applying the same patch to every test method
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Áp dụng cùng một patch cho mọi phương thức kiểm thử
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you want several patches in place for multiple test methods the obvious way
-is to apply the patch decorators to every method. This can feel like unnecessary
-repetition. Instead, you can use :func:`patch` (in all its
-various forms) as a class decorator. This applies the patches to all test
-methods on the class. A test method is identified by methods whose names start
-with ``test``::
+Nếu muốn áp dụng nhiều patch cho nhiều phương thức kiểm thử, cách rõ ràng nhất là áp dụng các patch decorator cho từng phương thức. Điều này có thể khiến mã bị lặp lại không cần thiết. Thay vào đó, bạn có thể sử dụng :func:`patch` (dưới mọi dạng của nó) làm class decorator. Cách này áp dụng các patch cho mọi phương thức kiểm thử trong class. Một phương thức kiểm thử được xác định là phương thức có tên bắt đầu bằng ``test``::
 
     >>> @patch('mymodule.SomeClass')
     ... class MyTest(unittest.TestCase):
@@ -706,9 +572,9 @@ with ``test``::
     >>> MyTest('test_two').not_a_test()
     'something'
 
-An alternative way of managing patches is to use the :ref:`start-and-stop`.
-These allow you to move the patching into your ``setUp`` and ``tearDown`` methods.
-::
+Một cách khác để quản lý các patch là sử dụng :ref:`start-and-stop`.
+Những điều này cho phép bạn chuyển việc patching vào các phương thức ``setUp`` và ``tearDown``.
+:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     >>> class MyTest(unittest.TestCase):
     ...     def setUp(self):
@@ -723,10 +589,8 @@ These allow you to move the patching into your ``setUp`` and ``tearDown`` method
     ...
     >>> MyTest('test_foo').run()
 
-If you use this technique you must ensure that the patching is "undone" by
-calling ``stop``. This can be fiddlier than you might think, because if an
-exception is raised in the setUp then tearDown is not called.
-:meth:`unittest.TestCase.addCleanup` makes this easier::
+Nếu sử dụng kỹ thuật này, bạn phải đảm bảo việc patching được "hoàn tác" bằng cách gọi ``stop``. Điều này có thể phức tạp hơn bạn nghĩ, vì nếu một exception được raise trong setUp thì tearDown sẽ không được gọi.
+:meth:`unittest.TestCase.addCleanup` giúp việc này dễ dàng hơn::
 
     >>> class MyTest(unittest.TestCase):
     ...     def setUp(self):
@@ -740,27 +604,12 @@ exception is raised in the setUp then tearDown is not called.
     >>> MyTest('test_foo').run()
 
 
-Mocking unbound methods
-~~~~~~~~~~~~~~~~~~~~~~~
+Mocking các unbound method
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Sometimes a test needs to patch an *unbound method*, which means patching the
-method on the class rather than on the instance. In order to make assertions
-about which objects were calling this particular method, you need to pass
-``self`` as the first argument. The issue is that you can't patch with a mock for
-this, because if you replace an unbound method with a mock it doesn't become
-a bound method when fetched from the instance, and so it doesn't get ``self``
-passed in. The workaround is to patch the unbound method with a real function
-instead. The :func:`patch` decorator makes it so simple to patch out methods
-with a mock that having to create a real function becomes a nuisance.
+Đôi khi một test cần patch một *unbound method*, tức là patch method trên class thay vì trên instance. Để có thể assertion về những object nào đang gọi method cụ thể này, bạn cần truyền ``self`` làm đối số đầu tiên. Vấn đề là bạn không thể dùng mock để patch việc này, vì nếu thay thế một unbound method bằng mock thì nó sẽ không trở thành bound method khi được lấy từ instance, và do đó không được truyền ``self`` vào. Cách giải quyết là patch unbound method bằng một function thực sự. Decorator :func:`patch` giúp việc patch method bằng mock trở nên đơn giản đến mức việc phải tạo một function thực sự trở thành điều phiền toái.
 
-If you pass ``autospec=True`` to patch then it does the patching with a
-*real* function object. This function object has the same signature as the one
-it is replacing, but delegates to a mock under the hood. You still get your
-mock auto-created in exactly the same way as before. What it means though, is
-that if you use it to patch out an unbound method on a class the mocked
-function will be turned into a bound method if it is fetched from an instance.
-It will have ``self`` passed in as the first argument, which is exactly what
-was needed:
+Nếu truyền ``autospec=True`` cho patch thì việc patching sẽ được thực hiện bằng một *real* function object. Function object này có cùng signature với function mà nó thay thế, nhưng bên dưới sẽ chuyển tiếp đến một mock. Bạn vẫn nhận được mock được tự động tạo theo đúng cách như trước. Tuy nhiên, điều đó có nghĩa là nếu dùng nó để patch một unbound method trên class, mocked function sẽ được chuyển thành bound method nếu được lấy từ một instance. Nó sẽ được truyền ``self`` làm đối số đầu tiên, đúng như yêu cầu:
 
     >>> class Foo:
     ...   def foo(self):
@@ -774,23 +623,22 @@ was needed:
     'foo'
     >>> mock_foo.assert_called_once_with(foo)
 
-If we don't use ``autospec=True`` then the unbound method is patched out
-with a Mock instance instead, and isn't called with ``self``.
+Nếu không dùng ``autospec=True`` thì unbound method sẽ được patch bằng một Mock instance thay thế, và không được gọi với ``self``.
 
 
-Checking multiple calls with mock
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Kiểm tra nhiều lần gọi bằng mock
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-mock has a nice API for making assertions about how your mock objects are used.
+mock có một API tiện lợi để đưa ra các assertion về cách các mock object của bạn được sử dụng.
 
     >>> mock = Mock()
     >>> mock.foo_bar.return_value = None
     >>> mock.foo_bar('baz', spam='eggs')
     >>> mock.foo_bar.assert_called_with('baz', spam='eggs')
 
-If your mock is only being called once you can use the
-:meth:`~Mock.assert_called_once_with` method that also asserts that the
-:attr:`~Mock.call_count` is one.
+Nếu mock của bạn chỉ được gọi một lần, bạn có thể sử dụng
+phương thức :meth:`~Mock.assert_called_once_with`, phương thức này cũng kiểm tra rằng
+:attr:`~Mock.call_count` là một.
 
     >>> mock.foo_bar.assert_called_once_with('baz', spam='eggs')
     >>> mock.foo_bar()
@@ -800,9 +648,7 @@ If your mock is only being called once you can use the
     AssertionError: Expected 'foo_bar' to be called once. Called 2 times.
     Calls: [call('baz', spam='eggs'), call()].
 
-Both ``assert_called_with`` and ``assert_called_once_with`` make assertions about
-the *most recent* call. If your mock is going to be called several times, and
-you want to make assertions about *all* those calls you can use
+Cả ``assert_called_with`` và ``assert_called_once_with`` đều đưa ra assertion về lần gọi *gần đây nhất*. Nếu mock của bạn sẽ được gọi nhiều lần và bạn muốn đưa ra assertion về *tất cả* những lần gọi đó, bạn có thể sử dụng
 :attr:`~Mock.call_args_list`:
 
     >>> mock = Mock(return_value=None)
@@ -812,25 +658,19 @@ you want to make assertions about *all* those calls you can use
     >>> mock.call_args_list
     [call(1, 2, 3), call(4, 5, 6), call()]
 
-The :data:`call` helper makes it easy to make assertions about these calls. You
-can build up a list of expected calls and compare it to ``call_args_list``. This
-looks remarkably similar to the repr of the ``call_args_list``:
+Helper :data:`call` giúp bạn dễ dàng đưa ra assertion về những lần gọi này. Bạn có thể tạo một danh sách các lần gọi dự kiến rồi so sánh danh sách đó với ``call_args_list``. Kết quả này trông rất giống với repr của ``call_args_list``:
 
     >>> expected = [call(1, 2, 3), call(4, 5, 6), call()]
     >>> mock.call_args_list == expected
     True
 
 
-Coping with mutable arguments
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Xử lý các đối số có thể thay đổi
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Another situation is rare, but can bite you, is when your mock is called with
-mutable arguments. ``call_args`` and ``call_args_list`` store *references* to the
-arguments. If the arguments are mutated by the code under test then you can no
-longer make assertions about what the values were when the mock was called.
+Một tình huống khác hiếm gặp nhưng có thể gây rắc rối là khi mock được gọi với các đối số có thể thay đổi. ``call_args`` và ``call_args_list`` lưu *các tham chiếu* đến các đối số. Nếu các đối số bị mã đang được kiểm thử thay đổi thì bạn không thể tiếp tục khẳng định các giá trị của chúng tại thời điểm mock được gọi.
 
-Here's some example code that shows the problem. Imagine the following functions
-defined in 'mymodule'::
+Đây là một đoạn mã ví dụ cho thấy vấn đề. Hãy hình dung các hàm sau được định nghĩa trong 'mymodule'::
 
     def frob(val):
         pass
@@ -840,8 +680,7 @@ defined in 'mymodule'::
         frob(val)
         val.clear()
 
-When we try to test that ``grob`` calls ``frob`` with the correct argument look
-what happens::
+Khi thử kiểm tra rằng ``grob`` gọi ``frob`` với đối số chính xác, hãy xem điều gì xảy ra::
 
     >>> with patch('mymodule.frob') as mock_frob:
     ...     val = {6}
@@ -855,17 +694,9 @@ what happens::
     AssertionError: Expected: (({6},), {})
     Called with: ((set(),), {})
 
-One possibility would be for mock to copy the arguments you pass in. This
-could then cause problems if you do assertions that rely on object identity
-for equality.
+Một khả năng là mock sẽ sao chép các đối số mà bạn truyền vào. Tuy nhiên, điều này có thể gây ra vấn đề nếu bạn thực hiện các phép khẳng định dựa vào identity của đối tượng để so sánh bằng nhau.
 
-Here's one solution that uses the :attr:`~Mock.side_effect`
-functionality. If you provide a ``side_effect`` function for a mock then
-``side_effect`` will be called with the same args as the mock. This gives us an
-opportunity to copy the arguments and store them for later assertions. In this
-example I'm using *another* mock to store the arguments so that I can use the
-mock methods for doing the assertion. Again a helper function sets this up for
-me. ::
+Đây là một giải pháp sử dụng chức năng :attr:`~Mock.side_effect`. Nếu cung cấp một hàm ``side_effect`` cho mock thì ``side_effect`` sẽ được gọi với cùng các args như mock. Điều này cho chúng ta cơ hội sao chép các đối số và lưu chúng để khẳng định sau này. Trong ví dụ này, tôi sử dụng *một* mock khác để lưu các đối số, nhờ đó có thể sử dụng các phương thức của mock để thực hiện phép khẳng định. Một lần nữa, một hàm trợ giúp sẽ thiết lập việc này cho tôi.::
 
     >>> from copy import deepcopy
     >>> from unittest.mock import Mock, patch, DEFAULT
@@ -888,15 +719,11 @@ me. ::
     >>> new_mock.call_args
     call({6})
 
-``copy_call_args`` is called with the mock that will be called. It returns a new
-mock that we do the assertion on. The ``side_effect`` function makes a copy of
-the args and calls our ``new_mock`` with the copy.
+``copy_call_args`` được gọi với mock sẽ được gọi. Nó trả về một mock mới để chúng ta thực hiện phép khẳng định. Hàm ``side_effect`` sao chép các args và gọi ``new_mock`` của chúng ta với bản sao đó.
 
 .. note::
 
-    If your mock is only going to be used once there is an easier way of
-    checking arguments at the point they are called. You can simply do the
-    checking inside a ``side_effect`` function.
+    Nếu mock của bạn chỉ được sử dụng một lần, có một cách dễ hơn để kiểm tra các đối số ngay tại thời điểm chúng được gọi. Bạn chỉ cần thực hiện việc kiểm tra bên trong một hàm ``side_effect``.
 
         >>> def side_effect(arg):
         ...     assert arg == {6}
@@ -908,9 +735,8 @@ the args and calls our ``new_mock`` with the copy.
             ...
         AssertionError
 
-An alternative approach is to create a subclass of :class:`Mock` or
-:class:`MagicMock` that copies (using :func:`copy.deepcopy`) the arguments.
-Here's an example implementation:
+Một cách tiếp cận khác là tạo một lớp con của :class:`Mock` hoặc
+:class:`MagicMock` để sao chép các đối số (bằng cách sử dụng :func:`copy.deepcopy`). Dưới đây là một cách triển khai mẫu:
 
     >>> from copy import deepcopy
     >>> class CopyingMock(MagicMock):
@@ -933,17 +759,13 @@ Here's an example implementation:
     >>> c.foo
     <CopyingMock name='mock.foo' id='...'>
 
-When you subclass ``Mock`` or ``MagicMock`` all dynamically created attributes,
-and the ``return_value`` will use your subclass automatically. That means all
-children of a ``CopyingMock`` will also have the type ``CopyingMock``.
+Khi bạn tạo lớp con của ``Mock`` hoặc ``MagicMock``, tất cả các thuộc tính được tạo động và ``return_value`` sẽ tự động sử dụng lớp con của bạn. Điều đó có nghĩa là tất cả các đối tượng con của một ``CopyingMock`` cũng sẽ có kiểu ``CopyingMock``.
 
 
-Nesting patches
-~~~~~~~~~~~~~~~
+Lồng ghép các bản vá
+~~~~~~~~~~~~~~~~~~~~
 
-Using patch as a context manager is nice, but if you do multiple patches you
-can end up with nested with statements indenting further and further to the
-right::
+Sử dụng patch như một trình quản lý ngữ cảnh rất tiện, nhưng nếu thực hiện nhiều bản vá, bạn có thể kết thúc với các câu lệnh with lồng nhau, khiến thụt lề ngày càng sâu hơn về bên phải::
 
     >>> class MyTest(unittest.TestCase):
     ...
@@ -959,10 +781,7 @@ right::
     >>> MyTest('test_foo').test_foo()
     >>> assert mymodule.Foo is original
 
-With unittest ``cleanup`` functions and the :ref:`start-and-stop` we can
-achieve the same effect without the nested indentation. A simple helper
-method, ``create_patch``, puts the patch in place and returns the created mock
-for us::
+Với các hàm unittest ``cleanup`` và :ref:`start-and-stop`, chúng ta có thể đạt được hiệu ứng tương tự mà không cần thụt lề lồng nhau. Một phương thức trợ giúp đơn giản, ``create_patch``, sẽ áp dụng patch và trả về mock đã được tạo cho chúng ta::
 
     >>> class MyTest(unittest.TestCase):
     ...
@@ -986,23 +805,17 @@ for us::
     >>> assert mymodule.Foo is original
 
 
-Mocking a dictionary with MagicMock
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Mô phỏng một dictionary bằng MagicMock
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You may want to mock a dictionary, or other container object, recording all
-access to it whilst having it still behave like a dictionary.
+Bạn có thể muốn mô phỏng một dictionary hoặc đối tượng container khác, ghi lại mọi lần truy cập vào nó nhưng vẫn cho phép nó hoạt động như một dictionary.
 
-We can do this with :class:`MagicMock`, which will behave like a dictionary,
-and using :data:`~Mock.side_effect` to delegate dictionary access to a real
-underlying dictionary that is under our control.
+Chúng ta có thể thực hiện việc này bằng :class:`MagicMock`, đối tượng này sẽ hoạt động như một dictionary, đồng thời sử dụng :data:`~Mock.side_effect` để ủy quyền việc truy cập dictionary cho một dictionary thực bên dưới mà chúng ta kiểm soát.
 
-When the :meth:`~object.__getitem__` and :meth:`~object.__setitem__` methods
-of our ``MagicMock`` are called
-(normal dictionary access) then ``side_effect`` is called with the key (and in
-the case of ``__setitem__`` the value too). We can also control what is returned.
+Khi các phương thức :meth:`~object.__getitem__` và :meth:`~object.__setitem__` của ``MagicMock`` được gọi (truy cập dictionary thông thường), ``side_effect`` sẽ được gọi với key (và trong trường hợp của ``__setitem__`` thì cả value). Chúng ta cũng có thể kiểm soát giá trị được trả về.
 
-After the ``MagicMock`` has been used we can use attributes like
-:data:`~Mock.call_args_list` to assert about how the dictionary was used:
+Sau khi sử dụng ``MagicMock``, chúng ta có thể dùng các thuộc tính như
+:data:`~Mock.call_args_list` để kiểm tra cách dictionary đã được sử dụng:
 
     >>> my_dict = {'a': 1, 'b': 2, 'c': 3}
     >>> def getitem(name):
@@ -1017,24 +830,19 @@ After the ``MagicMock`` has been used we can use attributes like
 
 .. note::
 
-    An alternative to using ``MagicMock`` is to use ``Mock`` and *only* provide
-    the magic methods you specifically want:
+    Một lựa chọn thay cho việc sử dụng ``MagicMock`` là dùng ``Mock`` và *only* để chỉ cung cấp các magic method mà bạn muốn:
 
         >>> mock = Mock()
         >>> mock.__getitem__ = Mock(side_effect=getitem)
         >>> mock.__setitem__ = Mock(side_effect=setitem)
 
-    A *third* option is to use ``MagicMock`` but passing in ``dict`` as the *spec*
-    (or *spec_set*) argument so that the ``MagicMock`` created only has
-    dictionary magic methods available:
+    Một *lựa chọn thứ ba* là sử dụng ``MagicMock`` nhưng truyền ``dict`` làm đối số *spec* (hoặc *spec_set*) để ``MagicMock`` được tạo ra chỉ có các magic method của dictionary:
 
         >>> mock = MagicMock(spec_set=dict)
         >>> mock.__getitem__.side_effect = getitem
         >>> mock.__setitem__.side_effect = setitem
 
-With these side effect functions in place, the ``mock`` will behave like a normal
-dictionary but recording the access. It even raises a :exc:`KeyError` if you try
-to access a key that doesn't exist.
+Khi đã thiết lập các hàm side effect này, ``mock`` sẽ hoạt động như một dictionary thông thường nhưng đồng thời ghi lại các lần truy cập. Nó thậm chí còn ném :exc:`KeyError` nếu bạn cố truy cập một khóa không tồn tại.
 
     >>> mock['a']
     1
@@ -1051,8 +859,7 @@ to access a key that doesn't exist.
     >>> mock['d']
     'eggs'
 
-After it has been used you can make assertions about the access using the normal
-mock methods and attributes:
+Sau khi sử dụng, bạn có thể dùng các phương thức và thuộc tính mock thông thường để kiểm tra các lần truy cập:
 
     >>> mock.__getitem__.call_args_list
     [call('a'), call('c'), call('d'), call('b'), call('d')]
@@ -1062,11 +869,10 @@ mock methods and attributes:
     {'a': 1, 'b': 'fish', 'c': 3, 'd': 'eggs'}
 
 
-Mock subclasses and their attributes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Các lớp con của Mock và thuộc tính của chúng
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are various reasons why you might want to subclass :class:`Mock`. One
-reason might be to add helper methods. Here's a silly example:
+Có nhiều lý do khiến bạn muốn tạo lớp con của :class:`Mock`. Một lý do có thể là để thêm các phương thức helper. Sau đây là một ví dụ hơi ngớ ngẩn:
 
     >>> class MyMock(MagicMock):
     ...     def has_been_called(self):
@@ -1081,12 +887,7 @@ reason might be to add helper methods. Here's a silly example:
     >>> mymock.has_been_called()
     True
 
-The standard behaviour for ``Mock`` instances is that attributes and the return
-value mocks are of the same type as the mock they are accessed on. This ensures
-that ``Mock`` attributes are ``Mocks`` and ``MagicMock`` attributes are ``MagicMocks``
-[#]_. So if you're subclassing to add helper methods then they'll also be
-available on the attributes and return value mock of instances of your
-subclass.
+Hành vi mặc định của các instance ``Mock`` là các thuộc tính và mock giá trị trả về có cùng kiểu với mock mà chúng được truy cập trên đó. Điều này đảm bảo rằng các thuộc tính ``Mock`` là ``Mocks`` và các thuộc tính ``MagicMock`` là ``MagicMocks`` [#]_. Vì vậy, nếu bạn tạo lớp con để thêm các phương thức helper, chúng cũng sẽ có sẵn trên các thuộc tính và mock giá trị trả về của các instance thuộc lớp con đó.
 
     >>> mymock.foo
     <MyMock name='mock.foo' id='...'>
@@ -1097,17 +898,9 @@ subclass.
     >>> mymock.foo.has_been_called()
     True
 
-Sometimes this is inconvenient. For example, `one user
-<https://code.google.com/archive/p/mock/issues/105>`_ is subclassing mock to
-created a `Twisted adaptor
-<https://twisted.org/documents/11.0.0/api/twisted.python.components.html>`_.
-Having this applied to attributes too actually causes errors.
+Đôi khi điều này gây bất tiện. Ví dụ, `một người dùng <https://code.google.com/archive/p/mock/issues/105>`_ đang tạo lớp con của mock để tạo một `bộ chuyển đổi Twisted <https://twisted.org/documents/11.0.0/api/twisted.python.components.html>`_. Việc áp dụng điều này cho cả các thuộc tính thực sự gây ra lỗi.
 
-``Mock`` (in all its flavours) uses a method called ``_get_child_mock`` to create
-these "sub-mocks" for attributes and return values. You can prevent your
-subclass being used for attributes by overriding this method. The signature is
-that it takes arbitrary keyword arguments (``**kwargs``) which are then passed
-onto the mock constructor:
+``Mock`` (trong tất cả các biến thể của nó) sử dụng một phương thức có tên là ``_get_child_mock`` để tạo các "sub-mock" này cho các thuộc tính và giá trị trả về. Bạn có thể ngăn không cho subclass của mình được sử dụng cho các thuộc tính bằng cách ghi đè phương thức này. Chữ ký của phương thức nhận các đối số keyword tùy ý (``**kwargs``), sau đó chuyển chúng cho constructor của mock:
 
     >>> class Subclass(MagicMock):
     ...     def _get_child_mock(self, /, **kwargs):
@@ -1120,39 +913,21 @@ onto the mock constructor:
     >>> assert not isinstance(mymock.foo, Subclass)
     >>> assert not isinstance(mymock(), Subclass)
 
-.. [#] An exception to this rule are the non-callable mocks. Attributes use the
-    callable variant because otherwise non-callable mocks couldn't have callable
-    methods.
+.. [#] Ngoại lệ của quy tắc này là các mock non-callable. Các thuộc tính sử dụng biến thể callable, vì nếu không thì mock non-callable sẽ không thể có các phương thức callable.
 
 
-Mocking imports with patch.dict
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Mock import bằng patch.dict
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-One situation where mocking can be hard is where you have a local import inside
-a function. These are harder to mock because they aren't using an object from
-the module namespace that we can patch out.
+Một tình huống mà việc mocking có thể khó khăn là khi bạn có một local import bên trong một hàm. Những import này khó mock hơn vì chúng không sử dụng một đối tượng từ namespace của module mà chúng ta có thể patch.
 
-Generally local imports are to be avoided. They are sometimes done to prevent
-circular dependencies, for which there is *usually* a much better way to solve
-the problem (refactor the code) or to prevent "up front costs" by delaying the
-import. This can also be solved in better ways than an unconditional local
-import (store the module as a class or module attribute and only do the import
-on first use).
+Nhìn chung, nên tránh local import. Đôi khi chúng được dùng để ngăn circular dependency, mà để giải quyết vấn đề đó *usually* có một cách tốt hơn nhiều (refactor code), hoặc để tránh "up front costs" bằng cách trì hoãn import. Vấn đề này cũng có thể được giải quyết theo những cách tốt hơn so với một local import không điều kiện (lưu module dưới dạng thuộc tính của class hoặc module và chỉ thực hiện import khi dùng lần đầu).
 
-That aside there is a way to use ``mock`` to affect the results of an import.
-Importing fetches an *object* from the :data:`sys.modules` dictionary. Note that it
-fetches an *object*, which need not be a module. Importing a module for the
-first time results in a module object being put in ``sys.modules``, so usually
-when you import something you get a module back. This need not be the case
-however.
+Ngoài điều đó, có một cách sử dụng ``mock`` để tác động đến kết quả của một import. Việc import lấy một *object* từ dictionary :data:`sys.modules`. Lưu ý rằng nó lấy một *object*, đối tượng này không nhất thiết phải là một module. Việc import một module lần đầu tiên khiến một đối tượng module được đưa vào ``sys.modules``, vì vậy thông thường khi bạn import một thứ gì đó, bạn sẽ nhận lại một module. Tuy nhiên, điều này không bắt buộc.
 
-This means you can use :func:`patch.dict` to *temporarily* put a mock in place
-in :data:`sys.modules`. Any imports whilst this patch is active will fetch the mock.
-When the patch is complete (the decorated function exits, the with statement
-body is complete or ``patcher.stop()`` is called) then whatever was there
-previously will be restored safely.
+Điều này có nghĩa là bạn có thể dùng :func:`patch.dict` để *temporarily* đặt một mock vào :data:`sys.modules`. Mọi import trong khi patch này đang hoạt động sẽ lấy mock đó. Khi patch hoàn tất (hàm được decorate kết thúc, phần thân của câu lệnh with hoàn tất hoặc ``patcher.stop()`` được gọi), bất kỳ thứ gì đã tồn tại trước đó sẽ được khôi phục an toàn.
 
-Here's an example that mocks out the 'fooble' module.
+Đây là một ví dụ mô phỏng module 'fooble'.
 
     >>> import sys
     >>> mock = Mock()
@@ -1164,10 +939,9 @@ Here's an example that mocks out the 'fooble' module.
     >>> assert 'fooble' not in sys.modules
     >>> mock.blob.assert_called_once_with()
 
-As you can see the ``import fooble`` succeeds, but on exit there is no 'fooble'
-left in :data:`sys.modules`.
+Như bạn có thể thấy, ``import fooble`` thành công, nhưng khi thoát ra thì không còn 'fooble' trong :data:`sys.modules`.
 
-This also works for the ``from module import name`` form:
+Cách này cũng hoạt động với dạng ``from module import name``:
 
     >>> mock = Mock()
     >>> with patch.dict('sys.modules', {'fooble': mock}):
@@ -1177,7 +951,7 @@ This also works for the ``from module import name`` form:
     <Mock name='mock.blob.blip()' id='...'>
     >>> mock.blob.blip.assert_called_once_with()
 
-With slightly more work you can also mock package imports:
+Với thêm một chút công sức, bạn cũng có thể mô phỏng các lần import package:
 
     >>> mock = Mock()
     >>> modules = {'package': mock, 'package.module': mock.module}
@@ -1189,18 +963,12 @@ With slightly more work you can also mock package imports:
     >>> mock.module.fooble.assert_called_once_with()
 
 
-Tracking order of calls and less verbose call assertions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Theo dõi thứ tự các lần gọi và các assertion về lần gọi ngắn gọn hơn
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The :class:`Mock` class allows you to track the *order* of method calls on
-your mock objects through the :attr:`~Mock.method_calls` attribute. This
-doesn't allow you to track the order of calls between separate mock objects,
-however we can use :attr:`~Mock.mock_calls` to achieve the same effect.
+Lớp :class:`Mock` cho phép bạn theo dõi *thứ tự* các lần gọi phương thức trên các mock object thông qua thuộc tính :attr:`~Mock.method_calls`. Tuy nhiên, cách này không cho phép bạn theo dõi thứ tự các lần gọi giữa những mock object riêng biệt; chúng ta có thể dùng :attr:`~Mock.mock_calls` để đạt được hiệu quả tương tự.
 
-Because mocks track calls to child mocks in ``mock_calls``, and accessing an
-arbitrary attribute of a mock creates a child mock, we can create our separate
-mocks from a parent one. Calls to those child mock will then all be recorded,
-in order, in the ``mock_calls`` of the parent:
+Vì các mock theo dõi những lần gọi đến các mock con trong ``mock_calls``, và việc truy cập một thuộc tính tùy ý của mock sẽ tạo ra một mock con, chúng ta có thể tạo các mock riêng biệt từ một mock cha. Khi đó, các lần gọi đến những mock con này sẽ được ghi lại theo đúng thứ tự trong ``mock_calls`` của mock cha:
 
     >>> manager = Mock()
     >>> mock_foo = manager.foo
@@ -1214,16 +982,13 @@ in order, in the ``mock_calls`` of the parent:
     >>> manager.mock_calls
     [call.foo.something(), call.bar.other.thing()]
 
-We can then assert about the calls, including the order, by comparing with
-the ``mock_calls`` attribute on the manager mock:
+Sau đó, chúng ta có thể assert về các lệnh gọi, bao gồm cả thứ tự, bằng cách so sánh với thuộc tính ``mock_calls`` trên mock manager:
 
     >>> expected_calls = [call.foo.something(), call.bar.other.thing()]
     >>> manager.mock_calls == expected_calls
     True
 
-If ``patch`` is creating, and putting in place, your mocks then you can attach
-them to a manager mock using the :meth:`~Mock.attach_mock` method. After
-attaching calls will be recorded in ``mock_calls`` of the manager. ::
+Nếu ``patch`` tạo và thiết lập các mock cho bạn, thì bạn có thể gắn chúng vào một mock manager bằng phương thức :meth:`~Mock.attach_mock`. Sau khi được gắn, các lệnh gọi sẽ được ghi lại trong ``mock_calls`` của manager.::
 
     >>> manager = MagicMock()
     >>> with patch('mymodule.Class1') as MockClass1:
@@ -1240,11 +1005,9 @@ attaching calls will be recorded in ``mock_calls`` of the manager. ::
     call.MockClass2(),
     call.MockClass2().bar()]
 
-If many calls have been made, but you're only interested in a particular
-sequence of them then an alternative is to use the
-:meth:`~Mock.assert_has_calls` method. This takes a list of calls (constructed
-with the :data:`call` object). If that sequence of calls are in
-:attr:`~Mock.mock_calls` then the assert succeeds.
+Nếu đã có nhiều lệnh gọi được thực hiện nhưng bạn chỉ quan tâm đến một chuỗi cụ thể trong số đó, thì một lựa chọn khác là sử dụng
+phương thức :meth:`~Mock.assert_has_calls`. Phương thức này nhận một danh sách các lệnh gọi (được tạo bằng đối tượng :data:`call`). Nếu chuỗi lệnh gọi đó nằm trong
+:attr:`~Mock.mock_calls` thì assert sẽ thành công.
 
     >>> m = MagicMock()
     >>> m().foo().bar().baz()
@@ -1254,12 +1017,9 @@ with the :data:`call` object). If that sequence of calls are in
     >>> calls = call.one().two().three().call_list()
     >>> m.assert_has_calls(calls)
 
-Even though the chained call ``m.one().two().three()`` aren't the only calls that
-have been made to the mock, the assert still succeeds.
+Mặc dù lệnh gọi nối chuỗi ``m.one().two().three()`` không phải là những lệnh gọi duy nhất đã được thực hiện trên mock, assert vẫn thành công.
 
-Sometimes a mock may have several calls made to it, and you are only interested
-in asserting about *some* of those calls. You may not even care about the
-order. In this case you can pass ``any_order=True`` to ``assert_has_calls``:
+Đôi khi một mock có thể nhận nhiều lệnh gọi, và bạn chỉ muốn assert về *some* trong số các lệnh gọi đó. Bạn thậm chí có thể không quan tâm đến thứ tự. Trong trường hợp này, bạn có thể truyền ``any_order=True`` cho ``assert_has_calls``:
 
     >>> m = MagicMock()
     >>> m(1), m.two(2, 3), m.seven(7), m.fifty('50')
@@ -1268,21 +1028,14 @@ order. In this case you can pass ``any_order=True`` to ``assert_has_calls``:
     >>> m.assert_has_calls(calls, any_order=True)
 
 
-More complex argument matching
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Đối sánh đối số phức tạp hơn
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Using the same basic concept as :data:`ANY` we can implement matchers to do more
-complex assertions on objects used as arguments to mocks.
+Sử dụng cùng khái niệm cơ bản như :data:`ANY`, chúng ta có thể triển khai các matcher để thực hiện những phép kiểm tra phức tạp hơn trên các đối tượng được dùng làm đối số cho các mock.
 
-Suppose we expect some object to be passed to a mock that by default
-compares equal based on object identity (which is the Python default for user
-defined classes). To use :meth:`~Mock.assert_called_with` we would need to pass
-in the exact same object. If we are only interested in some of the attributes
-of this object then we can create a matcher that will check these attributes
-for us.
+Giả sử chúng ta mong đợi một đối tượng nào đó được truyền vào một mock, mà theo mặc định sẽ so sánh bằng dựa trên identity của đối tượng (đây là mặc định của Python đối với các lớp do người dùng định nghĩa). Để sử dụng :meth:`~Mock.assert_called_with`, chúng ta cần truyền vào chính xác cùng một đối tượng đó. Nếu chúng ta chỉ quan tâm đến một số thuộc tính của đối tượng này, chúng ta có thể tạo một matcher để kiểm tra các thuộc tính đó giúp chúng ta.
 
-You can see in this example how a 'standard' call to ``assert_called_with`` isn't
-sufficient:
+Bạn có thể thấy trong ví dụ này rằng một lời gọi 'standard' đến ``assert_called_with`` là chưa đủ:
 
     >>> class Foo:
     ...     def __init__(self, a, b):
@@ -1297,7 +1050,7 @@ sufficient:
     Expected: mock(<__main__.Foo object at 0x...>)
     Actual: mock(<__main__.Foo object at 0x...>)
 
-A comparison function for our ``Foo`` class might look something like this:
+Một hàm so sánh cho lớp ``Foo`` của chúng ta có thể trông như sau:
 
     >>> def compare(self, other):
     ...     if not type(self) == type(other):
@@ -1309,8 +1062,7 @@ A comparison function for our ``Foo`` class might look something like this:
     ...     return True
     ...
 
-And a matcher object that can use comparison functions like this for its
-equality operation would look something like this:
+Một đối tượng matcher có thể sử dụng các hàm so sánh như thế này cho phép toán equality của nó sẽ có dạng như sau:
 
     >>> class Matcher:
     ...     def __init__(self, compare, some_obj):
@@ -1320,16 +1072,12 @@ equality operation would look something like this:
     ...         return self.compare(self.some_obj, other)
     ...
 
-Putting all this together:
+Kết hợp tất cả lại:
 
     >>> match_foo = Matcher(compare, Foo(1, 2))
     >>> mock.assert_called_with(match_foo)
 
-The ``Matcher`` is instantiated with our compare function and the ``Foo`` object
-we want to compare against. In ``assert_called_with`` the ``Matcher`` equality
-method will be called, which compares the object the mock was called with
-against the one we created our matcher with. If they match then
-``assert_called_with`` passes, and if they don't an :exc:`AssertionError` is raised:
+``Matcher`` được khởi tạo với hàm so sánh của chúng ta và đối tượng ``Foo`` mà chúng ta muốn so sánh. Trong ``assert_called_with``, phương thức kiểm tra tính bằng nhau ``Matcher`` sẽ được gọi; phương thức này so sánh đối tượng mà mock được gọi cùng với đối tượng mà chúng ta đã dùng để tạo matcher. Nếu chúng khớp nhau thì ``assert_called_with`` thành công, còn nếu không thì một :exc:`AssertionError` sẽ được phát sinh:
 
     >>> match_wrong = Matcher(compare, Foo(3, 4))
     >>> mock.assert_called_with(match_wrong)
@@ -1338,11 +1086,15 @@ against the one we created our matcher with. If they match then
     AssertionError: Expected: ((<Matcher object at 0x...>,), {})
     Called with: ((<Foo object at 0x...>,), {})
 
-With a bit of tweaking you could have the comparison function raise the
-:exc:`AssertionError` directly and provide a more useful failure message.
+Chỉ cần tinh chỉnh một chút, bạn có thể khiến hàm so sánh phát sinh
+:exc:`AssertionError` trực tiếp và cung cấp thông báo lỗi hữu ích hơn.
 
-As of version 1.5, the Python testing library `PyHamcrest
-<https://pyhamcrest.readthedocs.io/>`_ provides similar functionality,
-that may be useful here, in the form of its equality matcher
-(`hamcrest.library.integration.match_equality
-<https://pyhamcrest.readthedocs.io/en/release-1.8/integration/#module-hamcrest.library.integration.match_equality>`_).
+Kể từ phiên bản 1.5, thư viện kiểm thử Python `PyHamcrest <https://pyhamcrest.readthedocs.io/>`_ cung cấp chức năng tương tự, có thể hữu ích trong trường hợp này, dưới dạng equality matcher (`hamcrest.library.integration.match_equality <https://pyhamcrest.readthedocs.io/en/release-1.8/integration/#module-hamcrest.library.integration.match_equality>`_).
+
+.. _`this blog entry`: https://williambert.online/2011/07/how-to-unit-testing-in-django-with-mocking-and-patching/
+.. _`advanced uses`: http://www.dabeaz.com/coroutines/index.html
+.. _`Generator Tricks for Systems Programmers`: http://www.dabeaz.com/generators/
+.. _`one user`: https://code.google.com/archive/p/mock/issues/105
+.. _`Twisted adaptor`: https://twisted.org/documents/11.0.0/api/twisted.python.components.html
+.. _`PyHamcrest`: https://pyhamcrest.readthedocs.io/
+.. _`hamcrest.library.integration.match_equality`: https://pyhamcrest.readthedocs.io/en/release-1.8/integration/#module-hamcrest.library.integration.match_equality

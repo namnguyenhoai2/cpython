@@ -1,91 +1,65 @@
-:mod:`!unittest` --- Unit testing framework
-===========================================
+:mod:`!unittest` --- Khung kiểm thử đơn vị
+==========================================
 
 .. module:: unittest
-   :synopsis: Unit testing framework for Python.
+   :synopsis: Khung kiểm thử đơn vị cho Python.
 
 .. moduleauthor:: Steve Purcell <stephen_purcell@yahoo.com>
 .. sectionauthor:: Steve Purcell <stephen_purcell@yahoo.com>
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 .. sectionauthor:: Raymond Hettinger <python@rcn.com>
 
-**Source code:** :source:`Lib/unittest/__init__.py`
+**Mã nguồn:** :source:`Lib/unittest/__init__.py`
 
 --------------
 
-(If you are already familiar with the basic concepts of testing, you might want
-to skip to :ref:`the list of assert methods <assert-methods>`.)
+(Nếu bạn đã quen với các khái niệm cơ bản về kiểm thử, bạn có thể chuyển đến :ref:`danh sách các phương thức assert <assert-methods>`.)
 
-The :mod:`!unittest` unit testing framework was originally inspired by JUnit
-and has a similar flavor as major unit testing frameworks in other
-languages.  It supports test automation, sharing of setup and shutdown code
-for tests, aggregation of tests into collections, and independence of the
-tests from the reporting framework.
+Khung kiểm thử đơn vị :mod:`!unittest` ban đầu lấy cảm hứng từ JUnit và có cách hoạt động tương tự các khung kiểm thử đơn vị phổ biến trong những ngôn ngữ khác. Khung này hỗ trợ tự động hóa kiểm thử, chia sẻ mã thiết lập và mã dọn dẹp cho các bài kiểm thử, tập hợp các bài kiểm thử thành các bộ sưu tập, đồng thời tách biệt các bài kiểm thử khỏi khung báo cáo.
 
-To achieve this, :mod:`!unittest` supports some important concepts in an
-object-oriented way:
+Để đạt được điều này, :mod:`!unittest` hỗ trợ một số khái niệm quan trọng theo cách tiếp cận hướng đối tượng:
 
 test fixture
-   A :dfn:`test fixture` represents the preparation needed to perform one or more
-   tests, and any associated cleanup actions.  This may involve, for example,
-   creating temporary or proxy databases, directories, or starting a server
-   process.
+   Một :dfn:`fixture kiểm thử` đại diện cho phần chuẩn bị cần thiết để thực hiện một hoặc nhiều bài kiểm thử, cùng với mọi tác vụ dọn dẹp liên quan. Việc này có thể bao gồm, chẳng hạn như, tạo cơ sở dữ liệu tạm thời hoặc proxy, tạo thư mục hoặc khởi động một tiến trình máy chủ.
 
-test case
-   A :dfn:`test case` is the individual unit of testing.  It checks for a specific
-   response to a particular set of inputs.  :mod:`!unittest` provides a base class,
-   :class:`TestCase`, which may be used to create new test cases.
+trường hợp kiểm thử
+   Một :dfn:`trường hợp kiểm thử` là đơn vị kiểm thử riêng lẻ. Nó kiểm tra một phản hồi cụ thể đối với một tập hợp đầu vào cụ thể. :mod:`!unittest` cung cấp một lớp cơ sở,
+   :class:`TestCase`, có thể được sử dụng để tạo các trường hợp kiểm thử mới.
 
-test suite
-   A :dfn:`test suite` is a collection of test cases, test suites, or both.  It is
-   used to aggregate tests that should be executed together.
+bộ kiểm thử
+   Một :dfn:`bộ kiểm thử` là tập hợp các trường hợp kiểm thử, các bộ kiểm thử hoặc cả hai. Nó được dùng để tập hợp các bài kiểm thử cần được thực thi cùng nhau.
 
-test runner
-   A :dfn:`test runner` is a component which orchestrates the execution of tests
-   and provides the outcome to the user.  The runner may use a graphical interface,
-   a textual interface, or return a special value to indicate the results of
-   executing the tests.
+trình chạy kiểm thử
+   :dfn:`Trình chạy kiểm thử` là một thành phần điều phối việc thực thi các bài kiểm thử và cung cấp kết quả cho người dùng. Trình chạy có thể sử dụng giao diện đồ họa, giao diện văn bản hoặc trả về một giá trị đặc biệt để cho biết kết quả thực thi các bài kiểm thử.
 
 .. seealso::
 
-   Module :mod:`doctest`
-      Another test-support module with a very different flavor.
+   Mô-đun :mod:`doctest`
+      Một mô-đun hỗ trợ kiểm thử khác với đặc điểm rất khác biệt.
 
-   `Simple Smalltalk Testing: With Patterns <https://web.archive.org/web/20150315073817/http://www.xprogramming.com/testfram.htm>`_
-      Kent Beck's original paper on testing frameworks using the pattern shared
-      by :mod:`!unittest`.
+   `Kiểm thử Smalltalk đơn giản: Với các mẫu <https://web.archive.org/web/20150315073817/http://www.xprogramming.com/testfram.htm>`_
+      Bài viết gốc của Kent Beck về các framework kiểm thử sử dụng mẫu được chia sẻ bởi :mod:`!unittest`.
 
    `pytest <https://docs.pytest.org/>`_
-      Third-party unittest framework with a lighter-weight syntax for writing
-      tests.  For example, ``assert func(10) == 42``.
+      Framework unittest của bên thứ ba với cú pháp gọn nhẹ hơn để viết các bài kiểm thử. Ví dụ: ``assert func(10) == 42``.
 
-   `The Python Testing Tools Taxonomy <https://wiki.python.org/moin/PythonTestingToolsTaxonomy>`_
-      An extensive list of Python testing tools including functional testing
-      frameworks and mock object libraries.
+   `Phân loại các công cụ kiểm thử Python <https://wiki.python.org/moin/PythonTestingToolsTaxonomy>`_
+      Danh sách phong phú các công cụ kiểm thử Python, bao gồm các framework kiểm thử chức năng và thư viện mock object.
 
-   `Testing in Python Mailing List <http://lists.idyll.org/listinfo/testing-in-python>`_
-      A special-interest-group for discussion of testing, and testing tools,
-      in Python.
+   `Danh sách gửi thư Testing in Python <http://lists.idyll.org/listinfo/testing-in-python>`_
+      Một nhóm chuyên quan tâm để thảo luận về việc kiểm thử và các công cụ kiểm thử trong Python.
 
-   The script :file:`Tools/unittestgui/unittestgui.py` in the Python source distribution is
-   a GUI tool for test discovery and execution.  This is intended largely for ease of use
-   for those new to unit testing.  For production environments it is
-   recommended that tests be driven by a continuous integration system such as
-   `Buildbot <https://buildbot.net/>`_, `Jenkins <https://www.jenkins.io/>`_,
-   `GitHub Actions <https://github.com/features/actions>`_, or
-   `AppVeyor <https://www.appveyor.com/>`_.
+   Script :file:`Tools/unittestgui/unittestgui.py` trong bản phân phối mã nguồn Python là một công cụ GUI để phát hiện và thực thi kiểm thử. Công cụ này chủ yếu nhằm giúp những người mới làm quen với unit testing dễ sử dụng hơn. Trong môi trường production, bạn nên chạy các bài kiểm thử bằng một hệ thống tích hợp liên tục như `Buildbot <https://buildbot.net/>`_, `Jenkins <https://www.jenkins.io/>`_, `GitHub Actions <https://github.com/features/actions>`_ hoặc `AppVeyor <https://www.appveyor.com/>`_.
 
 
 .. _unittest-minimal-example:
 
-Basic example
--------------
+Ví dụ cơ bản
+------------
 
-The :mod:`!unittest` module provides a rich set of tools for constructing and
-running tests.  This section demonstrates that a small subset of the tools
-suffice to meet the needs of most users.
+Module :mod:`!unittest` cung cấp một bộ công cụ phong phú để xây dựng và chạy các bài kiểm thử. Phần này minh họa rằng một tập hợp nhỏ các công cụ cũng đủ đáp ứng nhu cầu của hầu hết người dùng.
 
-Here is a short script to test three string methods::
+Sau đây là một script ngắn để kiểm thử ba phương thức xử lý chuỗi::
 
   import unittest
 
@@ -101,7 +75,7 @@ Here is a short script to test three string methods::
       def test_split(self):
           s = 'hello world'
           self.assertEqual(s.split(), ['hello', 'world'])
-          # check that s.split fails when the separator is not a string
+          # kiểm tra rằng s.split không thành công khi dấu phân tách không phải là một chuỗi
           with self.assertRaises(TypeError):
               s.split(2)
 
@@ -109,25 +83,14 @@ Here is a short script to test three string methods::
       unittest.main()
 
 
-A test case is created by subclassing :class:`unittest.TestCase`.  The three
-individual tests are defined with methods whose names start with the letters
-``test``.  This naming convention informs the test runner about which methods
-represent tests.
+Một trường hợp kiểm thử được tạo bằng cách phân lớp :class:`unittest.TestCase`. Ba bài kiểm thử riêng lẻ được định nghĩa bằng các phương thức có tên bắt đầu bằng các chữ cái ``test``. Quy ước đặt tên này cho test runner biết những phương thức nào đại diện cho các bài kiểm thử.
 
-The crux of each test is a call to :meth:`~TestCase.assertEqual` to check for an
-expected result; :meth:`~TestCase.assertTrue` or :meth:`~TestCase.assertFalse`
-to verify a condition; or :meth:`~TestCase.assertRaises` to verify that a
-specific exception gets raised.  These methods are used instead of the
-:keyword:`assert` statement so the test runner can accumulate all test results
-and produce a report.
+Cốt lõi của mỗi bài kiểm thử là một lệnh gọi đến :meth:`~TestCase.assertEqual` để kiểm tra kết quả mong đợi; :meth:`~TestCase.assertTrue` hoặc :meth:`~TestCase.assertFalse` để xác minh một điều kiện; hoặc :meth:`~TestCase.assertRaises` để xác minh rằng một exception cụ thể được phát sinh. Các phương thức này được sử dụng thay cho
+câu lệnh :keyword:`assert` để test runner có thể tập hợp tất cả kết quả kiểm thử và tạo báo cáo.
 
-The :meth:`~TestCase.setUp` and :meth:`~TestCase.tearDown` methods allow you
-to define instructions that will be executed before and after each test method.
-They are covered in more detail in the section :ref:`organizing-tests`.
+Các phương thức :meth:`~TestCase.setUp` và :meth:`~TestCase.tearDown` cho phép bạn định nghĩa những chỉ dẫn sẽ được thực thi trước và sau mỗi phương thức kiểm thử. Chúng được trình bày chi tiết hơn trong phần :ref:`organizing-tests`.
 
-The final block shows a simple way to run the tests. :func:`unittest.main`
-provides a command-line interface to the test script.  When run from the command
-line, the above script produces an output that looks like this::
+Khối cuối cùng trình bày một cách đơn giản để chạy các bài kiểm thử. :func:`unittest.main` cung cấp giao diện dòng lệnh cho script kiểm thử. Khi được chạy từ dòng lệnh, script ở trên tạo ra kết quả có dạng như sau::
 
    ...
    ----------------------------------------------------------------------
@@ -135,8 +98,7 @@ line, the above script produces an output that looks like this::
 
    OK
 
-Passing the ``-v`` option to your test script will instruct :func:`unittest.main`
-to enable a higher level of verbosity, and produce the following output::
+Việc truyền tùy chọn ``-v`` vào test script sẽ hướng dẫn :func:`unittest.main` bật mức độ chi tiết cao hơn và tạo ra kết quả sau đây::
 
    test_isupper (__main__.TestStringMethods.test_isupper) ... ok
    test_split (__main__.TestStringMethods.test_split) ... ok
@@ -147,236 +109,185 @@ to enable a higher level of verbosity, and produce the following output::
 
    OK
 
-The above examples show the most commonly used :mod:`!unittest` features which
-are sufficient to meet many everyday testing needs.  The remainder of the
-documentation explores the full feature set from first principles.
+Các ví dụ trên minh họa những tính năng :mod:`!unittest` được sử dụng phổ biến nhất, đủ để đáp ứng nhiều nhu cầu kiểm thử hằng ngày. Phần còn lại của tài liệu sẽ tìm hiểu toàn bộ tập tính năng từ những nguyên tắc cơ bản.
 
 .. versionchanged:: 3.11
-   The behavior of returning a value from a test method (other than the default
-   ``None`` value), is now deprecated.
+   Hành vi trả về một giá trị từ phương thức kiểm thử (khác với giá trị ``None`` mặc định) hiện đã không còn được khuyến nghị.
 
 
 .. _unittest-command-line-interface:
 
-Command-Line Interface
-----------------------
+Giao diện dòng lệnh
+-------------------
 
-The unittest module can be used from the command line to run tests from
-modules, classes or even individual test methods::
+Có thể sử dụng module unittest từ dòng lệnh để chạy các bài kiểm thử từ module, class hoặc thậm chí từng phương thức kiểm thử riêng lẻ::
 
    python -m unittest test_module1 test_module2
    python -m unittest test_module.TestClass
    python -m unittest test_module.TestClass.test_method
 
-You can pass in a list with any combination of module names, and fully
-qualified class or method names.
+Bạn có thể truyền vào một danh sách chứa bất kỳ tổ hợp nào của tên module và tên class hoặc phương thức đầy đủ.
 
-Test modules can be specified by file path as well::
+Các module kiểm thử cũng có thể được chỉ định bằng đường dẫn tệp::
 
    python -m unittest tests/test_something.py
 
-This allows you to use the shell filename completion to specify the test module.
-The file specified must still be importable as a module. The path is converted
-to a module name by removing the '.py' and converting path separators into '.'.
-If you want to execute a test file that isn't importable as a module you should
-execute the file directly instead.
+Điều này cho phép bạn sử dụng tính năng hoàn thành tên tệp của shell để chỉ định test module. Tệp được chỉ định vẫn phải có thể được import dưới dạng module. Đường dẫn được chuyển đổi thành tên module bằng cách loại bỏ '.py' và chuyển các dấu phân cách trong đường dẫn thành '.'. Nếu muốn thực thi một tệp test không thể import dưới dạng module, bạn nên thực thi trực tiếp tệp đó.
 
-You can run tests with more detail (higher verbosity) by passing in the -v flag::
+Bạn có thể chạy các test với nhiều thông tin chi tiết hơn (độ chi tiết cao hơn) bằng cách truyền vào cờ -v::
 
    python -m unittest -v test_module
 
-When executed without arguments :ref:`unittest-test-discovery` is started::
+Khi được thực thi mà không có đối số, :ref:`unittest-test-discovery` sẽ được khởi động::
 
    python -m unittest
 
-For a list of all the command-line options::
+Để xem danh sách tất cả các tùy chọn dòng lệnh::
 
    python -m unittest -h
 
 .. versionchanged:: 3.2
-   In earlier versions it was only possible to run individual test methods and
-   not modules or classes.
+   Trong các phiên bản trước, bạn chỉ có thể chạy từng phương thức test riêng lẻ, không thể chạy module hoặc class.
 
 .. versionadded:: 3.14
-   Output is colorized by default and can be
-   :ref:`controlled using environment variables <using-on-controlling-color>`.
+   Theo mặc định, đầu ra được tô màu và có thể được
+   :ref:`điều khiển bằng các biến môi trường <using-on-controlling-color>`.
 
-Command-line options
-~~~~~~~~~~~~~~~~~~~~
+.. _`Command-line options`:
 
-:program:`unittest` supports these command-line options:
+Các tùy chọn dòng lệnh
+~~~~~~~~~~~~~~~~~~~~~~
+
+:program:`unittest` hỗ trợ các tùy chọn dòng lệnh sau:
 
 .. program:: unittest
 
 .. option:: -b, --buffer
 
-   The standard output and standard error streams are buffered during the test
-   run. Output during a passing test is discarded. Output is echoed normally
-   on test fail or error and is added to the failure messages.
+   Các stream đầu ra tiêu chuẩn và lỗi tiêu chuẩn được đệm trong quá trình chạy kiểm thử. Đầu ra trong một kiểm thử thành công sẽ bị loại bỏ. Đầu ra được hiển thị bình thường khi kiểm thử thất bại hoặc xảy ra lỗi, đồng thời được thêm vào các thông báo lỗi.
 
 .. option:: -c, --catch
 
-   :kbd:`Control-C` during the test run waits for the current test to end and then
-   reports all the results so far. A second :kbd:`Control-C` raises the normal
-   :exc:`KeyboardInterrupt` exception.
+   :kbd:`Control-C` trong quá trình chạy kiểm thử sẽ chờ kiểm thử hiện tại kết thúc, sau đó báo cáo tất cả kết quả cho đến thời điểm đó. Nhấn :kbd:`Control-C` lần thứ hai sẽ đưa ra ngoại lệ thông thường
+   :exc:`KeyboardInterrupt`.
 
-   See `Signal Handling`_ for the functions that provide this functionality.
+   Xem `Signal Handling <Signal Handling_>`_ để biết các hàm cung cấp chức năng này.
 
 .. option:: -f, --failfast
 
-   Stop the test run on the first error or failure.
+   Dừng quá trình chạy kiểm thử ngay khi gặp lỗi hoặc thất bại đầu tiên.
 
 .. option:: -k
 
-   Only run test methods and classes that match the pattern or substring.
-   This option may be used multiple times, in which case all test cases that
-   match any of the given patterns are included.
+   Chỉ chạy các phương thức và lớp kiểm thử khớp với mẫu hoặc chuỗi con. Tùy chọn này có thể được sử dụng nhiều lần; khi đó, tất cả các trường hợp kiểm thử khớp với bất kỳ mẫu nào đã cho đều được đưa vào.
 
-   Patterns that contain a wildcard character (``*``) are matched against the
-   test name using :meth:`fnmatch.fnmatchcase`; otherwise simple case-sensitive
-   substring matching is used.
+   Các mẫu chứa ký tự đại diện (``*``) được đối chiếu với tên kiểm thử bằng :meth:`fnmatch.fnmatchcase`; nếu không, phép đối chiếu chuỗi con phân biệt chữ hoa chữ thường đơn giản sẽ được sử dụng.
 
-   Patterns are matched against the fully qualified test method name as
-   imported by the test loader.
+   Các mẫu được đối chiếu với tên phương thức kiểm thử đầy đủ (fully qualified) như được test loader nhập vào.
 
-   For example, ``-k foo`` matches ``foo_tests.SomeTest.test_something``,
-   ``bar_tests.SomeTest.test_foo``, but not ``bar_tests.FooTest.test_something``.
+   Ví dụ, ``-k foo`` khớp với ``foo_tests.SomeTest.test_something``, ``bar_tests.SomeTest.test_foo``, nhưng không khớp với ``bar_tests.FooTest.test_something``.
 
 .. option:: --locals
 
-   Show local variables in tracebacks.
+   Hiển thị các biến cục bộ trong traceback.
 
 .. option:: --durations N
 
-   Show the N slowest test cases (N=0 for all).
+   Hiển thị N trường hợp kiểm thử chạy chậm nhất (N=0 để hiển thị tất cả).
 
 .. versionadded:: 3.2
-   The command-line options ``-b``, ``-c`` and ``-f`` were added.
+   Các tùy chọn dòng lệnh ``-b``, ``-c`` và ``-f`` đã được thêm vào.
 
 .. versionadded:: 3.5
-   The command-line option ``--locals``.
+   Tùy chọn dòng lệnh ``--locals``.
 
 .. versionadded:: 3.7
-   The command-line option ``-k``.
+   Tùy chọn dòng lệnh ``-k``.
 
 .. versionadded:: 3.12
-   The command-line option ``--durations``.
+   Tùy chọn dòng lệnh ``--durations``.
 
-The command line can also be used for test discovery, for running all of the
-tests in a project or just a subset.
+Dòng lệnh cũng có thể được dùng để discovery test, chạy tất cả các test trong một project hoặc chỉ một tập hợp con.
 
 .. _unittest-test-discovery:
 
-Test Discovery
+Discovery test
 --------------
 
 .. versionadded:: 3.2
 
-Unittest supports simple test discovery. In order to be compatible with test
-discovery, all of the test files must be :ref:`modules <tut-modules>` or
-:ref:`packages <tut-packages>` importable from the top-level directory of
-the project (this means that their filenames must be valid :ref:`identifiers
-<identifiers>`).
+Unittest hỗ trợ discovery test đơn giản. Để tương thích với discovery test, tất cả các tệp test phải là :ref:`modules <tut-modules>` hoặc
+:ref:`packages <tut-packages>` có thể import từ thư mục cấp cao nhất của project (điều này có nghĩa là tên tệp của chúng phải là các :ref:`identifiers <identifiers>` hợp lệ).
 
-Test discovery is implemented in :meth:`TestLoader.discover`, but can also be
-used from the command line. The basic command-line usage is::
+Tính năng phát hiện test được triển khai trong :meth:`TestLoader.discover`, nhưng cũng có thể được sử dụng từ dòng lệnh. Cách sử dụng cơ bản trên dòng lệnh là::
 
    cd project_directory
    python -m unittest discover
 
 .. note::
 
-   As a shortcut, ``python -m unittest`` is the equivalent of
-   ``python -m unittest discover``. If you want to pass arguments to test
-   discovery the ``discover`` sub-command must be used explicitly.
+   Dưới dạng viết tắt, ``python -m unittest`` tương đương với ``python -m unittest discover``. Nếu muốn truyền đối số cho quá trình phát hiện test, phải sử dụng rõ ràng tiểu lệnh ``discover``.
 
-The ``discover`` sub-command has the following options:
+Tiểu lệnh ``discover`` có các tùy chọn sau:
 
 .. program:: unittest discover
 
 .. option:: -v, --verbose
 
-   Verbose output
+   Đầu ra chi tiết
 
 .. option:: -s, --start-directory directory
 
-   Directory to start discovery (``.`` default)
+   Thư mục bắt đầu quá trình phát hiện (``.`` theo mặc định)
 
 .. option:: -p, --pattern pattern
 
-   Pattern to match test files (``test*.py`` default)
+   Mẫu khớp với các tệp test (``test*.py`` theo mặc định)
 
 .. option:: -t, --top-level-directory directory
 
-   Top level directory of project (defaults to start directory)
+   Thư mục cấp cao nhất của dự án (mặc định là thư mục bắt đầu)
 
-The :option:`-s`, :option:`-p`, and :option:`-t` options can be passed in
-as positional arguments in that order. The following two command lines
-are equivalent::
+Các tùy chọn :option:`-s`, :option:`-p` và :option:`-t` có thể được truyền dưới dạng các đối số vị trí theo thứ tự đó. Hai dòng lệnh sau tương đương::
 
    python -m unittest discover -s project_directory -p "*_test.py"
    python -m unittest discover project_directory "*_test.py"
 
-As well as being a path it is possible to pass a package name, for example
-``myproject.subpackage.test``, as the start directory. The package name you
-supply will then be imported and its location on the filesystem will be used
-as the start directory.
+Ngoài đường dẫn, bạn cũng có thể truyền tên package, chẳng hạn như ``myproject.subpackage.test``, làm thư mục bắt đầu. Tên package bạn cung cấp sau đó sẽ được import và vị trí của nó trên hệ thống tệp sẽ được dùng làm thư mục bắt đầu.
 
 .. caution::
 
-    Test discovery loads tests by importing them. Once test discovery has found
-    all the test files from the start directory you specify it turns the paths
-    into package names to import. For example :file:`foo/bar/baz.py` will be
-    imported as ``foo.bar.baz``.
+    Test discovery tải các test bằng cách import chúng. Sau khi test discovery tìm thấy tất cả các tệp test từ thư mục bắt đầu mà bạn chỉ định, nó chuyển đổi các đường dẫn thành tên package để import. Ví dụ: :file:`foo/bar/baz.py` sẽ được import dưới tên ``foo.bar.baz``.
 
-    If you have a package installed globally and attempt test discovery on
-    a different copy of the package then the import *could* happen from the
-    wrong place. If this happens test discovery will warn you and exit.
+    Nếu bạn đã cài đặt một package trên toàn hệ thống và cố gắng thực hiện test discovery trên một bản sao khác của package đó, thao tác import *có thể* diễn ra từ sai vị trí. Nếu điều này xảy ra, test discovery sẽ cảnh báo bạn rồi thoát.
 
-    If you supply the start directory as a package name rather than a
-    path to a directory then discover assumes that whichever location it
-    imports from is the location you intended, so you will not get the
-    warning.
+    Nếu bạn cung cấp thư mục bắt đầu dưới dạng tên package thay vì đường dẫn đến một thư mục, discover sẽ giả định rằng bất kỳ vị trí nào mà nó import từ đó đều là vị trí bạn mong muốn, vì vậy bạn sẽ không nhận được cảnh báo.
 
-Test modules and packages can customize test loading and discovery by through
-the `load_tests protocol`_.
+Các module và package test có thể tùy chỉnh việc tải và test discovery thông qua `load_tests protocol <load_tests protocol_>`_.
 
 .. versionchanged:: 3.4
-   Test discovery supports :term:`namespace packages <namespace package>`.
+   Test discovery hỗ trợ :term:`namespace packages <namespace package>`.
 
 .. versionchanged:: 3.11
-   Test discovery dropped the :term:`namespace packages <namespace package>`
-   support. It has been broken since Python 3.7.
-   Start directory and its subdirectories containing tests must be regular
-   package that have ``__init__.py`` file.
+   Tính năng phát hiện test đã loại bỏ hỗ trợ cho các :term:`namespace package <namespace package>`. Tính năng này đã bị hỏng kể từ Python 3.7. Thư mục bắt đầu và các thư mục con chứa test phải là package thông thường có tệp ``__init__.py``.
 
-   If the start directory is the dotted name of the package, the ancestor packages
-   can be namespace packages.
+   Nếu thư mục bắt đầu là tên có dấu chấm của package, các package tổ tiên có thể là namespace package.
 
 .. versionchanged:: 3.14
-   Test discovery supports :term:`namespace package` as start directory again.
-   To avoid scanning directories unrelated to Python,
-   tests are not searched in subdirectories that do not contain ``__init__.py``.
+   Tính năng phát hiện test một lần nữa hỗ trợ :term:`namespace package` làm thư mục bắt đầu. Để tránh quét các thư mục không liên quan đến Python, test sẽ không được tìm kiếm trong các thư mục con không chứa ``__init__.py``.
 
 
 .. _organizing-tests:
 
-Organizing test code
---------------------
+Tổ chức mã test
+---------------
 
-The basic building blocks of unit testing are :dfn:`test cases` --- single
-scenarios that must be set up and checked for correctness.  In :mod:`!unittest`,
-test cases are represented by :class:`unittest.TestCase` instances.
-To make your own test cases you must write subclasses of
-:class:`TestCase` or use :class:`FunctionTestCase`.
+Các khối xây dựng cơ bản của unit testing là các :dfn:`test case` --- những kịch bản riêng lẻ cần được thiết lập và kiểm tra tính chính xác. Trong :mod:`!unittest`, test case được biểu diễn bằng các instance :class:`unittest.TestCase`. Để tự tạo test case, bạn phải viết các lớp con của
+:class:`TestCase` hoặc sử dụng :class:`FunctionTestCase`.
 
-The testing code of a :class:`TestCase` instance should be entirely self
-contained, such that it can be run either in isolation or in arbitrary
-combination with any number of other test cases.
+Mã test của một instance :class:`TestCase` phải hoàn toàn độc lập, sao cho có thể chạy riêng lẻ hoặc kết hợp tùy ý với bất kỳ số lượng test case nào khác.
 
-The simplest :class:`TestCase` subclass will simply implement a test method
-(i.e. a method whose name starts with ``test``) in order to perform specific
-testing code::
+Lớp con :class:`TestCase` đơn giản nhất sẽ chỉ triển khai một phương thức kiểm thử (tức là phương thức có tên bắt đầu bằng ``test``) để thực hiện mã kiểm thử cụ thể::
 
    import unittest
 
@@ -385,16 +296,10 @@ testing code::
            widget = Widget('The widget')
            self.assertEqual(widget.size(), (50, 50))
 
-Note that in order to test something, we use one of the :ref:`assert\* methods <assert-methods>`
-provided by the :class:`TestCase` base class.  If the test fails, an
-exception will be raised with an explanatory message, and :mod:`!unittest`
-will identify the test case as a :dfn:`failure`.  Any other exceptions will be
-treated as :dfn:`errors`.
+Lưu ý rằng để kiểm thử một điều gì đó, chúng ta sử dụng một trong các phương thức :ref:`assert\*methods <assert-methods>` do lớp cơ sở :class:`TestCase` cung cấp. Nếu kiểm thử thất bại, một ngoại lệ sẽ được phát sinh kèm theo thông báo giải thích, và :mod:`!unittest` sẽ xác định trường hợp kiểm thử là một :dfn:`failure`. Mọi ngoại lệ khác sẽ được xử lý như :dfn:`errors`.
 
-Tests can be numerous, and their set-up can be repetitive.  Luckily, we
-can factor out set-up code by implementing a method called
-:meth:`~TestCase.setUp`, which the testing framework will automatically
-call for every single test we run::
+Các bài kiểm thử có thể rất nhiều, và việc thiết lập chúng có thể lặp đi lặp lại. May mắn là chúng ta có thể tách riêng mã thiết lập bằng cách triển khai một phương thức có tên
+:meth:`~TestCase.setUp`, mà framework kiểm thử sẽ tự động gọi cho từng bài kiểm thử mà chúng ta chạy::
 
    import unittest
 
@@ -412,16 +317,11 @@ call for every single test we run::
                             'wrong size after resize')
 
 .. note::
-   The order in which the various tests will be run is determined
-   by sorting the test method names with respect to the built-in
-   ordering for strings.
+   Thứ tự chạy các bài kiểm thử khác nhau được xác định bằng cách sắp xếp tên các phương thức kiểm thử theo thứ tự dựng sẵn dành cho chuỗi.
 
-If the :meth:`~TestCase.setUp` method raises an exception while the test is
-running, the framework will consider the test to have suffered an error, and
-the test method will not be executed.
+Nếu phương thức :meth:`~TestCase.setUp` phát sinh ngoại lệ trong khi bài kiểm thử đang chạy, framework sẽ coi bài kiểm thử đã gặp lỗi và phương thức kiểm thử sẽ không được thực thi.
 
-Similarly, we can provide a :meth:`~TestCase.tearDown` method that tidies up
-after the test method has been run::
+Tương tự, chúng ta có thể cung cấp một phương thức :meth:`~TestCase.tearDown` để dọn dẹp sau khi phương thức kiểm thử đã được chạy::
 
    import unittest
 
@@ -432,24 +332,16 @@ after the test method has been run::
        def tearDown(self):
            self.widget.dispose()
 
-If :meth:`~TestCase.setUp` succeeded, :meth:`~TestCase.tearDown` will be
-run whether the test method succeeded or not.
+Nếu :meth:`~TestCase.setUp` thành công, :meth:`~TestCase.tearDown` sẽ được chạy bất kể phương thức kiểm thử có thành công hay không.
 
-Such a working environment for the testing code is called a
-:dfn:`test fixture`.  A new TestCase instance is created as a unique
-test fixture used to execute each individual test method.  Thus
-:meth:`~TestCase.setUp`, :meth:`~TestCase.tearDown`, and :meth:`!TestCase.__init__`
-will be called once per test.
+Môi trường làm việc như vậy cho mã kiểm thử được gọi là
+:dfn:`test fixture`. Một đối tượng TestCase mới được tạo dưới dạng một test fixture riêng biệt, dùng để thực thi từng phương thức kiểm thử. Do đó
+:meth:`~TestCase.setUp`, :meth:`~TestCase.tearDown` và :meth:`!TestCase.__init__` sẽ được gọi một lần cho mỗi kiểm thử.
 
-It is recommended that you use TestCase implementations to group tests together
-according to the features they test.  :mod:`!unittest` provides a mechanism for
-this: the :dfn:`test suite`, represented by :mod:`!unittest`'s
-:class:`TestSuite` class.  In most cases, calling :func:`unittest.main` will do
-the right thing and collect all the module's test cases for you and execute
-them.
+Bạn nên sử dụng các triển khai TestCase để nhóm các kiểm thử theo những tính năng mà chúng kiểm thử. :mod:`!unittest` cung cấp một cơ chế cho việc này: :dfn:`test suite`, được biểu diễn bởi :mod:`!unittest`'s
+:class:`TestSuite` class. Trong hầu hết các trường hợp, gọi :func:`unittest.main` sẽ thực hiện đúng việc cần làm, tự động tập hợp tất cả test case của mô-đun và thực thi chúng.
 
-However, should you want to customize the building of your test suite,
-you can do it yourself::
+Tuy nhiên, nếu muốn tùy chỉnh việc xây dựng test suite, bạn có thể tự thực hiện::
 
    def suite():
        suite = unittest.TestSuite()
@@ -461,50 +353,42 @@ you can do it yourself::
        runner = unittest.TextTestRunner()
        runner.run(suite())
 
-You can place the definitions of test cases and test suites in the same modules
-as the code they are to test (such as :file:`widget.py`), but there are several
-advantages to placing the test code in a separate module, such as
+Bạn có thể đặt định nghĩa của các test case và test suite trong cùng module với mã mà chúng sẽ kiểm thử (chẳng hạn như :file:`widget.py`), nhưng việc đặt mã kiểm thử trong một module riêng có một số ưu điểm, chẳng hạn như
 :file:`test_widget.py`:
 
-* The test module can be run standalone from the command line.
+* Có thể chạy module kiểm thử độc lập từ dòng lệnh.
 
-* The test code can more easily be separated from shipped code.
+* Mã kiểm thử có thể được tách khỏi mã được phát hành dễ dàng hơn.
 
-* There is less temptation to change test code to fit the code it tests without
-  a good reason.
+* Ít có khả năng bạn muốn thay đổi mã kiểm thử để phù hợp với mã mà nó kiểm thử nếu không có lý do chính đáng.
 
-* Test code should be modified much less frequently than the code it tests.
+* Mã kiểm thử nên được sửa đổi ít thường xuyên hơn nhiều so với mã mà nó kiểm thử.
 
-* Tested code can be refactored more easily.
+* Mã được kiểm thử có thể được refactor dễ dàng hơn.
 
-* Tests for modules written in C must be in separate modules anyway, so why not
-  be consistent?
+* Các test dành cho module được viết bằng C ohnehin phải nằm trong các module riêng, vậy tại sao không nhất quán?
 
-* If the testing strategy changes, there is no need to change the source code.
+* Nếu chiến lược kiểm thử thay đổi, bạn không cần thay đổi mã nguồn.
 
 
 .. _legacy-unit-tests:
 
-Re-using old test code
-----------------------
+Tái sử dụng mã kiểm thử cũ
+--------------------------
 
-Some users will find that they have existing test code that they would like to
-run from :mod:`!unittest`, without converting every old test function to a
-:class:`TestCase` subclass.
+Một số người dùng sẽ nhận thấy rằng họ có mã kiểm thử hiện có mà họ muốn chạy từ :mod:`!unittest`, mà không cần chuyển đổi mọi hàm kiểm thử cũ thành một
+lớp con :class:`TestCase`.
 
-For this reason, :mod:`!unittest` provides a :class:`FunctionTestCase` class.
-This subclass of :class:`TestCase` can be used to wrap an existing test
-function.  Set-up and tear-down functions can also be provided.
+Vì lý do này, :mod:`!unittest` cung cấp một lớp :class:`FunctionTestCase`. Lớp con này của :class:`TestCase` có thể được dùng để bọc một hàm kiểm thử hiện có. Bạn cũng có thể cung cấp các hàm set-up và tear-down.
 
-Given the following test function::
+Với hàm kiểm thử sau đây::
 
    def testSomething():
        something = makeSomething()
        assert something.name is not None
        # ...
 
-one can create an equivalent test case instance as follows, with optional
-set-up and tear-down methods::
+ta có thể tạo một thực thể test case tương đương như sau, kèm theo các phương thức set-up và tear-down tùy chọn::
 
    testcase = unittest.FunctionTestCase(testSomething,
                                         setUp=makeSomethingDB,
@@ -512,34 +396,26 @@ set-up and tear-down methods::
 
 .. note::
 
-   Even though :class:`FunctionTestCase` can be used to quickly convert an
-   existing test base over to a :mod:`!unittest`\ -based system, this approach is
-   not recommended.  Taking the time to set up proper :class:`TestCase`
-   subclasses will make future test refactorings infinitely easier.
+   Mặc dù :class:`FunctionTestCase` có thể được dùng để nhanh chóng chuyển một bộ kiểm thử hiện có sang hệ thống dựa trên :mod:`!unittest`\ , cách tiếp cận này không được khuyến nghị. Dành thời gian thiết lập các lớp con :class:`TestCase` phù hợp sẽ giúp việc tái cấu trúc kiểm thử sau này dễ dàng hơn rất nhiều.
 
-In some cases, the existing tests may have been written using the :mod:`doctest`
-module.  If so, :mod:`doctest` provides a :class:`~doctest.DocTestSuite` class that can
-automatically build :class:`unittest.TestSuite` instances from the existing
-:mod:`doctest`\ -based tests.
+Trong một số trường hợp, các kiểm thử hiện có có thể được viết bằng module :mod:`doctest`. Nếu vậy, :mod:`doctest` cung cấp một lớp :class:`~doctest.DocTestSuite` có thể tự động xây dựng các thực thể :class:`unittest.TestSuite` từ các kiểm thử hiện có
+dựa trên :mod:`doctest`\ .
 
 
 .. _unittest-skipping:
 
-Skipping tests and expected failures
-------------------------------------
+Bỏ qua kiểm thử và các lỗi dự kiến
+----------------------------------
 
 .. versionadded:: 3.1
 
-Unittest supports skipping individual test methods and even whole classes of
-tests.  In addition, it supports marking a test as an "expected failure," a test
-that is broken and will fail, but shouldn't be counted as a failure on a
+Unittest hỗ trợ bỏ qua từng phương thức kiểm thử riêng lẻ và thậm chí cả những lớp kiểm thử. Ngoài ra, nó còn hỗ trợ đánh dấu một kiểm thử là "lỗi dự kiến"—một kiểm thử bị hỏng và sẽ thất bại, nhưng không nên được tính là một lỗi trên một
 :class:`TestResult`.
 
-Skipping a test is simply a matter of using the :deco:`skip` :term:`decorator`
-or one of its conditional variants, calling :meth:`TestCase.skipTest` within a
-:meth:`~TestCase.setUp` or test method, or raising :exc:`SkipTest` directly.
+Việc bỏ qua một kiểm thử chỉ đơn giản là sử dụng :deco:`skip` :term:`decorator` hoặc một biến thể có điều kiện của nó, gọi :meth:`TestCase.skipTest` bên trong một
+:meth:`~TestCase.setUp` hoặc phương thức kiểm thử, hoặc trực tiếp phát sinh :exc:`SkipTest`.
 
-Basic skipping looks like this::
+Bỏ qua cơ bản trông như sau::
 
    class MyTestCase(unittest.TestCase):
 
@@ -550,21 +426,21 @@ Basic skipping looks like this::
        @unittest.skipIf(mylib.__version__ < (1, 3),
                         "not supported in this library version")
        def test_format(self):
-           # Tests that work for only a certain version of the library.
+           # Các test chỉ hoạt động với một phiên bản cụ thể của thư viện.
            pass
 
        @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
        def test_windows_support(self):
-           # windows specific testing code
+           # mã kiểm thử dành riêng cho Windows
            pass
 
        def test_maybe_skipped(self):
            if not external_resource_available():
                self.skipTest("external resource not available")
-           # test code that depends on the external resource
+           # mã kiểm thử phụ thuộc vào tài nguyên bên ngoài
            pass
 
-This is the output of running the example above in verbose mode::
+Đây là kết quả khi chạy ví dụ trên ở chế độ verbose::
 
    test_format (__main__.MyTestCase.test_format) ... skipped 'not supported in this library version'
    test_nothing (__main__.MyTestCase.test_nothing) ... skipped 'demonstrating skipping'
@@ -576,78 +452,67 @@ This is the output of running the example above in verbose mode::
 
    OK (skipped=4)
 
-Classes can be skipped just like methods::
+Có thể bỏ qua các class giống như các method::
 
    @unittest.skip("showing class skipping")
    class MySkippedTestCase(unittest.TestCase):
        def test_not_run(self):
            pass
 
-:meth:`TestCase.setUp` can also skip the test.  This is useful when a resource
-that needs to be set up is not available.
+:meth:`TestCase.setUp` cũng có thể bỏ qua test. Điều này hữu ích khi không có tài nguyên cần thiết lập.
 
-Expected failures use the :deco:`expectedFailure` decorator. ::
+Các lỗi dự kiến sử dụng decorator :deco:`expectedFailure`.::
 
    class ExpectedFailureTestCase(unittest.TestCase):
        @unittest.expectedFailure
        def test_fail(self):
            self.assertEqual(1, 0, "broken")
 
-It's easy to roll your own skipping decorators by making a decorator that calls
-:func:`skip` on the test when it wants it to be skipped.  This decorator skips
-the test unless the passed object has a certain attribute::
+Bạn có thể dễ dàng tự tạo các decorator để bỏ qua bằng cách tạo một decorator gọi
+:func:`skip` trên bài kiểm thử khi muốn bỏ qua bài kiểm thử đó. Decorator này bỏ qua bài kiểm thử trừ khi đối tượng được truyền vào có một thuộc tính nhất định::
 
    def skipUnlessHasattr(obj, attr):
        if hasattr(obj, attr):
            return lambda func: func
        return unittest.skip("{!r} doesn't have {!r}".format(obj, attr))
 
-The following decorators and exception implement test skipping and expected failures:
+Các decorator và exception sau đây triển khai chức năng bỏ qua bài kiểm thử và các lỗi dự kiến:
 
 .. decorator:: skip(reason)
 
-   Unconditionally skip the decorated test.  *reason* should describe why the
-   test is being skipped.
+   Luôn bỏ qua bài kiểm thử được áp dụng decorator. *reason* nên mô tả lý do bài kiểm thử bị bỏ qua.
 
 .. decorator:: skipIf(condition, reason)
 
-   Skip the decorated test if *condition* is true.
+   Bỏ qua bài kiểm thử được áp dụng decorator nếu *condition* là true.
 
 .. decorator:: skipUnless(condition, reason)
 
-   Skip the decorated test unless *condition* is true.
+   Bỏ qua bài kiểm thử được áp dụng decorator trừ khi *condition* là true.
 
 .. decorator:: expectedFailure
 
-   Mark the test as an expected failure or error.  If the test fails or errors
-   in the test function itself (rather than in one of the :dfn:`test fixture`
-   methods) then it will be considered a success.  If the test passes, it will
-   be considered a failure.
+   Đánh dấu test là một lỗi hoặc thất bại được dự kiến. Nếu test thất bại hoặc xảy ra lỗi ngay trong hàm test (thay vì trong một trong các phương thức :dfn:`test fixture`) thì test sẽ được xem là thành công. Nếu test chạy thành công, test sẽ được xem là thất bại.
 
 .. exception:: SkipTest(reason)
 
-   This exception is raised to skip a test.
+   Ngoại lệ này được đưa ra để bỏ qua một test.
 
-   Usually you can use :meth:`TestCase.skipTest` or one of the skipping
-   decorators instead of raising this directly.
+   Thông thường, bạn có thể sử dụng :meth:`TestCase.skipTest` hoặc một trong các decorator bỏ qua thay vì trực tiếp đưa ra ngoại lệ này.
 
-Skipped tests will not have :meth:`~TestCase.setUp` or :meth:`~TestCase.tearDown` run around them.
-Skipped classes will not have :meth:`~TestCase.setUpClass` or :meth:`~TestCase.tearDownClass` run.
-Skipped modules will not have :func:`setUpModule` or :func:`tearDownModule` run.
+Các test bị bỏ qua sẽ không chạy :meth:`~TestCase.setUp` hoặc :meth:`~TestCase.tearDown` xung quanh chúng. Các lớp bị bỏ qua sẽ không chạy :meth:`~TestCase.setUpClass` hoặc :meth:`~TestCase.tearDownClass`. Các module bị bỏ qua sẽ không chạy :func:`setUpModule` hoặc :func:`tearDownModule`.
 
 
 .. _subtests:
 
-Distinguishing test iterations using subtests
----------------------------------------------
+Phân biệt các lần lặp test bằng subtest
+---------------------------------------
 
 .. versionadded:: 3.4
 
-When there are very small differences among your tests, for
-instance some parameters, unittest allows you to distinguish them inside
-the body of a test method using the :meth:`~TestCase.subTest` context manager.
+Khi các test của bạn chỉ khác nhau ở một vài điểm rất nhỏ, chẳng hạn như một số tham số, unittest cho phép bạn phân biệt chúng bên trong phần thân của một phương thức test bằng context manager :meth:`~TestCase.subTest`.
 
-For example, the following test::
+Ví dụ, test sau đây::
 
    class NumbersTest(unittest.TestCase):
 
@@ -659,7 +524,7 @@ For example, the following test::
                with self.subTest(i=i):
                    self.assertEqual(i % 2, 0)
 
-will produce the following output::
+sẽ tạo ra kết quả sau::
 
    ======================================================================
    FAIL: test_even (__main__.NumbersTest.test_even) (i=1)
@@ -691,9 +556,7 @@ will produce the following output::
        ^^^^^^^^^^^^^^^^^^^^^^^^^^
    AssertionError: 1 != 0
 
-Without using a subtest, execution would stop after the first failure,
-and the error would be less easy to diagnose because the value of ``i``
-wouldn't be displayed::
+Nếu không sử dụng subtest, quá trình thực thi sẽ dừng sau lỗi đầu tiên, và lỗi sẽ khó chẩn đoán hơn vì giá trị của ``i`` sẽ không được hiển thị::
 
    ======================================================================
    FAIL: test_even (__main__.NumbersTest.test_even)
@@ -706,143 +569,102 @@ wouldn't be displayed::
 
 .. _unittest-contents:
 
-Classes and functions
----------------------
+Các lớp và hàm
+--------------
 
-This section describes in depth the API of :mod:`!unittest`.
+Phần này mô tả chi tiết API của :mod:`!unittest`.
 
 
 .. _testcase-objects:
 
-Test cases
-~~~~~~~~~~
+Các test case
+~~~~~~~~~~~~~
 
 .. class:: TestCase(methodName='runTest')
 
-   Instances of the :class:`TestCase` class represent the logical test units
-   in the :mod:`!unittest` universe.  This class is intended to be used as a base
-   class, with specific tests being implemented by concrete subclasses.  This class
-   implements the interface needed by the test runner to allow it to drive the
-   tests, and methods that the test code can use to check for and report various
-   kinds of failure.
+   Các instance của lớp :class:`TestCase` đại diện cho các đơn vị kiểm thử logic trong hệ sinh thái :mod:`!unittest`. Lớp này được thiết kế để sử dụng làm lớp cơ sở, trong đó các kiểm thử cụ thể được triển khai bởi các lớp con cụ thể. Lớp này triển khai interface cần thiết để test runner điều khiển các kiểm thử, cùng với các phương thức mà mã kiểm thử có thể sử dụng để kiểm tra và báo cáo nhiều loại lỗi khác nhau.
 
-   Each instance of :class:`TestCase` will run a single base method: the method
-   named *methodName*.
-   In most uses of :class:`TestCase`, you will neither change
-   the *methodName* nor reimplement the default ``runTest()`` method.
+   Mỗi instance của :class:`TestCase` sẽ chạy một phương thức cơ sở duy nhất: phương thức có tên *methodName*. Trong hầu hết trường hợp sử dụng :class:`TestCase`, bạn sẽ không thay đổi *methodName* cũng như triển khai lại phương thức mặc định ``runTest()``.
 
    .. versionchanged:: 3.2
       :class:`TestCase` can be instantiated successfully without providing a
-      *methodName*. This makes it easier to experiment with :class:`TestCase`
-      from the interactive interpreter.
+      *methodName*. Điều này giúp việc thử nghiệm với :class:`TestCase` từ trình thông dịch tương tác trở nên dễ dàng hơn.
 
-   :class:`TestCase` instances provide three groups of methods: one group used
-   to run the test, another used by the test implementation to check conditions
-   and report failures, and some inquiry methods allowing information about the
-   test itself to be gathered.
+   Các instance :class:`TestCase` cung cấp ba nhóm phương thức: một nhóm dùng để chạy kiểm thử, một nhóm khác được phần triển khai kiểm thử sử dụng để kiểm tra các điều kiện và báo cáo lỗi, cùng một số phương thức truy vấn cho phép thu thập thông tin về chính bài kiểm thử.
 
-   Methods in the first group (running the test) are:
+   Các phương thức trong nhóm đầu tiên (chạy kiểm thử) là:
 
    .. method:: setUp()
 
-      Method called to prepare the test fixture.  This is called immediately
-      before calling the test method; other than :exc:`AssertionError` or :exc:`SkipTest`,
-      any exception raised by this method will be considered an error rather than
-      a test failure. The default implementation does nothing.
+      Phương thức được gọi để chuẩn bị test fixture. Phương thức này được gọi ngay trước khi gọi phương thức kiểm thử; ngoài :exc:`AssertionError` hoặc :exc:`SkipTest`, mọi ngoại lệ do phương thức này phát sinh sẽ được xem là lỗi thay vì một lần kiểm thử thất bại. Phần triển khai mặc định không thực hiện gì.
 
 
    .. method:: tearDown()
 
-      Method called immediately after the test method has been called and the
-      result recorded.  This is called even if the test method raised an
-      exception, so the implementation in subclasses may need to be particularly
-      careful about checking internal state.  Any exception, other than
-      :exc:`AssertionError` or :exc:`SkipTest`, raised by this method will be
-      considered an additional error rather than a test failure (thus increasing
-      the total number of reported errors). This method will only be called if
-      the :meth:`setUp` succeeds, regardless of the outcome of the test method.
-      The default implementation does nothing.
+      Phương thức được gọi ngay sau khi phương thức kiểm thử được gọi và kết quả được ghi lại. Phương thức này vẫn được gọi ngay cả khi phương thức kiểm thử phát sinh ngoại lệ, vì vậy phần triển khai trong các lớp con có thể cần đặc biệt cẩn thận khi kiểm tra trạng thái nội bộ. Mọi ngoại lệ, ngoại trừ
+      :exc:`AssertionError` hoặc :exc:`SkipTest`, do phương thức này phát sinh sẽ được xem là một lỗi bổ sung thay vì một lần kiểm thử thất bại (do đó làm tăng tổng số lỗi được báo cáo). Phương thức này chỉ được gọi nếu :meth:`setUp` thành công, bất kể kết quả của phương thức kiểm thử. Phần triển khai mặc định không thực hiện gì.
 
 
    .. method:: setUpClass()
 
-      A class method called before tests in an individual class are run.
-      ``setUpClass`` is called with the class as the only argument
-      and must be decorated as a :deco:`classmethod`::
+      Một class method được gọi trước khi các bài kiểm thử trong một lớp riêng lẻ được chạy. ``setUpClass`` được gọi với lớp đó là đối số duy nhất và phải được đánh dấu là một :deco:`classmethod`::
 
         @classmethod
         def setUpClass(cls):
             ...
 
-      See `Class and Module Fixtures`_ for more details.
+      Xem `Class and Module Fixtures <Class and Module Fixtures_>`_ để biết thêm chi tiết.
 
       .. versionadded:: 3.2
 
 
    .. method:: tearDownClass()
 
-      A class method called after tests in an individual class have run.
-      ``tearDownClass`` is called with the class as the only argument
-      and must be decorated as a :deco:`classmethod`::
+      Một class method được gọi sau khi các test trong một class riêng lẻ đã chạy xong. ``tearDownClass`` được gọi với class là đối số duy nhất và phải được trang trí bằng :deco:`classmethod`::
 
         @classmethod
         def tearDownClass(cls):
             ...
 
-      See `Class and Module Fixtures`_ for more details.
+      Xem `Class and Module Fixtures <Class and Module Fixtures_>`_ để biết thêm chi tiết.
 
       .. versionadded:: 3.2
 
 
    .. method:: run(result=None)
 
-      Run the test, collecting the result into the :class:`TestResult` object
-      passed as *result*.  If *result* is omitted or ``None``, a temporary
-      result object is created (by calling the :meth:`defaultTestResult`
-      method) and used. The result object is returned to :meth:`run`'s
-      caller.
+      Chạy test, lưu kết quả vào đối tượng :class:`TestResult` được truyền dưới dạng *result*. Nếu *result* bị bỏ qua hoặc là ``None``, một đối tượng kết quả tạm thời sẽ được tạo (bằng cách gọi method :meth:`defaultTestResult`) và được sử dụng. Đối tượng kết quả được trả về cho bên gọi :meth:`run`.
 
-      The same effect may be had by simply calling the :class:`TestCase`
-      instance.
+      Có thể đạt được hiệu ứng tương tự bằng cách פשוט gọi instance :class:`TestCase`.
 
       .. versionchanged:: 3.3
-         Previous versions of ``run`` did not return the result. Neither did
-         calling an instance.
+         Các phiên bản trước của ``run`` không trả về kết quả. Việc gọi một instance cũng vậy.
 
    .. method:: skipTest(reason)
 
-      Calling this during a test method or :meth:`setUp` skips the current
-      test.  See :ref:`unittest-skipping` for more information.
+      Việc gọi hàm này trong một test method hoặc :meth:`setUp` sẽ bỏ qua test hiện tại. Xem :ref:`unittest-skipping` để biết thêm thông tin.
 
       .. versionadded:: 3.1
 
 
    .. method:: subTest(msg=None, **params)
 
-      Return a context manager which executes the enclosed code block as a
-      subtest.  *msg* and *params* are optional, arbitrary values which are
-      displayed whenever a subtest fails, allowing you to identify them
-      clearly.
+      Trả về một context manager thực thi khối mã được bao quanh dưới dạng một subtest. *msg* và *params* là các giá trị tùy ý, không bắt buộc; chúng được hiển thị mỗi khi một subtest thất bại, giúp bạn xác định rõ subtest đó.
 
-      A test case can contain any number of subtest declarations, and
-      they can be arbitrarily nested.
+      Một test case có thể chứa bất kỳ số lượng khai báo subtest nào và chúng có thể được lồng nhau tùy ý.
 
-      See :ref:`subtests` for more information.
+      Xem :ref:`subtests` để biết thêm thông tin.
 
       .. versionadded:: 3.4
 
 
    .. method:: debug()
 
-      Run the test without collecting the result.  This allows exceptions raised
-      by the test to be propagated to the caller, and can be used to support
-      running tests under a debugger.
+      Chạy test mà không thu thập kết quả. Điều này cho phép các ngoại lệ do test phát sinh được truyền đến caller và có thể được dùng để hỗ trợ chạy test dưới debugger.
 
    .. _assert-methods:
 
-   The :class:`TestCase` class provides several assert methods to check for and
-   report failures.  The following table lists the most commonly used methods
-   (see the tables below for more assert methods):
+   Lớp :class:`TestCase` cung cấp một số phương thức assert để kiểm tra và báo cáo lỗi. Bảng sau liệt kê các phương thức thường được sử dụng nhất (xem các bảng bên dưới để biết thêm các phương thức assert):
 
    +-----------------------------------------+-----------------------------+---------------+
    | Method                                  | Checks that                 | New in        |
@@ -890,53 +712,39 @@ Test cases
    | <TestCase.assertNotIsSubclass>`         |                             |               |
    +-----------------------------------------+-----------------------------+---------------+
 
-   All the assert methods accept a *msg* argument that, if specified, is used
-   as the error message on failure (see also :data:`longMessage`).
-   Note that the *msg* keyword argument can be passed to :meth:`assertRaises`,
-   :meth:`assertRaisesRegex`, :meth:`assertWarns`, :meth:`assertWarnsRegex`
-   only when they are used as a context manager.
+   Tất cả các phương thức assert đều chấp nhận đối số *msg*, đối số này nếu được chỉ định sẽ được dùng làm thông báo lỗi khi thất bại (xem thêm :data:`longMessage`). Lưu ý rằng đối số từ khóa *msg* có thể được truyền cho :meth:`assertRaises`,
+   :meth:`assertRaisesRegex`, :meth:`assertWarns`, :meth:`assertWarnsRegex` chỉ khi chúng được sử dụng dưới dạng context manager.
 
    .. method:: assertEqual(first, second, msg=None)
 
-      Test that *first* and *second* are equal.  If the values do not
-      compare equal, the test will fail.
+      Kiểm tra xem *first* và *second* có bằng nhau không. Nếu các giá trị không bằng nhau, phép kiểm tra sẽ thất bại.
 
-      In addition, if *first* and *second* are the exact same type and one of
-      list, tuple, dict, set, frozenset or str or any type that a subclass
-      registers with :meth:`addTypeEqualityFunc` the type-specific equality
-      function will be called in order to generate a more useful default
-      error message (see also the :ref:`list of type-specific methods
-      <type-specific-methods>`).
+      Ngoài ra, nếu *first* và *second* có cùng chính xác một kiểu và kiểu đó là một trong các kiểu list, tuple, dict, set, frozenset hoặc str, hoặc bất kỳ kiểu nào mà một lớp con đăng ký với :meth:`addTypeEqualityFunc`, hàm so sánh bằng dành riêng cho kiểu sẽ được gọi để tạo thông báo lỗi mặc định hữu ích hơn (xem thêm :ref:`danh sách các phương thức dành riêng cho từng kiểu <type-specific-methods>`).
 
       .. versionchanged:: 3.1
-         Added the automatic calling of type-specific equality function.
+         Đã bổ sung việc tự động gọi hàm so sánh bằng dành riêng cho kiểu.
 
       .. versionchanged:: 3.2
          :meth:`assertMultiLineEqual` added as the default type equality
-         function for comparing strings.
+         hàm dùng để so sánh các chuỗi.
 
 
    .. method:: assertNotEqual(first, second, msg=None)
 
-      Test that *first* and *second* are not equal.  If the values do
-      compare equal, the test will fail.
+      Kiểm tra xem *first* và *second* có khác nhau không. Nếu các giá trị bằng nhau, phép kiểm tra sẽ thất bại.
 
    .. method:: assertTrue(expr, msg=None)
                assertFalse(expr, msg=None)
 
-      Test that *expr* is true (or false).
+      Kiểm tra xem *expr* là true (hoặc false).
 
-      Note that this is equivalent to ``bool(expr) is True`` and not to ``expr
-      is True`` (use ``assertIs(expr, True)`` for the latter).  This method
-      should also be avoided when more specific methods are available (e.g.
-      ``assertEqual(a, b)`` instead of ``assertTrue(a == b)``), because they
-      provide a better error message in case of failure.
+      Lưu ý rằng điều này tương đương với ``bool(expr) is True`` chứ không phải ``expr is True`` (hãy dùng ``assertIs(expr, True)`` cho trường hợp sau). Cũng nên tránh phương thức này khi có các phương thức cụ thể hơn (ví dụ: ``assertEqual(a, b)`` thay vì ``assertTrue(a == b)``), vì chúng cung cấp thông báo lỗi tốt hơn trong trường hợp thất bại.
 
 
    .. method:: assertIs(first, second, msg=None)
                assertIsNot(first, second, msg=None)
 
-      Test that *first* and *second* are (or are not) the same object.
+      Kiểm thử rằng *first* và *second* là (hoặc không là) cùng một đối tượng.
 
       .. versionadded:: 3.1
 
@@ -944,7 +752,7 @@ Test cases
    .. method:: assertIsNone(expr, msg=None)
                assertIsNotNone(expr, msg=None)
 
-      Test that *expr* is (or is not) ``None``.
+      Kiểm thử rằng *expr* là (hoặc không là) ``None``.
 
       .. versionadded:: 3.1
 
@@ -952,7 +760,7 @@ Test cases
    .. method:: assertIn(member, container, msg=None)
                assertNotIn(member, container, msg=None)
 
-      Test that *member* is (or is not) in *container*.
+      Kiểm thử rằng *member* nằm (hoặc không nằm) trong *container*.
 
       .. versionadded:: 3.1
 
@@ -960,9 +768,7 @@ Test cases
    .. method:: assertIsInstance(obj, cls, msg=None)
                assertNotIsInstance(obj, cls, msg=None)
 
-      Test that *obj* is (or is not) an instance of *cls* (which can be a
-      class or a tuple of classes, as supported by :func:`isinstance`).
-      To check for the exact type, use :func:`assertIs(type(obj), cls) <assertIs>`.
+      Kiểm tra rằng *obj* là (hoặc không là) một instance của *cls* (có thể là một class hoặc một tuple các class, như được hỗ trợ bởi :func:`isinstance`). Để kiểm tra type chính xác, hãy sử dụng :func:`assertIs(type(obj), cls) <assertIs>`.
 
       .. versionadded:: 3.2
 
@@ -970,15 +776,12 @@ Test cases
    .. method:: assertIsSubclass(cls, superclass, msg=None)
                assertNotIsSubclass(cls, superclass, msg=None)
 
-      Test that *cls* is (or is not) a subclass of *superclass* (which can be a
-      class or a tuple of classes, as supported by :func:`issubclass`).
-      To check for the exact type, use :func:`assertIs(cls, superclass) <assertIs>`.
+      Kiểm tra rằng *cls* là (hoặc không là) một subclass của *superclass* (có thể là một class hoặc một tuple các class, như được hỗ trợ bởi :func:`issubclass`). Để kiểm tra type chính xác, hãy sử dụng :func:`assertIs(cls, superclass) <assertIs>`.
 
       .. versionadded:: 3.14
 
 
-   It is also possible to check the production of exceptions, warnings, and
-   log messages using the following methods:
+   Bạn cũng có thể kiểm tra việc tạo ra exception, warning và log message bằng các phương thức sau:
 
    +---------------------------------------------------------+--------------------------------------+------------+
    | Method                                                  | Checks that                          | New in     |
@@ -1005,26 +808,18 @@ Test cases
    .. method:: assertRaises(exception, callable, *args, **kwds)
                assertRaises(exception, *, msg=None)
 
-      Test that an exception is raised when *callable* is called with any
-      positional or keyword arguments that are also passed to
-      :meth:`assertRaises`.  The test passes if *exception* is raised, is an
-      error if another exception is raised, or fails if no exception is raised.
-      To catch any of a group of exceptions, a tuple containing the exception
-      classes may be passed as *exception*.
+      Kiểm tra rằng một exception được raise khi *callable* được gọi với bất kỳ đối số positional hoặc keyword nào cũng được truyền cho
+      :meth:`assertRaises`.  Bài kiểm thử đạt nếu *exception* được phát sinh, là lỗi nếu một ngoại lệ khác được phát sinh hoặc thất bại nếu không có ngoại lệ nào được phát sinh. Để bắt bất kỳ ngoại lệ nào trong một nhóm ngoại lệ, có thể truyền một tuple chứa các lớp ngoại lệ làm *exception*.
 
-      If only the *exception* and possibly the *msg* arguments are given,
-      return a context manager so that the code under test can be written
-      inline rather than as a function::
+      Nếu chỉ cung cấp các đối số *exception* và có thể cả *msg*, hãy trả về một context manager để mã đang được kiểm thử có thể được viết trực tiếp thay vì viết dưới dạng một hàm::
 
          with self.assertRaises(SomeException):
              do_something()
 
-      When used as a context manager, :meth:`assertRaises` accepts the
-      additional keyword argument *msg*.
+      Khi được sử dụng làm context manager, :meth:`assertRaises` chấp nhận thêm đối số từ khóa *msg*.
 
-      The context manager will store the caught exception object in its
-      :attr:`!exception` attribute.  This can be useful if the intention
-      is to perform additional checks on the exception raised::
+      Context manager sẽ lưu đối tượng ngoại lệ đã bắt được vào
+      :attr:`!exception` attribute.  Điều này có thể hữu ích nếu mục đích là thực hiện các kiểm tra bổ sung đối với ngoại lệ được phát sinh::
 
          with self.assertRaises(SomeException) as cm:
              do_something()
@@ -1033,66 +828,53 @@ Test cases
          self.assertEqual(the_exception.error_code, 3)
 
       .. versionchanged:: 3.1
-         Added the ability to use :meth:`assertRaises` as a context manager.
+         Đã bổ sung khả năng sử dụng :meth:`assertRaises` làm context manager.
 
       .. versionchanged:: 3.2
-         Added the :attr:`!exception` attribute.
+         Đã bổ sung :attr:`!exception` attribute.
 
       .. versionchanged:: 3.3
-         Added the *msg* keyword argument when used as a context manager.
+         Đã thêm đối số từ khóa *msg* khi được sử dụng như một context manager.
 
 
    .. method:: assertRaisesRegex(exception, regex, callable, *args, **kwds)
                assertRaisesRegex(exception, regex, *, msg=None)
 
-      Like :meth:`assertRaises` but also tests that *regex* matches
-      on the string representation of the raised exception.  *regex* may be
-      a regular expression object or a string containing a regular expression
-      suitable for use by :func:`re.search`.  Examples::
+      Tương tự :meth:`assertRaises` nhưng cũng kiểm tra rằng *regex* khớp với biểu diễn chuỗi của exception được nêu ra. *regex* có thể là một đối tượng biểu thức chính quy hoặc một chuỗi chứa biểu thức chính quy phù hợp để sử dụng bởi :func:`re.search`. Ví dụ::
 
          self.assertRaisesRegex(ValueError, "invalid literal for.*XYZ'$",
                                 int, 'XYZ')
 
-      or::
+      hoặc::
 
          with self.assertRaisesRegex(ValueError, 'literal'):
             int('XYZ')
 
       .. versionadded:: 3.1
-         Added under the name ``assertRaisesRegexp``.
+         Được thêm với tên ``assertRaisesRegexp``.
 
       .. versionchanged:: 3.2
-         Renamed to :meth:`assertRaisesRegex`.
+         Đổi tên thành :meth:`assertRaisesRegex`.
 
       .. versionchanged:: 3.3
-         Added the *msg* keyword argument when used as a context manager.
+         Đã thêm đối số từ khóa *msg* khi được sử dụng như một context manager.
 
 
    .. method:: assertWarns(warning, callable, *args, **kwds)
                assertWarns(warning, *, msg=None)
 
-      Test that a warning is triggered when *callable* is called with any
-      positional or keyword arguments that are also passed to
-      :meth:`assertWarns`.  The test passes if *warning* is triggered and
-      fails if it isn't.  Any exception is an error.
-      To catch any of a group of warnings, a tuple containing the warning
-      classes may be passed as *warnings*.
+      Kiểm thử rằng một cảnh báo được kích hoạt khi *callable* được gọi với bất kỳ đối số vị trí hoặc từ khóa nào cũng được truyền vào
+      :meth:`assertWarns`. Bài kiểm thử thành công nếu *warning* được kích hoạt và thất bại nếu không. Mọi ngoại lệ đều là lỗi. Để bắt bất kỳ cảnh báo nào trong một nhóm cảnh báo, có thể truyền một tuple chứa các lớp cảnh báo làm *warnings*.
 
-      If only the *warning* and possibly the *msg* arguments are given,
-      return a context manager so that the code under test can be written
-      inline rather than as a function::
+      Nếu chỉ cung cấp các đối số *warning* và có thể cả *msg*, hãy trả về một context manager để mã đang được kiểm thử có thể được viết nội tuyến thay vì viết dưới dạng một hàm::
 
          with self.assertWarns(SomeWarning):
              do_something()
 
-      When used as a context manager, :meth:`assertWarns` accepts the
-      additional keyword argument *msg*.
+      Khi được sử dụng như một context manager, :meth:`assertWarns` chấp nhận thêm đối số từ khóa *msg*.
 
-      The context manager will store the caught warning object in its
-      :attr:`!warning` attribute, and the source line which triggered the
-      warnings in the :attr:`!filename` and :attr:`!lineno` attributes.
-      This can be useful if the intention is to perform additional checks
-      on the warning caught::
+      Context manager sẽ lưu đối tượng cảnh báo đã bắt được vào
+      :attr:`!warning` attribute, và dòng mã nguồn đã kích hoạt cảnh báo vào các attribute :attr:`!filename` và :attr:`!lineno`. Điều này có thể hữu ích nếu cần thực hiện thêm các kiểm tra trên cảnh báo đã bắt được::
 
          with self.assertWarns(SomeWarning) as cm:
              do_something()
@@ -1100,28 +882,24 @@ Test cases
          self.assertIn('myfile.py', cm.filename)
          self.assertEqual(320, cm.lineno)
 
-      This method works regardless of the warning filters in place when it
-      is called.
+      Phương thức này hoạt động bất kể các bộ lọc cảnh báo đang được áp dụng khi phương thức được gọi.
 
       .. versionadded:: 3.2
 
       .. versionchanged:: 3.3
-         Added the *msg* keyword argument when used as a context manager.
+         Đã thêm đối số từ khóa *msg* khi được sử dụng như một context manager.
 
 
    .. method:: assertWarnsRegex(warning, regex, callable, *args, **kwds)
                assertWarnsRegex(warning, regex, *, msg=None)
 
-      Like :meth:`assertWarns` but also tests that *regex* matches on the
-      message of the triggered warning.  *regex* may be a regular expression
-      object or a string containing a regular expression suitable for use
-      by :func:`re.search`.  Example::
+      Tương tự :meth:`assertWarns` nhưng cũng kiểm tra rằng *regex* khớp với thông báo của cảnh báo được kích hoạt. *regex* có thể là một đối tượng biểu thức chính quy hoặc một chuỗi chứa biểu thức chính quy phù hợp để :func:`re.search` sử dụng. Ví dụ::
 
          self.assertWarnsRegex(DeprecationWarning,
                                r'legacy_function\(\) is deprecated',
                                legacy_function, 'XYZ')
 
-      or::
+      hoặc::
 
          with self.assertWarnsRegex(RuntimeWarning, 'unsafe frobnicating'):
              frobnicate('/etc/passwd')
@@ -1129,41 +907,31 @@ Test cases
       .. versionadded:: 3.2
 
       .. versionchanged:: 3.3
-         Added the *msg* keyword argument when used as a context manager.
+         Đã thêm đối số từ khóa *msg* khi được sử dụng như một context manager.
 
    .. method:: assertLogs(logger=None, level=None)
 
-      A context manager to test that at least one message is logged on
-      the *logger* or one of its children, with at least the given
-      *level*.
+      Một context manager dùng để kiểm tra rằng ít nhất một thông báo được ghi vào *logger* hoặc một trong các logger con của nó, với *level* tối thiểu như đã chỉ định.
 
-      If given, *logger* should be a :class:`logging.Logger` object or a
-      :class:`str` giving the name of a logger.  The default is the root
-      logger, which will catch all messages that were not blocked by a
-      non-propagating descendent logger.
+      Nếu được chỉ định, *logger* phải là một đối tượng :class:`logging.Logger` hoặc một
+      :class:`str` chỉ định tên của một logger. Mặc định là root logger, logger này sẽ nhận tất cả thông báo không bị chặn bởi một logger con không truyền tiếp.
 
-      If given, *level* should be either a numeric logging level or
-      its string equivalent (for example either ``"ERROR"`` or
-      :const:`logging.ERROR`).  The default is :const:`logging.INFO`.
+      Nếu được chỉ định, *level* phải là một logging level dạng số hoặc giá trị chuỗi tương ứng (ví dụ là ``"ERROR"`` hoặc
+      :const:`logging.ERROR`). Mặc định là :const:`logging.INFO`.
 
-      The test passes if at least one message emitted inside the ``with``
-      block matches the *logger* and *level* conditions, otherwise it fails.
+      Bài kiểm thử đạt nếu ít nhất một thông báo được phát ra bên trong khối ``with`` khớp với các điều kiện *logger* và *level*; nếu không, bài kiểm thử thất bại.
 
-      The object returned by the context manager is a recording helper
-      which keeps tracks of the matching log messages.  It has two
-      attributes:
+      Đối tượng được context manager trả về là một recording helper dùng để theo dõi các thông báo log khớp điều kiện. Đối tượng này có hai thuộc tính:
 
       .. attribute:: records
 
-         A list of :class:`logging.LogRecord` objects of the matching
-         log messages.
+         Một danh sách các đối tượng :class:`logging.LogRecord` của những thông báo log khớp điều kiện.
 
       .. attribute:: output
 
-         A list of :class:`str` objects with the formatted output of
-         matching messages.
+         Một danh sách các đối tượng :class:`str` chứa đầu ra đã được định dạng của các message khớp.
 
-      Example::
+      Ví dụ::
 
          with self.assertLogs('foo', level='INFO') as cm:
              logging.getLogger('foo').info('first message')
@@ -1175,24 +943,19 @@ Test cases
 
    .. method:: assertNoLogs(logger=None, level=None)
 
-      A context manager to test that no messages are logged on
-      the *logger* or one of its children, with at least the given
-      *level*.
+      Một context manager để kiểm tra rằng không có message nào được ghi vào *logger* hoặc một logger con của nó, với *level* tối thiểu đã cho.
 
-      If given, *logger* should be a :class:`logging.Logger` object or a
-      :class:`str` giving the name of a logger.  The default is the root
-      logger, which will catch all messages.
+      Nếu được chỉ định, *logger* phải là một đối tượng :class:`logging.Logger` hoặc một
+      :class:`str` chỉ định tên của một logger. Mặc định là root logger, logger này sẽ bắt tất cả message.
 
-      If given, *level* should be either a numeric logging level or
-      its string equivalent (for example either ``"ERROR"`` or
-      :const:`logging.ERROR`).  The default is :const:`logging.INFO`.
+      Nếu được chỉ định, *level* phải là một logging level dạng số hoặc giá trị chuỗi tương ứng (ví dụ là ``"ERROR"`` hoặc
+      :const:`logging.ERROR`). Mặc định là :const:`logging.INFO`.
 
-      Unlike :meth:`assertLogs`, nothing will be returned by the context
-      manager.
+      Không giống :meth:`assertLogs`, trình quản lý ngữ cảnh sẽ không trả về gì.
 
       .. versionadded:: 3.10
 
-   There are also other methods used to perform more specific checks, such as:
+   Ngoài ra còn có các phương thức khác được dùng để thực hiện những kiểm tra cụ thể hơn, chẳng hạn như:
 
    +---------------------------------------+--------------------------------+--------------+
    | Method                                | Checks that                    | New in       |
@@ -1248,30 +1011,21 @@ Test cases
    .. method:: assertAlmostEqual(first, second, places=7, msg=None, delta=None)
                assertNotAlmostEqual(first, second, places=7, msg=None, delta=None)
 
-      Test that *first* and *second* are approximately (or not approximately)
-      equal by computing the difference, rounding to the given number of
-      decimal *places* (default 7), and comparing to zero.  Note that these
-      methods round the values to the given number of *decimal places* (i.e.
-      like the :func:`round` function) and not *significant digits*.
+      Kiểm tra rằng *first* và *second* bằng nhau một cách xấp xỉ (hoặc không bằng nhau một cách xấp xỉ) bằng cách tính hiệu, làm tròn đến số *places* thập phân đã cho (mặc định là 7), rồi so sánh với số 0. Lưu ý rằng các phương thức này làm tròn các giá trị đến số *decimal places* đã cho (tức là giống hàm :func:`round`) chứ không phải *significant digits*.
 
-      If *delta* is supplied instead of *places* then the difference
-      between *first* and *second* must be less or equal to (or greater than) *delta*.
+      Nếu cung cấp *delta* thay cho *places* thì hiệu giữa *first* và *second* phải nhỏ hơn hoặc bằng (hoặc lớn hơn) *delta*.
 
-      Supplying both *delta* and *places* raises a :exc:`TypeError`.
+      Việc cung cấp cả *delta* và *places* sẽ gây ra một :exc:`TypeError`.
 
       .. versionchanged:: 3.2
          :meth:`assertAlmostEqual` automatically considers almost equal objects
-         that compare equal.  :meth:`assertNotAlmostEqual` automatically fails
-         if the objects compare equal.  Added the *delta* keyword argument.
+         có giá trị so sánh bằng nhau. :meth:`assertNotAlmostEqual` sẽ tự động thất bại nếu các đối tượng có giá trị so sánh bằng nhau. Đã thêm đối số từ khóa *delta*.
 
 
    .. method:: assertGreater(first, second, msg=None)
-               assertGreaterEqual(first, second, msg=None)
-               assertLess(first, second, msg=None)
-               assertLessEqual(first, second, msg=None)
+               assertGreaterEqual(first, second, msg=None) assertLess(first, second, msg=None) assertLessEqual(first, second, msg=None)
 
-      Test that *first* is respectively >, >=, < or <= than *second* depending
-      on the method name.  If not, the test will fail::
+      Kiểm tra rằng *first* lần lượt >, >=, < hoặc <= *second* tùy thuộc vào tên phương thức. Nếu không, bài kiểm tra sẽ thất bại::
 
          >>> self.assertGreaterEqual(3, 4)
          AssertionError: "3" unexpectedly not greater than or equal to "4"
@@ -1282,16 +1036,12 @@ Test cases
    .. method:: assertRegex(text, regex, msg=None)
                assertNotRegex(text, regex, msg=None)
 
-      Test that a *regex* search matches (or does not match) *text*.  In case
-      of failure, the error message will include the pattern and the *text* (or
-      the pattern and the part of *text* that unexpectedly matched).  *regex*
-      may be a regular expression object or a string containing a regular
-      expression suitable for use by :func:`re.search`.
+      Kiểm tra rằng một phép tìm kiếm bằng *regex* khớp (hoặc không khớp) với *text*. Nếu thất bại, thông báo lỗi sẽ bao gồm mẫu và *text* (hoặc mẫu và phần của *text* bất ngờ khớp). *regex* có thể là một đối tượng regular expression hoặc một chuỗi chứa regular expression phù hợp để sử dụng với :func:`re.search`.
 
       .. versionadded:: 3.1
-         Added under the name ``assertRegexpMatches``.
+         Được thêm với tên ``assertRegexpMatches``.
       .. versionchanged:: 3.2
-         The method ``assertRegexpMatches()`` has been renamed to
+         Phương thức ``assertRegexpMatches()`` đã được đổi tên thành
          :meth:`.assertRegex`.
       .. versionadded:: 3.2
          :meth:`.assertNotRegex`.
@@ -1299,15 +1049,9 @@ Test cases
 
    .. method:: assertCountEqual(first, second, msg=None)
 
-      Test that sequence *first* contains the same elements as *second*,
-      regardless of their order. When they don't, an error message listing the
-      differences between the sequences will be generated.
+      Kiểm tra rằng sequence *first* chứa các phần tử giống như *second*, bất kể thứ tự của chúng. Nếu không giống nhau, một thông báo lỗi liệt kê những khác biệt giữa các sequence sẽ được tạo.
 
-      Duplicate elements are *not* ignored when comparing *first* and
-      *second*. It verifies whether each element has the same count in both
-      sequences. Equivalent to:
-      ``assertEqual(Counter(list(first)), Counter(list(second)))``
-      but works with sequences of unhashable objects as well.
+      Các phần tử trùng lặp *không* bị bỏ qua khi so sánh *first* và *second*. Phương thức này xác minh rằng mỗi phần tử xuất hiện cùng số lần trong cả hai sequence. Tương đương với: ``assertEqual(Counter(list(first)), Counter(list(second)))`` nhưng cũng hoạt động với các sequence chứa những object không thể băm.
 
       .. versionadded:: 3.2
 
@@ -1315,9 +1059,7 @@ Test cases
    .. method:: assertStartsWith(s, prefix, msg=None)
    .. method:: assertNotStartsWith(s, prefix, msg=None)
 
-      Test that the Unicode or byte string *s* starts (or does not start)
-      with a *prefix*.
-      *prefix* can also be a tuple of strings to try.
+      Kiểm tra xem chuỗi Unicode hoặc byte *s* có bắt đầu (hoặc không bắt đầu) bằng *prefix* hay không. *prefix* cũng có thể là một tuple gồm các chuỗi cần thử.
 
       .. versionadded:: 3.14
 
@@ -1325,9 +1067,7 @@ Test cases
    .. method:: assertEndsWith(s, suffix, msg=None)
    .. method:: assertNotEndsWith(s, suffix, msg=None)
 
-      Test that the Unicode or byte string *s* ends (or does not end)
-      with a *suffix*.
-      *suffix* can also be a tuple of strings to try.
+      Kiểm tra xem chuỗi Unicode hoặc byte *s* có kết thúc (hoặc không kết thúc) bằng *suffix* hay không. *suffix* cũng có thể là một tuple gồm các chuỗi cần thử.
 
       .. versionadded:: 3.14
 
@@ -1335,34 +1075,24 @@ Test cases
    .. method:: assertHasAttr(obj, name, msg=None)
    .. method:: assertNotHasAttr(obj, name, msg=None)
 
-      Test that the object *obj* has (or has not) an attribute *name*.
+      Kiểm tra xem object *obj* có (hoặc không có) thuộc tính *name* hay không.
 
       .. versionadded:: 3.14
 
 
    .. _type-specific-methods:
 
-   The :meth:`assertEqual` method dispatches the equality check for objects of
-   the same type to different type-specific methods.  These methods are already
-   implemented for most of the built-in types, but it's also possible to
-   register new methods using :meth:`addTypeEqualityFunc`:
+   Phương thức :meth:`assertEqual` chuyển việc kiểm tra tính bằng nhau của các object cùng kiểu sang những phương thức riêng cho từng kiểu. Các phương thức này đã được triển khai cho hầu hết các kiểu tích hợp sẵn, nhưng cũng có thể đăng ký các phương thức mới bằng :meth:`addTypeEqualityFunc`:
 
    .. method:: addTypeEqualityFunc(typeobj, function)
 
-      Registers a type-specific method called by :meth:`assertEqual` to check
-      if two objects of exactly the same *typeobj* (not subclasses) compare
-      equal.  *function* must take two positional arguments and a third msg=None
-      keyword argument just as :meth:`assertEqual` does.  It must raise
-      :data:`self.failureException(msg) <failureException>` when inequality
-      between the first two parameters is detected -- possibly providing useful
-      information and explaining the inequalities in details in the error
-      message.
+      Đăng ký một phương thức riêng cho kiểu, được :meth:`assertEqual` gọi để kiểm tra xem hai object có cùng *typeobj* chính xác (không phải subclass) có bằng nhau hay không. *function* phải nhận hai đối số vị trí và đối số từ khóa thứ ba msg=None, giống như :meth:`assertEqual`. Phương thức này phải raise
+      :data:`self.failureException(msg) <failureException>` khi phát hiện sự không bằng nhau giữa hai tham số đầu tiên — có thể cung cấp thông tin hữu ích và giải thích chi tiết sự khác nhau trong thông báo lỗi.
 
       .. versionadded:: 3.1
 
-   The list of type-specific methods automatically used by
-   :meth:`~TestCase.assertEqual` are summarized in the following table.  Note
-   that it's usually not necessary to invoke these methods directly.
+   Danh sách các phương thức dành riêng cho từng kiểu được tự động sử dụng bởi
+   :meth:`~TestCase.assertEqual` được tóm tắt trong bảng sau. Lưu ý rằng thường không cần gọi trực tiếp các phương thức này.
 
    +-----------------------------------------+-----------------------------+--------------+
    | Method                                  | Used to compare             | New in       |
@@ -1390,23 +1120,16 @@ Test cases
 
    .. method:: assertMultiLineEqual(first, second, msg=None)
 
-      Test that the multiline string *first* is equal to the string *second*.
-      When not equal a diff of the two strings highlighting the differences
-      will be included in the error message. This method is used by default
-      when comparing strings with :meth:`assertEqual`.
+      Kiểm tra xem chuỗi nhiều dòng *first* có bằng chuỗi *second* hay không. Nếu không bằng nhau, thông báo lỗi sẽ bao gồm diff của hai chuỗi, làm nổi bật những điểm khác biệt. Phương thức này được sử dụng theo mặc định khi so sánh các chuỗi với :meth:`assertEqual`.
 
       .. versionadded:: 3.1
 
 
    .. method:: assertSequenceEqual(first, second, msg=None, seq_type=None)
 
-      Tests that two sequences are equal.  If a *seq_type* is supplied, both
-      *first* and *second* must be instances of *seq_type* or a failure will
-      be raised.  If the sequences are different an error message is
-      constructed that shows the difference between the two.
+      Kiểm tra xem hai sequence có bằng nhau hay không. Nếu cung cấp một *seq_type*, cả *first* và *second* phải là các instance của *seq_type*, nếu không sẽ phát sinh lỗi. Nếu các sequence khác nhau, một thông báo lỗi sẽ được tạo để hiển thị sự khác biệt giữa chúng.
 
-      This method is not called directly by :meth:`assertEqual`, but
-      it's used to implement :meth:`assertListEqual` and
+      Phương thức này không được :meth:`assertEqual` gọi trực tiếp, nhưng được dùng để triển khai :meth:`assertListEqual` và
       :meth:`assertTupleEqual`.
 
       .. versionadded:: 3.1
@@ -1415,10 +1138,7 @@ Test cases
    .. method:: assertListEqual(first, second, msg=None)
                assertTupleEqual(first, second, msg=None)
 
-      Tests that two lists or tuples are equal.  If not, an error message is
-      constructed that shows only the differences between the two.  An error
-      is also raised if either of the parameters are of the wrong type.
-      These methods are used by default when comparing lists or tuples with
+      Kiểm tra xem hai list hoặc tuple có bằng nhau hay không. Nếu không, một thông báo lỗi sẽ được tạo để chỉ hiển thị những điểm khác biệt giữa chúng. Lỗi cũng sẽ phát sinh nếu một trong hai tham số có kiểu không đúng. Các phương thức này được sử dụng theo mặc định khi so sánh list hoặc tuple với
       :meth:`assertEqual`.
 
       .. versionadded:: 3.1
@@ -1426,22 +1146,16 @@ Test cases
 
    .. method:: assertSetEqual(first, second, msg=None)
 
-      Tests that two sets are equal.  If not, an error message is constructed
-      that lists the differences between the sets.  This method is used by
-      default when comparing sets or frozensets with :meth:`assertEqual`.
+      Kiểm tra xem hai tập hợp có bằng nhau hay không. Nếu không, một thông báo lỗi sẽ được tạo, liệt kê những khác biệt giữa các tập hợp. Theo mặc định, phương thức này được sử dụng khi so sánh các tập hợp hoặc frozenset với :meth:`assertEqual`.
 
-      Fails if either of *first* or *second* does not have a :meth:`~frozenset.difference`
-      method.
+      Sẽ thất bại nếu *first* hoặc *second* không có phương thức :meth:`~frozenset.difference`.
 
       .. versionadded:: 3.1
 
 
    .. method:: assertDictEqual(first, second, msg=None)
 
-      Test that two dictionaries are equal.  If not, an error message is
-      constructed that shows the differences in the dictionaries. This
-      method will be used by default to compare dictionaries in
-      calls to :meth:`assertEqual`.
+      Kiểm tra xem hai dictionary có bằng nhau hay không. Nếu không, một thông báo lỗi sẽ được tạo để hiển thị những khác biệt trong các dictionary. Theo mặc định, phương thức này sẽ được dùng để so sánh các dictionary trong những lệnh gọi đến :meth:`assertEqual`.
 
       .. versionadded:: 3.1
 
@@ -1449,240 +1163,181 @@ Test cases
 
    .. _other-methods-and-attrs:
 
-   Finally the :class:`TestCase` provides the following methods and attributes:
+   Cuối cùng, :class:`TestCase` cung cấp các phương thức và thuộc tính sau:
 
 
    .. method:: fail(msg=None)
 
-      Signals a test failure unconditionally, with *msg* or ``None`` for
-      the error message.
+      Luôn báo hiệu một kiểm thử thất bại, với *msg* hoặc ``None`` làm thông báo lỗi.
 
 
    .. attribute:: failureException
 
-      This class attribute gives the exception raised by the test method.  If a
-      test framework needs to use a specialized exception, possibly to carry
-      additional information, it must subclass this exception in order to "play
-      fair" with the framework.  The initial value of this attribute is
+      Thuộc tính lớp này cung cấp exception được phương thức kiểm thử đưa ra. Nếu một test framework cần sử dụng một exception chuyên biệt, có thể để chứa thêm thông tin, exception đó phải kế thừa exception này để "phối hợp đúng cách" với framework. Giá trị ban đầu của thuộc tính này là
       :exc:`AssertionError`.
 
 
    .. attribute:: longMessage
 
-      This class attribute determines what happens when a custom failure message
-      is passed as the msg argument to an assertXYY call that fails.
-      ``True`` is the default value. In this case, the custom message is appended
-      to the end of the standard failure message.
-      When set to ``False``, the custom message replaces the standard message.
+      Thuộc tính lớp này xác định điều gì sẽ xảy ra khi một thông báo lỗi tùy chỉnh được truyền dưới dạng đối số msg cho một lệnh gọi assertXYY bị thất bại. ``True`` là giá trị mặc định. Trong trường hợp này, thông báo tùy chỉnh được nối vào cuối thông báo lỗi tiêu chuẩn. Khi được đặt thành ``False``, thông báo tùy chỉnh sẽ thay thế thông báo tiêu chuẩn.
 
-      The class setting can be overridden in individual test methods by assigning
-      an instance attribute, self.longMessage, to ``True`` or ``False`` before
-      calling the assert methods.
+      Có thể ghi đè thiết lập của lớp trong từng phương thức kiểm thử bằng cách gán thuộc tính instance self.longMessage là ``True`` hoặc ``False`` trước khi gọi các phương thức assert.
 
-      The class setting gets reset before each test call.
+      Thiết lập của lớp được đặt lại trước mỗi lần gọi kiểm thử.
 
       .. versionadded:: 3.1
 
 
    .. attribute:: maxDiff
 
-      This attribute controls the maximum length of diffs output by assert
-      methods that report diffs on failure. It defaults to 80*8 characters.
-      Assert methods affected by this attribute are
-      :meth:`assertSequenceEqual` (including all the sequence comparison
-      methods that delegate to it), :meth:`assertDictEqual` and
+      Thuộc tính này kiểm soát độ dài tối đa của các diff do những phương thức assert xuất ra khi báo cáo diff lúc kiểm thử thất bại. Giá trị mặc định là 80*8 ký tự. Các phương thức assert bị ảnh hưởng bởi thuộc tính này gồm
+      :meth:`assertSequenceEqual` (bao gồm tất cả các phương thức so sánh sequence ủy quyền cho phương thức này), :meth:`assertDictEqual` và
       :meth:`assertMultiLineEqual`.
 
-      Setting ``maxDiff`` to ``None`` means that there is no maximum length of
-      diffs.
+      Đặt ``maxDiff`` thành ``None`` có nghĩa là độ dài của các diff không bị giới hạn.
 
       .. versionadded:: 3.2
 
 
-   Testing frameworks can use the following methods to collect information on
-   the test:
+   Các framework kiểm thử có thể sử dụng những phương thức sau để thu thập thông tin về bài kiểm thử:
 
 
    .. method:: countTestCases()
 
-      Return the number of tests represented by this test object.  For
-      :class:`TestCase` instances, this will always be ``1``.
+      Trả về số lượng bài kiểm thử được biểu diễn bởi đối tượng kiểm thử này.  Với
+      các thực thể :class:`TestCase`, điều này sẽ luôn là ``1``.
 
 
    .. method:: defaultTestResult()
 
-      Return an instance of the test result class that should be used for this
-      test case class (if no other result instance is provided to the
-      :meth:`run` method).
+      Trả về một thực thể của lớp kết quả kiểm thử sẽ được sử dụng cho lớp trường hợp kiểm thử này (nếu không có thực thể kết quả nào khác được cung cấp cho
+      phương thức :meth:`run`).
 
-      For :class:`TestCase` instances, this will always be an instance of
-      :class:`TestResult`; subclasses of :class:`TestCase` should override this
-      as necessary.
+      Đối với các thực thể :class:`TestCase`, đây sẽ luôn là một thực thể của
+      :class:`TestResult`; các lớp con của :class:`TestCase` nên ghi đè phương thức này khi cần.
 
 
    .. method:: id()
 
-      Return a string identifying the specific test case.  This is usually the
-      full name of the test method, including the module and class name.
+      Trả về một chuỗi xác định trường hợp kiểm thử cụ thể. Chuỗi này thường là tên đầy đủ của phương thức kiểm thử, bao gồm tên module và tên lớp.
 
 
    .. method:: shortDescription()
 
-      Returns a description of the test, or ``None`` if no description
-      has been provided.  The default implementation of this method
-      returns the first line of the test method's docstring, if available,
-      or ``None``.
+      Trả về mô tả của kiểm thử hoặc ``None`` nếu chưa có mô tả nào được cung cấp. Cách triển khai mặc định của phương thức này trả về dòng đầu tiên trong docstring của phương thức kiểm thử, nếu có, hoặc ``None``.
 
       .. versionchanged:: 3.1
-         In 3.1 this was changed to add the test name to the short description
-         even in the presence of a docstring.  This caused compatibility issues
-         with unittest extensions and adding the test name was moved to the
-         :class:`TextTestResult` in Python 3.2.
+         Trong 3.1, điều này đã được thay đổi để thêm tên kiểm thử vào phần mô tả ngắn ngay cả khi có docstring. Điều này gây ra các vấn đề tương thích với các phần mở rộng của unittest, và việc thêm tên kiểm thử đã được chuyển sang
+         :class:`TextTestResult` trong Python 3.2.
 
 
    .. method:: addCleanup(function, /, *args, **kwargs)
 
-      Add a function to be called after :meth:`tearDown` to cleanup resources
-      used during the test. Functions will be called in reverse order to the
-      order they are added (:abbr:`LIFO (last-in, first-out)`).  They
-      are called with any arguments and keyword arguments passed into
-      :meth:`addCleanup` when they are added.
+      Thêm một hàm được gọi sau :meth:`tearDown` để dọn dẹp các tài nguyên được sử dụng trong quá trình kiểm thử. Các hàm sẽ được gọi theo thứ tự ngược với thứ tự chúng được thêm vào (:abbr:`LIFO (vào sau, ra trước)`). Chúng được gọi với mọi đối số và đối số từ khóa được truyền vào
+      :meth:`addCleanup` khi chúng được thêm vào.
 
-      If :meth:`setUp` fails, meaning that :meth:`tearDown` is not called,
-      then any cleanup functions added will still be called.
+      Nếu :meth:`setUp` không thành công, nghĩa là :meth:`tearDown` không được gọi, thì mọi hàm dọn dẹp đã được thêm vào vẫn sẽ được gọi.
 
       .. versionadded:: 3.1
 
 
    .. method:: enterContext(cm)
 
-      Enter the supplied :term:`context manager`.  If successful, also
-      add its :meth:`~object.__exit__` method as a cleanup function by
-      :meth:`addCleanup` and return the result of the
-      :meth:`~object.__enter__` method.
+      Nhập trình quản lý ngữ cảnh được cung cấp. Nếu thành công, đồng thời thêm phương thức :meth:`~object.__exit__` của nó làm hàm dọn dẹp bằng cách sử dụng :term:`context manager` và trả về kết quả của
+      :meth:`addCleanup` và trả về kết quả của
+      Phương thức :meth:`~object.__enter__`.
 
       .. versionadded:: 3.11
 
 
    .. method:: doCleanups()
 
-      This method is called unconditionally after :meth:`tearDown`, or
-      after :meth:`setUp` if :meth:`setUp` raises an exception.
+      Phương thức này luôn được gọi sau :meth:`tearDown`, hoặc sau :meth:`setUp` nếu :meth:`setUp` phát sinh ngoại lệ.
 
-      It is responsible for calling all the cleanup functions added by
-      :meth:`addCleanup`. If you need cleanup functions to be called
-      *prior* to :meth:`tearDown` then you can call :meth:`doCleanups`
-      yourself.
+      Phương thức này chịu trách nhiệm gọi tất cả các hàm dọn dẹp được thêm bởi
+      :meth:`addCleanup`. Nếu bạn cần các hàm dọn dẹp được gọi *trước* :meth:`tearDown` thì bạn có thể tự gọi :meth:`doCleanups`.
 
-      :meth:`doCleanups` pops methods off the stack of cleanup
-      functions one at a time, so it can be called at any time.
+      :meth:`doCleanups` lần lượt lấy từng phương thức ra khỏi ngăn xếp các hàm dọn dẹp, vì vậy có thể gọi phương thức này bất kỳ lúc nào.
 
       .. versionadded:: 3.1
 
 
    .. classmethod:: addClassCleanup(function, /, *args, **kwargs)
 
-      Add a function to be called after :meth:`tearDownClass` to cleanup
-      resources used during the test class. Functions will be called in reverse
-      order to the order they are added (:abbr:`LIFO (last-in, first-out)`).
-      They are called with any arguments and keyword arguments passed into
-      :meth:`addClassCleanup` when they are added.
+      Thêm một hàm sẽ được gọi sau :meth:`tearDownClass` để dọn dẹp các tài nguyên được sử dụng trong lớp kiểm thử. Các hàm sẽ được gọi theo thứ tự ngược với thứ tự chúng được thêm vào (:abbr:`LIFO (vào sau, gọi trước)`). Chúng được gọi với mọi đối số và đối số từ khóa được truyền vào
+      :meth:`addClassCleanup` khi chúng được thêm vào.
 
-      If :meth:`setUpClass` fails, meaning that :meth:`tearDownClass` is not
-      called, then any cleanup functions added will still be called.
+      Nếu :meth:`setUpClass` thất bại, nghĩa là :meth:`tearDownClass` không được gọi, thì mọi hàm dọn dẹp đã được thêm vào vẫn sẽ được gọi.
 
       .. versionadded:: 3.8
 
 
    .. classmethod:: enterClassContext(cm)
 
-      Enter the supplied :term:`context manager`.  If successful, also
-      add its :meth:`~object.__exit__` method as a cleanup function by
-      :meth:`addClassCleanup` and return the result of the
-      :meth:`~object.__enter__` method.
+      Nhập trình quản lý ngữ cảnh được cung cấp. Nếu thành công, đồng thời thêm phương thức :meth:`~object.__exit__` của nó làm hàm dọn dẹp bằng cách sử dụng :term:`context manager` và trả về kết quả của
+      :meth:`addClassCleanup` và trả về kết quả của
+      Phương thức :meth:`~object.__enter__`.
 
       .. versionadded:: 3.11
 
 
    .. classmethod:: doClassCleanups()
 
-      This method is called unconditionally after :meth:`tearDownClass`, or
-      after :meth:`setUpClass` if :meth:`setUpClass` raises an exception.
+      Phương thức này luôn được gọi sau :meth:`tearDownClass`, hoặc sau :meth:`setUpClass` nếu :meth:`setUpClass` phát sinh ngoại lệ.
 
-      It is responsible for calling all the cleanup functions added by
-      :meth:`addClassCleanup`. If you need cleanup functions to be called
-      *prior* to :meth:`tearDownClass` then you can call
-      :meth:`doClassCleanups` yourself.
+      Phương thức này chịu trách nhiệm gọi tất cả các hàm dọn dẹp được thêm bởi
+      :meth:`addClassCleanup`. Nếu bạn cần các hàm dọn dẹp được gọi *trước* :meth:`tearDownClass` thì bạn có thể gọi
+      :meth:`doClassCleanups` chính bạn.
 
-      :meth:`doClassCleanups` pops methods off the stack of cleanup
-      functions one at a time, so it can be called at any time.
+      :meth:`doClassCleanups` lần lượt lấy các phương thức ra khỏi ngăn xếp các hàm cleanup, vì vậy có thể được gọi bất cứ lúc nào.
 
       .. versionadded:: 3.8
 
 
 .. class:: IsolatedAsyncioTestCase(methodName='runTest')
 
-   This class provides an API similar to :class:`TestCase` and also accepts
-   coroutines as test functions.
+   Lớp này cung cấp API tương tự :class:`TestCase` và cũng chấp nhận coroutine làm các hàm kiểm thử.
 
    .. versionadded:: 3.8
 
    .. attribute:: loop_factory
 
-      The *loop_factory* passed to :class:`asyncio.Runner`. Override
-      in subclasses with :class:`asyncio.EventLoop` to avoid using the
-      asyncio policy system.
+      *loop_factory* được truyền vào :class:`asyncio.Runner`. Ghi đè trong các lớp con bằng :class:`asyncio.EventLoop` để tránh sử dụng hệ thống chính sách asyncio.
 
       .. versionadded:: 3.13
 
    .. method:: asyncSetUp()
       :async:
 
-      Method called to prepare the test fixture. This is called after :meth:`TestCase.setUp`.
-      This is called immediately before calling the test method; other than
-      :exc:`AssertionError` or :exc:`SkipTest`, any exception raised by this method
-      will be considered an error rather than a test failure. The default implementation
-      does nothing.
+      Phương thức được gọi để chuẩn bị test fixture. Phương thức này được gọi sau :meth:`TestCase.setUp`. Phương thức này được gọi ngay trước khi gọi phương thức kiểm thử; ngoài
+      :exc:`AssertionError` hoặc :exc:`SkipTest`, mọi ngoại lệ do phương thức này phát sinh sẽ được xem là lỗi thay vì test failure. Cách triển khai mặc định không thực hiện gì.
 
    .. method:: asyncTearDown()
       :async:
 
-      Method called immediately after the test method has been called and the
-      result recorded.  This is called before :meth:`~TestCase.tearDown`. This is called even if
-      the test method raised an exception, so the implementation in subclasses may need
-      to be particularly careful about checking internal state.  Any exception, other than
-      :exc:`AssertionError` or :exc:`SkipTest`, raised by this method will be
-      considered an additional error rather than a test failure (thus increasing
-      the total number of reported errors). This method will only be called if
-      the :meth:`asyncSetUp` succeeds, regardless of the outcome of the test method.
-      The default implementation does nothing.
+      Phương thức được gọi ngay sau khi phương thức kiểm thử được gọi và kết quả được ghi nhận. Phương thức này được gọi trước :meth:`~TestCase.tearDown`. Phương thức này vẫn được gọi ngay cả khi phương thức kiểm thử phát sinh ngoại lệ, vì vậy cách triển khai trong các lớp con có thể cần đặc biệt cẩn thận khi kiểm tra trạng thái nội bộ. Mọi ngoại lệ, ngoại trừ
+      :exc:`AssertionError` hoặc :exc:`SkipTest` do phương thức này phát sinh sẽ được xem là một lỗi bổ sung thay vì lỗi kiểm thử (do đó làm tăng tổng số lỗi được báo cáo). Phương thức này chỉ được gọi nếu :meth:`asyncSetUp` thành công, bất kể kết quả của phương thức kiểm thử. Bản triển khai mặc định không thực hiện gì.
 
    .. method:: addAsyncCleanup(function, /, *args, **kwargs)
 
-      This method accepts a coroutine that can be used as a cleanup function.
+      Phương thức này nhận một coroutine có thể được dùng làm hàm cleanup.
 
    .. method:: enterAsyncContext(cm)
       :async:
 
-      Enter the supplied :term:`asynchronous context manager`.  If successful,
-      also add its :meth:`~object.__aexit__` method as a cleanup function by
-      :meth:`addAsyncCleanup` and return the result of the
-      :meth:`~object.__aenter__` method.
+      Đi vào :term:`asynchronous context manager` được cung cấp. Nếu thành công, đồng thời thêm phương thức :meth:`~object.__aexit__` của nó làm hàm cleanup bằng cách
+      :meth:`addAsyncCleanup` và trả về kết quả của
+      phương thức :meth:`~object.__aenter__`.
 
       .. versionadded:: 3.11
 
 
    .. method:: run(result=None)
 
-      Sets up a new event loop to run the test, collecting the result into
-      the :class:`TestResult` object passed as *result*.  If *result* is
-      omitted or ``None``, a temporary result object is created (by calling
-      the :meth:`~TestCase.defaultTestResult` method) and used. The result object is
-      returned to :meth:`run`'s caller. At the end of the test all the tasks
-      in the event loop are cancelled.
+      Thiết lập một event loop mới để chạy kiểm thử, rồi thu thập kết quả vào đối tượng :class:`TestResult` được truyền dưới dạng *result*. Nếu *result* bị bỏ qua hoặc là ``None``, một đối tượng kết quả tạm thời sẽ được tạo (bằng cách gọi phương thức :meth:`~TestCase.defaultTestResult`) và được sử dụng. Đối tượng kết quả được trả về cho bên gọi của :meth:`run`. Khi kết thúc kiểm thử, tất cả tác vụ trong event loop sẽ bị hủy.
 
 
-   An example illustrating the order::
+   Ví dụ minh họa thứ tự::
 
       from unittest import IsolatedAsyncioTestCase
 
@@ -1718,706 +1373,510 @@ Test cases
       if __name__ == "__main__":
           unittest.main()
 
-   After running the test, ``events`` would contain ``["setUp", "asyncSetUp", "test_response", "asyncTearDown", "tearDown", "cleanup"]``.
+   Sau khi chạy kiểm thử, ``events`` sẽ chứa ``["setUp", "asyncSetUp", "test_response", "asyncTearDown", "tearDown", "cleanup"]``.
 
 
 .. class:: FunctionTestCase(testFunc, setUp=None, tearDown=None, description=None)
 
-   This class implements the portion of the :class:`TestCase` interface which
-   allows the test runner to drive the test, but does not provide the methods
-   which test code can use to check and report errors.  This is used to create
-   test cases using legacy test code, allowing it to be integrated into a
-   :mod:`!unittest`-based test framework.
+   Lớp này triển khai phần của giao diện :class:`TestCase` cho phép test runner điều khiển kiểm thử, nhưng không cung cấp các phương thức mà mã kiểm thử có thể dùng để kiểm tra và báo cáo lỗi. Lớp này được dùng để tạo các test case bằng mã kiểm thử kiểu cũ, cho phép tích hợp mã đó vào một
+   framework kiểm thử dựa trên :mod:`!unittest`.
 
 
 .. _testsuite-objects:
 
-Grouping tests
-~~~~~~~~~~~~~~
+Nhóm các kiểm thử
+~~~~~~~~~~~~~~~~~
 
 .. class:: TestSuite(tests=())
 
-   This class represents an aggregation of individual test cases and test suites.
-   The class presents the interface needed by the test runner to allow it to be run
-   as any other test case.  Running a :class:`TestSuite` instance is the same as
-   iterating over the suite, running each test individually.
+   Lớp này biểu diễn một tập hợp các test case và test suite riêng lẻ. Lớp này cung cấp giao diện cần thiết cho test runner, cho phép chạy nó như bất kỳ test case nào khác. Chạy một thể hiện :class:`TestSuite` cũng giống như lặp qua test suite, chạy từng kiểm thử riêng lẻ.
 
-   If *tests* is given, it must be an iterable of individual test cases or other
-   test suites that will be used to build the suite initially. Additional methods
-   are provided to add test cases and suites to the collection later on.
+   Nếu *tests* được cung cấp, nó phải là một iterable gồm các test case riêng lẻ hoặc các test suite khác, được dùng để tạo test suite ban đầu. Các phương thức bổ sung cho phép thêm test case và test suite vào tập hợp này sau đó.
 
-   :class:`TestSuite` objects behave much like :class:`TestCase` objects, except
-   they do not actually implement a test.  Instead, they are used to aggregate
-   tests into groups of tests that should be run together. Some additional
-   methods are available to add tests to :class:`TestSuite` instances:
+   Các đối tượng :class:`TestSuite` hoạt động gần giống các đối tượng :class:`TestCase`, ngoại trừ việc chúng không thực sự triển khai một kiểm thử. Thay vào đó, chúng được dùng để tập hợp các kiểm thử thành những nhóm kiểm thử sẽ được chạy cùng nhau. Có thêm một số phương thức để thêm kiểm thử vào các thể hiện :class:`TestSuite`:
 
 
    .. method:: TestSuite.addTest(test)
 
-      Add a :class:`TestCase` or :class:`TestSuite` to the suite.
+      Thêm một :class:`TestCase` hoặc :class:`TestSuite` vào bộ kiểm thử.
 
 
    .. method:: TestSuite.addTests(tests)
 
-      Add all the tests from an iterable of :class:`TestCase` and :class:`TestSuite`
-      instances to this test suite.
+      Thêm tất cả các kiểm thử từ một iterable gồm các thực thể :class:`TestCase` và :class:`TestSuite` vào bộ kiểm thử này.
 
-      This is equivalent to iterating over *tests*, calling :meth:`addTest` for
-      each element.
+      Tương đương với việc lặp qua *tests* và gọi :meth:`addTest` cho mỗi phần tử.
 
-   :class:`TestSuite` shares the following methods with :class:`TestCase`:
+   :class:`TestSuite` dùng chung các phương thức sau với :class:`TestCase`:
 
 
    .. method:: run(result)
 
-      Run the tests associated with this suite, collecting the result into the
-      test result object passed as *result*.  Note that unlike
-      :meth:`TestCase.run`, :meth:`TestSuite.run` requires the result object to
-      be passed in.
+      Chạy các kiểm thử được liên kết với bộ kiểm thử này, rồi tập hợp kết quả vào đối tượng kết quả kiểm thử được truyền dưới dạng *result*. Lưu ý rằng không giống như
+      :meth:`TestCase.run`, :meth:`TestSuite.run` yêu cầu phải truyền đối tượng kết quả vào.
 
 
    .. method:: debug()
 
-      Run the tests associated with this suite without collecting the
-      result. This allows exceptions raised by the test to be propagated to the
-      caller and can be used to support running tests under a debugger.
+      Chạy các kiểm thử được liên kết với bộ kiểm thử này mà không tập hợp kết quả. Điều này cho phép các ngoại lệ do kiểm thử phát sinh được truyền đến caller và có thể được dùng để hỗ trợ chạy kiểm thử dưới debugger.
 
 
    .. method:: countTestCases()
 
-      Return the number of tests represented by this test object, including all
-      individual tests and sub-suites.
+      Trả về số lượng kiểm thử được biểu diễn bởi đối tượng kiểm thử này, bao gồm tất cả các kiểm thử riêng lẻ và các bộ kiểm thử con.
 
 
    .. method:: __iter__()
 
-      Tests grouped by a :class:`TestSuite` are always accessed by iteration.
-      Subclasses can lazily provide tests by overriding :meth:`!__iter__`. Note
-      that this method may be called several times on a single suite (for
-      example when counting tests or comparing for equality) so the tests
-      returned by repeated iterations before :meth:`TestSuite.run` must be the
-      same for each call iteration. After :meth:`TestSuite.run`, callers should
-      not rely on the tests returned by this method unless the caller uses a
-      subclass that overrides :meth:`!TestSuite._removeTestAtIndex` to preserve
-      test references.
+      Các kiểm thử được nhóm bởi một :class:`TestSuite` luôn được truy cập thông qua phép lặp. Các lớp con có thể cung cấp kiểm thử một cách trì hoãn bằng cách ghi đè :meth:`!__iter__`. Lưu ý rằng phương thức này có thể được gọi nhiều lần trên cùng một bộ kiểm thử (ví dụ: khi đếm kiểm thử hoặc so sánh tính bằng nhau), vì vậy các kiểm thử được trả về qua những lần lặp lại trước :meth:`TestSuite.run` phải giống nhau trong mỗi lần gọi. Sau :meth:`TestSuite.run`, bên gọi không nên dựa vào các kiểm thử được phương thức này trả về, trừ khi bên gọi sử dụng một lớp con ghi đè :meth:`!TestSuite._removeTestAtIndex` để bảo toàn các tham chiếu đến kiểm thử.
 
       .. versionchanged:: 3.2
-         In earlier versions the :class:`TestSuite` accessed tests directly rather
-         than through iteration, so overriding :meth:`!__iter__` wasn't sufficient
-         for providing tests.
+         Trong các phiên bản trước, :class:`TestSuite` truy cập trực tiếp vào các kiểm thử thay vì thông qua phép lặp, vì vậy việc ghi đè :meth:`!__iter__` là chưa đủ để cung cấp các kiểm thử.
 
       .. versionchanged:: 3.4
-         In earlier versions the :class:`TestSuite` held references to each
-         :class:`TestCase` after :meth:`TestSuite.run`. Subclasses can restore
-         that behavior by overriding :meth:`!TestSuite._removeTestAtIndex`.
+         Trong các phiên bản trước, :class:`TestSuite` lưu các tham chiếu đến từng
+         :class:`TestCase` sau :meth:`TestSuite.run`. Các lớp con có thể khôi phục hành vi đó bằng cách ghi đè :meth:`!TestSuite._removeTestAtIndex`.
 
-   In the typical usage of a :class:`TestSuite` object, the :meth:`run` method
-   is invoked by a :class:`!TestRunner` rather than by the end-user test harness.
+   Trong cách sử dụng điển hình của một đối tượng :class:`TestSuite`, phương thức :meth:`run` được gọi bởi một :class:`!TestRunner` thay vì bởi bộ chạy kiểm thử của người dùng cuối.
 
 
-Loading and running tests
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Tải và chạy kiểm thử
+~~~~~~~~~~~~~~~~~~~~
 
 .. class:: TestLoader()
 
-   The :class:`TestLoader` class is used to create test suites from classes and
-   modules.  Normally, there is no need to create an instance of this class; the
-   :mod:`!unittest` module provides an instance that can be shared as
-   :data:`unittest.defaultTestLoader`.  Using a subclass or instance, however,
-   allows customization of some configurable properties.
+   Lớp :class:`TestLoader` được dùng để tạo các test suite từ các lớp và module. Thông thường, không cần tạo một instance của lớp này;
+   module :mod:`!unittest` cung cấp một instance có thể được dùng chung dưới dạng
+   :data:`unittest.defaultTestLoader`. Tuy nhiên, việc sử dụng một lớp con hoặc instance cho phép tùy chỉnh một số thuộc tính có thể cấu hình.
 
-   :class:`TestLoader` objects have the following attributes:
+   Các object :class:`TestLoader` có các thuộc tính sau:
 
 
    .. attribute:: errors
 
-      A list of the non-fatal errors encountered while loading tests. Not reset
-      by the loader at any point. Fatal errors are signalled by the relevant
-      method raising an exception to the caller. Non-fatal errors are also
-      indicated by a synthetic test that will raise the original error when
-      run.
+      Danh sách các lỗi không nghiêm trọng gặp phải trong khi tải test. Loader không reset danh sách này tại bất kỳ thời điểm nào. Các lỗi nghiêm trọng được báo hiệu bằng cách phương thức liên quan ném exception cho caller. Các lỗi không nghiêm trọng cũng được biểu thị bằng một test tổng hợp, test này sẽ ném lỗi ban đầu khi được chạy.
 
       .. versionadded:: 3.5
 
 
-   :class:`TestLoader` objects have the following methods:
+   Các object :class:`TestLoader` có các phương thức sau:
 
 
    .. method:: loadTestsFromTestCase(testCaseClass)
 
-      Return a suite of all test cases contained in the :class:`TestCase`\ -derived
+      Trả về một suite gồm tất cả các test case có trong các lớp :class:`TestCase`\ -derived
       :class:`!testCaseClass`.
 
-      A test case instance is created for each method named by
-      :meth:`getTestCaseNames`. By default these are the method names
-      beginning with ``test``. If :meth:`getTestCaseNames` returns no
-      methods, but the :meth:`!runTest` method is implemented, a single test
-      case is created for that method instead.
+      Một đối tượng test case được tạo cho mỗi phương thức có tên được chỉ định bởi
+      :meth:`getTestCaseNames`. Theo mặc định, đây là các tên phương thức bắt đầu bằng ``test``. Nếu :meth:`getTestCaseNames` không trả về phương thức nào, nhưng phương thức :meth:`!runTest` được triển khai, thì thay vào đó, một test case duy nhất sẽ được tạo cho phương thức đó.
 
 
    .. method:: loadTestsFromModule(module, *, pattern=None)
 
-      Return a suite of all test cases contained in the given module. This
-      method searches *module* for classes derived from :class:`TestCase` and
-      creates an instance of the class for each test method defined for the
-      class.
+      Trả về một suite chứa tất cả test case trong module đã cho. Phương thức này tìm kiếm *module* để tìm các lớp kế thừa từ :class:`TestCase` và tạo một đối tượng của lớp cho mỗi phương thức test được định nghĩa trong lớp.
 
       .. note::
 
-         While using a hierarchy of :class:`TestCase`\ -derived classes can be
-         convenient in sharing fixtures and helper functions, defining test
-         methods on base classes that are not intended to be instantiated
-         directly does not play well with this method.  Doing so, however, can
-         be useful when the fixtures are different and defined in subclasses.
+         Mặc dù việc sử dụng một hệ phân cấp các lớp kế thừa từ :class:`TestCase`\  có thể thuận tiện cho việc chia sẻ fixture và hàm trợ giúp, việc định nghĩa các phương thức test trên các lớp cơ sở không được dự định khởi tạo trực tiếp sẽ không hoạt động tốt với phương thức này. Tuy nhiên, cách làm đó có thể hữu ích khi các fixture khác nhau và được định nghĩa trong các lớp con.
 
-      If a module provides a ``load_tests`` function it will be called to
-      load the tests. This allows modules to customize test loading.
-      This is the `load_tests protocol`_.  The *pattern* argument is passed as
-      the third argument to ``load_tests``.
+      Nếu một module cung cấp hàm ``load_tests`` thì hàm đó sẽ được gọi để tải các test. Điều này cho phép các module tùy chỉnh việc tải test. Đây là giao thức `load_tests protocol <load_tests protocol_>`_. Đối số *pattern* được truyền dưới dạng đối số thứ ba cho ``load_tests``.
 
       .. versionchanged:: 3.2
-         Support for ``load_tests`` added.
+         Đã bổ sung hỗ trợ cho ``load_tests``.
 
       .. versionchanged:: 3.5
-         Support for a keyword-only argument *pattern* has been added.
+         Đã bổ sung hỗ trợ cho đối số chỉ nhận theo từ khóa *pattern*.
 
       .. versionchanged:: 3.12
-         The undocumented and unofficial *use_load_tests* parameter has been
-         removed.
+         Tham số *use_load_tests* chưa được ghi nhận và không chính thức đã bị loại bỏ.
 
 
    .. method:: loadTestsFromName(name, module=None)
 
-      Return a suite of all test cases given a string specifier.
+      Trả về một suite gồm tất cả các test case được chỉ định bằng một chuỗi đặc tả.
 
-      The specifier *name* is a "dotted name" that may resolve either to a
-      module, a test case class, a test method within a test case class, a
-      :class:`TestSuite` instance, or a callable object which returns a
-      :class:`TestCase` or :class:`TestSuite` instance.  These checks are
-      applied in the order listed here; that is, a method on a possible test
-      case class will be picked up as "a test method within a test case class",
-      rather than "a callable object".
+      Bộ chỉ định *name* là một "tên dạng chấm" (dotted name), có thể phân giải thành một module, một lớp test case, một phương thức test trong một lớp test case, hoặc một
+      :class:`TestSuite` instance hoặc một đối tượng callable trả về một
+      :class:`TestCase` hoặc instance :class:`TestSuite`. Các kiểm tra này được áp dụng theo thứ tự được liệt kê ở đây; nghĩa là, một phương thức trên một lớp test case có thể được chọn làm "một phương thức test trong một lớp test case", thay vì "một đối tượng callable".
 
-      For example, if you have a module :mod:`!SampleTests` containing a
-      :class:`TestCase`\ -derived class :class:`!SampleTestCase` with three test
-      methods (:meth:`!test_one`, :meth:`!test_two`, and :meth:`!test_three`), the
-      specifier ``'SampleTests.SampleTestCase'`` would cause this method to
-      return a suite which will run all three test methods. Using the specifier
-      ``'SampleTests.SampleTestCase.test_two'`` would cause it to return a test
-      suite which will run only the :meth:`!test_two` test method. The specifier
-      can refer to modules and packages which have not been imported; they will
-      be imported as a side-effect.
+      Ví dụ: nếu bạn có một module :mod:`!SampleTests` chứa một
+      :class:`TestCase`\ -derived class :class:`!SampleTestCase` với ba phương thức test (:meth:`!test_one`, :meth:`!test_two` và :meth:`!test_three`), bộ chỉ định ``'SampleTests.SampleTestCase'`` sẽ khiến phương thức này trả về một suite chạy cả ba phương thức test. Sử dụng bộ chỉ định ``'SampleTests.SampleTestCase.test_two'`` sẽ khiến nó trả về một test suite chỉ chạy phương thức test :meth:`!test_two`. Bộ chỉ định có thể tham chiếu đến các module và package chưa được import; chúng sẽ được import như một tác dụng phụ.
 
-      The method optionally resolves *name* relative to the given *module*.
+      Phương thức này tùy chọn phân giải *name* tương đối so với *module* đã cho.
 
       .. versionchanged:: 3.5
-         If an :exc:`ImportError` or :exc:`AttributeError` occurs while traversing
-         *name* then a synthetic test that raises that error when run will be
-         returned. These errors are included in the errors accumulated by
-         self.errors.
+         Nếu xảy ra :exc:`ImportError` hoặc :exc:`AttributeError` trong khi duyệt qua *name*, một bài kiểm thử tổng hợp sẽ được trả về; bài kiểm thử này sẽ phát sinh lỗi đó khi chạy. Các lỗi này được đưa vào những lỗi được tích lũy trong self.errors.
 
 
    .. method:: loadTestsFromNames(names, module=None)
 
-      Similar to :meth:`loadTestsFromName`, but takes a sequence of names rather
-      than a single name.  The return value is a test suite which supports all
-      the tests defined for each name.
+      Tương tự như :meth:`loadTestsFromName`, nhưng nhận một chuỗi tên thay vì một tên duy nhất. Giá trị trả về là một test suite hỗ trợ tất cả các bài kiểm thử được định nghĩa cho từng tên.
 
 
    .. method:: getTestCaseNames(testCaseClass)
 
-      Return a sorted sequence of method names found within *testCaseClass*;
-      this should be a subclass of :class:`TestCase`.
+      Trả về một chuỗi tên phương thức đã được sắp xếp, được tìm thấy trong *testCaseClass*; đây phải là một lớp con của :class:`TestCase`.
 
 
    .. method:: discover(start_dir, pattern='test*.py', top_level_dir=None)
 
-      Find all the test modules by recursing into subdirectories from the
-      specified start directory, and return a TestSuite object containing them.
-      Only test files that match *pattern* will be loaded. (Using shell style
-      pattern matching.) Only module names that are importable (i.e. are valid
-      Python identifiers) will be loaded.
+      Tìm tất cả các module kiểm thử bằng cách đệ quy vào các thư mục con từ thư mục bắt đầu được chỉ định, rồi trả về một đối tượng TestSuite chứa chúng. Chỉ những tệp kiểm thử khớp với *pattern* mới được tải. (Sử dụng khớp mẫu theo kiểu shell.) Chỉ những tên module có thể import (tức là các mã định danh Python hợp lệ) mới được tải.
 
-      All test modules must be importable from the top level of the project. If
-      the start directory is not the top level directory then *top_level_dir*
-      must be specified separately.
+      Tất cả các module kiểm thử phải có thể được import từ cấp cao nhất của dự án. Nếu thư mục bắt đầu không phải là thư mục cấp cao nhất thì phải chỉ định riêng *top_level_dir*.
 
-      If importing a module fails, for example due to a syntax error, then
-      this will be recorded as a single error and discovery will continue.  If
-      the import failure is due to :exc:`SkipTest` being raised, it will be
-      recorded as a skip instead of an error.
+      Nếu việc import một module không thành công, chẳng hạn do lỗi cú pháp, thì lỗi này sẽ được ghi nhận là một lỗi duy nhất và quá trình phát hiện sẽ tiếp tục. Nếu việc import không thành công là do :exc:`SkipTest` được phát sinh, thì lỗi này sẽ được ghi nhận là một lần bỏ qua thay vì một lỗi.
 
-      If a package (a directory containing a file named :file:`__init__.py`) is
-      found, the package will be checked for a ``load_tests`` function. If this
-      exists then it will be called
-      ``package.load_tests(loader, tests, pattern)``. Test discovery takes care
-      to ensure that a package is only checked for tests once during an
-      invocation, even if the load_tests function itself calls
-      ``loader.discover``.
+      Nếu tìm thấy một package (thư mục chứa tệp có tên :file:`__init__.py`), package đó sẽ được kiểm tra để tìm hàm ``load_tests``. Nếu hàm này tồn tại thì nó sẽ được gọi với ``package.load_tests(loader, tests, pattern)``. Việc phát hiện test đảm bảo rằng một package chỉ được kiểm tra test một lần trong mỗi lần gọi, ngay cả khi bản thân hàm load_tests gọi ``loader.discover``.
 
-      If ``load_tests`` exists then discovery does *not* recurse into the
-      package, ``load_tests`` is responsible for loading all tests in the
-      package.
+      Nếu ``load_tests`` tồn tại thì quá trình phát hiện *không* đệ quy vào package; ``load_tests`` chịu trách nhiệm tải tất cả test trong package.
 
-      The pattern is deliberately not stored as a loader attribute so that
-      packages can continue discovery themselves.
+      Mẫu này được cố ý không lưu dưới dạng thuộc tính của loader để các package có thể tiếp tục tự thực hiện việc phát hiện.
 
-      *top_level_dir* is stored internally, and used as a default to any
-      nested calls to ``discover()``. That is, if a package's ``load_tests``
-      calls ``loader.discover()``, it does not need to pass this argument.
+      *top_level_dir* được lưu trữ nội bộ và được dùng làm giá trị mặc định cho mọi lời gọi lồng nhau tới ``discover()``. Nghĩa là, nếu ``load_tests`` của một package gọi ``loader.discover()``, thì không cần truyền đối số này.
 
-      *start_dir* can be a dotted module name as well as a directory.
+      *start_dir* cũng có thể là tên module dạng dotted, không chỉ là một thư mục.
 
       .. versionadded:: 3.2
 
       .. versionchanged:: 3.4
-         Modules that raise :exc:`SkipTest` on import are recorded as skips,
-         not errors.
+         Các module phát sinh :exc:`SkipTest` khi import sẽ được ghi nhận là bị bỏ qua, không phải lỗi.
 
-         *start_dir* can be a :term:`namespace packages <namespace package>`.
+         *start_dir* có thể là một :term:`namespace packages <namespace package>`.
 
-         Paths are sorted before being imported so that execution order is the
-         same even if the underlying file system's ordering is not dependent
-         on file name.
+         Các đường dẫn được sắp xếp trước khi import để thứ tự thực thi giống nhau ngay cả khi thứ tự của hệ thống tệp bên dưới không phụ thuộc vào tên tệp.
 
       .. versionchanged:: 3.5
-         Found packages are now checked for ``load_tests`` regardless of
-         whether their path matches *pattern*, because it is impossible for
-         a package name to match the default pattern.
+         Các package được tìm thấy hiện được kiểm tra để tìm ``load_tests`` bất kể đường dẫn của chúng có khớp với *pattern* hay không, vì tên package không thể khớp với pattern mặc định.
 
       .. versionchanged:: 3.11
-         *start_dir* can not be a :term:`namespace packages <namespace package>`.
-         It has been broken since Python 3.7, and Python 3.11 officially removes it.
+         *start_dir* không thể là một :term:`namespace packages <namespace package>`. Tính năng này đã bị hỏng kể từ Python 3.7 và Python 3.11 chính thức loại bỏ nó.
 
       .. versionchanged:: 3.13
-         *top_level_dir* is only stored for the duration of *discover* call.
+         *top_level_dir* chỉ được lưu trong thời gian thực hiện lệnh gọi *discover*.
 
       .. versionchanged:: 3.14
-         *start_dir* can once again be a :term:`namespace package`.
+         *start_dir* một lần nữa có thể là một :term:`namespace package`.
 
-   The following attributes of a :class:`TestLoader` can be configured either by
-   subclassing or assignment on an instance:
+   Các thuộc tính sau của một :class:`TestLoader` có thể được cấu hình bằng cách tạo subclass hoặc gán giá trị cho một instance:
 
 
    .. attribute:: testMethodPrefix
 
-      String giving the prefix of method names which will be interpreted as test
-      methods.  The default value is ``'test'``.
+      Chuỗi cho biết tiền tố của các tên phương thức sẽ được hiểu là phương thức kiểm thử. Giá trị mặc định là ``'test'``.
 
-      This affects :meth:`getTestCaseNames` and all the ``loadTestsFrom*``
-      methods.
+      Điều này ảnh hưởng đến :meth:`getTestCaseNames` và tất cả các phương thức ``loadTestsFrom*``.
 
 
    .. attribute:: sortTestMethodsUsing
 
-      Function to be used to compare method names when sorting them in
-      :meth:`getTestCaseNames` and all the ``loadTestsFrom*`` methods.
+      Hàm được dùng để so sánh tên phương thức khi sắp xếp chúng trong
+      :meth:`getTestCaseNames` và tất cả các phương thức ``loadTestsFrom*``.
 
 
    .. attribute:: suiteClass
 
-      Callable object that constructs a test suite from a list of tests. No
-      methods on the resulting object are needed.  The default value is the
-      :class:`TestSuite` class.
+      Đối tượng có thể gọi được dùng để tạo một test suite từ danh sách các test. Không cần dùng phương thức nào trên đối tượng kết quả. Giá trị mặc định là
+      lớp :class:`TestSuite`.
 
-      This affects all the ``loadTestsFrom*`` methods.
+      Điều này ảnh hưởng đến tất cả các phương thức ``loadTestsFrom*``.
 
    .. attribute:: testNamePatterns
 
-      List of Unix shell-style wildcard test name patterns that test methods
-      have to match to be included in test suites (see ``-k`` option).
+      Danh sách các mẫu tên test dùng ký tự đại diện theo kiểu Unix shell mà các phương thức test phải khớp để được đưa vào các test suite (xem tùy chọn ``-k``).
 
-      If this attribute is not ``None`` (the default), all test methods to be
-      included in test suites must match one of the patterns in this list.
-      Note that matches are always performed using :meth:`fnmatch.fnmatchcase`,
-      so unlike patterns passed to the ``-k`` option, simple substring patterns
-      will have to be converted using ``*`` wildcards.
+      Nếu thuộc tính này không phải là ``None`` (giá trị mặc định), tất cả các phương thức kiểm thử được đưa vào các test suite phải khớp với một trong các mẫu trong danh sách này. Lưu ý rằng việc khớp luôn được thực hiện bằng :meth:`fnmatch.fnmatchcase`, vì vậy không giống như các mẫu được truyền cho tùy chọn ``-k``, các mẫu chuỗi con đơn giản sẽ phải được chuyển đổi bằng các ký tự đại diện ``*``.
 
-      This affects all the ``loadTestsFrom*`` methods.
+      Điều này ảnh hưởng đến tất cả các phương thức ``loadTestsFrom*``.
 
       .. versionadded:: 3.7
 
 
 .. class:: TestResult
 
-   This class is used to compile information about which tests have succeeded
-   and which have failed.
+   Lớp này được dùng để tổng hợp thông tin về những kiểm thử đã thành công và những kiểm thử đã thất bại.
 
-   A :class:`TestResult` object stores the results of a set of tests.  The
-   :class:`TestCase` and :class:`TestSuite` classes ensure that results are
-   properly recorded; test authors do not need to worry about recording the
-   outcome of tests.
+   Một đối tượng :class:`TestResult` lưu trữ kết quả của một tập hợp kiểm thử.  :class:`TestResult`
+   Các lớp :class:`TestCase` và :class:`TestSuite` đảm bảo rằng kết quả được ghi lại đúng cách; tác giả kiểm thử không cần lo lắng về việc ghi lại kết quả của các kiểm thử.
 
-   Testing frameworks built on top of :mod:`!unittest` may want access to the
-   :class:`TestResult` object generated by running a set of tests for reporting
-   purposes; a :class:`TestResult` instance is returned by the
-   :meth:`!TestRunner.run` method for this purpose.
+   Các framework kiểm thử được xây dựng trên :mod:`!unittest` có thể muốn truy cập đối tượng
+   :class:`TestResult` được tạo ra khi chạy một tập hợp kiểm thử cho mục đích báo cáo; một thực thể :class:`TestResult` được trả về bởi
+   phương thức :meth:`!TestRunner.run` cho mục đích này.
 
-   :class:`TestResult` instances have the following attributes that will be of
-   interest when inspecting the results of running a set of tests:
+   Các instance :class:`TestResult` có những thuộc tính sau đây, hữu ích khi kiểm tra kết quả chạy một tập hợp các bài kiểm thử:
 
 
    .. attribute:: errors
 
-      A list containing 2-tuples of :class:`TestCase` instances and strings
-      holding formatted tracebacks. Each tuple represents a test which raised an
-      unexpected exception.
+      Danh sách chứa các tuple 2 phần tử gồm các instance :class:`TestCase` và các chuỗi chứa traceback đã được định dạng. Mỗi tuple đại diện cho một bài kiểm thử phát sinh ngoại lệ không mong đợi.
 
    .. attribute:: failures
 
-      A list containing 2-tuples of :class:`TestCase` instances and strings
-      holding formatted tracebacks. Each tuple represents a test where a failure
-      was explicitly signalled using the :ref:`assert\* methods <assert-methods>`.
+      Danh sách chứa các tuple 2 phần tử gồm các instance :class:`TestCase` và các chuỗi chứa traceback đã được định dạng. Mỗi tuple đại diện cho một bài kiểm thử trong đó lỗi được báo hiệu rõ ràng bằng các phương thức :ref:`assert\*methods <assert-methods>`.
 
    .. attribute:: skipped
 
-      A list containing 2-tuples of :class:`TestCase` instances and strings
-      holding the reason for skipping the test.
+      Danh sách chứa các tuple 2 phần tử gồm các instance :class:`TestCase` và các chuỗi chứa lý do bỏ qua bài kiểm thử.
 
       .. versionadded:: 3.1
 
    .. attribute:: expectedFailures
 
-      A list containing 2-tuples of :class:`TestCase` instances and strings
-      holding formatted tracebacks.  Each tuple represents an expected failure
-      or error of the test case.
+      Danh sách chứa các tuple 2 phần tử gồm các instance :class:`TestCase` và các chuỗi chứa traceback đã được định dạng. Mỗi tuple đại diện cho một lỗi hoặc ngoại lệ được dự kiến của test case.
 
    .. attribute:: unexpectedSuccesses
 
-      A list containing :class:`TestCase` instances that were marked as expected
-      failures, but succeeded.
+      Danh sách chứa các instance :class:`TestCase` được đánh dấu là lỗi dự kiến nhưng đã chạy thành công.
 
    .. attribute:: collectedDurations
 
-      A list containing 2-tuples of test case names and floats
-      representing the elapsed time of each test which was run.
+      Một danh sách chứa các bộ 2 phần tử gồm tên các trường hợp kiểm thử và các số thực biểu thị thời gian đã trôi qua của mỗi kiểm thử được chạy.
 
       .. versionadded:: 3.12
 
    .. attribute:: shouldStop
 
-      Set to ``True`` when the execution of tests should stop by :meth:`stop`.
+      Đặt thành ``True`` khi việc thực thi các kiểm thử cần được dừng bởi :meth:`stop`.
 
    .. attribute:: testsRun
 
-      The total number of tests run so far.
+      Tổng số kiểm thử đã chạy cho đến thời điểm hiện tại.
 
    .. attribute:: buffer
 
-      If set to true, ``sys.stdout`` and ``sys.stderr`` will be buffered in between
-      :meth:`startTest` and :meth:`stopTest` being called. Collected output will
-      only be echoed onto the real ``sys.stdout`` and ``sys.stderr`` if the test
-      fails or errors. Any output is also attached to the failure / error message.
+      Nếu đặt thành true, ``sys.stdout`` và ``sys.stderr`` sẽ được đệm trong khoảng giữa
+      việc gọi :meth:`startTest` và :meth:`stopTest`. Kết quả đầu ra được thu thập sẽ chỉ được ghi ra ``sys.stdout`` và ``sys.stderr`` thực tế nếu kiểm thử thất bại hoặc xảy ra lỗi. Mọi kết quả đầu ra cũng được đính kèm vào thông báo thất bại / lỗi.
 
       .. versionadded:: 3.2
 
    .. attribute:: failfast
 
-      If set to true :meth:`stop` will be called on the first failure or error,
-      halting the test run.
+      Nếu đặt thành true, :meth:`stop` sẽ được gọi khi xảy ra lỗi hoặc thất bại đầu tiên, dừng lượt chạy kiểm thử.
 
       .. versionadded:: 3.2
 
    .. attribute:: tb_locals
 
-      If set to true then local variables will be shown in tracebacks.
+      Nếu đặt thành true, các biến cục bộ sẽ được hiển thị trong traceback.
 
       .. versionadded:: 3.5
 
    .. method:: wasSuccessful()
 
-      Return ``True`` if all tests run so far have passed, otherwise returns
-      ``False``.
+      Trả về ``True`` nếu tất cả các kiểm thử đã chạy cho đến nay đều đạt, nếu không thì trả về ``False``.
 
       .. versionchanged:: 3.4
-         Returns ``False`` if there were any :attr:`unexpectedSuccesses`
-         from tests marked with the :deco:`expectedFailure` decorator.
+         Trả về ``False`` nếu có bất kỳ :attr:`unexpectedSuccesses` nào từ các kiểm thử được đánh dấu bằng decorator :deco:`expectedFailure`.
 
    .. method:: stop()
 
-      This method can be called to signal that the set of tests being run should
-      be aborted by setting the :attr:`shouldStop` attribute to ``True``.
-      :class:`!TestRunner` objects should respect this flag and return without
-      running any additional tests.
+      Có thể gọi phương thức này để báo hiệu rằng tập hợp các kiểm thử đang chạy nên bị hủy bằng cách đặt thuộc tính :attr:`shouldStop` thành ``True``.
+      Các đối tượng :class:`!TestRunner` nên tuân theo cờ này và trả về mà không chạy thêm bất kỳ kiểm thử nào.
 
-      For example, this feature is used by the :class:`TextTestRunner` class to
-      stop the test framework when the user signals an interrupt from the
-      keyboard.  Interactive tools which provide :class:`!TestRunner`
-      implementations can use this in a similar manner.
+      Ví dụ: tính năng này được lớp :class:`TextTestRunner` sử dụng để dừng test framework khi người dùng phát tín hiệu ngắt từ bàn phím. Các công cụ tương tác cung cấp các triển khai :class:`!TestRunner` có thể sử dụng tính năng này theo cách tương tự.
 
-   The following methods of the :class:`TestResult` class are used to maintain
-   the internal data structures, and may be extended in subclasses to support
-   additional reporting requirements.  This is particularly useful in building
-   tools which support interactive reporting while tests are being run.
+   Các phương thức sau đây của lớp :class:`TestResult` được dùng để duy trì các cấu trúc dữ liệu nội bộ và có thể được mở rộng trong các lớp con để hỗ trợ thêm các yêu cầu báo cáo. Điều này đặc biệt hữu ích khi xây dựng các công cụ hỗ trợ báo cáo tương tác trong lúc các kiểm thử đang được chạy.
 
 
    .. method:: startTest(test)
 
-      Called when the test case *test* is about to be run.
+      Được gọi khi test case *test* sắp được chạy.
 
    .. method:: stopTest(test)
 
-      Called after the test case *test* has been executed, regardless of the
-      outcome.
+      Được gọi sau khi test case *test* đã được thực thi, bất kể kết quả ra sao.
 
    .. method:: startTestRun()
 
-      Called once before any tests are executed.
+      Được gọi một lần trước khi bất kỳ test nào được thực thi.
 
       .. versionadded:: 3.1
 
 
    .. method:: stopTestRun()
 
-      Called once after all tests are executed.
+      Được gọi một lần sau khi tất cả test đã được thực thi.
 
       .. versionadded:: 3.1
 
 
    .. method:: addError(test, err)
 
-      Called when the test case *test* raises an unexpected exception. *err* is a
-      tuple of the form returned by :func:`sys.exc_info`: ``(type, value,
-      traceback)``.
+      Được gọi khi test case *test* phát sinh một ngoại lệ không mong muốn. *err* là một tuple có dạng do :func:`sys.exc_info`: ``(type, value, traceback)`` trả về.
 
-      The default implementation appends a tuple ``(test, formatted_err)`` to
-      the instance's :attr:`errors` attribute, where *formatted_err* is a
-      formatted traceback derived from *err*.
+      Triển khai mặc định nối thêm một tuple ``(test, formatted_err)`` vào thuộc tính :attr:`errors` của instance, trong đó *formatted_err* là traceback đã được định dạng, bắt nguồn từ *err*.
 
 
    .. method:: addFailure(test, err)
 
-      Called when the test case *test* signals a failure. *err* is a tuple of
-      the form returned by :func:`sys.exc_info`: ``(type, value, traceback)``.
+      Được gọi khi test case *test* báo hiệu một lỗi thất bại. *err* là một tuple có dạng do :func:`sys.exc_info`: ``(type, value, traceback)`` trả về.
 
-      The default implementation appends a tuple ``(test, formatted_err)`` to
-      the instance's :attr:`failures` attribute, where *formatted_err* is a
-      formatted traceback derived from *err*.
+      Triển khai mặc định nối thêm một tuple ``(test, formatted_err)`` vào thuộc tính :attr:`failures` của instance, trong đó *formatted_err* là traceback đã được định dạng, bắt nguồn từ *err*.
 
 
    .. method:: addSuccess(test)
 
-      Called when the test case *test* succeeds.
+      Được gọi khi test case *test* thành công.
 
-      The default implementation does nothing.
+      Phần triển khai mặc định không thực hiện thao tác nào.
 
 
    .. method:: addSkip(test, reason)
 
-      Called when the test case *test* is skipped.  *reason* is the reason the
-      test gave for skipping.
+      Được gọi khi test case *test* bị bỏ qua. *reason* là lý do mà test đưa ra để bỏ qua.
 
-      The default implementation appends a tuple ``(test, reason)`` to the
-      instance's :attr:`skipped` attribute.
+      Phần triển khai mặc định thêm một tuple ``(test, reason)`` vào thuộc tính :attr:`skipped` của instance.
 
 
    .. method:: addExpectedFailure(test, err)
 
-      Called when the test case *test* fails or errors, but was marked with
-      the :deco:`expectedFailure` decorator.
+      Được gọi khi test case *test* thất bại hoặc xảy ra lỗi, nhưng được đánh dấu bằng decorator :deco:`expectedFailure`.
 
-      The default implementation appends a tuple ``(test, formatted_err)`` to
-      the instance's :attr:`expectedFailures` attribute, where *formatted_err*
-      is a formatted traceback derived from *err*.
+      Phần triển khai mặc định thêm một tuple ``(test, formatted_err)`` vào thuộc tính :attr:`expectedFailures` của instance, trong đó *formatted_err* là traceback đã được định dạng, lấy từ *err*.
 
 
    .. method:: addUnexpectedSuccess(test)
 
-      Called when the test case *test* was marked with the
-      :deco:`expectedFailure` decorator, but succeeded.
+      Được gọi khi test case *test* được đánh dấu bằng
+      :deco:`expectedFailure` decorator nhưng đã thành công.
 
-      The default implementation appends the test to the instance's
-      :attr:`unexpectedSuccesses` attribute.
+      Cách triển khai mặc định thêm test vào
+      :attr:`unexpectedSuccesses` của instance.
 
 
    .. method:: addSubTest(test, subtest, outcome)
 
-      Called when a subtest finishes.  *test* is the test case
-      corresponding to the test method.  *subtest* is a custom
-      :class:`TestCase` instance describing the subtest.
+      Được gọi khi một subtest kết thúc. *test* là test case tương ứng với test method. *subtest* là một
+      :class:`TestCase` instance tùy chỉnh mô tả subtest.
 
-      If *outcome* is :const:`None`, the subtest succeeded.  Otherwise,
-      it failed with an exception where *outcome* is a tuple of the form
-      returned by :func:`sys.exc_info`: ``(type, value, traceback)``.
+      Nếu *outcome* là :const:`None`, subtest đã thành công. Nếu không, subtest đã thất bại với một exception, trong đó *outcome* là một tuple có dạng được trả về bởi :func:`sys.exc_info`: ``(type, value, traceback)``.
 
-      The default implementation does nothing when the outcome is a
-      success, and records subtest failures as normal failures.
+      Cách triển khai mặc định không làm gì khi outcome là thành công và ghi nhận các lỗi của subtest như những lỗi thông thường.
 
       .. versionadded:: 3.4
 
    .. method:: addDuration(test, elapsed)
 
-      Called when the test case finishes.  *elapsed* is the time represented in
-      seconds, and it includes the execution of cleanup functions.
+      Được gọi khi trường hợp kiểm thử kết thúc. *elapsed* là thời gian được biểu thị bằng giây và bao gồm cả thời gian thực thi các hàm cleanup.
 
       .. versionadded:: 3.12
 
 .. class:: TextTestResult(stream, descriptions, verbosity, *, durations=None)
 
-   A concrete implementation of :class:`TestResult` used by the
-   :class:`TextTestRunner`. Subclasses should accept ``**kwargs`` to ensure
-   compatibility as the interface changes.
+   Một triển khai cụ thể của :class:`TestResult` được sử dụng bởi
+   :class:`TextTestRunner`. Các lớp con nên chấp nhận ``**kwargs`` để đảm bảo khả năng tương thích khi interface thay đổi.
 
    .. versionadded:: 3.2
 
    .. versionchanged:: 3.12
-      Added the *durations* keyword parameter.
+      Đã thêm tham số từ khóa *durations*.
 
 .. data:: defaultTestLoader
 
-   Instance of the :class:`TestLoader` class intended to be shared.  If no
-   customization of the :class:`TestLoader` is needed, this instance can be used
-   instead of repeatedly creating new instances.
+   Instance của lớp :class:`TestLoader` предназначено để dùng chung. Nếu không cần tùy chỉnh :class:`TestLoader`, có thể sử dụng instance này thay vì liên tục tạo các instance mới.
 
 
 .. class:: TextTestRunner(stream=None, descriptions=True, verbosity=1, failfast=False, \
-                          buffer=False, resultclass=None, warnings=None, *, \
-                          tb_locals=False, durations=None)
+                          buffer=False, resultclass=None, warnings=None, *, \ tb_locals=False, durations=None)
 
-   A basic test runner implementation that outputs results to a stream. If *stream*
-   is ``None``, the default, :data:`sys.stderr` is used as the output stream. This class
-   has a few configurable parameters, but is essentially very simple.  Graphical
-   applications which run test suites should provide alternate implementations. Such
-   implementations should accept ``**kwargs`` as the interface to construct runners
-   changes when features are added to unittest.
+   Một triển khai test runner cơ bản xuất kết quả ra một stream. Nếu *stream* là ``None``, giá trị mặc định, thì :data:`sys.stderr` được sử dụng làm output stream. Lớp này có một vài tham số có thể cấu hình, nhưng về cơ bản rất đơn giản. Các ứng dụng đồ họa chạy các test suite nên cung cấp những triển khai thay thế. Các triển khai như vậy nên chấp nhận ``**kwargs`` vì interface để xây dựng các runner thay đổi khi các tính năng được thêm vào unittest.
 
-   By default this runner shows :exc:`DeprecationWarning`,
-   :exc:`PendingDeprecationWarning`, :exc:`ResourceWarning` and
-   :exc:`ImportWarning` even if they are :ref:`ignored by default
-   <warning-ignored>`.  This behavior can
-   be overridden using Python's :option:`!-Wd` or :option:`!-Wa` options
-   (see :ref:`Warning control <using-on-warnings>`) and leaving
-   *warnings* to ``None``.
+   Theo mặc định, runner này hiển thị :exc:`DeprecationWarning`,
+   :exc:`PendingDeprecationWarning`, :exc:`ResourceWarning` và
+   :exc:`ImportWarning` ngay cả khi chúng :ref:`bị bỏ qua theo mặc định <warning-ignored>`. Có thể ghi đè hành vi này bằng các tùy chọn :option:`!-Wd` hoặc :option:`!-Wa` của Python (xem :ref:`Kiểm soát cảnh báo <using-on-warnings>`) và đặt *cảnh báo* thành ``None``.
 
    .. versionchanged:: 3.2
-      Added the *warnings* parameter.
+      Đã thêm tham số *cảnh báo*.
 
    .. versionchanged:: 3.2
-      The default stream is set to :data:`sys.stderr` at instantiation time rather
-      than import time.
+      Luồng mặc định được đặt thành :data:`sys.stderr` tại thời điểm khởi tạo thay vì thời điểm import.
 
    .. versionchanged:: 3.5
-      Added the *tb_locals* parameter.
+      Đã thêm tham số *tb_locals*.
 
    .. versionchanged:: 3.12
-      Added the *durations* parameter.
+      Đã thêm tham số *durations*.
 
    .. method:: _makeResult()
 
-      This method returns the instance of ``TestResult`` used by :meth:`run`.
-      It is not intended to be called directly, but can be overridden in
-      subclasses to provide a custom ``TestResult``.
+      Phương thức này trả về thực thể của ``TestResult`` được :meth:`run` sử dụng. Phương thức này không предназначен để được gọi trực tiếp, nhưng có thể được ghi đè trong các lớp con để cung cấp ``TestResult`` tùy chỉnh.
 
-      ``_makeResult()`` instantiates the class or callable passed in the
-      ``TextTestRunner`` constructor as the ``resultclass`` argument. It
-      defaults to :class:`TextTestResult` if no ``resultclass`` is provided.
-      The result class is instantiated with the following arguments::
+      ``_makeResult()`` khởi tạo lớp hoặc callable được truyền vào hàm khởi tạo ``TextTestRunner`` dưới dạng đối số ``resultclass``. Theo mặc định, giá trị này là :class:`TextTestResult` nếu không cung cấp ``resultclass``. Lớp kết quả được khởi tạo với các đối số sau đây::
 
         stream, descriptions, verbosity
 
    .. method:: run(test)
 
-      This method is the main public interface to the ``TextTestRunner``. This
-      method takes a :class:`TestSuite` or :class:`TestCase` instance. A
-      :class:`TestResult` is created by calling
-      :func:`_makeResult` and the test(s) are run and the
-      results printed to stdout.
+      Phương thức này là giao diện công khai chính của ``TextTestRunner``. Phương thức này nhận một thực thể :class:`TestSuite` hoặc :class:`TestCase`. Một
+      :class:`TestResult` được tạo bằng cách gọi
+      :func:`_makeResult` và các bài kiểm thử được chạy, sau đó kết quả được in ra stdout.
 
 
 .. function:: main(module='__main__', defaultTest=None, argv=None, testRunner=None, \
-                   testLoader=unittest.defaultTestLoader, exit=True, verbosity=1, \
-                   failfast=None, catchbreak=None, buffer=None, warnings=None)
+                   testLoader=unittest.defaultTestLoader, exit=True, verbosity=1, \ failfast=None, catchbreak=None, buffer=None, warnings=None)
 
-   A command-line program that loads a set of tests from *module* and runs them;
-   this is primarily for making test modules conveniently executable.
-   The simplest use for this function is to include the following line at the
-   end of a test script::
+   Một chương trình dòng lệnh tải một tập hợp bài kiểm thử từ *module* và chạy chúng; chương trình này chủ yếu dùng để giúp các module kiểm thử có thể được thực thi một cách thuận tiện. Cách sử dụng đơn giản nhất của hàm này là thêm dòng sau vào cuối tập lệnh kiểm thử::
 
       if __name__ == '__main__':
           unittest.main()
 
-   You can run tests with more detailed information by passing in the verbosity
-   argument::
+   Bạn có thể chạy các bài kiểm thử với thông tin chi tiết hơn bằng cách truyền đối số verbosity::
 
       if __name__ == '__main__':
           unittest.main(verbosity=2)
 
-   The *defaultTest* argument is either the name of a single test or an
-   iterable of test names to run if no test names are specified via *argv*.  If
-   not specified or ``None`` and no test names are provided via *argv*, all
-   tests found in *module* are run.
+   Đối số *defaultTest* có thể là tên của một bài kiểm thử đơn lẻ hoặc một iterable chứa các tên bài kiểm thử cần chạy nếu không có tên bài kiểm thử nào được chỉ định qua *argv*. Nếu không được chỉ định hoặc là ``None`` và không có tên bài kiểm thử nào được cung cấp qua *argv*, tất cả các bài kiểm thử được tìm thấy trong *module* sẽ được chạy.
 
-   The *argv* argument can be a list of options passed to the program, with the
-   first element being the program name.  If not specified or ``None``,
-   the values of :data:`sys.argv` are used.
+   Đối số *argv* có thể là một danh sách các tùy chọn được truyền cho chương trình, trong đó phần tử đầu tiên là tên chương trình. Nếu không được chỉ định hoặc là ``None``, các giá trị của :data:`sys.argv` sẽ được sử dụng.
 
-   The *testRunner* argument can either be a test runner class or an already
-   created instance of it. By default ``main`` calls :func:`sys.exit` with
-   an exit code indicating success (0) or failure (1) of the tests run.
-   An exit code of 5 indicates that no tests were run or skipped.
+   Đối số *testRunner* có thể là một lớp test runner hoặc một instance đã được tạo của lớp đó. Theo mặc định, ``main`` gọi :func:`sys.exit` với mã thoát cho biết các bài kiểm thử đã chạy thành công (0) hay thất bại (1). Mã thoát 5 cho biết không có bài kiểm thử nào được chạy hoặc bị bỏ qua.
 
-   The *testLoader* argument has to be a :class:`TestLoader` instance,
-   and defaults to :data:`defaultTestLoader`.
+   Đối số *testLoader* phải là một instance :class:`TestLoader`, và mặc định là :data:`defaultTestLoader`.
 
-   ``main`` supports being used from the interactive interpreter by passing in the
-   argument ``exit=False``. This displays the result on standard output without
-   calling :func:`sys.exit`::
+   ``main`` hỗ trợ việc được sử dụng từ trình thông dịch tương tác bằng cách truyền đối số ``exit=False``. Thao tác này hiển thị kết quả trên đầu ra tiêu chuẩn mà không gọi :func:`sys.exit`::
 
       >>> from unittest import main
       >>> main(module='test_module', exit=False)
 
-   The *failfast*, *catchbreak* and *buffer* parameters have the same
-   effect as the same-name `command-line options`_.
+   Các tham số *failfast*, *catchbreak* và *buffer* có tác dụng giống như các `tùy chọn dòng lệnh <command-line options_>`_ cùng tên.
 
-   The *warnings* argument specifies the :ref:`warning filter <warning-filter>`
-   that should be used while running the tests.  If it's not specified, it will
-   remain ``None`` if a :option:`!-W` option is passed to :program:`python`
-   (see :ref:`Warning control <using-on-warnings>`),
-   otherwise it will be set to ``'default'``.
+   Đối số *warnings* chỉ định :ref:`bộ lọc cảnh báo <warning-filter>` sẽ được sử dụng trong khi chạy các bài kiểm thử. Nếu không được chỉ định, nó sẽ vẫn là ``None`` nếu một :option:`!-W` tùy chọn được truyền cho :program:`python` (xem :ref:`Kiểm soát cảnh báo <using-on-warnings>`), nếu không thì sẽ được đặt thành ``'default'``.
 
-   Calling ``main`` returns an object with the ``result`` attribute that contains
-   the result of the tests run as a :class:`unittest.TestResult`.
+   Việc gọi ``main`` trả về một đối tượng có thuộc tính ``result`` chứa kết quả của các bài kiểm thử được chạy dưới dạng :class:`unittest.TestResult`.
 
    .. versionchanged:: 3.1
-      The *exit* parameter was added.
+      Đã thêm tham số *exit*.
 
    .. versionchanged:: 3.2
-      The *verbosity*, *failfast*, *catchbreak*, *buffer*
-      and *warnings* parameters were added.
+      Đã thêm các tham số *verbosity*, *failfast*, *catchbreak*, *buffer* và *warnings*.
 
    .. versionchanged:: 3.4
-      The *defaultTest* parameter was changed to also accept an iterable of
-      test names.
+      Tham số *defaultTest* được thay đổi để cũng chấp nhận một iterable chứa các tên bài kiểm thử.
 
 
 .. _load_tests-protocol:
 
-load_tests Protocol
-###################
+.. _`load_tests Protocol`:
+
+Giao thức load_tests
+####################
 
 .. versionadded:: 3.2
 
-Modules or packages can customize how tests are loaded from them during normal
-test runs or test discovery by implementing a function called ``load_tests``.
+Các module hoặc package có thể tùy chỉnh cách tải các bài kiểm thử từ chúng trong các lần chạy kiểm thử thông thường hoặc quá trình phát hiện bài kiểm thử bằng cách triển khai một hàm có tên ``load_tests``.
 
-If a test module defines ``load_tests`` it will be called by
-:meth:`TestLoader.loadTestsFromModule` with the following arguments::
+Nếu một module kiểm thử định nghĩa ``load_tests`` thì module đó sẽ được gọi bởi
+:meth:`TestLoader.loadTestsFromModule` với các đối số sau::
 
     load_tests(loader, standard_tests, pattern)
 
-where *pattern* is passed straight through from ``loadTestsFromModule``.  It
-defaults to ``None``.
+trong đó *pattern* được truyền thẳng từ ``loadTestsFromModule``. Giá trị mặc định là ``None``.
 
-It should return a :class:`TestSuite`.
+Hàm này phải trả về một :class:`TestSuite`.
 
-*loader* is the instance of :class:`TestLoader` doing the loading.
-*standard_tests* are the tests that would be loaded by default from the
-module. It is common for test modules to only want to add or remove tests
-from the standard set of tests.
-The third argument is used when loading packages as part of test discovery.
+*loader* là instance của :class:`TestLoader` thực hiện việc tải. *standard_tests* là các kiểm thử được tải theo mặc định từ module. Các module kiểm thử thường chỉ muốn thêm hoặc xóa kiểm thử khỏi tập kiểm thử tiêu chuẩn. Đối số thứ ba được sử dụng khi tải các package trong quá trình phát hiện kiểm thử.
 
-A typical ``load_tests`` function that loads tests from a specific set of
-:class:`TestCase` classes may look like::
+Một hàm ``load_tests`` điển hình tải các kiểm thử từ một tập hợp cụ thể gồm
+:class:`TestCase` các lớp có thể trông như::
 
     test_cases = (TestCase1, TestCase2, TestCase3)
 
@@ -2428,77 +1887,53 @@ A typical ``load_tests`` function that loads tests from a specific set of
             suite.addTests(tests)
         return suite
 
-If discovery is started in a directory containing a package, either from the
-command line or by calling :meth:`TestLoader.discover`, then the package
-:file:`__init__.py` will be checked for ``load_tests``.  If that function does
-not exist, discovery will recurse into the package as though it were just
-another directory.  Otherwise, discovery of the package's tests will be left up
-to ``load_tests`` which is called with the following arguments::
+Nếu quá trình discovery được bắt đầu trong một thư mục chứa package, từ dòng lệnh hoặc bằng cách gọi :meth:`TestLoader.discover`, thì package
+:file:`__init__.py` sẽ được kiểm tra để tìm ``load_tests``. Nếu hàm đó không tồn tại, discovery sẽ đệ quy vào package như với bất kỳ thư mục nào khác. Nếu không, việc discovery các test của package sẽ do ``load_tests`` đảm nhiệm; hàm này được gọi với các đối số sau đây::
 
     load_tests(loader, standard_tests, pattern)
 
-This should return a :class:`TestSuite` representing all the tests
-from the package. (``standard_tests`` will only contain tests
-collected from :file:`__init__.py`.)
+Hàm này phải trả về một :class:`TestSuite` đại diện cho tất cả các test trong package. (``standard_tests`` sẽ chỉ chứa các test được thu thập từ :file:`__init__.py`.)
 
-Because the pattern is passed into ``load_tests`` the package is free to
-continue (and potentially modify) test discovery. A 'do nothing'
-``load_tests`` function for a test package would look like::
+Vì pattern được truyền vào ``load_tests``, package có thể tiếp tục (và có khả năng sửa đổi) quá trình discovery test. Một hàm ``load_tests`` 'không làm gì' cho test package sẽ có dạng như sau::
 
     def load_tests(loader, standard_tests, pattern):
-        # top level directory cached on loader instance
+        # thư mục cấp cao nhất được lưu trong instance của loader
         this_dir = os.path.dirname(__file__)
         package_tests = loader.discover(start_dir=this_dir, pattern=pattern)
         standard_tests.addTests(package_tests)
         return standard_tests
 
 .. versionchanged:: 3.5
-   Discovery no longer checks package names for matching *pattern* due to the
-   impossibility of package names matching the default pattern.
+   Discovery không còn kiểm tra tên package để khớp với *pattern* vì tên package không thể khớp với pattern mặc định.
 
 
 
-Class and Module Fixtures
+.. _`Class and Module Fixtures`:
+
+Fixture của lớp và mô-đun
 -------------------------
 
-Class and module level fixtures are implemented in :class:`TestSuite`. When
-the test suite encounters a test from a new class then
-:meth:`~TestCase.tearDownClass` from the previous class (if there is one)
-is called, followed by :meth:`~TestCase.setUpClass` from the new class.
+Các fixture cấp class và module được triển khai trong :class:`TestSuite`. Khi test suite gặp một test từ một class mới thì
+:meth:`~TestCase.tearDownClass` của class trước đó (nếu có) sẽ được gọi, tiếp theo là :meth:`~TestCase.setUpClass` của class mới.
 
-Similarly if a test is from a different module from the previous test then
-``tearDownModule`` from the previous module is run, followed by
-``setUpModule`` from the new module.
+Tương tự, nếu một test thuộc module khác với test trước đó thì ``tearDownModule`` của module trước đó sẽ được chạy, tiếp theo là ``setUpModule`` của module mới.
 
-After all the tests have run the final ``tearDownClass`` and
-``tearDownModule`` are run.
+Sau khi tất cả các test đã chạy, ``tearDownClass`` và ``tearDownModule`` cuối cùng sẽ được chạy.
 
-Note that shared fixtures do not play well with [potential] features like test
-parallelization and they break test isolation. They should be used with care.
+Lưu ý rằng các fixture dùng chung không hoạt động tốt với các tính năng [tiềm năng] như chạy test song song và chúng phá vỡ tính độc lập giữa các test. Hãy sử dụng chúng một cách thận trọng.
 
-The default ordering of tests created by the unittest test loaders is to group
-all tests from the same modules and classes together. This will lead to
-``setUpClass`` / ``setUpModule`` (etc) being called exactly once per class and
-module. If you randomize the order, so that tests from different modules and
-classes are adjacent to each other, then these shared fixture functions may be
-called multiple times in a single test run.
+Thứ tự mặc định của các test được tạo bởi unittest test loader là nhóm tất cả các test từ cùng module và class lại với nhau. Điều này sẽ khiến ``setUpClass`` / ``setUpModule`` (v.v.) được gọi chính xác một lần cho mỗi class và module. Nếu bạn xáo trộn thứ tự để các test từ các module và class khác nhau nằm cạnh nhau, thì các hàm fixture dùng chung này có thể được gọi nhiều lần trong một lần chạy test.
 
-Shared fixtures are not intended to work with suites with non-standard
-ordering. A ``BaseTestSuite`` still exists for frameworks that don't want to
-support shared fixtures.
+Fixture dùng chung không được thiết kế để hoạt động với các suite có thứ tự không chuẩn. Một ``BaseTestSuite`` vẫn tồn tại dành cho các framework không muốn hỗ trợ fixture dùng chung.
 
-If there are any exceptions raised during one of the shared fixture functions
-the test is reported as an error. Because there is no corresponding test
-instance an ``_ErrorHolder`` object (that has the same interface as a
-:class:`TestCase`) is created to represent the error. If you are just using
-the standard unittest test runner then this detail doesn't matter, but if you
-are a framework author it may be relevant.
+Nếu có bất kỳ ngoại lệ nào được phát sinh trong một trong các hàm fixture dùng chung, bài kiểm thử sẽ được báo cáo là lỗi. Vì không có phiên bản kiểm thử tương ứng, một đối tượng ``_ErrorHolder`` (có cùng giao diện với một
+:class:`TestCase`) được tạo để biểu diễn lỗi. Nếu bạn chỉ sử dụng test runner unittest tiêu chuẩn thì chi tiết này không quan trọng, nhưng nếu bạn là tác giả framework thì nó có thể liên quan.
 
 
-setUpClass and tearDownClass
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setUpClass và tearDownClass
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-These must be implemented as class methods::
+Các phương thức này phải được triển khai dưới dạng class method::
 
     import unittest
 
@@ -2511,25 +1946,21 @@ These must be implemented as class methods::
         def tearDownClass(cls):
             cls._connection.destroy()
 
-If you want the ``setUpClass`` and ``tearDownClass`` on base classes called
-then you must call up to them yourself. The implementations in
-:class:`TestCase` are empty.
+Nếu muốn ``setUpClass`` và ``tearDownClass`` trên các lớp cơ sở được gọi, bạn phải tự gọi chúng. Các triển khai trong
+:class:`TestCase` là các triển khai rỗng.
 
-If an exception is raised during a ``setUpClass`` then the tests in the class
-are not run and the ``tearDownClass`` is not run. Skipped classes will not
-have ``setUpClass`` or ``tearDownClass`` run. If the exception is a
-:exc:`SkipTest` exception then the class will be reported as having been skipped
-instead of as an error.
+Nếu một ngoại lệ được phát sinh trong ``setUpClass``, các bài kiểm thử trong lớp sẽ không được chạy và ``tearDownClass`` sẽ không được chạy. Các lớp bị bỏ qua sẽ không chạy ``setUpClass`` hoặc ``tearDownClass``. Nếu ngoại lệ là một
+Nếu xảy ra ngoại lệ :exc:`SkipTest` thì lớp sẽ được báo cáo là đã bị bỏ qua thay vì là lỗi.
 
 
-setUpModule and tearDownModule
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+setUpModule và tearDownModule
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. function:: setUpModule
               tearDownModule
    :no-typesetting:
 
-These should be implemented as functions::
+Các hàm này nên được triển khai dưới dạng các hàm::
 
     def setUpModule():
         createConnection()
@@ -2537,110 +1968,88 @@ These should be implemented as functions::
     def tearDownModule():
         closeConnection()
 
-If an exception is raised in a ``setUpModule`` then none of the tests in the
-module will be run and the ``tearDownModule`` will not be run. If the exception is a
-:exc:`SkipTest` exception then the module will be reported as having been skipped
-instead of as an error.
+Nếu xảy ra ngoại lệ trong ``setUpModule`` thì không có kiểm thử nào trong mô-đun được chạy và ``tearDownModule`` sẽ không được chạy. Nếu ngoại lệ là
+ngoại lệ :exc:`SkipTest` thì mô-đun sẽ được báo cáo là đã bị bỏ qua thay vì là lỗi.
 
-To add cleanup code that must be run even in the case of an exception, use
-``addModuleCleanup``:
+Để thêm mã dọn dẹp phải được chạy ngay cả khi xảy ra ngoại lệ, hãy sử dụng ``addModuleCleanup``:
 
 
 .. function:: addModuleCleanup(function, /, *args, **kwargs)
 
-   Add a function to be called after :func:`tearDownModule` to cleanup
-   resources used during the test class. Functions will be called in reverse
-   order to the order they are added (:abbr:`LIFO (last-in, first-out)`).
-   They are called with any arguments and keyword arguments passed into
-   :meth:`addModuleCleanup` when they are added.
+   Thêm một hàm sẽ được gọi sau :func:`tearDownModule` để dọn dẹp các tài nguyên được sử dụng trong test class. Các hàm sẽ được gọi theo thứ tự ngược với thứ tự chúng được thêm vào (:abbr:`LIFO (last-in, first-out)`). Chúng được gọi với mọi đối số và đối số từ khóa được truyền vào
+   :meth:`addModuleCleanup` khi chúng được thêm vào.
 
-   If :meth:`setUpModule` fails, meaning that :func:`tearDownModule` is not
-   called, then any cleanup functions added will still be called.
+   Nếu :meth:`setUpModule` không thành công, nghĩa là :func:`tearDownModule` không được gọi, thì mọi hàm dọn dẹp đã được thêm vào vẫn sẽ được gọi.
 
    .. versionadded:: 3.8
 
 
 .. function:: enterModuleContext(cm)
 
-   Enter the supplied :term:`context manager`.  If successful, also
-   add its :meth:`~object.__exit__` method as a cleanup function by
-   :func:`addModuleCleanup` and return the result of the
-   :meth:`~object.__enter__` method.
+   Đi vào :term:`context manager` được cung cấp. Nếu thành công, đồng thời thêm phương thức :meth:`~object.__exit__` của nó làm hàm dọn dẹp bằng cách
+   :func:`addModuleCleanup` và trả về kết quả của
+   phương thức :meth:`~object.__enter__`.
 
    .. versionadded:: 3.11
 
 
 .. function:: doModuleCleanups()
 
-   This function is called unconditionally after :func:`tearDownModule`, or
-   after :func:`setUpModule` if :func:`setUpModule` raises an exception.
+   Hàm này luôn được gọi sau :func:`tearDownModule`, hoặc sau :func:`setUpModule` nếu :func:`setUpModule` phát sinh ngoại lệ.
 
-   It is responsible for calling all the cleanup functions added by
-   :func:`addModuleCleanup`. If you need cleanup functions to be called
-   *prior* to :func:`tearDownModule` then you can call
-   :func:`doModuleCleanups` yourself.
+   Nó chịu trách nhiệm gọi tất cả các hàm cleanup được thêm bởi
+   :func:`addModuleCleanup`. Nếu bạn cần các hàm cleanup được gọi *trước* :func:`tearDownModule` thì bạn có thể gọi
+   :func:`doModuleCleanups` chính bạn.
 
-   :func:`doModuleCleanups` pops methods off the stack of cleanup
-   functions one at a time, so it can be called at any time.
+   :func:`doModuleCleanups` lấy từng phương thức ra khỏi ngăn xếp các hàm cleanup, vì vậy nó có thể được gọi bất kỳ lúc nào.
 
    .. versionadded:: 3.8
 
 
-Signal Handling
----------------
+.. _`Signal Handling`:
+
+Xử lý tín hiệu
+--------------
 
 .. versionadded:: 3.2
 
-The :option:`-c/--catch <unittest -c>` command-line option to unittest,
-along with the ``catchbreak`` parameter to :func:`unittest.main`, provide
-more friendly handling of control-C during a test run. With catch break
-behavior enabled control-C will allow the currently running test to complete,
-and the test run will then end and report all the results so far. A second
-control-c will raise a :exc:`KeyboardInterrupt` in the usual way.
+Tùy chọn dòng lệnh :option:`-c/--catch <unittest -c>` của unittest, cùng với tham số ``catchbreak`` của :func:`unittest.main`, cung cấp cách xử lý thân thiện hơn đối với control-C trong khi chạy test. Khi bật behavior catch break, control-C sẽ cho phép test hiện đang chạy hoàn tất, sau đó quá trình chạy test sẽ kết thúc và báo cáo tất cả kết quả tính đến thời điểm đó. Control-C lần thứ hai sẽ raise một :exc:`KeyboardInterrupt` theo cách thông thường.
 
-The control-c handling signal handler attempts to remain compatible with code or
-tests that install their own :const:`signal.SIGINT` handler. If the ``unittest``
-handler is called but *isn't* the installed :const:`signal.SIGINT` handler,
-i.e. it has been replaced by the system under test and delegated to, then it
-calls the default handler. This will normally be the expected behavior by code
-that replaces an installed handler and delegates to it. For individual tests
-that need ``unittest`` control-c handling disabled the :func:`removeHandler`
-decorator can be used.
+Trình xử lý tín hiệu control-c cố gắng duy trì khả năng tương thích với mã hoặc các bài kiểm thử cài đặt trình xử lý :const:`signal.SIGINT` riêng. Nếu trình xử lý ``unittest`` được gọi nhưng *isn't* trình xử lý :const:`signal.SIGINT` đã cài đặt, tức là nó đã bị hệ thống đang được kiểm thử thay thế và ủy quyền xử lý, thì nó sẽ gọi trình xử lý mặc định. Đây thường là hành vi được mã thay thế một trình xử lý đã cài đặt và ủy quyền xử lý cho trình xử lý đó mong đợi. Đối với các bài kiểm thử riêng lẻ cần tắt ``unittest`` việc xử lý control-c, có thể sử dụng decorator :func:`removeHandler`.
 
-There are a few utility functions for framework authors to enable control-c
-handling functionality within test frameworks.
+Có một số hàm tiện ích dành cho tác giả framework để bật chức năng xử lý control-c trong các test framework.
 
 .. function:: installHandler()
 
-   Install the control-c handler. When a :const:`signal.SIGINT` is received
-   (usually in response to the user pressing control-c) all registered results
-   have :meth:`~TestResult.stop` called.
+   Cài đặt trình xử lý control-c. Khi nhận được một :const:`signal.SIGINT` (thường là do người dùng nhấn control-c), tất cả các kết quả đã đăng ký sẽ được gọi :meth:`~TestResult.stop`.
 
 
 .. function:: registerResult(result)
 
-   Register a :class:`TestResult` object for control-c handling. Registering a
-   result stores a weak reference to it, so it doesn't prevent the result from
-   being garbage collected.
+   Đăng ký một đối tượng :class:`TestResult` để xử lý control-c. Việc đăng ký một kết quả sẽ lưu một weak reference đến kết quả đó, vì vậy không ngăn kết quả được garbage collection.
 
-   Registering a :class:`TestResult` object has no side-effects if control-c
-   handling is not enabled, so test frameworks can unconditionally register
-   all results they create independently of whether or not handling is enabled.
+   Việc đăng ký một đối tượng :class:`TestResult` không gây ra tác dụng phụ nếu tính năng xử lý control-c chưa được bật, vì vậy các test framework có thể vô điều kiện đăng ký tất cả kết quả mà chúng tạo ra, bất kể tính năng xử lý có được bật hay không.
 
 
 .. function:: removeResult(result)
 
-   Remove a registered result. Once a result has been removed then
-   :meth:`~TestResult.stop` will no longer be called on that result object in
-   response to a control-c.
+   Xóa một kết quả đã đăng ký. Sau khi một kết quả đã bị xóa thì
+   :meth:`~TestResult.stop` sẽ không còn được gọi trên đối tượng kết quả đó để phản hồi control-c.
 
 
 .. function:: removeHandler(function=None)
 
-   When called without arguments this function removes the control-c handler
-   if it has been installed. This function can also be used as a test decorator
-   to temporarily remove the handler while the test is being executed::
+   Khi được gọi mà không có đối số, hàm này sẽ xóa trình xử lý control-c nếu trình xử lý này đã được cài đặt. Hàm này cũng có thể được dùng làm test decorator để tạm thời xóa trình xử lý trong khi test đang được thực thi::
 
       @unittest.removeHandler
       def test_signal_handling(self):
           ...
+
+.. _`Simple Smalltalk Testing: With Patterns`: https://web.archive.org/web/20150315073817/http://www.xprogramming.com/testfram.htm
+.. _`pytest`: https://docs.pytest.org/
+.. _`The Python Testing Tools Taxonomy`: https://wiki.python.org/moin/PythonTestingToolsTaxonomy
+.. _`Testing in Python Mailing List`: http://lists.idyll.org/listinfo/testing-in-python
+.. _`Buildbot`: https://buildbot.net/
+.. _`Jenkins`: https://www.jenkins.io/
+.. _`GitHub Actions`: https://github.com/features/actions
+.. _`AppVeyor`: https://www.appveyor.com/

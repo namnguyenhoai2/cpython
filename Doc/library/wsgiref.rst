@@ -1,137 +1,86 @@
-:mod:`!wsgiref` --- WSGI Utilities and Reference Implementation
-===============================================================
+:mod:`!wsgiref` --- Tiện ích WSGI và Triển khai Tham chiếu
+==========================================================
 
 .. module:: wsgiref
-   :synopsis: WSGI Utilities and Reference Implementation.
+   :synopsis: Tiện ích WSGI và Triển khai Tham chiếu.
 
 .. moduleauthor:: Phillip J. Eby <pje@telecommunity.com>
 .. sectionauthor:: Phillip J. Eby <pje@telecommunity.com>
 
-**Source code:** :source:`Lib/wsgiref`
+**Mã nguồn:** :source:`Lib/wsgiref`
 
 --------------
 
 .. warning::
 
-   :mod:`!wsgiref` is a reference implementation and is not recommended for
-   production. The module only implements basic security checks.
+   :mod:`!wsgiref` là một triển khai tham chiếu và không được khuyến nghị dùng trong môi trường production. Mô-đun này chỉ thực hiện các kiểm tra bảo mật cơ bản.
 
-The Web Server Gateway Interface (WSGI) is a standard interface between web
-server software and web applications written in Python. Having a standard
-interface makes it easy to use an application that supports WSGI with a number
-of different web servers.
+Web Server Gateway Interface (WSGI) là một interface tiêu chuẩn giữa phần mềm web server và các web application được viết bằng Python. Việc có một interface tiêu chuẩn giúp dễ dàng sử dụng một application hỗ trợ WSGI với nhiều web server khác nhau.
 
-Only authors of web servers and programming frameworks need to know every detail
-and corner case of the WSGI design.  You don't need to understand every detail
-of WSGI just to install a WSGI application or to write a web application using
-an existing framework.
+Chỉ tác giả của web server và programming framework mới cần biết mọi chi tiết và trường hợp đặc biệt trong thiết kế WSGI. Bạn không cần hiểu mọi chi tiết của WSGI chỉ để cài đặt một WSGI application hoặc viết một web application bằng framework hiện có.
 
-:mod:`!wsgiref` is a reference implementation of the WSGI specification that can
-be used to add WSGI support to a web server or framework.  It provides utilities
-for manipulating WSGI environment variables and response headers, base classes
-for implementing WSGI servers, a demo HTTP server that serves WSGI applications,
-types for static type checking,
-and a validation tool that checks WSGI servers and applications for conformance
-to the WSGI specification (:pep:`3333`).
+:mod:`!wsgiref` là một triển khai tham chiếu của đặc tả WSGI, có thể được dùng để bổ sung hỗ trợ WSGI cho web server hoặc framework. Nó cung cấp các tiện ích để thao tác với các biến môi trường WSGI và response header, các base class để triển khai WSGI server, một HTTP server demo phục vụ các WSGI application, các type dùng cho static type checking, và một công cụ validation để kiểm tra WSGI server và application có tuân thủ đặc tả WSGI hay không (:pep:`3333`).
 
-See `wsgi.readthedocs.io <https://wsgi.readthedocs.io/>`_ for more information about WSGI, and links
-to tutorials and other resources.
+Xem `wsgi.readthedocs.io <https://wsgi.readthedocs.io/>`_ để biết thêm thông tin về WSGI, cùng các liên kết đến hướng dẫn và những tài nguyên khác.
 
 .. XXX If you're just trying to write a web application...
 
 
-:mod:`!wsgiref.util` -- WSGI environment utilities
---------------------------------------------------
+:mod:`!wsgiref.util` -- các tiện ích môi trường WSGI
+----------------------------------------------------
 
 .. module:: wsgiref.util
-   :synopsis: WSGI environment utilities.
+   :synopsis: Các tiện ích môi trường WSGI.
 
 
-This module provides a variety of utility functions for working with WSGI
-environments.  A WSGI environment is a dictionary containing HTTP request
-variables as described in :pep:`3333`.  All of the functions taking an *environ*
-parameter expect a WSGI-compliant dictionary to be supplied; please see
-:pep:`3333` for a detailed specification and
-:data:`~wsgiref.types.WSGIEnvironment` for a type alias that can be used
-in type annotations.
+Mô-đun này cung cấp nhiều hàm tiện ích để làm việc với các môi trường WSGI. Môi trường WSGI là một dictionary chứa các biến của HTTP request như được mô tả trong :pep:`3333`. Tất cả các hàm nhận tham số *environ* đều yêu cầu cung cấp một dictionary tuân thủ WSGI; vui lòng xem
+:pep:`3333` để biết đặc tả chi tiết và
+:data:`~wsgiref.types.WSGIEnvironment` để biết bí danh kiểu có thể dùng trong type annotations.
 
 
 .. function:: guess_scheme(environ)
 
-   Return a guess for whether ``wsgi.url_scheme`` should be "http" or "https", by
-   checking for a ``HTTPS`` environment variable in the *environ* dictionary.  The
-   return value is a string.
+   Trả về dự đoán về việc ``wsgi.url_scheme`` nên là "http" hay "https", bằng cách kiểm tra biến môi trường ``HTTPS`` trong dictionary *environ*. Giá trị trả về là một chuỗi.
 
-   This function is useful when creating a gateway that wraps CGI or a CGI-like
-   protocol such as FastCGI.  Typically, servers providing such protocols will
-   include a ``HTTPS`` variable with a value of "1", "yes", or "on" when a request
-   is received via SSL.  So, this function returns "https" if such a value is
-   found, and "http" otherwise.
+   Hàm này hữu ích khi tạo một gateway bao bọc CGI hoặc một giao thức tương tự CGI chẳng hạn như FastCGI. Thông thường, các máy chủ cung cấp những giao thức như vậy sẽ bao gồm một biến ``HTTPS`` có giá trị là "1", "yes" hoặc "on" khi nhận được một request qua SSL. Vì vậy, hàm này trả về "https" nếu tìm thấy giá trị như vậy và trả về "http" trong trường hợp ngược lại.
 
 
 .. function:: request_uri(environ, include_query=True)
 
-   Return the full request URI, optionally including the query string, using the
-   algorithm found in the "URL Reconstruction" section of :pep:`3333`.  If
-   *include_query* is false, the query string is not included in the resulting URI.
+   Trả về URI đầy đủ của request, có thể bao gồm query string, bằng thuật toán được nêu trong phần "URL Reconstruction" của :pep:`3333`. Nếu *include_query* là false, query string sẽ không được đưa vào URI kết quả.
 
 
 .. function:: application_uri(environ)
 
-   Similar to :func:`request_uri`, except that the ``PATH_INFO`` and
-   ``QUERY_STRING`` variables are ignored.  The result is the base URI of the
-   application object addressed by the request.
+   Tương tự như :func:`request_uri`, ngoại trừ việc các biến ``PATH_INFO`` và ``QUERY_STRING`` bị bỏ qua. Kết quả là URI cơ sở của application object được request định địa chỉ.
 
 
 .. function:: shift_path_info(environ)
 
-   Shift a single name from ``PATH_INFO`` to ``SCRIPT_NAME`` and return the name.
-   The *environ* dictionary is *modified* in-place; use a copy if you need to keep
-   the original ``PATH_INFO`` or ``SCRIPT_NAME`` intact.
+   Chuyển một name duy nhất từ ``PATH_INFO`` sang ``SCRIPT_NAME`` rồi trả về name đó. Dictionary *environ* được *sửa đổi* ngay tại chỗ; hãy sử dụng một bản sao nếu bạn cần giữ nguyên ``PATH_INFO`` hoặc ``SCRIPT_NAME`` ban đầu.
 
-   If there are no remaining path segments in ``PATH_INFO``, ``None`` is returned.
+   Nếu không còn path segment nào trong ``PATH_INFO``, ``None`` sẽ được trả về.
 
-   Typically, this routine is used to process each portion of a request URI path,
-   for example to treat the path as a series of dictionary keys. This routine
-   modifies the passed-in environment to make it suitable for invoking another WSGI
-   application that is located at the target URI. For example, if there is a WSGI
-   application at ``/foo``, and the request URI path is ``/foo/bar/baz``, and the
-   WSGI application at ``/foo`` calls :func:`shift_path_info`, it will receive the
-   string "bar", and the environment will be updated to be suitable for passing to
-   a WSGI application at ``/foo/bar``.  That is, ``SCRIPT_NAME`` will change from
-   ``/foo`` to ``/foo/bar``, and ``PATH_INFO`` will change from ``/bar/baz`` to
-   ``/baz``.
+   Thông thường, routine này được dùng để xử lý từng phần của path trong URI của request, chẳng hạn như coi path là một chuỗi dictionary key. Routine này sửa đổi environment được truyền vào để environment phù hợp với việc gọi một WSGI application khác nằm tại target URI. Ví dụ, nếu có một WSGI application tại ``/foo``, path trong URI của request là ``/foo/bar/baz``, và WSGI application tại ``/foo`` gọi :func:`shift_path_info`, application đó sẽ nhận được chuỗi "bar", còn environment sẽ được cập nhật để phù hợp với việc truyền vào một WSGI application tại ``/foo/bar``. Nghĩa là, ``SCRIPT_NAME`` sẽ đổi từ ``/foo`` thành ``/foo/bar``, và ``PATH_INFO`` sẽ đổi từ ``/bar/baz`` thành ``/baz``.
 
-   When ``PATH_INFO`` is just a "/", this routine returns an empty string and
-   appends a trailing slash to ``SCRIPT_NAME``, even though empty path segments are
-   normally ignored, and ``SCRIPT_NAME`` doesn't normally end in a slash.  This is
-   intentional behavior, to ensure that an application can tell the difference
-   between URIs ending in ``/x`` from ones ending in ``/x/`` when using this
-   routine to do object traversal.
+   Khi ``PATH_INFO`` chỉ là "/", routine này trả về một chuỗi rỗng và thêm dấu gạch chéo ở cuối vào ``SCRIPT_NAME``, mặc dù các path segment rỗng thường bị bỏ qua và ``SCRIPT_NAME`` thông thường không kết thúc bằng dấu gạch chéo. Đây là hành vi có chủ ý, nhằm đảm bảo application có thể phân biệt các URI kết thúc bằng ``/x`` với những URI kết thúc bằng ``/x/`` khi sử dụng routine này để thực hiện việc duyệt object.
 
 
 .. function:: setup_testing_defaults(environ)
 
-   Update *environ* with trivial defaults for testing purposes.
+   Cập nhật *environ* bằng các giá trị mặc định đơn giản để phục vụ việc kiểm thử.
 
-   This routine adds various parameters required for WSGI, including ``HTTP_HOST``,
-   ``SERVER_NAME``, ``SERVER_PORT``, ``REQUEST_METHOD``, ``SCRIPT_NAME``,
-   ``PATH_INFO``, and all of the :pep:`3333`\ -defined ``wsgi.*`` variables.  It
-   only supplies default values, and does not replace any existing settings for
-   these variables.
+   Routine này thêm nhiều tham số cần thiết cho WSGI, bao gồm ``HTTP_HOST``, ``SERVER_NAME``, ``SERVER_PORT``, ``REQUEST_METHOD``, ``SCRIPT_NAME``, ``PATH_INFO``, và tất cả các biến :pep:`3333`\ -defined ``wsgi.*``. Routine này chỉ cung cấp các giá trị mặc định và không thay thế bất kỳ thiết lập hiện có nào cho các biến này.
 
-   This routine is intended to make it easier for unit tests of WSGI servers and
-   applications to set up dummy environments.  It should NOT be used by actual WSGI
-   servers or applications, since the data is fake!
+   Routine này được thiết kế để giúp việc thiết lập các environment giả cho unit test của WSGI server và application trở nên dễ dàng hơn. KHÔNG được sử dụng routine này cho WSGI server hoặc application thực tế, vì dữ liệu là giả!
 
-   Example usage (see also :func:`~wsgiref.simple_server.demo_app`
-   for another example)::
+   Ví dụ sử dụng (xem thêm :func:`~wsgiref.simple_server.demo_app` để biết một ví dụ khác)::
 
       from wsgiref.util import setup_testing_defaults
       from wsgiref.simple_server import make_server
 
-      # A relatively simple WSGI application. It's going to print out the
-      # environment dictionary after being updated by setup_testing_defaults
+      # Một ứng dụng WSGI tương đối đơn giản. Ứng dụng này sẽ in ra
+      # từ điển environment sau khi được setup_testing_defaults cập nhật
       def simple_app(environ, start_response):
           setup_testing_defaults(environ)
 
@@ -149,36 +98,28 @@ in type annotations.
           httpd.serve_forever()
 
 
-In addition to the environment functions above, the :mod:`!wsgiref.util` module
-also provides these miscellaneous utilities:
+Ngoài các hàm environment ở trên, module :mod:`!wsgiref.util` cũng cung cấp các tiện ích linh tinh sau đây:
 
 
 .. function:: is_hop_by_hop(header_name)
 
-   Return ``True`` if 'header_name' is an HTTP/1.1 "Hop-by-Hop" header, as defined by
+   Trả về ``True`` nếu 'header_name' là header "Hop-by-Hop" của HTTP/1.1, như được định nghĩa bởi
    :rfc:`2616`.
 
 
 .. class:: FileWrapper(filelike, blksize=8192)
 
-   A concrete implementation of the :class:`wsgiref.types.FileWrapper`
-   protocol used to convert a file-like object to an :term:`iterator`.
-   The resulting objects
-   are :term:`iterable`\ s. As the object is iterated over, the
-   optional *blksize* parameter will be repeatedly passed to the *filelike*
-   object's :meth:`read` method to obtain bytestrings to yield.  When :meth:`read`
-   returns an empty bytestring, iteration is ended and is not resumable.
+   Một triển khai cụ thể của giao thức :class:`wsgiref.types.FileWrapper` được dùng để chuyển đổi một đối tượng giống tệp thành một :term:`iterator`. Các đối tượng kết quả là các :term:`iterable`\ s. Khi đối tượng được lặp qua, tham số *blksize* tùy chọn sẽ được truyền lặp lại cho phương thức *filelike* của đối tượng :meth:`read` để lấy các chuỗi byte cần trả về. Khi :meth:`read` trả về một chuỗi byte rỗng, quá trình lặp kết thúc và không thể tiếp tục.
 
-   If *filelike* has a :meth:`close` method, the returned object will also have a
-   :meth:`close` method, and it will invoke the *filelike* object's :meth:`close`
-   method when called.
+   Nếu *filelike* có phương thức :meth:`close`, đối tượng được trả về cũng sẽ có một
+   phương thức :meth:`close`, và phương thức này sẽ gọi phương thức :meth:`close` của đối tượng *filelike* khi được gọi.
 
-   Example usage::
+   Ví dụ sử dụng::
 
       from io import StringIO
       from wsgiref.util import FileWrapper
 
-      # We're using a StringIO-buffer for as the file-like object
+      # Chúng ta đang sử dụng bộ đệm StringIO làm đối tượng giống tệp
       filelike = StringIO("This is an example file-like object"*10)
       wrapper = FileWrapper(filelike, blksize=5)
 
@@ -186,268 +127,189 @@ also provides these miscellaneous utilities:
           print(chunk)
 
    .. versionchanged:: 3.11
-      Support for :meth:`~object.__getitem__` method has been removed.
+      Hỗ trợ cho phương thức :meth:`~object.__getitem__` đã bị loại bỏ.
 
 
-:mod:`!wsgiref.headers` -- WSGI response header tools
------------------------------------------------------
+:mod:`!wsgiref.headers` -- công cụ header phản hồi WSGI
+-------------------------------------------------------
 
 .. module:: wsgiref.headers
-   :synopsis: WSGI response header tools.
+   :synopsis: Công cụ header phản hồi WSGI.
 
 
-This module provides a single class, :class:`Headers`, for convenient
-manipulation of WSGI response headers using a mapping-like interface.
+Module này cung cấp một class duy nhất, :class:`Headers`, để thao tác thuận tiện với các header phản hồi WSGI bằng interface giống mapping.
 
 
 .. class:: Headers([headers])
 
-   Create a mapping-like object wrapping *headers*, which must be a list of header
-   name/value tuples as described in :pep:`3333`. The default value of *headers* is
-   an empty list.
+   Tạo một đối tượng giống mapping bao bọc *headers*, trong đó phải là một danh sách các tuple tên/giá trị header như được mô tả trong :pep:`3333`. Giá trị mặc định của *headers* là một danh sách rỗng.
 
-   :class:`Headers` objects support typical mapping operations including
+   Các đối tượng :class:`Headers` hỗ trợ những thao tác mapping thông thường, bao gồm
    :meth:`~object.__getitem__`, :meth:`~dict.get`, :meth:`~object.__setitem__`,
    :meth:`~dict.setdefault`,
-   :meth:`~object.__delitem__` and :meth:`~object.__contains__`.  For each of
-   these methods, the key is the header name (treated case-insensitively), and the
-   value is the first value associated with that header name.  Setting a header
-   deletes any existing values for that header, then adds a new value at the end of
-   the wrapped header list.  Headers' existing order is generally maintained, with
-   new headers added to the end of the wrapped list.
+   :meth:`~object.__delitem__` và :meth:`~object.__contains__`. Với mỗi phương thức này, khóa là tên header (không phân biệt chữ hoa chữ thường), còn giá trị là giá trị đầu tiên được liên kết với tên header đó. Việc thiết lập một header sẽ xóa mọi giá trị hiện có của header đó, sau đó thêm một giá trị mới vào cuối danh sách header được bao bọc. Thứ tự hiện có của các header nhìn chung được duy trì, còn các header mới được thêm vào cuối danh sách được bao bọc.
 
-   Unlike a dictionary, :class:`Headers` objects do not raise an error when you try
-   to get or delete a key that isn't in the wrapped header list. Getting a
-   nonexistent header just returns ``None``, and deleting a nonexistent header does
-   nothing.
+   Không giống dictionary, các đối tượng :class:`Headers` không phát sinh lỗi khi bạn cố lấy hoặc xóa một khóa không có trong danh sách header được bao bọc. Việc lấy một header không tồn tại chỉ trả về ``None``, còn việc xóa một header không tồn tại sẽ không làm gì cả.
 
-   :class:`Headers` objects also support :meth:`keys`, :meth:`values`, and
-   :meth:`items` methods.  The lists returned by :meth:`keys` and :meth:`items` can
-   include the same key more than once if there is a multi-valued header.  The
-   ``len()`` of a :class:`Headers` object is the same as the length of its
-   :meth:`items`, which is the same as the length of the wrapped header list.  In
-   fact, the :meth:`items` method just returns a copy of the wrapped header list.
+   Các đối tượng :class:`Headers` cũng hỗ trợ :meth:`keys`, :meth:`values`, và
+   các phương thức :meth:`items`. Các danh sách được :meth:`keys` và :meth:`items` trả về có thể chứa cùng một khóa nhiều lần nếu có một header nhiều giá trị. ``len()`` của một đối tượng :class:`Headers` giống với độ dài của nó
+   :meth:`items`, vốn cũng bằng độ dài của danh sách header được bao bọc. Thực tế, phương thức :meth:`items` chỉ trả về một bản sao của danh sách header được bao bọc.
 
-   Calling ``bytes()`` on a :class:`Headers` object returns a formatted bytestring
-   suitable for transmission as HTTP response headers.  Each header is placed on a
-   line with its value, separated by a colon and a space. Each line is terminated
-   by a carriage return and line feed, and the bytestring is terminated with a
-   blank line.
+   Việc gọi ``bytes()`` trên một đối tượng :class:`Headers` sẽ trả về một chuỗi byte đã được định dạng, phù hợp để truyền dưới dạng các header phản hồi HTTP. Mỗi header được đặt trên một dòng cùng với giá trị của nó, ngăn cách bằng dấu hai chấm và một dấu cách. Mỗi dòng kết thúc bằng ký tự xuống dòng và ký tự về đầu dòng, còn chuỗi byte kết thúc bằng một dòng trống.
 
-   In addition to their mapping interface and formatting features, :class:`Headers`
-   objects also have the following methods for querying and adding multi-valued
-   headers, and for adding headers with MIME parameters:
+   Ngoài giao diện mapping và các tính năng định dạng, các đối tượng :class:`Headers` còn có những phương thức sau để truy vấn và thêm các header nhiều giá trị, cũng như thêm các header có tham số MIME:
 
 
    .. method:: Headers.get_all(name)
 
-      Return a list of all the values for the named header.
+      Trả về một danh sách gồm tất cả giá trị của header được chỉ định tên.
 
-      The returned list will be sorted in the order they appeared in the original
-      header list or were added to this instance, and may contain duplicates.  Any
-      fields deleted and re-inserted are always appended to the header list.  If no
-      fields exist with the given name, returns an empty list.
+      Danh sách được trả về sẽ được sắp xếp theo thứ tự chúng xuất hiện trong danh sách header ban đầu hoặc được thêm vào instance này, và có thể chứa các giá trị trùng lặp. Mọi trường bị xóa rồi chèn lại luôn được thêm vào cuối danh sách header. Nếu không có trường nào có tên đã cho, phương thức trả về một danh sách rỗng.
 
 
    .. method:: Headers.add_header(name, value, **_params)
 
-      Add a (possibly multi-valued) header, with optional MIME parameters specified
-      via keyword arguments.
+      Thêm một header (có thể có nhiều giá trị), với các tham số MIME tùy chọn được chỉ định qua các đối số từ khóa.
 
-      *name* is the header field to add.  Keyword arguments can be used to set MIME
-      parameters for the header field.  Each parameter must be a string or ``None``.
-      Underscores in parameter names are converted to dashes, since dashes are illegal
-      in Python identifiers, but many MIME parameter names include dashes.  If the
-      parameter value is a string, it is added to the header value parameters in the
-      form ``name="value"``. If it is ``None``, only the parameter name is added.
-      (This is used for MIME parameters without a value.)  Example usage::
+      *name* là trường header cần thêm. Có thể sử dụng các đối số từ khóa để thiết lập các tham số MIME cho trường header. Mỗi tham số phải là một chuỗi hoặc ``None``. Dấu gạch dưới trong tên tham số được chuyển thành dấu gạch ngang, vì dấu gạch ngang không hợp lệ trong mã định danh Python, nhưng nhiều tên tham số MIME lại có dấu gạch ngang. Nếu giá trị tham số là một chuỗi, tham số đó được thêm vào các tham số giá trị header theo dạng ``name="value"``. Nếu là ``None``, chỉ tên tham số được thêm vào. (Cách này được dùng cho các tham số MIME không có giá trị.) Ví dụ sử dụng::
 
          h.add_header('content-disposition', 'attachment', filename='bud.gif')
 
-      The above will add a header that looks like this::
+      Đoạn mã trên sẽ thêm một header có dạng như sau::
 
          Content-Disposition: attachment; filename="bud.gif"
 
 
    .. versionchanged:: 3.5
-      *headers* parameter is optional.
+      Tham số *headers* là tùy chọn.
 
 
-:mod:`!wsgiref.simple_server` -- a simple WSGI HTTP server
-----------------------------------------------------------
+:mod:`!wsgiref.simple_server` -- một máy chủ HTTP WSGI đơn giản
+---------------------------------------------------------------
 
 .. module:: wsgiref.simple_server
-   :synopsis: A simple WSGI HTTP server.
+   :synopsis: Một máy chủ HTTP WSGI đơn giản.
 
 
-This module implements a simple HTTP server (based on :mod:`http.server`)
-that serves WSGI applications.  Each server instance serves a single WSGI
-application on a given host and port.  If you want to serve multiple
-applications on a single host and port, you should create a WSGI application
-that parses ``PATH_INFO`` to select which application to invoke for each
-request.  (E.g., using the :func:`shift_path_info` function from
+Mô-đun này triển khai một máy chủ HTTP đơn giản (dựa trên :mod:`http.server`) để phục vụ các ứng dụng WSGI. Mỗi phiên bản máy chủ phục vụ một ứng dụng WSGI duy nhất trên một host và port cụ thể. Nếu muốn phục vụ nhiều ứng dụng trên cùng một host và port, bạn nên tạo một ứng dụng WSGI phân tích ``PATH_INFO`` để chọn ứng dụng nào sẽ được gọi cho từng request. (Ví dụ: sử dụng hàm :func:`shift_path_info` từ
 :mod:`wsgiref.util`.)
 
 
 .. function:: make_server(host, port, app, server_class=WSGIServer, handler_class=WSGIRequestHandler)
 
-   Create a new WSGI server listening on *host* and *port*, accepting connections
-   for *app*.  The return value is an instance of the supplied *server_class*, and
-   will process requests using the specified *handler_class*.  *app* must be a WSGI
-   application object, as defined by :pep:`3333`.
+   Tạo một máy chủ WSGI mới lắng nghe trên *host* và *port*, chấp nhận các kết nối cho *app*. Giá trị trả về là một instance của *server_class* được cung cấp và sẽ xử lý các yêu cầu bằng *handler_class* được chỉ định. *app* phải là một đối tượng WSGI application, như được định nghĩa bởi :pep:`3333`.
 
-   Example usage::
+   Ví dụ sử dụng::
 
       from wsgiref.simple_server import make_server, demo_app
 
       with make_server('', 8000, demo_app) as httpd:
           print("Serving HTTP on port 8000...")
 
-          # Respond to requests until process is killed
+          # Phản hồi các yêu cầu cho đến khi tiến trình bị kết thúc
           httpd.serve_forever()
 
-          # Alternative: serve one request, then exit
+          # Cách khác: phục vụ một yêu cầu rồi thoát
           httpd.handle_request()
 
 
 .. function:: demo_app(environ, start_response)
 
-   This function is a small but complete WSGI application that returns a text page
-   containing the message "Hello world!" and a list of the key/value pairs provided
-   in the *environ* parameter.  It's useful for verifying that a WSGI server (such
-   as :mod:`!wsgiref.simple_server`) is able to run a simple WSGI application
-   correctly.
+   Hàm này là một WSGI application nhỏ nhưng hoàn chỉnh, trả về một trang văn bản chứa thông báo "Hello world!" và danh sách các cặp key/value được cung cấp trong tham số *environ*. Hàm này hữu ích để xác minh rằng một máy chủ WSGI (chẳng hạn như :mod:`!wsgiref.simple_server`) có thể chạy đúng cách một WSGI application đơn giản.
 
-   The *start_response* callable should follow the :class:`.StartResponse` protocol.
+   Callable *start_response* phải tuân theo :class:`.StartResponse` protocol.
 
 
 .. class:: WSGIServer(server_address, RequestHandlerClass)
 
-   Create a :class:`WSGIServer` instance.  *server_address* should be a
-   ``(host,port)`` tuple, and *RequestHandlerClass* should be the subclass of
-   :class:`http.server.BaseHTTPRequestHandler` that will be used to process
-   requests.
+   Tạo một instance :class:`WSGIServer`. *server_address* phải là một tuple ``(host,port)``, còn *RequestHandlerClass* phải là lớp con của
+   :class:`http.server.BaseHTTPRequestHandler` sẽ được sử dụng để xử lý các request.
 
-   You do not normally need to call this constructor, as the :func:`make_server`
-   function can handle all the details for you.
+   Bạn thường không cần gọi constructor này, vì hàm :func:`make_server` có thể tự xử lý mọi chi tiết cho bạn.
 
-   :class:`WSGIServer` is a subclass of :class:`http.server.HTTPServer`, so all
-   of its methods (such as :meth:`serve_forever` and :meth:`handle_request`) are
-   available. :class:`WSGIServer` also provides these WSGI-specific methods:
+   :class:`WSGIServer` là một lớp con của :class:`http.server.HTTPServer`, vì vậy tất cả các phương thức của nó (chẳng hạn như :meth:`serve_forever` và :meth:`handle_request`) đều khả dụng. :class:`WSGIServer` cũng cung cấp các phương thức dành riêng cho WSGI sau:
 
 
    .. method:: WSGIServer.set_app(application)
 
-      Sets the callable *application* as the WSGI application that will receive
-      requests.
+      Thiết lập callable *application* làm ứng dụng WSGI sẽ nhận các request.
 
 
    .. method:: WSGIServer.get_app()
 
-      Returns the currently set application callable.
+      Trả về application callable hiện được thiết lập.
 
-   Normally, however, you do not need to use these additional methods, as
-   :meth:`set_app` is normally called by :func:`make_server`, and the
-   :meth:`get_app` exists mainly for the benefit of request handler instances.
+   Tuy nhiên, thông thường bạn không cần sử dụng các phương thức bổ sung này, vì
+   :meth:`set_app` thường được :func:`make_server` gọi, và
+   :meth:`get_app` chủ yếu tồn tại để phục vụ các instance của request handler.
 
 
 .. class:: WSGIRequestHandler(request, client_address, server)
 
-   Create an HTTP handler for the given *request* (i.e. a socket), *client_address*
-   (a ``(host,port)`` tuple), and *server* (:class:`WSGIServer` instance).
+   Tạo một HTTP handler cho *request* đã cho (tức là một socket), *client_address* (một tuple ``(host,port)``) và *server* (một instance :class:`WSGIServer`).
 
-   You do not need to create instances of this class directly; they are
-   automatically created as needed by :class:`WSGIServer` objects.  You can,
-   however, subclass this class and supply it as a *handler_class* to the
-   :func:`make_server` function.  Some possibly relevant methods for overriding in
-   subclasses:
+   Bạn không cần trực tiếp tạo các instance của class này; chúng sẽ tự động được tạo khi cần bởi các object :class:`WSGIServer`. Tuy nhiên, bạn có thể subclass class này và cung cấp nó làm *handler_class* cho
+   hàm :func:`make_server`. Một số method có thể cần override trong các subclass:
 
 
    .. method:: WSGIRequestHandler.get_environ()
 
-      Return a :data:`~wsgiref.types.WSGIEnvironment` dictionary for a
-      request.  The default
-      implementation copies the contents of the :class:`WSGIServer` object's
-      :attr:`base_environ` dictionary attribute and then adds various headers derived
-      from the HTTP request.  Each call to this method should return a new dictionary
-      containing all of the relevant CGI environment variables as specified in
+      Trả về một dictionary :data:`~wsgiref.types.WSGIEnvironment` cho một request. Implementation mặc định sao chép nội dung của thuộc tính dictionary :class:`WSGIServer` của object
+      :attr:`base_environ` rồi thêm nhiều header khác nhau được suy ra từ HTTP request. Mỗi lần gọi method này phải trả về một dictionary mới chứa tất cả biến môi trường CGI liên quan như được chỉ định trong
       :pep:`3333`.
 
 
    .. method:: WSGIRequestHandler.get_stderr()
 
-      Return the object that should be used as the ``wsgi.errors`` stream. The default
-      implementation just returns ``sys.stderr``.
+      Trả về object sẽ được sử dụng làm stream ``wsgi.errors``. Implementation mặc định chỉ trả về ``sys.stderr``.
 
 
    .. method:: WSGIRequestHandler.handle()
 
-      Process the HTTP request.  The default implementation creates a handler instance
-      using a :mod:`wsgiref.handlers` class to implement the actual WSGI application
-      interface.
+      Xử lý yêu cầu HTTP. Bản triển khai mặc định tạo một thực thể handler bằng cách sử dụng một lớp :mod:`wsgiref.handlers` để triển khai giao diện ứng dụng WSGI thực tế.
 
 
-:mod:`!wsgiref.validate` --- WSGI conformance checker
------------------------------------------------------
+:mod:`!wsgiref.validate` --- trình kiểm tra tính tuân thủ WSGI
+--------------------------------------------------------------
 
 .. module:: wsgiref.validate
-   :synopsis: WSGI conformance checker.
+   :synopsis: Trình kiểm tra tính tuân thủ WSGI.
 
 
-When creating new WSGI application objects, frameworks, servers, or middleware,
-it can be useful to validate the new code's conformance using
-:mod:`!wsgiref.validate`.  This module provides a function that creates WSGI
-application objects that validate communications between a WSGI server or
-gateway and a WSGI application object, to check both sides for protocol
-conformance.
+Khi tạo các đối tượng ứng dụng WSGI, framework, server hoặc middleware mới, việc xác thực tính tuân thủ của mã mới bằng cách sử dụng
+:mod:`!wsgiref.validate` rất hữu ích. Mô-đun này cung cấp một hàm tạo các đối tượng ứng dụng WSGI để xác thực quá trình giao tiếp giữa một server hoặc gateway WSGI và một đối tượng ứng dụng WSGI, nhằm kiểm tra tính tuân thủ giao thức của cả hai phía.
 
-Note that this utility does not guarantee complete :pep:`3333` compliance; an
-absence of errors from this module does not necessarily mean that errors do not
-exist.  However, if this module does produce an error, then it is virtually
-certain that either the server or application is not 100% compliant.
+Lưu ý rằng tiện ích này không đảm bảo tính tuân thủ :pep:`3333` hoàn toàn; việc mô-đun này không phát hiện lỗi không nhất thiết có nghĩa là không tồn tại lỗi. Tuy nhiên, nếu mô-đun này tạo ra một lỗi thì gần như chắc chắn server hoặc ứng dụng không tuân thủ 100%.
 
-This module is based on the :mod:`paste.lint` module from Ian Bicking's "Python
-Paste" library.
+Mô-đun này dựa trên mô-đun :mod:`paste.lint` trong thư viện "Python Paste" của Ian Bicking.
 
 
 .. function:: validator(application)
 
-   Wrap *application* and return a new WSGI application object.  The returned
-   application will forward all requests to the original *application*, and will
-   check that both the *application* and the server invoking it are conforming to
-   the WSGI specification and to :rfc:`2616`.
+   Bọc *application* và trả về một đối tượng WSGI application mới. Application được trả về sẽ chuyển tiếp mọi request đến *application* ban đầu, đồng thời kiểm tra để bảo đảm cả *application* và server gọi nó đều tuân thủ đặc tả WSGI và :rfc:`2616`.
 
-   Any detected nonconformance results in an :exc:`AssertionError` being raised;
-   note, however, that how these errors are handled is server-dependent.  For
-   example, :mod:`wsgiref.simple_server` and other servers based on
-   :mod:`wsgiref.handlers` (that don't override the error handling methods to do
-   something else) will simply output a message that an error has occurred, and
-   dump the traceback to ``sys.stderr`` or some other error stream.
+   Mọi trường hợp không tuân thủ được phát hiện sẽ khiến một :exc:`AssertionError` được raise; tuy nhiên, lưu ý rằng cách các lỗi này được xử lý phụ thuộc vào server. Ví dụ, :mod:`wsgiref.simple_server` và các server khác dựa trên
+   :mod:`wsgiref.handlers` (không override các phương thức xử lý lỗi để thực hiện việc khác) sẽ chỉ đơn giản xuất ra thông báo rằng đã xảy ra lỗi và ghi traceback vào ``sys.stderr`` hoặc một error stream khác.
 
-   This wrapper may also generate output using the :mod:`warnings` module to
-   indicate behaviors that are questionable but which may not actually be
-   prohibited by :pep:`3333`.  Unless they are suppressed using Python command-line
-   options or the :mod:`warnings` API, any such warnings will be written to
-   ``sys.stderr`` (*not* ``wsgi.errors``, unless they happen to be the same
-   object).
+   Wrapper này cũng có thể tạo output bằng module :mod:`warnings` để chỉ ra những hành vi đáng ngờ nhưng có thể thực tế không bị :pep:`3333` cấm. Trừ khi bị vô hiệu hóa bằng các tùy chọn dòng lệnh của Python hoặc API :mod:`warnings`, mọi warning như vậy sẽ được ghi vào ``sys.stderr`` (*không phải* ``wsgi.errors``, trừ khi chúng tình cờ là cùng một object).
 
-   Example usage::
+   Ví dụ sử dụng::
 
       from wsgiref.validate import validator
       from wsgiref.simple_server import make_server
 
-      # Our callable object which is intentionally not compliant to the
-      # standard, so the validator is going to break
+      # Đối tượng callable của chúng ta cố ý không tuân thủ
+      # chuẩn, nên validator sẽ bị lỗi
       def simple_app(environ, start_response):
-          status = '200 OK'  # HTTP Status
-          headers = [('Content-type', 'text/plain')]  # HTTP Headers
+          status = '200 OK'  # Trạng thái HTTP
+          headers = [('Content-type', 'text/plain')]  # Tiêu đề HTTP
           start_response(status, headers)
 
-          # This is going to break because we need to return a list, and
-          # the validator is going to inform us
+          # Điều này sẽ gây lỗi vì chúng ta cần trả về một danh sách, và
+          # trình xác thực sẽ thông báo cho chúng ta
           return b"Hello World"
 
-      # This is the application wrapped in a validator
+      # Đây là ứng dụng được bọc trong một trình xác thực
       validator_app = validator(simple_app)
 
       with make_server('', 8000, validator_app) as httpd:
@@ -455,379 +317,263 @@ Paste" library.
           httpd.serve_forever()
 
 
-:mod:`!wsgiref.handlers` -- server/gateway base classes
--------------------------------------------------------
+:mod:`!wsgiref.handlers` -- các lớp cơ sở của server/gateway
+------------------------------------------------------------
 
 .. module:: wsgiref.handlers
-   :synopsis: WSGI server/gateway base classes.
+   :synopsis: Các lớp cơ sở của server/gateway WSGI.
 
 
-This module provides base handler classes for implementing WSGI servers and
-gateways.  These base classes handle most of the work of communicating with a
-WSGI application, as long as they are given a CGI-like environment, along with
-input, output, and error streams.
+Mô-đun này cung cấp các lớp handler cơ sở để triển khai WSGI server và gateway. Các lớp cơ sở này xử lý phần lớn công việc giao tiếp với một ứng dụng WSGI, miễn là chúng được cung cấp một môi trường tương tự CGI, cùng với các stream đầu vào, đầu ra và lỗi.
 
 
 .. class:: CGIHandler()
 
-   CGI-based invocation via ``sys.stdin``, ``sys.stdout``, ``sys.stderr`` and
-   ``os.environ``.  This is useful when you have a WSGI application and want to run
-   it as a CGI script.  Simply invoke ``CGIHandler().run(app)``, where ``app`` is
-   the WSGI application object you wish to invoke.
+   Gọi thực thi dựa trên CGI thông qua ``sys.stdin``, ``sys.stdout``, ``sys.stderr`` và ``os.environ``. Điều này hữu ích khi bạn có một ứng dụng WSGI và muốn chạy ứng dụng đó dưới dạng một CGI script. Chỉ cần gọi ``CGIHandler().run(app)``, trong đó ``app`` là đối tượng ứng dụng WSGI mà bạn muốn gọi.
 
-   This class is a subclass of :class:`BaseCGIHandler` that sets ``wsgi.run_once``
-   to true, ``wsgi.multithread`` to false, and ``wsgi.multiprocess`` to true, and
-   always uses :mod:`sys` and :mod:`os` to obtain the necessary CGI streams and
-   environment.
+   Lớp này là một lớp con của :class:`BaseCGIHandler`, đặt ``wsgi.run_once`` thành true, ``wsgi.multithread`` thành false và ``wsgi.multiprocess`` thành true, đồng thời luôn sử dụng :mod:`sys` và :mod:`os` để lấy các stream CGI và môi trường cần thiết.
 
 
 .. class:: IISCGIHandler()
 
-   A specialized alternative to :class:`CGIHandler`, for use when deploying on
-   Microsoft's IIS web server, without having set the config allowPathInfo
-   option (IIS>=7) or metabase allowPathInfoForScriptMappings (IIS<7).
+   Một lựa chọn chuyên biệt thay thế cho :class:`CGIHandler`, dùng khi triển khai trên web server IIS của Microsoft mà chưa thiết lập tùy chọn cấu hình allowPathInfo (IIS>=7) hoặc metabase allowPathInfoForScriptMappings (IIS<7).
 
-   By default, IIS gives a ``PATH_INFO`` that duplicates the ``SCRIPT_NAME`` at
-   the front, causing problems for WSGI applications that wish to implement
-   routing. This handler strips any such duplicated path.
+   Theo mặc định, IIS cung cấp một ``PATH_INFO`` trùng lặp với ``SCRIPT_NAME`` ở phía trước, gây ra sự cố cho các ứng dụng WSGI muốn triển khai routing. Handler này loại bỏ mọi path bị trùng lặp như vậy.
 
-   IIS can be configured to pass the correct ``PATH_INFO``, but this causes
-   another bug where ``PATH_TRANSLATED`` is wrong. Luckily this variable is
-   rarely used and is not guaranteed by WSGI. On IIS<7, though, the
-   setting can only be made on a vhost level, affecting all other script
-   mappings, many of which break when exposed to the ``PATH_TRANSLATED`` bug.
-   For this reason IIS<7 is almost never deployed with the fix (Even IIS7
-   rarely uses it because there is still no UI for it.).
+   IIS có thể được cấu hình để truyền ``PATH_INFO`` chính xác, nhưng điều này lại gây ra một lỗi khác, khiến ``PATH_TRANSLATED`` không chính xác. May mắn là biến này hiếm khi được sử dụng và không được WSGI đảm bảo. Tuy nhiên, trên IIS<7, thiết lập này chỉ có thể được thực hiện ở cấp vhost, ảnh hưởng đến tất cả script mapping khác, nhiều trong số đó sẽ bị lỗi khi gặp lỗi ``PATH_TRANSLATED``. Vì lý do này, IIS<7 hầu như không bao giờ được triển khai cùng bản sửa lỗi (Ngay cả IIS7 cũng hiếm khi sử dụng nó vì vẫn chưa có UI cho thiết lập này.).
 
-   There is no way for CGI code to tell whether the option was set, so a
-   separate handler class is provided.  It is used in the same way as
-   :class:`CGIHandler`, i.e., by calling ``IISCGIHandler().run(app)``, where
-   ``app`` is the WSGI application object you wish to invoke.
+   Không có cách nào để mã CGI biết tùy chọn đó đã được thiết lập hay chưa, vì vậy một lớp handler riêng được cung cấp. Lớp này được sử dụng theo cùng cách như
+   :class:`CGIHandler`, tức là bằng cách gọi ``IISCGIHandler().run(app)``, trong đó ``app`` là đối tượng ứng dụng WSGI mà bạn muốn gọi.
 
    .. versionadded:: 3.2
 
 
 .. class:: BaseCGIHandler(stdin, stdout, stderr, environ, multithread=True, multiprocess=False)
 
-   Similar to :class:`CGIHandler`, but instead of using the :mod:`sys` and
-   :mod:`os` modules, the CGI environment and I/O streams are specified explicitly.
-   The *multithread* and *multiprocess* values are used to set the
-   ``wsgi.multithread`` and ``wsgi.multiprocess`` flags for any applications run by
-   the handler instance.
+   Tương tự như :class:`CGIHandler`, nhưng thay vì sử dụng :mod:`sys` và
+   các mô-đun :mod:`os`, môi trường CGI và các luồng I/O được chỉ định một cách rõ ràng. Các giá trị *multithread* và *multiprocess* được dùng để thiết lập các cờ ``wsgi.multithread`` và ``wsgi.multiprocess`` cho mọi ứng dụng do thực thể handler chạy.
 
-   This class is a subclass of :class:`SimpleHandler` intended for use with
-   software other than HTTP "origin servers".  If you are writing a gateway
-   protocol implementation (such as CGI, FastCGI, SCGI, etc.) that uses a
-   ``Status:`` header to send an HTTP status, you probably want to subclass this
-   instead of :class:`SimpleHandler`.
+   Lớp này là lớp con của :class:`SimpleHandler`, предназначена để sử dụng với phần mềm khác với các "origin server" HTTP. Nếu bạn đang viết một triển khai giao thức gateway (chẳng hạn như CGI, FastCGI, SCGI, v.v.) sử dụng header ``Status:`` để gửi trạng thái HTTP, có lẽ bạn nên tạo lớp con từ lớp này thay vì từ :class:`SimpleHandler`.
 
 
 .. class:: SimpleHandler(stdin, stdout, stderr, environ, multithread=True, multiprocess=False)
 
-   Similar to :class:`BaseCGIHandler`, but designed for use with HTTP origin
-   servers.  If you are writing an HTTP server implementation, you will probably
-   want to subclass this instead of :class:`BaseCGIHandler`.
+   Tương tự như :class:`BaseCGIHandler`, nhưng được thiết kế để sử dụng với các origin server HTTP. Nếu bạn đang viết một triển khai HTTP server, có lẽ bạn nên tạo lớp con từ lớp này thay vì từ :class:`BaseCGIHandler`.
 
-   This class is a subclass of :class:`BaseHandler`.  It overrides the
+   Lớp này là lớp con của :class:`BaseHandler`. Lớp này ghi đè các
    :meth:`!__init__`, :meth:`~BaseHandler.get_stdin`,
    :meth:`~BaseHandler.get_stderr`, :meth:`~BaseHandler.add_cgi_vars`,
-   :meth:`~BaseHandler._write`, and :meth:`~BaseHandler._flush` methods to
-   support explicitly setting the
-   environment and streams via the constructor.  The supplied environment and
-   streams are stored in the :attr:`stdin`, :attr:`stdout`, :attr:`stderr`, and
-   :attr:`environ` attributes.
+   phương thức :meth:`~BaseHandler._write` và :meth:`~BaseHandler._flush` để hỗ trợ việc thiết lập rõ ràng environment và các stream thông qua constructor. Environment và các stream được cung cấp được lưu trong :attr:`stdin`, :attr:`stdout`, :attr:`stderr`, và
+   Các thuộc tính :attr:`environ`.
 
-   The :meth:`~io.BufferedIOBase.write` method of *stdout* should write
-   each chunk in full, like :class:`io.BufferedIOBase`.
+   Phương thức :meth:`~io.BufferedIOBase.write` của *stdout* phải ghi đầy đủ từng khối, giống như :class:`io.BufferedIOBase`.
 
 
 .. class:: BaseHandler()
 
-   This is an abstract base class for running WSGI applications.  Each instance
-   will handle a single HTTP request, although in principle you could create a
-   subclass that was reusable for multiple requests.
+   Đây là một lớp cơ sở trừu tượng để chạy các ứng dụng WSGI. Mỗi instance sẽ xử lý một HTTP request, mặc dù về nguyên tắc bạn có thể tạo một subclass có thể tái sử dụng cho nhiều request.
 
-   :class:`BaseHandler` instances have only one method intended for external use:
+   Các instance :class:`BaseHandler` chỉ có một phương thức dành cho việc sử dụng bên ngoài:
 
 
    .. method:: BaseHandler.run(app)
 
-      Run the specified WSGI application, *app*.
+      Chạy ứng dụng WSGI được chỉ định, *app*.
 
-   All of the other :class:`BaseHandler` methods are invoked by this method in the
-   process of running the application, and thus exist primarily to allow
-   customizing the process.
+   Tất cả các phương thức :class:`BaseHandler` khác đều được phương thức này gọi trong quá trình chạy ứng dụng, vì vậy chúng chủ yếu tồn tại để cho phép tùy chỉnh quy trình.
 
-   The following methods MUST be overridden in a subclass:
+   Các phương thức sau PHẢI được ghi đè trong một subclass:
 
 
    .. method:: BaseHandler._write(data)
 
-      Buffer the bytes *data* for transmission to the client.  It's okay if this
-      method actually transmits the data; :class:`BaseHandler` just separates write
-      and flush operations for greater efficiency when the underlying system actually
-      has such a distinction.
+      Đệm các byte *data* để truyền đến client. Việc phương thức này thực sự truyền dữ liệu cũng không sao; :class:`BaseHandler` chỉ tách các thao tác ghi và flush để đạt hiệu quả cao hơn khi hệ thống nền tảng thực sự có sự phân biệt như vậy.
 
 
    .. method:: BaseHandler._flush()
 
-      Force buffered data to be transmitted to the client.  It's okay if this method
-      is a no-op (i.e., if :meth:`_write` actually sends the data).
+      Buộc dữ liệu đã đệm được truyền đến client. Việc phương thức này không thực hiện thao tác nào cũng không sao (tức là nếu :meth:`_write` thực sự gửi dữ liệu).
 
 
    .. method:: BaseHandler.get_stdin()
 
-      Return an object compatible with :class:`~wsgiref.types.InputStream`
-      suitable for use as the ``wsgi.input`` of the
-      request currently being processed.
+      Trả về một đối tượng tương thích với :class:`~wsgiref.types.InputStream`, phù hợp để dùng làm ``wsgi.input`` của request hiện đang được xử lý.
 
 
    .. method:: BaseHandler.get_stderr()
 
-      Return an object compatible with :class:`~wsgiref.types.ErrorStream`
-      suitable for use as the ``wsgi.errors`` of the
-      request currently being processed.
+      Trả về một đối tượng tương thích với :class:`~wsgiref.types.ErrorStream`, phù hợp để dùng làm ``wsgi.errors`` của request hiện đang được xử lý.
 
 
    .. method:: BaseHandler.add_cgi_vars()
 
-      Insert CGI variables for the current request into the :attr:`environ` attribute.
+      Chèn các biến CGI của request hiện tại vào thuộc tính :attr:`environ`.
 
-   Here are some other methods and attributes you may wish to override. This list
-   is only a summary, however, and does not include every method that can be
-   overridden.  You should consult the docstrings and source code for additional
-   information before attempting to create a customized :class:`BaseHandler`
-   subclass.
+   Dưới đây là một số phương thức và thuộc tính khác mà bạn có thể muốn ghi đè. Tuy nhiên, đây chỉ là bản tóm tắt và không bao gồm mọi phương thức có thể được ghi đè. Bạn nên tham khảo docstring và mã nguồn để biết thêm thông tin trước khi thử tạo một subclass :class:`BaseHandler` tùy chỉnh.
 
-   Attributes and methods for customizing the WSGI environment:
+   Các thuộc tính và phương thức để tùy chỉnh môi trường WSGI:
 
 
    .. attribute:: BaseHandler.wsgi_multithread
 
-      The value to be used for the ``wsgi.multithread`` environment variable.  It
-      defaults to true in :class:`BaseHandler`, but may have a different default (or
-      be set by the constructor) in the other subclasses.
+      Giá trị được sử dụng cho biến môi trường ``wsgi.multithread``. Giá trị mặc định là true trong :class:`BaseHandler`, nhưng có thể có giá trị mặc định khác (hoặc được đặt bởi constructor) trong các lớp con khác.
 
 
    .. attribute:: BaseHandler.wsgi_multiprocess
 
-      The value to be used for the ``wsgi.multiprocess`` environment variable.  It
-      defaults to true in :class:`BaseHandler`, but may have a different default (or
-      be set by the constructor) in the other subclasses.
+      Giá trị được sử dụng cho biến môi trường ``wsgi.multiprocess``. Giá trị mặc định là true trong :class:`BaseHandler`, nhưng có thể có giá trị mặc định khác (hoặc được đặt bởi constructor) trong các lớp con khác.
 
 
    .. attribute:: BaseHandler.wsgi_run_once
 
-      The value to be used for the ``wsgi.run_once`` environment variable.  It
-      defaults to false in :class:`BaseHandler`, but :class:`CGIHandler` sets it to
-      true by default.
+      Giá trị được sử dụng cho biến môi trường ``wsgi.run_once``. Giá trị mặc định là false trong :class:`BaseHandler`, nhưng :class:`CGIHandler` đặt giá trị mặc định là true.
 
 
    .. attribute:: BaseHandler.os_environ
 
-      The default environment variables to be included in every request's WSGI
-      environment.  By default, this is a copy of ``os.environ`` at the time that
-      :mod:`!wsgiref.handlers` was imported, but subclasses can either create their own
-      at the class or instance level.  Note that the dictionary should be considered
-      read-only, since the default value is shared between multiple classes and
-      instances.
+      Các biến môi trường mặc định được đưa vào môi trường WSGI của mọi request. Theo mặc định, đây là một bản sao của ``os.environ`` tại thời điểm
+      :mod:`!wsgiref.handlers` được import, nhưng các lớp con có thể tạo biến riêng ở cấp lớp hoặc cấp instance. Lưu ý rằng dictionary này nên được xem là chỉ đọc, vì giá trị mặc định được chia sẻ giữa nhiều lớp và instance.
 
 
    .. attribute:: BaseHandler.server_software
 
-      If the :attr:`origin_server` attribute is set, this attribute's value is used to
-      set the default ``SERVER_SOFTWARE`` WSGI environment variable, and also to set a
-      default ``Server:`` header in HTTP responses.  It is ignored for handlers (such
-      as :class:`BaseCGIHandler` and :class:`CGIHandler`) that are not HTTP origin
-      servers.
+      Nếu thuộc tính :attr:`origin_server` được thiết lập, giá trị của thuộc tính này được dùng để đặt biến môi trường WSGI ``SERVER_SOFTWARE`` mặc định, đồng thời đặt header ``Server:`` mặc định trong các response HTTP. Thuộc tính này bị bỏ qua đối với các handler (chẳng hạn như :class:`BaseCGIHandler` và :class:`CGIHandler`) không phải là origin server HTTP.
 
       .. versionchanged:: 3.3
-         The term "Python" is replaced with implementation specific term like
-         "CPython", "Jython" etc.
+         Thuật ngữ "Python" được thay thế bằng thuật ngữ riêng của từng implementation, chẳng hạn như "CPython", "Jython", v.v.
 
    .. method:: BaseHandler.get_scheme()
 
-      Return the URL scheme being used for the current request.  The default
-      implementation uses the :func:`guess_scheme` function from :mod:`wsgiref.util`
-      to guess whether the scheme should be "http" or "https", based on the current
-      request's :attr:`environ` variables.
+      Trả về lược đồ URL đang được sử dụng cho request hiện tại. Cài đặt mặc định sử dụng hàm :func:`guess_scheme` từ :mod:`wsgiref.util` để đoán xem lược đồ nên là "http" hay "https", dựa trên các biến :attr:`environ` của request hiện tại.
 
 
    .. method:: BaseHandler.setup_environ()
 
-      Set the :attr:`environ` attribute to a fully populated WSGI environment.  The
-      default implementation uses all of the above methods and attributes, plus the
-      :meth:`get_stdin`, :meth:`get_stderr`, and :meth:`add_cgi_vars` methods and the
-      :attr:`wsgi_file_wrapper` attribute.  It also inserts a ``SERVER_SOFTWARE`` key
-      if not present, as long as the :attr:`origin_server` attribute is a true value
-      and the :attr:`server_software` attribute is set.
+      Đặt thuộc tính :attr:`environ` thành một môi trường WSGI được điền đầy đủ. Cài đặt mặc định sử dụng tất cả các phương thức và thuộc tính nêu trên, cùng với
+      các phương thức :meth:`get_stdin`, :meth:`get_stderr` và :meth:`add_cgi_vars`, cùng với
+      thuộc tính :attr:`wsgi_file_wrapper`. Nó cũng chèn khóa ``SERVER_SOFTWARE`` nếu khóa này chưa tồn tại, miễn là thuộc tính :attr:`origin_server` có giá trị true và thuộc tính :attr:`server_software` đã được thiết lập.
 
-   Methods and attributes for customizing exception handling:
+   Các phương thức và thuộc tính dùng để tùy chỉnh việc xử lý ngoại lệ:
 
 
    .. method:: BaseHandler.log_exception(exc_info)
 
-      Log the *exc_info* tuple in the server log.  *exc_info* is a ``(type, value,
-      traceback)`` tuple.  The default implementation simply writes the traceback to
-      the request's ``wsgi.errors`` stream and flushes it.  Subclasses can override
-      this method to change the format or retarget the output, mail the traceback to
-      an administrator, or whatever other action may be deemed suitable.
+      Ghi tuple *exc_info* vào server log. *exc_info* là một tuple ``(type, value, traceback)``. Cài đặt mặc định chỉ cần ghi traceback vào stream ``wsgi.errors`` của request rồi flush stream đó. Các subclass có thể override phương thức này để thay đổi định dạng hoặc chuyển hướng đầu ra, gửi traceback qua email cho quản trị viên, hoặc thực hiện bất kỳ hành động phù hợp nào khác.
 
 
    .. attribute:: BaseHandler.traceback_limit
 
-      The maximum number of frames to include in tracebacks output by the default
-      :meth:`log_exception` method.  If ``None``, all frames are included.
+      Số frame tối đa cần đưa vào traceback do cài đặt mặc định xuất ra
+      phương thức :meth:`log_exception`. Nếu ``None``, tất cả các frame đều được bao gồm.
 
 
    .. method:: BaseHandler.error_output(environ, start_response)
 
-      This method is a WSGI application to generate an error page for the user.  It is
-      only invoked if an error occurs before headers are sent to the client.
+      Phương thức này là một ứng dụng WSGI dùng để tạo trang lỗi cho người dùng. Phương thức chỉ được gọi nếu xảy ra lỗi trước khi các header được gửi đến client.
 
-      This method can access the current error using ``sys.exception()``,
-      and should pass that information to *start_response* when calling it (as
-      described in the "Error Handling" section of :pep:`3333`). In particular,
-      the *start_response* callable should follow the :class:`.StartResponse`
-      protocol.
+      Phương thức này có thể truy cập lỗi hiện tại bằng ``sys.exception()``, và phải truyền thông tin đó cho *start_response* khi gọi nó (như được mô tả trong phần "Xử lý lỗi" của :pep:`3333`). Cụ thể, callable *start_response* phải tuân theo giao thức :class:`.StartResponse`.
 
-      The default implementation just uses the :attr:`error_status`,
-      :attr:`error_headers`, and :attr:`error_body` attributes to generate an output
-      page.  Subclasses can override this to produce more dynamic error output.
+      Phần triển khai mặc định chỉ sử dụng :attr:`error_status` để tạo trang đầu ra,
+      các thuộc tính :attr:`error_headers` và :attr:`error_body` để tạo một trang đầu ra. Các lớp con có thể ghi đè phần này để tạo đầu ra lỗi động hơn.
 
-      Note, however, that it's not recommended from a security perspective to spit out
-      diagnostics to any old user; ideally, you should have to do something special to
-      enable diagnostic output, which is why the default implementation doesn't
-      include any.
+      Tuy nhiên, từ góc độ bảo mật, không nên hiển thị thông tin chẩn đoán cho bất kỳ người dùng nào; lý tưởng nhất là phải thực hiện một thao tác đặc biệt để bật đầu ra chẩn đoán, đó là lý do phần triển khai mặc định không bao gồm thông tin nào.
 
 
    .. attribute:: BaseHandler.error_status
 
-      The HTTP status used for error responses.  This should be a status string as
-      defined in :pep:`3333`; it defaults to a 500 code and message.
+      Trạng thái HTTP được sử dụng cho các phản hồi lỗi. Đây phải là một chuỗi trạng thái như được định nghĩa trong :pep:`3333`; mặc định là mã và thông báo 500.
 
 
    .. attribute:: BaseHandler.error_headers
 
-      The HTTP headers used for error responses.  This should be a list of WSGI
-      response headers (``(name, value)`` tuples), as described in :pep:`3333`.  The
-      default list just sets the content type to ``text/plain``.
+      Các HTTP header được sử dụng cho các response lỗi. Đây phải là một danh sách các WSGI response header (các tuple ``(name, value)``), như được mô tả trong :pep:`3333`. Danh sách mặc định chỉ đặt content type thành ``text/plain``.
 
 
    .. attribute:: BaseHandler.error_body
 
-      The error response body.  This should be an HTTP response body bytestring. It
-      defaults to the plain text, "A server error occurred.  Please contact the
-      administrator."
+      Body của response lỗi. Đây phải là một bytestring body của HTTP response. Giá trị mặc định là văn bản thuần túy, "Đã xảy ra lỗi máy chủ. Vui lòng liên hệ với quản trị viên."
 
-   Methods and attributes for :pep:`3333`'s "Optional Platform-Specific File
-   Handling" feature:
+   Các method và attribute cho tính năng "Xử lý tệp tùy chọn theo nền tảng" của :pep:`3333`:
 
 
    .. attribute:: BaseHandler.wsgi_file_wrapper
 
-      A ``wsgi.file_wrapper`` factory, compatible with
-      :class:`wsgiref.types.FileWrapper`, or ``None``.  The default value
-      of this attribute is the :class:`wsgiref.util.FileWrapper` class.
+      Một factory ``wsgi.file_wrapper``, tương thích với
+      :class:`wsgiref.types.FileWrapper`, hoặc ``None``. Giá trị mặc định của attribute này là class :class:`wsgiref.util.FileWrapper`.
 
 
    .. method:: BaseHandler.sendfile()
 
-      Override to implement platform-specific file transmission.  This method is
-      called only if the application's return value is an instance of the class
-      specified by the :attr:`wsgi_file_wrapper` attribute.  It should return a true
-      value if it was able to successfully transmit the file, so that the default
-      transmission code will not be executed. The default implementation of this
-      method just returns a false value.
+      Ghi đè để triển khai việc truyền tệp dành riêng cho nền tảng. Method này chỉ được gọi nếu giá trị trả về của ứng dụng là một instance của class được chỉ định bởi attribute :attr:`wsgi_file_wrapper`. Method này phải trả về giá trị true nếu đã truyền tệp thành công, để code truyền tệp mặc định không được thực thi. Bản triển khai mặc định của method này chỉ trả về giá trị false.
 
-   Miscellaneous methods and attributes:
+   Các method và attribute khác:
 
 
    .. attribute:: BaseHandler.origin_server
 
-      This attribute should be set to a true value if the handler's :meth:`_write` and
-      :meth:`_flush` are being used to communicate directly to the client, rather than
-      via a CGI-like gateway protocol that wants the HTTP status in a special
-      ``Status:`` header.
+      Thuộc tính này nên được đặt thành giá trị true nếu :meth:`_write` của handler và
+      :meth:`_flush` đang được sử dụng để giao tiếp trực tiếp với client, thay vì thông qua một giao thức gateway tương tự CGI yêu cầu trạng thái HTTP trong một header ``Status:`` đặc biệt.
 
-      This attribute's default value is true in :class:`BaseHandler`, but false in
-      :class:`BaseCGIHandler` and :class:`CGIHandler`.
+      Giá trị mặc định của thuộc tính này là true trong :class:`BaseHandler`, nhưng là false trong
+      :class:`BaseCGIHandler` và :class:`CGIHandler`.
 
 
    .. attribute:: BaseHandler.http_version
 
-      If :attr:`origin_server` is true, this string attribute is used to set the HTTP
-      version of the response set to the client.  It defaults to ``"1.0"``.
+      Nếu :attr:`origin_server` là true, thuộc tính chuỗi này được dùng để đặt phiên bản HTTP của response gửi đến client. Giá trị mặc định là ``"1.0"``.
 
 
 .. function:: read_environ()
 
-   Transcode CGI variables from ``os.environ`` to :pep:`3333` "bytes in unicode"
-   strings, returning a new dictionary.  This function is used by
-   :class:`CGIHandler` and :class:`IISCGIHandler` in place of directly using
-   ``os.environ``, which is not necessarily WSGI-compliant on all platforms
-   and web servers using Python 3 -- specifically, ones where the OS's
-   actual environment is Unicode (i.e. Windows), or ones where the environment
-   is bytes, but the system encoding used by Python to decode it is anything
-   other than ISO-8859-1 (e.g. Unix systems using UTF-8).
+   Chuyển mã các biến CGI từ ``os.environ`` sang :pep:`3333` các chuỗi "bytes in unicode", trả về một dictionary mới. Hàm này được dùng bởi
+   :class:`CGIHandler` và :class:`IISCGIHandler` thay cho việc sử dụng trực tiếp ``os.environ``, vốn không nhất thiết tuân thủ WSGI trên mọi nền tảng và web server sử dụng Python 3 -- cụ thể là những nền tảng mà môi trường thực tế của OS là Unicode (tức Windows), hoặc những nền tảng mà môi trường là bytes nhưng encoding hệ thống được Python sử dụng để giải mã không phải ISO-8859-1 (ví dụ các hệ thống Unix sử dụng UTF-8).
 
-   If you are implementing a CGI-based handler of your own, you probably want
-   to use this routine instead of just copying values out of ``os.environ``
-   directly.
+   Nếu bạn đang tự triển khai một trình xử lý dựa trên CGI, có lẽ bạn nên sử dụng routine này thay vì chỉ sao chép trực tiếp các giá trị từ ``os.environ``.
 
    .. versionadded:: 3.2
 
 
-:mod:`!wsgiref.types` -- WSGI types for static type checking
+:mod:`!wsgiref.types` -- Các kiểu WSGI để kiểm tra kiểu tĩnh
 ------------------------------------------------------------
 
 .. module:: wsgiref.types
-   :synopsis: WSGI types for static type checking
+   :synopsis: Các kiểu WSGI để kiểm tra kiểu tĩnh
 
 
-This module provides various types for static type checking as described
-in :pep:`3333`.
+Mô-đun này cung cấp nhiều kiểu khác nhau để kiểm tra kiểu tĩnh như được mô tả trong :pep:`3333`.
 
 .. versionadded:: 3.11
 
 
 .. class:: StartResponse
 
-   A :class:`typing.Protocol` describing :pep:`start_response()
-   <3333#the-start-response-callable>`
-   callables (:pep:`3333`).
+   Một :class:`typing.Protocol` mô tả các callable :pep:`start_response() <3333#the-start-response-callable>` (:pep:`3333`).
 
 .. data:: WSGIEnvironment
 
-   A type alias describing a WSGI environment dictionary.
+   Một bí danh kiểu mô tả dictionary môi trường WSGI.
 
 .. data:: WSGIApplication
 
-   A type alias describing a WSGI application callable.
+   Một bí danh kiểu mô tả callable ứng dụng WSGI.
 
 .. class:: InputStream()
 
-   A :class:`typing.Protocol` describing a :pep:`WSGI Input Stream
-   <3333#input-and-error-streams>`.
+   Một :class:`typing.Protocol` mô tả một :pep:`WSGI Input Stream <3333#input-and-error-streams>`.
 
 .. class:: ErrorStream()
 
-   A :class:`typing.Protocol` describing a :pep:`WSGI Error Stream
-   <3333#input-and-error-streams>`.
+   Một :class:`typing.Protocol` mô tả một :pep:`WSGI Error Stream <3333#input-and-error-streams>`.
 
 .. class:: FileWrapper()
 
-   A :class:`typing.Protocol` describing a :pep:`file wrapper
-   <3333#optional-platform-specific-file-handling>`.
-   See :class:`wsgiref.util.FileWrapper` for a concrete implementation of this
-   protocol.
+   Một :class:`typing.Protocol` mô tả một :pep:`file wrapper <3333#optional-platform-specific-file-handling>`. Xem :class:`wsgiref.util.FileWrapper` để biết một triển khai cụ thể của giao thức này.
 
 
-Examples
---------
+Ví dụ
+-----
 
-This is a working "Hello World" WSGI application, where the *start_response*
-callable should follow the :class:`.StartResponse` protocol::
+Đây là một ứng dụng WSGI "Hello World" hoạt động được, trong đó hàm *start_response* phải tuân theo giao thức :class:`.StartResponse`::
 
    """
    Every WSGI application must have an application object - a callable
@@ -841,23 +587,22 @@ callable should follow the :class:`.StartResponse` protocol::
 
 
    def hello_world_app(environ, start_response):
-       status = "200 OK"  # HTTP Status
-       headers = [("Content-type", "text/plain; charset=utf-8")]  # HTTP Headers
+       status = "200 OK"  # Trạng thái HTTP
+       headers = [("Content-type", "text/plain; charset=utf-8")]  # Tiêu đề HTTP
        start_response(status, headers)
 
-       # The returned object is going to be printed
+       # Đối tượng được trả về sẽ được in ra
        return [b"Hello World"]
 
    with make_server("", 8000, hello_world_app) as httpd:
        print("Serving on port 8000...")
 
-       # Serve until process is killed
+       # Phục vụ cho đến khi tiến trình bị kết thúc
        httpd.serve_forever()
 
 
 
-Example of a WSGI application serving the current directory, accept optional
-directory and port number (default: 8000) on the command line::
+Ví dụ về một ứng dụng WSGI phục vụ thư mục hiện tại, chấp nhận thư mục và số cổng tùy chọn (mặc định: 8000) trên command line::
 
     """
     Small wsgiref based web server. Takes a path to serve from and an
@@ -872,13 +617,13 @@ directory and port number (default: 8000) on the command line::
 
 
     def app(environ, respond):
-        # Get the file name and MIME type
+        # Lấy tên tệp và kiểu MIME
         fn = os.path.join(path, environ["PATH_INFO"][1:])
         if "." not in fn.split(os.path.sep)[-1]:
             fn = os.path.join(fn, "index.html")
         mime_type = mimetypes.guess_file_type(fn)[0]
 
-        # Return 200 OK if file exists, otherwise 404 Not Found
+        # Trả về 200 OK nếu tệp tồn tại, nếu không thì trả về 404 Not Found
         if os.path.exists(fn):
             respond("200 OK", [("Content-Type", mime_type)])
             return util.FileWrapper(open(fn, "rb"))
@@ -888,11 +633,11 @@ directory and port number (default: 8000) on the command line::
 
 
     if __name__ == "__main__":
-        # Get the path and port from command-line arguments
+        # Lấy đường dẫn và cổng từ các đối số command line
         path = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
         port = int(sys.argv[2]) if len(sys.argv) > 2 else 8000
 
-        # Make and start the server until control-c
+        # Tạo và khởi động server cho đến khi nhấn control-c
         httpd = simple_server.make_server("", port, app)
         print(f"Serving {path} on port {port}, control-C to stop")
         try:
@@ -901,4 +646,4 @@ directory and port number (default: 8000) on the command line::
             print("Shutting down.")
             httpd.server_close()
 
-
+.. _`wsgi.readthedocs.io`: https://wsgi.readthedocs.io/

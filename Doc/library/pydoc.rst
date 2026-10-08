@@ -1,13 +1,13 @@
-:mod:`!pydoc` --- Documentation generator and online help system
-================================================================
+:mod:`!pydoc` --- Trình tạo tài liệu và hệ thống trợ giúp trực tuyến
+====================================================================
 
 .. module:: pydoc
-   :synopsis: Documentation generator and online help system.
+   :synopsis: Trình tạo tài liệu và hệ thống trợ giúp trực tuyến.
 
 .. moduleauthor:: Ka-Ping Yee <ping@lfw.org>
 .. sectionauthor:: Ka-Ping Yee <ping@lfw.org>
 
-**Source code:** :source:`Lib/pydoc.py`
+**Mã nguồn:** :source:`Lib/pydoc.py`
 
 .. index::
    single: documentation; generation
@@ -16,100 +16,52 @@
 
 --------------
 
-The :mod:`!pydoc` module automatically generates documentation from Python
-modules.  The documentation can be presented as pages of text on the console,
-served to a web browser, or saved to HTML files.
+Mô-đun :mod:`!pydoc` tự động tạo tài liệu từ các mô-đun Python. Tài liệu có thể được hiển thị dưới dạng các trang văn bản trên console, cung cấp cho trình duyệt web hoặc lưu thành các tệp HTML.
 
-For modules, classes, functions and methods, the displayed documentation is
-derived from the docstring (i.e. the :attr:`~definition.__doc__` attribute) of the object,
-and recursively of its documentable members.  If there is no docstring,
-:mod:`!pydoc` tries to obtain a description from the block of comment lines just
-above the definition of the class, function or method in the source file, or at
-the top of the module (see :func:`inspect.getcomments`).
+Đối với các mô-đun, lớp, hàm và phương thức, tài liệu được hiển thị bắt nguồn từ docstring (tức là thuộc tính :attr:`~definition.__doc__`) của đối tượng và đệ quy từ các thành viên có thể lập tài liệu của đối tượng đó. Nếu không có docstring,
+:mod:`!pydoc` cố gắng lấy phần mô tả từ khối các dòng chú thích ngay phía trên phần định nghĩa lớp, hàm hoặc phương thức trong tệp nguồn, hoặc ở đầu mô-đun (xem :func:`inspect.getcomments`).
 
-The built-in function :func:`help` invokes the online help system in the
-interactive interpreter, which uses :mod:`!pydoc` to generate its documentation
-as text on the console.  The same text documentation can also be viewed from
-outside the Python interpreter by running :program:`pydoc` as a script at the
-operating system's command prompt. For example, running ::
+Hàm dựng sẵn :func:`help` gọi hệ thống trợ giúp trực tuyến trong trình thông dịch tương tác; hệ thống này sử dụng :mod:`!pydoc` để tạo tài liệu dưới dạng văn bản trên console. Bạn cũng có thể xem tài liệu văn bản tương tự từ bên ngoài trình thông dịch Python bằng cách chạy :program:`pydoc` dưới dạng một script tại dấu nhắc lệnh của hệ điều hành. Ví dụ, khi chạy::
 
    python -m pydoc sys
 
-at a shell prompt will display documentation on the :mod:`sys` module, in a
-style similar to the manual pages shown by the Unix :program:`man` command.  The
-argument to :program:`pydoc` can be the name of a function, module, or package,
-or a dotted reference to a class, method, or function within a module or module
-in a package.  If the argument to :program:`pydoc` looks like a path (that is,
-it contains the path separator for your operating system, such as a slash in
-Unix), and refers to an existing Python source file, then documentation is
-produced for that file.
+tại dấu nhắc shell sẽ hiển thị tài liệu về module :mod:`sys`, theo phong cách tương tự các trang hướng dẫn được hiển thị bằng lệnh Unix :program:`man`. Đối số của :program:`pydoc` có thể là tên của một function, module hoặc package, hoặc tham chiếu có dấu chấm đến một class, method hoặc function bên trong một module hoặc module trong một package. Nếu đối số của :program:`pydoc` trông giống một đường dẫn (nghĩa là chứa dấu phân cách đường dẫn của hệ điều hành, chẳng hạn như dấu gạch chéo trong Unix) và trỏ đến một tệp mã nguồn Python hiện có, thì tài liệu sẽ được tạo cho tệp đó.
 
 .. note::
 
-   In order to find objects and their documentation, :mod:`!pydoc` imports the
-   module(s) to be documented.  Therefore, any code on module level will be
-   executed on that occasion.  Use an ``if __name__ == '__main__':`` guard to
-   only execute code when a file is invoked as a script and not just imported.
+   Để tìm các object và tài liệu của chúng, :mod:`!pydoc` sẽ import các module cần được lập tài liệu. Do đó, mọi mã ở cấp module sẽ được thực thi vào thời điểm đó. Hãy sử dụng một guard ``if __name__ == '__main__':`` để chỉ thực thi mã khi tệp được gọi dưới dạng script, thay vì chỉ được import.
 
-When printing output to the console, :program:`pydoc` attempts to paginate the
-output for easier reading.  If either the :envvar:`MANPAGER` or the
-:envvar:`PAGER` environment variable is set, :program:`pydoc` will use its
-value as a pagination program. When both are set, :envvar:`MANPAGER` is used.
+Khi in đầu ra ra console, :program:`pydoc` sẽ cố gắng phân trang đầu ra để dễ đọc hơn. Nếu :envvar:`MANPAGER` hoặc
+biến môi trường :envvar:`PAGER` được thiết lập, :program:`pydoc` sẽ sử dụng giá trị của biến này làm chương trình phân trang. Khi cả hai được thiết lập, :envvar:`MANPAGER` sẽ được sử dụng.
 
-Specifying a ``-w`` flag before the argument will cause HTML documentation
-to be written out to a file in the current directory, instead of displaying text
-on the console.
+Việc chỉ định cờ ``-w`` trước đối số sẽ khiến tài liệu HTML được ghi vào một tệp trong thư mục hiện tại, thay vì hiển thị văn bản trên console.
 
-Specifying a ``-k`` flag before the argument will search the synopsis
-lines of all available modules for the keyword given as the argument, again in a
-manner similar to the Unix :program:`man` command.  The synopsis line of a
-module is the first line of its documentation string.
+Việc chỉ định cờ ``-k`` trước đối số sẽ tìm kiếm các dòng tóm tắt của tất cả module hiện có để tìm từ khóa được cung cấp làm đối số, một lần nữa theo cách tương tự lệnh Unix :program:`man`. Dòng tóm tắt của một module là dòng đầu tiên trong chuỗi tài liệu của module đó.
 
-You can also use :program:`pydoc` to start an HTTP server on the local machine
-that will serve documentation to visiting web browsers.  :program:`python -m pydoc -p 1234`
-will start a HTTP server on port 1234, allowing you to browse the
-documentation at ``http://localhost:1234/`` in your preferred web browser.
-Specifying ``0`` as the port number will select an arbitrary unused port.
+Bạn cũng có thể sử dụng :program:`pydoc` để khởi động một HTTP server trên máy cục bộ, server này sẽ cung cấp tài liệu cho các trình duyệt web truy cập. :program:`python -m pydoc -p 1234` sẽ khởi động HTTP server trên cổng 1234, cho phép bạn duyệt tài liệu tại ``http://localhost:1234/`` bằng trình duyệt web ưa thích. Việc chỉ định ``0`` làm số cổng sẽ chọn một cổng chưa được sử dụng bất kỳ.
 
 .. warning::
 
-   The :mod:`!pydoc` HTTP server is intended for local use during
-   development and is not suitable for production use.
+   Máy chủ HTTP :mod:`!pydoc` предназначен cho việc sử dụng cục bộ trong quá trình phát triển và không phù hợp để sử dụng trong môi trường production.
 
-:program:`python -m pydoc -n <hostname>` will start the server listening at the given
-hostname.  By default the hostname is 'localhost' but if you want the server to
-be reached from other machines, you may want to change the host name that the
-server responds to.  During development this is especially useful if you want
-to run pydoc from within a container.
+:program:`python -m pydoc -n <hostname>` sẽ khởi động máy chủ và lắng nghe tại hostname đã cho. Theo mặc định, hostname là 'localhost', nhưng nếu muốn các máy khác truy cập được máy chủ, bạn có thể thay đổi hostname mà máy chủ phản hồi. Trong quá trình phát triển, điều này đặc biệt hữu ích nếu bạn muốn chạy pydoc bên trong một container.
 
-:program:`python -m pydoc -b` will start the server and additionally open a web
-browser to a module index page.  Each served page has a navigation bar at the
-top where you can *Get* help on an individual item, *Search* all modules with a
-keyword in their synopsis line, and go to the *Module index*, *Topics* and
-*Keywords* pages.
+:program:`python -m pydoc -b` sẽ khởi động máy chủ và đồng thời mở trình duyệt web đến trang chỉ mục module. Mỗi trang được cung cấp đều có thanh điều hướng ở đầu trang, tại đó bạn có thể *Get* trợ giúp về một mục riêng lẻ, *Search* tất cả module có từ khóa trong dòng tóm tắt, cũng như chuyển đến các trang *Module index*, *Topics* và *Keywords*.
 
-When :program:`pydoc` generates documentation, it uses the current environment
-and path to locate modules.  Thus, invoking :program:`pydoc spam`
-documents precisely the version of the module you would get if you started the
-Python interpreter and typed ``import spam``.
+Khi :program:`pydoc` tạo tài liệu, nó sử dụng environment và path hiện tại để định vị các module. Vì vậy, việc gọi :program:`pydoc spam` sẽ lập tài liệu chính xác phiên bản của module mà bạn sẽ nhận được nếu khởi động Python interpreter và nhập ``import spam``.
 
-Module docs for core modules are assumed to reside in
-``https://docs.python.org/X.Y/library/`` where ``X`` and ``Y`` are the
-major and minor version numbers of the Python interpreter.  This can
-be overridden by setting the :envvar:`!PYTHONDOCS` environment variable
-to a different URL or to a local directory containing the Library
-Reference Manual pages.
+Tài liệu module cho các core module được giả định nằm trong ``https://docs.python.org/X.Y/library/``, trong đó ``X`` và ``Y`` lần lượt là số phiên bản major và minor của Python interpreter. Bạn có thể ghi đè thiết lập này bằng cách đặt biến môi trường :envvar:`!PYTHONDOCS` thành một URL khác hoặc một thư mục cục bộ chứa các trang của Library Reference Manual.
 
 .. versionchanged:: 3.2
-   Added the ``-b`` option.
+   Đã thêm tùy chọn ``-b``.
 
 .. versionchanged:: 3.3
-   The ``-g`` command line option was removed.
+   Tùy chọn dòng lệnh ``-g`` đã bị xóa.
 
 .. versionchanged:: 3.4
    :mod:`!pydoc` now uses :func:`inspect.signature` rather than
    :func:`inspect.getfullargspec` to extract signature information from
-   callables.
+   các đối tượng có thể gọi.
 
 .. versionchanged:: 3.7
-   Added the ``-n`` option.
+   Đã thêm tùy chọn ``-n``.

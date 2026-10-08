@@ -1,47 +1,41 @@
-:mod:`!html.entities` --- Definitions of HTML general entities
-==============================================================
+:mod:`!html.entities` --- Định nghĩa các thực thể tổng quát của HTML
+====================================================================
 
 .. module:: html.entities
-   :synopsis: Definitions of HTML general entities.
+   :synopsis: Định nghĩa các thực thể tổng quát của HTML.
 
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 
-**Source code:** :source:`Lib/html/entities.py`
+**Mã nguồn:** :source:`Lib/html/entities.py`
 
 --------------
 
-This module defines four dictionaries, :data:`html5`,
-:data:`name2codepoint`, :data:`codepoint2name`, and :data:`entitydefs`.
+Mô-đun này định nghĩa bốn từ điển, :data:`html5`,
+:data:`name2codepoint`, :data:`codepoint2name`, và :data:`entitydefs`.
 
 
 .. data:: html5
 
-   A dictionary that maps HTML5 named character references [#]_ to the
-   equivalent Unicode character(s), e.g. ``html5['gt;'] == '>'``.
-   Note that the trailing semicolon is included in the name (e.g. ``'gt;'``),
-   however some of the names are accepted by the standard even without the
-   semicolon: in this case the name is present with and without the ``';'``.
-   See also :func:`html.unescape`.
+   Một từ điển ánh xạ các tham chiếu ký tự có tên HTML5 [#]_ với (các) ký tự Unicode tương đương, ví dụ ``html5['gt;'] == '>'``. Lưu ý rằng dấu chấm phẩy ở cuối được bao gồm trong tên (ví dụ ``'gt;'``), tuy nhiên tiêu chuẩn chấp nhận một số tên ngay cả khi không có dấu chấm phẩy: trong trường hợp này, tên xuất hiện cả khi có và không có ``';'``. Xem thêm :func:`html.unescape`.
 
    .. versionadded:: 3.3
 
 
 .. data:: entitydefs
 
-   A dictionary mapping XHTML 1.0 entity definitions to their replacement text in
-   ISO Latin-1.
+   Một từ điển ánh xạ các định nghĩa thực thể XHTML 1.0 với văn bản thay thế tương ứng trong ISO Latin-1.
 
 
 .. data:: name2codepoint
 
-   A dictionary that maps HTML4 entity names to the Unicode code points.
+   Một dictionary ánh xạ tên entity HTML4 tới các code point Unicode.
 
 
 .. data:: codepoint2name
 
-   A dictionary that maps Unicode code points to HTML4 entity names.
+   Một dictionary ánh xạ các code point Unicode tới tên entity HTML4.
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] See https://html.spec.whatwg.org/multipage/named-characters.html#named-character-references
+.. [#] Xem https://html.spec.whatwg.org/multipage/named-characters.html#named-character-references

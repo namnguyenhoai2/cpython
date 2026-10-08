@@ -1,10 +1,10 @@
-:mod:`!urllib.parse` --- Parse URLs into components
-===================================================
+:mod:`!urllib.parse` --- Phân tích URL thành các thành phần
+===========================================================
 
 .. module:: urllib.parse
-   :synopsis: Parse URLs into or assemble them from components.
+   :synopsis: Phân tích URL thành các thành phần hoặc lắp ráp URL từ các thành phần đó.
 
-**Source code:** :source:`Lib/urllib/parse.py`
+**Mã nguồn:** :source:`Lib/urllib/parse.py`
 
 .. index::
    single: WWW
@@ -15,59 +15,37 @@
 
 --------------
 
-This module defines a standard interface to break Uniform Resource Locator (URL)
-strings up in components (addressing scheme, network location, path etc.), to
-combine the components back into a URL string, and to convert a "relative URL"
-to an absolute URL given a "base URL."
+Mô-đun này định nghĩa một giao diện tiêu chuẩn để tách các chuỗi Uniform Resource Locator (URL) thành các thành phần (scheme định địa chỉ, vị trí mạng, đường dẫn, v.v.), kết hợp các thành phần đó lại thành một chuỗi URL và chuyển đổi một "URL tương đối" thành URL tuyệt đối khi đã cho một "URL cơ sở".
 
-The module has been designed to match the internet RFC on Relative Uniform
-Resource Locators. It supports the following URL schemes: ``file``, ``ftp``,
-``gopher``, ``hdl``, ``http``, ``https``, ``imap``, ``itms-services``, ``mailto``, ``mms``,
-``news``, ``nntp``, ``prospero``, ``rsync``, ``rtsp``, ``rtsps``, ``rtspu``,
-``sftp``, ``shttp``, ``sip``, ``sips``, ``snews``, ``svn``, ``svn+ssh``,
-``telnet``, ``wais``, ``ws``, ``wss``.
+Mô-đun này được thiết kế để phù hợp với RFC Internet về Relative Uniform Resource Locators. Mô-đun hỗ trợ các scheme URL sau: ``file``, ``ftp``, ``gopher``, ``hdl``, ``http``, ``https``, ``imap``, ``itms-services``, ``mailto``, ``mms``, ``news``, ``nntp``, ``prospero``, ``rsync``, ``rtsp``, ``rtsps``, ``rtspu``, ``sftp``, ``shttp``, ``sip``, ``sips``, ``snews``, ``svn``, ``svn+ssh``, ``telnet``, ``wais``, ``ws``, ``wss``.
 
 .. impl-detail::
 
-   The inclusion of the ``itms-services`` URL scheme can prevent an app from
-   passing Apple's App Store review process for the macOS and iOS App Stores.
-   Handling for the ``itms-services`` scheme is always removed on iOS; on
-   macOS, it *may* be removed if CPython has been built with the
+   Việc bao gồm scheme URL ``itms-services`` có thể khiến một ứng dụng không vượt qua được quy trình xét duyệt của Apple App Store dành cho macOS và iOS. Việc xử lý scheme ``itms-services`` luôn bị loại bỏ trên iOS; trên macOS, nó *có thể* bị loại bỏ nếu CPython được xây dựng với
    :option:`--with-app-store-compliance` option.
 
-The :mod:`!urllib.parse` module defines functions that fall into two broad
-categories: URL parsing and URL quoting. These are covered in detail in
-the following sections.
+Mô-đun :mod:`!urllib.parse` định nghĩa các hàm thuộc hai nhóm chính: phân tích cú pháp URL và trích dẫn URL. Các nội dung này được trình bày chi tiết trong những phần sau.
 
-This module's functions use the deprecated term ``netloc`` (or ``net_loc``),
-which was introduced in :rfc:`1808`. However, this term has been obsoleted by
-:rfc:`3986`, which introduced the term ``authority`` as its replacement.
-The use of ``netloc`` is continued for backward compatibility.
+Các hàm của mô-đun này sử dụng thuật ngữ đã lỗi thời ``netloc`` (hoặc ``net_loc``), được giới thiệu trong :rfc:`1808`. Tuy nhiên, thuật ngữ này đã bị thay thế bởi
+:rfc:`3986`, trong đó giới thiệu thuật ngữ ``authority`` để thay thế. Việc sử dụng ``netloc`` vẫn được duy trì để đảm bảo khả năng tương thích ngược.
 
-URL Parsing
------------
+Phân tích cú pháp URL
+---------------------
 
-The URL parsing functions focus on splitting a URL string into its components,
-or on combining URL components into a URL string.
+Các hàm phân tích cú pháp URL tập trung vào việc tách một chuỗi URL thành các thành phần hoặc kết hợp các thành phần URL thành một chuỗi URL.
 
 .. function:: urlsplit(urlstring, scheme=None, allow_fragments=True)
 
-   Parse a URL into five components, returning a 5-item :term:`named tuple`
-   :class:`SplitResult` or :class:`SplitResultBytes`.
-   This corresponds to the general structure of a URL:
-   ``scheme://netloc/path?query#fragment``.
-   Each tuple item is a string, possibly empty.
+   Phân tích cú pháp một URL thành năm thành phần, trả về một :term:`named tuple` gồm 5 mục
+   :class:`SplitResult` hoặc :class:`SplitResultBytes`. Điều này tương ứng với cấu trúc chung của một URL: ``scheme://netloc/path?query#fragment``. Mỗi mục trong tuple là một chuỗi, có thể rỗng.
 
-   The delimiters as shown above are not part of the result, except for a
-   leading slash in the *path* component, which is retained if present.
+   Các dấu phân cách như minh họa ở trên không thuộc về kết quả, ngoại trừ dấu gạch chéo đứng đầu trong thành phần *path*, được giữ lại nếu có.
 
-   Additionally, the netloc property is broken down into these additional
-   attributes added to the returned object: username, password, hostname, and
-   port.
+   Ngoài ra, thuộc tính netloc được phân tách thành các thuộc tính bổ sung sau và được thêm vào đối tượng trả về: username, password, hostname và port.
 
-   Percent-encoded sequences are not decoded.
+   Các chuỗi được mã hóa theo phần trăm không được giải mã.
 
-   For example:
+   Ví dụ:
 
    .. doctest::
       :options: +NORMALIZE_WHITESPACE
@@ -93,10 +71,7 @@ or on combining URL components into a URL string.
       >>> o._replace(fragment="").geturl()
       'http://docs.python.org:80/3/library/urllib.parse.html?highlight=params'
 
-   Following the syntax specifications in :rfc:`1808`, :func:`!urlsplit` recognizes
-   a netloc only if it is properly introduced by '//'.  Otherwise the
-   input is presumed to be a relative URL and thus to start with
-   a path component.
+   Theo các đặc tả cú pháp trong :rfc:`1808`, :func:`!urlsplit` chỉ nhận diện netloc nếu nó được giới thiệu đúng bằng '//'. Nếu không, đầu vào được xem là một URL tương đối và do đó bắt đầu bằng một thành phần path.
 
    .. doctest::
       :options: +NORMALIZE_WHITESPACE
@@ -112,62 +87,45 @@ or on combining URL components into a URL string.
       SplitResult(scheme='', netloc='', path='help/Python.html',
                   query='', fragment='')
 
-   The *scheme* argument gives the default addressing scheme, to be
-   used only if the URL does not specify one.  It should be the same type
-   (text or bytes) as *urlstring*, except that the default value ``''`` is
-   always allowed, and is automatically converted to ``b''`` if appropriate.
+   Đối số *scheme* cung cấp scheme định địa chỉ mặc định, chỉ được sử dụng nếu URL không chỉ định scheme. Đối số này phải có cùng kiểu (text hoặc bytes) với *urlstring*, ngoại trừ giá trị mặc định ``''`` luôn được cho phép và sẽ tự động được chuyển đổi thành ``b''`` nếu thích hợp.
 
-   If the *allow_fragments* argument is false, fragment identifiers are not
-   recognized.  Instead, they are parsed as part of the path, parameters
-   or query component, and :attr:`fragment` is set to the empty string in
-   the return value.
+   Nếu đối số *allow_fragments* là false, các fragment identifier sẽ không được nhận diện. Thay vào đó, chúng được phân tích cú pháp như một phần của thành phần path, parameters hoặc query, và :attr:`fragment` được đặt thành chuỗi rỗng trong giá trị trả về.
 
-   The return value is a :term:`named tuple`, which means that its items can
-   be accessed by index or as named attributes, which are:
+   Giá trị trả về là một :term:`named tuple`, nghĩa là các phần tử của nó có thể được truy cập theo chỉ mục hoặc dưới dạng các thuộc tính có tên, bao gồm:
 
-   +------------------+-------+-------------------------+------------------------+
-   | Attribute        | Index | Value                   | Value if not present   |
-   +==================+=======+=========================+========================+
-   | :attr:`scheme`   | 0     | URL scheme specifier    | *scheme* parameter     |
-   +------------------+-------+-------------------------+------------------------+
-   | :attr:`netloc`   | 1     | Network location part   | empty string           |
-   +------------------+-------+-------------------------+------------------------+
-   | :attr:`path`     | 2     | Hierarchical path       | empty string           |
-   +------------------+-------+-------------------------+------------------------+
-   | :attr:`query`    | 3     | Query component         | empty string           |
-   +------------------+-------+-------------------------+------------------------+
-   | :attr:`fragment` | 4     | Fragment identifier     | empty string           |
-   +------------------+-------+-------------------------+------------------------+
-   | :attr:`username` |       | User name               | :const:`None`          |
-   +------------------+-------+-------------------------+------------------------+
-   | :attr:`password` |       | Password                | :const:`None`          |
-   +------------------+-------+-------------------------+------------------------+
-   | :attr:`hostname` |       | Host name (lower case)  | :const:`None`          |
-   +------------------+-------+-------------------------+------------------------+
-   | :attr:`port`     |       | Port number as integer, | :const:`None`          |
-   |                  |       | if present              |                        |
-   +------------------+-------+-------------------------+------------------------+
+   +------------------+---------+-------------------------------------+----------------------+
+   | Thuộc tính       | Chỉ mục | Giá trị                             | Giá trị nếu không có |
+   +==================+=========+=====================================+======================+
+   | :attr:`scheme`   | 0       | Bộ chỉ định scheme của URL          | tham số *scheme*     |
+   +------------------+---------+-------------------------------------+----------------------+
+   | :attr:`netloc`   | 1       | Phần vị trí mạng                    | chuỗi rỗng           |
+   +------------------+---------+-------------------------------------+----------------------+
+   | :attr:`path`     | 2       | Đường dẫn phân cấp                  | chuỗi rỗng           |
+   +------------------+---------+-------------------------------------+----------------------+
+   | :attr:`query`    | 3       | Thành phần truy vấn                 | chuỗi rỗng           |
+   +------------------+---------+-------------------------------------+----------------------+
+   | :attr:`fragment` | 4       | Mã định danh fragment               | chuỗi rỗng           |
+   +------------------+---------+-------------------------------------+----------------------+
+   | :attr:`username` |         | Tên người dùng                      | :const:`None`        |
+   +------------------+---------+-------------------------------------+----------------------+
+   | :attr:`password` |         | Mật khẩu                            | :const:`None`        |
+   +------------------+---------+-------------------------------------+----------------------+
+   | :attr:`hostname` |         | Tên máy chủ (chữ thường)            | :const:`None`        |
+   +------------------+---------+-------------------------------------+----------------------+
+   | :attr:`port`     |         | Số cổng dưới dạng số nguyên, nếu có | :const:`None`        |
+   +------------------+---------+-------------------------------------+----------------------+
 
-   Reading the :attr:`port` attribute will raise a :exc:`ValueError` if
-   an invalid port is specified in the URL.  See section
-   :ref:`urlparse-result-object` for more information on the result object.
+   Việc đọc thuộc tính :attr:`port` sẽ gây ra :exc:`ValueError` nếu URL chỉ định một cổng không hợp lệ. Xem mục
+   :ref:`urlparse-result-object` để biết thêm thông tin về đối tượng kết quả.
 
-   Unmatched square brackets in the :attr:`netloc` attribute will raise a
+   Các dấu ngoặc vuông không khớp trong thuộc tính :attr:`netloc` sẽ gây ra một
    :exc:`ValueError`.
 
-   Characters in the :attr:`netloc` attribute that decompose under NFKC
-   normalization (as used by the IDNA encoding) into any of ``/``, ``?``,
-   ``#``, ``@``, or ``:`` will raise a :exc:`ValueError`. If the URL is
-   decomposed before parsing, no error will be raised.
+   Các ký tự trong thuộc tính :attr:`netloc` khi phân rã theo chuẩn hóa NFKC (được sử dụng bởi mã hóa IDNA) thành bất kỳ ký tự nào trong số ``/``, ``?``, ``#``, ``@`` hoặc ``:`` sẽ gây ra :exc:`ValueError`. Nếu URL được phân rã trước khi phân tích cú pháp, sẽ không xảy ra lỗi.
 
-   Following some of the `WHATWG spec`_ that updates :rfc:`3986`, leading C0
-   control and space characters are stripped from the URL. ``\n``,
-   ``\r`` and tab ``\t`` characters are removed from the URL at any position.
+   Tuân theo một phần của đặc tả `WHATWG spec <WHATWG spec_>`_ cập nhật :rfc:`3986`, các ký tự điều khiển C0 và ký tự khoảng trắng ở đầu sẽ bị loại bỏ khỏi URL. Các ký tự ``\n``, ``\r`` và tab ``\t`` được xóa khỏi URL ở mọi vị trí.
 
-   As is the case with all named tuples, the subclass has a few additional methods
-   and attributes that are particularly useful. One such method is :meth:`_replace`.
-   The :meth:`_replace` method will return a new :class:`SplitResult` object
-   replacing specified fields with new values.
+   Tương tự như mọi named tuple, lớp con có thêm một số phương thức và thuộc tính đặc biệt hữu ích. Một trong những phương thức đó là :meth:`_replace`. Phương thức :meth:`_replace` sẽ trả về một đối tượng :class:`SplitResult` mới, thay thế các trường được chỉ định bằng các giá trị mới.
 
    .. doctest::
       :options: +NORMALIZE_WHITESPACE
@@ -183,179 +141,120 @@ or on combining URL components into a URL string.
 
    .. warning::
 
-      :func:`urlsplit` does not perform validation.  See :ref:`URL parsing
-      security <url-parsing-security>` for details.
+      :func:`urlsplit` không thực hiện việc xác thực. Xem :ref:`Bảo mật khi phân tích cú pháp URL <url-parsing-security>` để biết chi tiết.
 
    .. versionchanged:: 3.2
-      Added IPv6 URL parsing capabilities.
+      Đã bổ sung khả năng phân tích cú pháp URL IPv6.
 
    .. versionchanged:: 3.3
-      The fragment is now parsed for all URL schemes (unless *allow_fragments* is
-      false), in accordance with :rfc:`3986`.  Previously, an allowlist of
-      schemes that support fragments existed.
+      Giờ đây, fragment được phân tích cú pháp cho tất cả các lược đồ URL (trừ khi *allow_fragments* là false), phù hợp với :rfc:`3986`. Trước đây, tồn tại một allowlist gồm các lược đồ hỗ trợ fragment.
 
    .. versionchanged:: 3.6
-      Out-of-range port numbers now raise :exc:`ValueError`, instead of
-      returning :const:`None`.
+      Số cổng nằm ngoài phạm vi giờ sẽ phát sinh :exc:`ValueError`, thay vì trả về :const:`None`.
 
    .. versionchanged:: 3.8
-      Characters that affect netloc parsing under NFKC normalization will
-      now raise :exc:`ValueError`.
+      Các ký tự ảnh hưởng đến việc phân tích netloc khi chuẩn hóa theo NFKC giờ sẽ phát sinh :exc:`ValueError`.
 
    .. versionchanged:: 3.10
-      ASCII newline and tab characters are stripped from the URL.
+      Các ký tự xuống dòng và tab ASCII sẽ bị loại bỏ khỏi URL.
 
    .. versionchanged:: 3.12
-      Leading WHATWG C0 control and space characters are stripped from the URL.
+      Các ký tự điều khiển C0 và ký tự khoảng trắng ở đầu theo WHATWG sẽ bị loại bỏ khỏi URL.
 
 .. _WHATWG spec: https://url.spec.whatwg.org/#concept-basic-url-parser
 
 
 .. function:: parse_qs(qs, keep_blank_values=False, strict_parsing=False, encoding='utf-8', errors='replace', max_num_fields=None, separator='&')
 
-   Parse a query string given as a string argument (data of type
-   :mimetype:`application/x-www-form-urlencoded`).  Data are returned as a
-   dictionary.  The dictionary keys are the unique query variable names and the
-   values are lists of values for each name.
+   Phân tích chuỗi truy vấn được cung cấp dưới dạng đối số chuỗi (dữ liệu thuộc kiểu
+   :mimetype:`application/x-www-form-urlencoded`).  Dữ liệu được trả về dưới dạng từ điển.  Các khóa của từ điển là tên duy nhất của các biến truy vấn, còn các giá trị là danh sách các giá trị tương ứng với từng tên.
 
-   The optional argument *keep_blank_values* is a flag indicating whether blank
-   values in percent-encoded queries should be treated as blank strings. A true value
-   indicates that blanks should be retained as  blank strings.  The default false
-   value indicates that blank values are to be ignored and treated as if they were
-   not included.
+   Đối số tùy chọn *keep_blank_values* là một cờ cho biết liệu các giá trị trống trong truy vấn được mã hóa phần trăm có được xử lý dưới dạng chuỗi trống hay không. Giá trị true cho biết các giá trị trống sẽ được giữ lại dưới dạng chuỗi trống.  Giá trị false mặc định cho biết các giá trị trống sẽ bị bỏ qua và được xử lý như thể chúng không được đưa vào.
 
-   The optional argument *strict_parsing* is a flag indicating what to do with
-   parsing errors.  If false (the default), errors are silently ignored.  If true,
-   errors raise a :exc:`ValueError` exception.
+   Đối số tùy chọn *strict_parsing* là một cờ cho biết cần xử lý lỗi phân tích cú pháp như thế nào. Nếu là false (mặc định), các lỗi sẽ bị bỏ qua một cách im lặng. Nếu là true, các lỗi sẽ gây ra một ngoại lệ :exc:`ValueError`.
 
-   The optional *encoding* and *errors* parameters specify how to decode
-   percent-encoded sequences into Unicode characters, as accepted by the
-   :meth:`bytes.decode` method.
+   Các tham số tùy chọn *encoding* và *errors* chỉ định cách giải mã các chuỗi được mã hóa phần trăm thành các ký tự Unicode, theo cách được chấp nhận bởi
+   phương thức :meth:`bytes.decode`.
 
-   The optional argument *max_num_fields* is the maximum number of fields to
-   read. If set, then throws a :exc:`ValueError` if there are more than
-   *max_num_fields* fields read.
+   Đối số tùy chọn *max_num_fields* là số trường tối đa cần đọc. Nếu được đặt, một :exc:`ValueError` sẽ được ném ra nếu số trường được đọc nhiều hơn *max_num_fields*.
 
-   The optional argument *separator* is the symbol to use for separating the
-   query arguments. It defaults to ``&``.
+   Đối số tùy chọn *separator* là ký hiệu được sử dụng để phân tách các đối số truy vấn. Giá trị mặc định là ``&``.
 
-   Use the :func:`urllib.parse.urlencode` function (with the ``doseq``
-   parameter set to ``True``) to convert such dictionaries into query
-   strings.
+   Sử dụng hàm :func:`urllib.parse.urlencode` (với tham số ``doseq`` được đặt thành ``True``) để chuyển các từ điển như vậy thành các chuỗi truy vấn.
 
 
    .. versionchanged:: 3.2
-      Add *encoding* and *errors* parameters.
+      Thêm các tham số *encoding* và *errors*.
 
    .. versionchanged:: 3.8
-      Added *max_num_fields* parameter.
+      Đã thêm tham số *max_num_fields*.
 
    .. versionchanged:: 3.10
-      Added *separator* parameter with the default value of ``&``. Python
-      versions earlier than Python 3.10 allowed using both ``;`` and ``&`` as
-      query parameter separator. This has been changed to allow only a single
-      separator key, with ``&`` as the default separator.
+      Đã thêm tham số *separator* với giá trị mặc định là ``&``. Các phiên bản Python trước Python 3.10 cho phép sử dụng cả ``;`` và ``&`` làm dấu phân cách tham số truy vấn. Điều này đã được thay đổi để chỉ cho phép một khóa dấu phân cách duy nhất, với ``&`` là dấu phân cách mặc định.
 
    .. deprecated:: 3.14
-      Accepting objects with false values (like ``0`` and ``[]``) except empty
-      strings and byte-like objects and ``None`` is now deprecated.
+      Việc chấp nhận các đối tượng có giá trị false (chẳng hạn như ``0`` và ``[]``) ngoại trừ chuỗi rỗng, các đối tượng dạng byte và ``None`` hiện đã bị deprecated.
 
 
 .. function:: parse_qsl(qs, keep_blank_values=False, strict_parsing=False, encoding='utf-8', errors='replace', max_num_fields=None, separator='&')
 
-   Parse a query string given as a string argument (data of type
-   :mimetype:`application/x-www-form-urlencoded`).  Data are returned as a list of
-   name, value pairs.
+   Phân tích chuỗi truy vấn được cung cấp dưới dạng đối số chuỗi (dữ liệu thuộc kiểu
+   :mimetype:`application/x-www-form-urlencoded`). Dữ liệu được trả về dưới dạng danh sách các cặp tên, giá trị.
 
-   The optional argument *keep_blank_values* is a flag indicating whether blank
-   values in percent-encoded queries should be treated as blank strings. A true value
-   indicates that blanks should be retained as  blank strings.  The default false
-   value indicates that blank values are to be ignored and treated as if they were
-   not included.
+   Đối số tùy chọn *keep_blank_values* là một cờ cho biết liệu các giá trị trống trong truy vấn được mã hóa phần trăm có được xử lý dưới dạng chuỗi trống hay không. Giá trị true cho biết các giá trị trống sẽ được giữ lại dưới dạng chuỗi trống.  Giá trị false mặc định cho biết các giá trị trống sẽ bị bỏ qua và được xử lý như thể chúng không được đưa vào.
 
-   The optional argument *strict_parsing* is a flag indicating what to do with
-   parsing errors.  If false (the default), errors are silently ignored.  If true,
-   errors raise a :exc:`ValueError` exception.
+   Đối số tùy chọn *strict_parsing* là một cờ cho biết cần xử lý lỗi phân tích cú pháp như thế nào. Nếu là false (mặc định), các lỗi sẽ bị bỏ qua một cách im lặng. Nếu là true, các lỗi sẽ gây ra một ngoại lệ :exc:`ValueError`.
 
-   The optional *encoding* and *errors* parameters specify how to decode
-   percent-encoded sequences into Unicode characters, as accepted by the
-   :meth:`bytes.decode` method.
+   Các tham số tùy chọn *encoding* và *errors* chỉ định cách giải mã các chuỗi được mã hóa phần trăm thành các ký tự Unicode, theo cách được chấp nhận bởi
+   phương thức :meth:`bytes.decode`.
 
-   The optional argument *max_num_fields* is the maximum number of fields to
-   read. If set, then throws a :exc:`ValueError` if there are more than
-   *max_num_fields* fields read.
+   Đối số tùy chọn *max_num_fields* là số trường tối đa cần đọc. Nếu được đặt, một :exc:`ValueError` sẽ được ném ra nếu số trường được đọc nhiều hơn *max_num_fields*.
 
-   The optional argument *separator* is the symbol to use for separating the
-   query arguments. It defaults to ``&``.
+   Đối số tùy chọn *separator* là ký hiệu được sử dụng để phân tách các đối số truy vấn. Giá trị mặc định là ``&``.
 
-   Use the :func:`urllib.parse.urlencode` function to convert such lists of pairs into
-   query strings.
+   Sử dụng hàm :func:`urllib.parse.urlencode` để chuyển đổi các danh sách cặp như vậy thành chuỗi truy vấn.
 
    .. versionchanged:: 3.2
-      Add *encoding* and *errors* parameters.
+      Thêm các tham số *encoding* và *errors*.
 
    .. versionchanged:: 3.8
-      Added *max_num_fields* parameter.
+      Đã thêm tham số *max_num_fields*.
 
    .. versionchanged:: 3.10
-      Added *separator* parameter with the default value of ``&``. Python
-      versions earlier than Python 3.10 allowed using both ``;`` and ``&`` as
-      query parameter separator. This has been changed to allow only a single
-      separator key, with ``&`` as the default separator.
+      Đã thêm tham số *separator* với giá trị mặc định là ``&``. Các phiên bản Python trước Python 3.10 cho phép sử dụng cả ``;`` và ``&`` làm dấu phân cách tham số truy vấn. Điều này đã được thay đổi để chỉ cho phép một khóa dấu phân cách duy nhất, với ``&`` là dấu phân cách mặc định.
 
 
 .. function:: urlunsplit(parts)
 
-   Construct a URL from a tuple as returned by ``urlsplit()``. The *parts*
-   argument can be any five-item iterable. This may result in a slightly
-   different, but equivalent URL, if the URL that was parsed originally had
-   unnecessary delimiters (for example, a ``?`` with an empty query; the RFC
-   states that these are equivalent).
+   Tạo một URL từ một tuple như được trả về bởi ``urlsplit()``. Đối số *parts* có thể là bất kỳ iterable nào gồm năm phần tử. Điều này có thể tạo ra một URL hơi khác nhưng tương đương, nếu URL được phân tích ban đầu có các dấu phân cách không cần thiết (ví dụ: một ``?`` có query rỗng; RFC nêu rằng các URL này tương đương).
 
 
 .. function:: urlparse(urlstring, scheme=None, allow_fragments=True)
 
-   This is similar to :func:`urlsplit`, but additionally splits the *path*
-   component on *path* and *params*.
-   This function returns a 6-item :term:`named tuple` :class:`ParseResult`
-   or :class:`ParseResultBytes`.
-   Its items are the same as for the :func:`!urlsplit` result, except that
-   *params* is inserted at index 3, between *path* and *query*.
+   Điều này tương tự như :func:`urlsplit`, nhưng còn tách thành phần *path* tại *path* và *params*. Hàm này trả về một :term:`named tuple` :class:`ParseResult` gồm 6 phần tử hoặc :class:`ParseResultBytes`. Các phần tử của nó giống với kết quả :func:`!urlsplit`, ngoại trừ *params* được chèn tại chỉ mục 3, giữa *path* và *query*.
 
-   This function is based on obsoleted :rfc:`1738` and :rfc:`1808`, which
-   listed *params* as the main URL component.
-   The more recent URL syntax allows parameters to be applied to each segment
-   of the *path* portion of the URL (see :rfc:`3986`).
-   :func:`urlsplit` should generally be used instead of :func:`urlparse`.
-   A separate function is needed to separate the path segments and parameters.
+   Hàm này dựa trên :rfc:`1738` và :rfc:`1808` đã lỗi thời, trong đó liệt kê *params* là thành phần URL chính. Cú pháp URL mới hơn cho phép áp dụng các tham số cho từng phân đoạn của phần *path* trong URL (xem :rfc:`3986`).
+   Nhìn chung nên sử dụng :func:`urlsplit` thay cho :func:`urlparse`. Cần có một hàm riêng để tách các phân đoạn đường dẫn và tham số.
 
 .. function:: urlunparse(parts)
 
-   Combine the elements of a tuple as returned by :func:`urlparse` into a
-   complete URL as a string. The *parts* argument can be any six-item
-   iterable. This may result in a slightly different, but equivalent URL, if the
-   URL that was parsed originally had unnecessary delimiters (for example, a ?
-   with an empty query; the RFC states that these are equivalent).
+   Kết hợp các phần tử của một tuple như được trả về bởi :func:`urlparse` thành một URL hoàn chỉnh dưới dạng chuỗi. Đối số *parts* có thể là bất kỳ iterable nào gồm sáu phần tử. Điều này có thể tạo ra một URL hơi khác nhưng tương đương, nếu URL được phân tích ban đầu có các dấu phân cách không cần thiết (ví dụ: ? với query rỗng; RFC nêu rằng các URL này tương đương).
 
 
 .. function:: urljoin(base, url, allow_fragments=True)
 
-   Construct a full ("absolute") URL by combining a "base URL" (*base*) with
-   another URL (*url*).  Informally, this uses components of the base URL, in
-   particular the addressing scheme, the network location and (part of) the
-   path, to provide missing components in the relative URL.  For example:
+   Tạo một URL đầy đủ ("tuyệt đối") bằng cách kết hợp "URL cơ sở" (*base*) với một URL khác (*url*). Nói một cách đơn giản, cách này sử dụng các thành phần của URL cơ sở, đặc biệt là scheme định địa chỉ, vị trí mạng và (một phần của) đường dẫn, để cung cấp các thành phần còn thiếu trong URL tương đối. Ví dụ:
 
       >>> from urllib.parse import urljoin
       >>> urljoin('http://www.cwi.nl/%7Eguido/Python.html', 'FAQ.html')
       'http://www.cwi.nl/%7Eguido/FAQ.html'
 
-   The *allow_fragments* argument has the same meaning and default as for
+   Đối số *allow_fragments* có cùng ý nghĩa và giá trị mặc định như đối với
    :func:`urlsplit`.
 
    .. note::
 
-      If *url* is an absolute URL (that is, it starts with ``//`` or ``scheme://``),
-      the *url*'s hostname and/or scheme will be present in the result.  For example:
+      Nếu *url* là một URL tuyệt đối (nghĩa là bắt đầu bằng ``//`` hoặc ``scheme://``), hostname và/hoặc scheme của *url* sẽ xuất hiện trong kết quả. Ví dụ:
 
       .. doctest::
 
@@ -363,152 +262,99 @@ or on combining URL components into a URL string.
          ...         '//www.python.org/%7Eguido')
          'http://www.python.org/%7Eguido'
 
-      If you do not want that behavior, preprocess the *url* with :func:`urlsplit` and
-      :func:`urlunsplit`, removing possible *scheme* and *netloc* parts.
+      Nếu không muốn hành vi đó, hãy tiền xử lý *url* bằng :func:`urlsplit` và
+      :func:`urlunsplit`, loại bỏ các phần *scheme* và *netloc* nếu có.
 
    .. warning::
 
-      Because an absolute URL may be passed as the ``url`` parameter, it is
-      generally **not secure** to use ``urljoin`` with an attacker-controlled
-      ``url``. For example in,
-      ``urljoin("https://website.com/users/", username)``, if ``username`` can
-      contain an absolute URL, the result of ``urljoin`` will be the absolute
-      URL.
+      Vì một URL tuyệt đối có thể được truyền làm tham số ``url``, việc sử dụng ``urljoin`` với ``url`` do kẻ tấn công kiểm soát thường **không an toàn**. Ví dụ, trong ``urljoin("https://website.com/users/", username)``, nếu ``username`` có thể chứa một URL tuyệt đối, kết quả của ``urljoin`` sẽ là URL tuyệt đối đó.
 
 
    .. versionchanged:: 3.5
 
-      Behavior updated to match the semantics defined in :rfc:`3986`.
+      Hành vi đã được cập nhật để phù hợp với các ngữ nghĩa được định nghĩa trong :rfc:`3986`.
 
 
 .. function:: urldefrag(url)
 
-   If *url* contains a fragment identifier, return a modified version of *url*
-   with no fragment identifier, and the fragment identifier as a separate
-   string.  If there is no fragment identifier in *url*, return *url* unmodified
-   and an empty string.
+   Nếu *url* chứa mã định danh fragment, hãy trả về một phiên bản đã sửa đổi của *url* không có mã định danh fragment và mã định danh fragment dưới dạng một chuỗi riêng biệt. Nếu *url* không chứa mã định danh fragment, hãy trả về *url* không sửa đổi và một chuỗi rỗng.
 
-   The return value is a :term:`named tuple`, its items can be accessed by index
-   or as named attributes:
+   Giá trị trả về là một :term:`named tuple`, các phần tử của nó có thể được truy cập theo chỉ mục hoặc dưới dạng các thuộc tính có tên:
 
-   +------------------+-------+-------------------------+----------------------+
-   | Attribute        | Index | Value                   | Value if not present |
-   +==================+=======+=========================+======================+
-   | :attr:`url`      | 0     | URL with no fragment    | empty string         |
-   +------------------+-------+-------------------------+----------------------+
-   | :attr:`fragment` | 1     | Fragment identifier     | empty string         |
-   +------------------+-------+-------------------------+----------------------+
+   +------------------+---------+-----------------------+----------------------+
+   | Thuộc tính       | Chỉ mục | Giá trị               | Giá trị nếu không có |
+   +==================+=========+=======================+======================+
+   | :attr:`url`      | 0       | URL không có fragment | chuỗi rỗng           |
+   +------------------+---------+-----------------------+----------------------+
+   | :attr:`fragment` | 1       | Mã định danh fragment | chuỗi rỗng           |
+   +------------------+---------+-----------------------+----------------------+
 
-   See section :ref:`urlparse-result-object` for more information on the result
-   object.
+   Xem phần :ref:`urlparse-result-object` để biết thêm thông tin về đối tượng kết quả.
 
    .. versionchanged:: 3.2
-      Result is a structured object rather than a simple 2-tuple.
+      Kết quả là một đối tượng có cấu trúc thay vì một tuple 2 phần tử đơn giản.
 
 .. function:: unwrap(url)
 
-   Extract the url from a wrapped URL (that is, a string formatted as
-   ``<URL:scheme://host/path>``, ``<scheme://host/path>``, ``URL:scheme://host/path``
-   or ``scheme://host/path``). If *url* is not a wrapped URL, it is returned
-   without changes.
+   Trích xuất URL từ một URL được bao bọc (tức là một chuỗi có định dạng ``<URL:scheme://host/path>``, ``<scheme://host/path>``, ``URL:scheme://host/path`` hoặc ``scheme://host/path``). Nếu *url* không phải là một URL được bao bọc, nó sẽ được trả về không thay đổi.
 
 .. _url-parsing-security:
 
-URL parsing security
---------------------
+Bảo mật khi phân tích cú pháp URL
+---------------------------------
 
-The :func:`urlsplit` and :func:`urlparse` APIs do not perform **validation** of
-inputs.  They may not raise errors on inputs that other applications consider
-invalid.  They may also succeed on some inputs that might not be considered
-URLs elsewhere.  Their purpose is for practical functionality rather than
-purity.
+Các API :func:`urlsplit` và :func:`urlparse` không thực hiện **validation** đầu vào. Chúng có thể không phát sinh lỗi đối với những đầu vào mà các ứng dụng khác coi là không hợp lệ. Chúng cũng có thể thành công với một số đầu vào có thể không được coi là URL ở nơi khác. Mục đích của chúng là cung cấp chức năng thiết thực thay vì sự thuần túy.
 
-Instead of raising an exception on unusual input, they may instead return some
-component parts as empty strings. Or components may contain more than perhaps
-they should.
+Thay vì phát sinh một exception khi gặp dữ liệu đầu vào bất thường, chúng có thể trả về một số thành phần dưới dạng chuỗi rỗng. Hoặc các thành phần có thể chứa nhiều hơn mức cần thiết.
 
-We recommend that users of these APIs where the values may be used anywhere
-with security implications code defensively. Do some verification within your
-code before trusting a returned component part.  Does that ``scheme`` make
-sense?  Is that a sensible ``path``?  Is there anything strange about that
-``hostname``?  etc.
+Chúng tôi khuyến nghị người dùng các API này, khi các giá trị có thể được sử dụng ở bất kỳ đâu có liên quan đến bảo mật, hãy lập trình theo hướng phòng thủ. Hãy thực hiện một số bước xác minh trong code trước khi tin tưởng thành phần được trả về. ``scheme`` đó có hợp lý không? ``path`` đó có phù hợp không? Có điều gì bất thường về ``hostname`` đó không? v.v.
 
-What constitutes a URL is not universally well defined.  Different applications
-have different needs and desired constraints.  For instance the living `WHATWG
-spec`_ describes what user facing web clients such as a web browser require.
-While :rfc:`3986` is more general.  These functions incorporate some aspects of
-both, but cannot be claimed compliant with either.  The APIs and existing user
-code with expectations on specific behaviors predate both standards leading us
-to be very cautious about making API behavior changes.
+Khái niệm URL không được định nghĩa hoàn toàn thống nhất. Các ứng dụng khác nhau có những nhu cầu và ràng buộc mong muốn khác nhau. Chẳng hạn, `WHATWG spec <WHATWG spec_>`_ hiện tại mô tả những yêu cầu của các client web hướng đến người dùng, chẳng hạn như trình duyệt web. Trong khi :rfc:`3986` thì tổng quát hơn. Các hàm này kết hợp một số khía cạnh của cả hai, nhưng không thể được xem là tuân thủ hoàn toàn tiêu chuẩn nào. Các API và code hiện có của người dùng, với những kỳ vọng về các hành vi cụ thể, đã xuất hiện trước cả hai tiêu chuẩn, khiến chúng tôi phải hết sức thận trọng khi thay đổi hành vi của API.
 
 .. _parsing-ascii-encoded-bytes:
 
-Parsing ASCII Encoded Bytes
----------------------------
+Phân tích các byte được mã hóa ASCII
+------------------------------------
 
-The URL parsing functions were originally designed to operate on character
-strings only. In practice, it is useful to be able to manipulate properly
-quoted and encoded URLs as sequences of ASCII bytes. Accordingly, the
-URL parsing functions in this module all operate on :class:`bytes` and
-:class:`bytearray` objects in addition to :class:`str` objects.
+Các hàm phân tích URL ban đầu chỉ được thiết kế để hoạt động trên các chuỗi ký tự. Trong thực tế, khả năng thao tác với các URL đã được trích dẫn và mã hóa đúng cách dưới dạng các chuỗi byte ASCII rất hữu ích. Vì vậy, các hàm phân tích URL trong module này đều hoạt động trên :class:`bytes` và
+các đối tượng :class:`bytearray` bên cạnh các đối tượng :class:`str`.
 
-If :class:`str` data is passed in, the result will also contain only
-:class:`str` data. If :class:`bytes` or :class:`bytearray` data is
-passed in, the result will contain only :class:`bytes` data.
+Nếu dữ liệu :class:`str` được truyền vào, kết quả cũng sẽ chỉ chứa
+dữ liệu :class:`str`. Nếu truyền vào dữ liệu :class:`bytes` hoặc :class:`bytearray`, kết quả sẽ chỉ chứa dữ liệu :class:`bytes`.
 
-Attempting to mix :class:`str` data with :class:`bytes` or
-:class:`bytearray` in a single function call will result in a
-:exc:`TypeError` being raised, while attempting to pass in non-ASCII
-byte values will trigger :exc:`UnicodeDecodeError`.
+Việc cố gắng trộn dữ liệu :class:`str` với :class:`bytes` hoặc
+:class:`bytearray` trong cùng một lần gọi hàm sẽ dẫn đến việc phát sinh
+:exc:`TypeError`, còn việc cố gắng truyền các giá trị byte không phải ASCII sẽ kích hoạt :exc:`UnicodeDecodeError`.
 
-To support easier conversion of result objects between :class:`str` and
-:class:`bytes`, all return values from URL parsing functions provide
-either an :meth:`encode` method (when the result contains :class:`str`
-data) or a :meth:`decode` method (when the result contains :class:`bytes`
-data). The signatures of these methods match those of the corresponding
-:class:`str` and :class:`bytes` methods (except that the default encoding
-is ``'ascii'`` rather than ``'utf-8'``). Each produces a value of a
-corresponding type that contains either :class:`bytes` data (for
-:meth:`encode` methods) or :class:`str` data (for
+Để hỗ trợ việc chuyển đổi các đối tượng kết quả giữa :class:`str` và
+:class:`bytes` dễ dàng hơn, tất cả giá trị trả về từ các hàm phân tích URL đều cung cấp một phương thức :meth:`encode` (khi kết quả chứa dữ liệu :class:`str`) hoặc một phương thức :meth:`decode` (khi kết quả chứa dữ liệu :class:`bytes`). Chữ ký của các phương thức này khớp với chữ ký của các phương thức :class:`bytes` và :meth:`encode` tương ứng (ngoại trừ việc encoding mặc định là :class:`str` thay vì :meth:`decode`). Mỗi phương thức tạo ra một giá trị thuộc kiểu tương ứng, chứa dữ liệu :class:`bytes` (đối với
+các phương thức :class:`str` và :class:`bytes` (ngoại trừ việc encoding mặc định là ``'ascii'`` thay vì ``'utf-8'``). Mỗi phương thức tạo ra một giá trị thuộc kiểu tương ứng, chứa dữ liệu :class:`bytes` (đối với
+:meth:`encode` methods) hoặc :class:`str` dữ liệu (để
 :meth:`decode` methods).
 
-Applications that need to operate on potentially improperly quoted URLs
-that may contain non-ASCII data will need to do their own decoding from
-bytes to characters before invoking the URL parsing methods.
+Các ứng dụng cần xử lý những URL có thể được đặt trong dấu ngoặc kép không đúng cách và có thể chứa dữ liệu không phải ASCII sẽ cần tự giải mã từ byte sang ký tự trước khi gọi các phương thức phân tích URL.
 
-The behaviour described in this section applies only to the URL parsing
-functions. The URL quoting functions use their own rules when producing
-or consuming byte sequences as detailed in the documentation of the
-individual URL quoting functions.
+Hành vi được mô tả trong phần này chỉ áp dụng cho các hàm phân tích URL. Các hàm trích dẫn URL sử dụng các quy tắc riêng khi tạo hoặc sử dụng các chuỗi byte, như được nêu chi tiết trong tài liệu của từng hàm trích dẫn URL.
 
 .. versionchanged:: 3.2
-   URL parsing functions now accept ASCII encoded byte sequences
+   Các hàm phân tích URL hiện chấp nhận các chuỗi byte được mã hóa ASCII
 
 
 .. _urlparse-result-object:
 
-Structured Parse Results
-------------------------
+Kết quả phân tích có cấu trúc
+-----------------------------
 
-The result objects from the :func:`urlsplit`, :func:`urlparse`  and
-:func:`urldefrag` functions are subclasses of the :class:`tuple` type.
-These subclasses add the attributes listed in the documentation for
-those functions, the encoding and decoding support described in the
-previous section, as well as an additional method:
+Các đối tượng kết quả từ :func:`urlsplit`, :func:`urlparse`  và
+Các hàm :func:`urldefrag` là các lớp con của kiểu :class:`tuple`. Các lớp con này bổ sung các thuộc tính được liệt kê trong tài liệu dành cho những hàm đó, hỗ trợ mã hóa và giải mã được mô tả trong phần trước, cũng như một phương thức bổ sung:
 
 .. method:: urllib.parse.SplitResult.geturl()
 
-   Return the re-combined version of the original URL as a string. This may
-   differ from the original URL in that the scheme may be normalized to lower
-   case and empty components may be dropped. Specifically, empty parameters,
-   queries, and fragment identifiers will be removed.
+   Trả về phiên bản được kết hợp lại của URL ban đầu dưới dạng chuỗi. Phiên bản này có thể khác URL ban đầu ở chỗ scheme có thể được chuẩn hóa thành chữ thường và các thành phần trống có thể bị loại bỏ. Cụ thể, các tham số, query và mã định danh fragment trống sẽ bị loại bỏ.
 
-   For :func:`urldefrag` results, only empty fragment identifiers will be removed.
-   For :func:`urlsplit` and :func:`urlparse` results, all noted changes will be
-   made to the URL returned by this method.
+   Đối với các kết quả :func:`urldefrag`, chỉ các mã định danh fragment trống mới bị loại bỏ. Đối với các kết quả :func:`urlsplit` và :func:`urlparse`, tất cả thay đổi đã nêu sẽ được thực hiện trên URL do phương thức này trả về.
 
-   The result of this method remains unchanged if passed back through the original
-   parsing function:
+   Kết quả của phương thức này vẫn không thay đổi nếu được truyền lại qua hàm phân tích ban đầu:
 
       >>> from urllib.parse import urlsplit
       >>> url = 'HTTP://www.Python.org/doc/#'
@@ -520,237 +366,168 @@ previous section, as well as an additional method:
       'http://www.Python.org/doc/'
 
 
-The following classes provide the implementations of the structured parse
-results when operating on :class:`str` objects:
+Các lớp sau cung cấp phần triển khai cho các kết quả phân tích có cấu trúc khi hoạt động trên các đối tượng :class:`str`:
 
 .. class:: DefragResult(url, fragment)
 
-   Concrete class for :func:`urldefrag` results containing :class:`str`
-   data. The :meth:`encode` method returns a :class:`DefragResultBytes`
-   instance.
+   Lớp cụ thể cho các kết quả :func:`urldefrag` chứa dữ liệu :class:`str`. Phương thức :meth:`encode` trả về một thực thể :class:`DefragResultBytes`.
 
    .. versionadded:: 3.2
 
 .. class:: ParseResult(scheme, netloc, path, params, query, fragment)
 
-   Concrete class for :func:`urlparse` results containing :class:`str`
-   data. The :meth:`encode` method returns a :class:`ParseResultBytes`
-   instance.
+   Lớp cụ thể cho các kết quả :func:`urlparse` chứa dữ liệu :class:`str`. Phương thức :meth:`encode` trả về một thực thể :class:`ParseResultBytes`.
 
 .. class:: SplitResult(scheme, netloc, path, query, fragment)
 
-   Concrete class for :func:`urlsplit` results containing :class:`str`
-   data. The :meth:`encode` method returns a :class:`SplitResultBytes`
-   instance.
+   Lớp cụ thể cho các kết quả :func:`urlsplit` chứa dữ liệu :class:`str`. Phương thức :meth:`encode` trả về một thực thể :class:`SplitResultBytes`.
 
 
-The following classes provide the implementations of the parse results when
-operating on :class:`bytes` or :class:`bytearray` objects:
+Các lớp sau cung cấp phần triển khai cho các kết quả phân tích cú pháp khi hoạt động trên các đối tượng :class:`bytes` hoặc :class:`bytearray`:
 
 .. class:: DefragResultBytes(url, fragment)
 
-   Concrete class for :func:`urldefrag` results containing :class:`bytes`
-   data. The :meth:`decode` method returns a :class:`DefragResult`
-   instance.
+   Lớp cụ thể cho các kết quả :func:`urldefrag` chứa dữ liệu :class:`bytes`. Phương thức :meth:`decode` trả về một thực thể :class:`DefragResult`.
 
    .. versionadded:: 3.2
 
 .. class:: ParseResultBytes(scheme, netloc, path, params, query, fragment)
 
-   Concrete class for :func:`urlparse` results containing :class:`bytes`
-   data. The :meth:`decode` method returns a :class:`ParseResult`
-   instance.
+   Lớp cụ thể cho các kết quả :func:`urlparse` chứa dữ liệu :class:`bytes`. Phương thức :meth:`decode` trả về một thực thể :class:`ParseResult`.
 
    .. versionadded:: 3.2
 
 .. class:: SplitResultBytes(scheme, netloc, path, query, fragment)
 
-   Concrete class for :func:`urlsplit` results containing :class:`bytes`
-   data. The :meth:`decode` method returns a :class:`SplitResult`
-   instance.
+   Lớp cụ thể cho các kết quả :func:`urlsplit` chứa dữ liệu :class:`bytes`. Phương thức :meth:`decode` trả về một thực thể :class:`SplitResult`.
 
    .. versionadded:: 3.2
 
 
-URL Quoting
------------
+Trích dẫn URL
+-------------
 
-The URL quoting functions focus on taking program data and making it safe
-for use as URL components by quoting special characters and appropriately
-encoding non-ASCII text. They also support reversing these operations to
-recreate the original data from the contents of a URL component if that
-task isn't already covered by the URL parsing functions above.
+Các hàm trích dẫn URL tập trung vào việc lấy dữ liệu chương trình và đảm bảo dữ liệu đó an toàn để sử dụng làm các thành phần URL bằng cách trích dẫn các ký tự đặc biệt và mã hóa phù hợp văn bản không phải ASCII. Chúng cũng hỗ trợ đảo ngược các thao tác này để tạo lại dữ liệu ban đầu từ nội dung của một thành phần URL nếu tác vụ đó chưa được các hàm phân tích URL ở trên đảm nhiệm.
 
 .. function:: quote(string, safe='/', encoding=None, errors=None)
 
-   Replace special characters in *string* using the :samp:`%{xx}` escape. Letters,
-   digits, and the characters ``'_.-~'`` are never quoted. By default, this
-   function is intended for quoting the path section of a URL. The optional
-   *safe* parameter specifies additional ASCII characters that should not be
-   quoted --- its default value is ``'/'``.
+   Thay thế các ký tự đặc biệt trong *string* bằng :samp:`%{xx}` escape. Chữ cái, chữ số và các ký tự ``'_.-~'`` không bao giờ được đặt trong dấu trích dẫn. Theo mặc định, hàm này được dùng để đặt phần đường dẫn của URL trong dấu trích dẫn. Tham số tùy chọn *safe* chỉ định các ký tự ASCII bổ sung không nên được đặt trong dấu trích dẫn --- giá trị mặc định là ``'/'``.
 
-   *string* may be either a :class:`str` or a :class:`bytes` object.
+   *string* có thể là một đối tượng :class:`str` hoặc :class:`bytes`.
 
    .. versionchanged:: 3.7
-      Moved from :rfc:`2396` to :rfc:`3986` for quoting URL strings. "~" is now
-      included in the set of unreserved characters.
+      Đã chuyển từ :rfc:`2396` sang :rfc:`3986` để đặt các chuỗi URL trong dấu trích dẫn. "~" hiện đã được thêm vào tập hợp các ký tự không cần mã hóa.
 
-   The optional *encoding* and *errors* parameters specify how to deal with
-   non-ASCII characters, as accepted by the :meth:`str.encode` method.
-   Although these parameters default to ``None`` in the function signature,
-   when processing :class:`str` inputs, *encoding* effectively defaults to ``'utf-8'``
-   and *errors* to ``'strict'``, meaning unsupported characters raise a
-   :class:`UnicodeEncodeError`.
-   *encoding* and *errors* must not be supplied if *string* is a
-   :class:`bytes`, or a :class:`TypeError` is raised.
+   Các tham số tùy chọn *encoding* và *errors* chỉ định cách xử lý các ký tự không thuộc ASCII, theo quy định của phương thức :meth:`str.encode`. Mặc dù trong chữ ký hàm, các tham số này mặc định là ``None``, khi xử lý đầu vào :class:`str`, *encoding* trên thực tế mặc định là ``'utf-8'`` và *errors* là ``'strict'``, nghĩa là các ký tự không được hỗ trợ sẽ gây ra một
+   :class:`UnicodeEncodeError`. Không được cung cấp *encoding* và *errors* nếu *string* là một
+   :class:`bytes`, hoặc một :class:`TypeError` sẽ được phát sinh.
 
-   Note that ``quote(string, safe, encoding, errors)`` is equivalent to
-   ``quote_from_bytes(string.encode(encoding, errors), safe)``.
+   Lưu ý rằng ``quote(string, safe, encoding, errors)`` tương đương với ``quote_from_bytes(string.encode(encoding, errors), safe)``.
 
-   Example: ``quote('/El Niño/')`` yields ``'/El%20Ni%C3%B1o/'``.
+   Ví dụ: ``quote('/El Niño/')`` cho ra ``'/El%20Ni%C3%B1o/'``.
 
 
 .. function:: quote_plus(string, safe='', encoding=None, errors=None)
 
-   Like :func:`quote`, but also replace spaces with plus signs, as required for
-   quoting HTML form values when building up a query string to go into a URL.
-   Plus signs in the original string are escaped unless they are included in
-   *safe*.  It also does not have *safe* default to ``'/'``.
+   Tương tự :func:`quote`, nhưng cũng thay thế khoảng trắng bằng dấu cộng, như cần thiết khi trích dẫn các giá trị biểu mẫu HTML trong quá trình tạo chuỗi truy vấn để đưa vào URL. Các dấu cộng trong chuỗi ban đầu sẽ được escape, trừ khi chúng được bao gồm trong *safe*. Nó cũng không đặt *safe* mặc định thành ``'/'``.
 
-   Example: ``quote_plus('/El Niño/')`` yields ``'%2FEl+Ni%C3%B1o%2F'``.
+   Ví dụ: ``quote_plus('/El Niño/')`` cho ra ``'%2FEl+Ni%C3%B1o%2F'``.
 
 
 .. function:: quote_from_bytes(bytes, safe='/')
 
-   Like :func:`quote`, but accepts a :class:`bytes` object rather than a
-   :class:`str`, and does not perform string-to-bytes encoding.
+   Tương tự :func:`quote`, nhưng chấp nhận một đối tượng :class:`bytes` thay vì một
+   :class:`str`, và không thực hiện việc mã hóa chuỗi thành byte.
 
-   Example: ``quote_from_bytes(b'a&\xef')`` yields
-   ``'a%26%EF'``.
+   Ví dụ: ``quote_from_bytes(b'a&\xef')`` cho ra ``'a%26%EF'``.
 
 
 .. function:: unquote(string, encoding='utf-8', errors='replace')
 
-   Replace :samp:`%{xx}` escapes with their single-character equivalent.
-   The optional *encoding* and *errors* parameters specify how to decode
-   percent-encoded sequences into Unicode characters, as accepted by the
-   :meth:`bytes.decode` method.
+   Thay thế các escape :samp:`%{xx}` bằng ký tự tương ứng. Các tham số tùy chọn *encoding* và *errors* chỉ định cách giải mã các chuỗi được mã hóa phần trăm thành ký tự Unicode, như được chấp nhận bởi
+   :meth:`bytes.decode` phương thức.
 
-   *string* may be either a :class:`str` or a :class:`bytes` object.
+   *string* có thể là một đối tượng :class:`str` hoặc :class:`bytes`.
 
-   *encoding* defaults to ``'utf-8'``.
-   *errors* defaults to ``'replace'``, meaning invalid sequences are replaced
-   by a placeholder character.
+   *encoding* mặc định là ``'utf-8'``. *errors* mặc định là ``'replace'``, nghĩa là các chuỗi không hợp lệ được thay thế bằng một ký tự giữ chỗ.
 
-   Example: ``unquote('/El%20Ni%C3%B1o/')`` yields ``'/El Niño/'``.
+   Ví dụ: ``unquote('/El%20Ni%C3%B1o/')`` cho kết quả ``'/El Niño/'``.
 
    .. versionchanged:: 3.9
-      *string* parameter supports bytes and str objects (previously only str).
+      Tham số *string* hỗ trợ các đối tượng bytes và str (trước đây chỉ hỗ trợ str).
 
 
 
 
 .. function:: unquote_plus(string, encoding='utf-8', errors='replace')
 
-   Like :func:`unquote`, but also replace plus signs with spaces, as required
-   for unquoting HTML form values.
+   Tương tự :func:`unquote`, nhưng cũng thay thế dấu cộng bằng khoảng trắng, theo yêu cầu khi bỏ trích dẫn các giá trị của biểu mẫu HTML.
 
-   *string* must be a :class:`str`.
+   *string* phải là một :class:`str`.
 
-   Example: ``unquote_plus('/El+Ni%C3%B1o/')`` yields ``'/El Niño/'``.
+   Ví dụ: ``unquote_plus('/El+Ni%C3%B1o/')`` cho ra ``'/El Niño/'``.
 
 
 .. function:: unquote_to_bytes(string)
 
-   Replace :samp:`%{xx}` escapes with their single-octet equivalent, and return a
-   :class:`bytes` object.
+   Thay thế các chuỗi escape :samp:`%{xx}` bằng giá trị tương đương một octet, rồi trả về một
+   đối tượng :class:`bytes`.
 
-   *string* may be either a :class:`str` or a :class:`bytes` object.
+   *string* có thể là một đối tượng :class:`str` hoặc :class:`bytes`.
 
-   If it is a :class:`str`, unescaped non-ASCII characters in *string*
-   are encoded into UTF-8 bytes.
+   Nếu đó là một :class:`str`, các ký tự không phải ASCII chưa được escape trong *string* sẽ được mã hóa thành các byte UTF-8.
 
-   Example: ``unquote_to_bytes('a%26%EF')`` yields ``b'a&\xef'``.
+   Ví dụ: ``unquote_to_bytes('a%26%EF')`` cho ra ``b'a&\xef'``.
 
 
 .. function:: urlencode(query, doseq=False, safe='', encoding=None, \
                         errors=None, quote_via=quote_plus)
 
-   Convert a mapping object or a sequence of two-element tuples, which may
-   contain :class:`str` or :class:`bytes` objects, to a percent-encoded ASCII
-   text string.  If the resultant string is to be used as a *data* for POST
-   operation with the :func:`~urllib.request.urlopen` function, then
-   it should be encoded to bytes, otherwise it would result in a
+   Chuyển đổi một đối tượng mapping hoặc một chuỗi các tuple gồm hai phần tử, có thể chứa các đối tượng :class:`str` hoặc :class:`bytes`, thành một chuỗi văn bản ASCII được mã hóa theo phần trăm. Nếu chuỗi kết quả được dùng làm *data* cho thao tác POST với hàm :func:`~urllib.request.urlopen`, thì chuỗi đó cần được mã hóa thành các byte; nếu không, điều này sẽ dẫn đến một
    :exc:`TypeError`.
 
-   The resulting string is a series of ``key=value`` pairs separated by ``'&'``
-   characters, where both *key* and *value* are quoted using the *quote_via*
-   function.  By default, :func:`quote_plus` is used to quote the values, which
-   means spaces are quoted as a ``'+'`` character and '/' characters are
-   encoded as ``%2F``, which follows the standard for GET requests
-   (``application/x-www-form-urlencoded``).  An alternate function that can be
-   passed as *quote_via* is :func:`quote`, which will encode spaces as ``%20``
-   and not encode '/' characters.  For maximum control of what is quoted, use
-   ``quote`` and specify a value for *safe*.
+   Chuỗi kết quả là một loạt các cặp ``key=value`` được phân tách bằng các ký tự ``'&'``, trong đó cả *key* và *value* đều được trích dẫn bằng hàm *quote_via*. Theo mặc định, :func:`quote_plus` được dùng để trích dẫn các giá trị, nghĩa là dấu cách được trích dẫn thành ký tự ``'+'`` và các ký tự '/' được mã hóa thành ``%2F``, tuân theo tiêu chuẩn dành cho các yêu cầu GET (``application/x-www-form-urlencoded``). Một hàm thay thế có thể được truyền dưới dạng *quote_via* là :func:`quote`, hàm này sẽ mã hóa dấu cách thành ``%20`` và không mã hóa các ký tự '/'. Để kiểm soát tối đa những gì được trích dẫn, hãy sử dụng ``quote`` và chỉ định một giá trị cho *safe*.
 
-   When a sequence of two-element tuples is used as the *query*
-   argument, the first element of each tuple is a key and the second is a
-   value. The value element in itself can be a sequence and in that case, if
-   the optional parameter *doseq* evaluates to ``True``, individual
-   ``key=value`` pairs separated by ``'&'`` are generated for each element of
-   the value sequence for the key.  The order of parameters in the encoded
-   string will match the order of parameter tuples in the sequence.
+   Khi sử dụng một chuỗi các tuple gồm hai phần tử làm đối số *query*, phần tử đầu tiên của mỗi tuple là một khóa và phần tử thứ hai là một giá trị. Bản thân phần tử giá trị có thể là một chuỗi và trong trường hợp đó, nếu tham số tùy chọn *doseq* được đánh giá là ``True``, các cặp ``key=value`` riêng lẻ được phân tách bằng ``'&'`` sẽ được tạo cho mỗi phần tử của chuỗi giá trị tương ứng với khóa. Thứ tự các tham số trong chuỗi được mã hóa sẽ khớp với thứ tự của các tuple tham số trong chuỗi.
 
-   The *safe*, *encoding*, and *errors* parameters are passed down to
-   *quote_via* (the *encoding* and *errors* parameters are only passed
-   when a query element is a :class:`str`).
+   Các tham số *safe*, *encoding* và *errors* được truyền xuống *quote_via* (các tham số *encoding* và *errors* chỉ được truyền khi một phần tử truy vấn là :class:`str`).
 
-   To reverse this encoding process, :func:`parse_qs` and :func:`parse_qsl` are
-   provided in this module to parse query strings into Python data structures.
+   Để đảo ngược quá trình mã hóa này, mô-đun cung cấp :func:`parse_qs` và :func:`parse_qsl` để phân tích chuỗi truy vấn thành các cấu trúc dữ liệu Python.
 
-   Refer to :ref:`urllib examples <urllib-examples>` to find out how the
-   :func:`urllib.parse.urlencode` method can be used for generating the query
-   string of a URL or data for a POST request.
+   Hãy tham khảo :ref:`urllib examples <urllib-examples>` để biết cách
+   phương thức :func:`urllib.parse.urlencode` có thể được dùng để tạo chuỗi truy vấn của một URL hoặc dữ liệu cho một yêu cầu POST.
 
    .. versionchanged:: 3.2
-      *query* supports bytes and string objects.
+      *query* hỗ trợ các đối tượng bytes và chuỗi.
 
    .. versionchanged:: 3.5
-      Added the *quote_via* parameter.
+      Đã thêm tham số *quote_via*.
 
    .. deprecated:: 3.14
-      Accepting objects with false values (like ``0`` and ``[]``) except empty
-      strings and byte-like objects and ``None`` is now deprecated.
+      Việc chấp nhận các đối tượng có giá trị false (chẳng hạn như ``0`` và ``[]``) ngoại trừ chuỗi rỗng, các đối tượng dạng byte và ``None`` hiện không còn được khuyến nghị.
 
 
 .. seealso::
 
-   `WHATWG`_ -  URL Living standard
-      Working Group for the URL Standard that defines URLs, domains, IP addresses, the
-      application/x-www-form-urlencoded format, and their API.
+   `WHATWG`_ -  Tiêu chuẩn Living về URL
+      Nhóm công tác về Tiêu chuẩn URL, định nghĩa URL, domain, địa chỉ IP, định dạng application/x-www-form-urlencoded và API của chúng.
 
-   :rfc:`3986` - Uniform Resource Identifiers
-      This is the current standard (STD66). Any changes to urllib.parse module
-      should conform to this. Certain deviations could be observed, which are
-      mostly for backward compatibility purposes and for certain de-facto
-      parsing requirements as commonly observed in major browsers.
+   :rfc:`3986` - Mã định danh tài nguyên đồng nhất
+      Đây là tiêu chuẩn hiện hành (STD66). Mọi thay đổi đối với module urllib.parse cần tuân thủ tiêu chuẩn này. Có thể quan sát thấy một số điểm sai lệch, chủ yếu nhằm duy trì khả năng tương thích ngược và đáp ứng một số yêu cầu phân tích cú pháp trên thực tế thường thấy ở các trình duyệt phổ biến.
 
-   :rfc:`2732` - Format for Literal IPv6 Addresses in URL's.
-      This specifies the parsing requirements of IPv6 URLs.
+   :rfc:`2732` - Định dạng cho các địa chỉ IPv6 dạng literal trong URL.
+      Tài liệu này nêu các yêu cầu phân tích cú pháp của URL IPv6.
 
-   :rfc:`2396` - Uniform Resource Identifiers (URI): Generic Syntax
-      Document describing the generic syntactic requirements for both Uniform Resource
-      Names (URNs) and Uniform Resource Locators (URLs).
+   :rfc:`2396` - Uniform Resource Identifiers (URI): Cú pháp chung
+      Tài liệu mô tả các yêu cầu cú pháp chung cho cả Uniform Resource Names (URN) và Uniform Resource Locators (URL).
 
-   :rfc:`2368` - The mailto URL scheme.
-      Parsing requirements for mailto URL schemes.
+   :rfc:`2368` - Lược đồ URL mailto.
+      Các yêu cầu phân tích cú pháp cho lược đồ URL mailto.
 
-   :rfc:`1808` - Relative Uniform Resource Locators
-      This Request For Comments includes the rules for joining an absolute and a
-      relative URL, including a fair number of "Abnormal Examples" which govern the
-      treatment of border cases.
+   :rfc:`1808` - Uniform Resource Locators tương đối
+      Tài liệu Request For Comments này bao gồm các quy tắc để kết hợp URL tuyệt đối và URL tương đối, trong đó có khá nhiều "Ví dụ bất thường" quy định cách xử lý các trường hợp biên.
 
-   :rfc:`1738` - Uniform Resource Locators (URL)
-      This specifies the formal syntax and semantics of absolute URLs.
+   :rfc:`1738` - Bộ định vị tài nguyên thống nhất (URL)
+      Tài liệu này nêu cú pháp hình thức và ngữ nghĩa của URL tuyệt đối.
 
 .. _WHATWG: https://url.spec.whatwg.org/

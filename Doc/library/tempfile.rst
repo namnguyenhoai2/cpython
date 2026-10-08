@@ -1,12 +1,12 @@
-:mod:`!tempfile` --- Generate temporary files and directories
-=============================================================
+:mod:`!tempfile` --- Tạo các tệp và thư mục tạm thời
+====================================================
 
 .. module:: tempfile
-   :synopsis: Generate temporary files and directories.
+   :synopsis: Tạo các tệp và thư mục tạm thời.
 
 .. sectionauthor:: Zack Weinberg <zack@codesourcery.com>
 
-**Source code:** :source:`Lib/tempfile.py`
+**Mã nguồn:** :source:`Lib/tempfile.py`
 
 .. index::
    pair: temporary; file name
@@ -14,291 +14,179 @@
 
 --------------
 
-This module creates temporary files and directories.  It works on all
-supported platforms. :class:`TemporaryFile`, :class:`NamedTemporaryFile`,
-:class:`TemporaryDirectory`, and :class:`SpooledTemporaryFile` are high-level
-interfaces which provide automatic cleanup and can be used as
-:term:`context managers <context manager>`. :func:`mkstemp` and
-:func:`mkdtemp` are lower-level functions which require manual cleanup.
+Mô-đun này tạo các tệp và thư mục tạm thời.  Nó hoạt động trên tất cả các nền tảng được hỗ trợ. :class:`TemporaryFile`, :class:`NamedTemporaryFile`,
+:class:`TemporaryDirectory`, và :class:`SpooledTemporaryFile` là các giao diện cấp cao cung cấp khả năng dọn dẹp tự động và có thể được sử dụng làm
+:term:`trình quản lý ngữ cảnh <context manager>`. :func:`mkstemp` và
+:func:`mkdtemp` là các hàm cấp thấp hơn, yêu cầu dọn dẹp thủ công.
 
-All the user-callable functions and constructors take additional arguments which
-allow direct control over the location and name of temporary files and
-directories. Files names used by this module include a string of
-random characters which allows those files to be securely created in
-shared temporary directories.
-To maintain backward compatibility, the argument order is somewhat odd; it
-is recommended to use keyword arguments for clarity.
+Tất cả các hàm và constructor mà người dùng có thể gọi đều nhận thêm các đối số cho phép kiểm soát trực tiếp vị trí và tên của các tệp và thư mục tạm thời. Tên tệp được mô-đun này sử dụng bao gồm một chuỗi ký tự ngẫu nhiên, cho phép tạo các tệp đó một cách an toàn trong các thư mục tạm thời dùng chung. Để duy trì khả năng tương thích ngược, thứ tự đối số hơi khác thường; bạn nên sử dụng các đối số từ khóa để mã rõ ràng hơn.
 
-The module defines the following user-callable items:
+Mô-đun định nghĩa các mục sau đây mà người dùng có thể gọi:
 
 .. function:: TemporaryFile(mode='w+b', buffering=-1, encoding=None, newline=None, suffix=None, prefix=None, dir=None, *, errors=None)
 
-   Return a :term:`file-like object` that can be used as a temporary storage area.
-   The file is created securely, using the same rules as :func:`mkstemp`. It will be destroyed as soon
-   as it is closed (including an implicit close when the object is garbage
-   collected).  Under Unix, the directory entry for the file is either not created at all or is removed
-   immediately after the file is created.  Other platforms do not support
-   this; your code should not rely on a temporary file created using this
-   function having or not having a visible name in the file system.
+   Trả về một :term:`file-like object` có thể được dùng làm vùng lưu trữ tạm thời. Tệp được tạo một cách an toàn, sử dụng cùng các quy tắc như :func:`mkstemp`. Tệp sẽ bị hủy ngay khi được đóng (bao gồm cả thao tác đóng ngầm khi đối tượng được thu gom rác). Trên Unix, mục thư mục của tệp либо không được tạo hoặc được xóa ngay sau khi tệp được tạo. Các nền tảng khác không hỗ trợ điều này; mã của bạn không nên dựa vào việc tệp tạm thời được tạo bằng hàm này có hoặc không có tên hiển thị trong hệ thống tệp.
 
-   The resulting object can be used as a :term:`context manager` (see
-   :ref:`tempfile-examples`).  On completion of the context or
-   destruction of the file object the temporary file will be removed
-   from the filesystem.
+   Đối tượng kết quả có thể được sử dụng như một :term:`context manager` (xem
+   :ref:`tempfile-examples`). Khi ngữ cảnh kết thúc hoặc đối tượng tệp bị hủy, tệp tạm thời sẽ bị xóa khỏi hệ thống tệp.
 
-   The *mode* parameter defaults to ``'w+b'`` so that the file created can
-   be read and written without being closed.  Binary mode is used so that it
-   behaves consistently on all platforms without regard for the data that is
-   stored.  *buffering*, *encoding*, *errors* and *newline* are interpreted as for
+   Tham số *mode* mặc định là ``'w+b'`` để tệp được tạo có thể được đọc và ghi mà không cần đóng. Chế độ nhị phân được sử dụng để đảm bảo hành vi nhất quán trên mọi nền tảng, không phụ thuộc vào dữ liệu được lưu trữ. *buffering*, *encoding*, *errors* và *newline* được diễn giải giống như trong
    :func:`open`.
 
-   The *dir*, *prefix* and *suffix* parameters have the same meaning and
-   defaults as with :func:`mkstemp`.
+   Các tham số *dir*, *prefix* và *suffix* có cùng ý nghĩa và giá trị mặc định như trong :func:`mkstemp`.
 
-   The returned object is a true file object on POSIX platforms.  On other
-   platforms, it is a file-like object whose :attr:`!file` attribute is the
-   underlying true file object.
+   Đối tượng được trả về là một đối tượng tệp thực sự trên các nền tảng POSIX. Trên các nền tảng khác, đây là một đối tượng giống tệp có thuộc tính :attr:`!file` trỏ đến đối tượng tệp thực sự bên dưới.
 
-   The :py:const:`os.O_TMPFILE` flag is used if it is available and works
-   (Linux-specific, requires Linux kernel 3.11 or later).
+   Cờ :py:const:`os.O_TMPFILE` được sử dụng nếu có sẵn và hoạt động (chỉ dành cho Linux, yêu cầu Linux kernel 3.11 trở lên).
 
-   On platforms that are neither Posix nor Cygwin, TemporaryFile is an alias
-   for NamedTemporaryFile.
+   Trên các nền tảng không phải Posix hoặc Cygwin, TemporaryFile là bí danh của NamedTemporaryFile.
 
    .. audit-event:: tempfile.mkstemp fullpath tempfile.TemporaryFile
 
    .. versionchanged:: 3.5
 
-      The :py:const:`os.O_TMPFILE` flag is now used if available.
+      Cờ :py:const:`os.O_TMPFILE` hiện được sử dụng nếu có sẵn.
 
    .. versionchanged:: 3.8
-      Added *errors* parameter.
+      Đã thêm tham số *errors*.
 
 
 .. function:: NamedTemporaryFile(mode='w+b', buffering=-1, encoding=None, newline=None, suffix=None, prefix=None, dir=None, delete=True, *, errors=None, delete_on_close=True)
 
-   This function operates exactly as :func:`TemporaryFile` does, except the
-   following differences:
+   Hàm này hoạt động chính xác như :func:`TemporaryFile`, ngoại trừ những điểm khác biệt sau:
 
-   * This function returns a file that is guaranteed to have a visible name in
-     the file system.
-   * To manage the named file, it extends the parameters of
-     :func:`TemporaryFile` with *delete* and *delete_on_close* parameters that
-     determine whether and how the named file should be automatically deleted.
+   * Hàm này trả về một tệp được đảm bảo có tên hiển thị trong hệ thống tệp.
+   * Để quản lý tệp có tên, hàm này mở rộng các tham số của
+     :func:`TemporaryFile` với các tham số *delete* và *delete_on_close* để xác định liệu tệp có tên có được tự động xóa hay không và xóa như thế nào.
 
-   The returned object is always a :term:`file-like object` whose :attr:`!file`
-   attribute is the underlying true file object. This file-like object
-   can be used in a :keyword:`with` statement, just like a normal file.  The
-   name of the temporary file can be retrieved from the :attr:`!name` attribute
-   of the returned file-like object. On Unix, unlike with the
-   :func:`TemporaryFile`, the directory entry does not get unlinked immediately
-   after the file creation.
+   Đối tượng được trả về luôn là một :term:`file-like object` có thuộc tính :attr:`!file` là đối tượng tệp thực bên dưới. Đối tượng giống tệp này có thể được sử dụng trong câu lệnh :keyword:`with`, giống như một tệp thông thường. Có thể lấy tên của tệp tạm thời từ thuộc tính :attr:`!name` của đối tượng giống tệp được trả về. Trên Unix, không giống như với
+   :func:`TemporaryFile`, mục nhập thư mục không bị hủy liên kết ngay sau khi tệp được tạo.
 
-   If *delete* is true (the default) and *delete_on_close* is true (the
-   default), the file is deleted as soon as it is closed. If *delete* is true
-   and *delete_on_close* is false, the file is deleted on context manager exit
-   only, or else when the :term:`file-like object` is finalized. Deletion is not
-   always guaranteed in this case (see :meth:`object.__del__`). If *delete* is
-   false, the value of *delete_on_close* is ignored.
+   Nếu *delete* là true (mặc định) và *delete_on_close* là true (mặc định), tệp sẽ bị xóa ngay khi được đóng. Nếu *delete* là true và *delete_on_close* là false, tệp chỉ bị xóa khi thoát khỏi context manager hoặc khi :term:`file-like object` được hoàn tất. Trong trường hợp này, việc xóa không phải lúc nào cũng được đảm bảo (xem :meth:`object.__del__`). Nếu *delete* là false, giá trị của *delete_on_close* sẽ bị bỏ qua.
 
-   Therefore to use the name of the temporary file to reopen the file after
-   closing it, either make sure not to delete the file upon closure (set the
-   *delete* parameter to be false) or, in case the temporary file is created in
-   a :keyword:`with` statement, set the *delete_on_close* parameter to be false.
-   The latter approach is recommended as it provides assistance in automatic
-   cleaning of the temporary file upon the context manager exit.
+   Do đó, để sử dụng tên của tệp tạm thời nhằm mở lại tệp sau khi đóng, hãy đảm bảo không xóa tệp khi đóng (đặt tham số *delete* thành false) hoặc, trong trường hợp tệp tạm thời được tạo trong câu lệnh :keyword:`with`, đặt tham số *delete_on_close* thành false. Cách tiếp cận sau được khuyến nghị vì hỗ trợ tự động dọn dẹp tệp tạm thời khi thoát khỏi context manager.
 
-   Opening the temporary file again by its name while it is still open works as
-   follows:
+   Việc mở lại tệp tạm thời bằng tên của nó trong khi tệp vẫn đang mở hoạt động như sau:
 
-   * On POSIX the file can always be opened again.
-   * On Windows, make sure that at least one of the following conditions are
-     fulfilled:
+   * Trên POSIX, tệp luôn có thể được mở lại.
+   * Trên Windows, hãy đảm bảo ít nhất một trong các điều kiện sau được đáp ứng:
 
-     * *delete* is false
-     * additional open shares delete access (e.g. by calling :func:`os.open`
-       with the flag ``O_TEMPORARY``)
-     * *delete* is true but *delete_on_close* is false. Note, that in this
-       case the additional opens that do not share delete access (e.g.
-       created via builtin :func:`open`) must be closed before exiting the
-       context manager, else the :func:`os.unlink` call on context manager
-       exit will fail with a :exc:`PermissionError`.
+     * *delete* là false
+     * các thao tác mở bổ sung chia sẻ quyền truy cập delete (ví dụ: bằng cách gọi :func:`os.open` với cờ ``O_TEMPORARY``)
+     * *delete* là true nhưng *delete_on_close* là false. Lưu ý rằng trong trường hợp này, các thao tác mở bổ sung không chia sẻ quyền truy cập delete (ví dụ: được tạo thông qua :func:`open` tích hợp sẵn) phải được đóng trước khi thoát khỏi context manager; nếu không, lệnh gọi :func:`os.unlink` khi context manager thoát sẽ thất bại với lỗi :exc:`PermissionError`.
 
-   On Windows, if *delete_on_close* is false, and the file is created in a
-   directory for which the user lacks delete access, then the :func:`os.unlink`
-   call on exit of the context manager will fail with a :exc:`PermissionError`.
-   This cannot happen when *delete_on_close* is true because delete access is
-   requested by the open, which fails immediately if the requested access is not
-   granted.
+   Trên Windows, nếu *delete_on_close* là false và tệp được tạo trong một thư mục mà người dùng không có quyền truy cập delete, thì lệnh gọi :func:`os.unlink` khi context manager thoát sẽ thất bại với lỗi :exc:`PermissionError`. Điều này không thể xảy ra khi *delete_on_close* là true, vì thao tác mở sẽ yêu cầu quyền truy cập delete và thất bại ngay lập tức nếu quyền truy cập được yêu cầu không được cấp.
 
-   On POSIX (only), a process that is terminated abruptly with SIGKILL
-   cannot automatically delete any NamedTemporaryFiles it created.
+   Chỉ trên POSIX, một tiến trình bị kết thúc đột ngột bằng SIGKILL không thể tự động xóa bất kỳ NamedTemporaryFiles nào mà nó đã tạo.
 
    .. audit-event:: tempfile.mkstemp fullpath tempfile.NamedTemporaryFile
 
    .. versionchanged:: 3.8
-      Added *errors* parameter.
+      Đã thêm tham số *errors*.
 
    .. versionchanged:: 3.12
-      Added *delete_on_close* parameter.
+      Đã thêm tham số *delete_on_close*.
 
 
 .. class:: SpooledTemporaryFile(max_size=0, mode='w+b', buffering=-1, encoding=None, newline=None, suffix=None, prefix=None, dir=None, *, errors=None)
 
-   This class operates exactly as :func:`TemporaryFile` does, except that
-   data is spooled in memory until the file size exceeds *max_size*, or
-   until the file's :func:`~io.IOBase.fileno` method is called, at which point the
-   contents are written to disk and operation proceeds as with
+   Lớp này hoạt động chính xác như :func:`TemporaryFile`, ngoại trừ việc dữ liệu được lưu tạm trong bộ nhớ cho đến khi kích thước tệp vượt quá *max_size*, hoặc cho đến khi phương thức :func:`~io.IOBase.fileno` của tệp được gọi; tại thời điểm đó, nội dung được ghi vào đĩa và quá trình hoạt động tiếp tục như với
    :func:`TemporaryFile`.
 
    .. method:: SpooledTemporaryFile.rollover
 
-      The resulting file has one additional method, :meth:`!rollover`, which
-      causes the file to roll over to an on-disk file regardless of its size.
+      Tệp kết quả có thêm một phương thức, :meth:`!rollover`, khiến tệp chuyển sang tệp trên đĩa bất kể kích thước của nó.
 
-   The returned object is a file-like object whose :attr:`!_file` attribute
-   is either an :class:`io.BytesIO` or :class:`io.TextIOWrapper` object
-   (depending on whether binary or text *mode* was specified) or a true file
-   object, depending on whether :meth:`rollover` has been called.  This
-   file-like object can be used in a :keyword:`with` statement, just like
-   a normal file.
+   Đối tượng được trả về là một đối tượng giống tệp, có thuộc tính :attr:`!_file` là một đối tượng :class:`io.BytesIO` hoặc :class:`io.TextIOWrapper` (tùy thuộc vào việc chỉ định *mode* nhị phân hay văn bản), hoặc là một đối tượng tệp thực, tùy thuộc vào việc :meth:`rollover` đã được gọi hay chưa. Đối tượng giống tệp này có thể được sử dụng trong câu lệnh :keyword:`with`, giống như một tệp thông thường.
 
    .. versionchanged:: 3.3
-      the truncate method now accepts a *size* argument.
+      Phương thức truncate hiện chấp nhận đối số *size*.
 
    .. versionchanged:: 3.8
-      Added *errors* parameter.
+      Đã thêm tham số *errors*.
 
    .. versionchanged:: 3.11
-      Fully implements the :class:`io.BufferedIOBase` and
-      :class:`io.TextIOBase` abstract base classes (depending on whether binary
-      or text *mode* was specified).
+      Triển khai đầy đủ :class:`io.BufferedIOBase` và
+      các lớp cơ sở trừu tượng :class:`io.TextIOBase` (tùy thuộc vào việc chỉ định *chế độ nhị phân hoặc văn bản*).
 
 
 .. class:: TemporaryDirectory(suffix=None, prefix=None, dir=None, ignore_cleanup_errors=False, *, delete=True)
 
-   This class securely creates a temporary directory using the same rules as :func:`mkdtemp`.
-   The resulting object can be used as a :term:`context manager` (see
-   :ref:`tempfile-examples`).  On completion of the context or destruction
-   of the temporary directory object, the newly created temporary directory
-   and all its contents are removed from the filesystem.
+   Lớp này tạo một thư mục tạm thời một cách an toàn, sử dụng cùng các quy tắc như :func:`mkdtemp`. Đối tượng kết quả có thể được sử dụng như một :term:`context manager` (xem
+   :ref:`tempfile-examples`). Khi ngữ cảnh kết thúc hoặc đối tượng thư mục tạm thời bị hủy, thư mục tạm thời mới tạo cùng toàn bộ nội dung của nó sẽ bị xóa khỏi hệ thống tệp.
 
    .. attribute:: TemporaryDirectory.name
 
-      The directory name can be retrieved from the :attr:`!name` attribute of the
-      returned object.  When the returned object is used as a :term:`context manager`, the
-      :attr:`!name` will be assigned to the target of the :keyword:`!as` clause in
-      the :keyword:`with` statement, if there is one.
+      Có thể lấy tên thư mục từ thuộc tính :attr:`!name` của đối tượng được trả về. Khi đối tượng được trả về được sử dụng như một :term:`context manager`, thì
+      :attr:`!name` sẽ được gán cho đích của mệnh đề :keyword:`!as` trong câu lệnh :keyword:`with`, nếu có.
 
    .. method:: TemporaryDirectory.cleanup
 
-      The directory can be explicitly cleaned up by calling the
-      :meth:`!cleanup` method. If *ignore_cleanup_errors* is true, any unhandled
-      exceptions during explicit or implicit cleanup (such as a
-      :exc:`PermissionError` removing open files on Windows) will be ignored,
-      and the remaining removable items deleted on a "best-effort" basis.
-      Otherwise, errors will be raised in whatever context cleanup occurs
-      (the :meth:`!cleanup` call, exiting the context manager, when the object
-      is garbage-collected or during interpreter shutdown).
+      Có thể dọn dẹp thư mục một cách rõ ràng bằng cách gọi
+      phương thức :meth:`!cleanup`. Nếu *ignore_cleanup_errors* là true, mọi ngoại lệ chưa được xử lý trong quá trình dọn dẹp tường minh hoặc ngầm (chẳng hạn như
+      :exc:`PermissionError` việc xóa các tệp đang mở trên Windows) sẽ bị bỏ qua, còn các mục còn lại có thể xóa được sẽ bị xóa trên cơ sở "cố gắng hết sức". Nếu không, lỗi sẽ được phát sinh trong bất kỳ bối cảnh nào mà việc dọn dẹp diễn ra (cuộc gọi :meth:`!cleanup` , khi thoát khỏi context manager, khi đối tượng được garbage-collected hoặc trong quá trình interpreter shutdown).
 
-   The *delete* parameter can be used to disable cleanup of the directory tree
-   upon exiting the context.  While it may seem unusual for a context manager
-   to disable the action taken when exiting the context, it can be useful during
-   debugging or when you need your cleanup behavior to be conditional based on
-   other logic.
+   Có thể sử dụng tham số *delete* để tắt việc dọn dẹp cây thư mục khi thoát khỏi context. Mặc dù việc một context manager tắt hành động được thực hiện khi thoát có vẻ bất thường, điều này có thể hữu ích khi gỡ lỗi hoặc khi bạn cần hành vi dọn dẹp của mình phụ thuộc có điều kiện vào logic khác.
 
    .. audit-event:: tempfile.mkdtemp fullpath tempfile.TemporaryDirectory
 
    .. versionadded:: 3.2
 
    .. versionchanged:: 3.10
-      Added *ignore_cleanup_errors* parameter.
+      Đã thêm tham số *ignore_cleanup_errors*.
 
    .. versionchanged:: 3.12
-      Added the *delete* parameter.
+      Đã thêm tham số *delete*.
 
 
 .. function:: mkstemp(suffix=None, prefix=None, dir=None, text=False)
 
-   Creates a temporary file in the most secure manner possible.  There are
-   no race conditions in the file's creation, assuming that the platform
-   properly implements the :const:`os.O_EXCL` flag for :func:`os.open`.  The
-   file is readable and writable only by the creating user ID.  If the
-   platform uses permission bits to indicate whether a file is executable,
-   the file is executable by no one.
+   Tạo một tệp tạm thời theo cách bảo mật nhất có thể. Không xảy ra điều kiện tranh chấp trong quá trình tạo tệp, với điều kiện nền tảng triển khai đúng :const:`os.O_EXCL` flag cho :func:`os.open`. Tệp chỉ có thể được đọc và ghi bởi user ID tạo ra nó. Nếu nền tảng sử dụng các bit quyền để cho biết tệp có thể thực thi hay không, thì không ai có thể thực thi tệp này.
 
-   The file descriptor is :ref:`not inherited by child processes <fd_inheritance>`.
+   File descriptor này :ref:`không được kế thừa bởi các tiến trình con <fd_inheritance>`.
 
-   Unlike :func:`TemporaryFile`, the user of :func:`mkstemp` is responsible
-   for closing the file descriptor (for example, using :func:`os.close`) and
-   deleting the temporary file (for example, using :func:`os.remove`).
+   Không giống như :func:`TemporaryFile`, người dùng :func:`mkstemp` chịu trách nhiệm đóng file descriptor (ví dụ: sử dụng :func:`os.close`) và xóa tệp tạm thời (ví dụ: sử dụng :func:`os.remove`).
 
-   If *suffix* is not ``None``, the file name will end with that suffix,
-   otherwise there will be no suffix.  :func:`mkstemp` does not put a dot
-   between the file name and the suffix; if you need one, put it at the
-   beginning of *suffix*.
+   Nếu *suffix* không phải là ``None``, tên tệp sẽ kết thúc bằng hậu tố đó; nếu không, tệp sẽ không có hậu tố. :func:`mkstemp` không chèn dấu chấm giữa tên tệp và hậu tố; nếu cần, hãy đặt dấu chấm ở đầu *suffix*.
 
-   If *prefix* is not ``None``, the file name will begin with that prefix;
-   otherwise, a default prefix is used.  The default is the return value of
-   :func:`gettempprefix` or :func:`gettempprefixb`, as appropriate.
+   Nếu *prefix* không phải là ``None``, tên tệp sẽ bắt đầu bằng tiền tố đó; nếu không, tiền tố mặc định sẽ được sử dụng. Giá trị mặc định là giá trị trả về của
+   :func:`gettempprefix` hoặc :func:`gettempprefixb`, tùy trường hợp.
 
-   If *dir* is not ``None``, the file will be created in that directory;
-   otherwise, a default directory is used.  The default directory is chosen
-   from a platform-dependent list, but the user of the application can
-   control the directory location by setting the *TMPDIR*, *TEMP* or *TMP*
-   environment variables.  There is thus no guarantee that the generated
-   filename will have any nice properties, such as not requiring quoting
-   when passed to external commands via ``os.popen()``.
+   Nếu *dir* không phải là ``None``, tệp sẽ được tạo trong thư mục đó; nếu không, một thư mục mặc định sẽ được sử dụng. Thư mục mặc định được chọn từ một danh sách phụ thuộc vào nền tảng, nhưng người dùng ứng dụng có thể kiểm soát vị trí thư mục bằng cách đặt các biến môi trường *TMPDIR*, *TEMP* hoặc *TMP*. Do đó, không có gì đảm bảo rằng tên tệp được tạo sẽ có các thuộc tính thuận tiện, chẳng hạn như không cần đặt trong dấu ngoặc kép khi truyền cho các lệnh bên ngoài thông qua ``os.popen()``.
 
-   If any of *suffix*, *prefix*, and *dir* are not
-   ``None``, they must be the same type.
-   If they are bytes, the returned name will be bytes instead of str.
-   If you want to force a bytes return value with otherwise default behavior,
-   pass ``suffix=b''``.
+   Nếu bất kỳ đối số nào trong số *suffix*, *prefix* và *dir* không phải là ``None``, chúng phải cùng kiểu. Nếu chúng là bytes, tên được trả về sẽ là bytes thay vì str. Nếu muốn buộc giá trị trả về là bytes trong khi vẫn giữ hành vi mặc định, hãy truyền ``suffix=b''``.
 
-   If *text* is specified and true, the file is opened in text mode.
-   Otherwise, (the default) the file is opened in binary mode.
+   Nếu *text* được chỉ định và có giá trị true, tệp sẽ được mở ở chế độ văn bản. Nếu không, tệp sẽ được mở ở chế độ nhị phân (mặc định).
 
-   :func:`mkstemp` returns a tuple containing an OS-level handle to an open
-   file (as would be returned by :func:`os.open`) and the absolute pathname
-   of that file, in that order.
+   :func:`mkstemp` trả về một tuple chứa handle cấp hệ điều hành đến một tệp đang mở (như được :func:`os.open` trả về) và pathname tuyệt đối của tệp đó, theo thứ tự này.
 
    .. audit-event:: tempfile.mkstemp fullpath tempfile.mkstemp
 
    .. versionchanged:: 3.5
-      *suffix*, *prefix*, and *dir* may now be supplied in bytes in order to
-      obtain a bytes return value.  Prior to this, only str was allowed.
-      *suffix* and *prefix* now accept and default to ``None`` to cause
-      an appropriate default value to be used.
+      *suffix*, *prefix* và *dir* giờ đây có thể được cung cấp dưới dạng bytes để nhận về giá trị kiểu bytes. Trước đây, chỉ str mới được phép. *suffix* và *prefix* giờ đây chấp nhận và mặc định là ``None`` để sử dụng giá trị mặc định thích hợp.
 
    .. versionchanged:: 3.6
-      The *dir* parameter now accepts a :term:`path-like object`.
+      Tham số *dir* giờ đây chấp nhận một :term:`path-like object`.
 
 
 .. function:: mkdtemp(suffix=None, prefix=None, dir=None)
 
-   Creates a temporary directory in the most secure manner possible. There
-   are no race conditions in the directory's creation.  The directory is
-   readable, writable, and searchable only by the creating user ID.
+   Tạo một thư mục tạm thời theo cách bảo mật nhất có thể. Không có điều kiện tranh đua nào trong quá trình tạo thư mục. Chỉ user ID tạo thư mục mới có quyền đọc, ghi và tìm kiếm trong thư mục đó.
 
-   The user of :func:`mkdtemp` is responsible for deleting the temporary
-   directory and its contents when done with it.
+   Người dùng :func:`mkdtemp` có trách nhiệm xóa thư mục tạm thời và nội dung của thư mục khi không còn sử dụng.
 
-   The *prefix*, *suffix*, and *dir* arguments are the same as for
+   Các đối số *prefix*, *suffix* và *dir* giống như đối với
    :func:`mkstemp`.
 
-   :func:`mkdtemp` returns the absolute pathname of the new directory.
+   :func:`mkdtemp` trả về pathname tuyệt đối của thư mục mới.
 
    .. audit-event:: tempfile.mkdtemp fullpath tempfile.mkdtemp
 
    .. versionchanged:: 3.5
-      *suffix*, *prefix*, and *dir* may now be supplied in bytes in order to
-      obtain a bytes return value.  Prior to this, only str was allowed.
-      *suffix* and *prefix* now accept and default to ``None`` to cause
-      an appropriate default value to be used.
+      *suffix*, *prefix* và *dir* giờ đây có thể được cung cấp dưới dạng bytes để nhận về giá trị kiểu bytes. Trước đây, chỉ str mới được phép. *suffix* và *prefix* giờ đây chấp nhận và mặc định là ``None`` để sử dụng giá trị mặc định thích hợp.
 
    .. versionchanged:: 3.6
-      The *dir* parameter now accepts a :term:`path-like object`.
+      Tham số *dir* giờ đây chấp nhận một :term:`path-like object`.
 
    .. versionchanged:: 3.12
       :func:`mkdtemp` now always returns an absolute path, even if *dir* is relative.
@@ -306,163 +194,130 @@ The module defines the following user-callable items:
 
 .. function:: gettempdir()
 
-   Return the name of the directory used for temporary files. This
-   defines the default value for the *dir* argument to all functions
-   in this module.
+   Trả về tên của thư mục được dùng cho các tệp tạm thời. Giá trị này xác định giá trị mặc định cho đối số *dir* của tất cả các hàm trong mô-đun này.
 
-   Python searches a standard list of directories to find one which
-   the calling user can create files in.  The list is:
+   Python tìm kiếm một danh sách thư mục tiêu chuẩn để tìm thư mục mà người dùng gọi hàm có thể tạo tệp trong đó. Danh sách này là:
 
-   #. The directory named by the :envvar:`TMPDIR` environment variable.
+   #. Thư mục được chỉ định bởi biến môi trường :envvar:`TMPDIR`.
 
-   #. The directory named by the :envvar:`TEMP` environment variable.
+   #. Thư mục được chỉ định bởi biến môi trường :envvar:`TEMP`.
 
-   #. The directory named by the :envvar:`TMP` environment variable.
+   #. Thư mục được chỉ định bởi biến môi trường :envvar:`TMP`.
 
-   #. A platform-specific location:
+   #. Vị trí dành riêng cho nền tảng:
 
-      * On Windows, the directories
+      * Trên Windows, các thư mục
         :file:`%USERPROFILE%\\AppData\\Local\\Temp`,
         :file:`%SYSTEMROOT%\\Temp`, :file:`C:\\TEMP`,
-        :file:`C:\\TMP`, :file:`\\TEMP`, and
-        :file:`\\TMP`, in that order.
+        :file:`C:\\TMP`, :file:`\\TEMP`, và
+        :file:`\\TMP`, theo thứ tự đó.
 
-      * On all other platforms, the directories :file:`/tmp`, :file:`/var/tmp`, and
-        :file:`/usr/tmp`, in that order.
+      * Trên tất cả các nền tảng khác, các thư mục :file:`/tmp`, :file:`/var/tmp`, và
+        :file:`/usr/tmp`, theo thứ tự đó.
 
-   #. As a last resort, the current working directory.
+   #. Cuối cùng, thư mục làm việc hiện tại.
 
-   The result of this search is cached, see the description of
-   :data:`tempdir` below.
+   Kết quả của tìm kiếm này được lưu vào bộ nhớ đệm, xem phần mô tả của
+   :data:`tempdir` bên dưới.
 
    .. versionchanged:: 3.10
 
-      Always returns a str.  Previously it would return any :data:`tempdir`
-      value regardless of type so long as it was not ``None``.
+      Luôn trả về một str. Trước đây, hàm sẽ trả về bất kỳ giá trị :data:`tempdir` nào bất kể kiểu dữ liệu, miễn là giá trị đó không phải là ``None``.
 
 .. function:: gettempdirb()
 
-   Same as :func:`gettempdir` but the return value is in bytes.
+   Tương tự như :func:`gettempdir`, nhưng giá trị trả về ở dạng bytes.
 
    .. versionadded:: 3.5
 
 .. function:: gettempprefix()
 
-   Return the filename prefix used to create temporary files.  This does not
-   contain the directory component.
+   Trả về tiền tố tên tệp được dùng để tạo các tệp tạm thời. Tiền tố này không chứa thành phần thư mục.
 
 .. function:: gettempprefixb()
 
-   Same as :func:`gettempprefix` but the return value is in bytes.
+   Tương tự như :func:`gettempprefix`, nhưng giá trị trả về ở dạng bytes.
 
    .. versionadded:: 3.5
 
-The module uses a global variable to store the name of the directory
-used for temporary files returned by :func:`gettempdir`.  It can be
-set directly to override the selection process, but this is discouraged.
-All functions in this module take a *dir* argument which can be used
-to specify the directory. This is the recommended approach that does
-not surprise other unsuspecting code by changing global API behavior.
+Module này sử dụng một biến toàn cục để lưu tên thư mục được dùng cho các tệp tạm thời do :func:`gettempdir` trả về. Có thể đặt trực tiếp biến này để ghi đè quá trình lựa chọn, nhưng không nên làm vậy. Tất cả các hàm trong module này nhận một đối số *dir*, dùng để chỉ định thư mục. Đây là cách được khuyến nghị vì không làm thay đổi hành vi API toàn cục và gây bất ngờ cho các đoạn mã khác.
 
 .. data:: tempdir
 
-   When set to a value other than ``None``, this variable defines the
-   default value for the *dir* argument to the functions defined in this
-   module, including its type, bytes or str.  It cannot be a
+   Khi được đặt thành một giá trị khác ``None``, biến này xác định giá trị mặc định cho đối số *dir* của các hàm được định nghĩa trong module này, bao gồm kiểu của đối số đó là bytes hay str. Đối số này không thể là
    :term:`path-like object`.
 
-   If ``tempdir`` is ``None`` (the default) at any call to any of the above
-   functions except :func:`gettempprefix` it is initialized following the
-   algorithm described in :func:`gettempdir`.
+   Nếu ``tempdir`` là ``None`` (giá trị mặc định) trong bất kỳ lần gọi nào đến các hàm nêu trên, ngoại trừ :func:`gettempprefix`, thì nó được khởi tạo theo thuật toán được mô tả trong :func:`gettempdir`.
 
    .. note::
 
-      Beware that if you set ``tempdir`` to a bytes value, there is a
-      nasty side effect: The global default return type of
-      :func:`mkstemp` and :func:`mkdtemp` changes to bytes when no
-      explicit ``prefix``, ``suffix``, or ``dir`` arguments of type
-      str are supplied. Please do not write code expecting or
-      depending on this. This awkward behavior is maintained for
-      compatibility with the historical implementation.
+      Lưu ý rằng nếu bạn đặt ``tempdir`` thành một giá trị bytes, sẽ có một tác dụng phụ khó chịu: Kiểu trả về mặc định toàn cục của
+      :func:`mkstemp` và :func:`mkdtemp` sẽ chuyển thành bytes khi không cung cấp rõ ràng các đối số ``prefix``, ``suffix`` hoặc ``dir`` có kiểu str. Vui lòng không viết mã dựa vào hoặc phụ thuộc vào điều này. Hành vi bất tiện này được duy trì để tương thích với cách triển khai trước đây.
 
 .. _tempfile-examples:
 
-Examples
---------
+Ví dụ
+-----
 
-Here are some examples of typical usage of the :mod:`!tempfile` module::
+Sau đây là một số ví dụ về cách sử dụng điển hình của module :mod:`!tempfile`::
 
     >>> import tempfile
 
-    # create a temporary file and write some data to it
+    # tạo một tệp tạm thời và ghi một số dữ liệu vào đó
     >>> fp = tempfile.TemporaryFile()
     >>> fp.write(b'Hello world!')
-    # read data from file
+    # đọc dữ liệu từ tệp
     >>> fp.seek(0)
     >>> fp.read()
     b'Hello world!'
-    # close the file, it will be removed
+    # đóng tệp, tệp sẽ bị xóa
     >>> fp.close()
 
-    # create a temporary file using a context manager
+    # tạo tệp tạm thời bằng trình quản lý ngữ cảnh
     >>> with tempfile.TemporaryFile() as fp:
     ...     fp.write(b'Hello world!')
     ...     fp.seek(0)
     ...     fp.read()
     b'Hello world!'
     >>>
-    # file is now closed and removed
+    # tệp hiện đã được đóng và xóa
 
-    # create a temporary file using a context manager
-    # close the file, use the name to open the file again
+    # tạo tệp tạm thời bằng trình quản lý ngữ cảnh
+    # đóng tệp, sử dụng tên để mở lại tệp
     >>> with tempfile.NamedTemporaryFile(delete_on_close=False) as fp:
     ...     fp.write(b'Hello world!')
     ...     fp.close()
-    ... # the file is closed, but not removed
-    ... # open the file again by using its name
+    ... # tệp đã được đóng nhưng chưa bị xóa
+    ... # mở lại tệp bằng cách sử dụng tên của nó
     ...     with open(fp.name, mode='rb') as f:
     ...         f.read()
     b'Hello world!'
     >>>
-    # file is now removed
+    # tệp hiện đã bị xóa
 
-    # create a temporary directory using the context manager
+    # tạo một thư mục tạm thời bằng context manager
     >>> with tempfile.TemporaryDirectory() as tmpdirname:
     ...     print('created temporary directory', tmpdirname)
     >>>
-    # directory and contents have been removed
+    # thư mục và nội dung đã bị xóa
 
 .. _tempfile-mktemp-deprecated:
 
-Deprecated functions and variables
-----------------------------------
+Các hàm và biến đã lỗi thời
+---------------------------
 
-A historical way to create temporary files was to first generate a
-file name with the :func:`mktemp` function and then create a file
-using this name. Unfortunately this is not secure, because a different
-process may create a file with this name in the time between the call
-to :func:`mktemp` and the subsequent attempt to create the file by the
-first process. The solution is to combine the two steps and create the
-file immediately. This approach is used by :func:`mkstemp` and the
-other functions described above.
+Một cách trước đây để tạo tệp tạm thời là trước tiên tạo tên tệp bằng hàm :func:`mktemp`, sau đó tạo tệp bằng tên này. Tuy nhiên, cách này không an toàn, vì một tiến trình khác có thể tạo tệp bằng tên này trong khoảng thời gian giữa lần gọi :func:`mktemp` và lần thử tiếp theo của tiến trình đầu tiên để tạo tệp. Giải pháp là kết hợp hai bước này và tạo tệp ngay lập tức. Cách tiếp cận này được :func:`mkstemp` và các hàm khác được mô tả ở trên sử dụng.
 
 .. function:: mktemp(suffix='', prefix='tmp', dir=None)
 
    .. deprecated:: 2.3
-      Use :func:`mkstemp` instead.
+      Thay vào đó, hãy sử dụng :func:`mkstemp`.
 
-   Return an absolute pathname of a file that did not exist at the time the
-   call is made.  The *prefix*, *suffix*, and *dir* arguments are similar
-   to those of :func:`mkstemp`, except that bytes file names, ``suffix=None``
-   and ``prefix=None`` are not supported.
+   Trả về một pathname tuyệt đối của một tệp không tồn tại tại thời điểm thực hiện lệnh gọi. Các đối số *prefix*, *suffix* và *dir* tương tự như các đối số của :func:`mkstemp`, ngoại trừ việc không hỗ trợ tên tệp dạng bytes, ``suffix=None`` và ``prefix=None``.
 
    .. warning::
 
-      Use of this function may introduce a security hole in your program.  By
-      the time you get around to doing anything with the file name it returns,
-      someone else may have beaten you to the punch.  :func:`mktemp` usage can
-      be replaced easily with :func:`NamedTemporaryFile`, passing it the
-      ``delete=False`` parameter::
+      Việc sử dụng hàm này có thể tạo ra lỗ hổng bảo mật trong chương trình của bạn. Đến khi bạn bắt đầu thực hiện bất kỳ thao tác nào với tên tệp mà hàm trả về, người khác có thể đã nhanh tay sử dụng nó trước bạn. Có thể dễ dàng thay thế việc sử dụng :func:`mktemp` bằng :func:`NamedTemporaryFile`, truyền cho nó tham số ``delete=False``::
 
          >>> f = NamedTemporaryFile(delete=False)
          >>> f.name

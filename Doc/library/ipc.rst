@@ -1,17 +1,15 @@
 .. _ipc:
 
-*****************************************
-Networking and Interprocess Communication
-*****************************************
+*************************************
+Mạng và giao tiếp giữa các tiến trình
+*************************************
 
-The modules described in this chapter provide mechanisms for
-networking and inter-processes communication.
+Các module được mô tả trong chương này cung cấp các cơ chế cho mạng và giao tiếp giữa các tiến trình.
 
-Some modules only work for two processes that are on the same machine, e.g.
-:mod:`signal` and :mod:`mmap`.  Other modules support networking protocols
-that two or more processes can use to communicate across machines.
+Một số module chỉ hoạt động với hai tiến trình trên cùng một máy, ví dụ như
+:mod:`signal` và :mod:`mmap`. Các module khác hỗ trợ những giao thức mạng mà hai hoặc nhiều tiến trình có thể sử dụng để giao tiếp giữa các máy.
 
-The list of modules described in this chapter is:
+Danh sách các module được mô tả trong chương này là:
 
 
 .. toctree::

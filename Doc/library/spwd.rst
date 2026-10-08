@@ -1,18 +1,16 @@
-:mod:`!spwd` --- The shadow password database
-=============================================
+:mod:`!spwd` --- Cơ sở dữ liệu mật khẩu ẩn
+==========================================
 
 .. module:: spwd
-   :synopsis: Removed in 3.13.
+   :synopsis: Đã bị loại bỏ trong 3.13.
    :deprecated:
 
 .. deprecated-removed:: 3.11 3.13
 
-This module is no longer part of the Python standard library.
-It was :ref:`removed in Python 3.13 <whatsnew313-pep594>` after
-being deprecated in Python 3.11.  The removal was decided in :pep:`594`.
+Mô-đun này không còn thuộc thư viện chuẩn của Python. Mô-đun đã được :ref:`loại bỏ trong Python 3.13 <whatsnew313-pep594>` sau khi bị phản đối sử dụng trong Python 3.11. Việc loại bỏ được quyết định trong :pep:`594`.
 
-A possible replacement is the third-party library :pypi:`python-pam`.
-This library is not supported or maintained by the Python core team.
+Một lựa chọn thay thế có thể là thư viện bên thứ ba :pypi:`python-pam`. Thư viện này không được nhóm nòng cốt Python hỗ trợ hoặc duy trì.
 
-The last version of Python that provided the :mod:`!spwd` module was
-`Python 3.12 <https://docs.python.org/3.12/library/spwd.html>`_.
+Phiên bản Python cuối cùng cung cấp mô-đun :mod:`!spwd` là `Python 3.12 <https://docs.python.org/3.12/library/spwd.html>`_.
+
+.. _`Python 3.12`: https://docs.python.org/3.12/library/spwd.html

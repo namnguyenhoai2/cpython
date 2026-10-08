@@ -1,58 +1,36 @@
-:mod:`!fractions` --- Rational numbers
-======================================
+:mod:`!fractions` --- Số hữu tỉ
+===============================
 
 .. module:: fractions
-   :synopsis: Rational numbers.
+   :synopsis: Số hữu tỉ.
 
 .. moduleauthor:: Jeffrey Yasskin <jyasskin at gmail.com>
 .. sectionauthor:: Jeffrey Yasskin <jyasskin at gmail.com>
 
-**Source code:** :source:`Lib/fractions.py`
+**Mã nguồn:** :source:`Lib/fractions.py`
 
 --------------
 
-The :mod:`!fractions` module provides support for rational number arithmetic.
+Mô-đun :mod:`!fractions` cung cấp khả năng hỗ trợ thực hiện phép tính số hữu tỉ.
 
 
-A Fraction instance can be constructed from a pair of rational numbers, from
-a single number, or from a string.
+Có thể tạo một đối tượng Fraction từ một cặp số hữu tỉ, một số đơn lẻ hoặc một chuỗi.
 
 .. index:: single: as_integer_ratio()
 
 .. class:: Fraction(numerator=0, denominator=1)
-           Fraction(number)
-           Fraction(string)
+           Fraction(number) Fraction(string)
 
-   The first version requires that *numerator* and *denominator* are instances
-   of :class:`numbers.Rational` and returns a new :class:`Fraction` instance
-   with a value equal to ``numerator/denominator``.
-   If *denominator* is zero, it raises a :exc:`ZeroDivisionError`.
+   Phiên bản đầu tiên yêu cầu *numerator* và *denominator* là các thể hiện của :class:`numbers.Rational` và trả về một thể hiện :class:`Fraction` mới có giá trị bằng ``numerator/denominator``. Nếu *denominator* bằng không, nó sẽ phát sinh :exc:`ZeroDivisionError`.
 
-   The second version requires that *number* is an instance of
-   :class:`numbers.Rational` or has the :meth:`!as_integer_ratio` method
-   (this includes :class:`float` and :class:`decimal.Decimal`).
-   It returns a :class:`Fraction` instance with exactly the same value.
-   Assumed, that the :meth:`!as_integer_ratio` method returns a pair
-   of coprime integers and last one is positive.
-   Note that due to the
-   usual issues with binary point (see :ref:`tut-fp-issues`), the
-   argument to ``Fraction(1.1)`` is not exactly equal to 11/10, and so
-   ``Fraction(1.1)`` does *not* return ``Fraction(11, 10)`` as one might expect.
-   (But see the documentation for the :meth:`limit_denominator` method below.)
+   Phiên bản thứ hai yêu cầu *number* là một instance của
+   :class:`numbers.Rational` hoặc có phương thức :meth:`!as_integer_ratio` (bao gồm :class:`float` và :class:`decimal.Decimal`). Phương thức này trả về một instance :class:`Fraction` có chính xác cùng giá trị. Giả định rằng phương thức :meth:`!as_integer_ratio` trả về một cặp số nguyên nguyên tố cùng nhau và số cuối cùng là số dương. Lưu ý rằng do các vấn đề thường gặp với dấu chấm động nhị phân (xem :ref:`tut-fp-issues`), đối số truyền cho ``Fraction(1.1)`` không hoàn toàn bằng 11/10, vì vậy ``Fraction(1.1)`` không *not* trả về ``Fraction(11, 10)`` như người ta có thể mong đợi. (Tuy nhiên, hãy xem tài liệu về phương thức :meth:`limit_denominator` bên dưới.)
 
-   The last version of the constructor expects a string.
-   The usual form for this instance is::
+   Phiên bản cuối cùng của hàm khởi tạo mong đợi một chuỗi. Dạng thông thường của chuỗi này là::
 
       [sign] numerator ['/' denominator]
 
-   where the optional ``sign`` may be either '+' or '-' and
-   ``numerator`` and ``denominator`` (if present) are strings of
-   decimal digits (underscores may be used to delimit digits as with
-   integral literals in code).  In addition, any string that represents a finite
-   value and is accepted by the :class:`float` constructor is also
-   accepted by the :class:`Fraction` constructor.  In either form the
-   input string may also have leading and/or trailing whitespace.
-   Here are some examples::
+   Trong đó ``sign`` tùy chọn có thể là '+' hoặc '-' và ``numerator`` và ``denominator`` (nếu có) là các chuỗi gồm các chữ số thập phân (có thể dùng dấu gạch dưới để phân tách các chữ số như với các literal số nguyên trong mã). Ngoài ra, mọi chuỗi biểu diễn một giá trị hữu hạn và được chấp nhận bởi hàm khởi tạo :class:`float` cũng được chấp nhận bởi hàm khởi tạo :class:`Fraction`. Ở cả hai dạng, chuỗi đầu vào cũng có thể chứa khoảng trắng ở đầu và/hoặc cuối. Dưới đây là một số ví dụ::
 
       >>> from fractions import Fraction
       >>> Fraction(16, -10)
@@ -80,114 +58,99 @@ a single number, or from a string.
       Fraction(11, 10)
 
 
-   The :class:`Fraction` class inherits from the abstract base class
-   :class:`numbers.Rational`, and implements all of the methods and
-   operations from that class.  :class:`Fraction` instances are :term:`hashable`,
-   and should be treated as immutable.  In addition,
-   :class:`Fraction` has the following properties and methods:
+   Lớp :class:`Fraction` kế thừa từ lớp cơ sở trừu tượng
+   :class:`numbers.Rational`, và triển khai tất cả các phương thức và phép toán của lớp đó. Các instance :class:`Fraction` là :term:`hashable`, và nên được xem là bất biến. Ngoài ra,
+   :class:`Fraction` có các thuộc tính và phương thức sau:
 
    .. versionchanged:: 3.2
-      The :class:`Fraction` constructor now accepts :class:`float` and
-      :class:`decimal.Decimal` instances.
+      Hàm khởi tạo :class:`Fraction` hiện chấp nhận :class:`float` và
+      các thực thể :class:`decimal.Decimal`.
 
    .. versionchanged:: 3.9
-      The :func:`math.gcd` function is now used to normalize the *numerator*
-      and *denominator*. :func:`math.gcd` always returns an :class:`int` type.
-      Previously, the GCD type depended on *numerator* and *denominator*.
+      Hàm :func:`math.gcd` hiện được dùng để chuẩn hóa *tử số* và *mẫu số*. :func:`math.gcd` luôn trả về kiểu :class:`int`. Trước đây, kiểu GCD phụ thuộc vào *tử số* và *mẫu số*.
 
    .. versionchanged:: 3.11
-      Underscores are now permitted when creating a :class:`Fraction` instance
-      from a string, following :PEP:`515` rules.
+      Giờ đây, dấu gạch dưới được cho phép khi tạo một thực thể :class:`Fraction` từ chuỗi, theo các quy tắc của :PEP:`515`.
 
    .. versionchanged:: 3.11
       :class:`Fraction` implements ``__int__`` now to satisfy
-      ``typing.SupportsInt`` instance checks.
+      Các phép kiểm tra thực thể ``typing.SupportsInt``.
 
    .. versionchanged:: 3.12
-      Space is allowed around the slash for string inputs: ``Fraction('2 / 3')``.
+      Được phép có khoảng trắng quanh dấu gạch chéo đối với đầu vào chuỗi: ``Fraction('2 / 3')``.
 
    .. versionchanged:: 3.12
       :class:`Fraction` instances now support float-style formatting, with
-      presentation types ``"e"``, ``"E"``, ``"f"``, ``"F"``, ``"g"``, ``"G"``
-      and ``"%""``.
+      các kiểu trình bày ``"e"``, ``"E"``, ``"f"``, ``"F"``, ``"g"``, ``"G"`` và ``"%""``.
 
    .. versionchanged:: 3.13
-      Formatting of :class:`Fraction` instances without a presentation type
-      now supports fill, alignment, sign handling, minimum width and grouping.
+      Việc định dạng các đối tượng :class:`Fraction` mà không chỉ định kiểu hiển thị hiện hỗ trợ ký tự điền, căn chỉnh, xử lý dấu, độ rộng tối thiểu và nhóm chữ số.
 
    .. versionchanged:: 3.14
-      The :class:`Fraction` constructor now accepts any objects with the
-      :meth:`!as_integer_ratio` method.
+      Hàm khởi tạo :class:`Fraction` hiện chấp nhận mọi đối tượng có
+      phương thức :meth:`!as_integer_ratio`.
 
    .. attribute:: numerator
 
-      Numerator of the Fraction in lowest term.
+      Tử số của Fraction ở dạng tối giản.
 
    .. attribute:: denominator
 
-      Denominator of the Fraction in lowest terms.
-      Guaranteed to be positive.
+      Mẫu số của Fraction ở dạng tối giản. Được đảm bảo là số dương.
 
 
    .. method:: as_integer_ratio()
 
-      Return a tuple of two integers, whose ratio is equal
-      to the original Fraction.  The ratio is in lowest terms
-      and has a positive denominator.
+      Trả về một tuple gồm hai số nguyên, trong đó tỷ số của chúng bằng với Fraction ban đầu. Tỷ số ở dạng tối giản và có mẫu số dương.
 
       .. versionadded:: 3.8
 
    .. method:: is_integer()
 
-      Return ``True`` if the Fraction is an integer.
+      Trả về ``True`` nếu Fraction là một số nguyên.
 
       .. versionadded:: 3.12
 
    .. classmethod:: from_float(f)
 
-      Alternative constructor which only accepts instances of
-      :class:`float` or :class:`numbers.Integral`. Beware that
-      ``Fraction.from_float(0.3)`` is not the same value as ``Fraction(3, 10)``.
+      Hàm khởi tạo thay thế chỉ chấp nhận các thực thể của
+      :class:`float` hoặc :class:`numbers.Integral`. Lưu ý rằng ``Fraction.from_float(0.3)`` không có cùng giá trị với ``Fraction(3, 10)``.
 
       .. note::
 
-         From Python 3.2 onwards, you can also construct a
-         :class:`Fraction` instance directly from a :class:`float`.
+         Kể từ Python 3.2, bạn cũng có thể tạo một
+         thực thể :class:`Fraction` trực tiếp từ một :class:`float`.
 
 
    .. classmethod:: from_decimal(dec)
 
-      Alternative constructor which only accepts instances of
-      :class:`decimal.Decimal` or :class:`numbers.Integral`.
+      Hàm khởi tạo thay thế chỉ chấp nhận các thực thể của
+      :class:`decimal.Decimal` hoặc :class:`numbers.Integral`.
 
       .. note::
 
-         From Python 3.2 onwards, you can also construct a
-         :class:`Fraction` instance directly from a :class:`decimal.Decimal`
-         instance.
+         Kể từ Python 3.2, bạn cũng có thể tạo một
+         Tạo một instance :class:`Fraction` trực tiếp từ một instance :class:`decimal.Decimal`.
 
 
    .. classmethod:: from_number(number)
 
-      Alternative constructor which only accepts instances of
+      Hàm khởi tạo thay thế chỉ chấp nhận các thực thể của
       :class:`numbers.Integral`, :class:`numbers.Rational`,
-      :class:`float` or :class:`decimal.Decimal`, and objects with
-      the :meth:`!as_integer_ratio` method, but not strings.
+      :class:`float` hoặc :class:`decimal.Decimal`, và các đối tượng có phương thức :meth:`!as_integer_ratio`, nhưng không phải chuỗi.
 
       .. versionadded:: 3.14
 
 
    .. method:: limit_denominator(max_denominator=1000000)
 
-      Finds and returns the closest :class:`Fraction` to ``self`` that has
-      denominator at most max_denominator.  This method is useful for finding
-      rational approximations to a given floating-point number:
+      Tìm và trả về :class:`Fraction` gần nhất với ``self`` có mẫu số không vượt quá max_denominator. Phương thức này hữu ích để tìm các xấp xỉ hữu tỉ cho một số dấu phẩy động đã cho:
 
          >>> from fractions import Fraction
          >>> Fraction('3.1415926535897932').limit_denominator(1000)
          Fraction(355, 113)
 
-      or for recovering a rational number that's represented as a float:
+      hoặc để khôi phục một số hữu tỉ được biểu diễn dưới dạng float:
 
          >>> from math import pi, cos
          >>> Fraction(cos(pi/3))
@@ -200,8 +163,7 @@ a single number, or from a string.
 
    .. method:: __floor__()
 
-      Returns the greatest :class:`int` ``<= self``.  This method can
-      also be accessed through the :func:`math.floor` function:
+      Trả về :class:`int` lớn nhất ``<= self``. Phương thức này cũng có thể được truy cập thông qua hàm :func:`math.floor`:
 
         >>> from math import floor
         >>> floor(Fraction(355, 113))
@@ -210,41 +172,27 @@ a single number, or from a string.
 
    .. method:: __ceil__()
 
-      Returns the least :class:`int` ``>= self``.  This method can
-      also be accessed through the :func:`math.ceil` function.
+      Trả về :class:`int` nhỏ nhất ``>= self``. Phương thức này cũng có thể được truy cập thông qua hàm :func:`math.ceil`.
 
 
    .. method:: __round__()
                __round__(ndigits)
 
-      The first version returns the nearest :class:`int` to ``self``,
-      rounding half to even. The second version rounds ``self`` to the
-      nearest multiple of ``Fraction(1, 10**ndigits)`` (logically, if
-      ``ndigits`` is negative), again rounding half toward even.  This
-      method can also be accessed through the :func:`round` function.
+      Phiên bản đầu tiên trả về :class:`int` gần nhất với ``self``, làm tròn nửa về số chẵn. Phiên bản thứ hai làm tròn ``self`` đến bội số gần nhất của ``Fraction(1, 10**ndigits)`` (về mặt logic, nếu ``ndigits`` là số âm), cũng làm tròn nửa về số chẵn. Phương thức này cũng có thể được truy cập thông qua hàm :func:`round`.
 
    .. method:: __format__(format_spec, /)
 
-      Provides support for formatting of :class:`Fraction` instances via the
-      :meth:`str.format` method, the :func:`format` built-in function, or
-      :ref:`Formatted string literals <f-strings>`.
+      Hỗ trợ định dạng các thực thể :class:`Fraction` thông qua
+      phương thức :meth:`str.format`, hàm dựng sẵn :func:`format`, hoặc
+      :ref:`chuỗi định dạng <f-strings>`.
 
-      If the ``format_spec`` format specification string does not end with one
-      of the presentation types ``'e'``, ``'E'``, ``'f'``, ``'F'``, ``'g'``,
-      ``'G'`` or ``'%'`` then formatting follows the general rules for fill,
-      alignment, sign handling, minimum width, and grouping as described in the
-      :ref:`format specification mini-language <formatspec>`. The "alternate
-      form" flag ``'#'`` is supported: if present, it forces the output string
-      to always include an explicit denominator, even when the value being
-      formatted is an exact integer. The zero-fill flag ``'0'`` is not
-      supported.
+      Nếu chuỗi đặc tả định dạng ``format_spec`` format không kết thúc bằng một trong các kiểu trình bày ``'e'``, ``'E'``, ``'f'``, ``'F'``, ``'g'``, ``'G'`` hoặc ``'%'`` thì việc định dạng tuân theo các quy tắc chung về điền, căn chỉnh, xử lý dấu, độ rộng tối thiểu và nhóm như được mô tả trong
+      :ref:`ngôn ngữ mini đặc tả định dạng <formatspec>`. Cờ "dạng thay thế" ``'#'`` được hỗ trợ: nếu có, cờ này buộc chuỗi đầu ra luôn bao gồm mẫu số tường minh, ngay cả khi giá trị được định dạng là một số nguyên chính xác. Cờ điền bằng số 0 ``'0'`` không được hỗ trợ.
 
-      If the ``format_spec`` format specification string ends with one of
-      the presentation types ``'e'``, ``'E'``, ``'f'``, ``'F'``, ``'g'``,
-      ``'G'`` or ``'%'`` then formatting follows the rules outlined for the
-      :class:`float` type in the :ref:`formatspec` section.
+      Nếu chuỗi đặc tả định dạng ``format_spec`` kết thúc bằng một trong các kiểu trình bày ``'e'``, ``'E'``, ``'f'``, ``'F'``, ``'g'``, ``'G'`` hoặc ``'%'`` thì việc định dạng tuân theo các quy tắc được nêu cho
+      kiểu :class:`float` trong phần :ref:`formatspec`.
 
-      Here are some examples::
+      Dưới đây là một số ví dụ::
 
          >>> from fractions import Fraction
          >>> format(Fraction(103993, 33102), '_')
@@ -268,5 +216,5 @@ a single number, or from a string.
 
 .. seealso::
 
-   Module :mod:`numbers`
-      The abstract base classes making up the numeric tower.
+   Mô-đun :mod:`numbers`
+      Các lớp cơ sở trừu tượng tạo nên tháp số học.

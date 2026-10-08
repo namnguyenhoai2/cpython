@@ -1,136 +1,77 @@
 .. _sys-path-init:
 
-The initialization of the :data:`sys.path` module search path
-=============================================================
+Việc khởi tạo đường dẫn tìm kiếm module :data:`sys.path`
+========================================================
 
-A module search path is initialized when Python starts. This module search path
-may be accessed at :data:`sys.path`.
+Đường dẫn tìm kiếm module được khởi tạo khi Python khởi động. Có thể truy cập đường dẫn tìm kiếm module này tại :data:`sys.path`.
 
-The first entry in the module search path is the directory that contains the
-input script, if there is one. Otherwise, the first entry is the current
-directory, which is the case when executing the interactive shell, a :option:`-c`
-command, or :option:`-m` module.
+Mục đầu tiên trong đường dẫn tìm kiếm module là thư mục chứa script đầu vào, nếu có. Nếu không, mục đầu tiên là thư mục hiện tại, áp dụng khi thực thi shell tương tác, lệnh :option:`-c`, hoặc module :option:`-m`.
 
-The :envvar:`PYTHONPATH` environment variable is often used to add directories
-to the search path. If this environment variable is found then the contents are
-added to the module search path.
+Biến môi trường :envvar:`PYTHONPATH` thường được dùng để thêm các thư mục vào đường dẫn tìm kiếm. Nếu tìm thấy biến môi trường này, nội dung của nó sẽ được thêm vào đường dẫn tìm kiếm module.
 
 .. note::
 
-   :envvar:`PYTHONPATH` will affect all installed Python versions/environments.
-   Be wary of setting this in your shell profile or global environment variables.
-   The :mod:`site` module offers more nuanced techniques as mentioned below.
+   :envvar:`PYTHONPATH` sẽ ảnh hưởng đến tất cả các phiên bản/môi trường Python đã cài đặt. Hãy thận trọng khi đặt biến này trong shell profile hoặc các biến môi trường toàn cục. Module :mod:`site` cung cấp những kỹ thuật tinh vi hơn như được đề cập bên dưới.
 
-The next items added are the directories containing standard Python modules as
-well as any :term:`extension module`\s that these modules depend on. Extension
-modules are ``.pyd`` files on Windows and ``.so`` files on other platforms. The
-directory with the platform-independent Python modules is called ``prefix``.
-The directory with the extension modules is called ``exec_prefix``.
+Các mục tiếp theo được thêm vào là những thư mục chứa các module Python chuẩn, cũng như bất kỳ :term:`extension module`\s nào mà các module này phụ thuộc vào. Các extension module là các tệp ``.pyd`` trên Windows và các tệp ``.so`` trên các nền tảng khác. Thư mục chứa các module Python độc lập với nền tảng được gọi là ``prefix``. Thư mục chứa các extension module được gọi là ``exec_prefix``.
 
-The :envvar:`PYTHONHOME` environment variable may be used to set the ``prefix``
-and ``exec_prefix`` locations. Otherwise these directories are found by using
-the Python executable as a starting point and then looking for various 'landmark'
-files and directories. Note that any symbolic links are followed so the real
-Python executable location is used as the search starting point. The Python
-executable location is called ``home``.
+Có thể sử dụng biến môi trường :envvar:`PYTHONHOME` để đặt vị trí của ``prefix`` và ``exec_prefix``. Nếu không, các thư mục này được tìm thấy bằng cách lấy tệp thực thi Python làm điểm bắt đầu, sau đó tìm nhiều tệp và thư mục 'mốc' khác nhau. Lưu ý rằng mọi symbolic link đều được truy theo, vì vậy vị trí thực của tệp thực thi Python được dùng làm điểm bắt đầu tìm kiếm. Vị trí của tệp thực thi Python được gọi là ``home``.
 
-Once ``home`` is determined, the ``prefix`` directory is found by first looking
-for :file:`python{majorversion}{minorversion}.zip` (``python311.zip``). On Windows
-the zip archive is searched for in ``home`` and on Unix the archive is expected
-to be in :file:`lib`. Note that the expected zip archive location is added to the
-module search path even if the archive does not exist. If no archive was found,
-Python on Windows will continue the search for ``prefix`` by looking for :file:`Lib\\os.py`.
-Python on Unix will look for :file:`lib/python{majorversion}.{minorversion}/os.py`
-(``lib/python3.11/os.py``). On Windows ``prefix`` and ``exec_prefix`` are the same,
-however on other platforms :file:`lib/python{majorversion}.{minorversion}/lib-dynload`
-(``lib/python3.11/lib-dynload``) is searched for and used as an anchor for
-``exec_prefix``. On some platforms :file:`lib` may be :file:`lib64` or another value,
-see :data:`sys.platlibdir` and :envvar:`PYTHONPLATLIBDIR`.
+Sau khi ``home`` được xác định, thư mục ``prefix`` được tìm thấy bằng cách trước tiên tìm :file:`python{majorversion}{minorversion}.zip` (``python311.zip``). Trên Windows, kho lưu trữ zip được tìm trong ``home``, còn trên Unix, kho lưu trữ được dự kiến nằm trong :file:`lib`. Lưu ý rằng vị trí dự kiến của kho lưu trữ zip được thêm vào đường dẫn tìm kiếm module ngay cả khi kho lưu trữ không tồn tại. Nếu không tìm thấy kho lưu trữ nào, Python trên Windows sẽ tiếp tục tìm ``prefix`` bằng cách tìm :file:`Lib\\os.py`. Python trên Unix sẽ tìm :file:`lib/python{majorversion}.{minorversion}/os.py` (``lib/python3.11/os.py``). Trên Windows, ``prefix`` và ``exec_prefix`` là một, tuy nhiên trên các nền tảng khác, :file:`lib/python{majorversion}.{minorversion}/lib-dynload` (``lib/python3.11/lib-dynload``) được tìm kiếm và sử dụng làm mốc cho ``exec_prefix``. Trên một số nền tảng, :file:`lib` có thể là :file:`lib64` hoặc một giá trị khác; xem :data:`sys.platlibdir` và :envvar:`PYTHONPLATLIBDIR`.
 
-Once found, ``prefix`` and ``exec_prefix`` are available at
-:data:`sys.base_prefix` and :data:`sys.base_exec_prefix` respectively.
+Sau khi được tìm thấy, ``prefix`` và ``exec_prefix`` sẽ khả dụng tại
+:data:`sys.base_prefix` và :data:`sys.base_exec_prefix`, tương ứng.
 
-If :envvar:`PYTHONHOME` is not set, and a ``pyvenv.cfg`` file is found alongside
-the main executable, or in its parent directory, :data:`sys.prefix` and
-:data:`sys.exec_prefix` get set to the directory containing ``pyvenv.cfg``,
-otherwise they are set to the same value as :data:`sys.base_prefix` and
-:data:`sys.base_exec_prefix`, respectively.
-This is used by :ref:`sys-path-init-virtual-environments`.
+Nếu :envvar:`PYTHONHOME` chưa được thiết lập và tìm thấy tệp ``pyvenv.cfg`` bên cạnh tệp thực thi chính hoặc trong thư mục cha của nó, :data:`sys.prefix` và
+:data:`sys.exec_prefix` được đặt thành thư mục chứa ``pyvenv.cfg``; nếu không, chúng được đặt thành cùng giá trị với :data:`sys.base_prefix` và
+:data:`sys.base_exec_prefix`, tương ứng. Điều này được :ref:`sys-path-init-virtual-environments` sử dụng.
 
-Finally, the :mod:`site` module is processed and :file:`site-packages` directories
-are added to the module search path. A common way to customize the search path is
-to create :mod:`sitecustomize` or :mod:`usercustomize` modules as described in
-the :mod:`site` module documentation.
+Cuối cùng, module :mod:`site` được xử lý và các thư mục :file:`site-packages` được thêm vào đường dẫn tìm kiếm module. Một cách phổ biến để tùy chỉnh đường dẫn tìm kiếm là tạo các module :mod:`sitecustomize` hoặc :mod:`usercustomize` như được mô tả trong tài liệu module :mod:`site`.
 
 .. note::
 
-   Certain command line options may further affect path calculations.
-   See :option:`-E`, :option:`-I`, :option:`-s` and :option:`-S` for further details.
+   Một số tùy chọn dòng lệnh có thể tiếp tục ảnh hưởng đến việc tính toán đường dẫn. Xem :option:`-E`, :option:`-I`, :option:`-s` và :option:`-S` để biết thêm chi tiết.
 
 .. versionchanged:: 3.14
 
-   :data:`sys.prefix` and :data:`sys.exec_prefix` are now set to the
-   ``pyvenv.cfg`` directory during the path initialization. This was previously
-   done by :mod:`site`, therefore affected by :option:`-S`.
+   :data:`sys.prefix` và :data:`sys.exec_prefix` hiện được đặt thành thư mục ``pyvenv.cfg`` trong quá trình khởi tạo đường dẫn. Trước đây, việc này được thực hiện bởi :mod:`site`, vì vậy chịu ảnh hưởng của :option:`-S`.
 
 .. _sys-path-init-virtual-environments:
 
-Virtual Environments
---------------------
+Môi trường ảo
+-------------
 
-Virtual environments place a ``pyvenv.cfg`` file in their prefix, which causes
-:data:`sys.prefix` and :data:`sys.exec_prefix` to point to them, instead of the
-base installation.
+Môi trường ảo đặt một tệp ``pyvenv.cfg`` trong prefix của chúng, khiến
+:data:`sys.prefix` và :data:`sys.exec_prefix` trỏ đến chúng thay vì bản cài đặt cơ sở.
 
-The ``prefix`` and ``exec_prefix`` values of the base installation are available
-at :data:`sys.base_prefix` and :data:`sys.base_exec_prefix`.
+Các giá trị ``prefix`` và ``exec_prefix`` của bản cài đặt cơ sở có tại :data:`sys.base_prefix` và :data:`sys.base_exec_prefix`.
 
-As well as being used as a marker to identify virtual environments,
-``pyvenv.cfg`` may also be used to configure the :mod:`site` initialization.
-Please refer to :mod:`site`'s
-:ref:`virtual environments documentation <site-virtual-environments-configuration>`.
+Ngoài việc được sử dụng làm dấu hiệu để nhận diện các môi trường ảo, ``pyvenv.cfg`` cũng có thể được sử dụng để cấu hình việc khởi tạo :mod:`site`. Vui lòng tham khảo :mod:`site`'s
+:ref:`tài liệu về môi trường ảo <site-virtual-environments-configuration>`.
 
 .. note::
 
-   :envvar:`PYTHONHOME` overrides the ``pyvenv.cfg`` detection.
+   :envvar:`PYTHONHOME` ghi đè việc phát hiện ``pyvenv.cfg``.
 
 .. note::
 
-   There are other ways how "virtual environments" could be implemented, this
-   documentation refers implementations based on the ``pyvenv.cfg`` mechanism,
-   such as :mod:`venv`. Most virtual environment implementations follow the
-   model set by :mod:`venv`, but there may be exotic implementations that
-   diverge from it.
+   Có những cách khác để triển khai "môi trường ảo"; tài liệu này đề cập đến các cách triển khai dựa trên cơ chế ``pyvenv.cfg``, chẳng hạn như :mod:`venv`. Hầu hết các triển khai môi trường ảo đều tuân theo mô hình do :mod:`venv` thiết lập, nhưng cũng có thể có những triển khai đặc biệt không tuân theo mô hình này.
 
 _pth files
 ----------
 
-To completely override :data:`sys.path` create a ``._pth`` file with the same
-name as the shared library or executable (``python._pth`` or ``python311._pth``).
-The shared library path is always known on Windows, however it may not be
-available on other platforms. In the ``._pth`` file specify one line for each path
-to add to :data:`sys.path`. The file based on the shared library name overrides
-the one based on the executable, which allows paths to be restricted for any
-program loading the runtime if desired.
+Để ghi đè hoàn toàn :data:`sys.path`, hãy tạo tệp ``._pth`` có cùng tên với thư viện dùng chung hoặc tệp thực thi (``python._pth`` hoặc ``python311._pth``). Trên Windows, đường dẫn đến thư viện dùng chung luôn được biết, tuy nhiên đường dẫn này có thể không khả dụng trên các nền tảng khác. Trong tệp ``._pth``, hãy chỉ định mỗi đường dẫn cần thêm vào :data:`sys.path` trên một dòng riêng. Tệp dựa trên tên thư viện dùng chung sẽ ghi đè tệp dựa trên tệp thực thi, nhờ đó có thể hạn chế các đường dẫn cho mọi chương trình tải runtime nếu muốn.
 
-When the file exists, all registry and environment variables are ignored,
-isolated mode is enabled, and :mod:`site` is not imported unless one line in the
-file specifies ``import site``. Blank paths and lines starting with ``#`` are
-ignored. Each path may be absolute or relative to the location of the file.
-Import statements other than to ``site`` are not permitted, and arbitrary code
-cannot be specified.
+Khi tệp này tồn tại, mọi biến registry và biến môi trường đều bị bỏ qua, chế độ cô lập được bật, và :mod:`site` không được import trừ khi một dòng trong tệp chỉ định ``import site``. Các đường dẫn trống và những dòng bắt đầu bằng ``#`` sẽ bị bỏ qua. Mỗi đường dẫn có thể là đường dẫn tuyệt đối hoặc tương đối so với vị trí của tệp. Không cho phép các câu lệnh import ngoài câu lệnh import ``site``, và không thể chỉ định mã tùy ý.
 
-Note that ``.pth`` files (without leading underscore) will be processed normally
-by the :mod:`site` module when ``import site`` has been specified.
+Lưu ý rằng các tệp ``.pth`` (không có dấu gạch dưới ở đầu) sẽ được module :mod:`site` xử lý bình thường khi ``import site`` đã được chỉ định.
 
-Embedded Python
----------------
+Python nhúng
+------------
 
-If Python is embedded within another application :c:func:`Py_InitializeFromConfig` and
-the :c:type:`PyConfig` structure can be used to initialize Python. The path specific
-details are described at :ref:`init-path-config`.
+Nếu Python được nhúng trong một ứng dụng khác :c:func:`Py_InitializeFromConfig` thì có thể sử dụng cấu trúc :c:type:`PyConfig` để khởi tạo Python. Các chi tiết cụ thể về đường dẫn được mô tả tại :ref:`init-path-config`.
 
 .. seealso::
 
-   * :ref:`windows_finding_modules` for detailed Windows notes.
-   * :ref:`using-on-unix` for Unix details.
+   * :ref:`windows_finding_modules` để xem các ghi chú chi tiết dành cho Windows.
+   * :ref:`using-on-unix` để xem thông tin chi tiết dành cho Unix.

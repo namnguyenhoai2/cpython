@@ -1,299 +1,257 @@
-:mod:`!wave` --- Read and write WAV files
-=========================================
+:mod:`!wave` --- Đọc và ghi tệp WAV
+===================================
 
 .. module:: wave
-   :synopsis: Provide an interface to the WAV sound format.
+   :synopsis: Cung cấp một giao diện cho định dạng âm thanh WAV.
 
 .. sectionauthor:: Moshe Zadka <moshez@zadka.site.co.il>
 .. Documentations stolen from comments in file.
 
-**Source code:** :source:`Lib/wave.py`
+**Mã nguồn:** :source:`Lib/wave.py`
 
 --------------
 
-The :mod:`!wave` module provides a convenient interface to the Waveform Audio
-"WAVE" (or "WAV") file format. Only uncompressed PCM encoded wave files are
-supported.
+Mô-đun :mod:`!wave` cung cấp một giao diện thuận tiện cho định dạng tệp Waveform Audio "WAVE" (hoặc "WAV"). Chỉ hỗ trợ các tệp wave được mã hóa PCM không nén.
 
 .. versionchanged:: 3.12
 
-   Support for ``WAVE_FORMAT_EXTENSIBLE`` headers was added, provided that the
-   extended format is ``KSDATAFORMAT_SUBTYPE_PCM``.
+   Đã bổ sung hỗ trợ cho các header ``WAVE_FORMAT_EXTENSIBLE``, với điều kiện định dạng mở rộng là ``KSDATAFORMAT_SUBTYPE_PCM``.
 
-The :mod:`!wave` module defines the following function and exception:
+Mô-đun :mod:`!wave` định nghĩa hàm và ngoại lệ sau:
 
 
 .. function:: open(file, mode=None)
 
-   If *file* is a string, open the file by that name, otherwise treat it as a
-   file-like object.  *mode* can be:
+   Nếu *tệp* là một chuỗi, hãy mở tệp có tên đó; nếu không, hãy coi đó là một đối tượng giống tệp. *mode* có thể là:
 
    ``'rb'``
-      Read only mode.
+      Chế độ chỉ đọc.
 
    ``'wb'``
-      Write only mode.
+      Chế độ chỉ ghi.
 
-   Note that it does not allow read/write WAV files.
+   Lưu ý rằng chế độ này không cho phép đọc/ghi các tệp WAV.
 
-   A *mode* of ``'rb'`` returns a :class:`Wave_read` object, while a *mode* of
-   ``'wb'`` returns a :class:`Wave_write` object.  If *mode* is omitted and a
-   file-like object is passed as *file*, ``file.mode`` is used as the default
-   value for *mode*.
+   Một *mode* với ``'rb'`` sẽ trả về một đối tượng :class:`Wave_read`, trong khi một *mode* với ``'wb'`` sẽ trả về một đối tượng :class:`Wave_write`. Nếu *mode* bị bỏ qua và một đối tượng giống tệp được truyền vào dưới dạng *file*, ``file.mode`` được sử dụng làm giá trị mặc định cho *mode*.
 
-   If you pass in a file-like object, the wave object will not close it when its
-   ``close()`` method is called; it is the caller's responsibility to close
-   the file object.
+   Nếu bạn truyền vào một đối tượng giống tệp, đối tượng wave sẽ không đóng đối tượng đó khi phương thức ``close()`` được gọi; người gọi có trách nhiệm đóng đối tượng tệp.
 
-   The :func:`.open` function may be used in a :keyword:`with` statement.  When
-   the :keyword:`!with` block completes, the :meth:`Wave_read.close` or
-   :meth:`Wave_write.close` method is called.
+   Hàm :func:`.open` có thể được sử dụng trong câu lệnh :keyword:`with`. Khi khối :keyword:`!with` hoàn tất, :meth:`Wave_read.close` hoặc
+   phương thức :meth:`Wave_write.close` được gọi.
 
    .. versionchanged:: 3.4
-      Added support for unseekable files.
+      Đã bổ sung hỗ trợ cho các tệp không thể seek.
 
 .. exception:: Error
 
-   An error raised when something is impossible because it violates the WAV
-   specification or hits an implementation deficiency.
+   Một lỗi được phát sinh khi một thao tác là không thể thực hiện do vi phạm đặc tả WAV hoặc gặp hạn chế trong quá trình triển khai.
 
 
 .. _wave-read-objects:
 
-Wave_read Objects
------------------
+Đối tượng Wave_read
+-------------------
 
 .. class:: Wave_read
 
-   Read a WAV file.
+   Đọc một tệp WAV.
 
-   Wave_read objects, as returned by :func:`.open`, have the following methods:
+   Các đối tượng Wave_read, được trả về bởi :func:`.open`, có các phương thức sau:
 
 
    .. method:: close()
 
-      Close the stream if it was opened by :mod:`!wave`, and make the instance
-      unusable.  This is called automatically on object collection.
+      Đóng stream nếu stream được mở bởi :mod:`!wave`, đồng thời khiến thực thể không thể sử dụng được. Thao tác này được tự động gọi khi đối tượng được thu gom.
 
 
    .. method:: getnchannels()
 
-      Returns number of audio channels (``1`` for mono, ``2`` for stereo).
+      Trả về số kênh âm thanh (``1`` cho mono, ``2`` cho stereo).
 
 
    .. method:: getsampwidth()
 
-      Returns sample width in bytes.
+      Trả về độ rộng mẫu tính bằng byte.
 
 
    .. method:: getframerate()
 
-      Returns sampling frequency.
+      Trả về tần số lấy mẫu.
 
 
    .. method:: getnframes()
 
-      Returns number of audio frames.
+      Trả về số lượng khung âm thanh.
 
 
    .. method:: getcomptype()
 
-      Returns compression type (``'NONE'`` is the only supported type).
+      Trả về kiểu nén (``'NONE'`` là kiểu duy nhất được hỗ trợ).
 
 
    .. method:: getcompname()
 
-      Human-readable version of :meth:`getcomptype`. Usually ``'not compressed'``
-      parallels ``'NONE'``.
+      Phiên bản dễ đọc của :meth:`getcomptype`. Thông thường, ``'not compressed'`` tương ứng với ``'NONE'``.
 
 
    .. method:: getparams()
 
-      Returns a :func:`~collections.namedtuple` ``(nchannels, sampwidth,
-      framerate, nframes, comptype, compname)``, equivalent to output of the
-      ``get*()`` methods.
+      Trả về một :func:`~collections.namedtuple` ``(nchannels, sampwidth, framerate, nframes, comptype, compname)``, tương đương với đầu ra của các phương thức ``get*()``.
 
 
    .. method:: readframes(n)
 
-      Reads and returns at most *n* frames of audio, as a :class:`bytes` object.
+      Đọc và trả về nhiều nhất *n* khung âm thanh dưới dạng một đối tượng :class:`bytes`.
 
 
    .. method:: rewind()
 
-      Rewind the file pointer to the beginning of the audio stream.
+      Đưa con trỏ tệp về đầu luồng âm thanh.
 
-   The following two methods are defined for compatibility with the old :mod:`!aifc`
-   module, and don't do anything interesting.
+   Hai phương thức sau được định nghĩa để tương thích với mô-đun :mod:`!aifc` cũ và không thực hiện điều gì đáng chú ý.
 
 
    .. method:: getmarkers()
 
-      Returns ``None``.
+      Trả về ``None``.
 
       .. deprecated-removed:: 3.13 3.15
-         The method only existed for compatibility with the :mod:`!aifc` module
-         which has been removed in Python 3.13.
+         Phương thức này chỉ tồn tại để tương thích với mô-đun :mod:`!aifc`, mô-đun đã bị xóa trong Python 3.13.
 
 
    .. method:: getmark(id)
 
-      Raise an error.
+      Phát sinh lỗi.
 
       .. deprecated-removed:: 3.13 3.15
-         The method only existed for compatibility with the :mod:`!aifc` module
-         which has been removed in Python 3.13.
+         Phương thức này chỉ tồn tại để tương thích với mô-đun :mod:`!aifc`, mô-đun đã bị xóa trong Python 3.13.
 
-   The following two methods define a term "position" which is compatible between
-   them, and is otherwise implementation dependent.
+   Hai phương thức sau định nghĩa một thuật ngữ "vị trí" tương thích với nhau và phụ thuộc vào cách triển khai trong các trường hợp khác.
 
 
    .. method:: setpos(pos)
 
-      Set the file pointer to the specified position.
+      Đặt con trỏ tệp tại vị trí được chỉ định.
 
 
    .. method:: tell()
 
-      Return current file pointer position.
+      Trả về vị trí hiện tại của con trỏ tệp.
 
 
 .. _wave-write-objects:
 
-Wave_write Objects
-------------------
+Đối tượng Wave_write
+--------------------
 
 .. class:: Wave_write
 
-   Write a WAV file.
+   Ghi tệp WAV.
 
-   Wave_write objects, as returned by :func:`.open`.
+   Các đối tượng Wave_write, được trả về bởi :func:`.open`.
 
-   For seekable output streams, the ``wave`` header will automatically be updated
-   to reflect the number of frames actually written.  For unseekable streams, the
-   *nframes* value must be accurate when the first frame data is written.  An
-   accurate *nframes* value can be achieved either by calling
-   :meth:`setnframes` or :meth:`setparams` with the number
-   of frames that will be written before :meth:`close` is called and
-   then using :meth:`writeframesraw` to write the frame data, or by
-   calling :meth:`writeframes` with all of the frame data to be
-   written.  In the latter case :meth:`writeframes` will calculate
-   the number of frames in the data and set *nframes* accordingly before writing
-   the frame data.
+   Đối với các luồng đầu ra có thể seek, header ``wave`` sẽ tự động được cập nhật để phản ánh số frame thực tế đã ghi. Đối với các luồng không thể seek, giá trị *nframes* phải chính xác khi dữ liệu frame đầu tiên được ghi. Có thể đạt được giá trị *nframes* chính xác bằng cách gọi
+   :meth:`setnframes` hoặc :meth:`setparams` với số frame sẽ được ghi trước khi gọi :meth:`close`, sau đó dùng :meth:`writeframesraw` để ghi dữ liệu frame; hoặc gọi :meth:`writeframes` với toàn bộ dữ liệu frame cần ghi. Trong trường hợp sau, :meth:`writeframes` sẽ tính số frame trong dữ liệu và đặt *nframes* tương ứng trước khi ghi dữ liệu frame.
 
    .. versionchanged:: 3.4
-      Added support for unseekable files.
+      Đã bổ sung hỗ trợ cho các tệp không thể seek.
 
-   Wave_write objects have the following methods:
+   Các đối tượng Wave_write có những phương thức sau:
 
    .. method:: close()
 
-      Make sure *nframes* is correct, and close the file if it was opened by
-      :mod:`!wave`.  This method is called upon object collection.  It will raise
-      an exception if the output stream is not seekable and *nframes* does not
-      match the number of frames actually written.
+      Hãy đảm bảo *nframes* là chính xác và đóng tệp nếu tệp được mở bởi
+      :mod:`!wave`. Phương thức này được gọi khi đối tượng được thu gom. Phương thức sẽ phát sinh ngoại lệ nếu luồng đầu ra không thể seek và *nframes* không khớp với số frame thực tế đã ghi.
 
 
    .. method:: setnchannels(n)
 
-      Set the number of channels.
+      Thiết lập số kênh.
 
 
    .. method:: getnchannels()
 
-      Return the number of channels.
+      Trả về số kênh.
 
 
    .. method:: setsampwidth(n)
 
-      Set the sample width to *n* bytes.
+      Thiết lập độ rộng mẫu thành *n* byte.
 
 
    .. method:: getsampwidth()
 
-      Return the sample width in bytes.
+      Trả về độ rộng mẫu theo byte.
 
 
    .. method:: setframerate(n)
 
-      Set the frame rate to *n*.
+      Đặt tốc độ khung hình thành *n*.
 
       .. versionchanged:: 3.2
-         A non-integral input to this method is rounded to the nearest
-         integer.
+         Giá trị đầu vào không phải số nguyên của phương thức này sẽ được làm tròn đến số nguyên gần nhất.
 
 
    .. method:: getframerate()
 
-      Return the frame rate.
+      Trả về tốc độ khung hình.
 
 
    .. method:: setnframes(n)
 
-      Set the number of frames to *n*.  This will be changed later if the number
-      of frames actually written is different (this update attempt will
-      raise an error if the output stream is not seekable).
+      Đặt số lượng khung hình thành *n*. Giá trị này sẽ được thay đổi sau nếu số lượng khung hình thực sự được ghi khác với giá trị đã đặt (lần thử cập nhật này sẽ gây ra lỗi nếu output stream không hỗ trợ seek).
 
 
    .. method:: getnframes()
 
-      Return the number of audio frames written so far.
+      Trả về số lượng khung hình âm thanh đã được ghi cho đến thời điểm hiện tại.
 
 
    .. method:: setcomptype(type, name)
 
-      Set the compression type and description. At the moment, only compression type
-      ``NONE`` is supported, meaning no compression.
+      Đặt kiểu nén và mô tả. Hiện tại, chỉ hỗ trợ kiểu nén ``NONE``, nghĩa là không nén.
 
 
    .. method:: getcomptype()
 
-      Return the compression type (``'NONE'``).
+      Trả về kiểu nén (``'NONE'``).
 
 
    .. method:: getcompname()
 
-      Return the human-readable compression type name.
+      Trả về tên kiểu nén ở dạng dễ đọc.
 
 
    .. method:: setparams(tuple)
 
-      The *tuple* should be ``(nchannels, sampwidth, framerate, nframes, comptype,
-      compname)``, with values valid for the ``set*()`` methods.  Sets all
-      parameters.
+      *tuple* phải là ``(nchannels, sampwidth, framerate, nframes, comptype, compname)``, với các giá trị hợp lệ cho những phương thức ``set*()``. Thiết lập tất cả tham số.
 
 
    .. method:: getparams()
 
-      Return a :func:`~collections.namedtuple`
-      ``(nchannels, sampwidth, framerate, nframes, comptype, compname)``
-      containing the current output parameters.
+      Trả về một :func:`~collections.namedtuple` ``(nchannels, sampwidth, framerate, nframes, comptype, compname)`` chứa các tham số đầu ra hiện tại.
 
 
    .. method:: tell()
 
-      Return current position in the file, with the same disclaimer for the
-      :meth:`Wave_read.tell` and :meth:`Wave_read.setpos` methods.
+      Trả về vị trí hiện tại trong tệp, với cùng lưu ý như đối với các phương thức
+      :meth:`Wave_read.tell` và :meth:`Wave_read.setpos`.
 
 
    .. method:: writeframesraw(data)
 
-      Write audio frames, without correcting *nframes*.
+      Ghi các frame âm thanh mà không điều chỉnh *nframes*.
 
       .. versionchanged:: 3.4
-         Any :term:`bytes-like object` is now accepted.
+         Bất kỳ :term:`bytes-like object` nào hiện được chấp nhận.
 
 
    .. method:: writeframes(data)
 
-      Write audio frames and make sure *nframes* is correct.  It will raise an
-      error if the output stream is not seekable and the total number of frames
-      that have been written after *data* has been written does not match the
-      previously set value for *nframes*.
+      Ghi các frame âm thanh và đảm bảo *nframes* là chính xác. Thao tác này sẽ gây ra lỗi nếu output stream không hỗ trợ seek và tổng số frame đã được ghi sau khi *data* được ghi không khớp với giá trị *nframes* đã đặt trước đó.
 
       .. versionchanged:: 3.4
-         Any :term:`bytes-like object` is now accepted.
+         Bất kỳ :term:`bytes-like object` nào hiện được chấp nhận.
 
-      Note that it is invalid to set any parameters after calling :meth:`writeframes`
-      or :meth:`writeframesraw`, and any attempt to do so will raise
+      Lưu ý rằng việc đặt bất kỳ tham số nào sau khi gọi :meth:`writeframes` hoặc :meth:`writeframesraw` là không hợp lệ, và mọi nỗ lực thực hiện việc đó sẽ gây ra
       :exc:`wave.Error`.

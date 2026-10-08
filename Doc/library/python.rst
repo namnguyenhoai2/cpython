@@ -1,12 +1,10 @@
 .. _python:
 
-***********************
-Python Runtime Services
-***********************
+******************************
+Các dịch vụ Runtime của Python
+******************************
 
-The modules described in this chapter provide a wide range of services related
-to the Python interpreter and its interaction with its environment.  Here's an
-overview:
+Các module được mô tả trong chương này cung cấp nhiều dịch vụ liên quan đến trình thông dịch Python và cách trình thông dịch tương tác với môi trường của nó. Dưới đây là tổng quan:
 
 
 .. toctree::
@@ -30,5 +28,4 @@ overview:
 
 .. seealso::
 
-   * See the :mod:`concurrent.interpreters` module, which similarly
-     exposes core runtime functionality.
+   * Xem module :mod:`concurrent.interpreters`, module này cũng cung cấp các chức năng cốt lõi của runtime.

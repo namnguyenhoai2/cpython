@@ -1,14 +1,14 @@
-:mod:`!plistlib` --- Generate and parse Apple ``.plist`` files
+:mod:`!plistlib` --- Tạo và phân tích các tệp Apple ``.plist``
 ==============================================================
 
 .. module:: plistlib
-   :synopsis: Generate and parse Apple plist files.
+   :synopsis: Tạo và phân tích các tệp plist của Apple.
 
 .. moduleauthor:: Jack Jansen
 .. sectionauthor:: Georg Brandl <georg@python.org>
 .. (harvested from docstrings in the original file)
 
-**Source code:** :source:`Lib/plistlib.py`
+**Mã nguồn:** :source:`Lib/plistlib.py`
 
 .. index::
    pair: plist; file
@@ -16,173 +16,145 @@
 
 --------------
 
-This module provides an interface for reading and writing the "property list"
-files used by Apple, primarily on macOS and iOS. This module supports both binary
-and XML plist files.
+Mô-đun này cung cấp giao diện để đọc và ghi các tệp "property list" được Apple sử dụng, chủ yếu trên macOS và iOS. Mô-đun này hỗ trợ cả tệp plist nhị phân và XML.
 
-The property list (``.plist``) file format is a simple serialization supporting
-basic object types, like dictionaries, lists, numbers and strings.  Usually the
-top level object is a dictionary.
+Định dạng tệp property list (``.plist``) là một dạng tuần tự hóa đơn giản, hỗ trợ các kiểu đối tượng cơ bản như dictionary, list, số và chuỗi. Thông thường, đối tượng cấp cao nhất là một dictionary.
 
-To write out and to parse a plist file, use the :func:`dump` and
-:func:`load` functions.
+Để ghi và phân tích một tệp plist, hãy sử dụng :func:`dump` và
+:func:`load` các hàm.
 
-To work with plist data in bytes or string objects, use :func:`dumps`
-and :func:`loads`.
+Để làm việc với dữ liệu plist dưới dạng đối tượng byte hoặc chuỗi, hãy sử dụng :func:`dumps` và :func:`loads`.
 
-Values can be strings, integers, floats, booleans, tuples, lists, dictionaries
-(but only with string keys), :class:`bytes`, :class:`bytearray`
-or :class:`datetime.datetime` objects.
+Các giá trị có thể là chuỗi, số nguyên, số thực, giá trị boolean, tuple, danh sách, từ điển (nhưng chỉ có khóa dạng chuỗi), đối tượng :class:`bytes`, :class:`bytearray` hoặc :class:`datetime.datetime`.
 
 .. versionchanged:: 3.4
-   New API, old API deprecated.  Support for binary format plists added.
+   API mới, API cũ không còn được dùng. Đã bổ sung hỗ trợ cho plist ở định dạng nhị phân.
 
 .. versionchanged:: 3.8
-   Support added for reading and writing :class:`UID` tokens in binary plists as used
-   by NSKeyedArchiver and NSKeyedUnarchiver.
+   Đã bổ sung hỗ trợ đọc và ghi các token :class:`UID` trong plist nhị phân được NSKeyedArchiver và NSKeyedUnarchiver sử dụng.
 
 .. versionchanged:: 3.9
-   Old API removed.
+   API cũ đã bị xóa.
 
 .. seealso::
 
-   `PList manual page <https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/PropertyLists/>`_
-      Apple's documentation of the file format.
+   `Tài liệu hướng dẫn PList <https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/PropertyLists/>`_
+      Tài liệu của Apple về định dạng tệp.
 
 
-This module defines the following functions:
+Mô-đun này định nghĩa các hàm sau:
 
 .. function:: load(fp, *, fmt=None, dict_type=dict, aware_datetime=False)
 
-   Read a plist file. *fp* should be a readable and binary file object.
-   Return the unpacked root object (which usually is a
-   dictionary).
+   Đọc tệp plist. *fp* phải là đối tượng tệp có thể đọc và ở dạng nhị phân. Trả về đối tượng gốc đã giải nén (thường là một dictionary).
 
-   The *fmt* is the format of the file and the following values are valid:
+   *fmt* là định dạng của tệp và các giá trị sau đây là hợp lệ:
 
-   * :data:`None`: Autodetect the file format
+   * :data:`None`: Tự động phát hiện định dạng tệp
 
-   * :data:`FMT_XML`: XML file format
+   * :data:`FMT_XML`: Định dạng tệp XML
 
-   * :data:`FMT_BINARY`: Binary plist format
+   * :data:`FMT_BINARY`: Định dạng plist nhị phân
 
-   The *dict_type* is the type used for dictionaries that are read from the
-   plist file.
+   *dict_type* là kiểu được dùng cho các dictionary được đọc từ tệp plist.
 
-   When *aware_datetime* is true, fields with type ``datetime.datetime`` will
-   be created as :ref:`aware object <datetime-naive-aware>`, with
-   :attr:`!tzinfo` as :const:`datetime.UTC`.
+   Khi *aware_datetime* là true, các trường có kiểu ``datetime.datetime`` sẽ được tạo dưới dạng :ref:`đối tượng aware <datetime-naive-aware>`, với
+   :attr:`!tzinfo` dưới dạng :const:`datetime.UTC`.
 
-   XML data for the :data:`FMT_XML` format is parsed using the Expat parser
-   from :mod:`xml.parsers.expat` -- see its documentation for possible
-   exceptions on ill-formed XML.  Unknown elements will simply be ignored
-   by the plist parser.
+   Dữ liệu XML cho định dạng :data:`FMT_XML` được phân tích bằng parser Expat từ :mod:`xml.parsers.expat` -- xem tài liệu của nó để biết các ngoại lệ có thể xảy ra với XML không đúng định dạng. Các phần tử không xác định sẽ đơn giản bị parser plist bỏ qua.
 
-   The parser raises :exc:`InvalidFileException` when the file cannot be parsed.
+   Parser sẽ ném :exc:`InvalidFileException` khi không thể phân tích tệp.
 
    .. versionadded:: 3.4
 
    .. versionchanged:: 3.13
-      The keyword-only parameter *aware_datetime* has been added.
+      Đã thêm tham số chỉ nhận theo từ khóa *aware_datetime*.
 
 
 .. function:: loads(data, *, fmt=None, dict_type=dict, aware_datetime=False)
 
-   Load a plist from a bytes or string object. See :func:`load` for an
-   explanation of the keyword arguments.
+   Nạp một plist từ đối tượng bytes hoặc chuỗi. Xem :func:`load` để biết giải thích về các đối số từ khóa.
 
    .. versionadded:: 3.4
 
    .. versionchanged:: 3.13
-      *data* can be a string when *fmt* equals :data:`FMT_XML`.
+      *data* có thể là một chuỗi khi *fmt* bằng :data:`FMT_XML`.
 
 .. function:: dump(value, fp, *, fmt=FMT_XML, sort_keys=True, skipkeys=False, aware_datetime=False)
 
-   Write *value* to a plist file. *fp* should be a writable, binary
-   file object.
+   Ghi *value* vào một tệp plist. *fp* phải là một đối tượng tệp nhị phân có thể ghi.
 
-   The *fmt* argument specifies the format of the plist file and can be
-   one of the following values:
+   Đối số *fmt* chỉ định định dạng của tệp plist và có thể nhận một trong các giá trị sau:
 
-   * :data:`FMT_XML`: XML formatted plist file
+   * :data:`FMT_XML`: Tệp plist có định dạng XML
 
-   * :data:`FMT_BINARY`: Binary formatted plist file
+   * :data:`FMT_BINARY`: Tệp plist có định dạng nhị phân
 
-   When *sort_keys* is true (the default) the keys for dictionaries will be
-   written to the plist in sorted order, otherwise they will be written in
-   the iteration order of the dictionary.
+   Khi *sort_keys* là true (mặc định), các key của dictionary sẽ được ghi vào plist theo thứ tự đã sắp xếp; nếu không, chúng sẽ được ghi theo thứ tự lặp của dictionary.
 
-   When *skipkeys* is false (the default) the function raises :exc:`TypeError`
-   when a key of a dictionary is not a string, otherwise such keys are skipped.
+   Khi *skipkeys* là false (mặc định), hàm sẽ phát sinh :exc:`TypeError` nếu một key của dictionary không phải là chuỗi; nếu không, các key như vậy sẽ bị bỏ qua.
 
-   When *aware_datetime* is true and any field with type ``datetime.datetime``
-   is set as an :ref:`aware object <datetime-naive-aware>`, it will convert to
-   UTC timezone before writing it.
+   Khi *aware_datetime* là true và bất kỳ trường nào có kiểu ``datetime.datetime`` được đặt thành một đối tượng :ref:`aware object <datetime-naive-aware>`, trường đó sẽ được chuyển đổi sang múi giờ UTC trước khi ghi.
 
-   A :exc:`TypeError` will be raised if the object is of an unsupported type or
-   a container that contains objects of unsupported types.
+   Sẽ phát sinh :exc:`TypeError` nếu đối tượng thuộc kiểu không được hỗ trợ hoặc là một container chứa các đối tượng thuộc những kiểu không được hỗ trợ.
 
-   An :exc:`OverflowError` will be raised for integer values that cannot
-   be represented in (binary) plist files.
+   Sẽ phát sinh :exc:`OverflowError` đối với các giá trị số nguyên không thể biểu diễn trong tệp plist (dạng nhị phân).
 
    .. versionadded:: 3.4
 
    .. versionchanged:: 3.13
-      The keyword-only parameter *aware_datetime* has been added.
+      Đã thêm tham số chỉ nhận theo từ khóa *aware_datetime*.
 
 
 .. function:: dumps(value, *, fmt=FMT_XML, sort_keys=True, skipkeys=False, aware_datetime=False)
 
-   Return *value* as a plist-formatted bytes object. See
-   the documentation for :func:`dump` for an explanation of the keyword
-   arguments of this function.
+   Trả về *value* dưới dạng một đối tượng bytes được định dạng plist. Xem tài liệu về :func:`dump` để biết giải thích về các đối số từ khóa của hàm này.
 
    .. versionadded:: 3.4
 
 
-The following classes are available:
+Các lớp sau đây hiện có:
 
 .. class:: UID(data)
 
-   Wraps an :class:`int`.  This is used when reading or writing NSKeyedArchiver
-   encoded data, which contains UID (see PList manual).
+   Bọc một :class:`int`. Được dùng khi đọc hoặc ghi dữ liệu được mã hóa bằng NSKeyedArchiver, trong đó chứa UID (xem hướng dẫn sử dụng PList).
 
    .. attribute:: data
 
-      Int value of the UID.  It must be in the range ``0 <= data < 2**64``.
+      Giá trị Int của UID. Giá trị này phải nằm trong phạm vi ``0 <= data < 2**64``.
 
    .. versionadded:: 3.8
 
 
-The following constants are available:
+Các hằng số sau đây khả dụng:
 
 .. data:: FMT_XML
 
-   The XML format for plist files.
+   Định dạng XML cho các tệp plist.
 
    .. versionadded:: 3.4
 
 
 .. data:: FMT_BINARY
 
-   The binary format for plist files
+   Định dạng nhị phân cho các tệp plist
 
    .. versionadded:: 3.4
 
 
-The module defines the following exceptions:
+Mô-đun định nghĩa các ngoại lệ sau:
 
 .. exception:: InvalidFileException
 
-   Raised when a file cannot be parsed.
+   Được phát sinh khi không thể phân tích cú pháp một tệp.
 
    .. versionadded:: 3.4
 
 
-Examples
---------
+Ví dụ
+-----
 
-Generating a plist::
+Tạo plist::
 
     import datetime as dt
     import plistlib
@@ -204,7 +176,7 @@ Generating a plist::
     )
     print(plistlib.dumps(pl).decode())
 
-Parsing a plist::
+Phân tích tệp plist::
 
     import plistlib
 
@@ -216,3 +188,5 @@ Parsing a plist::
     </plist>"""
     pl = plistlib.loads(plist)
     print(pl["foo"])
+
+.. _`PList manual page`: https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/PropertyLists/

@@ -1,211 +1,146 @@
-:mod:`!heapq` --- Heap queue algorithm
-======================================
+:mod:`!heapq` --- Thuật toán hàng đợi heap
+==========================================
 
 .. module:: heapq
-   :synopsis: Heap queue algorithm (a.k.a. priority queue).
+   :synopsis: Thuật toán hàng đợi heap (còn gọi là hàng đợi ưu tiên).
 
 .. moduleauthor:: Kevin O'Connor
 .. sectionauthor:: Guido van Rossum <guido@python.org>
 .. sectionauthor:: François Pinard
 .. sectionauthor:: Raymond Hettinger
 
-**Source code:** :source:`Lib/heapq.py`
+**Mã nguồn:** :source:`Lib/heapq.py`
 
 --------------
 
-This module provides an implementation of the heap queue algorithm, also known
-as the priority queue algorithm.
+Mô-đun này cung cấp cách triển khai thuật toán hàng đợi heap, còn được gọi là thuật toán hàng đợi ưu tiên.
 
-Min-heaps are binary trees for which every parent node has a value less than
-or equal to any of its children.
-We refer to this condition as the heap invariant.
+Min-heap là các cây nhị phân trong đó mọi nút cha đều có giá trị nhỏ hơn hoặc bằng giá trị của bất kỳ nút con nào. Chúng ta gọi điều kiện này là bất biến heap.
 
-For min-heaps, this implementation uses lists for which
-``heap[k] <= heap[2*k+1]`` and ``heap[k] <= heap[2*k+2]`` for all *k* for which
-the compared elements exist.  Elements are counted from zero.  The interesting
-property of a min-heap is that its smallest element is always the root,
-``heap[0]``.
+Đối với min-heap, cách triển khai này sử dụng các list sao cho ``heap[k] <= heap[2*k+1]`` và ``heap[k] <= heap[2*k+2]`` với mọi *k* mà các phần tử được so sánh tồn tại. Các phần tử được đánh số bắt đầu từ không. Đặc điểm đáng chú ý của min-heap là phần tử nhỏ nhất luôn là nút gốc, ``heap[0]``.
 
-Max-heaps satisfy the reverse invariant: every parent node has a value
-*greater* than any of its children.  These are implemented as lists for which
-``maxheap[2*k+1] <= maxheap[k]`` and ``maxheap[2*k+2] <= maxheap[k]`` for all
-*k* for which the compared elements exist.
-The root, ``maxheap[0]``, contains the *largest* element;
-``heap.sort(reverse=True)`` maintains the max-heap invariant.
+Max-heap thỏa mãn bất biến ngược lại: mọi nút cha đều có giá trị *greater* hơn bất kỳ nút con nào. Chúng được triển khai dưới dạng các list sao cho ``maxheap[2*k+1] <= maxheap[k]`` và ``maxheap[2*k+2] <= maxheap[k]`` với mọi *k* mà các phần tử được so sánh tồn tại. Nút gốc, ``maxheap[0]``, chứa phần tử *largest*; ``heap.sort(reverse=True)`` duy trì bất biến max-heap.
 
-The :mod:`!heapq` API differs from textbook heap algorithms in two aspects: (a)
-We use zero-based indexing.  This makes the relationship between the index for
-a node and the indexes for its children slightly less obvious, but is more
-suitable since Python uses zero-based indexing. (b) Textbooks often focus on
-max-heaps, due to their suitability for in-place sorting. Our implementation
-favors min-heaps as they better correspond to Python :class:`lists <list>`.
+API :mod:`!heapq` khác với các thuật toán heap trong giáo trình ở hai khía cạnh: (a) Chúng tôi sử dụng indexing bắt đầu từ 0. Điều này khiến mối quan hệ giữa chỉ mục của một node và các chỉ mục của các node con kém rõ ràng hơn đôi chút, nhưng phù hợp hơn vì Python sử dụng indexing bắt đầu từ 0. (b) Các giáo trình thường tập trung vào max-heap vì chúng phù hợp với việc sắp xếp tại chỗ. Cách triển khai của chúng tôi ưu tiên min-heap vì chúng tương ứng tốt hơn với :class:`lists <list>` của Python.
 
-These two aspects make it possible to view the heap as a regular Python list
-without surprises: ``heap[0]`` is the smallest item, and ``heap.sort()``
-maintains the heap invariant!
+Hai khía cạnh này giúp bạn có thể xem heap như một Python list thông thường mà không gặp bất ngờ: ``heap[0]`` là phần tử nhỏ nhất, và ``heap.sort()`` duy trì bất biến của heap!
 
-Like :meth:`list.sort`, this implementation uses only the ``<`` operator
-for comparisons, for both min-heaps and max-heaps.
+Tương tự :meth:`list.sort`, cách triển khai này chỉ sử dụng toán tử ``<`` để so sánh, cho cả min-heap và max-heap.
 
-In the API below, and in this documentation, the unqualified term *heap*
-generally refers to a min-heap.
-The API for max-heaps is named using a ``_max``  suffix.
+Trong API dưới đây và trong tài liệu này, thuật ngữ không có tiền tố *heap* thường chỉ min-heap. API dành cho max-heap được đặt tên với hậu tố ``_max``.
 
-To create a heap, use a list initialized as ``[]``, or transform an existing list
-into a min-heap or max-heap using the :func:`heapify` or :func:`heapify_max`
-functions, respectively.
+Để tạo một heap, hãy sử dụng một list được khởi tạo là ``[]``, hoặc chuyển một list hiện có thành min-heap hoặc max-heap bằng các hàm :func:`heapify` hoặc :func:`heapify_max`, tương ứng.
 
-The following functions are provided for min-heaps:
+Các hàm sau đây được cung cấp cho min-heap:
 
 
 .. function:: heapify(x)
 
-   Transform list *x* into a min-heap, in-place, in linear time.
+   Chuyển list *x* thành min-heap tại chỗ trong thời gian tuyến tính.
 
 
 .. function:: heappush(heap, item)
 
-   Push the value *item* onto the *heap*, maintaining the min-heap invariant.
+   Đẩy giá trị *item* vào *heap*, đồng thời duy trì bất biến min-heap.
 
 
 .. function:: heappop(heap)
 
-   Pop and return the smallest item from the *heap*, maintaining the min-heap
-   invariant.  If the heap is empty, :exc:`IndexError` is raised.  To access the
-   smallest item without popping it, use ``heap[0]``.
+   Lấy và trả về item nhỏ nhất từ *heap*, đồng thời duy trì bất biến min-heap. Nếu heap trống, :exc:`IndexError` sẽ được phát sinh. Để truy cập item nhỏ nhất mà không lấy nó ra, hãy sử dụng ``heap[0]``.
 
 
 .. function:: heappushpop(heap, item)
 
-   Push *item* on the heap, then pop and return the smallest item from the
-   *heap*.  The combined action runs more efficiently than :func:`heappush`
-   followed by a separate call to :func:`heappop`.
+   Đẩy *item* vào heap, sau đó lấy và trả về item nhỏ nhất từ *heap*. Thao tác kết hợp này chạy hiệu quả hơn so với :func:`heappush` rồi gọi riêng :func:`heappop`.
 
 
 .. function:: heapreplace(heap, item)
 
-   Pop and return the smallest item from the *heap*, and also push the new *item*.
-   The heap size doesn't change. If the heap is empty, :exc:`IndexError` is raised.
+   Lấy và trả về item nhỏ nhất từ *heap*, đồng thời đẩy *item* mới vào. Kích thước heap không thay đổi. Nếu heap trống, :exc:`IndexError` sẽ được phát sinh.
 
-   This one step operation is more efficient than a :func:`heappop` followed by
-   :func:`heappush` and can be more appropriate when using a fixed-size heap.
-   The pop/push combination always returns an element from the heap and replaces
-   it with *item*.
+   Thao tác một bước này hiệu quả hơn so với :func:`heappop` rồi
+   :func:`heappush` và có thể phù hợp hơn khi sử dụng heap có kích thước cố định. Tổ hợp pop/push luôn trả về một phần tử từ heap và thay thế nó bằng *item*.
 
-   The value returned may be larger than the *item* added.  If that isn't
-   desired, consider using :func:`heappushpop` instead.  Its push/pop
-   combination returns the smaller of the two values, leaving the larger value
-   on the heap.
+   Giá trị được trả về có thể lớn hơn *item* đã thêm vào. Nếu không mong muốn điều đó, hãy cân nhắc sử dụng :func:`heappushpop` thay thế. Tổ hợp push/pop của nó trả về giá trị nhỏ hơn trong hai giá trị, đồng thời giữ giá trị lớn hơn trên heap.
 
 
-For max-heaps, the following functions are provided:
+Đối với max-heap, các hàm sau được cung cấp:
 
 
 .. function:: heapify_max(x)
 
-   Transform list *x* into a max-heap, in-place, in linear time.
+   Chuyển đổi danh sách *x* thành max-heap ngay tại chỗ trong thời gian tuyến tính.
 
    .. versionadded:: 3.14
 
 
 .. function:: heappush_max(heap, item)
 
-   Push the value *item* onto the max-heap *heap*, maintaining the max-heap
-   invariant.
+   Đẩy giá trị *item* vào max-heap *heap*, duy trì bất biến max-heap.
 
    .. versionadded:: 3.14
 
 
 .. function:: heappop_max(heap)
 
-   Pop and return the largest item from the max-heap *heap*, maintaining the
-   max-heap invariant.  If the max-heap is empty, :exc:`IndexError` is raised.
-   To access the largest item without popping it, use ``maxheap[0]``.
+   Lấy và trả về phần tử lớn nhất từ max-heap *heap*, duy trì bất biến max-heap. Nếu max-heap trống, :exc:`IndexError` sẽ được phát sinh. Để truy cập phần tử lớn nhất mà không lấy nó ra, hãy sử dụng ``maxheap[0]``.
 
    .. versionadded:: 3.14
 
 
 .. function:: heappushpop_max(heap, item)
 
-   Push *item* on the max-heap *heap*, then pop and return the largest item
-   from *heap*.
-   The combined action runs more efficiently than :func:`heappush_max`
-   followed by a separate call to :func:`heappop_max`.
+   Đẩy *item* vào max-heap *heap*, sau đó lấy và trả về phần tử lớn nhất từ *heap*. Thao tác kết hợp này hiệu quả hơn :func:`heappush_max` tiếp theo là một lệnh gọi riêng đến :func:`heappop_max`.
 
    .. versionadded:: 3.14
 
 
 .. function:: heapreplace_max(heap, item)
 
-   Pop and return the largest item from the max-heap *heap* and also push the
-   new *item*.
-   The max-heap size doesn't change. If the max-heap is empty,
-   :exc:`IndexError` is raised.
+   Lấy và trả về phần tử lớn nhất từ max-heap *heap*, đồng thời đẩy *item* mới vào. Kích thước max-heap không thay đổi. Nếu max-heap trống,
+   :exc:`IndexError` sẽ được phát sinh.
 
-   The value returned may be smaller than the *item* added.  Refer to the
-   analogous function :func:`heapreplace` for detailed usage notes.
+   Giá trị được trả về có thể nhỏ hơn *item* đã được thêm vào. Tham khảo hàm tương tự :func:`heapreplace` để biết ghi chú sử dụng chi tiết.
 
    .. versionadded:: 3.14
 
 
-The module also offers three general purpose functions based on heaps.
+Mô-đun này cũng cung cấp ba hàm đa dụng dựa trên heap.
 
 
 .. function:: merge(*iterables, key=None, reverse=False)
 
-   Merge multiple sorted inputs into a single sorted output (for example, merge
-   timestamped entries from multiple log files).  Returns an :term:`iterator`
-   over the sorted values.
+   Trộn nhiều đầu vào đã được sắp xếp thành một đầu ra duy nhất cũng được sắp xếp (ví dụ: trộn các mục có dấu thời gian từ nhiều tệp nhật ký). Trả về một :term:`iterator` trên các giá trị đã sắp xếp.
 
-   Similar to ``sorted(itertools.chain(*iterables))`` but returns an iterable, does
-   not pull the data into memory all at once, and assumes that each of the input
-   streams is already sorted (smallest to largest).
+   Tương tự như ``sorted(itertools.chain(*iterables))`` nhưng trả về một iterable, không tải toàn bộ dữ liệu vào bộ nhớ cùng một lúc và giả định rằng mỗi luồng đầu vào đã được sắp xếp (từ nhỏ đến lớn).
 
-   Has two optional arguments which must be specified as keyword arguments.
+   Có hai đối số tùy chọn phải được chỉ định dưới dạng keyword argument.
 
-   *key* specifies a :term:`key function` of one argument that is used to
-   extract a comparison key from each input element.  The default value is
-   ``None`` (compare the elements directly).
+   *key* chỉ định một :term:`key function` gồm một đối số, được dùng để trích xuất khóa so sánh từ mỗi phần tử đầu vào. Giá trị mặc định là ``None`` (so sánh trực tiếp các phần tử).
 
-   *reverse* is a boolean value.  If set to ``True``, then the input elements
-   are merged as if each comparison were reversed. To achieve behavior similar
-   to ``sorted(itertools.chain(*iterables), reverse=True)``, all iterables must
-   be sorted from largest to smallest.
+   *reverse* là một giá trị boolean. Nếu được đặt thành ``True``, các phần tử đầu vào sẽ được trộn như thể mỗi phép so sánh đều bị đảo ngược. Để đạt được hành vi tương tự ``sorted(itertools.chain(*iterables), reverse=True)``, tất cả iterable phải được sắp xếp từ lớn đến nhỏ.
 
    .. versionchanged:: 3.5
-      Added the optional *key* and *reverse* parameters.
+      Đã bổ sung các tham số tùy chọn *key* và *reverse*.
 
 
 .. function:: nlargest(n, iterable, key=None)
 
-   Return a list with the *n* largest elements from the dataset defined by
-   *iterable*.  *key*, if provided, specifies a function of one argument that is
-   used to extract a comparison key from each element in *iterable* (for example,
-   ``key=str.lower``).  Equivalent to:  ``sorted(iterable, key=key,
-   reverse=True)[:n]``.
+   Trả về một danh sách gồm *n* phần tử lớn nhất từ tập dữ liệu được xác định bởi *iterable*.  *key*, nếu được cung cấp, chỉ định một hàm nhận một đối số, được dùng để trích xuất khóa so sánh từ mỗi phần tử trong *iterable* (ví dụ: ``key=str.lower``).  Tương đương với:  ``sorted(iterable, key=key, reverse=True)[:n]``.
 
 
 .. function:: nsmallest(n, iterable, key=None)
 
-   Return a list with the *n* smallest elements from the dataset defined by
-   *iterable*.  *key*, if provided, specifies a function of one argument that is
-   used to extract a comparison key from each element in *iterable* (for example,
-   ``key=str.lower``).  Equivalent to:  ``sorted(iterable, key=key)[:n]``.
+   Trả về một danh sách gồm *n* phần tử nhỏ nhất từ tập dữ liệu được xác định bởi *iterable*.  *key*, nếu được cung cấp, chỉ định một hàm nhận một đối số, được dùng để trích xuất khóa so sánh từ mỗi phần tử trong *iterable* (ví dụ: ``key=str.lower``).  Tương đương với:  ``sorted(iterable, key=key)[:n]``.
 
 
-The latter two functions perform best for smaller values of *n*.  For larger
-values, it is more efficient to use the :func:`sorted` function.  Also, when
-``n==1``, it is more efficient to use the built-in :func:`min` and :func:`max`
-functions.  If repeated usage of these functions is required, consider turning
-the iterable into an actual heap.
+Hai hàm sau hoạt động tốt nhất với các giá trị *n* nhỏ hơn.  Với các giá trị lớn hơn, sử dụng hàm :func:`sorted` sẽ hiệu quả hơn.  Ngoài ra, khi ``n==1``, việc sử dụng các hàm tích hợp sẵn :func:`min` và :func:`max` sẽ hiệu quả hơn.  Nếu cần sử dụng lặp lại các hàm này, hãy cân nhắc chuyển iterable thành một heap thực sự.
 
 
-Basic Examples
---------------
+Các ví dụ cơ bản
+----------------
 
-A `heapsort <https://en.wikipedia.org/wiki/Heapsort>`_ can be implemented by
-pushing all values onto a heap and then popping off the smallest values one at a
-time::
+Có thể triển khai `heapsort <https://en.wikipedia.org/wiki/Heapsort>`_ bằng cách đẩy tất cả giá trị vào một heap, sau đó lần lượt lấy ra các giá trị nhỏ nhất::
 
    >>> def heapsort(iterable):
    ...     h = []
@@ -216,11 +151,9 @@ time::
    >>> heapsort([1, 3, 5, 7, 9, 2, 4, 6, 8, 0])
    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-This is similar to ``sorted(iterable)``, but unlike :func:`sorted`, this
-implementation is not stable.
+Điều này tương tự như ``sorted(iterable)``, nhưng không giống :func:`sorted`, cách triển khai này không stable.
 
-Heap elements can be tuples.  This is useful for assigning comparison values
-(such as task priorities) alongside the main record being tracked::
+Các phần tử trong heap có thể là các tuple. Điều này hữu ích khi gán các giá trị dùng để so sánh (chẳng hạn như độ ưu tiên của tác vụ) cùng với bản ghi chính đang được theo dõi::
 
     >>> h = []
     >>> heappush(h, (5, 'write code'))
@@ -231,27 +164,18 @@ Heap elements can be tuples.  This is useful for assigning comparison values
     (1, 'write spec')
 
 
-Other Applications
-------------------
+Các ứng dụng khác
+-----------------
 
-`Medians <https://en.wikipedia.org/wiki/Median>`_ are a measure of
-central tendency for a set of numbers.  In distributions skewed by
-outliers, the median provides a more stable estimate than an average
-(arithmetic mean).  A running median is an `online algorithm
-<https://en.wikipedia.org/wiki/Online_algorithm>`_ that updates
-continuously as new data arrives.
+`Trung vị <https://en.wikipedia.org/wiki/Median>`_ là một đại lượng đo xu hướng trung tâm của một tập hợp số. Trong các phân phối bị lệch do các giá trị ngoại lệ, trung vị cung cấp một ước tính ổn định hơn so với giá trị trung bình (trung bình số học). Trung vị động là một `thuật toán trực tuyến <https://en.wikipedia.org/wiki/Online_algorithm>`_ được cập nhật liên tục khi dữ liệu mới xuất hiện.
 
-A running median can be efficiently implemented by balancing two heaps,
-a max-heap for values at or below the midpoint and a min-heap for values
-above the midpoint.  When the two heaps have the same size, the new
-median is the average of the tops of the two heaps; otherwise, the
-median is at the top of the larger heap::
+Có thể triển khai trung vị động một cách hiệu quả bằng cách cân bằng hai heap: một max-heap chứa các giá trị nhỏ hơn hoặc bằng điểm giữa và một min-heap chứa các giá trị lớn hơn điểm giữa. Khi hai heap có cùng kích thước, trung vị mới là giá trị trung bình của các phần tử đầu của hai heap; nếu không, trung vị nằm ở phần tử đầu của heap lớn hơn::
 
     def running_median(iterable):
         "Yields the cumulative median of values seen so far."
 
         lo = []  # max-heap
-        hi = []  # min-heap (same size as or one smaller than lo)
+        hi = []  # min-heap (có kích thước bằng hoặc nhỏ hơn lo một phần tử)
 
         for x in iterable:
             if len(lo) == len(hi):
@@ -261,38 +185,28 @@ median is at the top of the larger heap::
                 heappush(hi, heappushpop_max(lo, x))
                 yield (lo[0] + hi[0]) / 2
 
-For example::
+Ví dụ::
 
     >>> list(running_median([5.0, 9.0, 4.0, 12.0, 8.0, 9.0]))
     [5.0, 7.0, 5.0, 7.0, 8.0, 8.5]
 
 
-Priority Queue Implementation Notes
------------------------------------
+Ghi chú triển khai Priority Queue
+---------------------------------
 
-A `priority queue <https://en.wikipedia.org/wiki/Priority_queue>`_ is common use
-for a heap, and it presents several implementation challenges:
+Một `hàng đợi ưu tiên <https://en.wikipedia.org/wiki/Priority_queue>`_ thường được triển khai bằng heap và đặt ra một số thách thức khi triển khai:
 
-* Sort stability:  how do you get two tasks with equal priorities to be returned
-  in the order they were originally added?
+* Tính ổn định khi sắp xếp: làm thế nào để hai tác vụ có cùng mức ưu tiên được trả về theo thứ tự chúng được thêm vào ban đầu?
 
-* Tuple comparison breaks for (priority, task) pairs if the priorities are equal
-  and the tasks do not have a default comparison order.
+* So sánh tuple sẽ không hoạt động với các cặp (priority, task) nếu các priority bằng nhau và các task không có thứ tự so sánh mặc định.
 
-* If the priority of a task changes, how do you move it to a new position in
-  the heap?
+* Nếu priority của một task thay đổi, làm thế nào để di chuyển task đó đến vị trí mới trong heap?
 
-* Or if a pending task needs to be deleted, how do you find it and remove it
-  from the queue?
+* Hoặc nếu cần xóa một task đang chờ, làm thế nào để tìm và xóa task đó khỏi queue?
 
-A solution to the first two challenges is to store entries as 3-element list
-including the priority, an entry count, and the task.  The entry count serves as
-a tie-breaker so that two tasks with the same priority are returned in the order
-they were added. And since no two entry counts are the same, the tuple
-comparison will never attempt to directly compare two tasks.
+Một cách giải quyết hai thách thức đầu tiên là lưu các mục dưới dạng danh sách gồm 3 phần tử, bao gồm priority, số thứ tự mục nhập và task. Số thứ tự mục nhập đóng vai trò là tiêu chí phân định để hai task có cùng priority được trả về theo thứ tự chúng được thêm vào. Và vì không có hai số thứ tự mục nhập nào giống nhau, phép so sánh tuple sẽ không bao giờ cố gắng so sánh trực tiếp hai task.
 
-Another solution to the problem of non-comparable tasks is to create a wrapper
-class that ignores the task item and only compares the priority field::
+Một giải pháp khác cho vấn đề các task không thể so sánh là tạo một lớp wrapper bỏ qua phần tử task và chỉ so sánh trường priority::
 
     from dataclasses import dataclass, field
     from typing import Any
@@ -302,18 +216,14 @@ class that ignores the task item and only compares the priority field::
         priority: int
         item: Any=field(compare=False)
 
-The remaining challenges revolve around finding a pending task and making
-changes to its priority or removing it entirely.  Finding a task can be done
-with a dictionary pointing to an entry in the queue.
+Các thách thức còn lại xoay quanh việc tìm một task đang chờ xử lý và thay đổi priority của task đó hoặc xóa hoàn toàn task. Có thể tìm task bằng một dictionary trỏ đến một entry trong queue.
 
-Removing the entry or changing its priority is more difficult because it would
-break the heap structure invariants.  So, a possible solution is to mark the
-entry as removed and add a new entry with the revised priority::
+Việc xóa entry hoặc thay đổi priority của entry khó hơn vì sẽ phá vỡ các bất biến của cấu trúc heap. Vì vậy, một giải pháp khả thi là đánh dấu entry là đã bị xóa và thêm một entry mới với priority đã được điều chỉnh::
 
-    pq = []                         # list of entries arranged in a heap
-    entry_finder = {}               # mapping of tasks to entries
-    REMOVED = '<removed-task>'      # placeholder for a removed task
-    counter = itertools.count()     # unique sequence count
+    pq = []                         # danh sách các entry được sắp xếp trong một heap
+    entry_finder = {}               # ánh xạ các task tới các entry
+    REMOVED = '<removed-task>'      # placeholder cho một task đã bị xóa
+    counter = itertools.count()     # bộ đếm chuỗi tuần tự duy nhất
 
     def add_task(task, priority=0):
         'Add a new task or update the priority of an existing task'
@@ -339,16 +249,12 @@ entry as removed and add a new entry with the revised priority::
         raise KeyError('pop from an empty priority queue')
 
 
-Theory
-------
+Lý thuyết
+---------
 
-Heaps are arrays for which ``a[k] <= a[2*k+1]`` and ``a[k] <= a[2*k+2]`` for all
-*k*, counting elements from 0.  For the sake of comparison, non-existing
-elements are considered to be infinite.  The interesting property of a heap is
-that ``a[0]`` is always its smallest element.
+Heap là các mảng mà ``a[k] <= a[2*k+1]`` và ``a[k] <= a[2*k+2]`` với mọi *k*, tính các phần tử bắt đầu từ 0. Để tiện so sánh, các phần tử không tồn tại được coi là vô hạn. Đặc điểm thú vị của heap là ``a[0]`` luôn là phần tử nhỏ nhất của nó.
 
-The strange invariant above is meant to be an efficient memory representation
-for a tournament.  The numbers below are *k*, not ``a[k]``::
+Bất biến kỳ lạ ở trên nhằm biểu diễn một giải đấu bằng bộ nhớ một cách hiệu quả. Các số bên dưới là *k*, không phải ``a[k]``::
 
                                   0
 
@@ -360,66 +266,25 @@ for a tournament.  The numbers below are *k*, not ``a[k]``::
 
    15 16   17 18   19 20   21 22   23 24   25 26   27 28   29 30
 
-In the tree above, each cell *k* is topping ``2*k+1`` and ``2*k+2``. In a usual
-binary tournament we see in sports, each cell is the winner over the two cells
-it tops, and we can trace the winner down the tree to see all opponents s/he
-had.  However, in many computer applications of such tournaments, we do not need
-to trace the history of a winner. To be more memory efficient, when a winner is
-promoted, we try to replace it by something else at a lower level, and the rule
-becomes that a cell and the two cells it tops contain three different items, but
-the top cell "wins" over the two topped cells.
+Trong cây ở trên, mỗi ô *k* nằm trên ``2*k+1`` và ``2*k+2``. Trong một giải đấu nhị phân thông thường mà ta thấy trong thể thao, mỗi ô là ô thắng hai ô mà nó nằm trên, và ta có thể lần theo người thắng xuống cây để xem tất cả đối thủ mà người đó từng gặp. Tuy nhiên, trong nhiều ứng dụng máy tính của các giải đấu như vậy, ta không cần lần theo lịch sử của người thắng. Để sử dụng bộ nhớ hiệu quả hơn, khi một người thắng được đưa lên, ta cố gắng thay thế nó bằng một phần tử khác ở cấp thấp hơn, và quy tắc trở thành: một ô cùng hai ô mà nó nằm trên chứa ba phần tử khác nhau, nhưng ô ở trên "thắng" hai ô bên dưới.
 
-If this heap invariant is protected at all time, index 0 is clearly the overall
-winner.  The simplest algorithmic way to remove it and find the "next" winner is
-to move some loser (let's say cell 30 in the diagram above) into the 0 position,
-and then percolate this new 0 down the tree, exchanging values, until the
-invariant is re-established. This is clearly logarithmic on the total number of
-items in the tree. By iterating over all items, you get an *O*\ (*n* log *n*) sort.
+Nếu luôn duy trì bất biến của heap này, chỉ số 0 rõ ràng là người thắng chung cuộc. Cách đơn giản nhất về mặt thuật toán để xóa nó và tìm người thắng "tiếp theo" là đưa một phần tử thua nào đó (giả sử là ô 30 trong sơ đồ ở trên) vào vị trí 0, sau đó đẩy phần tử 0 mới này xuống cây, hoán đổi các giá trị, cho đến khi bất biến được thiết lập lại. Rõ ràng, thao tác này có độ phức tạp logarithm theo tổng số phần tử trong cây. Bằng cách lặp qua tất cả các phần tử, ta có một phép sắp xếp *O*\ (*n* log *n*).
 
-A nice feature of this sort is that you can efficiently insert new items while
-the sort is going on, provided that the inserted items are not "better" than the
-last 0'th element you extracted.  This is especially useful in simulation
-contexts, where the tree holds all incoming events, and the "win" condition
-means the smallest scheduled time.  When an event schedules other events for
-execution, they are scheduled into the future, so they can easily go into the
-heap.  So, a heap is a good structure for implementing schedulers (this is what
-I used for my MIDI sequencer :-).
+Một đặc điểm hay của cách sắp xếp này là bạn có thể chèn các phần tử mới một cách hiệu quả trong khi quá trình sắp xếp đang diễn ra, miễn là các phần tử được chèn không "tốt hơn" phần tử 0 cuối cùng mà bạn đã lấy ra. Điều này đặc biệt hữu ích trong các ngữ cảnh mô phỏng, nơi cây chứa tất cả các sự kiện đến và điều kiện "thắng" có nghĩa là thời điểm được lập lịch nhỏ nhất. Khi một sự kiện lập lịch các sự kiện khác để thực thi, chúng được lập lịch vào tương lai, nên có thể dễ dàng đưa chúng vào heap. Vì vậy, heap là một cấu trúc phù hợp để triển khai các scheduler (đây là cấu trúc tôi đã dùng cho bộ tuần tự MIDI của mình :-).
 
-Various structures for implementing schedulers have been extensively studied,
-and heaps are good for this, as they are reasonably speedy, the speed is almost
-constant, and the worst case is not much different than the average case.
-However, there are other representations which are more efficient overall, yet
-the worst cases might be terrible.
+Nhiều cấu trúc khác nhau để triển khai scheduler đã được nghiên cứu rộng rãi, và heap rất phù hợp cho việc này vì chúng có tốc độ tương đối nhanh, tốc độ gần như không đổi, đồng thời trường hợp xấu nhất không khác nhiều so với trường hợp trung bình. Tuy nhiên, có những cách biểu diễn khác hiệu quả hơn xét trên tổng thể, dù các trường hợp xấu nhất của chúng có thể rất tệ.
 
-Heaps are also very useful in big disk sorts.  You most probably all know that a
-big sort implies producing "runs" (which are pre-sorted sequences, whose size is
-usually related to the amount of CPU memory), followed by a merging passes for
-these runs, which merging is often very cleverly organised [#]_. It is very
-important that the initial sort produces the longest runs possible.  Tournaments
-are a good way to achieve that.  If, using all the memory available to hold a
-tournament, you replace and percolate items that happen to fit the current run,
-you'll produce runs which are twice the size of the memory for random input, and
-much better for input fuzzily ordered.
+Heap cũng rất hữu ích trong việc sắp xếp dữ liệu lớn trên đĩa. Có lẽ bạn đều biết rằng một lần sắp xếp lớn bao gồm việc tạo ra các "run" (những chuỗi đã được sắp xếp trước, với kích thước thường liên quan đến dung lượng bộ nhớ CPU), sau đó là các lượt trộn những run này; quá trình trộn thường được tổ chức rất khéo léo [#]_. Điều rất quan trọng là lần sắp xếp ban đầu tạo ra các run dài nhất có thể. Tournament là một cách tốt để đạt được điều đó. Nếu sử dụng toàn bộ bộ nhớ có sẵn để chứa một tournament, bạn thay thế và đẩy xuống các phần tử vừa với run hiện tại, bạn sẽ tạo ra các run có kích thước gấp đôi bộ nhớ đối với dữ liệu đầu vào ngẫu nhiên, và lớn hơn nhiều đối với dữ liệu đầu vào được sắp xếp tương đối.
 
-Moreover, if you output the 0'th item on disk and get an input which may not fit
-in the current tournament (because the value "wins" over the last output value),
-it cannot fit in the heap, so the size of the heap decreases.  The freed memory
-could be cleverly reused immediately for progressively building a second heap,
-which grows at exactly the same rate the first heap is melting.  When the first
-heap completely vanishes, you switch heaps and start a new run.  Clever and
-quite effective!
+Hơn nữa, nếu bạn xuất phần tử thứ 0 ra đĩa và nhận được một dữ liệu đầu vào không thể vừa với tournament hiện tại (vì giá trị của nó "thắng" giá trị được xuất cuối cùng), nó cũng không thể vừa trong heap, nên kích thước heap giảm xuống. Phần bộ nhớ được giải phóng có thể ngay lập tức được tái sử dụng một cách khéo léo để dần xây dựng một heap thứ hai, heap này tăng trưởng với đúng tốc độ mà heap đầu tiên thu nhỏ. Khi heap đầu tiên biến mất hoàn toàn, bạn chuyển sang heap kia và bắt đầu một run mới. Thật khéo léo và khá hiệu quả!
 
-In a word, heaps are useful memory structures to know.  I use them in a few
-applications, and I think it is good to keep a 'heap' module around. :-)
+Tóm lại, heap là một cấu trúc bộ nhớ hữu ích mà bạn nên biết. Tôi sử dụng chúng trong một vài ứng dụng, và tôi nghĩ nên duy trì một module 'heap'. :-)
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích cuối trang
 
-.. [#] The disk balancing algorithms which are current, nowadays, are more annoying
-   than clever, and this is a consequence of the seeking capabilities of the disks.
-   On devices which cannot seek, like big tape drives, the story was quite
-   different, and one had to be very clever to ensure (far in advance) that each
-   tape movement will be the most effective possible (that is, will best
-   participate at "progressing" the merge).  Some tapes were even able to read
-   backwards, and this was also used to avoid the rewinding time. Believe me, real
-   good tape sorts were quite spectacular to watch! From all times, sorting has
-   always been a Great Art! :-)
+.. [#] Các thuật toán cân bằng đĩa hiện nay phiền toái hơn là khéo léo, và đây là hệ quả của khả năng seek của các đĩa. Trên những thiết bị không thể seek, chẳng hạn như các ổ băng lớn, câu chuyện lại hoàn toàn khác, và người ta phải cực kỳ khéo léo để đảm bảo (từ rất lâu trước đó) rằng mỗi lần di chuyển băng sẽ hiệu quả nhất có thể (nghĩa là đóng góp tốt nhất vào việc "tiến triển" quá trình trộn). Một số loại băng thậm chí còn có thể đọc ngược, và điều này cũng được tận dụng để tránh thời gian tua lại. Tin tôi đi, những lần sắp xếp trên băng thực sự tốt rất ngoạn mục khi xem! Từ trước đến nay, sắp xếp luôn là một Nghệ thuật Vĩ đại! :-)
+
+.. _`heapsort`: https://en.wikipedia.org/wiki/Heapsort
+.. _`Medians`: https://en.wikipedia.org/wiki/Median
+.. _`online algorithm`: https://en.wikipedia.org/wiki/Online_algorithm
+.. _`priority queue`: https://en.wikipedia.org/wiki/Priority_queue

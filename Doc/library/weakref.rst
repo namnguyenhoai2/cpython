@@ -1,184 +1,114 @@
 .. _mod-weakref:
 
-:mod:`!weakref` --- Weak references
-===================================
+:mod:`!weakref` --- Tham chiếu yếu
+==================================
 
 .. module:: weakref
-   :synopsis: Support for weak references and weak dictionaries.
+   :synopsis: Hỗ trợ tham chiếu yếu và từ điển yếu.
 
 .. moduleauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 .. moduleauthor:: Neil Schemenauer <nas@arctrix.com>
 .. moduleauthor:: Martin von Löwis <martin@loewis.home.cs.tu-berlin.de>
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 
-**Source code:** :source:`Lib/weakref.py`
+**Mã nguồn:** :source:`Lib/weakref.py`
 
 --------------
 
-The :mod:`!weakref` module allows the Python programmer to create :dfn:`weak
-references` to objects.
+Mô-đun :mod:`!weakref` cho phép lập trình viên Python tạo ra các :dfn:`tham chiếu yếu` đến các đối tượng.
 
 .. When making changes to the examples in this file, be sure to update
    Lib/test/test_weakref.py::libreftest too!
 
-In the following, the term :dfn:`referent` means the object which is referred to
-by a weak reference.
+Trong phần sau, thuật ngữ :dfn:`đối tượng được tham chiếu` dùng để chỉ đối tượng được một tham chiếu yếu tham chiếu đến.
 
-A weak reference to an object is not enough to keep the object alive: when the
-only remaining references to a referent are weak references,
-:term:`garbage collection` is free to destroy the referent and reuse its memory
-for something else.  However, until the object is actually destroyed the weak
-reference may return the object even if there are no strong references to it.
+Một tham chiếu yếu đến một đối tượng không đủ để giữ đối tượng đó tồn tại: khi các tham chiếu duy nhất còn lại đến đối tượng được tham chiếu là các tham chiếu yếu,
+:term:`garbage collection` có thể tự do hủy đối tượng được tham chiếu và sử dụng lại vùng nhớ của nó cho một mục đích khác. Tuy nhiên, cho đến khi đối tượng thực sự bị hủy, tham chiếu yếu vẫn có thể trả về đối tượng đó ngay cả khi không còn tham chiếu mạnh nào đến nó.
 
-A primary use for weak references is to implement caches or
-mappings holding large objects, where it's desired that a large object not be
-kept alive solely because it appears in a cache or mapping.
+Một ứng dụng chính của weak reference là triển khai cache hoặc các ánh xạ lưu giữ những đối tượng lớn, trong đó mong muốn rằng một đối tượng lớn không được giữ lại chỉ vì nó xuất hiện trong cache hoặc ánh xạ.
 
-For example, if you have a number of large binary image objects, you may wish to
-associate a name with each.  If you used a Python dictionary to map names to
-images, or images to names, the image objects would remain alive just because
-they appeared as values or keys in the dictionaries.  The
-:class:`WeakKeyDictionary` and :class:`WeakValueDictionary` classes supplied by
-the :mod:`!weakref` module are an alternative, using weak references to construct
-mappings that don't keep objects alive solely because they appear in the mapping
-objects.  If, for example, an image object is a value in a
-:class:`WeakValueDictionary`, then when the last remaining references to that
-image object are the weak references held by weak mappings, garbage collection
-can reclaim the object, and its corresponding entries in weak mappings are
-simply deleted.
+Ví dụ, nếu bạn có một số đối tượng ảnh nhị phân lớn, bạn có thể muốn gắn một tên với mỗi đối tượng. Nếu bạn sử dụng từ điển Python để ánh xạ tên tới ảnh hoặc ảnh tới tên, các đối tượng ảnh sẽ vẫn tồn tại chỉ vì chúng xuất hiện dưới dạng giá trị hoặc khóa trong các từ điển.
+Các lớp :class:`WeakKeyDictionary` và :class:`WeakValueDictionary` do module :mod:`!weakref` cung cấp là một lựa chọn thay thế, sử dụng weak reference để xây dựng các ánh xạ không giữ đối tượng tồn tại chỉ vì chúng xuất hiện trong các đối tượng ánh xạ. Ví dụ, nếu một đối tượng ảnh là một giá trị trong một
+:class:`WeakValueDictionary`, thì khi các tham chiếu còn lại cuối cùng tới đối tượng ảnh đó chỉ là các weak reference do các ánh xạ yếu lưu giữ, garbage collection có thể thu hồi đối tượng này và các mục tương ứng trong các ánh xạ yếu sẽ פשוט được xóa.
 
-:class:`WeakKeyDictionary` and :class:`WeakValueDictionary` use weak references
-in their implementation, setting up callback functions on the weak references
-that notify the weak dictionaries when a key or value has been reclaimed by
-garbage collection.  :class:`WeakSet` implements the :class:`set` interface,
-but keeps weak references to its elements, just like a
-:class:`WeakKeyDictionary` does.
+:class:`WeakKeyDictionary` và :class:`WeakValueDictionary` sử dụng weak reference trong phần triển khai, thiết lập các hàm callback trên những weak reference để thông báo cho các từ điển yếu khi một khóa hoặc giá trị đã được garbage collection thu hồi. :class:`WeakSet` triển khai interface :class:`set`, nhưng lưu giữ weak reference tới các phần tử của nó, giống như
+:class:`WeakKeyDictionary`.
 
-:class:`finalize` provides a straight forward way to register a
-cleanup function to be called when an object is garbage collected.
-This is simpler to use than setting up a callback function on a raw
-weak reference, since the module automatically ensures that the finalizer
-remains alive until the object is collected.
+:class:`finalize` cung cấp một cách đơn giản để đăng ký một hàm dọn dẹp sẽ được gọi khi một đối tượng được garbage collection thu hồi. Cách này đơn giản hơn so với việc thiết lập một hàm callback trên weak reference thô, vì module tự động đảm bảo rằng finalizer vẫn tồn tại cho đến khi đối tượng được thu hồi.
 
-Most programs should find that using one of these weak container types
-or :class:`finalize` is all they need -- it's not usually necessary to
-create your own weak references directly.  The low-level machinery is
-exposed by the :mod:`!weakref` module for the benefit of advanced uses.
+Hầu hết các chương trình sẽ thấy rằng việc sử dụng một trong các kiểu container yếu này hoặc :class:`finalize` là tất cả những gì chúng cần -- thường không cần tự tạo weak reference trực tiếp. Cơ chế cấp thấp được cung cấp bởi mô-đun :mod:`!weakref` để phục vụ các mục đích sử dụng nâng cao.
 
-Not all objects can be weakly referenced. Objects which support weak references
-include class instances, functions written in Python (but not in C), instance methods,
-sets, frozensets, some :term:`file objects <file object>`, :term:`generators <generator>`,
-type objects, sockets, arrays, deques, regular expression pattern objects, and code
-objects.
+Không phải mọi đối tượng đều có thể được tham chiếu yếu. Các đối tượng hỗ trợ weak reference bao gồm các instance của class, các hàm được viết bằng Python (nhưng không phải bằng C), các phương thức của instance, các set, frozenset, một số :term:`đối tượng tệp <file object>`, :term:`generator <generator>`, các đối tượng kiểu, socket, mảng, deque, các đối tượng mẫu biểu thức chính quy và các đối tượng code.
 
 .. versionchanged:: 3.2
-   Added support for thread.lock, threading.Lock, and code objects.
+   Đã bổ sung hỗ trợ cho thread.lock, threading.Lock và các đối tượng code.
 
-Several built-in types such as :class:`list` and :class:`dict` do not directly
-support weak references but can add support through subclassing::
+Một số kiểu dựng sẵn như :class:`list` và :class:`dict` không trực tiếp hỗ trợ weak reference nhưng có thể bổ sung hỗ trợ thông qua việc tạo lớp con::
 
    class Dict(dict):
        pass
 
-   obj = Dict(red=1, green=2, blue=3)   # this object is weak referenceable
+   obj = Dict(red=1, green=2, blue=3)   # đối tượng này có thể được tham chiếu yếu
 
 .. impl-detail::
 
-   Other built-in types such as :class:`tuple` and :class:`int` do not support weak
-   references even when subclassed.
+   Các kiểu dựng sẵn khác như :class:`tuple` và :class:`int` không hỗ trợ weak reference ngay cả khi được tạo lớp con.
 
-Extension types can easily be made to support weak references; see
+Các kiểu mở rộng có thể dễ dàng được làm cho hỗ trợ weak reference; xem
 :ref:`weakref-support`.
 
-When ``__slots__`` are defined for a given type, weak reference support is
-disabled unless a ``'__weakref__'`` string is also present in the sequence of
-strings in the ``__slots__`` declaration.
-See :ref:`__slots__ documentation <slots>` for details.
+Khi ``__slots__`` được định nghĩa cho một kiểu nhất định, hỗ trợ weak reference bị vô hiệu hóa trừ khi một chuỗi ``'__weakref__'`` cũng có mặt trong dãy chuỗi của khai báo ``__slots__``. Xem tài liệu :ref:`__slots__ documentation <slots>` để biết chi tiết.
 
 .. class:: ref(object[, callback])
 
-   Return a weak reference to *object*.  The original object can be retrieved by
-   calling the reference object if the referent is still alive; if the referent is
-   no longer alive, calling the reference object will cause :const:`None` to be
-   returned.  If *callback* is provided and not :const:`None`, and the returned
-   weakref object is still alive, the callback will be called when the object is
-   about to be finalized; the weak reference object will be passed as the only
-   parameter to the callback; the referent will no longer be available.
+   Trả về một weak reference tới *đối tượng*. Có thể truy xuất đối tượng gốc bằng cách gọi đối tượng reference nếu đối tượng được tham chiếu vẫn còn tồn tại; nếu đối tượng được tham chiếu không còn tồn tại, việc gọi đối tượng reference sẽ khiến :const:`None` được trả về. Nếu *callback* được cung cấp và không phải :const:`None`, đồng thời đối tượng weakref được trả về vẫn còn tồn tại, callback sẽ được gọi khi đối tượng sắp được hoàn tất; đối tượng weak reference sẽ được truyền làm tham số duy nhất cho callback; đối tượng được tham chiếu sẽ không còn khả dụng.
 
-   It is allowable for many weak references to be constructed for the same object.
-   Callbacks registered for each weak reference will be called from the most
-   recently registered callback to the oldest registered callback.
+   Có thể tạo nhiều weak reference cho cùng một đối tượng. Các callback được đăng ký cho từng weak reference sẽ được gọi theo thứ tự từ callback được đăng ký gần nhất đến callback được đăng ký sớm nhất.
 
-   Exceptions raised by the callback will be noted on the standard error output,
-   but cannot be propagated; they are handled in exactly the same way as exceptions
-   raised from an object's :meth:`~object.__del__` method.
+   Các exception do callback tạo ra sẽ được ghi nhận trên đầu ra lỗi chuẩn, nhưng không thể được truyền ra ngoài; chúng được xử lý chính xác như các exception phát sinh từ phương thức :meth:`~object.__del__` của một đối tượng.
 
-   Weak references are :term:`hashable` if the *object* is hashable.  They will
-   maintain their hash value even after the *object* was deleted.  If
-   :func:`hash` is called the first time only after the *object* was deleted,
-   the call will raise :exc:`TypeError`.
+   Weak reference là :term:`hashable` nếu *đối tượng* có thể băm. Chúng vẫn giữ nguyên giá trị băm ngay cả sau khi *đối tượng* đã bị xóa. Nếu
+   :func:`hash` chỉ được gọi lần đầu sau khi *đối tượng* đã bị xóa, lần gọi đó sẽ gây ra :exc:`TypeError`.
 
-   Weak references support tests for equality, but not ordering.  If the referents
-   are still alive, two references have the same equality relationship as their
-   referents (regardless of the *callback*).  If either referent has been deleted,
-   the references are equal only if the reference objects are the same object.
+   Weak reference hỗ trợ kiểm tra tính bằng nhau, nhưng không hỗ trợ sắp xếp. Nếu các đối tượng được tham chiếu vẫn còn tồn tại, hai reference có quan hệ bằng nhau giống với các đối tượng được tham chiếu (không phụ thuộc vào *callback*). Nếu một trong hai đối tượng được tham chiếu đã bị xóa, các reference chỉ bằng nhau khi chính các đối tượng reference là cùng một đối tượng.
 
-   This is a subclassable type rather than a factory function.
+   Đây là một kiểu có thể tạo lớp con thay vì một hàm factory.
 
-   Weak references are :ref:`generic <generics>` over the type of the object they
-   reference.
+   Weak reference được :ref:`generic <generics>` theo kiểu của đối tượng mà chúng tham chiếu.
 
    .. attribute:: __callback__
 
-      This read-only attribute returns the callback currently associated to the
-      weakref.  If there is no callback or if the referent of the weakref is
-      no longer alive then this attribute will have value ``None``.
+      Thuộc tính chỉ đọc này trả về callback hiện được liên kết với weakref. Nếu không có callback hoặc đối tượng được weakref tham chiếu không còn tồn tại thì thuộc tính này sẽ có giá trị ``None``.
 
    .. versionchanged:: 3.4
-      Added the :attr:`__callback__` attribute.
+      Đã thêm thuộc tính :attr:`__callback__`.
 
 
 .. function:: proxy(object[, callback])
 
-   Return a proxy to *object* which uses a weak reference.  This supports use of
-   the proxy in most contexts instead of requiring the explicit dereferencing used
-   with weak reference objects.  The returned object will have a type of either
-   ``ProxyType`` or ``CallableProxyType``, depending on whether *object* is
-   callable.  Proxy objects are not :term:`hashable` regardless of the referent; this
-   avoids a number of problems related to their fundamentally mutable nature, and
-   prevents their use as dictionary keys.  *callback* is the same as the parameter
-   of the same name to the :func:`ref` function.
+   Trả về một proxy tới *object* sử dụng weak reference. Điều này cho phép sử dụng proxy trong hầu hết ngữ cảnh thay vì phải giải tham chiếu rõ ràng như khi sử dụng các đối tượng weak reference. Đối tượng được trả về sẽ có kiểu là ``ProxyType`` hoặc ``CallableProxyType``, tùy thuộc vào việc *object* có callable hay không. Các đối tượng proxy không :term:`hashable` bất kể đối tượng được tham chiếu là gì; điều này tránh một số vấn đề liên quan đến bản chất có thể thay đổi của chúng và ngăn việc sử dụng chúng làm khóa từ điển. *callback* giống với tham số cùng tên của hàm :func:`ref`.
 
-   Accessing an attribute of the proxy object after the referent is
-   garbage collected raises :exc:`ReferenceError`.
+   Việc truy cập một thuộc tính của đối tượng proxy sau khi đối tượng được tham chiếu đã được garbage collected sẽ gây ra :exc:`ReferenceError`.
 
    .. versionchanged:: 3.8
-      Extended the operator support on proxy objects to include the matrix
-      multiplication operators ``@`` and ``@=``.
+      Đã mở rộng hỗ trợ toán tử trên các đối tượng proxy để bao gồm các toán tử nhân ma trận ``@`` và ``@=``.
 
 
 .. function:: getweakrefcount(object)
 
-   Return the number of weak references and proxies which refer to *object*.
+   Trả về số lượng weak reference và proxy tham chiếu đến *object*.
 
 
 .. function:: getweakrefs(object)
 
-   Return a list of all weak reference and proxy objects which refer to *object*.
+   Trả về danh sách tất cả các đối tượng weak reference và proxy tham chiếu đến *object*.
 
 
 .. class:: WeakKeyDictionary([dict])
 
-   Mapping class that references keys weakly.  Entries in the dictionary will be
-   discarded when there is no longer a strong reference to the key.  This can be
-   used to associate additional data with an object owned by other parts of an
-   application without adding attributes to those objects.  This can be especially
-   useful with objects that override attribute accesses.
+   Lớp mapping tham chiếu yếu đến các khóa. Các mục trong dictionary sẽ bị loại bỏ khi không còn strong reference nào đến khóa. Có thể sử dụng lớp này để liên kết dữ liệu bổ sung với một đối tượng do các phần khác của ứng dụng sở hữu mà không cần thêm thuộc tính vào các đối tượng đó. Điều này đặc biệt hữu ích với những đối tượng ghi đè các thao tác truy cập thuộc tính.
 
-   Note that when a key with equal value to an existing key (but not equal identity)
-   is inserted into the dictionary, it replaces the value but does not replace the
-   existing key. Due to this, when the reference to the original key is deleted, it
-   also deletes the entry in the dictionary::
+   Lưu ý rằng khi một khóa có giá trị bằng với khóa hiện có (nhưng không cùng identity) được chèn vào dictionary, nó sẽ thay thế giá trị nhưng không thay thế khóa hiện có. Do đó, khi tham chiếu đến khóa ban đầu bị xóa, mục tương ứng trong dictionary cũng bị xóa::
 
       >>> class T(str): pass
       ...
@@ -188,7 +118,7 @@ See :ref:`__slots__ documentation <slots>` for details.
       >>> d[k2] = 2   # d = {k1: 2}
       >>> del k1      # d = {}
 
-   A workaround would be to remove the key prior to reassignment::
+   Một cách khắc phục là xóa key trước khi gán lại::
 
       >>> class T(str): pass
       ...
@@ -200,51 +130,39 @@ See :ref:`__slots__ documentation <slots>` for details.
       >>> del k1      # d = {k2: 2}
 
    .. versionchanged:: 3.9
-      Added support for ``|`` and ``|=`` operators, as specified in :pep:`584`.
+      Đã bổ sung hỗ trợ cho các toán tử ``|`` và ``|=``, như được chỉ định trong :pep:`584`.
 
-:class:`WeakKeyDictionary` objects have an additional method that
-exposes the internal references directly.  The references are not guaranteed to
-be "live" at the time they are used, so the result of calling the references
-needs to be checked before being used.  This can be used to avoid creating
-references that will cause the garbage collector to keep the keys around longer
-than needed.
+Các đối tượng :class:`WeakKeyDictionary` có thêm một phương thức cho phép truy cập trực tiếp vào các tham chiếu nội bộ. Các tham chiếu này không được đảm bảo là "còn hiệu lực" tại thời điểm được sử dụng, vì vậy cần kiểm tra kết quả của việc gọi các tham chiếu trước khi sử dụng. Bạn có thể dùng cách này để tránh tạo ra các tham chiếu khiến garbage collector giữ các key lâu hơn cần thiết.
 
 
 .. method:: WeakKeyDictionary.keyrefs()
 
-   Return an iterable of the weak references to the keys.
+   Trả về một iterable chứa các tham chiếu yếu đến các key.
 
 
 .. class:: WeakValueDictionary([dict])
 
-   Mapping class that references values weakly.  Entries in the dictionary will be
-   discarded when no strong reference to the value exists any more.
+   Lớp ánh xạ tham chiếu yếu đến các giá trị. Các mục trong từ điển sẽ bị loại bỏ khi không còn tham chiếu mạnh nào đến giá trị.
 
    .. versionchanged:: 3.9
-      Added support for ``|`` and ``|=`` operators, as specified in :pep:`584`.
+      Đã bổ sung hỗ trợ cho các toán tử ``|`` và ``|=``, như được chỉ định trong :pep:`584`.
 
-:class:`WeakValueDictionary` objects have an additional method that has the
-same issues as the :meth:`WeakKeyDictionary.keyrefs` method.
+Các đối tượng :class:`WeakValueDictionary` có thêm một phương thức gặp những vấn đề giống như phương thức :meth:`WeakKeyDictionary.keyrefs`.
 
 
 .. method:: WeakValueDictionary.valuerefs()
 
-   Return an iterable of the weak references to the values.
+   Trả về một đối tượng iterable gồm các tham chiếu yếu đến các giá trị.
 
 
 .. class:: WeakSet([elements])
 
-   Set class that keeps weak references to its elements.  An element will be
-   discarded when no strong reference to it exists any more.
+   Lớp tập hợp duy trì các tham chiếu yếu đến các phần tử của nó. Một phần tử sẽ bị loại bỏ khi không còn tham chiếu mạnh nào đến nó.
 
 
 .. class:: WeakMethod(method[, callback])
 
-   A custom :class:`ref` subclass which simulates a weak reference to a bound
-   method (i.e., a method defined on a class and looked up on an instance).
-   Since a bound method is ephemeral, a standard weak reference cannot keep
-   hold of it.  :class:`WeakMethod` has special code to recreate the bound
-   method until either the object or the original function dies::
+   Một lớp con :class:`ref` tùy chỉnh mô phỏng một tham chiếu yếu đến một bound method (tức là một phương thức được định nghĩa trên một lớp và được tra cứu trên một thực thể). Vì bound method có tính tạm thời, một tham chiếu yếu tiêu chuẩn không thể giữ nó. :class:`WeakMethod` có mã đặc biệt để tạo lại bound method cho đến khi đối tượng hoặc hàm gốc bị hủy::
 
       >>> class C:
       ...     def method(self):
@@ -264,112 +182,86 @@ same issues as the :meth:`WeakKeyDictionary.keyrefs` method.
       >>> r()
       >>>
 
-   *callback* is the same as the parameter of the same name to the :func:`ref` function.
+   *callback* giống với tham số cùng tên của hàm :func:`ref`.
 
    .. versionadded:: 3.4
 
 .. class:: finalize(obj, func, /, *args, **kwargs)
 
-   Return a callable finalizer object which will be called when *obj*
-   is garbage collected. Unlike an ordinary weak reference, a finalizer
-   will always survive until the reference object is collected, greatly
-   simplifying lifecycle management.
+   Trả về một đối tượng finalizer có thể gọi, đối tượng này sẽ được gọi khi *obj* được thu gom rác. Không giống một weak reference thông thường, finalizer sẽ luôn tồn tại cho đến khi đối tượng tham chiếu được thu gom, giúp đơn giản hóa đáng kể việc quản lý vòng đời.
 
-   A finalizer is considered *alive* until it is called (either explicitly
-   or at garbage collection), and after that it is *dead*.  Calling a live
-   finalizer returns the result of evaluating ``func(*arg, **kwargs)``,
-   whereas calling a dead finalizer returns :const:`None`.
+   Một finalizer được xem là *alive* cho đến khi nó được gọi (dù là gọi tường minh hay khi thu gom rác), và sau đó nó sẽ *dead*. Việc gọi một finalizer còn sống sẽ trả về kết quả của việc đánh giá ``func(*arg, **kwargs)``, trong khi việc gọi một finalizer đã chết sẽ trả về :const:`None`.
 
-   Exceptions raised by finalizer callbacks during garbage collection
-   will be shown on the standard error output, but cannot be
-   propagated.  They are handled in the same way as exceptions raised
-   from an object's :meth:`~object.__del__` method or a weak reference's
-   callback.
+   Các exception do callback của finalizer phát sinh trong quá trình thu gom rác sẽ được hiển thị trên đầu ra lỗi chuẩn, nhưng không thể được truyền đi. Chúng được xử lý giống như các exception phát sinh từ phương thức :meth:`~object.__del__` của một đối tượng hoặc callback của một weak reference.
 
-   When the program exits (or more generally, at :term:`interpreter shutdown`),
-   each remaining live finalizer is called unless its :attr:`atexit` attribute
-   has been set to false.
-   They are called in reverse order of creation.
+   Khi chương trình thoát (hoặc nói chung, tại :term:`interpreter shutdown`), mỗi finalizer còn sống sẽ được gọi, trừ khi thuộc tính :attr:`atexit` của nó đã được đặt thành false. Chúng được gọi theo thứ tự ngược với thứ tự tạo.
 
-   A finalizer will never invoke its callback during the later part of
-   the :term:`interpreter shutdown` when module globals are liable to have
-   been replaced by :const:`None`.
+   Một finalizer sẽ không bao giờ gọi callback của nó trong giai đoạn sau của :term:`interpreter shutdown`, khi các biến toàn cục của module có thể đã bị thay thế bằng :const:`None`.
 
    .. method:: __call__()
 
-      If *self* is alive then mark it as dead and return the result of
-      calling ``func(*args, **kwargs)``.  If *self* is dead then return
+      Nếu *self* còn sống thì đánh dấu nó là đã chết và trả về kết quả của việc gọi ``func(*args, **kwargs)``. Nếu *self* đã chết thì trả về
       :const:`None`.
 
    .. method:: detach()
 
-      If *self* is alive then mark it as dead and return the tuple
-      ``(obj, func, args, kwargs)``.  If *self* is dead then return
+      Nếu *self* còn sống thì đánh dấu nó là đã chết và trả về tuple ``(obj, func, args, kwargs)``. Nếu *self* đã chết thì trả về
       :const:`None`.
 
    .. method:: peek()
 
-      If *self* is alive then return the tuple ``(obj, func, args,
-      kwargs)``.  If *self* is dead then return :const:`None`.
+      Nếu *self* còn sống thì trả về tuple ``(obj, func, args, kwargs)``. Nếu *self* đã bị hủy thì trả về :const:`None`.
 
    .. attribute:: alive
 
-      Property which is true if the finalizer is alive, false otherwise.
+      Thuộc tính có giá trị true nếu finalizer còn sống, và false trong trường hợp ngược lại.
 
    .. attribute:: atexit
 
-      A writable boolean property which by default is true.  At
-      :term:`interpreter shutdown`, all remaining live finalizers for which
-      :attr:`.atexit` is true are called in reverse order of
-      creation.
+      Một thuộc tính boolean có thể ghi, mặc định là true. Khi
+      :term:`interpreter shutdown`, tất cả các finalizer còn sống mà
+      :attr:`.atexit` có giá trị true sẽ được gọi theo thứ tự ngược với thứ tự tạo.
 
    .. note::
 
-      It is important to ensure that *func*, *args* and *kwargs* do
-      not own any references to *obj*, either directly or indirectly,
-      since otherwise *obj* will never be garbage collected.  In
-      particular, *func* should not be a bound method of *obj*.
+      Điều quan trọng là đảm bảo *func*, *args* và *kwargs* không trực tiếp hoặc gián tiếp sở hữu bất kỳ tham chiếu nào đến *obj*, vì nếu không thì *obj* sẽ không bao giờ được garbage collector thu gom. Đặc biệt, *func* không nên là bound method của *obj*.
 
    .. versionadded:: 3.4
 
 
 .. class:: ReferenceType
 
-   The type object for weak references objects.
+   Đối tượng kiểu dùng cho các đối tượng weak reference.
 
 
 .. class:: ProxyType
 
-   The type object for proxies of objects which are not callable.
+   Đối tượng kiểu dành cho các proxy của những đối tượng không thể gọi được.
 
 
 .. class:: CallableProxyType
 
-   The type object for proxies of callable objects.
+   Đối tượng kiểu dành cho các proxy của những đối tượng có thể gọi được.
 
 
 .. data:: ProxyTypes
 
-   Sequence containing all the type objects for proxies.  This can make it simpler
-   to test if an object is a proxy without being dependent on naming both proxy
-   types.
+   Sequence chứa tất cả các đối tượng kiểu dành cho proxy. Điều này có thể giúp việc kiểm tra xem một đối tượng có phải là proxy hay không trở nên đơn giản hơn mà không phụ thuộc vào việc phải chỉ rõ tên của cả hai kiểu proxy.
 
 
 .. seealso::
 
    :pep:`205` - Weak References
-      The proposal and rationale for this feature, including links to earlier
-      implementations and information about similar features in other languages.
+      Đề xuất và lý do cho tính năng này, bao gồm các liên kết đến những triển khai trước đây và thông tin về các tính năng tương tự trong những ngôn ngữ khác.
 
 
 .. _weakref-objects:
 
-Weak Reference Objects
-----------------------
+Đối tượng tham chiếu yếu
+------------------------
 
-Weak reference objects have no methods and no attributes besides
-:attr:`ref.__callback__`. A weak reference object allows the referent to be
-obtained, if it still exists, by calling it:
+Đối tượng tham chiếu yếu không có phương thức và thuộc tính nào ngoài
+:attr:`ref.__callback__`. Một đối tượng tham chiếu yếu cho phép lấy đối tượng được tham chiếu, nếu đối tượng đó vẫn còn tồn tại, bằng cách gọi nó:
 
    >>> import weakref
    >>> class Object:
@@ -381,40 +273,29 @@ obtained, if it still exists, by calling it:
    >>> o is o2
    True
 
-If the referent no longer exists, calling the reference object returns
+Nếu đối tượng được tham chiếu không còn tồn tại, việc gọi đối tượng tham chiếu sẽ trả về
 :const:`None`:
 
    >>> del o, o2
    >>> print(r())
    None
 
-Testing that a weak reference object is still live should be done using the
-expression ``ref() is not None``.  Normally, application code that needs to use
-a reference object should follow this pattern::
+Nên kiểm tra xem đối tượng tham chiếu yếu còn tồn tại hay không bằng biểu thức ``ref() is not None``. Thông thường, mã ứng dụng cần sử dụng một đối tượng tham chiếu nên tuân theo mẫu sau::
 
-   # r is a weak reference object
+   # r là một đối tượng tham chiếu yếu
    o = r()
    if o is None:
-       # referent has been garbage collected
+       # đối tượng được tham chiếu đã được garbage collector thu gom
        print("Object has been deallocated; can't frobnicate.")
    else:
        print("Object is still live!")
        o.do_something_useful()
 
-Using a separate test for "liveness" creates race conditions in threaded
-applications; another thread can cause a weak reference to become invalidated
-before the weak reference is called; the idiom shown above is safe in threaded
-applications as well as single-threaded applications.
+Việc sử dụng một phép kiểm tra riêng cho "trạng thái tồn tại" sẽ tạo ra các điều kiện tranh đua trong các ứng dụng đa luồng; một luồng khác có thể khiến một tham chiếu yếu trở nên không hợp lệ trước khi tham chiếu yếu được gọi; thành ngữ thể hiện ở trên cũng an toàn trong các ứng dụng đa luồng cũng như ứng dụng đơn luồng.
 
-Specialized versions of :class:`ref` objects can be created through subclassing.
-This is used in the implementation of the :class:`WeakValueDictionary` to reduce
-the memory overhead for each entry in the mapping.  This may be most useful to
-associate additional information with a reference, but could also be used to
-insert additional processing on calls to retrieve the referent.
+Có thể tạo các phiên bản chuyên biệt của các đối tượng :class:`ref` thông qua cơ chế kế thừa. Cách này được sử dụng trong quá trình triển khai :class:`WeakValueDictionary` để giảm chi phí bộ nhớ cho mỗi mục trong mapping. Điều này có thể hữu ích nhất khi liên kết thêm thông tin với một tham chiếu, nhưng cũng có thể được dùng để chèn thêm xử lý vào các lần gọi lấy đối tượng được tham chiếu.
 
-This example shows how a subclass of :class:`ref` can be used to store
-additional information about an object and affect the value that's returned when
-the referent is accessed::
+Ví dụ này cho thấy cách sử dụng một lớp con của :class:`ref` để lưu trữ thêm thông tin về một đối tượng và ảnh hưởng đến giá trị được trả về khi truy cập đối tượng được tham chiếu::
 
    import weakref
 
@@ -438,13 +319,10 @@ the referent is accessed::
 
 .. _weakref-example:
 
-Example
--------
+Ví dụ
+-----
 
-This simple example shows how an application can use object IDs to retrieve
-objects that it has seen before.  The IDs of the objects can then be used in
-other data structures without forcing the objects to remain alive, but the
-objects can still be retrieved by ID if they do.
+Ví dụ đơn giản này cho thấy cách một ứng dụng có thể sử dụng ID đối tượng để truy xuất các đối tượng mà nó đã từng thấy. ID của các đối tượng sau đó có thể được sử dụng trong các cấu trúc dữ liệu khác mà không buộc các đối tượng phải tiếp tục tồn tại, nhưng vẫn có thể truy xuất các đối tượng theo ID nếu chúng còn tồn tại.
 
 .. Example contributed by Tim Peters.
 
@@ -465,12 +343,10 @@ objects can still be retrieved by ID if they do.
 
 .. _finalize-examples:
 
-Finalizer Objects
------------------
+Đối tượng Finalizer
+-------------------
 
-The main benefit of using :class:`finalize` is that it makes it simple
-to register a callback without needing to preserve the returned finalizer
-object.  For instance
+Lợi ích chính của việc sử dụng :class:`finalize` là giúp đăng ký callback một cách đơn giản mà không cần giữ lại đối tượng finalizer được trả về. Ví dụ:
 
     >>> import weakref
     >>> class Object:
@@ -482,8 +358,7 @@ object.  For instance
     >>> del kenny
     You killed Kenny!
 
-The finalizer can be called directly as well.  However the finalizer
-will invoke the callback at most once.
+Bạn cũng có thể gọi trực tiếp finalizer. Tuy nhiên, finalizer sẽ gọi callback nhiều nhất một lần.
 
     >>> def callback(x, y, z):
     ...     print("CALLBACK")
@@ -495,12 +370,10 @@ will invoke the callback at most once.
     >>> assert f() == 6
     CALLBACK
     >>> assert not f.alive
-    >>> f()                     # callback not called because finalizer dead
-    >>> del obj                 # callback not called because finalizer dead
+    >>> f()                     # callback không được gọi vì finalizer đã chết
+    >>> del obj                 # callback không được gọi vì finalizer đã chết
 
-You can unregister a finalizer using its :meth:`~finalize.detach`
-method.  This kills the finalizer and returns the arguments passed to
-the constructor when it was created.
+Bạn có thể hủy đăng ký một finalizer bằng method :meth:`~finalize.detach` của nó. Việc này sẽ hủy finalizer và trả về các đối số được truyền cho constructor khi nó được tạo.
 
     >>> obj = Object()
     >>> f = weakref.finalize(obj, callback, 1, 2, z=3)
@@ -512,9 +385,8 @@ the constructor when it was created.
     >>> assert func(*args, **kwargs) == 6
     CALLBACK
 
-Unless you set the :attr:`~finalize.atexit` attribute to
-:const:`False`, a finalizer will be called when the program exits if it
-is still alive.  For instance
+Nếu bạn không đặt thuộc tính :attr:`~finalize.atexit` thành
+:const:`False`, một finalizer sẽ được gọi khi chương trình thoát nếu nó vẫn còn hoạt động. Ví dụ
 
 .. doctest::
    :options: +SKIP
@@ -526,19 +398,16 @@ is still alive.  For instance
    obj dead or exiting
 
 
-Comparing finalizers with :meth:`~object.__del__` methods
----------------------------------------------------------
+So sánh các finalizer với các method :meth:`~object.__del__`
+------------------------------------------------------------
 
-Suppose we want to create a class whose instances represent temporary
-directories.  The directories should be deleted with their contents
-when the first of the following events occurs:
+Giả sử chúng ta muốn tạo một class mà các instance của nó biểu diễn các thư mục tạm thời. Các thư mục này phải được xóa cùng với nội dung của chúng khi sự kiện đầu tiên trong các sự kiện sau đây xảy ra:
 
-* the object is garbage collected,
-* the object's :meth:`!remove` method is called, or
-* the program exits.
+* đối tượng được garbage collect,
+* phương thức :meth:`!remove` của đối tượng được gọi, hoặc
+* chương trình kết thúc.
 
-We might try to implement the class using a :meth:`~object.__del__` method as
-follows::
+Chúng ta có thể thử triển khai class này bằng phương thức :meth:`~object.__del__` như sau::
 
     class TempDir:
         def __init__(self):
@@ -556,18 +425,11 @@ follows::
         def __del__(self):
             self.remove()
 
-Starting with Python 3.4, :meth:`~object.__del__` methods no longer prevent
-reference cycles from being garbage collected, and module globals are
-no longer forced to :const:`None` during :term:`interpreter shutdown`.
-So this code should work without any issues on CPython.
+Bắt đầu từ Python 3.4, các phương thức :meth:`~object.__del__` không còn ngăn các reference cycle được garbage collect, và các biến toàn cục của module không còn bị buộc phải :const:`None` trong :term:`interpreter shutdown`. Vì vậy, đoạn mã này sẽ hoạt động mà không gặp vấn đề nào trên CPython.
 
-However, handling of :meth:`~object.__del__` methods is notoriously implementation
-specific, since it depends on internal details of the interpreter's garbage
-collector implementation.
+Tuy nhiên, việc xử lý các phương thức :meth:`~object.__del__` nổi tiếng là phụ thuộc vào từng implementation, vì nó phụ thuộc vào các chi tiết nội bộ trong implementation của garbage collector của interpreter.
 
-A more robust alternative can be to define a finalizer which only references
-the specific functions and objects that it needs, rather than having access
-to the full state of the object::
+Một giải pháp thay thế mạnh mẽ hơn là định nghĩa một finalizer chỉ tham chiếu đến các hàm và đối tượng cụ thể mà nó cần, thay vì có quyền truy cập vào toàn bộ trạng thái của đối tượng::
 
     class TempDir:
         def __init__(self):
@@ -581,24 +443,17 @@ to the full state of the object::
         def removed(self):
             return not self._finalizer.alive
 
-Defined like this, our finalizer only receives a reference to the details
-it needs to clean up the directory appropriately. If the object never gets
-garbage collected the finalizer will still be called at exit.
+Được định nghĩa như vậy, finalizer của chúng ta chỉ nhận được tham chiếu đến những chi tiết cần thiết để dọn dẹp thư mục đúng cách. Nếu đối tượng không bao giờ được garbage collector thu gom, finalizer vẫn sẽ được gọi khi chương trình thoát.
 
-The other advantage of weakref based finalizers is that they can be used to
-register finalizers for classes where the definition is controlled by a
-third party, such as running code when a module is unloaded::
+Một ưu điểm khác của finalizer dựa trên weakref là chúng có thể được dùng để đăng ký finalizer cho các class mà định nghĩa do bên thứ ba kiểm soát, chẳng hạn như chạy mã khi một module được dỡ tải::
 
     import weakref, sys
     def unloading_module():
-        # implicit reference to the module globals from the function body
+        # tham chiếu ngầm đến các biến toàn cục của module từ phần thân hàm
     weakref.finalize(sys.modules[__name__], unloading_module)
 
 
 .. note::
 
-   If you create a finalizer object in a daemonic thread just as the program
-   exits then there is the possibility that the finalizer
-   does not get called at exit.  However, in a daemonic thread
-   :func:`atexit.register`, ``try: ... finally: ...`` and ``with: ...``
-   do not guarantee that cleanup occurs either.
+   Nếu bạn tạo một đối tượng finalizer trong một daemonic thread ngay khi chương trình thoát, finalizer có thể không được gọi lúc thoát. Tuy nhiên, trong một daemonic thread
+   :func:`atexit.register`, ``try: ... finally: ...`` và ``with: ...`` cũng không đảm bảo rằng quá trình dọn dẹp sẽ diễn ra.

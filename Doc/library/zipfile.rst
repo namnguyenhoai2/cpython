@@ -1,72 +1,58 @@
-:mod:`!zipfile` --- Work with ZIP archives
-==========================================
+:mod:`!zipfile` --- Làm việc với các tệp lưu trữ ZIP
+====================================================
 
 .. module:: zipfile
-   :synopsis: Read and write ZIP-format archive files.
+   :synopsis: Đọc và ghi các tệp lưu trữ định dạng ZIP.
 
 .. moduleauthor:: James C. Ahlstrom <jim@interet.com>
 .. sectionauthor:: James C. Ahlstrom <jim@interet.com>
 
-**Source code:** :source:`Lib/zipfile/`
+**Mã nguồn:** :source:`Lib/zipfile/`
 
 --------------
 
-The ZIP file format is a common archive and compression standard. This module
-provides tools to create, read, write, append, and list a ZIP file.  Any
-advanced use of this module will require an understanding of the format, as
-defined in `PKZIP Application Note`_.
+Định dạng tệp ZIP là một tiêu chuẩn lưu trữ và nén phổ biến. Mô-đun này cung cấp các công cụ để tạo, đọc, ghi, nối thêm và liệt kê một tệp ZIP. Mọi cách sử dụng nâng cao mô-đun này đều yêu cầu hiểu về định dạng, như được định nghĩa trong `PKZIP Application Note <PKZIP Application Note_>`_.
 
-This module does not handle multipart ZIP files.
-It can handle ZIP files that use the ZIP64 extensions
-(that is ZIP files that are more than 4 GiB in size).  It supports
-decryption of encrypted files in ZIP archives, but it cannot
-create an encrypted file.  Decryption is extremely slow as it is
-implemented in native Python rather than C.
+Mô-đun này không xử lý các tệp ZIP nhiều phần. Mô-đun có thể xử lý các tệp ZIP sử dụng phần mở rộng ZIP64 (tức là các tệp ZIP có kích thước lớn hơn 4 GiB). Mô-đun hỗ trợ giải mã các tệp được mã hóa trong kho lưu trữ ZIP, nhưng không thể tạo tệp được mã hóa. Việc giải mã cực kỳ chậm vì được triển khai bằng Python thuần thay vì C.
 
 ..
-   The following paragraph should be similar to ../includes/optional-module.rst
+   Đoạn văn sau đây phải tương tự như ../includes/optional-module.rst
 
-Handling compressed archives requires :term:`optional modules <optional module>`
-such as :mod:`zlib`, :mod:`bz2`, :mod:`lzma`, and :mod:`compression.zstd`.
-If any of them are missing from your copy of CPython,
-look for documentation from your distributor (that is,
-whoever provided Python to you).
-If you are the distributor, see :ref:`optional-module-requirements`.
+Việc xử lý các kho lưu trữ đã nén yêu cầu các :term:`mô-đun tùy chọn <optional module>` như :mod:`zlib`, :mod:`bz2`, :mod:`lzma` và :mod:`compression.zstd`. Nếu bất kỳ mô-đun nào trong số đó bị thiếu trong bản sao CPython của bạn, hãy tìm tài liệu từ nhà phân phối (tức là đơn vị đã cung cấp Python cho bạn). Nếu bạn là nhà phân phối, hãy xem :ref:`optional-module-requirements`.
 
-The module defines the following items:
+Mô-đun định nghĩa các mục sau:
 
 .. exception:: BadZipFile
 
-   The error raised for bad ZIP files.
+   Lỗi được phát sinh đối với các tệp ZIP không hợp lệ.
 
    .. versionadded:: 3.2
 
 
 .. exception:: BadZipfile
 
-   Alias of :exc:`BadZipFile`, for compatibility with older Python versions.
+   Bí danh của :exc:`BadZipFile`, để tương thích với các phiên bản Python cũ hơn.
 
    .. deprecated:: 3.2
 
 
 .. exception:: LargeZipFile
 
-   The error raised when a ZIP file would require ZIP64 functionality but that has
-   not been enabled.
+   Lỗi được phát sinh khi một tệp ZIP yêu cầu chức năng ZIP64 nhưng chức năng này chưa được bật.
 
 
 .. class:: ZipFile
    :noindex:
 
-   The class for reading and writing ZIP files.  See section
-   :ref:`zipfile-objects` for constructor details.
+   Lớp dùng để đọc và ghi các tệp ZIP. Xem phần
+   :ref:`zipfile-objects` để biết chi tiết về hàm khởi tạo.
 
 
 .. class:: Path
    :noindex:
 
-   Class that implements a subset of the interface provided by
-   :class:`pathlib.Path`, including the full
+   Lớp triển khai một tập con của giao diện do
+   :class:`pathlib.Path`, bao gồm toàn bộ
    :class:`importlib.resources.abc.Traversable` interface.
 
    .. versionadded:: 3.8
@@ -75,691 +61,498 @@ The module defines the following items:
 .. class:: PyZipFile
    :noindex:
 
-   Class for creating ZIP archives containing Python libraries.
+   Lớp dùng để tạo các kho lưu trữ ZIP chứa các thư viện Python.
 
 
 .. class:: ZipInfo(filename='NoName', date_time=(1980,1,1,0,0,0))
 
-   Class used to represent information about a member of an archive. Instances
-   of this class are returned by the :meth:`.getinfo` and :meth:`.infolist`
-   methods of :class:`ZipFile` objects.  Most users of the :mod:`!zipfile` module
-   will not need to create these, but only use those created by this
-   module. *filename* should be the full name of the archive member, and
-   *date_time* should be a tuple containing six fields which describe the time
-   of the last modification to the file; the fields are described in section
+   Lớp dùng để biểu diễn thông tin về một thành phần của kho lưu trữ. Các thực thể của lớp này được các phương thức :meth:`.getinfo` và :meth:`.infolist` của các đối tượng :class:`ZipFile` trả về. Hầu hết người dùng mô-đun :mod:`!zipfile` sẽ không cần tạo các thực thể này mà chỉ sử dụng những thực thể do mô-đun này tạo ra. *filename* phải là tên đầy đủ của thành phần trong kho lưu trữ, còn *date_time* phải là một tuple chứa sáu trường mô tả thời điểm tệp được sửa đổi lần cuối; các trường được mô tả trong phần
    :ref:`zipinfo-objects`.
 
    .. versionchanged:: 3.13
-      A public :attr:`!compress_level` attribute has been added to expose the
-      formerly protected :attr:`!_compresslevel`.  The older protected name
-      continues to work as a property for backwards compatibility.
+      Một thuộc tính :attr:`!compress_level` công khai đã được thêm để cung cấp :attr:`!_compresslevel` trước đây được bảo vệ. Tên được bảo vệ cũ tiếp tục hoạt động dưới dạng một property để đảm bảo khả năng tương thích ngược.
 
 
    .. method:: _for_archive(archive)
 
-      Resolve the date_time, compression attributes, and external attributes
-      to suitable defaults as used by :meth:`ZipFile.writestr`.
+      Phân giải các thuộc tính date_time, compression và các thuộc tính bên ngoài thành các giá trị mặc định phù hợp như được :meth:`ZipFile.writestr` sử dụng.
 
-      Returns self for chaining.
+      Trả về self để cho phép chaining.
 
       .. versionadded:: 3.14
 
 
 .. function:: is_zipfile(filename)
 
-   Returns ``True`` if *filename* is a valid ZIP file based on its magic number,
-   otherwise returns ``False``.  *filename* may be a file or file-like object too.
+   Trả về ``True`` nếu *filename* là tệp ZIP hợp lệ dựa trên magic number của nó, nếu không thì trả về ``False``. *filename* cũng có thể là tệp hoặc đối tượng giống tệp.
 
    .. versionchanged:: 3.1
-      Support for file and file-like objects.
+      Hỗ trợ các đối tượng tệp và đối tượng giống tệp.
 
 
 .. data:: ZIP_STORED
 
-   The numeric constant for an uncompressed archive member.
+   Hằng số số cho một thành viên archive không nén.
 
 
 .. data:: ZIP_DEFLATED
 
-   The numeric constant for the usual ZIP compression method.  This requires the
-   :mod:`zlib` module.
+   Hằng số số cho phương thức nén ZIP thông thường. Điều này yêu cầu
+   :mod:`zlib` mô-đun.
 
 
 .. data:: ZIP_BZIP2
 
-   The numeric constant for the BZIP2 compression method.  This requires the
-   :mod:`bz2` module.
+   Hằng số số cho phương thức nén BZIP2. Điều này yêu cầu
+   :mod:`bz2` mô-đun.
 
    .. versionadded:: 3.3
 
 .. data:: ZIP_LZMA
 
-   The numeric constant for the LZMA compression method.  This requires the
-   :mod:`lzma` module.
+   Hằng số số học cho phương thức nén LZMA. Phương thức này yêu cầu
+   :mod:`lzma` mô-đun.
 
    .. versionadded:: 3.3
 
 .. data:: ZIP_ZSTANDARD
 
-   The numeric constant for Zstandard compression. This requires the
-   :mod:`compression.zstd` module.
+   Hằng số số học cho phương thức nén Zstandard. Phương thức này yêu cầu
+   :mod:`compression.zstd` mô-đun.
 
    .. note::
 
-      In APPNOTE 6.3.7, the method ID ``20`` was assigned to Zstandard
-      compression. This was changed in APPNOTE 6.3.8 to method ID ``93`` to
-      avoid conflicts, with method ID ``20`` being deprecated. For
-      compatibility, the :mod:`!zipfile` module reads both method IDs but will
-      only write data with method ID ``93``.
+      Trong APPNOTE 6.3.7, mã phương thức ``20`` được gán cho phương thức nén Zstandard. Mã này đã được thay đổi trong APPNOTE 6.3.8 thành mã phương thức ``93`` để tránh xung đột, còn mã phương thức ``20`` bị ngừng sử dụng. Để đảm bảo khả năng tương thích, mô-đun :mod:`!zipfile` đọc cả hai mã phương thức nhưng chỉ ghi dữ liệu bằng mã phương thức ``93``.
 
    .. versionadded:: 3.14
 
 .. note::
 
-   The ZIP file format specification has included support for bzip2 compression
-   since 2001, for LZMA compression since 2006, and Zstandard compression since
-   2020. However, some tools (including older Python releases) do not support
-   these compression methods, and may either refuse to process the ZIP file
-   altogether, or fail to extract individual files.
+   Định dạng tệp ZIP đã hỗ trợ phương thức nén bzip2 từ năm 2001, phương thức nén LZMA từ năm 2006 và phương thức nén Zstandard từ
+   2020. Tuy nhiên, một số công cụ (bao gồm các bản phát hành Python cũ hơn) không hỗ trợ
+   các phương thức nén này, và có thể từ chối xử lý toàn bộ tệp ZIP hoặc không thể giải nén các tệp riêng lẻ.
 
 .. seealso::
 
-   `PKZIP Application Note`_
-      Documentation on the ZIP file format by Phil Katz, the creator of the format and
-      algorithms used.
+   `Ghi chú ứng dụng PKZIP <PKZIP Application Note_>`_
+      Tài liệu về định dạng tệp ZIP do Phil Katz, người tạo ra định dạng và các thuật toán được sử dụng, biên soạn.
 
-   `Info-ZIP Home Page <https://infozip.sourceforge.net/>`_
-      Information about the Info-ZIP project's ZIP archive programs and development
-      libraries.
+   `Trang chủ Info-ZIP <https://infozip.sourceforge.net/>`_
+      Thông tin về các chương trình lưu trữ ZIP và thư viện phát triển của dự án Info-ZIP.
 
 
 .. _zipfile-objects:
 
-ZipFile objects
----------------
+Đối tượng ZipFile
+-----------------
 
 
 .. class:: ZipFile(file, mode='r', compression=ZIP_STORED, allowZip64=True, \
-                   compresslevel=None, *, strict_timestamps=True, \
-                   metadata_encoding=None)
+                   compresslevel=None, *, strict_timestamps=True, \ metadata_encoding=None)
 
-   Open a ZIP file, where *file* can be a path to a file (a string), a
-   file-like object or a :term:`path-like object`.
+   Mở một tệp ZIP, trong đó *file* có thể là đường dẫn đến một tệp (một chuỗi), một đối tượng giống tệp hoặc một :term:`path-like object`.
 
-   The *mode* parameter should be ``'r'`` to read an existing
-   file, ``'w'`` to truncate and write a new file, ``'a'`` to append to an
-   existing file, or ``'x'`` to exclusively create and write a new file.
-   If *mode* is ``'x'`` and *file* refers to an existing file,
-   a :exc:`FileExistsError` will be raised.
-   If *mode* is ``'a'`` and *file* refers to an existing ZIP
-   file, then additional files are added to it.  If *file* does not refer to a
-   ZIP file, then a new ZIP archive is appended to the file.  This is meant for
-   adding a ZIP archive to another file (such as :file:`python.exe`).  If
-   *mode* is ``'a'`` and the file does not exist at all, it is created.
-   If *mode* is ``'r'`` or ``'a'``, the file should be seekable.
+   Tham số *mode* phải là ``'r'`` để đọc một tệp hiện có, ``'w'`` để cắt ngắn và ghi một tệp mới, ``'a'`` để nối thêm vào một tệp hiện có hoặc ``'x'`` để chỉ tạo và ghi một tệp mới. Nếu *mode* là ``'x'`` và *file* trỏ đến một tệp hiện có, một :exc:`FileExistsError` sẽ được phát sinh. Nếu *mode* là ``'a'`` và *file* trỏ đến một tệp ZIP hiện có, các tệp bổ sung sẽ được thêm vào đó. Nếu *file* không trỏ đến một tệp ZIP, một kho lưu trữ ZIP mới sẽ được nối thêm vào tệp. Cách này được dùng để thêm một kho lưu trữ ZIP vào một tệp khác (chẳng hạn như :file:`python.exe`). Nếu *mode* là ``'a'`` và tệp hoàn toàn không tồn tại, tệp sẽ được tạo. Nếu *mode* là ``'r'`` hoặc ``'a'``, tệp phải hỗ trợ thao tác seek.
 
-   *compression* is the ZIP compression method to use when writing the archive,
-   and should be :const:`ZIP_STORED`, :const:`ZIP_DEFLATED`,
-   :const:`ZIP_BZIP2`, :const:`ZIP_LZMA`, or :const:`ZIP_ZSTANDARD`;
-   unrecognized values will cause :exc:`NotImplementedError` to be raised.  If
-   :const:`ZIP_DEFLATED`, :const:`ZIP_BZIP2`, :const:`ZIP_LZMA`, or
-   :const:`ZIP_ZSTANDARD` is specified but the corresponding module
-   (:mod:`zlib`, :mod:`bz2`, :mod:`lzma`, or :mod:`compression.zstd`) is not
-   available, :exc:`RuntimeError` is raised. The default is :const:`ZIP_STORED`.
+   *compression* là phương thức nén ZIP được sử dụng khi ghi kho lưu trữ và phải là :const:`ZIP_STORED`, :const:`ZIP_DEFLATED`,
+   :const:`ZIP_BZIP2`, :const:`ZIP_LZMA` hoặc :const:`ZIP_ZSTANDARD`; các giá trị không được nhận dạng sẽ khiến :exc:`NotImplementedError` được phát sinh. Nếu
+   :const:`ZIP_DEFLATED`, :const:`ZIP_BZIP2`, :const:`ZIP_LZMA` hoặc
+   :const:`ZIP_ZSTANDARD` được chỉ định nhưng mô-đun tương ứng (:mod:`zlib`, :mod:`bz2`, :mod:`lzma` hoặc :mod:`compression.zstd`) không khả dụng, :exc:`RuntimeError` sẽ được phát sinh. Giá trị mặc định là :const:`ZIP_STORED`.
 
-   If *allowZip64* is ``True`` (the default) zipfile will create ZIP files that
-   use the ZIP64 extensions when the zipfile is larger than 4 GiB. If it is
-   ``false`` :mod:`!zipfile` will raise an exception when the ZIP file would
-   require ZIP64 extensions.
+   Nếu *allowZip64* là ``True`` (mặc định), zipfile sẽ tạo các tệp ZIP sử dụng phần mở rộng ZIP64 khi tệp zip lớn hơn 4 GiB. Nếu là ``false``, :mod:`!zipfile` sẽ phát sinh ngoại lệ khi tệp ZIP cần các phần mở rộng ZIP64.
 
-   The *compresslevel* parameter controls the compression level to use when
-   writing files to the archive.
-   When using :const:`ZIP_STORED` or :const:`ZIP_LZMA` it has no effect.
-   When using :const:`ZIP_DEFLATED` integers ``0`` through ``9`` are accepted
-   (see :class:`zlib <zlib.compressobj>` for more information).
-   When using :const:`ZIP_BZIP2` integers ``1`` through ``9`` are accepted
-   (see :class:`bz2 <bz2.BZ2File>` for more information).
-   When using :const:`ZIP_ZSTANDARD` integers ``-131072`` through ``22`` are
-   commonly accepted (see
-   :attr:`CompressionParameter.compression_level <compression.zstd.CompressionParameter.compression_level>`
-   for more on retrieving valid values and their meaning).
+   Tham số *compresslevel* kiểm soát mức độ nén được sử dụng khi ghi tệp vào kho lưu trữ. Khi sử dụng :const:`ZIP_STORED` hoặc :const:`ZIP_LZMA`, tham số này không có tác dụng. Khi sử dụng :const:`ZIP_DEFLATED`, các số nguyên từ ``0`` đến ``9`` được chấp nhận (xem :class:`zlib <zlib.compressobj>` để biết thêm thông tin). Khi sử dụng :const:`ZIP_BZIP2`, các số nguyên từ ``1`` đến ``9`` được chấp nhận (xem :class:`bz2 <bz2.BZ2File>` để biết thêm thông tin). Khi sử dụng :const:`ZIP_ZSTANDARD`, các số nguyên từ ``-131072`` đến ``22`` thường được chấp nhận (xem
+   :attr:`CompressionParameter.compression_level <compression.zstd.CompressionParameter.compression_level>` để biết thêm về cách lấy các giá trị hợp lệ và ý nghĩa của chúng).
 
-   The *strict_timestamps* argument, when set to ``False``, allows to
-   zip files older than 1980-01-01 at the cost of setting the
-   timestamp to 1980-01-01.
-   Similar behavior occurs with files newer than 2107-12-31,
-   the timestamp is also set to the limit.
+   Đối số *strict_timestamps*, khi được đặt thành ``False``, cho phép nén các tệp cũ hơn ngày 1980-01-01, nhưng phải trả giá bằng việc đặt dấu thời gian thành 1980-01-01. Hành vi tương tự xảy ra với các tệp mới hơn ngày 2107-12-31; dấu thời gian cũng được đặt thành giới hạn này.
 
-   When mode is ``'r'``, *metadata_encoding* may be set to the name of a codec,
-   which will be used to decode metadata such as the names of members and ZIP
-   comments.
+   Khi mode là ``'r'``, có thể đặt *metadata_encoding* thành tên của một codec, được dùng để giải mã metadata như tên của các thành viên và chú thích ZIP.
 
-   If the file is created with mode ``'w'``, ``'x'`` or ``'a'`` and then
-   :meth:`closed <close>` without adding any files to the archive, the appropriate
-   ZIP structures for an empty archive will be written to the file.
+   Nếu tệp được tạo với mode ``'w'``, ``'x'`` hoặc ``'a'`` rồi
+   :meth:`closed <close>` mà không thêm tệp nào vào kho lưu trữ, các cấu trúc ZIP thích hợp cho một kho lưu trữ trống sẽ được ghi vào tệp.
 
-   ZipFile is also a context manager and therefore supports the
-   :keyword:`with` statement.  In the example, *myzip* is closed after the
-   :keyword:`!with` statement's suite is finished---even if an exception occurs::
+   ZipFile cũng là một context manager và do đó hỗ trợ
+   :keyword:`with` câu lệnh. Trong ví dụ, *myzip* được đóng sau khi
+   phần thân của câu lệnh :keyword:`!with` hoàn tất---ngay cả khi xảy ra ngoại lệ::
 
       with ZipFile('spam.zip', 'w') as myzip:
           myzip.write('eggs.txt')
 
    .. note::
 
-      *metadata_encoding* is an instance-wide setting for the ZipFile.
-      It is not possible to set this on a per-member basis.
+      *metadata_encoding* là thiết lập áp dụng cho toàn bộ ZipFile. Không thể thiết lập thuộc tính này riêng cho từng thành viên.
 
-      This attribute is a workaround for legacy implementations which produce
-      archives with names in the current locale encoding or code page (mostly
-      on Windows).  According to the .ZIP standard, the encoding of metadata
-      may be specified to be either IBM code page (default) or UTF-8 by a flag
-      in the archive header.
-      That flag takes precedence over *metadata_encoding*, which is
-      a Python-specific extension.
+      Thuộc tính này là một giải pháp thay thế cho các implementation cũ tạo archive với tên được mã hóa theo encoding hoặc code page của locale hiện tại (chủ yếu trên Windows). Theo tiêu chuẩn .ZIP, encoding của metadata có thể được chỉ định là IBM code page (mặc định) hoặc UTF-8 bằng một cờ trong header của archive. Cờ đó được ưu tiên hơn *metadata_encoding*, vốn là một phần mở rộng dành riêng cho Python.
 
    .. versionchanged:: 3.2
-      Added the ability to use :class:`ZipFile` as a context manager.
+      Đã bổ sung khả năng sử dụng :class:`ZipFile` làm context manager.
 
    .. versionchanged:: 3.3
-      Added support for :mod:`bzip2 <bz2>` and :mod:`lzma` compression.
+      Đã bổ sung hỗ trợ nén bằng :mod:`bzip2 <bz2>` và :mod:`lzma`.
 
    .. versionchanged:: 3.4
-      ZIP64 extensions are enabled by default.
+      Các phần mở rộng ZIP64 được bật theo mặc định.
 
    .. versionchanged:: 3.5
-      Added support for writing to unseekable streams.
-      Added support for the ``'x'`` mode.
+      Đã bổ sung hỗ trợ ghi vào các stream không thể seek. Đã bổ sung hỗ trợ cho chế độ ``'x'``.
 
    .. versionchanged:: 3.6
-      Previously, a plain :exc:`RuntimeError` was raised for unrecognized
-      compression values.
+      Trước đây, một :exc:`RuntimeError` đơn thuần sẽ được raise khi gặp các giá trị compression không được nhận dạng.
 
    .. versionchanged:: 3.6.2
-      The *file* parameter accepts a :term:`path-like object`.
+      Tham số *file* chấp nhận một :term:`path-like object`.
 
    .. versionchanged:: 3.7
-      Add the *compresslevel* parameter.
+      Thêm tham số *compresslevel*.
 
    .. versionchanged:: 3.8
-      The *strict_timestamps* keyword-only parameter.
+      Tham số chỉ nhận keyword *strict_timestamps*.
 
    .. versionchanged:: 3.11
-      Added support for specifying member name encoding for reading
-      metadata in the zipfile's directory and file headers.
+      Đã bổ sung hỗ trợ chỉ định encoding của tên member để đọc metadata trong thư mục và các header của file trong zipfile.
 
 
 .. method:: ZipFile.close()
 
-   Close the archive file.  You must call :meth:`close` before exiting your program
-   or essential records will not be written.
+   Đóng file archive. Bạn phải gọi :meth:`close` trước khi thoát khỏi chương trình, nếu không các bản ghi thiết yếu sẽ không được ghi.
 
 
 .. method:: ZipFile.getinfo(name)
 
-   Return a :class:`ZipInfo` object with information about the archive member
-   *name*.  Calling :meth:`getinfo` for a name not currently contained in the
-   archive will raise a :exc:`KeyError`.
+   Trả về một đối tượng :class:`ZipInfo` chứa thông tin về thành viên lưu trữ *name*. Việc gọi :meth:`getinfo` với một tên hiện không có trong kho lưu trữ sẽ gây ra :exc:`KeyError`.
 
 
 .. method:: ZipFile.infolist()
 
-   Return a list containing a :class:`ZipInfo` object for each member of the
-   archive.  The objects are in the same order as their entries in the actual ZIP
-   file on disk if an existing archive was opened.
+   Trả về một danh sách chứa một đối tượng :class:`ZipInfo` cho mỗi thành viên của kho lưu trữ. Các đối tượng có cùng thứ tự với các mục tương ứng trong tệp ZIP thực tế trên đĩa nếu một kho lưu trữ hiện có đã được mở.
 
 
 .. method:: ZipFile.namelist()
 
-   Return a list of archive members by name.
+   Trả về danh sách các thành viên của kho lưu trữ theo tên.
 
 
 .. method:: ZipFile.open(name, mode='r', pwd=None, *, force_zip64=False)
 
-   Access a member of the archive as a binary file-like object.  *name*
-   can be either the name of a file within the archive or a :class:`ZipInfo`
-   object.  The *mode* parameter, if included, must be ``'r'`` (the default)
-   or ``'w'``.  *pwd* is the password used to decrypt encrypted ZIP files as a
-   :class:`bytes` object.
+   Truy cập một thành viên của kho lưu trữ dưới dạng đối tượng giống tệp nhị phân. *name* có thể là tên của một tệp trong kho lưu trữ hoặc một đối tượng :class:`ZipInfo`. Tham số *mode*, nếu được cung cấp, phải là ``'r'`` (mặc định) hoặc ``'w'``. *pwd* là mật khẩu được sử dụng để giải mã các tệp ZIP được mã hóa dưới dạng một
+   đối tượng :class:`bytes`.
 
-   :meth:`~ZipFile.open` is also a context manager and therefore supports the
-   :keyword:`with` statement::
+   :meth:`~ZipFile.open` cũng là một context manager và do đó hỗ trợ
+   câu lệnh :keyword:`with`::
 
       with ZipFile('spam.zip') as myzip:
           with myzip.open('eggs.txt') as myfile:
               print(myfile.read())
 
-   With *mode* ``'r'`` the file-like object
-   (``ZipExtFile``) is read-only and provides the following methods:
+   Với *mode* ``'r'``, đối tượng giống tệp (``ZipExtFile``) là chỉ đọc và cung cấp các phương thức sau:
    :meth:`~io.BufferedIOBase.read`, :meth:`~io.IOBase.readline`,
    :meth:`~io.IOBase.readlines`, :meth:`~io.IOBase.seek`,
-   :meth:`~io.IOBase.tell`, :meth:`~container.__iter__`, :meth:`~iterator.__next__`.
-   These objects can operate independently of the ZipFile.
+   :meth:`~io.IOBase.tell`, :meth:`~container.__iter__`, :meth:`~iterator.__next__`. Các đối tượng này có thể hoạt động độc lập với ZipFile.
 
-   With ``mode='w'``, a writable file handle is returned, which supports the
-   :meth:`~io.BufferedIOBase.write` method.  While a writable file handle is open,
-   attempting to read or write other files in the ZIP file will raise a
+   Với ``mode='w'``, một file handle có thể ghi được trả về, hỗ trợ
+   phương thức :meth:`~io.BufferedIOBase.write`. Trong khi một file handle có thể ghi đang mở, việc cố gắng đọc hoặc ghi các tệp khác trong tệp ZIP sẽ gây ra
    :exc:`ValueError`.
 
-   In both cases the file-like object has also attributes :attr:`!name`,
-   which is equivalent to the name of a file within the archive, and
-   :attr:`!mode`, which is ``'rb'`` or ``'wb'`` depending on the input mode.
+   Trong cả hai trường hợp, đối tượng giống tệp cũng có thuộc tính :attr:`!name`, tương đương với tên của một tệp trong archive, và
+   :attr:`!mode`, là ``'rb'`` hoặc ``'wb'`` tùy thuộc vào input mode.
 
-   When writing a file, if the file size is not known in advance but may exceed
-   2 GiB, pass ``force_zip64=True`` to ensure that the header format is
-   capable of supporting large files.  If the file size is known in advance,
-   construct a :class:`ZipInfo` object with :attr:`~ZipInfo.file_size` set, and
-   use that as the *name* parameter.
+   Khi ghi một tệp, nếu trước đó chưa biết kích thước tệp nhưng kích thước này có thể vượt quá 2 GiB, hãy truyền ``force_zip64=True`` để đảm bảo định dạng header có khả năng hỗ trợ các tệp lớn. Nếu biết trước kích thước tệp, hãy tạo một đối tượng :class:`ZipInfo` với :attr:`~ZipInfo.file_size` được thiết lập, rồi dùng đối tượng đó làm tham số *name*.
 
    .. note::
 
-      The :meth:`.open`, :meth:`read` and :meth:`extract` methods can take a filename
-      or a :class:`ZipInfo` object.  You will appreciate this when trying to read a
-      ZIP file that contains members with duplicate names.
+      Các phương thức :meth:`.open`, :meth:`read` và :meth:`extract` có thể nhận tên tệp hoặc đối tượng :class:`ZipInfo`. Điều này sẽ rất hữu ích khi bạn cố đọc một tệp ZIP chứa các thành viên có tên trùng nhau.
 
    .. versionchanged:: 3.6
-      Removed support of ``mode='U'``.  Use :class:`io.TextIOWrapper` for reading
-      compressed text files in :term:`universal newlines` mode.
+      Đã loại bỏ hỗ trợ cho ``mode='U'``. Sử dụng :class:`io.TextIOWrapper` để đọc các tệp văn bản đã nén ở chế độ :term:`universal newlines`.
 
    .. versionchanged:: 3.6
       :meth:`ZipFile.open` can now be used to write files into the archive with the
-      ``mode='w'`` option.
+      Tùy chọn ``mode='w'``.
 
    .. versionchanged:: 3.6
-      Calling :meth:`.open` on a closed ZipFile will raise a :exc:`ValueError`.
-      Previously, a :exc:`RuntimeError` was raised.
+      Việc gọi :meth:`.open` trên một ZipFile đã đóng sẽ gây ra :exc:`ValueError`. Trước đây, một :exc:`RuntimeError` sẽ được phát sinh.
 
    .. versionchanged:: 3.13
-      Added attributes :attr:`!name` and :attr:`!mode` for the writeable
-      file-like object.
-      The value of the :attr:`!mode` attribute for the readable file-like
-      object was changed from ``'r'`` to ``'rb'``.
+      Đã thêm các thuộc tính :attr:`!name` và :attr:`!mode` cho đối tượng giống tệp có thể ghi. Giá trị của thuộc tính :attr:`!mode` đối với đối tượng giống tệp có thể đọc đã được thay đổi từ ``'r'`` thành ``'rb'``.
 
 
 .. method:: ZipFile.extract(member, path=None, pwd=None)
 
-   Extract a member from the archive to the current working directory; *member*
-   must be its full name or a :class:`ZipInfo` object.  Its file information is
-   extracted as accurately as possible.  *path* specifies a different directory
-   to extract to.  *member* can be a filename or a :class:`ZipInfo` object.
-   *pwd* is the password used for encrypted files as a :class:`bytes` object.
+   Trích xuất một thành viên từ kho lưu trữ vào thư mục làm việc hiện tại; *member* phải là tên đầy đủ của thành viên hoặc một đối tượng :class:`ZipInfo`. Thông tin tệp của thành viên được trích xuất chính xác nhất có thể. *path* chỉ định một thư mục khác để trích xuất vào. *member* có thể là tên tệp hoặc một đối tượng :class:`ZipInfo`. *pwd* là mật khẩu dùng cho các tệp được mã hóa, dưới dạng một đối tượng :class:`bytes`.
 
-   Returns the normalized path created (a directory or new file).
+   Trả về đường dẫn đã chuẩn hóa được tạo (một thư mục hoặc tệp mới).
 
    .. note::
 
-      If a member filename is an absolute path, a drive/UNC sharepoint and
-      leading (back)slashes will be stripped, e.g.: ``///foo/bar`` becomes
-      ``foo/bar`` on Unix, and ``C:\foo\bar`` becomes ``foo\bar`` on Windows.
-      And all ``".."`` components in a member filename will be removed, e.g.:
-      ``../../foo../../ba..r`` becomes ``foo../ba..r``.  On Windows illegal
-      characters (``:``, ``<``, ``>``, ``|``, ``"``, ``?``, and ``*``)
-      replaced by underscore (``_``).
+      Nếu tên tệp thành viên là một đường dẫn tuyệt đối, điểm chia sẻ drive/UNC và các dấu gạch chéo (ngược) ở đầu sẽ bị loại bỏ, ví dụ: ``///foo/bar`` trở thành ``foo/bar`` trên Unix và ``C:\foo\bar`` trở thành ``foo\bar`` trên Windows. Ngoài ra, mọi thành phần ``".."`` trong tên tệp thành viên sẽ bị loại bỏ, ví dụ: ``../../foo../../ba..r`` trở thành ``foo../ba..r``. Trên Windows, các ký tự không hợp lệ (``:``, ``<``, ``>``, ``|``, ``"``, ``?`` và ``*``) được thay thế bằng dấu gạch dưới (``_``).
 
    .. versionchanged:: 3.6
-      Calling :meth:`extract` on a closed ZipFile will raise a
-      :exc:`ValueError`.  Previously, a :exc:`RuntimeError` was raised.
+      Gọi :meth:`extract` trên một ZipFile đã đóng sẽ phát sinh một
+      :exc:`ValueError`. Trước đây, một :exc:`RuntimeError` được phát sinh.
 
    .. versionchanged:: 3.6.2
-      The *path* parameter accepts a :term:`path-like object`.
+      Tham số *path* chấp nhận một :term:`path-like object`.
 
 
 .. method:: ZipFile.extractall(path=None, members=None, pwd=None)
 
-   Extract all members from the archive to the current working directory.  *path*
-   specifies a different directory to extract to.  *members* is optional and must
-   be a subset of the list returned by :meth:`namelist`.  *pwd* is the password
-   used for encrypted files as a :class:`bytes` object.
+   Giải nén tất cả thành viên từ archive vào thư mục làm việc hiện tại. *path* chỉ định một thư mục khác để giải nén. *members* là tùy chọn và phải là tập con của danh sách do :meth:`namelist` trả về. *pwd* là mật khẩu được dùng cho các tệp đã mã hóa dưới dạng đối tượng :class:`bytes`.
 
    .. warning::
 
-      Never extract archives from untrusted sources without prior inspection.
-      It is possible that files are created outside of *path*, for example, members
-      that have absolute filenames or filenames with ".." components.
-      This module attempts to prevent that.
-      See :meth:`extract` note.
+      Không bao giờ giải nén archive từ các nguồn không đáng tin cậy nếu chưa kiểm tra trước. Các tệp có thể được tạo bên ngoài *path*, chẳng hạn như các thành viên có tên tệp tuyệt đối hoặc tên tệp chứa các thành phần "..". Module này cố gắng ngăn chặn điều đó. Xem :meth:`extract` note.
 
    .. versionchanged:: 3.6
-      Calling :meth:`extractall` on a closed ZipFile will raise a
-      :exc:`ValueError`.  Previously, a :exc:`RuntimeError` was raised.
+      Gọi :meth:`extractall` trên một ZipFile đã đóng sẽ phát sinh một
+      :exc:`ValueError`. Trước đây, một :exc:`RuntimeError` được phát sinh.
 
    .. versionchanged:: 3.6.2
-      The *path* parameter accepts a :term:`path-like object`.
+      Tham số *path* chấp nhận một :term:`path-like object`.
 
 
 .. method:: ZipFile.printdir()
 
-   Print a table of contents for the archive to ``sys.stdout``.
+   In mục lục của archive ra ``sys.stdout``.
 
 
 .. method:: ZipFile.setpassword(pwd)
 
-   Set *pwd* (a :class:`bytes` object) as default password to extract encrypted files.
+   Đặt *pwd* (một đối tượng :class:`bytes`) làm mật khẩu mặc định để giải nén các tệp được mã hóa.
 
 
 .. method:: ZipFile.read(name, pwd=None)
 
-   Return the bytes of the file *name* in the archive.  *name* is the name of the
-   file in the archive, or a :class:`ZipInfo` object.  The archive must be open for
-   read or append. *pwd* is the password used for encrypted files as a :class:`bytes`
-   object and, if specified, overrides the default password set with :meth:`setpassword`.
-   Calling :meth:`read` on a ZipFile that uses a compression method other than
+   Trả về các byte của tệp *name* trong archive. *name* là tên của tệp trong archive hoặc một đối tượng :class:`ZipInfo`. Archive phải được mở để đọc hoặc nối thêm. *pwd* là mật khẩu được sử dụng cho các tệp được mã hóa dưới dạng đối tượng :class:`bytes` và nếu được chỉ định thì sẽ ghi đè mật khẩu mặc định được đặt bằng :meth:`setpassword`. Việc gọi :meth:`read` trên một ZipFile sử dụng phương thức nén khác với
    :const:`ZIP_STORED`, :const:`ZIP_DEFLATED`, :const:`ZIP_BZIP2`,
-   :const:`ZIP_LZMA`, or :const:`ZIP_ZSTANDARD` will raise a
-   :exc:`NotImplementedError`. An error will also be raised if the
-   corresponding compression module is not available.
+   :const:`ZIP_LZMA` hoặc :const:`ZIP_ZSTANDARD` sẽ phát sinh một
+   :exc:`NotImplementedError`. Lỗi cũng sẽ phát sinh nếu không có mô-đun nén tương ứng.
 
    .. versionchanged:: 3.6
-      Calling :meth:`read` on a closed ZipFile will raise a :exc:`ValueError`.
-      Previously, a :exc:`RuntimeError` was raised.
+      Gọi :meth:`read` trên một ZipFile đã đóng sẽ gây ra :exc:`ValueError`. Trước đây, một :exc:`RuntimeError` sẽ được gây ra.
 
 
 .. method:: ZipFile.testzip()
 
-   Read all the files in the archive and check their CRC's and file headers.
-   Return the name of the first bad file, or else return ``None``.
+   Đọc tất cả các tệp trong archive và kiểm tra CRC cũng như các header của tệp. Trả về tên của tệp đầu tiên bị lỗi, hoặc trả về ``None``.
 
    .. versionchanged:: 3.6
-      Calling :meth:`testzip` on a closed ZipFile will raise a
-      :exc:`ValueError`.  Previously, a :exc:`RuntimeError` was raised.
+      Gọi :meth:`testzip` trên một ZipFile đã đóng sẽ gây ra một
+      :exc:`ValueError`. Trước đây, một :exc:`RuntimeError` được phát sinh.
 
 
 .. method:: ZipFile.write(filename, arcname=None, compress_type=None, \
                           compresslevel=None)
 
-   Write the file named *filename* to the archive, giving it the archive name
-   *arcname* (by default, this will be the same as *filename*, but without a drive
-   letter and with leading path separators removed).  If given, *compress_type*
-   overrides the value given for the *compression* parameter to the constructor for
-   the new entry. Similarly, *compresslevel* will override the constructor if
-   given.
-   The archive must be open with mode ``'w'``, ``'x'`` or ``'a'``.
+   Ghi tệp có tên *filename* vào archive, đặt tên trong archive là *arcname* (theo mặc định, tên này sẽ giống *filename*, nhưng không có ký tự ổ đĩa và các dấu phân cách đường dẫn ở đầu sẽ bị loại bỏ). Nếu được cung cấp, *compress_type* sẽ ghi đè giá trị được truyền cho tham số *compression* của constructor đối với entry mới. Tương tự, *compresslevel* sẽ ghi đè giá trị của constructor nếu được cung cấp. Archive phải được mở với mode ``'w'``, ``'x'`` hoặc ``'a'``.
 
    .. note::
 
-      The ZIP file standard historically did not specify a metadata encoding,
-      but strongly recommended CP437 (the original IBM PC encoding) for
-      interoperability.  Recent versions allow use of UTF-8 (only).  In this
-      module, UTF-8 will automatically be used to write the member names if
-      they contain any non-ASCII characters.  It is not possible to write
-      member names in any encoding other than ASCII or UTF-8.
+      Tiêu chuẩn tệp ZIP trước đây không quy định encoding cho metadata, nhưng khuyến nghị mạnh mẽ CP437 (encoding gốc của IBM PC) để bảo đảm khả năng tương tác. Các phiên bản gần đây cho phép chỉ sử dụng UTF-8. Trong module này, UTF-8 sẽ tự động được dùng để ghi tên member nếu chúng chứa bất kỳ ký tự nào không phải ASCII. Không thể ghi tên member bằng bất kỳ encoding nào khác ngoài ASCII hoặc UTF-8.
 
    .. note::
 
-      Archive names should be relative to the archive root, that is, they should not
-      start with a path separator.
+      Tên archive phải tương đối so với thư mục gốc của archive, nghĩa là không được bắt đầu bằng dấu phân cách đường dẫn.
 
    .. note::
 
-      If ``arcname`` (or ``filename``, if ``arcname`` is  not given) contains a null
-      byte, the name of the file in the archive will be truncated at the null byte.
+      Nếu ``arcname`` (hoặc ``filename``, nếu ``arcname`` không được cung cấp) chứa byte null, tên tệp trong archive sẽ bị cắt tại byte null.
 
    .. note::
 
-      A leading slash in the filename may lead to the archive being impossible to
-      open in some zip programs on Windows systems.
+      Dấu gạch chéo ở đầu tên tệp có thể khiến không thể mở archive bằng một số chương trình zip trên hệ thống Windows.
 
    .. versionchanged:: 3.6
-      Calling :meth:`write` on a ZipFile created with mode ``'r'`` or
-      a closed ZipFile will raise a :exc:`ValueError`.  Previously,
-      a :exc:`RuntimeError` was raised.
+      Gọi :meth:`write` trên một ZipFile được tạo với mode ``'r'`` hoặc một ZipFile đã đóng sẽ phát sinh :exc:`ValueError`. Trước đây, một :exc:`RuntimeError` sẽ được phát sinh.
 
 
 .. method:: ZipFile.writestr(zinfo_or_arcname, data, compress_type=None, \
                              compresslevel=None)
 
-   Write a file into the archive.  The contents is *data*, which may be either
-   a :class:`str` or a :class:`bytes` instance; if it is a :class:`str`,
-   it is encoded as UTF-8 first.  *zinfo_or_arcname* is either the file
-   name it will be given in the archive, or a :class:`ZipInfo` instance.  If it's
-   an instance, at least the filename, date, and time must be given.  If it's a
-   name, the date and time is set to the current date and time.
-   The archive must be opened with mode ``'w'``, ``'x'`` or ``'a'``.
+   Ghi một tệp vào archive. Nội dung là *data*, có thể là một instance của :class:`str` hoặc :class:`bytes`; nếu là một :class:`str`, trước tiên nó sẽ được mã hóa thành UTF-8. *zinfo_or_arcname* là tên tệp sẽ được đặt trong archive hoặc một instance của :class:`ZipInfo`. Nếu là một instance, ít nhất phải cung cấp tên tệp, ngày và giờ. Nếu là một tên, ngày và giờ sẽ được đặt thành ngày và giờ hiện tại. Archive phải được mở với mode ``'w'``, ``'x'`` hoặc ``'a'``.
 
-   If given, *compress_type* overrides the value given for the *compression*
-   parameter to the constructor for the new entry, or in the *zinfo_or_arcname*
-   (if that is a :class:`ZipInfo` instance). Similarly, *compresslevel* will
-   override the constructor if given.
+   Nếu được cung cấp, *compress_type* sẽ ghi đè giá trị được cung cấp cho tham số *compression* của constructor cho entry mới hoặc trong *zinfo_or_arcname* (nếu đó là một instance của :class:`ZipInfo`). Tương tự, *compresslevel* sẽ ghi đè giá trị của constructor nếu được cung cấp.
 
    .. note::
 
-      When passing a :class:`ZipInfo` instance as the *zinfo_or_arcname* parameter,
-      the compression method used will be that specified in the *compress_type*
-      member of the given :class:`ZipInfo` instance.  By default, the
-      :class:`ZipInfo` constructor sets this member to :const:`ZIP_STORED`.
+      Khi truyền một instance :class:`ZipInfo` làm tham số *zinfo_or_arcname*, phương thức nén được sử dụng sẽ là phương thức được chỉ định trong member *compress_type* của instance :class:`ZipInfo` đã cho. Theo mặc định, the
+      constructor :class:`ZipInfo` đặt member này thành :const:`ZIP_STORED`.
 
    .. versionchanged:: 3.2
-      The *compress_type* argument.
+      Đối số *compress_type*.
 
    .. versionchanged:: 3.6
-      Calling :meth:`writestr` on a ZipFile created with mode ``'r'`` or
-      a closed ZipFile will raise a :exc:`ValueError`.  Previously,
-      a :exc:`RuntimeError` was raised.
+      Việc gọi :meth:`writestr` trên một ZipFile được tạo với mode ``'r'`` hoặc trên một ZipFile đã đóng sẽ phát sinh :exc:`ValueError`. Trước đây, một :exc:`RuntimeError` được phát sinh.
 
    .. versionchanged:: 3.14
-      Now respects the :envvar:`SOURCE_DATE_EPOCH` environment variable.
-      If set, it uses this value as the modification timestamp for the file
-      written into the ZIP archive, instead of using the current time.
+      Hiện tôn trọng biến môi trường :envvar:`SOURCE_DATE_EPOCH`. Nếu được đặt, giá trị này được dùng làm dấu thời gian sửa đổi cho tệp được ghi vào kho lưu trữ ZIP, thay vì dùng thời gian hiện tại.
 
 .. method:: ZipFile.mkdir(zinfo_or_directory, mode=511)
 
-   Create a directory inside the archive.  If *zinfo_or_directory* is a string,
-   a directory is created inside the archive with the mode that is specified in
-   the *mode* argument. If, however, *zinfo_or_directory* is
-   a :class:`ZipInfo` instance then the *mode* argument is ignored.
+   Tạo một thư mục bên trong kho lưu trữ. Nếu *zinfo_or_directory* là một chuỗi, một thư mục sẽ được tạo bên trong kho lưu trữ với mode được chỉ định trong đối số *mode*. Tuy nhiên, nếu *zinfo_or_directory* là một instance :class:`ZipInfo` thì đối số *mode* sẽ bị bỏ qua.
 
-   The archive must be opened with mode ``'w'``, ``'x'`` or ``'a'``.
+   Kho lưu trữ phải được mở với mode ``'w'``, ``'x'`` hoặc ``'a'``.
 
    .. versionadded:: 3.11
 
 
-The following data attributes are also available:
+Các thuộc tính dữ liệu sau cũng khả dụng:
 
 .. attribute:: ZipFile.filename
 
-   Name of the ZIP file.
+   Tên của tệp ZIP.
 
 .. attribute:: ZipFile.debug
 
-   The level of debug output to use.  This may be set from ``0`` (the default, no
-   output) to ``3`` (the most output).  Debugging information is written to
-   ``sys.stdout``.
+   Mức đầu ra debug cần sử dụng. Có thể đặt giá trị này từ ``0`` (mặc định, không có đầu ra) đến ``3`` (nhiều đầu ra nhất). Thông tin debug được ghi vào ``sys.stdout``.
 
 .. attribute:: ZipFile.comment
 
-   The comment associated with the ZIP file as a :class:`bytes` object.
-   If assigning a comment to a
-   :class:`ZipFile` instance created with mode ``'w'``, ``'x'`` or ``'a'``,
-   it should be no longer than 65535 bytes.  Comments longer than this will be
-   truncated.
+   Comment liên kết với tệp ZIP dưới dạng đối tượng :class:`bytes`. Nếu gán comment cho một
+   instance :class:`ZipFile` được tạo với mode ``'w'``, ``'x'`` hoặc ``'a'``, comment đó không được dài quá 65535 byte. Comment dài hơn sẽ bị cắt bớt.
 
 
 .. _path-objects:
 
-Path objects
-------------
+Các đối tượng Path
+------------------
 
 .. class:: Path(root, at='')
 
-   Construct a Path object from a ``root`` zipfile (which may be a
-   :class:`ZipFile` instance or ``file`` suitable for passing to
-   the :class:`ZipFile` constructor).
+   Tạo một đối tượng Path từ một zipfile ``root`` (có thể là một
+   một instance của :class:`ZipFile` hoặc ``file`` phù hợp để truyền vào constructor :class:`ZipFile`.
 
-   ``at`` specifies the location of this Path within the zipfile,
-   e.g. 'dir/file.txt', 'dir/', or ''. Defaults to the empty string,
-   indicating the root.
+   ``at`` chỉ định vị trí của Path này trong zipfile, ví dụ: 'dir/file.txt', 'dir/' hoặc ''. Mặc định là chuỗi rỗng, biểu thị thư mục gốc.
 
    .. note::
-      The :class:`Path` class does not sanitize filenames within the ZIP archive. Unlike
-      the :meth:`ZipFile.extract` and :meth:`ZipFile.extractall` methods, it is the
-      caller's responsibility to validate or sanitize filenames to prevent path traversal
-      vulnerabilities (for example, absolute paths or paths with ".." components). When handling
-      untrusted archives, consider resolving filenames using :func:`os.path.abspath`
-      and checking against the target directory with :func:`os.path.commonpath`.
+      Lớp :class:`Path` không làm sạch tên tệp trong kho lưu trữ ZIP. Không giống các phương thức :meth:`ZipFile.extract` và :meth:`ZipFile.extractall`, trách nhiệm xác thực hoặc làm sạch tên tệp để ngăn lỗ hổng path traversal (ví dụ: đường dẫn tuyệt đối hoặc đường dẫn có các thành phần "..") thuộc về bên gọi. Khi xử lý các kho lưu trữ không đáng tin cậy, hãy cân nhắc phân giải tên tệp bằng :func:`os.path.abspath` và kiểm tra tên đó với thư mục đích bằng :func:`os.path.commonpath`.
 
-Path objects expose the following features of :mod:`pathlib.Path`
-objects:
+Các đối tượng Path cung cấp những tính năng sau của các đối tượng :mod:`pathlib.Path`:
 
-Path objects are traversable using the ``/`` operator or ``joinpath``.
+Có thể duyệt qua các đối tượng Path bằng toán tử ``/`` hoặc ``joinpath``.
 
 .. attribute:: Path.name
 
-   The final path component.
+   Thành phần cuối cùng của đường dẫn.
 
 .. method:: Path.open(mode='r', *, pwd, **)
 
-   Invoke :meth:`ZipFile.open` on the current path.
-   Allows opening for read or write, text or binary
-   through supported modes: 'r', 'w', 'rb', 'wb'.
-   Positional and keyword arguments are passed through to
-   :class:`io.TextIOWrapper` when opened as text and
-   ignored otherwise.
-   ``pwd`` is the ``pwd`` parameter to
+   Gọi :meth:`ZipFile.open` trên path hiện tại. Cho phép mở để đọc hoặc ghi, ở dạng văn bản hoặc nhị phân, thông qua các mode được hỗ trợ: 'r', 'w', 'rb', 'wb'. Các đối số vị trí và từ khóa được truyền tiếp đến
+   :class:`io.TextIOWrapper` khi được mở dưới dạng văn bản và bị bỏ qua nếu không. ``pwd`` là tham số ``pwd`` cho
    :meth:`ZipFile.open`.
 
    .. versionchanged:: 3.9
-      Added support for text and binary modes for open. Default
-      mode is now text.
+      Đã bổ sung hỗ trợ cho các chế độ văn bản và nhị phân của open. Chế độ mặc định hiện là văn bản.
 
    .. versionchanged:: 3.11.2
-      The ``encoding`` parameter can be supplied as a positional argument
-      without causing a :exc:`TypeError`. As it could in 3.9. Code needing to
-      be compatible with unpatched 3.10 and 3.11 versions must pass all
-      :class:`io.TextIOWrapper` arguments, ``encoding`` included, as keywords.
+      Có thể cung cấp tham số ``encoding`` dưới dạng đối số vị trí mà không gây ra :exc:`TypeError`. Như đã có thể xảy ra trong 3.9. Mã cần tương thích với các phiên bản 3.10 và 3.11 chưa được vá phải truyền tất cả
+      các đối số :class:`io.TextIOWrapper`, bao gồm cả ``encoding``, dưới dạng keyword.
 
 .. method:: Path.iterdir()
 
-   Enumerate the children of the current directory.
+   Liệt kê các mục con của thư mục hiện tại.
 
 .. method:: Path.is_dir()
 
-   Return ``True`` if the current context references a directory.
+   Trả về ``True`` nếu context hiện tại tham chiếu đến một thư mục.
 
 .. method:: Path.is_file()
 
-   Return ``True`` if the current context references a file.
+   Trả về ``True`` nếu context hiện tại tham chiếu đến một tệp.
 
 .. method:: Path.is_symlink()
 
-   Return ``True`` if the current context references a symbolic link.
+   Trả về ``True`` nếu ngữ cảnh hiện tại tham chiếu đến một symbolic link.
 
    .. versionadded:: 3.12
 
    .. versionchanged:: 3.13
-      Previously, ``is_symlink`` would unconditionally return ``False``.
+      Trước đây, ``is_symlink`` luôn trả về ``False``.
 
 .. method:: Path.exists()
 
-   Return ``True`` if the current context references a file or
-   directory in the zip file.
+   Trả về ``True`` nếu ngữ cảnh hiện tại tham chiếu đến một tệp hoặc thư mục trong tệp zip.
 
 .. data:: Path.suffix
 
-   The last dot-separated portion of the final component, if any.
-   This is commonly called the file extension.
+   Phần cuối được phân tách bằng dấu chấm của thành phần cuối cùng, nếu có. Phần này thường được gọi là phần mở rộng tệp.
 
    .. versionadded:: 3.11
-      Added :data:`Path.suffix` property.
+      Đã thêm thuộc tính :data:`Path.suffix`.
 
 .. data:: Path.stem
 
-   The final path component, without its suffix.
+   Thành phần đường dẫn cuối cùng, không có hậu tố.
 
    .. versionadded:: 3.11
-      Added :data:`Path.stem` property.
+      Đã thêm thuộc tính :data:`Path.stem`.
 
 .. data:: Path.suffixes
 
-   A list of the path’s suffixes, commonly called file extensions.
+   Danh sách các hậu tố của đường dẫn, thường được gọi là phần mở rộng tệp.
 
    .. versionadded:: 3.11
-      Added :data:`Path.suffixes` property.
+      Đã thêm thuộc tính :data:`Path.suffixes`.
 
 .. method:: Path.read_text(*, **)
 
-   Read the current file as unicode text. Positional and
-   keyword arguments are passed through to
-   :class:`io.TextIOWrapper` (except ``buffer``, which is
-   implied by the context).
+   Đọc tệp hiện tại dưới dạng văn bản Unicode. Các đối số vị trí và đối số từ khóa được truyền tiếp đến
+   :class:`io.TextIOWrapper` (ngoại trừ ``buffer``, vốn được ngầm định theo ngữ cảnh).
 
    .. versionchanged:: 3.11.2
-      The ``encoding`` parameter can be supplied as a positional argument
-      without causing a :exc:`TypeError`. As it could in 3.9. Code needing to
-      be compatible with unpatched 3.10 and 3.11 versions must pass all
-      :class:`io.TextIOWrapper` arguments, ``encoding`` included, as keywords.
+      Có thể cung cấp tham số ``encoding`` dưới dạng đối số vị trí mà không gây ra :exc:`TypeError`. Như đã có thể xảy ra trong 3.9. Mã cần tương thích với các phiên bản 3.10 và 3.11 chưa được vá phải truyền tất cả
+      các đối số :class:`io.TextIOWrapper`, bao gồm cả ``encoding``, dưới dạng keyword.
 
 .. method:: Path.read_bytes()
 
-   Read the current file as bytes.
+   Đọc tệp hiện tại dưới dạng byte.
 
 .. method:: Path.joinpath(*other)
 
-   Return a new Path object with each of the *other* arguments
-   joined. The following are equivalent::
+   Trả về một đối tượng Path mới với từng đối số *other* được nối lại. Các cách sau là tương đương::
 
    >>> Path(...).joinpath('child').joinpath('grandchild')
    >>> Path(...).joinpath('child', 'grandchild')
    >>> Path(...) / 'child' / 'grandchild'
 
    .. versionchanged:: 3.10
-      Prior to 3.10, ``joinpath`` was undocumented and accepted
-      exactly one parameter.
+      Trước phiên bản 3.10, ``joinpath`` chưa được ghi chép và chỉ chấp nhận đúng một tham số.
 
-The :pypi:`zipp` project provides backports
-of the latest path object functionality to older Pythons. Use
-``zipp.Path`` in place of ``zipfile.Path`` for early access to
-changes.
+Dự án :pypi:`zipp` cung cấp các bản backport của chức năng đối tượng path mới nhất cho các phiên bản Python cũ hơn. Sử dụng ``zipp.Path`` thay cho ``zipfile.Path`` để sớm sử dụng các thay đổi.
 
 .. _pyzipfile-objects:
 
-PyZipFile objects
------------------
+Đối tượng PyZipFile
+-------------------
 
-The :class:`PyZipFile` constructor takes the same parameters as the
-:class:`ZipFile` constructor, and one additional parameter, *optimize*.
+Hàm khởi tạo :class:`PyZipFile` nhận các tham số giống như hàm khởi tạo
+:class:`ZipFile`, cùng với một tham số bổ sung là *optimize*.
 
 .. class:: PyZipFile(file, mode='r', compression=ZIP_STORED, allowZip64=True, \
                      optimize=-1)
 
    .. versionchanged:: 3.2
-      Added the *optimize* parameter.
+      Đã thêm tham số *optimize*.
 
    .. versionchanged:: 3.4
-      ZIP64 extensions are enabled by default.
+      Các phần mở rộng ZIP64 được bật theo mặc định.
 
-   Instances have one method in addition to those of :class:`ZipFile` objects:
+   Các instance có thêm một phương thức ngoài những phương thức của các đối tượng :class:`ZipFile`:
 
    .. method:: PyZipFile.writepy(pathname, basename='', filterfunc=None)
 
-      Search for files :file:`\*.py` and add the corresponding file to the
-      archive.
+      Tìm kiếm các tệp :file:`\*.py` và thêm tệp tương ứng vào archive.
 
-      If the *optimize* parameter to :class:`PyZipFile` was not given or ``-1``,
-      the corresponding file is a :file:`\*.pyc` file, compiling if necessary.
+      Nếu tham số *optimize* của :class:`PyZipFile` không được cung cấp hoặc là ``-1``, tệp tương ứng là tệp :file:`\*.pyc`, được biên dịch nếu cần.
 
-      If the *optimize* parameter to :class:`PyZipFile` was ``0``, ``1`` or
-      ``2``, only files with that optimization level (see :func:`compile`) are
-      added to the archive, compiling if necessary.
+      Nếu tham số *optimize* của :class:`PyZipFile` là ``0``, ``1`` hoặc ``2``, chỉ các tệp có mức tối ưu hóa đó (xem :func:`compile`) mới được thêm vào archive, được biên dịch nếu cần.
 
-      If *pathname* is a file, the filename must end with :file:`.py`, and
-      just the (corresponding :file:`\*.pyc`) file is added at the top level
-      (no path information).  If *pathname* is a file that does not end with
-      :file:`.py`, a :exc:`RuntimeError` will be raised.  If it is a directory,
-      and the directory is not a package directory, then all the files
-      :file:`\*.pyc` are added at the top level.  If the directory is a
-      package directory, then all :file:`\*.pyc` are added under the package
-      name as a file path, and if any subdirectories are package directories,
-      all of these are added recursively in sorted order.
+      Nếu *pathname* là một tệp, tên tệp phải kết thúc bằng :file:`.py`, và chỉ tệp (tương ứng với :file:`\*.pyc`) được thêm ở cấp cao nhất (không có thông tin đường dẫn). Nếu *pathname* là một tệp không kết thúc bằng
+      :file:`.py`, một :exc:`RuntimeError` sẽ được raise. Nếu đó là một thư mục và thư mục đó không phải là thư mục package, thì tất cả các tệp
+      :file:`\*.pyc` sẽ được thêm ở cấp cao nhất. Nếu thư mục đó là một thư mục package, thì tất cả :file:`\*.pyc` sẽ được thêm dưới tên package dưới dạng đường dẫn tệp; nếu có thư mục con nào là thư mục package, tất cả chúng sẽ được thêm đệ quy theo thứ tự sắp xếp.
 
-      *basename* is intended for internal use only.
+      *basename* chỉ предназнач cho việc sử dụng nội bộ.
 
-      *filterfunc*, if given, must be a function taking a single string
-      argument.  It will be passed each path (including each individual full
-      file path) before it is added to the archive.  If *filterfunc* returns a
-      false value, the path will not be added, and if it is a directory its
-      contents will be ignored.  For example, if our test files are all either
-      in ``test`` directories or start with the string ``test_``, we can use a
-      *filterfunc* to exclude them::
+      *filterfunc*, nếu được cung cấp, phải là một hàm nhận một đối số chuỗi duy nhất. Hàm này sẽ được truyền từng đường dẫn (bao gồm từng đường dẫn tệp đầy đủ) trước khi đường dẫn đó được thêm vào archive. Nếu *filterfunc* trả về giá trị false, đường dẫn đó sẽ không được thêm vào; nếu đó là một thư mục, nội dung của nó sẽ bị bỏ qua. Ví dụ, nếu tất cả các tệp kiểm thử của chúng ta либо nằm trong các thư mục ``test`` hoặc bắt đầu bằng chuỗi ``test_``, chúng ta có thể sử dụng một *filterfunc* để loại trừ chúng::
 
           >>> zf = PyZipFile('myprog.zip')
           >>> def notests(s):
@@ -768,302 +561,275 @@ The :class:`PyZipFile` constructor takes the same parameters as the
           ...
           >>> zf.writepy('myprog', filterfunc=notests)
 
-      The :meth:`writepy` method makes archives with file names like
-      this::
+      Phương thức :meth:`writepy` tạo các archive có tên tệp như sau::
 
-         string.pyc                   # Top level name
-         test/__init__.pyc            # Package directory
-         test/testall.pyc             # Module test.testall
-         test/bogus/__init__.pyc      # Subpackage directory
+         string.pyc                   # Tên cấp cao nhất
+         test/__init__.pyc            # Thư mục package
+         test/testall.pyc             # Mô-đun test.testall
+         test/bogus/__init__.pyc      # Thư mục subpackage
          test/bogus/myfile.pyc        # Submodule test.bogus.myfile
 
       .. versionchanged:: 3.4
-         Added the *filterfunc* parameter.
+         Đã thêm tham số *filterfunc*.
 
       .. versionchanged:: 3.6.2
-         The *pathname* parameter accepts a :term:`path-like object`.
+         Tham số *pathname* chấp nhận một :term:`path-like object`.
 
       .. versionchanged:: 3.7
-         Recursion sorts directory entries.
+         Đệ quy sắp xếp các mục nhập thư mục.
 
 
 .. _zipinfo-objects:
 
-ZipInfo objects
----------------
+Các đối tượng ZipInfo
+---------------------
 
-Instances of the :class:`ZipInfo` class are returned by the :meth:`.getinfo` and
-:meth:`.infolist` methods of :class:`ZipFile` objects.  Each object stores
-information about a single member of the ZIP archive.
+Các instance của lớp :class:`ZipInfo` được trả về bởi :meth:`.getinfo` và
+các phương thức :meth:`.infolist` của các đối tượng :class:`ZipFile`. Mỗi đối tượng lưu trữ thông tin về một thành phần riêng lẻ của kho lưu trữ ZIP.
 
-There is one classmethod to make a :class:`ZipInfo` instance for a filesystem
-file:
+Có một classmethod để tạo một instance :class:`ZipInfo` cho một tệp trong hệ thống tệp:
 
 .. classmethod:: ZipInfo.from_file(filename, arcname=None, *, \
                                    strict_timestamps=True)
 
-   Construct a :class:`ZipInfo` instance for a file on the filesystem, in
-   preparation for adding it to a zip file.
+   Tạo một instance :class:`ZipInfo` cho một tệp trong hệ thống tệp, để chuẩn bị thêm tệp đó vào tệp zip.
 
-   *filename* should be the path to a file or directory on the filesystem.
+   *filename* phải là đường dẫn đến một tệp hoặc thư mục trong hệ thống tệp.
 
-   If *arcname* is specified, it is used as the name within the archive.
-   If *arcname* is not specified, the name will be the same as *filename*, but
-   with any drive letter and leading path separators removed.
+   Nếu chỉ định *arcname*, giá trị này sẽ được dùng làm tên bên trong kho lưu trữ. Nếu không chỉ định *arcname*, tên sẽ giống với *filename*, nhưng mọi ký tự ổ đĩa và dấu phân cách đường dẫn ở đầu sẽ bị loại bỏ.
 
-   The *strict_timestamps* argument, when set to ``False``, allows to
-   zip files older than 1980-01-01 at the cost of setting the
-   timestamp to 1980-01-01.
-   Similar behavior occurs with files newer than 2107-12-31,
-   the timestamp is also set to the limit.
+   Đối số *strict_timestamps*, khi được đặt thành ``False``, cho phép nén các tệp cũ hơn 1980-01-01, nhưng phải đặt dấu thời gian thành 1980-01-01. Hành vi tương tự xảy ra với các tệp mới hơn 2107-12-31; dấu thời gian cũng được đặt thành giới hạn này.
 
    .. versionadded:: 3.6
 
    .. versionchanged:: 3.6.2
-      The *filename* parameter accepts a :term:`path-like object`.
+      Tham số *filename* chấp nhận một :term:`path-like object`.
 
    .. versionchanged:: 3.8
-      Added the *strict_timestamps* keyword-only parameter.
+      Đã thêm tham số chỉ nhận bằng từ khóa *strict_timestamps*.
 
 
-Instances have the following methods and attributes:
+Các instance có những phương thức và thuộc tính sau:
 
 .. method:: ZipInfo.is_dir()
 
-   Return ``True`` if this archive member is a directory.
+   Trả về ``True`` nếu thành viên này của archive là một thư mục.
 
-   This uses the entry's name: directories should always end with ``/``.
+   Điều này sử dụng tên của entry: các thư mục luôn phải kết thúc bằng ``/``.
 
    .. versionadded:: 3.6
 
 
 .. attribute:: ZipInfo.filename
 
-   Name of the file in the archive.
+   Tên của tệp trong archive.
 
 
 .. attribute:: ZipInfo.date_time
 
-   The time and date of the last modification to the archive member.  This is a
-   tuple of six values representing the "last [modified] file time" and "last [modified] file date"
-   fields from the ZIP file's central directory.
+   Thời gian và ngày sửa đổi lần cuối của thành viên lưu trữ. Đây là một tuple gồm sáu giá trị, biểu thị các trường "thời gian tệp [được sửa đổi] lần cuối" và "ngày tệp [được sửa đổi] lần cuối" trong thư mục trung tâm của tệp ZIP.
 
-   The tuple contains:
+   Tuple này chứa:
 
-   +-------+--------------------------+
-   | Index | Value                    |
-   +=======+==========================+
-   | ``0`` | Year (>= 1980)           |
-   +-------+--------------------------+
-   | ``1`` | Month (one-based)        |
-   +-------+--------------------------+
-   | ``2`` | Day of month (one-based) |
-   +-------+--------------------------+
-   | ``3`` | Hours (zero-based)       |
-   +-------+--------------------------+
-   | ``4`` | Minutes (zero-based)     |
-   +-------+--------------------------+
-   | ``5`` | Seconds (zero-based)     |
-   +-------+--------------------------+
+   +---------+-----------------------------------+
+   | Chỉ mục | Giá trị                           |
+   +=========+===================================+
+   | ``0``   | Năm (>= 1980)                     |
+   +---------+-----------------------------------+
+   | ``1``   | Tháng (đánh số từ một)            |
+   +---------+-----------------------------------+
+   | ``2``   | Ngày trong tháng (đánh số từ một) |
+   +---------+-----------------------------------+
+   | ``3``   | Giờ (đánh số từ 0)                |
+   +---------+-----------------------------------+
+   | ``4``   | Phút (đánh số từ 0)               |
+   +---------+-----------------------------------+
+   | ``5``   | Giây (đánh số từ 0)               |
+   +---------+-----------------------------------+
 
    .. note::
 
-      The ZIP format supports multiple timestamp fields in different locations
-      (central directory, extra fields for NTFS/UNIX systems, etc.). This attribute
-      specifically returns the timestamp from the central directory. The central
-      directory timestamp format in ZIP files does not support timestamps before
-      1980. While some extra field formats (such as UNIX timestamps) can represent
-      earlier dates, this attribute only returns the central directory timestamp.
+      Định dạng ZIP hỗ trợ nhiều trường dấu thời gian ở các vị trí khác nhau (thư mục trung tâm, các trường bổ sung cho hệ thống NTFS/UNIX, v.v.). Thuộc tính này cụ thể trả về dấu thời gian từ thư mục trung tâm. Định dạng dấu thời gian của thư mục trung tâm trong các tệp ZIP không hỗ trợ dấu thời gian trước
+      1980. Mặc dù một số định dạng trường bổ sung (chẳng hạn như dấu thời gian UNIX) có thể biểu diễn
+      các ngày sớm hơn, thuộc tính này chỉ trả về dấu thời gian của thư mục trung tâm.
 
-      The central directory timestamp is interpreted as representing local
-      time, rather than UTC time, to match the behavior of other zip tools.
+      Dấu thời gian của thư mục trung tâm được hiểu là giờ địa phương, thay vì giờ UTC, để phù hợp với hành vi của các công cụ zip khác.
 
 
 .. attribute:: ZipInfo.compress_type
 
-   Type of compression for the archive member.
+   Loại nén của thành viên archive.
 
 
 .. attribute:: ZipInfo.comment
 
-   Comment for the individual archive member as a :class:`bytes` object.
+   Chú thích cho thành viên archive riêng lẻ dưới dạng đối tượng :class:`bytes`.
 
 
 .. attribute:: ZipInfo.extra
 
-   Expansion field data.  The `PKZIP Application Note`_ contains
-   some comments on the internal structure of the data contained in this
-   :class:`bytes` object.
+   Dữ liệu trường mở rộng. `Ghi chú ứng dụng PKZIP <PKZIP Application Note_>`_ có chứa một số nhận xét về cấu trúc nội bộ của dữ liệu có trong
+   đối tượng :class:`bytes`.
 
 
 .. attribute:: ZipInfo.create_system
 
-   System which created ZIP archive.
+   Hệ thống đã tạo archive ZIP.
 
 
 .. attribute:: ZipInfo.create_version
 
-   PKZIP version which created ZIP archive.
+   Phiên bản PKZIP đã tạo archive ZIP.
 
 
 .. attribute:: ZipInfo.extract_version
 
-   PKZIP version needed to extract archive.
+   Phiên bản PKZIP cần thiết để giải nén archive.
 
 
 .. attribute:: ZipInfo.reserved
 
-   Must be zero.
+   Phải bằng không.
 
 
 .. attribute:: ZipInfo.flag_bits
 
-   ZIP flag bits.
+   Các bit cờ ZIP.
 
 
 .. attribute:: ZipInfo.volume
 
-   Volume number of file header.
+   Số volume của header tệp.
 
 
 .. attribute:: ZipInfo.internal_attr
 
-   Internal attributes.
+   Các thuộc tính nội bộ.
 
 
 .. attribute:: ZipInfo.external_attr
 
-   External file attributes.
+   Các thuộc tính tệp bên ngoài.
 
 
 .. attribute:: ZipInfo.header_offset
 
-   Byte offset to the file header.
+   Độ lệch byte đến header tệp.
 
 
 .. attribute:: ZipInfo.CRC
 
-   CRC-32 of the uncompressed file.
+   CRC-32 của tệp chưa giải nén.
 
 
 .. attribute:: ZipInfo.compress_size
 
-   Size of the compressed data.
+   Kích thước của dữ liệu đã nén.
 
 
 .. attribute:: ZipInfo.file_size
 
-   Size of the uncompressed file.
+   Kích thước của tệp chưa nén.
 
 
 .. _zipfile-commandline:
 .. program:: zipfile
 
-Command-line interface
-----------------------
+Giao diện dòng lệnh
+-------------------
 
-The :mod:`!zipfile` module provides a simple command-line interface to interact
-with ZIP archives.
+Mô-đun :mod:`!zipfile` cung cấp một giao diện dòng lệnh đơn giản để tương tác với các kho lưu trữ ZIP.
 
-If you want to create a new ZIP archive, specify its name after the :option:`-c`
-option and then list the filename(s) that should be included:
+Nếu muốn tạo một kho lưu trữ ZIP mới, hãy chỉ định tên của kho lưu trữ sau tùy chọn :option:`-c`, sau đó liệt kê (các) tên tệp cần đưa vào:
 
 .. code-block:: shell-session
 
     $ python -m zipfile -c monty.zip spam.txt eggs.txt
 
-Passing a directory is also acceptable:
+Bạn cũng có thể truyền vào một thư mục:
 
 .. code-block:: shell-session
 
     $ python -m zipfile -c monty.zip life-of-brian_1979/
 
-If you want to extract a ZIP archive into the specified directory, use
-the :option:`-e` option:
+Nếu muốn giải nén một kho lưu trữ ZIP vào thư mục được chỉ định, hãy sử dụng tùy chọn :option:`-e`:
 
 .. code-block:: shell-session
 
     $ python -m zipfile -e monty.zip target-dir/
 
-For a list of the files in a ZIP archive, use the :option:`-l` option:
+Để liệt kê các tệp trong một kho lưu trữ ZIP, hãy sử dụng tùy chọn :option:`-l`:
 
 .. code-block:: shell-session
 
     $ python -m zipfile -l monty.zip
 
 
-Command-line options
-~~~~~~~~~~~~~~~~~~~~
+Các tùy chọn dòng lệnh
+~~~~~~~~~~~~~~~~~~~~~~
 
 .. option:: -l <zipfile>
             --list <zipfile>
 
-   List files in a zipfile.
+   Liệt kê các tệp trong tệp ZIP.
 
 .. option:: -c <zipfile> <source1> ... <sourceN>
             --create <zipfile> <source1> ... <sourceN>
 
-   Create zipfile from source files.
+   Tạo tệp ZIP từ các tệp nguồn.
 
 .. option:: -e <zipfile> <output_dir>
             --extract <zipfile> <output_dir>
 
-   Extract zipfile into target directory.
+   Giải nén zipfile vào thư mục đích.
 
 .. option:: -t <zipfile>
             --test <zipfile>
 
-   Test whether the zipfile is valid or not.
+   Kiểm tra xem zipfile có hợp lệ hay không.
 
 .. option:: --metadata-encoding <encoding>
 
-   Specify encoding of member names for :option:`-l`, :option:`-e` and
+   Chỉ định encoding của tên thành viên cho :option:`-l`, :option:`-e` và
    :option:`-t`.
 
    .. versionadded:: 3.11
 
 
-Decompression pitfalls
-----------------------
+Các cạm bẫy khi giải nén
+------------------------
 
-The extraction in zipfile module might fail due to some pitfalls listed below.
+Việc giải nén trong module zipfile có thể thất bại do một số cạm bẫy được liệt kê dưới đây.
 
-From file itself
-~~~~~~~~~~~~~~~~
+Từ chính tệp
+~~~~~~~~~~~~
 
-Decompression may fail due to incorrect password / CRC checksum / ZIP format or
-unsupported compression method / decryption.
+Việc giải nén có thể không thành công do mật khẩu không đúng, lỗi checksum CRC, định dạng ZIP hoặc phương thức nén/giải mã không được hỗ trợ.
 
-File system limitations
-~~~~~~~~~~~~~~~~~~~~~~~
+Các giới hạn của hệ thống tệp
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Exceeding limitations on different file systems can cause decompression failed.
-Such as allowable characters in the directory entries, length of the file name,
-length of the pathname, size of a single file, and number of files, etc.
+Việc vượt quá các giới hạn trên những hệ thống tệp khác nhau có thể khiến quá trình giải nén thất bại. Ví dụ: các ký tự được phép trong các mục thư mục, độ dài tên tệp, độ dài đường dẫn, kích thước của một tệp đơn lẻ và số lượng tệp, v.v.
 
 .. _zipfile-resources-limitations:
 
-Resources limitations
-~~~~~~~~~~~~~~~~~~~~~
+Các giới hạn về tài nguyên
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The lack of memory or disk volume would lead to decompression
-failed. For example, decompression bombs (aka `ZIP bomb`_)
-apply to zipfile library that can cause disk volume exhaustion.
+Thiếu bộ nhớ hoặc dung lượng đĩa có thể khiến quá trình giải nén thất bại. Ví dụ, các bom giải nén (còn gọi là `bom ZIP <ZIP bomb_>`_) áp dụng cho thư viện zipfile có thể khiến dung lượng đĩa bị cạn kiệt.
 
-Interruption
-~~~~~~~~~~~~
+Gián đoạn
+~~~~~~~~~
 
-Interruption during the decompression, such as pressing control-C or killing the
-decompression process may result in incomplete decompression of the archive.
+Việc bị gián đoạn trong quá trình giải nén, chẳng hạn như nhấn control-C hoặc dừng tiến trình giải nén, có thể khiến quá trình giải nén kho lưu trữ không hoàn tất.
 
-Default behaviors of extraction
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Hành vi mặc định khi giải nén
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Not knowing the default extraction behaviors
-can cause unexpected decompression results.
-For example, when extracting the same archive twice,
-it overwrites files without asking.
+Không nắm được các hành vi mặc định khi giải nén có thể dẫn đến kết quả giải nén không mong muốn. Ví dụ: khi giải nén cùng một archive hai lần, chương trình sẽ ghi đè các tệp mà không hỏi.
 
 
 .. _ZIP bomb: https://en.wikipedia.org/wiki/Zip_bomb
 .. _PKZIP Application Note: https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT
+
+.. _`Info-ZIP Home Page`: https://infozip.sourceforge.net/

@@ -1,84 +1,54 @@
-:mod:`!socketserver` --- A framework for network servers
-========================================================
+:mod:`!socketserver` --- Khung cho các máy chủ mạng
+===================================================
 
 .. module:: socketserver
-   :synopsis: A framework for network servers.
+   :synopsis: Khung cho các máy chủ mạng.
 
-**Source code:** :source:`Lib/socketserver.py`
+**Mã nguồn:** :source:`Lib/socketserver.py`
 
 --------------
 
-The :mod:`!socketserver` module simplifies the task of writing network servers.
+Mô-đun :mod:`!socketserver` đơn giản hóa việc viết các máy chủ mạng.
 
 .. include:: ../includes/wasm-notavail.rst
 
-There are four basic concrete server classes:
+Có bốn lớp máy chủ cụ thể cơ bản:
 
 
 .. class:: TCPServer(server_address, RequestHandlerClass, bind_and_activate=True)
 
-   This uses the internet TCP protocol, which provides for
-   continuous streams of data between the client and server.
-   If *bind_and_activate* is true, the constructor automatically attempts to
-   invoke :meth:`~BaseServer.server_bind` and
-   :meth:`~BaseServer.server_activate`.  The other parameters are passed to
-   the :class:`BaseServer` base class.
+   Lớp này sử dụng giao thức TCP internet, cung cấp các luồng dữ liệu liên tục giữa máy khách và máy chủ. Nếu *bind_and_activate* là true, hàm khởi tạo sẽ tự động cố gắng gọi :meth:`~BaseServer.server_bind` và
+   :meth:`~BaseServer.server_activate`.  Các tham số khác được truyền cho lớp cơ sở :class:`BaseServer`.
 
 
 .. class:: UDPServer(server_address, RequestHandlerClass, bind_and_activate=True)
 
-   This uses datagrams, which are discrete packets of information that may
-   arrive out of order or be lost while in transit.  The parameters are
-   the same as for :class:`TCPServer`.
+   Phần này sử dụng datagram, tức là các gói thông tin riêng biệt có thể đến không theo thứ tự hoặc bị mất trong quá trình truyền. Các tham số giống như đối với :class:`TCPServer`.
 
 
 .. class:: UnixStreamServer(server_address, RequestHandlerClass, bind_and_activate=True)
            UnixDatagramServer(server_address, RequestHandlerClass, bind_and_activate=True)
 
-   These more infrequently used classes are similar to the TCP and
-   UDP classes, but use Unix domain sockets; they're not available on
-   non-Unix platforms.  The parameters are the same as for
+   Các lớp ít được sử dụng thường xuyên hơn này tương tự như các lớp TCP và UDP, nhưng sử dụng Unix domain socket; chúng không có trên các nền tảng không phải Unix. Các tham số giống như đối với
    :class:`TCPServer`.
 
 
-These four classes process requests :dfn:`synchronously`; each request must be
-completed before the next request can be started.  This isn't suitable if each
-request takes a long time to complete, because it requires a lot of computation,
-or because it returns a lot of data which the client is slow to process.  The
-solution is to create a separate process or thread to handle each request; the
-:class:`ForkingMixIn` and :class:`ThreadingMixIn` mix-in classes can be used to
-support asynchronous behaviour.
+Bốn lớp này xử lý các yêu cầu :dfn:`đồng bộ`; mỗi yêu cầu phải hoàn tất trước khi yêu cầu tiếp theo có thể bắt đầu. Cách này không phù hợp nếu mỗi yêu cầu mất nhiều thời gian để hoàn tất, vì yêu cầu đó cần nhiều phép tính hoặc trả về nhiều dữ liệu mà client xử lý chậm. Giải pháp là tạo một process hoặc thread riêng để xử lý từng yêu cầu;
+Các lớp mix-in :class:`ForkingMixIn` và :class:`ThreadingMixIn` có thể được sử dụng để hỗ trợ hành vi bất đồng bộ.
 
-Creating a server requires several steps.  First, you must create a request
-handler class by subclassing the :class:`BaseRequestHandler` class and
-overriding its :meth:`~BaseRequestHandler.handle` method;
-this method will process incoming
-requests.  Second, you must instantiate one of the server classes, passing it
-the server's address and the request handler class. It is recommended to use
-the server in a :keyword:`with` statement. Then call the
-:meth:`~BaseServer.handle_request` or
-:meth:`~BaseServer.serve_forever` method of the server object to
-process one or many requests.  Finally, call :meth:`~BaseServer.server_close`
-to close the socket (unless you used a :keyword:`!with` statement).
+Để tạo một server, cần thực hiện một số bước. Trước tiên, bạn phải tạo một lớp xử lý yêu cầu bằng cách kế thừa lớp :class:`BaseRequestHandler` và ghi đè phương thức :meth:`~BaseRequestHandler.handle`; phương thức này sẽ xử lý các yêu cầu đến. Tiếp theo, bạn phải khởi tạo một trong các lớp server, truyền vào địa chỉ của server và lớp xử lý yêu cầu. Bạn nên sử dụng server trong câu lệnh :keyword:`with`. Sau đó gọi
+:meth:`~BaseServer.handle_request` hoặc
+phương thức :meth:`~BaseServer.serve_forever` của đối tượng server để xử lý một hoặc nhiều request. Cuối cùng, hãy gọi :meth:`~BaseServer.server_close` để đóng socket (trừ khi bạn đã sử dụng câu lệnh :keyword:`!with`).
 
-When inheriting from :class:`ThreadingMixIn` for threaded connection behavior,
-you should explicitly declare how you want your threads to behave on an abrupt
-shutdown.  The :class:`ThreadingMixIn` class defines an attribute
-*daemon_threads*, which indicates whether or not the server should wait for
-thread termination.  You should set the flag explicitly if you would like
-threads to behave autonomously; the default is :const:`False`, meaning that
-Python will not exit until all threads created by :class:`ThreadingMixIn` have
-exited.
+Khi kế thừa từ :class:`ThreadingMixIn` để xử lý kết nối bằng thread, bạn nên khai báo rõ các thread sẽ hoạt động như thế nào khi server tắt đột ngột. Lớp :class:`ThreadingMixIn` định nghĩa một thuộc tính *daemon_threads*, cho biết server có chờ các thread kết thúc hay không. Bạn nên đặt cờ này một cách rõ ràng nếu muốn các thread hoạt động độc lập; giá trị mặc định là :const:`False`, nghĩa là Python sẽ không thoát cho đến khi tất cả các thread do :class:`ThreadingMixIn` tạo đã kết thúc.
 
-Server classes have the same external methods and attributes, no matter what
-network protocol they use.
+Các lớp server có cùng những method và attribute bên ngoài, bất kể chúng sử dụng giao thức mạng nào.
 
 
-Server Creation Notes
----------------------
+Ghi chú về việc tạo server
+--------------------------
 
-There are five classes in an inheritance diagram, four of which represent
-synchronous servers of four types::
+Có năm lớp trong sơ đồ kế thừa, trong đó bốn lớp đại diện cho bốn loại server đồng bộ.::
 
    +------------+
    | BaseServer |
@@ -94,284 +64,196 @@ synchronous servers of four types::
    | UDPServer |------->| UnixDatagramServer |
    +-----------+        +--------------------+
 
-Note that :class:`UnixDatagramServer` derives from :class:`UDPServer`, not from
-:class:`UnixStreamServer` --- the only difference between an IP and a Unix
-server is the address family.
+Lưu ý rằng :class:`UnixDatagramServer` kế thừa từ :class:`UDPServer`, không phải từ
+:class:`UnixStreamServer` — điểm khác biệt duy nhất giữa server IP và server Unix là họ địa chỉ.
 
 
 .. class:: ForkingMixIn
            ThreadingMixIn
 
-   Forking and threading versions of each type of server can be created
-   using these mix-in classes.  For instance, :class:`ThreadingUDPServer`
-   is created as follows::
+   Có thể tạo các phiên bản server sử dụng forking và threading cho từng loại server bằng các lớp mix-in này. Ví dụ, :class:`ThreadingUDPServer` được tạo như sau::
 
       class ThreadingUDPServer(ThreadingMixIn, UDPServer):
           pass
 
-   The mix-in class comes first, since it overrides a method defined in
-   :class:`UDPServer`.  Setting the various attributes also changes the
-   behavior of the underlying server mechanism.
+   Lớp mix-in được đặt trước, vì nó ghi đè một phương thức được định nghĩa trong
+   :class:`UDPServer`. Việc thiết lập các thuộc tính khác nhau cũng làm thay đổi cách hoạt động của cơ chế server bên dưới.
 
-   :class:`ForkingMixIn` and the Forking classes mentioned below are
-   only available on POSIX platforms that support :func:`~os.fork`.
+   :class:`ForkingMixIn` và các lớp Forking được đề cập bên dưới chỉ khả dụng trên các nền tảng POSIX hỗ trợ :func:`~os.fork`.
 
    .. attribute:: block_on_close
 
-      :meth:`ForkingMixIn.server_close <BaseServer.server_close>`
-      waits until all child processes complete, except if
-      :attr:`block_on_close` attribute is ``False``.
+      :meth:`ForkingMixIn.server_close <BaseServer.server_close>` chờ cho đến khi tất cả các tiến trình con hoàn tất, trừ khi
+      thuộc tính :attr:`block_on_close` là ``False``.
 
-      :meth:`ThreadingMixIn.server_close <BaseServer.server_close>`
-      waits until all non-daemon threads complete, except if
-      :attr:`block_on_close` attribute is ``False``.
+      :meth:`ThreadingMixIn.server_close <BaseServer.server_close>` sẽ chờ cho đến khi tất cả các thread không phải daemon hoàn tất, trừ khi
+      thuộc tính :attr:`block_on_close` là ``False``.
 
    .. attribute:: max_children
 
-      Specify how many child processes will exist to handle requests at a time
-      for :class:`ForkingMixIn`.  If the limit is reached,
-      new requests will wait until one child process has finished.
+      Chỉ định số lượng tiến trình con sẽ tồn tại để xử lý các yêu cầu cùng lúc cho :class:`ForkingMixIn`. Nếu đạt đến giới hạn, các yêu cầu mới sẽ chờ cho đến khi một tiến trình con hoàn tất.
 
    .. attribute:: daemon_threads
 
-      For :class:`ThreadingMixIn` use daemonic threads by setting
-      :data:`ThreadingMixIn.daemon_threads <daemon_threads>`
-      to ``True`` to not wait until threads complete.
+      Đối với :class:`ThreadingMixIn`, hãy sử dụng các thread daemon bằng cách đặt
+      :data:`ThreadingMixIn.daemon_threads <daemon_threads>` thành ``True`` để không phải chờ cho đến khi các thread hoàn tất.
 
    .. versionchanged:: 3.7
 
-      :meth:`ForkingMixIn.server_close <BaseServer.server_close>` and
-      :meth:`ThreadingMixIn.server_close <BaseServer.server_close>` now waits until all
-      child processes and non-daemonic threads complete.
-      Add a new :attr:`ForkingMixIn.block_on_close <block_on_close>` class
-      attribute to opt-in for the pre-3.7 behaviour.
+      :meth:`ForkingMixIn.server_close <BaseServer.server_close>` và
+      :meth:`ThreadingMixIn.server_close <BaseServer.server_close>` hiện sẽ chờ cho đến khi tất cả các tiến trình con và thread không phải daemon hoàn tất. Thêm một thuộc tính lớp :attr:`ForkingMixIn.block_on_close <block_on_close>` mới để bật hành vi trước phiên bản 3.7.
 
 
 .. class:: ForkingTCPServer
-           ForkingUDPServer
-           ThreadingTCPServer
-           ThreadingUDPServer
-           ForkingUnixStreamServer
-           ForkingUnixDatagramServer
-           ThreadingUnixStreamServer
-           ThreadingUnixDatagramServer
+           ForkingUDPServer ThreadingTCPServer ThreadingUDPServer ForkingUnixStreamServer ForkingUnixDatagramServer ThreadingUnixStreamServer ThreadingUnixDatagramServer
 
-   These classes are pre-defined using the mix-in classes.
+   Các lớp này được định nghĩa sẵn bằng cách sử dụng các lớp mix-in.
 
 .. versionadded:: 3.12
-   The ``ForkingUnixStreamServer`` and ``ForkingUnixDatagramServer`` classes
-   were added.
+   Các lớp ``ForkingUnixStreamServer`` và ``ForkingUnixDatagramServer`` đã được thêm vào.
 
-To implement a service, you must derive a class from :class:`BaseRequestHandler`
-and redefine its :meth:`~BaseRequestHandler.handle` method.
-You can then run various versions of
-the service by combining one of the server classes with your request handler
-class.  The request handler class must be different for datagram or stream
-services.  This can be hidden by using the handler subclasses
-:class:`StreamRequestHandler` or :class:`DatagramRequestHandler`.
+Để triển khai một dịch vụ, bạn phải tạo một lớp dẫn xuất từ :class:`BaseRequestHandler` và định nghĩa lại phương thức :meth:`~BaseRequestHandler.handle` của lớp đó. Sau đó, bạn có thể chạy nhiều phiên bản khác nhau của dịch vụ bằng cách kết hợp một trong các lớp server với lớp xử lý yêu cầu của mình. Lớp xử lý yêu cầu phải khác nhau đối với dịch vụ datagram hoặc stream. Bạn có thể ẩn sự khác biệt này bằng cách sử dụng các lớp con của handler
+:class:`StreamRequestHandler` hoặc :class:`DatagramRequestHandler`.
 
-Of course, you still have to use your head!  For instance, it makes no sense to
-use a forking server if the service contains state in memory that can be
-modified by different requests, since the modifications in the child process
-would never reach the initial state kept in the parent process and passed to
-each child.  In this case, you can use a threading server, but you will probably
-have to use locks to protect the integrity of the shared data.
+Tất nhiên, bạn vẫn phải suy nghĩ thận trọng! Chẳng hạn, sẽ không hợp lý khi sử dụng một server fork nếu dịch vụ chứa trạng thái trong bộ nhớ có thể bị các yêu cầu khác nhau sửa đổi, vì những thay đổi trong tiến trình con sẽ không bao giờ được phản ánh vào trạng thái ban đầu nằm trong tiến trình cha và được truyền cho mỗi tiến trình con. Trong trường hợp này, bạn có thể sử dụng một server threading, nhưng có lẽ sẽ phải sử dụng các lock để bảo vệ tính toàn vẹn của dữ liệu dùng chung.
 
-On the other hand, if you are building an HTTP server where all data is stored
-externally (for instance, in the file system), a synchronous class will
-essentially render the service "deaf" while one request is being handled --
-which may be for a very long time if a client is slow to receive all the data it
-has requested.  Here a threading or forking server is appropriate.
+Mặt khác, nếu bạn đang xây dựng một HTTP server trong đó tất cả dữ liệu được lưu trữ bên ngoài (chẳng hạn trong hệ thống tệp), một lớp synchronous về cơ bản sẽ khiến dịch vụ trở nên "điếc" trong khi một yêu cầu đang được xử lý -- thời gian này có thể rất dài nếu client nhận dữ liệu mà nó yêu cầu một cách chậm chạp. Trong trường hợp này, server threading hoặc forking là lựa chọn phù hợp.
 
-In some cases, it may be appropriate to process part of a request synchronously,
-but to finish processing in a forked child depending on the request data.  This
-can be implemented by using a synchronous server and doing an explicit fork in
-the request handler class :meth:`~BaseRequestHandler.handle` method.
+Trong một số trường hợp, việc xử lý một phần request một cách đồng bộ có thể phù hợp, nhưng việc xử lý có thể được hoàn tất trong một tiến trình con được fork tùy thuộc vào dữ liệu của request. Có thể triển khai điều này bằng cách sử dụng một synchronous server và thực hiện fork tường minh trong phương thức :meth:`~BaseRequestHandler.handle` của lớp request handler.
 
-Another approach to handling multiple simultaneous requests in an environment
-that supports neither threads nor :func:`~os.fork` (or where these are too
-expensive or inappropriate for the service) is to maintain an explicit table of
-partially finished requests and to use :mod:`selectors` to decide which
-request to work on next (or whether to handle a new incoming request).  This is
-particularly important for stream services where each client can potentially be
-connected for a long time (if threads or subprocesses cannot be used).
+Một cách tiếp cận khác để xử lý nhiều request đồng thời trong môi trường không hỗ trợ threads hoặc :func:`~os.fork` (hoặc khi các cơ chế này quá tốn kém hay không phù hợp với service) là duy trì một bảng tường minh gồm các request chưa hoàn tất và sử dụng :mod:`selectors` để quyết định request nào sẽ được xử lý tiếp theo (hoặc có nên xử lý một request mới đến hay không). Điều này đặc biệt quan trọng đối với các stream service, nơi mỗi client có thể duy trì kết nối trong thời gian dài (nếu không thể sử dụng threads hoặc subprocesses).
 
 .. XXX should data and methods be intermingled, or separate?
    how should the distinction between class and instance variables be drawn?
 
 
-Server Objects
---------------
+Các đối tượng Server
+--------------------
 
 .. class:: BaseServer(server_address, RequestHandlerClass)
 
-   This is the superclass of all Server objects in the module.  It defines the
-   interface, given below, but does not implement most of the methods, which is
-   done in subclasses.  The two parameters are stored in the respective
-   :attr:`server_address` and :attr:`RequestHandlerClass` attributes.
+   Đây là lớp cha của tất cả các đối tượng Server trong module. Lớp này định nghĩa interface được mô tả bên dưới, nhưng không triển khai hầu hết các phương thức; việc đó được thực hiện trong các lớp con. Hai tham số được lưu trong các
+   thuộc tính :attr:`server_address` và :attr:`RequestHandlerClass` tương ứng.
 
 
    .. method:: fileno()
 
-      Return an integer file descriptor for the socket on which the server is
-      listening.  This function is most commonly passed to :mod:`selectors`, to
-      allow monitoring multiple servers in the same process.
+      Trả về một file descriptor dạng số nguyên cho socket mà server đang lắng nghe. Hàm này thường được truyền cho :mod:`selectors` để cho phép giám sát nhiều server trong cùng một process.
 
 
    .. method:: handle_request()
 
-      Process a single request.  This function calls the following methods in
-      order: :meth:`get_request`, :meth:`verify_request`, and
-      :meth:`process_request`.  If the user-provided
-      :meth:`~BaseRequestHandler.handle` method of the
-      handler class raises an exception, the server's :meth:`handle_error` method
-      will be called.  If no request is received within :attr:`timeout`
-      seconds, :meth:`handle_timeout` will be called and :meth:`handle_request`
-      will return.
+      Xử lý một request đơn. Hàm này lần lượt gọi các phương thức sau: :meth:`get_request`, :meth:`verify_request`, và
+      :meth:`process_request`.  Nếu người dùng cung cấp
+      phương thức :meth:`~BaseRequestHandler.handle` của lớp handler phát sinh ngoại lệ, phương thức :meth:`handle_error` của server sẽ được gọi.  Nếu không nhận được request nào trong vòng :attr:`timeout` giây, :meth:`handle_timeout` sẽ được gọi và :meth:`handle_request` sẽ trả về.
 
 
    .. method:: serve_forever(poll_interval=0.5)
 
-      Handle requests until an explicit :meth:`shutdown` request.  Poll for
-      shutdown every *poll_interval* seconds.
-      Ignores the :attr:`timeout` attribute.  It
-      also calls :meth:`service_actions`, which may be used by a subclass or mixin
-      to provide actions specific to a given service.  For example, the
-      :class:`ForkingMixIn` class uses :meth:`service_actions` to clean up zombie
-      child processes.
+      Xử lý các request cho đến khi nhận được một request :meth:`shutdown` rõ ràng.  Thăm dò trạng thái shutdown sau mỗi *poll_interval* giây. Bỏ qua thuộc tính :attr:`timeout`.  Phương thức này cũng gọi :meth:`service_actions`, có thể được subclass hoặc mixin sử dụng để cung cấp các hành động riêng cho một service cụ thể.  Ví dụ,
+      lớp :class:`ForkingMixIn` sử dụng :meth:`service_actions` để dọn dẹp các tiến trình con zombie.
 
       .. versionchanged:: 3.3
-         Added ``service_actions`` call to the ``serve_forever`` method.
+         Đã thêm lệnh gọi ``service_actions`` vào phương thức ``serve_forever``.
 
 
    .. method:: service_actions()
 
-      This is called in the :meth:`serve_forever` loop. This method can be
-      overridden by subclasses or mixin classes to perform actions specific to
-      a given service, such as cleanup actions.
+      Phương thức này được gọi trong vòng lặp :meth:`serve_forever`. Phương thức này có thể được các subclass hoặc lớp mixin ghi đè để thực hiện các hành động riêng cho một service cụ thể, chẳng hạn như các thao tác dọn dẹp.
 
       .. versionadded:: 3.3
 
    .. method:: shutdown()
 
-      Tell the :meth:`serve_forever` loop to stop and wait until it does.
-      :meth:`shutdown` must be called while :meth:`serve_forever` is running in a
-      different thread otherwise it will deadlock.
+      Yêu cầu vòng lặp :meth:`serve_forever` dừng lại và chờ cho đến khi vòng lặp dừng.
+      :meth:`shutdown` phải được gọi khi :meth:`serve_forever` đang chạy trong một thread khác; nếu không, nó sẽ bị deadlock.
 
 
    .. method:: server_close()
 
-      Clean up the server. May be overridden.
+      Dọn dẹp server. Có thể được ghi đè.
 
 
    .. attribute:: address_family
 
-      The family of protocols to which the server's socket belongs.  Common
-      examples are :const:`socket.AF_INET`, :const:`socket.AF_INET6`, and
-      :const:`socket.AF_UNIX`.  Subclass the TCP or UDP server classes in this
-      module with class attribute ``address_family = AF_INET6`` set if you
-      want IPv6 server classes.
+      Họ giao thức mà socket của server thuộc về. Các ví dụ phổ biến là :const:`socket.AF_INET`, :const:`socket.AF_INET6`, và
+      :const:`socket.AF_UNIX`. Phân lớp các lớp server TCP hoặc UDP trong module này với class attribute ``address_family = AF_INET6`` được thiết lập nếu bạn muốn các lớp server IPv6.
 
 
    .. attribute:: RequestHandlerClass
 
-      The user-provided request handler class; an instance of this class is created
-      for each request.
+      Lớp request handler do người dùng cung cấp; một instance của lớp này được tạo cho mỗi request.
 
 
    .. attribute:: server_address
 
-      The address on which the server is listening.  The format of addresses varies
-      depending on the protocol family;
-      see the documentation for the :mod:`socket` module
-      for details.  For internet protocols, this is a tuple containing a string giving
-      the address, and an integer port number: ``('127.0.0.1', 80)``, for example.
+      Địa chỉ mà server đang lắng nghe. Định dạng địa chỉ thay đổi tùy thuộc vào họ giao thức; hãy xem tài liệu của module :mod:`socket` để biết chi tiết. Đối với các giao thức internet, đây là một tuple chứa một string chỉ địa chỉ và một số nguyên chỉ số cổng: ``('127.0.0.1', 80)``, chẳng hạn.
 
 
    .. attribute:: socket
 
-      The socket object on which the server will listen for incoming requests.
+      Đối tượng socket mà server sẽ lắng nghe các request đến.
 
 
-   The server classes support the following class variables:
+   Các lớp server hỗ trợ những biến lớp sau:
 
    .. XXX should class variables be covered before instance variables, or vice versa?
 
    .. attribute:: allow_reuse_address
 
-      Whether the server will allow the reuse of an address.  This defaults to
-      :const:`False`, and can be set in subclasses to change the policy.
+      Cho biết server có cho phép sử dụng lại một địa chỉ hay không. Giá trị này mặc định là
+      :const:`False`, và có thể được thiết lập trong các lớp con để thay đổi chính sách.
 
 
    .. attribute:: request_queue_size
 
-      The size of the request queue.  If it takes a long time to process a single
-      request, any requests that arrive while the server is busy are placed into a
-      queue, up to :attr:`request_queue_size` requests.  Once the queue is full,
-      further requests from clients will get a "Connection denied" error.  The default
-      value is usually 5, but this can be overridden by subclasses.
+      Kích thước của hàng đợi yêu cầu. Nếu mất nhiều thời gian để xử lý một yêu cầu, mọi yêu cầu đến trong khi server đang bận sẽ được xếp vào hàng đợi, tối đa :attr:`request_queue_size` yêu cầu. Khi hàng đợi đầy, các yêu cầu tiếp theo từ client sẽ nhận được lỗi "Connection denied". Giá trị mặc định thường là 5, nhưng các lớp con có thể ghi đè giá trị này.
 
 
    .. attribute:: socket_type
 
-      The type of socket used by the server; :const:`socket.SOCK_STREAM` and
-      :const:`socket.SOCK_DGRAM` are two common values.
+      Loại socket được server sử dụng; :const:`socket.SOCK_STREAM` và
+      :const:`socket.SOCK_DGRAM` là hai giá trị phổ biến.
 
 
    .. attribute:: timeout
 
-      Timeout duration, measured in seconds, or :const:`None` if no timeout is
-      desired.  If :meth:`handle_request` receives no incoming requests within the
-      timeout period, the :meth:`handle_timeout` method is called.
+      Thời lượng timeout, tính bằng giây, hoặc :const:`None` nếu không muốn đặt timeout. Nếu :meth:`handle_request` không nhận được yêu cầu đến nào trong khoảng thời gian timeout, phương thức :meth:`handle_timeout` sẽ được gọi.
 
 
-   There are various server methods that can be overridden by subclasses of base
-   server classes like :class:`TCPServer`; these methods aren't useful to external
-   users of the server object.
+   Có nhiều phương thức server khác nhau có thể được các lớp con của những lớp server cơ sở như :class:`TCPServer` ghi đè; các phương thức này không hữu ích đối với người dùng bên ngoài của đối tượng server.
 
    .. XXX should the default implementations of these be documented, or should
       it be assumed that the user will look at socketserver.py?
 
    .. method:: finish_request(request, client_address)
 
-      Actually processes the request by instantiating :attr:`RequestHandlerClass` and
-      calling its :meth:`~BaseRequestHandler.handle` method.
+      Thực sự xử lý request bằng cách khởi tạo :attr:`RequestHandlerClass` và gọi phương thức :meth:`~BaseRequestHandler.handle` của nó.
 
 
    .. method:: get_request()
 
-      Must accept a request from the socket, and return a 2-tuple containing the *new*
-      socket object to be used to communicate with the client, and the client's
-      address.
+      Phải chấp nhận một request từ socket và trả về một bộ 2 phần chứa đối tượng socket *new* được sử dụng để giao tiếp với client và địa chỉ của client.
 
 
    .. method:: handle_error(request, client_address)
 
-      This function is called if the :meth:`~BaseRequestHandler.handle`
-      method of a :attr:`RequestHandlerClass` instance raises
-      an exception.  The default action is to print the traceback to
-      standard error and continue handling further requests.
+      Hàm này được gọi nếu phương thức :meth:`~BaseRequestHandler.handle` của một instance :attr:`RequestHandlerClass` phát sinh exception. Hành động mặc định là in traceback ra standard error và tiếp tục xử lý các request tiếp theo.
 
       .. versionchanged:: 3.6
-         Now only called for exceptions derived from the :exc:`Exception`
-         class.
+         Hiện chỉ được gọi cho các exception bắt nguồn từ lớp :exc:`Exception`.
 
 
    .. method:: handle_timeout()
 
-      This function is called when the :attr:`timeout` attribute has been set to a
-      value other than :const:`None` and the timeout period has passed with no
-      requests being received.  The default action for forking servers is
-      to collect the status of any child processes that have exited, while
-      in threading servers this method does nothing.
+      Hàm này được gọi khi thuộc tính :attr:`timeout` được đặt thành một giá trị khác :const:`None` và khoảng thời gian timeout đã trôi qua mà không nhận được request nào. Hành động mặc định đối với các server sử dụng fork là thu thập trạng thái của mọi tiến trình con đã thoát, còn trong các server sử dụng threading, phương thức này không thực hiện gì.
 
 
    .. method:: process_request(request, client_address)
 
-      Calls :meth:`finish_request` to create an instance of the
-      :attr:`RequestHandlerClass`.  If desired, this function can create a new process
-      or thread to handle the request; the :class:`ForkingMixIn` and
-      :class:`ThreadingMixIn` classes do this.
+      Gọi :meth:`finish_request` để tạo một instance của
+      :attr:`RequestHandlerClass`. Nếu muốn, hàm này có thể tạo một tiến trình hoặc luồng mới để xử lý yêu cầu; các :class:`ForkingMixIn` và
+      :class:`ThreadingMixIn` thực hiện việc này.
 
 
    .. Is there any point in documenting the following two functions?
@@ -380,100 +262,77 @@ Server Objects
 
    .. method:: server_activate()
 
-      Called by the server's constructor to activate the server.  The default behavior
-      for a TCP server just invokes :meth:`~socket.socket.listen`
-      on the server's socket.  May be overridden.
+      Được gọi bởi hàm dựng của server để kích hoạt server. Hành vi mặc định đối với TCP server chỉ gọi :meth:`~socket.socket.listen` trên socket của server. Có thể được ghi đè.
 
 
    .. method:: server_bind()
 
-      Called by the server's constructor to bind the socket to the desired address.
-      May be overridden.
+      Được gọi bởi hàm dựng của server để liên kết socket với địa chỉ mong muốn. Có thể được ghi đè.
 
 
    .. method:: verify_request(request, client_address)
 
-      Must return a Boolean value; if the value is :const:`True`, the request will
-      be processed, and if it's :const:`False`, the request will be denied.  This
-      function can be overridden to implement access controls for a server. The
-      default implementation always returns :const:`True`.
+      Phải trả về một giá trị Boolean; nếu giá trị là :const:`True`, yêu cầu sẽ được xử lý, còn nếu là :const:`False`, yêu cầu sẽ bị từ chối. Có thể ghi đè hàm này để triển khai các quyền kiểm soát truy cập cho server. Cách triển khai mặc định luôn trả về :const:`True`.
 
 
    .. versionchanged:: 3.6
-      Support for the :term:`context manager` protocol was added.  Exiting the
-      context manager is equivalent to calling :meth:`server_close`.
+      Đã bổ sung hỗ trợ cho giao thức :term:`context manager`. Việc thoát khỏi context manager tương đương với việc gọi :meth:`server_close`.
 
 
-Request Handler Objects
+Đối tượng xử lý yêu cầu
 -----------------------
 
 .. class:: BaseRequestHandler
 
-   This is the superclass of all request handler objects.  It defines
-   the interface, given below.  A concrete request handler subclass must
-   define a new :meth:`handle` method, and can override any of
-   the other methods.  A new instance of the subclass is created for each
-   request.
+   Đây là lớp cha của tất cả các đối tượng xử lý yêu cầu. Lớp này định nghĩa giao diện như dưới đây. Một lớp con xử lý yêu cầu cụ thể phải định nghĩa một phương thức :meth:`handle` mới và có thể ghi đè bất kỳ phương thức nào khác. Một instance mới của lớp con được tạo cho mỗi yêu cầu.
 
 
    .. method:: setup()
 
-      Called before the :meth:`handle` method to perform any initialization actions
-      required.  The default implementation does nothing.
+      Được gọi trước phương thức :meth:`handle` để thực hiện mọi thao tác khởi tạo cần thiết. Cài đặt mặc định không thực hiện thao tác nào.
 
 
    .. method:: handle()
 
-      This function must do all the work required to service a request.  The
-      default implementation does nothing.  Several instance attributes are
-      available to it; the request is available as :attr:`request`; the client
-      address as :attr:`client_address`; and the server instance as
-      :attr:`server`, in case it needs access to per-server information.
+      Hàm này phải thực hiện mọi công việc cần thiết để xử lý một yêu cầu. Cài đặt mặc định không thực hiện thao tác nào. Hàm này có thể sử dụng một số thuộc tính instance; yêu cầu được cung cấp dưới dạng :attr:`request`; địa chỉ máy khách dưới dạng :attr:`client_address`; và instance máy chủ dưới dạng
+      :attr:`server`, trong trường hợp cần truy cập thông tin riêng của máy chủ.
 
-      The type of :attr:`request` is different for datagram or stream
-      services.  For stream services, :attr:`request` is a socket object; for
-      datagram services, :attr:`request` is a pair of string and socket.
+      Kiểu của :attr:`request` khác nhau tùy theo dịch vụ datagram hoặc stream. Đối với dịch vụ stream, :attr:`request` là một đối tượng socket; đối với dịch vụ datagram, :attr:`request` là một cặp gồm chuỗi và socket.
 
 
    .. method:: finish()
 
-      Called after the :meth:`handle` method to perform any clean-up actions
-      required.  The default implementation does nothing.  If :meth:`setup`
-      raises an exception, this function will not be called.
+      Được gọi sau phương thức :meth:`handle` để thực hiện mọi thao tác dọn dẹp cần thiết. Cài đặt mặc định không thực hiện thao tác nào. Nếu :meth:`setup` phát sinh một ngoại lệ, hàm này sẽ không được gọi.
 
 
    .. attribute:: request
 
-      The *new* :class:`socket.socket` object
-      to be used to communicate with the client.
+      Đối tượng *new* :class:`socket.socket` được dùng để giao tiếp với máy khách.
 
 
    .. attribute:: client_address
 
-      Client address returned by :meth:`BaseServer.get_request`.
+      Địa chỉ client được trả về bởi :meth:`BaseServer.get_request`.
 
 
    .. attribute:: server
 
-      :class:`BaseServer` object used for handling the request.
+      Đối tượng :class:`BaseServer` được sử dụng để xử lý yêu cầu.
 
 
 .. class:: StreamRequestHandler
            DatagramRequestHandler
 
-   These :class:`BaseRequestHandler` subclasses override the
-   :meth:`~BaseRequestHandler.setup` and :meth:`~BaseRequestHandler.finish`
-   methods, and provide :attr:`rfile` and :attr:`wfile` attributes.
+   Các lớp con :class:`BaseRequestHandler` này ghi đè
+   các phương thức :meth:`~BaseRequestHandler.setup` và :meth:`~BaseRequestHandler.finish`, đồng thời cung cấp các thuộc tính :attr:`rfile` và :attr:`wfile`.
 
    .. attribute:: rfile
 
-      A file object from which receives the request is read.
-      Support the :class:`io.BufferedIOBase` readable interface.
+      Một đối tượng file dùng để đọc yêu cầu nhận được. Hỗ trợ interface readable của :class:`io.BufferedIOBase`.
 
    .. attribute:: wfile
 
-      A file object to which the reply is written.
-      Support the :class:`io.BufferedIOBase` writable interface
+      Một đối tượng file dùng để ghi phản hồi. Hỗ trợ interface writable của :class:`io.BufferedIOBase`
 
 
    .. versionchanged:: 3.6
@@ -481,13 +340,13 @@ Request Handler Objects
       :class:`io.BufferedIOBase` writable interface.
 
 
-Examples
---------
+Ví dụ
+-----
 
-:class:`socketserver.TCPServer` Example
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:class:`socketserver.TCPServer` Ví dụ
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is the server side::
+Đây là phía máy chủ::
 
    import socketserver
 
@@ -501,7 +360,7 @@ This is the server side::
        """
 
        def handle(self):
-           # self.request is the TCP socket connected to the client
+           # self.request là TCP socket được kết nối với client
            pieces = [b'']
            total = 0
            while b'\n' not in pieces[-1] and total < 10_000:
@@ -510,46 +369,38 @@ This is the server side::
            self.data = b''.join(pieces)
            print(f"Received from {self.client_address[0]}:")
            print(self.data.decode("utf-8"))
-           # just send back the same data, but upper-cased
+           # chỉ gửi lại cùng dữ liệu đó nhưng chuyển thành chữ hoa
            self.request.sendall(self.data.upper())
-           # after we return, the socket will be closed.
+           # sau khi chúng ta trả về, socket sẽ được đóng.
 
    if __name__ == "__main__":
        HOST, PORT = "localhost", 9999
 
-       # Create the server, binding to localhost on port 9999
+       # Tạo server, liên kết với localhost trên port 9999
        with socketserver.TCPServer((HOST, PORT), MyTCPHandler) as server:
-           # Activate the server; this will keep running until you
-           # interrupt the program with Ctrl-C
+           # Kích hoạt server; server sẽ tiếp tục chạy cho đến khi bạn
+           # ngắt chương trình bằng Ctrl-C
            server.serve_forever()
 
-An alternative request handler class that makes use of streams (file-like
-objects that simplify communication by providing the standard file interface)::
+Một lớp xử lý request thay thế sử dụng streams (các đối tượng giống tệp giúp đơn giản hóa việc giao tiếp bằng cách cung cấp giao diện tệp tiêu chuẩn)::
 
    class MyTCPHandler(socketserver.StreamRequestHandler):
 
        def handle(self):
-           # self.rfile is a file-like object created by the handler.
-           # We can now use e.g. readline() instead of raw recv() calls.
-           # We limit ourselves to 10000 bytes to avoid abuse by the sender.
+           # self.rfile là một đối tượng giống tệp được handler tạo ra.
+           # Giờ đây, chúng ta có thể sử dụng, chẳng hạn, readline() thay vì gọi recv() thô.
+           # Chúng ta giới hạn ở 10000 byte để tránh sender lạm dụng.
            self.data = self.rfile.readline(10000).rstrip()
            print(f"{self.client_address[0]} wrote:")
            print(self.data.decode("utf-8"))
-           # Likewise, self.wfile is a file-like object used to write back
-           # to the client
+           # Tương tự, self.wfile là một đối tượng giống tệp được dùng để ghi trả về
+           # tới client
            self.wfile.write(self.data.upper())
 
-The difference is that the ``readline()`` call in the second handler will call
-``recv()`` multiple times until it encounters a newline character, while the
-first handler had to use a ``recv()`` loop to accumulate data until a
-newline itself.  If it had just used a single ``recv()`` without the loop it
-would just have returned what has been received so far from the client.
-TCP is stream based: data arrives in the order it was sent, but there is no
-correlation between client ``send()`` or ``sendall()`` calls and the number
-of ``recv()`` calls on the server required to receive it.
+Điểm khác biệt là lệnh gọi ``readline()`` trong handler thứ hai sẽ gọi ``recv()`` nhiều lần cho đến khi gặp ký tự xuống dòng, trong khi handler đầu tiên phải sử dụng vòng lặp ``recv()`` để tích lũy dữ liệu cho đến khi gặp ký tự xuống dòng. Nếu chỉ sử dụng một ``recv()`` duy nhất mà không có vòng lặp, nó chỉ trả về phần dữ liệu đã nhận được từ client cho đến thời điểm đó. TCP hoạt động dựa trên stream: dữ liệu đến theo đúng thứ tự đã được gửi, nhưng không có mối liên hệ nào giữa số lần gọi ``send()`` hoặc ``sendall()`` của client và số lần gọi ``recv()`` cần thiết trên server để nhận dữ liệu đó.
 
 
-This is the client side::
+Đây là phía client::
 
    import socket
    import sys
@@ -557,23 +408,23 @@ This is the client side::
    HOST, PORT = "localhost", 9999
    data = " ".join(sys.argv[1:])
 
-   # Create a socket (SOCK_STREAM means a TCP socket)
+   # Tạo một socket (SOCK_STREAM có nghĩa là socket TCP)
    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-       # Connect to server and send data
+       # Kết nối tới server và gửi dữ liệu
        sock.connect((HOST, PORT))
        sock.sendall(bytes(data, "utf-8"))
        sock.sendall(b"\n")
 
-       # Receive data from the server and shut down
+       # Nhận dữ liệu từ server và tắt kết nối
        received = str(sock.recv(1024), "utf-8")
 
    print("Sent:    ", data)
    print("Received:", received)
 
 
-The output of the example should look something like this:
+Kết quả đầu ra của ví dụ sẽ trông gần giống như sau:
 
-Server:
+Máy chủ:
 
 .. code-block:: shell-session
 
@@ -583,7 +434,7 @@ Server:
    127.0.0.1 wrote:
    b'python is nice'
 
-Client:
+Máy khách:
 
 .. code-block:: shell-session
 
@@ -595,10 +446,10 @@ Client:
    Received: PYTHON IS NICE
 
 
-:class:`socketserver.UDPServer` Example
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+:class:`socketserver.UDPServer` Ví dụ
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This is the server side::
+Đây là phía máy chủ::
 
    import socketserver
 
@@ -622,7 +473,7 @@ This is the server side::
        with socketserver.UDPServer((HOST, PORT), MyUDPHandler) as server:
            server.serve_forever()
 
-This is the client side::
+Đây là phía máy khách::
 
    import socket
    import sys
@@ -630,27 +481,27 @@ This is the client side::
    HOST, PORT = "localhost", 9999
    data = " ".join(sys.argv[1:])
 
-   # SOCK_DGRAM is the socket type to use for UDP sockets
+   # SOCK_DGRAM là loại socket cần dùng cho các socket UDP
    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-   # As you can see, there is no connect() call; UDP has no connections.
-   # Instead, data is directly sent to the recipient via sendto().
+   # Như bạn có thể thấy, không có lời gọi connect(); UDP không có kết nối.
+   # Thay vào đó, dữ liệu được gửi trực tiếp đến bên nhận thông qua sendto().
    sock.sendto(bytes(data + "\n", "utf-8"), (HOST, PORT))
    received = str(sock.recv(1024), "utf-8")
 
    print("Sent:    ", data)
    print("Received:", received)
 
-The output of the example should look exactly like for the TCP server example.
+Đầu ra của ví dụ phải giống hệt như trong ví dụ về máy chủ TCP.
 
 
-Asynchronous Mixins
-~~~~~~~~~~~~~~~~~~~
+Mixin bất đồng bộ
+~~~~~~~~~~~~~~~~~
 
-To build asynchronous handlers, use the :class:`ThreadingMixIn` and
-:class:`ForkingMixIn` classes.
+Để xây dựng các handler bất đồng bộ, hãy sử dụng :class:`ThreadingMixIn` và
+các lớp :class:`ForkingMixIn`.
 
-An example for the :class:`ThreadingMixIn` class::
+Ví dụ về lớp :class:`ThreadingMixIn`::
 
    import socket
    import threading
@@ -675,17 +526,17 @@ An example for the :class:`ThreadingMixIn` class::
            print("Received: {}".format(response))
 
    if __name__ == "__main__":
-       # Port 0 means to select an arbitrary unused port
+       # Cổng 0 có nghĩa là chọn một cổng chưa được sử dụng bất kỳ
        HOST, PORT = "localhost", 0
 
        server = ThreadedTCPServer((HOST, PORT), ThreadedTCPRequestHandler)
        with server:
            ip, port = server.server_address
 
-           # Start a thread with the server -- that thread will then start one
-           # more thread for each request
+           # Khởi động một luồng cùng với server -- sau đó luồng đó sẽ khởi động một luồng khác cho mỗi yêu cầu
+           # thoát khỏi luồng server khi luồng chính kết thúc
            server_thread = threading.Thread(target=server.serve_forever)
-           # Exit the server thread when the main thread terminates
+           # Thoát khỏi luồng server khi luồng chính kết thúc
            server_thread.daemon = True
            server_thread.start()
            print("Server loop running in thread:", server_thread.name)
@@ -697,7 +548,7 @@ An example for the :class:`ThreadingMixIn` class::
            server.shutdown()
 
 
-The output of the example should look something like this:
+Kết quả của ví dụ sẽ có dạng như sau:
 
 .. code-block:: shell-session
 
@@ -708,7 +559,5 @@ The output of the example should look something like this:
    Received: Thread-4: Hello World 3
 
 
-The :class:`ForkingMixIn` class is used in the same way, except that the server
-will spawn a new process for each request.
-Available only on POSIX platforms that support :func:`~os.fork`.
+Lớp :class:`ForkingMixIn` được sử dụng theo cách tương tự, ngoại trừ việc server sẽ tạo một tiến trình mới cho mỗi yêu cầu. Chỉ khả dụng trên các nền tảng POSIX hỗ trợ :func:`~os.fork`.
 

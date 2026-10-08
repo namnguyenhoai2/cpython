@@ -1,70 +1,60 @@
-:mod:`!pwd` --- The password database
-=====================================
+:mod:`!pwd` --- Cơ sở dữ liệu mật khẩu
+======================================
 
 .. module:: pwd
-   :synopsis: The password database (getpwnam() and friends).
+   :synopsis: Cơ sở dữ liệu mật khẩu (getpwnam() và các hàm liên quan).
 
 --------------
 
-This module provides access to the Unix user account and password database.  It
-is available on all Unix versions.
+Mô-đun này cung cấp quyền truy cập vào cơ sở dữ liệu tài khoản người dùng và mật khẩu Unix. Mô-đun này có sẵn trên mọi phiên bản Unix.
 
 .. availability:: Unix, not WASI, not iOS.
 
-Password database entries are reported as a tuple-like object, whose attributes
-correspond to the members of the ``passwd`` structure (Attribute field below,
-see ``<pwd.h>``):
+Các mục trong cơ sở dữ liệu mật khẩu được trả về dưới dạng một đối tượng giống tuple, với các thuộc tính tương ứng với các thành phần của cấu trúc ``passwd`` (trường Attribute bên dưới, xem ``<pwd.h>``):
 
-+-------+---------------+-----------------------------+
-| Index | Attribute     | Meaning                     |
-+=======+===============+=============================+
-| 0     | ``pw_name``   | Login name                  |
-+-------+---------------+-----------------------------+
-| 1     | ``pw_passwd`` | Optional encrypted password |
-+-------+---------------+-----------------------------+
-| 2     | ``pw_uid``    | Numerical user ID           |
-+-------+---------------+-----------------------------+
-| 3     | ``pw_gid``    | Numerical group ID          |
-+-------+---------------+-----------------------------+
-| 4     | ``pw_gecos``  | User name or comment field  |
-+-------+---------------+-----------------------------+
-| 5     | ``pw_dir``    | User home directory         |
-+-------+---------------+-----------------------------+
-| 6     | ``pw_shell``  | User command interpreter    |
-+-------+---------------+-----------------------------+
++---------+---------------+--------------------------------------+
+| Chỉ mục | Thuộc tính    | Ý nghĩa                              |
++=========+===============+======================================+
+| 0       | ``pw_name``   | Tên đăng nhập                        |
++---------+---------------+--------------------------------------+
+| 1       | ``pw_passwd`` | Mật khẩu được mã hóa, không bắt buộc |
++---------+---------------+--------------------------------------+
+| 2       | ``pw_uid``    | ID người dùng dạng số                |
++---------+---------------+--------------------------------------+
+| 3       | ``pw_gid``    | ID nhóm dạng số                      |
++---------+---------------+--------------------------------------+
+| 4       | ``pw_gecos``  | Tên người dùng hoặc trường chú thích |
++---------+---------------+--------------------------------------+
+| 5       | ``pw_dir``    | Thư mục chính của người dùng         |
++---------+---------------+--------------------------------------+
+| 6       | ``pw_shell``  | Trình thông dịch lệnh của người dùng |
++---------+---------------+--------------------------------------+
 
-The uid and gid items are integers, all others are strings. :exc:`KeyError` is
-raised if the entry asked for cannot be found.
+Các mục uid và gid là số nguyên, tất cả các mục khác đều là chuỗi. :exc:`KeyError` được phát sinh nếu không tìm thấy mục nhập được yêu cầu.
 
 .. note::
 
-   In traditional Unix the field ``pw_passwd`` usually contains a password
-   encrypted with a DES derived algorithm.  However most
-   modern unices  use a so-called *shadow password* system.  On those unices the
-   *pw_passwd* field only contains an asterisk (``'*'``) or the  letter ``'x'``
-   where the encrypted password is stored in a file :file:`/etc/shadow` which is
-   not world readable.  Whether the *pw_passwd* field contains anything useful is
-   system-dependent.
+   Trong Unix truyền thống, trường ``pw_passwd`` thường chứa mật khẩu được mã hóa bằng một thuật toán bắt nguồn từ DES. Tuy nhiên, hầu hết các hệ Unix hiện đại đều sử dụng hệ thống *shadow password*. Trên các hệ Unix đó, trường *pw_passwd* chỉ chứa dấu hoa thị (``'*'``) hoặc chữ cái ``'x'``, trong khi mật khẩu được mã hóa được lưu trong một tệp :file:`/etc/shadow` không cho phép mọi người đọc. Trường *pw_passwd* có chứa thông tin hữu ích hay không tùy thuộc vào hệ thống.
 
-It defines the following items:
+Mô-đun này định nghĩa các mục sau:
 
 
 .. function:: getpwuid(uid)
 
-   Return the password database entry for the given numeric user ID.
+   Trả về mục nhập cơ sở dữ liệu mật khẩu cho ID người dùng dạng số đã cho.
 
 
 .. function:: getpwnam(name)
 
-   Return the password database entry for the given user name.
+   Trả về mục nhập cơ sở dữ liệu mật khẩu cho tên người dùng đã cho.
 
 
 .. function:: getpwall()
 
-   Return a list of all available password database entries, in arbitrary order.
+   Trả về danh sách tất cả các mục nhập cơ sở dữ liệu mật khẩu hiện có, theo thứ tự bất kỳ.
 
 
 .. seealso::
 
-   Module :mod:`grp`
-      An interface to the group database, similar to this.
+   Mô-đun :mod:`grp`
+      Một giao diện tới cơ sở dữ liệu nhóm, tương tự như giao diện này.

@@ -1,185 +1,136 @@
-:mod:`!marshal` --- Internal Python object serialization
-========================================================
+:mod:`!marshal` --- Tuần tự hóa đối tượng Python nội bộ
+=======================================================
 
 .. module:: marshal
-   :synopsis: Convert Python objects to streams of bytes and back (with different
-              constraints).
+   :synopsis: Chuyển đổi các đối tượng Python thành các luồng byte và ngược lại (với những ràng buộc khác nhau).
 
 --------------
 
-This module contains functions that can read and write Python values in a binary
-format.  The format is specific to Python, but independent of machine
-architecture issues (e.g., you can write a Python value to a file on a PC,
-transport the file to a Mac, and read it back there).  Details of the format are
-undocumented on purpose; it may change between Python versions (although it
-rarely does). [#]_
+Module này chứa các hàm có thể đọc và ghi các giá trị Python ở định dạng nhị phân. Định dạng này dành riêng cho Python nhưng không phụ thuộc vào các vấn đề về kiến trúc máy (ví dụ: bạn có thể ghi một giá trị Python vào tệp trên PC, chuyển tệp đó sang máy Mac và đọc lại ở đó). Chi tiết về định dạng được cố ý không ghi thành tài liệu; định dạng có thể thay đổi giữa các phiên bản Python (mặc dù điều này hiếm khi xảy ra). [#]_
 
 .. index::
    pair: module; pickle
    pair: module; shelve
 
-This is not a general "persistence" module.  For general persistence and
-transfer of Python objects through RPC calls, see the modules :mod:`pickle` and
-:mod:`shelve`.  The :mod:`!marshal` module exists mainly to support reading and
-writing the "pseudo-compiled" code for Python modules of :file:`.pyc` files.
-Therefore, the Python maintainers reserve the right to modify the marshal format
-in backward incompatible ways should the need arise.
-The format of code objects is not compatible between Python versions,
-even if the version of the format is the same.
-De-serializing a code object in the incorrect Python version has undefined behavior.
-If you're serializing and
-de-serializing Python objects, use the :mod:`pickle` module instead -- the
-performance is comparable, version independence is guaranteed, and pickle
-supports a substantially wider range of objects than marshal.
+Đây không phải là module "lưu trữ" đa dụng. Để lưu trữ và truyền các đối tượng Python qua các cuộc gọi RPC nói chung, hãy xem các module :mod:`pickle` và
+:mod:`shelve`. Module :mod:`!marshal` chủ yếu tồn tại để hỗ trợ đọc và ghi mã "giả biên dịch" cho các module Python từ các tệp :file:`.pyc`. Vì vậy, các nhà bảo trì Python bảo lưu quyền sửa đổi định dạng marshal theo những cách không tương thích ngược nếu cần. Định dạng của các đối tượng mã không tương thích giữa các phiên bản Python, ngay cả khi phiên bản của định dạng là như nhau. Việc giải tuần tự hóa một đối tượng mã bằng sai phiên bản Python sẽ có hành vi không xác định. Nếu bạn đang tuần tự hóa và giải tuần tự hóa các đối tượng Python, hãy sử dụng module :mod:`pickle` thay thế -- hiệu năng tương đương, đảm bảo tính độc lập giữa các phiên bản, và pickle hỗ trợ phạm vi đối tượng rộng hơn đáng kể so với marshal.
 
 .. warning::
 
-   The :mod:`!marshal` module is not intended to be secure against erroneous or
-   maliciously constructed data.  Never unmarshal data received from an
-   untrusted or unauthenticated source.
+   Module :mod:`!marshal` không được thiết kế để bảo mật trước dữ liệu sai hoặc được tạo một cách độc hại. Không bao giờ giải tuần tự hóa dữ liệu nhận được từ một nguồn không đáng tin cậy hoặc chưa được xác thực.
 
-There are functions that read/write files as well as functions operating on
-bytes-like objects.
+Có các hàm đọc/ghi tệp cũng như các hàm hoạt động trên các đối tượng giống byte.
 
 .. index:: object; code, code object
 
-Not all Python object types are supported; in general, only objects whose value
-is independent from a particular invocation of Python can be written and read by
-this module.  The following types are supported:
+Không phải mọi kiểu đối tượng Python đều được hỗ trợ; nhìn chung, chỉ những đối tượng có giá trị độc lập với một lần gọi Python cụ thể mới có thể được ghi và đọc bởi module này. Các kiểu sau được hỗ trợ:
 
-* Numeric types: :class:`int`, :class:`bool`, :class:`float`, :class:`complex`.
-* Strings (:class:`str`) and :class:`bytes`.
-  :term:`Bytes-like objects <bytes-like object>` like :class:`bytearray` are
-  marshalled as :class:`!bytes`.
-* Containers: :class:`tuple`, :class:`list`, :class:`set`, :class:`frozenset`,
-  and (since :data:`version` 5), :class:`slice`.
-  It should be understood that these are supported only if the values contained
-  therein are themselves supported.
-  Recursive containers are supported since :data:`version` 3.
-* The singletons :const:`None`, :const:`Ellipsis` and :exc:`StopIteration`.
-* :class:`code` objects, if *allow_code* is true. See note above about
-  version dependence.
+* Các kiểu số: :class:`int`, :class:`bool`, :class:`float`, :class:`complex`.
+* Chuỗi (:class:`str`) và :class:`bytes`.
+  :term:`Các đối tượng dạng byte <bytes-like object>` như :class:`bytearray` được marshal dưới dạng :class:`!bytes`.
+* Các container: :class:`tuple`, :class:`list`, :class:`set`, :class:`frozenset`, và (kể từ :data:`version` 5), :class:`slice`. Cần hiểu rằng các container này chỉ được hỗ trợ nếu bản thân các giá trị chứa bên trong cũng được hỗ trợ. Các container đệ quy được hỗ trợ kể từ :data:`version` 3.
+* Các singleton :const:`None`, :const:`Ellipsis` và :exc:`StopIteration`.
+* :class:`code` các đối tượng, nếu *allow_code* là true. Xem lưu ý ở trên về sự phụ thuộc vào phiên bản.
 
 .. versionchanged:: 3.4
 
-   * Added format version 3, which supports marshalling recursive lists, sets
-     and dictionaries.
-   * Added format version 4, which supports efficient representations
-     of short strings.
+   * Đã thêm phiên bản định dạng 3, hỗ trợ marshalling các list, set và dictionary đệ quy.
+   * Đã thêm phiên bản định dạng 4, hỗ trợ các biểu diễn hiệu quả cho chuỗi ngắn.
 
 .. versionchanged:: 3.14
 
-   Added format version 5, which allows marshalling slices.
+   Đã thêm phiên bản định dạng 5, cho phép marshalling các slice.
 
 
-The module defines these functions:
+Module định nghĩa các hàm sau:
 
 
 .. function:: dump(value, file, version=version, /, *, allow_code=True)
 
-   Write the value on the open file.  The value must be a supported type.  The
-   file must be a writeable :term:`binary file`.
+   Ghi giá trị vào file đang mở. Giá trị phải thuộc một kiểu được hỗ trợ. File phải là một :term:`binary file` có thể ghi.
 
-   If the value has (or contains an object that has) an unsupported type, a
-   :exc:`ValueError` exception is raised --- but garbage data will also be written
-   to the file.  The object will not be properly read back by :func:`load`.
-   :ref:`Code objects <code-objects>` are only supported if *allow_code* is true.
+   Nếu giá trị có (hoặc chứa một đối tượng có) kiểu không được hỗ trợ, một
+   ngoại lệ :exc:`ValueError` sẽ được phát sinh --- nhưng dữ liệu rác cũng sẽ được ghi vào file. Đối tượng sẽ không được :func:`load` đọc lại đúng cách.
+   :ref:`Các đối tượng code <code-objects>` chỉ được hỗ trợ nếu *allow_code* là true.
 
-   The *version* argument indicates the data format that ``dump`` should use
-   (see below).
+   Đối số *version* cho biết định dạng dữ liệu mà ``dump`` nên sử dụng (xem bên dưới).
 
    .. audit-event:: marshal.dumps value,version marshal.dump
 
    .. versionchanged:: 3.13
-      Added the *allow_code* parameter.
+      Đã thêm tham số *allow_code*.
 
 
 .. function:: load(file, /, *, allow_code=True)
 
-   Read one value from the open file and return it.  If no valid value is read
-   (e.g. because the data has a different Python version's incompatible marshal
-   format), raise :exc:`EOFError`, :exc:`ValueError` or :exc:`TypeError`.
-   :ref:`Code objects <code-objects>` are only supported if *allow_code* is true.
-   The file must be a readable :term:`binary file`.
+   Đọc một giá trị từ tệp đang mở và trả về giá trị đó. Nếu không đọc được giá trị hợp lệ nào (ví dụ: vì dữ liệu có định dạng marshal không tương thích của một phiên bản Python khác), hãy phát sinh :exc:`EOFError`, :exc:`ValueError` hoặc :exc:`TypeError`.
+   :ref:`Các đối tượng code <code-objects>` chỉ được hỗ trợ nếu *allow_code* là true. Tệp phải là một :term:`binary file` có thể đọc được.
 
    .. audit-event:: marshal.load "" marshal.load
 
    .. note::
 
-      If an object containing an unsupported type was marshalled with :func:`dump`,
-      :func:`load` will substitute ``None`` for the unmarshallable type.
+      Nếu một đối tượng chứa kiểu không được hỗ trợ được marshal bằng :func:`dump`,
+      :func:`load` sẽ thay thế ``None`` cho kiểu không thể unmarshall.
 
    .. versionchanged:: 3.10
 
-      This call used to raise a ``code.__new__`` audit event for each code object. Now
-      it raises a single ``marshal.load`` event for the entire load operation.
+      Lệnh gọi này trước đây phát sinh một sự kiện audit ``code.__new__`` cho mỗi đối tượng mã. Hiện tại, lệnh gọi này phát sinh một sự kiện ``marshal.load`` duy nhất cho toàn bộ thao tác tải.
 
    .. versionchanged:: 3.13
-      Added the *allow_code* parameter.
+      Đã thêm tham số *allow_code*.
 
 
 .. function:: dumps(value, version=version, /, *, allow_code=True)
 
-   Return the bytes object that would be written to a file by ``dump(value, file)``.  The
-   value must be a supported type.  Raise a :exc:`ValueError` exception if value
-   has (or contains an object that has) an unsupported type.
-   :ref:`Code objects <code-objects>` are only supported if *allow_code* is true.
+   Trả về đối tượng bytes sẽ được ghi vào tệp bởi ``dump(value, file)``. Giá trị phải thuộc một kiểu được hỗ trợ. Phát sinh ngoại lệ :exc:`ValueError` nếu value có (hoặc chứa một đối tượng có) kiểu không được hỗ trợ.
+   :ref:`Các đối tượng code <code-objects>` chỉ được hỗ trợ nếu *allow_code* là true.
 
-   The *version* argument indicates the data format that ``dumps`` should use
-   (see below).
+   Đối số *version* cho biết định dạng dữ liệu mà ``dumps`` sẽ sử dụng (xem bên dưới).
 
    .. audit-event:: marshal.dumps value,version marshal.dump
 
    .. versionchanged:: 3.13
-      Added the *allow_code* parameter.
+      Đã thêm tham số *allow_code*.
 
 
 .. function:: loads(bytes, /, *, allow_code=True)
 
-   Convert the :term:`bytes-like object` to a value.  If no valid value is found, raise
-   :exc:`EOFError`, :exc:`ValueError` or :exc:`TypeError`.
-   :ref:`Code objects <code-objects>` are only supported if *allow_code* is true.
-   Extra bytes in the input are ignored.
+   Chuyển đổi :term:`bytes-like object` thành một giá trị. Nếu không tìm thấy giá trị hợp lệ, hãy phát sinh
+   :exc:`EOFError`, :exc:`ValueError` hoặc :exc:`TypeError`.
+   :ref:`Các đối tượng mã <code-objects>` chỉ được hỗ trợ nếu *allow_code* là true. Các byte bổ sung trong dữ liệu đầu vào sẽ bị bỏ qua.
 
    .. audit-event:: marshal.loads bytes marshal.load
 
    .. versionchanged:: 3.10
 
-      This call used to raise a ``code.__new__`` audit event for each code object. Now
-      it raises a single ``marshal.loads`` event for the entire load operation.
+      Trước đây, lệnh gọi này phát sinh một sự kiện kiểm tra ``code.__new__`` cho mỗi đối tượng mã. Hiện tại, lệnh gọi này chỉ phát sinh một sự kiện ``marshal.loads`` duy nhất cho toàn bộ thao tác tải.
 
    .. versionchanged:: 3.13
-      Added the *allow_code* parameter.
+      Đã thêm tham số *allow_code*.
 
 
-In addition, the following constants are defined:
+Ngoài ra, các hằng số sau đây được định nghĩa:
 
 .. data:: version
 
-   Indicates the format that the module uses.
-   Version 0 is the historical first version; subsequent versions
-   add new features.
-   Generally, a new version becomes the default when it is introduced.
+   Cho biết định dạng mà module sử dụng. Phiên bản 0 là phiên bản đầu tiên trong lịch sử; các phiên bản tiếp theo bổ sung những tính năng mới. Nhìn chung, một phiên bản mới sẽ trở thành mặc định khi được giới thiệu.
 
-   ======= =============== ====================================================
-   Version Available since New features
-   ======= =============== ====================================================
-   1       Python 2.4      Sharing interned strings
-   ------- --------------- ----------------------------------------------------
-   2       Python 2.5      Binary representation of floats
-   ------- --------------- ----------------------------------------------------
-   3       Python 3.4      Support for object instancing and recursion
-   ------- --------------- ----------------------------------------------------
-   4       Python 3.4      Efficient representation of short strings
-   ------- --------------- ----------------------------------------------------
-   5       Python 3.14     Support for :class:`slice` objects
-   ======= =============== ====================================================
+   +-----------+-----------------+-----------------------------------------+
+   | Phiên bản | Có từ phiên bản | Tính năng mới                           |
+   +===========+=================+=========================================+
+   | 1         | Python 2.4      | Chia sẻ các chuỗi interned              |
+   +-----------+-----------------+-----------------------------------------+
+   | 2         | Python 2.5      | Biểu diễn nhị phân của số thực          |
+   +-----------+-----------------+-----------------------------------------+
+   | 3         | Python 3.4      | Hỗ trợ tạo instance đối tượng và đệ quy |
+   +-----------+-----------------+-----------------------------------------+
+   | 4         | Python 3.4      | Biểu diễn hiệu quả các chuỗi ngắn       |
+   +-----------+-----------------+-----------------------------------------+
+   | 5         | Python 3.14     | Hỗ trợ các đối tượng :class:`slice`     |
+   +-----------+-----------------+-----------------------------------------+
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích
 
-.. [#] The name of this module stems from a bit of terminology used by the designers of
-   Modula-3 (amongst others), who use the term "marshalling" for shipping of data
-   around in a self-contained form. Strictly speaking, "to marshal" means to
-   convert some data from internal to external form (in an RPC buffer for instance)
-   and "unmarshalling" for the reverse process.
+.. [#] Tên của module này bắt nguồn từ một thuật ngữ được các nhà thiết kế Modula-3 (cùng những người khác) sử dụng: họ dùng thuật ngữ "marshalling" để chỉ việc truyền dữ liệu dưới dạng khép kín. Nói chính xác, "to marshal" có nghĩa là chuyển đổi dữ liệu từ dạng nội bộ sang dạng bên ngoài (chẳng hạn trong một bộ đệm RPC), còn "unmarshalling" là quá trình ngược lại.

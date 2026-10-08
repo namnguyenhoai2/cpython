@@ -1,373 +1,311 @@
-:mod:`!xml.sax.xmlreader` --- Interface for XML parsers
-=======================================================
+:mod:`!xml.sax.xmlreader` --- Giao diện cho trình phân tích cú pháp XML
+=======================================================================
 
 .. module:: xml.sax.xmlreader
-   :synopsis: Interface which SAX-compliant XML parsers must implement.
+   :synopsis: Giao diện mà các trình phân tích cú pháp XML tuân thủ SAX phải triển khai.
 
 .. moduleauthor:: Lars Marius Garshol <larsga@garshol.priv.no>
 .. sectionauthor:: Martin v. Löwis <martin@v.loewis.de>
 
-**Source code:** :source:`Lib/xml/sax/xmlreader.py`
+**Mã nguồn:** :source:`Lib/xml/sax/xmlreader.py`
 
 --------------
 
-SAX parsers implement the :class:`XMLReader` interface. They are implemented in
-a Python module, which must provide a function :func:`create_parser`. This
-function is invoked by  :func:`xml.sax.make_parser` with no arguments to create
-a new  parser object.
+Các trình phân tích cú pháp SAX triển khai giao diện :class:`XMLReader`. Chúng được triển khai trong một mô-đun Python, mô-đun này phải cung cấp một hàm :func:`create_parser`. Hàm này được :func:`xml.sax.make_parser` gọi không có đối số để tạo một đối tượng trình phân tích cú pháp mới.
 
 
 .. class:: XMLReader()
 
-   Base class which can be inherited by SAX parsers.
+   Lớp cơ sở mà các trình phân tích cú pháp SAX có thể kế thừa.
 
 
 .. class:: IncrementalParser()
 
-   In some cases, it is desirable not to parse an input source at once, but to feed
-   chunks of the document as they get available. Note that the reader will normally
-   not read the entire file, but read it in chunks as well; still :meth:`parse`
-   won't return until the entire document is processed. So these interfaces should
-   be used if the blocking behaviour of :meth:`parse` is not desirable.
+   Trong một số trường hợp, bạn không nên phân tích cú pháp toàn bộ nguồn đầu vào cùng một lúc, mà nên cung cấp từng phần của tài liệu khi chúng sẵn sàng. Lưu ý rằng reader thường cũng không đọc toàn bộ tệp mà đọc theo từng phần; tuy nhiên, :meth:`parse` sẽ không trả về cho đến khi toàn bộ tài liệu được xử lý. Vì vậy, nên sử dụng các giao diện này nếu hành vi blocking của :meth:`parse` không phù hợp.
 
-   When the parser is instantiated it is ready to begin accepting data from the
-   feed method immediately. After parsing has been finished with a call to close
-   the reset method must be called to make the parser ready to accept new data,
-   either from feed or using the parse method.
+   Khi được khởi tạo, parser đã sẵn sàng ngay lập tức để nhận dữ liệu từ phương thức feed. Sau khi hoàn tất việc phân tích cú pháp bằng một lệnh gọi đến close, phải gọi phương thức reset để đưa parser về trạng thái sẵn sàng nhận dữ liệu mới, είτε từ feed hoặc bằng phương thức parse.
 
-   Note that these methods must *not* be called during parsing, that is, after
-   parse has been called and before it returns.
+   Lưu ý rằng các phương thức này *không* được gọi trong quá trình phân tích cú pháp, tức là sau khi parse được gọi và trước khi nó trả về.
 
-   By default, the class also implements the parse method of the XMLReader
-   interface using the feed, close and reset methods of the IncrementalParser
-   interface as a convenience to SAX 2.0 driver writers.
+   Theo mặc định, lớp này cũng triển khai phương thức parse của interface XMLReader bằng cách sử dụng các phương thức feed, close và reset của interface IncrementalParser, nhằm tạo thuận tiện cho các tác giả viết driver SAX 2.0.
 
 
 .. class:: Locator()
 
-   Interface for associating a SAX event with a document location. A locator object
-   will return valid results only during calls to DocumentHandler methods; at any
-   other time, the results are unpredictable. If information is not available,
-   methods may return ``None``.
+   Interface dùng để liên kết một sự kiện SAX với vị trí trong tài liệu. Đối tượng locator chỉ trả về kết quả hợp lệ trong các lần gọi đến các phương thức của DocumentHandler; vào bất kỳ thời điểm nào khác, kết quả là không thể dự đoán. Nếu không có thông tin, các phương thức có thể trả về ``None``.
 
 
 .. class:: InputSource(system_id=None)
 
-   Encapsulation of the information needed by the :class:`XMLReader` to read
-   entities.
+   Đóng gói thông tin cần thiết cho :class:`XMLReader` để đọc các entity.
 
-   This class may include information about the public identifier, system
-   identifier, byte stream (possibly with character encoding information) and/or
-   the character stream of an entity.
+   Lớp này có thể chứa thông tin về public identifier, system identifier, byte stream (có thể kèm thông tin về encoding ký tự) và/hoặc character stream của một entity.
 
-   Applications will create objects of this class for use in the
-   :meth:`XMLReader.parse` method and for returning from
-   EntityResolver.resolveEntity.
+   Các ứng dụng sẽ tạo các đối tượng của lớp này để sử dụng trong
+   :meth:`XMLReader.parse` method và để trả về từ EntityResolver.resolveEntity.
 
-   An :class:`InputSource` belongs to the application, the :class:`XMLReader` is
-   not allowed to modify :class:`InputSource` objects passed to it from the
-   application, although it may make copies and modify those.
+   Một :class:`InputSource` thuộc về ứng dụng; :class:`XMLReader` không được phép sửa đổi các đối tượng :class:`InputSource` được ứng dụng truyền cho nó, mặc dù nó có thể tạo bản sao và sửa đổi các bản sao đó.
 
 
 .. class:: AttributesImpl(attrs)
 
-   This is an implementation of the :class:`Attributes` interface (see section
-   :ref:`attributes-objects`).  This is a dictionary-like object which
-   represents the element attributes in a :meth:`startElement` call. In addition
-   to the most useful dictionary operations, it supports a number of other
-   methods as described by the interface. Objects of this class should be
-   instantiated by readers; *attrs* must be a dictionary-like object containing
-   a mapping from attribute names to attribute values.
+   Đây là một cách triển khai giao diện :class:`Attributes` (xem phần
+   :ref:`attributes-objects`). Đây là một đối tượng giống từ điển, biểu diễn các thuộc tính của phần tử trong một lệnh gọi :meth:`startElement`. Ngoài các thao tác từ điển hữu ích nhất, đối tượng này còn hỗ trợ một số phương thức khác như được mô tả trong giao diện. Các đối tượng thuộc lớp này nên được reader khởi tạo; *attrs* phải là một đối tượng giống từ điển chứa ánh xạ từ tên thuộc tính đến giá trị thuộc tính.
 
 
 .. class:: AttributesNSImpl(attrs, qnames)
 
-   Namespace-aware variant of :class:`AttributesImpl`, which will be passed to
-   :meth:`startElementNS`. It is derived from :class:`AttributesImpl`, but
-   understands attribute names as two-tuples of *namespaceURI* and
-   *localname*. In addition, it provides a number of methods expecting qualified
-   names as they appear in the original document.  This class implements the
-   :class:`AttributesNS` interface (see section :ref:`attributes-ns-objects`).
+   Biến thể nhận biết namespace của :class:`AttributesImpl`, sẽ được truyền cho
+   :meth:`startElementNS`. Nó được kế thừa từ :class:`AttributesImpl`, nhưng hiểu tên thuộc tính là các bộ đôi gồm *namespaceURI* và *localname*. Ngoài ra, nó cung cấp một số phương thức nhận tên đủ điều kiện như xuất hiện trong tài liệu gốc. Lớp này triển khai giao diện
+   :class:`AttributesNS` (xem phần :ref:`attributes-ns-objects`).
 
 
 .. _xmlreader-objects:
 
-XMLReader Objects
------------------
+Đối tượng XMLReader
+-------------------
 
-The :class:`XMLReader` interface supports the following methods:
+Giao diện :class:`XMLReader` hỗ trợ các phương thức sau:
 
 
 .. method:: XMLReader.parse(source)
 
-   Process an input source, producing SAX events. The *source* object can be a
-   system identifier (a string identifying the input source -- typically a file
-   name or a URL), a :class:`pathlib.Path` or :term:`path-like <path-like object>`
-   object, or an :class:`InputSource` object. When
-   :meth:`parse` returns, the input is completely processed, and the parser object
-   can be discarded or reset.
+   Xử lý một nguồn đầu vào và tạo ra các sự kiện SAX. Đối tượng *source* có thể là một system identifier (một chuỗi xác định nguồn đầu vào -- thường là tên tệp hoặc URL), một :class:`pathlib.Path` hoặc đối tượng :term:`path-like <path-like object>`, hoặc một đối tượng :class:`InputSource`. Khi
+   :meth:`parse` trả về, dữ liệu đầu vào đã được xử lý hoàn toàn và có thể loại bỏ hoặc đặt lại đối tượng parser.
 
    .. versionchanged:: 3.5
-      Added support of character streams.
+      Đã bổ sung hỗ trợ cho các character stream.
 
    .. versionchanged:: 3.8
-      Added support of path-like objects.
+      Đã bổ sung hỗ trợ cho các đối tượng path-like.
 
 
 .. method:: XMLReader.getContentHandler()
 
-   Return the current :class:`~xml.sax.handler.ContentHandler`.
+   Trả về :class:`~xml.sax.handler.ContentHandler` hiện tại.
 
 
 .. method:: XMLReader.setContentHandler(handler)
 
-   Set the current :class:`~xml.sax.handler.ContentHandler`.  If no
-   :class:`~xml.sax.handler.ContentHandler` is set, content events will be
-   discarded.
+   Đặt :class:`~xml.sax.handler.ContentHandler` hiện tại. Nếu không
+   :class:`~xml.sax.handler.ContentHandler` được thiết lập, các sự kiện nội dung sẽ bị loại bỏ.
 
 
 .. method:: XMLReader.getDTDHandler()
 
-   Return the current :class:`~xml.sax.handler.DTDHandler`.
+   Trả về :class:`~xml.sax.handler.DTDHandler` hiện tại.
 
 
 .. method:: XMLReader.setDTDHandler(handler)
 
-   Set the current :class:`~xml.sax.handler.DTDHandler`.  If no
-   :class:`~xml.sax.handler.DTDHandler` is set, DTD
-   events will be discarded.
+   Thiết lập :class:`~xml.sax.handler.DTDHandler` hiện tại.  Nếu không
+   :class:`~xml.sax.handler.DTDHandler` được thiết lập, các sự kiện DTD sẽ bị loại bỏ.
 
 
 .. method:: XMLReader.getEntityResolver()
 
-   Return the current :class:`~xml.sax.handler.EntityResolver`.
+   Trả về :class:`~xml.sax.handler.EntityResolver` hiện tại.
 
 
 .. method:: XMLReader.setEntityResolver(handler)
 
-   Set the current :class:`~xml.sax.handler.EntityResolver`.  If no
-   :class:`~xml.sax.handler.EntityResolver` is set,
-   attempts to resolve an external entity will result in opening the system
-   identifier for the entity, and fail if it is not available.
+   Thiết lập :class:`~xml.sax.handler.EntityResolver` hiện tại.  Nếu không
+   :class:`~xml.sax.handler.EntityResolver` được thiết lập, việc cố gắng phân giải một thực thể bên ngoài sẽ dẫn đến việc mở system identifier của thực thể đó và thất bại nếu nó không khả dụng.
 
 
 .. method:: XMLReader.getErrorHandler()
 
-   Return the current :class:`~xml.sax.handler.ErrorHandler`.
+   Trả về :class:`~xml.sax.handler.ErrorHandler` hiện tại.
 
 
 .. method:: XMLReader.setErrorHandler(handler)
 
-   Set the current error handler.  If no :class:`~xml.sax.handler.ErrorHandler`
-   is set, errors will be raised as exceptions, and warnings will be printed.
+   Thiết lập bộ xử lý lỗi hiện tại. Nếu chưa thiết lập :class:`~xml.sax.handler.ErrorHandler`, lỗi sẽ được phát sinh dưới dạng ngoại lệ và cảnh báo sẽ được in ra.
 
 
 .. method:: XMLReader.setLocale(locale)
 
-   Allow an application to set the locale for errors and warnings.
+   Cho phép ứng dụng thiết lập locale cho lỗi và cảnh báo.
 
-   SAX parsers are not required to provide localization for errors and warnings; if
-   they cannot support the requested locale, however, they must raise a SAX
-   exception.  Applications may request a locale change in the middle of a parse.
+   Các bộ phân tích SAX không bắt buộc phải cung cấp bản địa hóa cho lỗi và cảnh báo; tuy nhiên, nếu không thể hỗ trợ locale được yêu cầu, chúng phải phát sinh một ngoại lệ SAX. Ứng dụng có thể yêu cầu thay đổi locale ở giữa quá trình phân tích.
 
 
 .. method:: XMLReader.getFeature(featurename)
 
-   Return the current setting for feature *featurename*.  If the feature is not
-   recognized, :exc:`SAXNotRecognizedException` is raised. The well-known
-   featurenames are listed in the module :mod:`xml.sax.handler`.
+   Trả về thiết lập hiện tại cho feature *featurename*. Nếu không nhận dạng được feature, :exc:`SAXNotRecognizedException` sẽ được phát sinh. Các featurename được biết đến được liệt kê trong module :mod:`xml.sax.handler`.
 
 
 .. method:: XMLReader.setFeature(featurename, value)
 
-   Set the *featurename* to *value*. If the feature is not recognized,
-   :exc:`SAXNotRecognizedException` is raised. If the feature or its setting is not
-   supported by the parser, *SAXNotSupportedException* is raised.
+   Thiết lập *featurename* thành *value*. Nếu không nhận dạng được feature,
+   :exc:`SAXNotRecognizedException` sẽ được phát sinh. Nếu parser không hỗ trợ feature hoặc thiết lập của feature, *SAXNotSupportedException* sẽ được phát sinh.
 
 
 .. method:: XMLReader.getProperty(propertyname)
 
-   Return the current setting for property *propertyname*. If the property is not
-   recognized, a :exc:`SAXNotRecognizedException` is raised. The well-known
-   propertynames are listed in the module :mod:`xml.sax.handler`.
+   Trả về thiết lập hiện tại cho thuộc tính *propertyname*. Nếu không nhận dạng được thuộc tính, một :exc:`SAXNotRecognizedException` sẽ được phát sinh. Các propertyname phổ biến được liệt kê trong module :mod:`xml.sax.handler`.
 
 
 .. method:: XMLReader.setProperty(propertyname, value)
 
-   Set the *propertyname* to *value*. If the property is not recognized,
-   :exc:`SAXNotRecognizedException` is raised. If the property or its setting is
-   not supported by the parser, *SAXNotSupportedException* is raised.
+   Đặt *propertyname* thành *value*. Nếu không nhận dạng được thuộc tính,
+   :exc:`SAXNotRecognizedException` sẽ được phát sinh. Nếu parser không hỗ trợ thuộc tính hoặc thiết lập của thuộc tính đó, *SAXNotSupportedException* sẽ được phát sinh.
 
 
 .. _incremental-parser-objects:
 
-IncrementalParser Objects
--------------------------
+Các đối tượng IncrementalParser
+-------------------------------
 
-Instances of :class:`IncrementalParser` offer the following additional methods:
+Các instance của :class:`IncrementalParser` cung cấp các phương thức bổ sung sau:
 
 
 .. method:: IncrementalParser.feed(data)
 
-   Process a chunk of *data*.
+   Xử lý một phần *data*.
 
 
 .. method:: IncrementalParser.close()
 
-   Assume the end of the document. That will check well-formedness conditions that
-   can be checked only at the end, invoke handlers, and may clean up resources
-   allocated during parsing.
+   Giả định rằng tài liệu đã kết thúc. Thao tác này sẽ kiểm tra các điều kiện well-formed chỉ có thể được kiểm tra khi kết thúc, gọi các handler và có thể dọn dẹp các tài nguyên được cấp phát trong quá trình phân tích cú pháp.
 
 
 .. method:: IncrementalParser.prepareParser(source)
 
-   Prepare the parser for parsing *source*, an
-   :class:`InputSource` instance.
-   It is called by :meth:`~XMLReader.parse` before feeding the data.
-   The parser implementation must override this method;
-   the default implementation raises :exc:`NotImplementedError`.
+   Chuẩn bị parser để phân tích cú pháp *source*, một
+   :class:`InputSource` instance. Phương thức này được gọi bởi :meth:`~XMLReader.parse` trước khi nạp dữ liệu. Phần triển khai parser phải ghi đè phương thức này; phần triển khai mặc định sẽ phát sinh :exc:`NotImplementedError`.
 
 
 .. method:: IncrementalParser.reset()
 
-   This method is called after close has been called to reset the parser so that it
-   is ready to parse new documents. The results of calling parse or feed after
-   close without calling reset are undefined.
+   Phương thức này được gọi sau khi close được gọi để đặt lại parser, giúp parser sẵn sàng phân tích cú pháp các tài liệu mới. Kết quả của việc gọi parse hoặc feed sau close mà không gọi reset là không xác định.
 
 
 .. _locator-objects:
 
-Locator Objects
----------------
+Các đối tượng Locator
+---------------------
 
-Instances of :class:`Locator` provide these methods:
+Các instance của :class:`Locator` cung cấp những phương thức sau:
 
 
 .. method:: Locator.getColumnNumber()
 
-   Return the column number where the current event begins.
+   Trả về số cột nơi sự kiện hiện tại bắt đầu.
 
 
 .. method:: Locator.getLineNumber()
 
-   Return the line number where the current event begins.
+   Trả về số dòng nơi sự kiện hiện tại bắt đầu.
 
 
 .. method:: Locator.getPublicId()
 
-   Return the public identifier for the current event.
+   Trả về mã định danh công khai cho sự kiện hiện tại.
 
 
 .. method:: Locator.getSystemId()
 
-   Return the system identifier for the current event.
+   Trả về mã định danh hệ thống cho sự kiện hiện tại.
 
 
 .. _input-source-objects:
 
-InputSource Objects
--------------------
+Đối tượng InputSource
+---------------------
 
 
 .. method:: InputSource.setPublicId(id)
 
-   Sets the public identifier of this :class:`InputSource`.
+   Đặt mã định danh công khai của :class:`InputSource` này.
 
 
 .. method:: InputSource.getPublicId()
 
-   Returns the public identifier of this :class:`InputSource`.
+   Trả về mã định danh công khai của :class:`InputSource` này.
 
 
 .. method:: InputSource.setSystemId(id)
 
-   Sets the system identifier of this :class:`InputSource`.
+   Đặt mã định danh hệ thống của :class:`InputSource` này.
 
 
 .. method:: InputSource.getSystemId()
 
-   Returns the system identifier of this :class:`InputSource`.
+   Trả về mã định danh hệ thống của :class:`InputSource` này.
 
 
 .. method:: InputSource.setEncoding(encoding)
 
-   Sets the character encoding of this :class:`InputSource`.
+   Thiết lập encoding ký tự của :class:`InputSource` này.
 
-   The encoding must be a string acceptable for an XML encoding declaration (see
-   section 4.3.3 of the XML recommendation).
+   Encoding phải là một chuỗi được chấp nhận trong khai báo encoding của XML (xem mục 4.3.3 của khuyến nghị XML).
 
-   The encoding attribute of the :class:`InputSource` is ignored if the
-   :class:`InputSource` also contains a character stream.
+   Thuộc tính encoding của :class:`InputSource` sẽ bị bỏ qua nếu
+   :class:`InputSource` cũng chứa một luồng ký tự.
 
 
 .. method:: InputSource.getEncoding()
 
-   Get the character encoding of this InputSource.
+   Lấy encoding ký tự của InputSource này.
 
 
 .. method:: InputSource.setByteStream(bytefile)
 
-   Set the byte stream (a :term:`binary file`) for this input source.
+   Thiết lập luồng byte (một :term:`binary file`) cho input source này.
 
-   The SAX parser will ignore this if there is also a character stream specified,
-   but it will use a byte stream in preference to opening a URI connection itself.
+   SAX parser sẽ bỏ qua luồng này nếu đồng thời có một luồng ký tự được chỉ định, nhưng sẽ ưu tiên sử dụng luồng byte thay vì tự mở kết nối URI.
 
-   If the application knows the character encoding of the byte stream, it should
-   set it with the setEncoding method.
+   Nếu ứng dụng biết encoding ký tự của byte stream, ứng dụng nên thiết lập encoding đó bằng method setEncoding.
 
 
 .. method:: InputSource.getByteStream()
 
-   Get the byte stream for this input source.
+   Lấy byte stream cho input source này.
 
-   The getEncoding method will return the character encoding for this byte stream,
-   or ``None`` if unknown.
+   Method getEncoding sẽ trả về encoding ký tự của byte stream này hoặc ``None`` nếu không xác định.
 
 
 .. method:: InputSource.setCharacterStream(charfile)
 
-   Set the character stream (a :term:`text file`) for this input source.
+   Thiết lập character stream (một :term:`text file`) cho input source này.
 
-   If there is a character stream specified, the SAX parser will ignore any byte
-   stream and will not attempt to open a URI connection to the system identifier.
+   Nếu có character stream được chỉ định, SAX parser sẽ bỏ qua mọi byte stream và không cố mở kết nối URI đến system identifier.
 
 
 .. method:: InputSource.getCharacterStream()
 
-   Get the character stream for this input source.
+   Lấy character stream cho input source này.
 
 
 .. _attributes-objects:
 
-The :class:`Attributes` Interface
----------------------------------
+Giao diện :class:`Attributes`
+-----------------------------
 
-:class:`Attributes` objects implement a portion of the :term:`mapping protocol
-<mapping>`, including the methods :meth:`~collections.abc.Mapping.copy`,
+Các đối tượng :class:`Attributes` triển khai một phần của giao thức :term:`mapping protocol <mapping>`, bao gồm các phương thức :meth:`~collections.abc.Mapping.copy`,
 :meth:`~collections.abc.Mapping.get`, :meth:`~object.__contains__`,
-:meth:`~collections.abc.Mapping.items`, :meth:`~collections.abc.Mapping.keys`,
-and :meth:`~collections.abc.Mapping.values`.  The following methods
-are also provided:
+:meth:`~collections.abc.Mapping.items`, :meth:`~collections.abc.Mapping.keys` và :meth:`~collections.abc.Mapping.values`. Các phương thức sau đây cũng được cung cấp:
 
 
 .. method:: Attributes.getLength()
 
-   Return the number of attributes.
+   Trả về số lượng thuộc tính.
 
 
 .. method:: Attributes.getNames()
 
-   Return the names of the attributes.
+   Trả về tên của các thuộc tính.
 
 
 .. method:: Attributes.getType(name)
 
-   Returns the type of the attribute *name*, which is normally ``'CDATA'``.
+   Trả về kiểu của thuộc tính *name*, thường là ``'CDATA'``.
 
 
 .. method:: Attributes.getValue(name)
 
-   Return the value of attribute *name*.
+   Trả về giá trị của thuộc tính *name*.
 
 .. getValueByQName, getNameByQName, getQNameByName, getQNames available
 .. here already, but documented only for derived class.
@@ -375,32 +313,31 @@ are also provided:
 
 .. _attributes-ns-objects:
 
-The :class:`AttributesNS` Interface
------------------------------------
+Giao diện :class:`AttributesNS`
+-------------------------------
 
-This interface is a subtype of the :class:`Attributes` interface (see section
-:ref:`attributes-objects`).  All methods supported by that interface are also
-available on :class:`AttributesNS` objects.
+Giao diện này là một kiểu con của giao diện :class:`Attributes` (xem phần
+:ref:`attributes-objects`). Tất cả các phương thức được giao diện đó hỗ trợ cũng có sẵn trên các đối tượng :class:`AttributesNS`.
 
-The following methods are also available:
+Các phương thức sau cũng có sẵn:
 
 
 .. method:: AttributesNS.getValueByQName(name)
 
-   Return the value for a qualified name.
+   Trả về giá trị của một tên đủ điều kiện.
 
 
 .. method:: AttributesNS.getNameByQName(name)
 
-   Return the ``(namespace, localname)`` pair for a qualified *name*.
+   Trả về cặp ``(namespace, localname)`` cho một *tên* đủ điều kiện.
 
 
 .. method:: AttributesNS.getQNameByName(name)
 
-   Return the qualified name for a ``(namespace, localname)`` pair.
+   Trả về tên đủ điều kiện cho một cặp ``(namespace, localname)``.
 
 
 .. method:: AttributesNS.getQNames()
 
-   Return the qualified names of all attributes.
+   Trả về tên đủ điều kiện của tất cả các thuộc tính.
 

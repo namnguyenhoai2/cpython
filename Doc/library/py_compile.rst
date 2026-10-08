@@ -1,162 +1,105 @@
-:mod:`!py_compile` --- Compile Python source files
-==================================================
+:mod:`!py_compile` --- Biên dịch các tệp mã nguồn Python
+========================================================
 
 .. module:: py_compile
-   :synopsis: Generate byte-code files from Python source files.
+   :synopsis: Tạo các tệp byte-code từ các tệp mã nguồn Python.
 
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 .. documentation based on module docstrings
 
-**Source code:** :source:`Lib/py_compile.py`
+**Mã nguồn:** :source:`Lib/py_compile.py`
 
 .. index:: pair: file; byte-code
 
 --------------
 
-The :mod:`!py_compile` module provides a function to generate a byte-code file
-from a source file, and another function used when the module source file is
-invoked as a script.
+Mô-đun :mod:`!py_compile` cung cấp một hàm để tạo tệp byte-code từ một tệp mã nguồn, cùng một hàm khác được sử dụng khi tệp mã nguồn của mô-đun được gọi như một script.
 
-Though not often needed, this function can be useful when installing modules for
-shared use, especially if some of the users may not have permission to write the
-byte-code cache files in the directory containing the source code.
+Mặc dù không thường xuyên cần đến, hàm này có thể hữu ích khi cài đặt các mô-đun để dùng chung, đặc biệt nếu một số người dùng có thể không có quyền ghi các tệp bộ nhớ đệm byte-code vào thư mục chứa mã nguồn.
 
 
 .. exception:: PyCompileError
 
-   Exception raised when an error occurs while attempting to compile the file.
+   Ngoại lệ được đưa ra khi xảy ra lỗi trong lúc cố gắng biên dịch tệp.
 
 
 .. function:: compile(file, cfile=None, dfile=None, doraise=False, optimize=-1, invalidation_mode=PycInvalidationMode.TIMESTAMP, quiet=0)
 
-   Compile a source file to byte-code and write out the byte-code cache file.
-   The source code is loaded from the file named *file*.  The byte-code is
-   written to *cfile*, which defaults to the :pep:`3147`/:pep:`488` path, ending
-   in ``.pyc``.
-   For example, if *file* is ``/foo/bar/baz.py`` *cfile* will default to
-   ``/foo/bar/__pycache__/baz.cpython-32.pyc`` for Python 3.2.  If *dfile* is
-   specified, it is used instead of *file* as the name of the source file from
-   which source lines are obtained for display in exception tracebacks.
-   If *doraise* is true, a :exc:`PyCompileError` is raised
-   when an error is encountered while compiling *file*. If *doraise* is false
-   (the default), an error string is written to ``sys.stderr``, but no exception
-   is raised.  This function returns the path to byte-compiled file, i.e.
-   whatever *cfile* value was used.
+   Biên dịch một tệp mã nguồn thành byte-code và ghi tệp bộ nhớ đệm byte-code. Mã nguồn được tải từ tệp có tên *file*. Byte-code được ghi vào *cfile*, mặc định là đường dẫn :pep:`3147`/:pep:`488`, kết thúc bằng ``.pyc``. Ví dụ, nếu *file* là ``/foo/bar/baz.py`` *cfile* sẽ mặc định là ``/foo/bar/__pycache__/baz.cpython-32.pyc`` đối với Python 3.2. Nếu *dfile* được chỉ định, nó sẽ được dùng thay cho *file* làm tên của tệp mã nguồn dùng để lấy các dòng mã nguồn nhằm hiển thị trong traceback của ngoại lệ. Nếu *doraise* là true, một :exc:`PyCompileError` sẽ được đưa ra khi gặp lỗi trong lúc biên dịch *file*. Nếu *doraise* là false (mặc định), một chuỗi lỗi sẽ được ghi vào ``sys.stderr``, nhưng không có ngoại lệ nào được đưa ra. Hàm này trả về đường dẫn đến tệp đã được biên dịch thành byte-code, tức là bất kỳ giá trị *cfile* nào đã được sử dụng.
 
-   The *doraise* and *quiet* arguments determine how errors are handled while
-   compiling file. If *quiet* is 0 or 1, and *doraise* is false, the default
-   behaviour is enabled: an error string is written to ``sys.stderr``, and the
-   function returns ``None`` instead of a path. If *doraise* is true,
-   a :exc:`PyCompileError` is raised instead. However if *quiet* is 2,
-   no message is written, and *doraise* has no effect.
+   Các đối số *doraise* và *quiet* xác định cách xử lý lỗi khi biên dịch tệp. Nếu *quiet* là 0 hoặc 1, còn *doraise* là false, hành vi mặc định được bật: một chuỗi lỗi được ghi vào ``sys.stderr``, và hàm trả về ``None`` thay vì một đường dẫn. Nếu *doraise* là true, một :exc:`PyCompileError` sẽ được raise thay thế. Tuy nhiên, nếu *quiet* là 2, không có thông báo nào được ghi và *doraise* không có tác dụng.
 
-   If the path that *cfile* becomes (either explicitly specified or computed)
-   is a symlink or non-regular file, :exc:`FileExistsError` will be raised.
-   This is to act as a warning that import will turn those paths into regular
-   files if it is allowed to write byte-compiled files to those paths. This is
-   a side-effect of import using file renaming to place the final byte-compiled
-   file into place to prevent concurrent file writing issues.
+   Nếu đường dẫn mà *cfile* trở thành (dù được chỉ định rõ ràng hay được tính toán) là một symlink hoặc tệp không thông thường, :exc:`FileExistsError` sẽ được raise. Điều này nhằm đưa ra cảnh báo rằng import sẽ chuyển các đường dẫn đó thành tệp thông thường nếu được phép ghi các tệp đã biên dịch thành byte-code vào những đường dẫn đó. Đây là tác dụng phụ của việc import sử dụng thao tác đổi tên tệp để đặt tệp byte-code cuối cùng vào đúng vị trí, nhằm ngăn các vấn đề do ghi tệp đồng thời.
 
-   *optimize* controls the optimization level and is passed to the built-in
-   :func:`compile` function.  The default of ``-1`` selects the optimization
-   level of the current interpreter.
+   *optimize* kiểm soát mức optimization và được truyền cho hàm dựng sẵn
+   :func:`compile` function. Giá trị mặc định là ``-1``, chọn mức optimization của interpreter hiện tại.
 
-   *invalidation_mode* should be a member of the :class:`PycInvalidationMode`
-   enum and controls how the generated bytecode cache is invalidated at
-   runtime.  The default is :attr:`PycInvalidationMode.CHECKED_HASH` if
-   the :envvar:`SOURCE_DATE_EPOCH` environment variable is set, otherwise
-   the default is :attr:`PycInvalidationMode.TIMESTAMP`.
+   *invalidation_mode* phải là một thành viên của enum :class:`PycInvalidationMode` và kiểm soát cách cache bytecode được tạo ra bị invalidated tại runtime. Giá trị mặc định là :attr:`PycInvalidationMode.CHECKED_HASH` nếu biến môi trường :envvar:`SOURCE_DATE_EPOCH` được đặt; nếu không, giá trị mặc định là :attr:`PycInvalidationMode.TIMESTAMP`.
 
    .. versionchanged:: 3.2
-      Changed default value of *cfile* to be :PEP:`3147`-compliant.  Previous
-      default was *file* + ``'c'`` (``'o'`` if optimization was enabled).
-      Also added the *optimize* parameter.
+      Đã thay đổi giá trị mặc định của *cfile* để tuân thủ :PEP:`3147`. Giá trị mặc định trước đây là *file* + ``'c'`` (``'o'`` nếu optimization được bật). Đồng thời đã thêm tham số *optimize*.
 
    .. versionchanged:: 3.4
-      Changed code to use :mod:`importlib` for the byte-code cache file writing.
-      This means file creation/writing semantics now match what :mod:`importlib`
-      does, e.g. permissions, write-and-move semantics, etc. Also added the
-      caveat that :exc:`FileExistsError` is raised if *cfile* is a symlink or
-      non-regular file.
+      Đã thay đổi mã để sử dụng :mod:`importlib` cho việc ghi tệp cache byte-code. Điều này có nghĩa là ngữ nghĩa tạo/ghi tệp hiện khớp với những gì :mod:`importlib` thực hiện, chẳng hạn như quyền, ngữ nghĩa ghi-rồi-di-chuyển, v.v. Đồng thời đã bổ sung lưu ý rằng :exc:`FileExistsError` sẽ được raise nếu *cfile* là một symlink hoặc tệp không thông thường.
 
    .. versionchanged:: 3.7
-      The *invalidation_mode* parameter was added as specified in :pep:`552`.
-      If the :envvar:`SOURCE_DATE_EPOCH` environment variable is set,
-      *invalidation_mode* will be forced to
+      Tham số *invalidation_mode* được thêm như được chỉ định trong :pep:`552`. Nếu biến môi trường :envvar:`SOURCE_DATE_EPOCH` được đặt, *invalidation_mode* sẽ bị buộc thành
       :attr:`PycInvalidationMode.CHECKED_HASH`.
 
    .. versionchanged:: 3.7.2
-      The :envvar:`SOURCE_DATE_EPOCH` environment variable no longer
-      overrides the value of the *invalidation_mode* argument, and determines
-      its default value instead.
+      Biến môi trường :envvar:`SOURCE_DATE_EPOCH` không còn ghi đè giá trị của đối số *invalidation_mode*, mà thay vào đó xác định giá trị mặc định của đối số này.
 
    .. versionchanged:: 3.8
-      The *quiet* parameter was added.
+      Đã thêm tham số *quiet*.
 
 
 .. class:: PycInvalidationMode
 
-   An enumeration of possible methods the interpreter can use to determine
-   whether a bytecode file is up to date with a source file. The ``.pyc`` file
-   indicates the desired invalidation mode in its header. See
-   :ref:`pyc-invalidation` for more information on how Python invalidates
-   ``.pyc`` files at runtime.
+   Một kiểu liệt kê các phương thức mà trình thông dịch có thể sử dụng để xác định xem tệp bytecode có còn cập nhật so với tệp mã nguồn hay không. Tệp ``.pyc`` cho biết chế độ vô hiệu hóa mong muốn trong phần header của tệp. Xem
+   :ref:`pyc-invalidation` để biết thêm thông tin về cách Python vô hiệu hóa các tệp ``.pyc`` trong runtime.
 
    .. versionadded:: 3.7
 
    .. attribute:: TIMESTAMP
 
-      The ``.pyc`` file includes the timestamp and size of the source file,
-      which Python will compare against the metadata of the source file at
-      runtime to determine if the ``.pyc`` file needs to be regenerated.
+      Tệp ``.pyc`` chứa dấu thời gian và kích thước của tệp mã nguồn; Python sẽ so sánh các giá trị này với metadata của tệp mã nguồn trong runtime để xác định xem có cần tạo lại tệp ``.pyc`` hay không.
 
    .. attribute:: CHECKED_HASH
 
-      The ``.pyc`` file includes a hash of the source file content, which Python
-      will compare against the source at runtime to determine if the ``.pyc``
-      file needs to be regenerated.
+      Tệp ``.pyc`` chứa hash của nội dung tệp mã nguồn; Python sẽ so sánh hash này với mã nguồn trong runtime để xác định xem có cần tạo lại tệp ``.pyc`` hay không.
 
    .. attribute:: UNCHECKED_HASH
 
-      Like :attr:`CHECKED_HASH`, the ``.pyc`` file includes a hash of the source
-      file content. However, Python will at runtime assume the ``.pyc`` file is
-      up to date and not validate the ``.pyc`` against the source file at all.
+      Giống như :attr:`CHECKED_HASH`, tệp ``.pyc`` chứa một hash của nội dung tệp nguồn. Tuy nhiên, khi chạy, Python sẽ giả định rằng tệp ``.pyc`` đã được cập nhật và hoàn toàn không xác thực ``.pyc`` với tệp nguồn.
 
-      This option is useful when the ``.pycs`` are kept up to date by some
-      system external to Python like a build system.
+      Tùy chọn này hữu ích khi ``.pycs`` được một hệ thống bên ngoài Python, chẳng hạn như hệ thống build, cập nhật.
 
 .. _py_compile-cli:
 
-Command-Line Interface
-----------------------
+Giao diện dòng lệnh
+-------------------
 
-This module can be invoked as a script to compile several source
-files.  The files named in *filenames* are compiled and the resulting
-bytecode is cached in the normal manner.  This program does not search
-a directory structure to locate source files; it only compiles files
-named explicitly. The exit status is nonzero if one of the files could
-not be compiled.
+Có thể gọi module này dưới dạng một script để biên dịch nhiều tệp nguồn. Các tệp được chỉ định trong *filenames* sẽ được biên dịch và bytecode tạo ra sẽ được lưu vào bộ nhớ đệm theo cách thông thường. Chương trình này không tìm kiếm cấu trúc thư mục để xác định các tệp nguồn; chương trình chỉ biên dịch những tệp được chỉ định rõ ràng. Trạng thái thoát sẽ khác không nếu không thể biên dịch một trong các tệp.
 
 .. program:: python -m py_compile
 
 .. option:: <file> ... <fileN>
             -
 
-   Positional arguments are files to compile.  If ``-`` is the only
-   parameter, the list of files is taken from standard input.
+   Các đối số vị trí là những tệp cần biên dịch. Nếu ``-`` là tham số duy nhất, danh sách tệp sẽ được đọc từ đầu vào chuẩn.
 
 .. option:: -q, --quiet
 
-   Suppress errors output.
+   Không xuất lỗi.
 
 .. versionchanged:: 3.2
-   Added support for ``-``.
+   Đã bổ sung hỗ trợ cho ``-``.
 
 .. versionchanged:: 3.10
-   Added support for :option:`-q`.
+   Đã bổ sung hỗ trợ cho :option:`-q`.
 
 
 .. seealso::
 
-   Module :mod:`compileall`
-      Utilities to compile all Python source files in a directory tree.
+   Mô-đun :mod:`compileall`
+      Các tiện ích để biên dịch tất cả tệp mã nguồn Python trong một cây thư mục.

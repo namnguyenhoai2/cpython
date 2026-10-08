@@ -1,13 +1,10 @@
 .. _markup:
 
-**********************************
-Structured Markup Processing Tools
-**********************************
+********************************
+Công cụ xử lý markup có cấu trúc
+********************************
 
-Python supports a variety of modules to work with various forms of structured
-data markup.  This includes modules to work with the Standard Generalized Markup
-Language (SGML) and the Hypertext Markup Language (HTML), and several interfaces
-for working with the Extensible Markup Language (XML).
+Python hỗ trợ nhiều module để làm việc với các dạng markup dữ liệu có cấu trúc khác nhau. Trong đó có các module để làm việc với Standard Generalized Markup Language (SGML) và Hypertext Markup Language (HTML), cùng một số interface để làm việc với Extensible Markup Language (XML).
 
 
 .. toctree::

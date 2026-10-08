@@ -1,36 +1,28 @@
-:mod:`!posix` --- The most common POSIX system calls
-====================================================
+:mod:`!posix` --- Các lời gọi hệ thống POSIX phổ biến nhất
+==========================================================
 
 .. module:: posix
-   :synopsis: The most common POSIX system calls (normally used via module os).
+   :synopsis: Các lời gọi hệ thống POSIX phổ biến nhất (thường được sử dụng thông qua mô-đun os).
 
 --------------
 
-This module provides access to operating system functionality that is
-standardized by the C Standard and the POSIX standard (a thinly disguised Unix
-interface).
+Mô-đun này cung cấp quyền truy cập vào các chức năng của hệ điều hành được chuẩn hóa bởi Tiêu chuẩn C và tiêu chuẩn POSIX (một giao diện Unix được che giấu khá kỹ).
 
 .. availability:: Unix.
 
 .. index:: pair: module; os
 
-**Do not import this module directly.**  Instead, import the module :mod:`os`,
-which provides a *portable* version of this interface.  On Unix, the :mod:`os`
-module provides a superset of the :mod:`!posix` interface.  On non-Unix operating
-systems the :mod:`!posix` module is not available, but a subset is always
-available through the :mod:`os` interface.  Once :mod:`os` is imported, there is
-*no* performance penalty in using it instead of :mod:`!posix`.  In addition,
-:mod:`os` provides some additional functionality, such as automatically calling
-:func:`~os.putenv` when an entry in ``os.environ`` is changed.
+**Không nhập trực tiếp mô-đun này.**  Thay vào đó, hãy nhập mô-đun :mod:`os`, mô-đun này cung cấp phiên bản *portable* của giao diện này.  Trên Unix, mô-đun :mod:`os` cung cấp một siêu tập của giao diện :mod:`!posix`.  Trên các hệ điều hành không phải Unix, mô-đun :mod:`!posix` không khả dụng, nhưng một tập con luôn khả dụng thông qua giao diện :mod:`os`.  Sau khi :mod:`os` được nhập, việc sử dụng nó thay cho :mod:`!posix` sẽ *không* gây tổn thất hiệu năng.  Ngoài ra,
+:mod:`os` cung cấp một số chức năng bổ sung, chẳng hạn như tự động gọi
+:func:`~os.putenv` khi một mục trong ``os.environ`` bị thay đổi.
 
-Errors are reported as exceptions; the usual exceptions are given for type
-errors, while errors reported by the system calls raise :exc:`OSError`.
+Các lỗi được báo cáo dưới dạng ngoại lệ; các ngoại lệ thông thường được sử dụng cho lỗi kiểu, trong khi những lỗi do các lời gọi hệ thống báo cáo sẽ phát sinh :exc:`OSError`.
 
 
 .. _posix-large-files:
 
-Large File Support
-------------------
+Hỗ trợ tệp lớn
+--------------
 
 .. index::
    single: large files
@@ -38,23 +30,15 @@ Large File Support
 
 .. sectionauthor:: Steve Clift <clift@mail.anacapa.net>
 
-Several operating systems (including AIX and Solaris) provide
-support for files that are larger than 2 GiB from a C programming model where
-:c:expr:`int` and :c:expr:`long` are 32-bit values. This is typically accomplished
-by defining the relevant size and offset types as 64-bit values. Such files are
-sometimes referred to as :dfn:`large files`.
+Một số hệ điều hành (bao gồm AIX và Solaris) cung cấp hỗ trợ cho các tệp lớn hơn 2 GiB từ mô hình lập trình C, trong đó
+:c:expr:`int` và :c:expr:`long` là các giá trị 32 bit. Điều này thường được thực hiện bằng cách định nghĩa các kiểu kích thước và offset liên quan là các giá trị 64 bit. Những tệp như vậy đôi khi được gọi là :dfn:`tệp lớn`.
 
-Large file support is enabled in Python when the size of an :c:type:`off_t` is
-larger than a :c:expr:`long` and the :c:expr:`long long` is at least as large
-as an :c:type:`off_t`.
-It may be necessary to configure and compile Python with certain compiler flags
-to enable this mode. For example, with Solaris 2.6 and 2.7 you need to do
-something like::
+Hỗ trợ tệp lớn được bật trong Python khi kích thước của một :c:type:`off_t` lớn hơn một :c:expr:`long` và :c:expr:`long long` ít nhất phải lớn bằng một :c:type:`off_t`. Có thể cần cấu hình và biên dịch Python với một số cờ compiler nhất định để bật chế độ này. Ví dụ, với Solaris 2.6 và 2.7, bạn cần làm như sau::
 
    CFLAGS="`getconf LFS_CFLAGS`" OPT="-g -O2 $CFLAGS" \
            ./configure
 
-On large-file-capable Linux systems, this might work::
+Trên các hệ thống Linux hỗ trợ tệp lớn, cách này có thể hoạt động::
 
    CFLAGS='-D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64' OPT="-g -O2 $CFLAGS" \
            ./configure
@@ -62,32 +46,26 @@ On large-file-capable Linux systems, this might work::
 
 .. _posix-contents:
 
-Notable Module Contents
------------------------
+Nội dung đáng chú ý của module
+------------------------------
 
-In addition to many functions described in the :mod:`os` module documentation,
-:mod:`!posix` defines the following data item:
+Ngoài nhiều hàm được mô tả trong tài liệu module :mod:`os`,
+:mod:`!posix` định nghĩa mục dữ liệu sau:
 
 .. data:: environ
 
-   A dictionary representing the string environment at the time the interpreter
-   was started. Keys and values are bytes on Unix and str on Windows. For
-   example, ``environ[b'HOME']`` (``environ['HOME']`` on Windows) is the
-   pathname of your home directory, equivalent to ``getenv("HOME")`` in C.
+   Một ánh xạ biểu diễn môi trường chuỗi tại thời điểm trình thông dịch được khởi động. Khóa và giá trị là bytes trên Unix và str trên Windows. Ví dụ, ``environ[b'HOME']`` (``environ['HOME']`` trên Windows) là pathname của thư mục chính của bạn, tương đương với ``getenv("HOME")`` trong C.
 
-   Modifying this dictionary does not affect the string environment passed on by
-   :func:`~os.execv`, :func:`~os.popen` or :func:`~os.system`; if you need to
-   change the environment, pass ``environ`` to :func:`~os.execve` or add
-   variable assignments and export statements to the command string for
-   :func:`~os.system` or :func:`~os.popen`.
+   Việc sửa đổi ánh xạ này không ảnh hưởng đến môi trường chuỗi được truyền tiếp bởi
+   :func:`~os.execv`, :func:`~os.popen` hoặc :func:`~os.system`; nếu cần thay đổi môi trường, hãy truyền ``environ`` cho :func:`~os.execve` hoặc thêm các phép gán biến và câu lệnh export vào chuỗi lệnh cho
+   :func:`~os.system` hoặc :func:`~os.popen`.
 
    .. versionchanged:: 3.2
-      On Unix, keys and values are bytes.
+      Trên Unix, khóa và giá trị là bytes.
 
    .. note::
 
-      The :mod:`os` module provides an alternate implementation of ``environ``
-      which updates the environment on modification. Note also that updating
-      :data:`os.environ` will render this dictionary obsolete. Use of the
-      :mod:`os` module version of this is recommended over direct access to the
-      :mod:`!posix` module.
+      Mô-đun :mod:`os` cung cấp một cách triển khai thay thế cho ``environ``, trong đó môi trường được cập nhật khi có sửa đổi. Cũng lưu ý rằng việc cập nhật
+      :data:`os.environ` sẽ khiến từ điển này trở nên lỗi thời. Nên sử dụng
+      :mod:`os`, phiên bản mô-đun của cách này, thay vì truy cập trực tiếp vào
+      :mod:`!posix` mô-đun.

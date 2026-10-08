@@ -1,6 +1,6 @@
-=========================================
-:mod:`!typing` --- Support for type hints
-=========================================
+====================================
+:mod:`!typing` --- Hỗ trợ gợi ý kiểu
+====================================
 
 .. testsetup:: *
 
@@ -9,82 +9,65 @@
    from typing import *
 
 .. module:: typing
-   :synopsis: Support for type hints (see :pep:`484`).
+   :synopsis: Hỗ trợ gợi ý kiểu (xem :pep:`484`).
 
 .. versionadded:: 3.5
 
-**Source code:** :source:`Lib/typing.py`
+**Mã nguồn:** :source:`Lib/typing.py`
 
 .. note::
 
-   The Python runtime does not enforce function and variable type annotations.
-   They can be used by third party tools such as :term:`type checkers <static type checker>`,
-   IDEs, linters, etc.
+   Python runtime không thực thi các chú thích kiểu của hàm và biến. Các chú thích này có thể được các công cụ của bên thứ ba như :term:`trình kiểm tra kiểu <static type checker>`, IDE, linter, v.v. sử dụng.
 
 --------------
 
-This module provides runtime support for type hints.
+Mô-đun này cung cấp hỗ trợ runtime cho các gợi ý kiểu.
 
-Consider the function below::
+Hãy xem xét hàm dưới đây::
 
    def surface_area_of_cube(edge_length: float) -> str:
        return f"The surface area of the cube is {6 * edge_length ** 2}."
 
-The function ``surface_area_of_cube`` takes an argument expected to
-be an instance of :class:`float`, as indicated by the :term:`type hint`
-``edge_length: float``. The function is expected to return an instance
-of :class:`str`, as indicated by the ``-> str`` hint.
+Hàm ``surface_area_of_cube`` nhận một đối số được kỳ vọng là một thể hiện của :class:`float`, như được chỉ ra bởi :term:`type hint` ``edge_length: float``. Hàm này được kỳ vọng trả về một thể hiện của :class:`str`, như được chỉ ra bởi gợi ý ``-> str``.
 
-While type hints can be simple classes like :class:`float` or :class:`str`,
-they can also be more complex. The :mod:`typing` module provides a vocabulary of
-more advanced type hints.
+Mặc dù type hint có thể là những class đơn giản như :class:`float` hoặc :class:`str`, chúng cũng có thể phức tạp hơn. Module :mod:`typing` cung cấp một bộ thuật ngữ cho các type hint nâng cao hơn.
 
-New features are frequently added to the ``typing`` module.
-The :pypi:`typing_extensions` package
-provides backports of these new features to older versions of Python.
+Các tính năng mới thường xuyên được thêm vào module ``typing``. Package :pypi:`typing_extensions` cung cấp các bản backport của những tính năng mới này cho các phiên bản Python cũ hơn.
 
 .. seealso::
 
-   `Typing cheat sheet <https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html>`_
-       A quick overview of type hints (hosted at the mypy docs)
+   `Bảng tóm tắt typing <https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html>`_
+       Tổng quan nhanh về type hint (được lưu trữ trên tài liệu mypy)
 
-   Type System Reference section of `the mypy docs <https://mypy.readthedocs.io/en/stable/index.html>`_
-      The Python typing system is standardised via PEPs, so this reference
-      should broadly apply to most Python type checkers. (Some parts may still
-      be specific to mypy.)
+   Phần Tham khảo Hệ thống Kiểu của `tài liệu mypy <https://mypy.readthedocs.io/en/stable/index.html>`_
+      Hệ thống typing của Python được tiêu chuẩn hóa thông qua các PEP, vì vậy tài liệu tham khảo này nhìn chung áp dụng cho hầu hết các trình kiểm tra kiểu Python. (Một số phần vẫn có thể chỉ áp dụng cho mypy.)
 
-   `Static Typing with Python <https://typing.python.org/en/latest/>`_
-      Type-checker-agnostic documentation written by the community detailing
-      type system features, useful typing related tools and typing best
-      practices.
+   `Typing tĩnh với Python <https://typing.python.org/en/latest/>`_
+      Tài liệu không phụ thuộc type checker do cộng đồng biên soạn, trình bày chi tiết các tính năng của hệ thống kiểu, những công cụ hữu ích liên quan đến typing và các phương pháp hay nhất khi sử dụng typing.
 
 .. _relevant-peps:
 
-Specification for the Python Type System
-========================================
+Đặc tả cho Hệ thống Kiểu của Python
+===================================
 
-The canonical, up-to-date specification of the Python type system can be
-found at `Specification for the Python type system <https://typing.python.org/en/latest/spec/index.html>`_.
+Đặc tả chính thức, được cập nhật mới nhất về hệ thống kiểu của Python có tại `Đặc tả cho hệ thống kiểu của Python <https://typing.python.org/en/latest/spec/index.html>`_.
 
 .. _type-aliases:
 
-Type aliases
+Bí danh kiểu
 ============
 
-A type alias is defined using the :keyword:`type` statement, which creates
-an instance of :class:`TypeAliasType`. In this example,
-``Vector`` and ``list[float]`` will be treated equivalently by static type
-checkers::
+Bí danh kiểu được định nghĩa bằng câu lệnh :keyword:`type`, câu lệnh này tạo một thực thể của :class:`TypeAliasType`. Trong ví dụ này, ``Vector`` và ``list[float]`` sẽ được các trình kiểm tra kiểu tĩnh xem là tương đương::
 
    type Vector = list[float]
 
    def scale(scalar: float, vector: Vector) -> Vector:
        return [scalar * num for num in vector]
 
-   # passes type checking; a list of floats qualifies as a Vector.
+   # vượt qua kiểm tra kiểu; một danh sách các số thực được xem là một Vector.
    new_vector = scale(2.0, [1.0, -4.2, 5.4])
 
-Type aliases are useful for simplifying complex type signatures. For example::
+Bí danh kiểu hữu ích trong việc đơn giản hóa các chữ ký kiểu phức tạp. Ví dụ::
 
    from collections.abc import Sequence
 
@@ -95,21 +78,19 @@ Type aliases are useful for simplifying complex type signatures. For example::
    def broadcast_message(message: str, servers: Sequence[Server]) -> None:
        ...
 
-   # The static type checker will treat the previous type signature as
-   # being exactly equivalent to this one.
+   # Trình kiểm tra kiểu tĩnh sẽ xem chữ ký kiểu trước đó là
+   # hoàn toàn tương đương với chữ ký này.
    def broadcast_message(
        message: str,
        servers: Sequence[tuple[tuple[str, int], dict[str, str]]]
    ) -> None:
        ...
 
-The :keyword:`type` statement is new in Python 3.12. For backwards
-compatibility, type aliases can also be created through simple assignment::
+Câu lệnh :keyword:`type` là tính năng mới trong Python 3.12. Để đảm bảo tương thích ngược, bạn cũng có thể tạo bí danh kiểu bằng phép gán đơn giản::
 
    Vector = list[float]
 
-Or marked with :data:`TypeAlias` to make it explicit that this is a type alias,
-not a normal variable assignment::
+Hoặc đánh dấu bằng :data:`TypeAlias` để nêu rõ đây là bí danh kiểu, không phải phép gán biến thông thường::
 
    from typing import TypeAlias
 
@@ -120,52 +101,43 @@ not a normal variable assignment::
 NewType
 =======
 
-Use the :class:`NewType` helper to create distinct types::
+Sử dụng helper :class:`NewType` để tạo các kiểu riêng biệt::
 
    from typing import NewType
 
    UserId = NewType('UserId', int)
    some_id = UserId(524313)
 
-The static type checker will treat the new type as if it were a subclass
-of the original type. This is useful in helping catch logical errors::
+Trình kiểm tra kiểu tĩnh sẽ xem kiểu mới như thể đó là một lớp con của kiểu ban đầu. Điều này hữu ích để giúp phát hiện các lỗi logic::
 
    def get_user_name(user_id: UserId) -> str:
        ...
 
-   # passes type checking
+   # vượt qua kiểm tra kiểu
    user_a = get_user_name(UserId(42351))
 
-   # fails type checking; an int is not a UserId
+   # không vượt qua kiểm tra kiểu; int không phải là UserId
    user_b = get_user_name(-1)
 
-You may still perform all ``int`` operations on a variable of type ``UserId``,
-but the result will always be of type ``int``. This lets you pass in a
-``UserId`` wherever an ``int`` might be expected, but will prevent you from
-accidentally creating a ``UserId`` in an invalid way::
+Bạn vẫn có thể thực hiện mọi thao tác ``int`` trên một biến có kiểu ``UserId``, nhưng kết quả sẽ luôn có kiểu ``int``. Điều này cho phép bạn truyền một ``UserId`` ở bất cứ nơi nào có thể yêu cầu một ``int``, nhưng sẽ ngăn bạn vô tình tạo một ``UserId`` theo cách không hợp lệ::
 
-   # 'output' is of type 'int', not 'UserId'
+   # 'output' có kiểu 'int', không phải 'UserId'
    output = UserId(23413) + UserId(54341)
 
-Note that these checks are enforced only by the static type checker. At runtime,
-the statement ``Derived = NewType('Derived', Base)`` will make ``Derived`` a
-callable that immediately returns whatever parameter you pass it. That means
-the expression ``Derived(some_value)`` does not create a new class or introduce
-much overhead beyond that of a regular function call.
+Lưu ý rằng các kiểm tra này chỉ được thực thi bởi trình kiểm tra kiểu tĩnh. Khi chạy, câu lệnh ``Derived = NewType('Derived', Base)`` sẽ khiến ``Derived`` trở thành một callable ngay lập tức trả về bất kỳ tham số nào bạn truyền vào. Điều đó có nghĩa là biểu thức ``Derived(some_value)`` không tạo một class mới và hầu như không gây thêm overhead so với một lần gọi hàm thông thường.
 
-More precisely, the expression ``some_value is Derived(some_value)`` is always
-true at runtime.
+Chính xác hơn, biểu thức ``some_value is Derived(some_value)`` luôn có giá trị true khi chạy.
 
-It is invalid to create a subtype of ``Derived``::
+Không hợp lệ khi tạo subtype của ``Derived``::
 
    from typing import NewType
 
    UserId = NewType('UserId', int)
 
-   # Fails at runtime and does not pass type checking
+   # Không thành công khi runtime và không vượt qua kiểm tra kiểu
    class AdminUserId(UserId): pass
 
-However, it is possible to create a :class:`NewType` based on a 'derived' ``NewType``::
+Tuy nhiên, bạn có thể tạo một :class:`NewType` dựa trên một ``NewType`` 'dẫn xuất'.::
 
    from typing import NewType
 
@@ -173,72 +145,55 @@ However, it is possible to create a :class:`NewType` based on a 'derived' ``NewT
 
    ProUserId = NewType('ProUserId', UserId)
 
-and typechecking for ``ProUserId`` will work as expected.
+và việc kiểm tra kiểu cho ``ProUserId`` sẽ hoạt động như mong đợi.
 
-See :pep:`484` for more details.
+Xem :pep:`484` để biết thêm chi tiết.
 
 .. note::
 
-   Recall that the use of a type alias declares two types to be *equivalent* to
-   one another. Doing ``type Alias = Original`` will make the static type checker
-   treat ``Alias`` as being *exactly equivalent* to ``Original`` in all cases.
-   This is useful when you want to simplify complex type signatures.
+   Hãy nhớ rằng việc sử dụng bí danh kiểu khai báo hai kiểu là *tương đương* với nhau. Thực hiện ``type Alias = Original`` sẽ khiến bộ kiểm tra kiểu tĩnh xem ``Alias`` là *hoàn toàn tương đương* với ``Original`` trong mọi trường hợp. Điều này hữu ích khi bạn muốn đơn giản hóa các chữ ký kiểu phức tạp.
 
-   In contrast, ``NewType`` declares one type to be a *subtype* of another.
-   Doing ``Derived = NewType('Derived', Original)`` will make the static type
-   checker treat ``Derived`` as a *subclass* of ``Original``, which means a
-   value of type ``Original`` cannot be used in places where a value of type
-   ``Derived`` is expected. This is useful when you want to prevent logic
-   errors with minimal runtime cost.
+   Ngược lại, ``NewType`` khai báo một kiểu là *kiểu con* của một kiểu khác. Thực hiện ``Derived = NewType('Derived', Original)`` sẽ khiến bộ kiểm tra kiểu tĩnh xem ``Derived`` là một *lớp con* của ``Original``, nghĩa là một giá trị kiểu ``Original`` không thể được sử dụng ở nơi yêu cầu một giá trị kiểu ``Derived``. Điều này hữu ích khi bạn muốn ngăn ngừa lỗi logic với chi phí runtime tối thiểu.
 
 .. versionadded:: 3.5.2
 
 .. versionchanged:: 3.10
-   ``NewType`` is now a class rather than a function.  As a result, there is
-   some additional runtime cost when calling ``NewType`` over a regular
-   function.
+   ``NewType`` hiện là một lớp thay vì một hàm. Do đó, việc gọi ``NewType`` sẽ tốn thêm chi phí runtime so với một hàm thông thường.
 
 .. versionchanged:: 3.11
-   The performance of calling ``NewType`` has been restored to its level in
-   Python 3.9.
+   Hiệu năng khi gọi ``NewType`` đã được khôi phục về mức như trong Python 3.9.
 
 .. _annotating-callables:
 
-Annotating callable objects
-===========================
+Chú thích cho các đối tượng có thể gọi
+======================================
 
-Functions -- or other :term:`callable` objects -- can be annotated using
-:class:`collections.abc.Callable` or deprecated :data:`typing.Callable`.
-``Callable[[int], str]`` signifies a function that takes a single parameter
-of type :class:`int` and returns a :class:`str`.
+Các hàm -- hoặc những đối tượng :term:`callable` khác -- có thể được chú thích bằng
+:class:`collections.abc.Callable` hoặc :data:`typing.Callable` đã lỗi thời. ``Callable[[int], str]`` biểu thị một hàm nhận một tham số duy nhất thuộc kiểu :class:`int` và trả về một :class:`str`.
 
-For example:
+Ví dụ:
 
 .. testcode::
 
    from collections.abc import Callable, Awaitable
 
    def feeder(get_next_item: Callable[[], str]) -> None:
-       ...  # Body
+       ...  # Thân hàm
 
    def async_query(on_success: Callable[[int], None],
                    on_error: Callable[[int, Exception], None]) -> None:
-       ...  # Body
+       ...  # Thân hàm
 
    async def on_update(value: str) -> None:
-       ...  # Body
+       ...  # Thân hàm
 
    callback: Callable[[str], Awaitable[None]] = on_update
 
 .. index:: single: ...; ellipsis literal
 
-The subscription syntax must always be used with exactly two values: the
-argument list and the return type.  The argument list must be a list of types,
-a :class:`ParamSpec`, :data:`Concatenate`, or an ellipsis (``...``). The return type must
-be a single type.
+Cú pháp subscription phải luôn được sử dụng với đúng hai giá trị: danh sách đối số và kiểu trả về. Danh sách đối số phải là một danh sách các kiểu, một :class:`ParamSpec`, :data:`Concatenate`, hoặc một dấu chấm lửng (``...``). Kiểu trả về phải là một kiểu duy nhất.
 
-If a literal ellipsis ``...`` is given as the argument list, it indicates that
-a callable with any arbitrary parameter list would be acceptable:
+Nếu một dấu chấm lửng literal ``...`` được cung cấp làm danh sách đối số, điều đó cho biết rằng một callable với bất kỳ danh sách tham số nào cũng được chấp nhận:
 
 .. testcode::
 
@@ -247,13 +202,10 @@ a callable with any arbitrary parameter list would be acceptable:
 
    x: Callable[..., str]
    x = str     # OK
-   x = concat  # Also OK
+   x = concat  # Cũng OK
 
-``Callable`` cannot express complex signatures such as functions that take a
-variadic number of arguments, :ref:`overloaded functions <overload>`, or
-functions that have keyword-only parameters. However, these signatures can be
-expressed by defining a :class:`Protocol` class with a
-:meth:`~object.__call__` method:
+``Callable`` không thể biểu diễn các signature phức tạp, chẳng hạn như các hàm nhận số lượng đối số biến đổi, :ref:`các hàm overloaded <overload>`, hoặc các hàm có tham số chỉ dành cho từ khóa. Tuy nhiên, có thể biểu diễn các signature này bằng cách định nghĩa một lớp :class:`Protocol` với một
+phương thức :meth:`~object.__call__`:
 
 .. testcode::
 
@@ -273,33 +225,23 @@ expressed by defining a :class:`Protocol` class with a
        ...
 
    batch_proc([], good_cb)  # OK
-   batch_proc([], bad_cb)   # Error! Argument 2 has incompatible type because of
-                            # different name and kind in the callback
+   batch_proc([], bad_cb)   # Lỗi! Đối số 2 có kiểu không tương thích vì
+                            # tên và loại khác nhau trong callback
 
-Callables which take other callables as arguments may indicate that their
-parameter types are dependent on each other using :class:`ParamSpec`.
-Additionally, if that callable adds or removes arguments from other
-callables, the :data:`Concatenate` operator may be used.  They
-take the form ``Callable[ParamSpecVariable, ReturnType]`` and
-``Callable[Concatenate[Arg1Type, Arg2Type, ..., ParamSpecVariable], ReturnType]``
-respectively.
+Các callable nhận những callable khác làm đối số có thể cho biết rằng kiểu tham số của chúng phụ thuộc lẫn nhau bằng cách sử dụng :class:`ParamSpec`. Ngoài ra, nếu callable đó thêm hoặc xóa các đối số khỏi những callable khác, có thể sử dụng toán tử :data:`Concatenate`. Chúng lần lượt có dạng ``Callable[ParamSpecVariable, ReturnType]`` và ``Callable[Concatenate[Arg1Type, Arg2Type, ..., ParamSpecVariable], ReturnType]``.
 
 .. versionchanged:: 3.10
-   ``Callable`` now supports :class:`ParamSpec` and :data:`Concatenate`.
-   See :pep:`612` for more details.
+   ``Callable`` hiện hỗ trợ :class:`ParamSpec` và :data:`Concatenate`. Xem :pep:`612` để biết thêm chi tiết.
 
 .. seealso::
-   The documentation for :class:`ParamSpec` and :class:`Concatenate` provides
-   examples of usage in ``Callable``.
+   Tài liệu dành cho :class:`ParamSpec` và :class:`Concatenate` cung cấp các ví dụ về cách sử dụng trong ``Callable``.
 
 .. _generics:
 
 Generics
 ========
 
-Since type information about objects kept in containers cannot be statically
-inferred in a generic way, many container classes in the standard library support
-subscription to denote the expected types of container elements.
+Vì không thể suy luận tĩnh một cách tổng quát thông tin kiểu của các đối tượng được lưu trong container, nhiều lớp container trong thư viện chuẩn hỗ trợ cú pháp subscription để biểu thị các kiểu dự kiến của phần tử container.
 
 .. testcode::
 
@@ -307,115 +249,101 @@ subscription to denote the expected types of container elements.
 
    class Employee: ...
 
-   # Sequence[Employee] indicates that all elements in the sequence
-   # must be instances of "Employee".
-   # Mapping[str, str] indicates that all keys and all values in the mapping
-   # must be strings.
+   # Sequence[Employee] cho biết tất cả phần tử trong sequence
+   # phải là các instance của "Employee".
+   # Mapping[str, str] cho biết tất cả key và value trong mapping
+   # phải là chuỗi.
    def notify_by_email(employees: Sequence[Employee],
                        overrides: Mapping[str, str]) -> None: ...
 
-Generic functions and classes can be parameterized by using
-:ref:`type parameter syntax <type-params>`::
+Các hàm và lớp generic có thể được tham số hóa bằng cách sử dụng
+:ref:`cú pháp tham số kiểu <type-params>`::
 
    from collections.abc import Sequence
 
-   def first[T](l: Sequence[T]) -> T:  # Function is generic over the TypeVar "T"
+   def first[T](l: Sequence[T]) -> T:  # Hàm có tính generic với TypeVar "T"
        return l[0]
 
-Or by using the :class:`TypeVar` factory directly::
+Hoặc bằng cách sử dụng trực tiếp factory :class:`TypeVar`::
 
    from collections.abc import Sequence
    from typing import TypeVar
 
-   U = TypeVar('U')                  # Declare type variable "U"
+   U = TypeVar('U')                  # Khai báo biến kiểu "U"
 
-   def second(l: Sequence[U]) -> U:  # Function is generic over the TypeVar "U"
+   def second(l: Sequence[U]) -> U:  # Hàm có tính generic với TypeVar "U"
        return l[1]
 
 .. versionchanged:: 3.12
-   Syntactic support for generics is new in Python 3.12.
+   Hỗ trợ cú pháp cho generics là tính năng mới trong Python 3.12.
 
 .. _annotating-tuples:
 
-Annotating tuples
-=================
+Chú thích kiểu cho tuple
+========================
 
-For most containers in Python, the typing system assumes that all elements in
-the container will be of the same type. For example::
+Đối với hầu hết container trong Python, hệ thống typing giả định rằng tất cả phần tử trong container sẽ có cùng một kiểu. Ví dụ::
 
    from collections.abc import Mapping
 
-   # Type checker will infer that all elements in ``x`` are meant to be ints
+   # Trình kiểm tra kiểu sẽ suy luận rằng tất cả các phần tử trong ``x`` đều là ints
    x: list[int] = []
 
-   # Type checker error: ``list`` only accepts a single type argument:
+   # Lỗi của trình kiểm tra kiểu: ``list`` chỉ chấp nhận một đối số kiểu duy nhất:
    y: list[int, str] = [1, 'foo']
 
-   # Type checker will infer that all keys in ``z`` are meant to be strings,
-   # and that all values in ``z`` are meant to be either strings or ints
+   # Trình kiểm tra kiểu sẽ suy luận rằng tất cả các khóa trong ``z`` đều là strings,
+   # và tất cả các giá trị trong ``z`` đều là strings hoặc ints
    z: Mapping[str, str | int] = {}
 
-:class:`list` only accepts one type argument, so a type checker would emit an
-error on the ``y`` assignment above. Similarly,
-:class:`~collections.abc.Mapping` only accepts two type arguments: the first
-indicates the type of the keys, and the second indicates the type of the
-values.
+:class:`list` chỉ chấp nhận một đối số kiểu, vì vậy trình kiểm tra kiểu sẽ báo lỗi tại phép gán ``y`` ở trên. Tương tự,
+:class:`~collections.abc.Mapping` chỉ chấp nhận hai đối số kiểu: đối số thứ nhất cho biết kiểu của các khóa, còn đối số thứ hai cho biết kiểu của các giá trị.
 
-Unlike most other Python containers, however, it is common in idiomatic Python
-code for tuples to have elements which are not all of the same type. For this
-reason, tuples are special-cased in Python's typing system. :class:`tuple`
-accepts *any number* of type arguments::
+Tuy nhiên, không giống hầu hết các container khác trong Python, trong mã Python theo phong cách chuẩn, việc các phần tử của tuple không cùng một kiểu là điều phổ biến. Vì lý do này, tuple được xử lý đặc biệt trong hệ thống typing của Python. :class:`tuple` chấp nhận *bất kỳ số lượng nào* đối số kiểu::
 
-   # OK: ``x`` is assigned to a tuple of length 1 where the sole element is an int
+   # OK: ``x`` được gán cho một tuple có độ dài 1, trong đó phần tử duy nhất là một int
    x: tuple[int] = (5,)
 
-   # OK: ``y`` is assigned to a tuple of length 2;
-   # element 1 is an int, element 2 is a str
+   # OK: ``y`` được gán cho một tuple có độ dài 2;
+   # phần tử 1 là một int, phần tử 2 là một str
    y: tuple[int, str] = (5, "foo")
 
    # Error: the type annotation indicates a tuple of length 1,
-   # but ``z`` has been assigned to a tuple of length 3
+   # nhưng ``z`` đã được gán cho một tuple có độ dài 3
    z: tuple[int] = (1, 2, 3)
 
 .. index:: single: ...; ellipsis literal
 
-To denote a tuple which could be of *any* length, and in which all elements are
-of the same type ``T``, use the literal ellipsis ``...``: ``tuple[T, ...]``.
-To denote an empty tuple, use
-``tuple[()]``. Using plain ``tuple`` as an annotation is equivalent to using
-``tuple[Any, ...]``::
+Để biểu thị một tuple có thể có độ dài *bất kỳ*, trong đó tất cả các phần tử đều có cùng kiểu ``T``, hãy sử dụng dấu chấm lửng literal ``...``: ``tuple[T, ...]``. Để biểu thị một tuple rỗng, hãy sử dụng ``tuple[()]``. Việc sử dụng riêng ``tuple`` làm chú thích tương đương với việc sử dụng ``tuple[Any, ...]``::
 
    x: tuple[int, ...] = (1, 2)
-   # These reassignments are OK: ``tuple[int, ...]`` indicates x can be of any length
+   # Các phép gán lại này đều hợp lệ: ``tuple[int, ...]`` cho biết x có thể có độ dài bất kỳ
    x = (1, 2, 3)
    x = ()
-   # This reassignment is an error: all elements in ``x`` must be ints
+   # Phép gán lại này gây lỗi: tất cả các phần tử trong ``x`` phải là int
    x = ("foo", "bar")
 
-   # ``y`` can only ever be assigned to an empty tuple
+   # ``y`` chỉ có thể được gán cho một tuple rỗng
    y: tuple[()] = ()
 
    z: tuple = ("foo", "bar")
-   # These reassignments are OK: plain ``tuple`` is equivalent to ``tuple[Any, ...]``
+   # Các phép gán lại này đều hợp lệ: ``tuple`` thuần túy tương đương với ``tuple[Any, ...]``
    z = (1, 2, 3)
    z = ()
 
 .. _type-of-class-objects:
 
-The type of class objects
-=========================
+Kiểu của các đối tượng lớp
+==========================
 
-A variable annotated with ``C`` may accept a value of type ``C``. In
-contrast, a variable annotated with ``type[C]`` (or deprecated
-:class:`typing.Type[C] <Type>`) may accept values that are classes
-themselves -- specifically, it will accept the *class object* of ``C``. For
-example::
+Một biến được chú thích bằng ``C`` có thể nhận một giá trị thuộc kiểu ``C``. Ngược lại, một biến được chú thích bằng ``type[C]`` (hoặc không còn được khuyến nghị
+:class:`typing.Type[C] <Type>`) có thể nhận các giá trị vốn là các lớp -- cụ thể là, nó sẽ nhận *đối tượng lớp* của ``C``. Ví dụ::
 
-   a = 3         # Has type ``int``
-   b = int       # Has type ``type[int]``
-   c = type(a)   # Also has type ``type[int]``
+   a = 3         # Có kiểu ``int``
+   b = int       # Có kiểu ``type[int]``
+   c = type(a)   # Cũng có kiểu ``type[int]``
 
-Note that ``type[C]`` is covariant::
+Lưu ý rằng ``type[C]`` là covariant::
 
    class User: ...
    class ProUser(User): ...
@@ -426,35 +354,33 @@ Note that ``type[C]`` is covariant::
        return user_class()
 
    make_new_user(User)      # OK
-   make_new_user(ProUser)   # Also OK: ``type[ProUser]`` is a subtype of ``type[User]``
-   make_new_user(TeamUser)  # Still fine
-   make_new_user(User())    # Error: expected ``type[User]`` but got ``User``
-   make_new_user(int)       # Error: ``type[int]`` is not a subtype of ``type[User]``
+   make_new_user(ProUser)   # Cũng hợp lệ: ``type[ProUser]`` là kiểu con của ``type[User]``
+   make_new_user(TeamUser)  # Vẫn hợp lệ
+   make_new_user(User())    # Lỗi: cần ``type[User]`` nhưng nhận được ``User``
+   make_new_user(int)       # Lỗi: ``type[int]`` không phải là kiểu con của ``type[User]``
 
-The only legal parameters for :class:`type` are classes, :data:`Any`,
-:ref:`type variables <generics>`, and unions of any of these types.
-For example::
+Các tham số hợp lệ duy nhất cho :class:`type` là các lớp, :data:`Any`,
+:ref:`biến kiểu <generics>`, và hợp của bất kỳ kiểu nào trong số này. Ví dụ::
 
    def new_non_team_user(user_class: type[BasicUser | ProUser]): ...
 
    new_non_team_user(BasicUser)  # OK
    new_non_team_user(ProUser)    # OK
-   new_non_team_user(TeamUser)   # Error: ``type[TeamUser]`` is not a subtype
-                                 # of ``type[BasicUser | ProUser]``
-   new_non_team_user(User)       # Also an error
+   new_non_team_user(TeamUser)   # Lỗi: ``type[TeamUser]`` không phải là kiểu con
+                                 # của ``type[BasicUser | ProUser]``
+   new_non_team_user(User)       # Cũng là một lỗi
 
-``type[Any]`` is equivalent to :class:`type`, which is the root of Python's
-:ref:`metaclass hierarchy <metaclasses>`.
+``type[Any]`` tương đương với :class:`type`, là gốc của Python
+:ref:`hệ thống phân cấp metaclass <metaclasses>`.
 
 
 .. _annotating-generators-and-coroutines:
 
-Annotating generators and coroutines
-====================================
+Chú thích generator và coroutine
+================================
 
-A generator can be annotated using the generic type
-:class:`Generator[YieldType, SendType, ReturnType] <collections.abc.Generator>`.
-For example::
+Có thể chú thích generator bằng kiểu generic
+:class:`Generator[YieldType, SendType, ReturnType] <collections.abc.Generator>`. Ví dụ::
 
    def echo_round() -> Generator[int, float, str]:
        sent = yield 0
@@ -462,39 +388,31 @@ For example::
            sent = yield round(sent)
        return 'Done'
 
-Note that unlike many other generic classes in the standard library,
-the ``SendType`` of :class:`~collections.abc.Generator` behaves
-contravariantly, not covariantly or invariantly.
+Lưu ý rằng, không giống như nhiều lớp generic khác trong standard library, ``SendType`` của :class:`~collections.abc.Generator` có tính phản biến (contravariant), không phải đồng biến (covariant) hay bất biến (invariant).
 
-The ``SendType`` and ``ReturnType`` parameters default to :const:`!None`::
+Các tham số ``SendType`` và ``ReturnType`` mặc định là :const:`!None`::
 
    def infinite_stream(start: int) -> Generator[int]:
        while True:
            yield start
            start += 1
 
-It is also possible to set these types explicitly::
+Bạn cũng có thể thiết lập rõ ràng các kiểu này::
 
    def infinite_stream(start: int) -> Generator[int, None, None]:
        while True:
            yield start
            start += 1
 
-Simple generators that only ever yield values can also be annotated
-as having a return type of either
-:class:`Iterable[YieldType] <collections.abc.Iterable>`
-or :class:`Iterator[YieldType] <collections.abc.Iterator>`::
+Các generator đơn giản chỉ yield giá trị cũng có thể được chú thích là có kiểu trả về là một trong hai
+:class:`Iterable[YieldType] <collections.abc.Iterable>` hoặc :class:`Iterator[YieldType] <collections.abc.Iterator>`::
 
    def infinite_stream(start: int) -> Iterator[int]:
        while True:
            yield start
            start += 1
 
-Async generators are handled in a similar fashion, but don't
-expect a ``ReturnType`` type argument
-(:class:`AsyncGenerator[YieldType, SendType] <collections.abc.AsyncGenerator>`).
-The ``SendType`` argument defaults to :const:`!None`, so the following definitions
-are equivalent::
+Các async generator được xử lý tương tự, nhưng không cần đối số kiểu ``ReturnType`` (:class:`AsyncGenerator[YieldType, SendType] <collections.abc.AsyncGenerator>`). Đối số ``SendType`` mặc định là :const:`!None`, vì vậy các định nghĩa sau là tương đương::
 
    async def infinite_stream(start: int) -> AsyncGenerator[int]:
        while True:
@@ -506,33 +424,29 @@ are equivalent::
            yield start
            start = await increment(start)
 
-As in the synchronous case,
-:class:`AsyncIterable[YieldType] <collections.abc.AsyncIterable>`
-and :class:`AsyncIterator[YieldType] <collections.abc.AsyncIterator>` are
-available as well::
+Như trong trường hợp đồng bộ,
+:class:`AsyncIterable[YieldType] <collections.abc.AsyncIterable>` và :class:`AsyncIterator[YieldType] <collections.abc.AsyncIterator>` cũng có sẵn::
 
    async def infinite_stream(start: int) -> AsyncIterator[int]:
        while True:
            yield start
            start = await increment(start)
 
-Coroutines can be annotated using
-:class:`Coroutine[YieldType, SendType, ReturnType] <collections.abc.Coroutine>`.
-Generic arguments correspond to those of :class:`~collections.abc.Generator`,
-for example::
+Có thể chú thích coroutine bằng
+:class:`Coroutine[YieldType, SendType, ReturnType] <collections.abc.Coroutine>`. Các đối số generic tương ứng với các đối số của :class:`~collections.abc.Generator`, chẳng hạn như::
 
    from collections.abc import Coroutine
-   c: Coroutine[list[str], str, int]  # Some coroutine defined elsewhere
-   x = c.send('hi')                   # Inferred type of 'x' is list[str]
+   c: Coroutine[list[str], str, int]  # Một coroutine được định nghĩa ở nơi khác
+   x = c.send('hi')                   # Kiểu được suy luận của 'x' là list[str]
    async def bar() -> None:
-       y = await c                    # Inferred type of 'y' is int
+       y = await c                    # Kiểu được suy luận của 'y' là int
 
 .. _user-defined-generics:
 
-User-defined generic types
-==========================
+Các kiểu generic do người dùng định nghĩa
+=========================================
 
-A user-defined class can be defined as a generic class.
+Một lớp do người dùng định nghĩa có thể được khai báo là lớp generic.
 
 ::
 
@@ -555,13 +469,10 @@ A user-defined class can be defined as a generic class.
        def log(self, message: str) -> None:
            self.logger.info('%s: %s', self.name, message)
 
-This syntax indicates that the class ``LoggedVar`` is parameterised around a
-single :ref:`type variable <typevar>` ``T`` . This also makes ``T`` valid as
-a type within the class body.
+Cú pháp này cho biết rằng lớp ``LoggedVar`` được tham số hóa quanh một :ref:`biến kiểu <typevar>` ``T`` . Điều này cũng khiến ``T`` hợp lệ dưới dạng một kiểu trong thân lớp.
 
-Generic classes implicitly inherit from :class:`Generic`. For compatibility
-with Python 3.11 and lower, it is also possible to inherit explicitly from
-:class:`Generic` to indicate a generic class::
+Các lớp generic ngầm kế thừa từ :class:`Generic`. Để tương thích với Python 3.11 trở xuống, bạn cũng có thể kế thừa rõ ràng từ
+:class:`Generic` để chỉ báo một lớp generic::
 
    from typing import TypeVar, Generic
 
@@ -570,8 +481,7 @@ with Python 3.11 and lower, it is also possible to inherit explicitly from
    class LoggedVar(Generic[T]):
        ...
 
-Generic classes have :meth:`~object.__class_getitem__` methods, meaning they
-can be parameterised at runtime (e.g. ``LoggedVar[int]`` below)::
+Các lớp generic có các phương thức :meth:`~object.__class_getitem__`, nghĩa là chúng có thể được tham số hóa tại runtime (ví dụ: ``LoggedVar[int]`` bên dưới)::
 
    from collections.abc import Iterable
 
@@ -579,8 +489,8 @@ can be parameterised at runtime (e.g. ``LoggedVar[int]`` below)::
        for var in vars:
            var.set(0)
 
-A generic type can have any number of type variables. All varieties of
-:class:`TypeVar` are permissible as parameters for a generic type::
+Một kiểu generic có thể có bất kỳ số lượng biến kiểu nào. Mọi dạng của
+:class:`TypeVar` đều được phép dùng làm tham số cho một kiểu generic::
 
    from typing import TypeVar, Generic, Sequence
 
@@ -594,8 +504,7 @@ A generic type can have any number of type variables. All varieties of
    class OldWeirdTrio(Generic[OldT, OldB, OldS]):
        ...
 
-Each type variable argument to :class:`Generic` must be distinct.
-This is thus invalid::
+Mỗi đối số biến kiểu của :class:`Generic` phải là duy nhất. Do đó, cách sau không hợp lệ::
 
    from typing import TypeVar, Generic
    ...
@@ -605,53 +514,51 @@ This is thus invalid::
 
    T = TypeVar('T')
 
-   class Pair(Generic[T, T]):   # INVALID
+   class Pair(Generic[T, T]):   # KHÔNG HỢP LỆ
        ...
 
-Generic classes can also inherit from other classes::
+Các lớp generic cũng có thể kế thừa từ các lớp khác::
 
    from collections.abc import Sized
 
    class LinkedList[T](Sized):
        ...
 
-When inheriting from generic classes, some type parameters could be fixed::
+Khi kế thừa từ các lớp generic, một số tham số kiểu có thể được cố định::
 
     from collections.abc import Mapping
 
     class MyDict[T](Mapping[str, T]):
         ...
 
-In this case ``MyDict`` has a single parameter, ``T``.
+Trong trường hợp này ``MyDict`` có một tham số duy nhất, ``T``.
 
-Using a generic class without specifying type parameters assumes
-:data:`Any` for each position. In the following example, ``MyIterable`` is
-not generic but implicitly inherits from ``Iterable[Any]``:
+Việc sử dụng một lớp generic mà không chỉ định các tham số kiểu sẽ giả định
+:data:`Any` cho mỗi vị trí. Trong ví dụ sau, ``MyIterable`` không phải là generic nhưng ngầm kế thừa từ ``Iterable[Any]``:
 
 .. testcode::
 
    from collections.abc import Iterable
 
-   class MyIterable(Iterable): # Same as Iterable[Any]
+   class MyIterable(Iterable): # Giống với Iterable[Any]
        ...
 
-User-defined generic type aliases are also supported. Examples::
+Bí danh kiểu generic do người dùng định nghĩa cũng được hỗ trợ. Ví dụ::
 
    from collections.abc import Iterable
 
    type Response[S] = Iterable[S] | int
 
-   # Return type here is same as Iterable[str] | int
+   # Kiểu trả về ở đây giống với Iterable[str] | int
    def response(query: str) -> Response[str]:
        ...
 
    type Vec[T] = Iterable[tuple[T, T]]
 
-   def inproduct[T: (int, float, complex)](v: Vec[T]) -> T: # Same as Iterable[tuple[T, T]]
+   def inproduct[T: (int, float, complex)](v: Vec[T]) -> T: # Giống với Iterable[tuple[T, T]]
        return sum(x*y for x, y in v)
 
-For backward compatibility, generic type aliases can also be created
-through a simple assignment::
+Để đảm bảo khả năng tương thích ngược, bạn cũng có thể tạo bí danh kiểu generic thông qua phép gán đơn giản::
 
    from collections.abc import Iterable
    from typing import TypeVar
@@ -663,23 +570,16 @@ through a simple assignment::
     :class:`Generic` no longer has a custom metaclass.
 
 .. versionchanged:: 3.12
-   Syntactic support for generics and type aliases is new in version 3.12.
-   Previously, generic classes had to explicitly inherit from :class:`Generic`
-   or contain a type variable in one of their bases.
+   Hỗ trợ cú pháp cho generic và bí danh kiểu là tính năng mới trong phiên bản 3.12. Trước đây, các lớp generic phải kế thừa tường minh từ :class:`Generic` hoặc chứa một biến kiểu trong một trong các lớp cơ sở của chúng.
 
-User-defined generics for parameter expressions are also supported via parameter
-specification variables in the form ``[**P]``.  The behavior is consistent
-with type variables' described above as parameter specification variables are
-treated by the :mod:`!typing` module as a specialized type variable.  The one exception
-to this is that a list of types can be used to substitute a :class:`ParamSpec`::
+Generic do người dùng định nghĩa cho các biểu thức tham số cũng được hỗ trợ thông qua các biến đặc tả tham số dưới dạng ``[**P]``. Hành vi này nhất quán với các biến kiểu được mô tả ở trên, vì các biến đặc tả tham số được mô-đun :mod:`!typing` xử lý như một biến kiểu chuyên biệt. Ngoại lệ duy nhất là có thể sử dụng một danh sách các kiểu để thay thế cho một :class:`ParamSpec`::
 
-   >>> class Z[T, **P]: ...  # T is a TypeVar; P is a ParamSpec
+   >>> class Z[T, **P]: ...  # T là TypeVar; P là ParamSpec
    ...
    >>> Z[int, [dict, float]]
    __main__.Z[int, [dict, float]]
 
-Classes generic over a :class:`ParamSpec` can also be created using explicit
-inheritance from :class:`Generic`. In this case, ``**`` is not used::
+Các lớp generic trên một :class:`ParamSpec` cũng có thể được tạo bằng cách kế thừa tường minh từ :class:`Generic`. Trong trường hợp này, ``**`` không được sử dụng::
 
    from typing import ParamSpec, Generic
 
@@ -688,11 +588,7 @@ inheritance from :class:`Generic`. In this case, ``**`` is not used::
    class Z(Generic[P]):
        ...
 
-Another difference between :class:`TypeVar` and :class:`ParamSpec` is that a
-generic with only one parameter specification variable will accept
-parameter lists in the forms ``X[[Type1, Type2, ...]]`` and also
-``X[Type1, Type2, ...]`` for aesthetic reasons.  Internally, the latter is converted
-to the former, so the following are equivalent::
+Một điểm khác biệt nữa giữa :class:`TypeVar` và :class:`ParamSpec` là generic chỉ có một biến đặc tả tham số sẽ chấp nhận các danh sách tham số ở dạng ``X[[Type1, Type2, ...]]`` và cả ``X[Type1, Type2, ...]`` vì lý do thẩm mỹ. Về nội bộ, dạng sau được chuyển đổi thành dạng trước, vì vậy các khai báo sau là tương đương::
 
    >>> class X[**P]: ...
    ...
@@ -701,29 +597,21 @@ to the former, so the following are equivalent::
    >>> X[[int, str]]
    __main__.X[[int, str]]
 
-Note that generics with :class:`ParamSpec` may not have correct
-``__parameters__`` after substitution in some cases because they
-are intended primarily for static type checking.
+Lưu ý rằng trong một số trường hợp, các generic có :class:`ParamSpec` có thể không có ``__parameters__`` chính xác sau khi thay thế, vì chúng chủ yếu được dùng để kiểm tra kiểu tĩnh.
 
 .. versionchanged:: 3.10
    :class:`Generic` can now be parameterized over parameter expressions.
-   See :class:`ParamSpec` and :pep:`612` for more details.
+   Xem :class:`ParamSpec` và :pep:`612` để biết thêm chi tiết.
 
-A user-defined generic class can have ABCs as base classes without a metaclass
-conflict. Generic metaclasses are not supported. The outcome of parameterizing
-generics is cached, and most types in the :mod:`!typing` module are :term:`hashable` and
-comparable for equality.
+Một lớp generic do người dùng định nghĩa có thể có các ABC làm lớp cơ sở mà không xảy ra xung đột metaclass. Không hỗ trợ generic metaclass. Kết quả của việc tham số hóa generic được lưu vào bộ nhớ đệm, và hầu hết các kiểu trong mô-đun :mod:`!typing` đều :term:`hashable` và có thể so sánh bằng nhau.
 
 
-The :data:`Any` type
-====================
+Kiểu :data:`Any`
+================
 
-A special kind of type is :data:`Any`. A static type checker will treat
-every type as assignable to :data:`Any` and :data:`Any` as assignable to
-every type.
+Một loại kiểu đặc biệt là :data:`Any`. Trình kiểm tra kiểu tĩnh sẽ coi mọi kiểu đều có thể gán cho :data:`Any` và :data:`Any` có thể gán cho mọi kiểu.
 
-This means that it is possible to perform any operation or method call on a
-value of type :data:`Any` and assign it to any variable::
+Điều này có nghĩa là bạn có thể thực hiện bất kỳ thao tác hoặc lời gọi phương thức nào trên một giá trị có kiểu :data:`Any` và gán giá trị đó cho bất kỳ biến nào::
 
    from typing import Any
 
@@ -735,76 +623,60 @@ value of type :data:`Any` and assign it to any variable::
    s = a           # OK
 
    def foo(item: Any) -> int:
-       # Passes type checking; 'item' could be any type,
-       # and that type might have a 'bar' method
+       # Vượt qua kiểm tra kiểu; 'item' có thể thuộc bất kỳ kiểu nào,
+       # và kiểu đó có thể có một phương thức 'bar'
        item.bar()
        ...
 
-Notice that no type checking is performed when assigning a value of type
-:data:`Any` to a more precise type. For example, the static type checker did
-not report an error when assigning ``a`` to ``s`` even though ``s`` was
-declared to be of type :class:`str` and receives an :class:`int` value at
-runtime!
+Lưu ý rằng không có kiểm tra kiểu nào được thực hiện khi gán một giá trị có kiểu
+Gán :data:`Any` cho một kiểu chính xác hơn. Ví dụ, trình kiểm tra kiểu tĩnh không báo lỗi khi gán ``a`` cho ``s``, mặc dù ``s`` được khai báo có kiểu :class:`str` và nhận một giá trị :class:`int` trong runtime!
 
-Furthermore, all functions without a return type or parameter types will
-implicitly default to using :data:`Any`::
+Hơn nữa, tất cả các hàm không có kiểu trả về hoặc kiểu tham số sẽ mặc định ngầm sử dụng :data:`Any`::
 
    def legacy_parser(text):
        ...
        return data
 
-   # A static type checker will treat the above
-   # as having the same signature as:
+   # trình kiểm tra kiểu tĩnh sẽ xem phần trên
+   # là có cùng chữ ký với:
    def legacy_parser(text: Any) -> Any:
        ...
        return data
 
-This behavior allows :data:`Any` to be used as an *escape hatch* when you
-need to mix dynamically and statically typed code.
+Hành vi này cho phép :data:`Any` được sử dụng như một *lối thoát* khi bạn cần kết hợp mã được định kiểu động và mã được định kiểu tĩnh.
 
-Contrast the behavior of :data:`Any` with the behavior of :class:`object`.
-Similar to :data:`Any`, every type is a subtype of :class:`object`. However,
-unlike :data:`Any`, the reverse is not true: :class:`object` is *not* a
-subtype of every other type.
+Hãy so sánh hành vi của :data:`Any` với hành vi của :class:`object`. Tương tự như :data:`Any`, mọi kiểu đều là kiểu con của :class:`object`. Tuy nhiên, không giống :data:`Any`, điều ngược lại không đúng: :class:`object` *không* phải là kiểu con của mọi kiểu khác.
 
-That means when the type of a value is :class:`object`, a type checker will
-reject almost all operations on it, and assigning it to a variable (or using
-it as a return value) of a more specialized type is a type error. For example::
+Điều đó có nghĩa là khi kiểu của một giá trị là :class:`object`, trình kiểm tra kiểu sẽ từ chối hầu hết mọi thao tác trên giá trị đó, và việc gán nó cho một biến (hoặc sử dụng nó làm giá trị trả về) có kiểu chuyên biệt hơn sẽ là một lỗi kiểu. Ví dụ::
 
    def hash_a(item: object) -> int:
-       # Fails type checking; an object does not have a 'magic' method.
+       # Không vượt qua kiểm tra kiểu; một object không có phương thức 'magic'.
        item.magic()
        ...
 
    def hash_b(item: Any) -> int:
-       # Passes type checking
+       # Vượt qua kiểm tra kiểu
        item.magic()
        ...
 
-   # Passes type checking, since ints and strs are subclasses of object
+   # Vượt qua kiểm tra kiểu, vì int và str là các lớp con của object
    hash_a(42)
    hash_a("foo")
 
-   # Passes type checking, since Any is assignable to all types
+   # Vượt qua kiểm tra kiểu, vì Any có thể được gán cho mọi kiểu
    hash_b(42)
    hash_b("foo")
 
-Use :class:`object` to indicate that a value could be any type in a typesafe
-manner. Use :data:`Any` to indicate that a value is dynamically typed.
+Sử dụng :class:`object` để chỉ ra theo cách an toàn kiểu rằng một giá trị có thể thuộc bất kỳ kiểu nào. Sử dụng :data:`Any` để chỉ ra rằng một giá trị có kiểu động.
 
 
-Nominal vs structural subtyping
-===============================
+Kiểu con danh nghĩa và kiểu con cấu trúc
+========================================
 
-Initially :pep:`484` defined the Python static type system as using
-*nominal subtyping*. This means that a class ``A`` is allowed where
-a class ``B`` is expected if and only if ``A`` is a subclass of ``B``.
+Ban đầu, :pep:`484` định nghĩa hệ thống kiểu tĩnh của Python là sử dụng *kiểu con danh nghĩa*. Điều này có nghĩa là một lớp ``A`` được phép sử dụng ở nơi dự kiến một lớp ``B`` khi và chỉ khi ``A`` là lớp con của ``B``.
 
-This requirement previously also applied to abstract base classes, such as
-:class:`~collections.abc.Iterable`. The problem with this approach is that a class had
-to be explicitly marked to support them, which is unpythonic and unlike
-what one would normally do in idiomatic dynamically typed Python code.
-For example, this conforms to :pep:`484`::
+Yêu cầu này trước đây cũng áp dụng cho các lớp cơ sở trừu tượng, chẳng hạn như
+:class:`~collections.abc.Iterable`. Vấn đề với cách tiếp cận này là một lớp phải được đánh dấu rõ ràng để hỗ trợ chúng, điều này không mang tính Pythonic và không giống cách người ta thường viết mã Python định kiểu động theo phong cách tự nhiên. Ví dụ, điều này tuân theo :pep:`484`::
 
    from collections.abc import Sized, Iterable, Iterator
 
@@ -813,108 +685,90 @@ For example, this conforms to :pep:`484`::
        def __len__(self) -> int: ...
        def __iter__(self) -> Iterator[int]: ...
 
-:pep:`544` solves this problem by allowing users to write
-the above code without explicit base classes in the class definition,
-allowing ``Bucket`` to be implicitly considered a subtype of both ``Sized``
-and ``Iterable[int]`` by static type checkers. This is known as
-*structural subtyping* (or static duck-typing)::
+:pep:`544` giải quyết vấn đề này bằng cách cho phép người dùng viết đoạn mã trên mà không cần các lớp cơ sở rõ ràng trong định nghĩa lớp, cho phép ``Bucket`` được các trình kiểm tra kiểu tĩnh ngầm coi là kiểu con của cả ``Sized`` và ``Iterable[int]``. Điều này được gọi là *structural subtyping* (hoặc duck typing tĩnh)::
 
    from collections.abc import Iterator, Iterable
 
-   class Bucket:  # Note: no base classes
+   class Bucket:  # Lưu ý: không có lớp cơ sở
        ...
        def __len__(self) -> int: ...
        def __iter__(self) -> Iterator[int]: ...
 
    def collect(items: Iterable[int]) -> int: ...
-   result = collect(Bucket())  # Passes type check
+   result = collect(Bucket())  # Đạt kiểm tra kiểu
 
-Moreover, by subclassing a special class :class:`Protocol`, a user
-can define new custom protocols to fully enjoy structural subtyping
-(see examples below).
+Ngoài ra, bằng cách kế thừa một lớp đặc biệt :class:`Protocol`, người dùng có thể định nghĩa các protocol tùy chỉnh mới để tận dụng đầy đủ structural subtyping (xem các ví dụ bên dưới).
 
-Module contents
+Nội dung mô-đun
 ===============
 
-The ``typing`` module defines the following classes, functions and decorators.
+Module ``typing`` định nghĩa các lớp, hàm và decorator sau đây.
 
-Special typing primitives
--------------------------
+Các primitive typing đặc biệt
+-----------------------------
 
-Special types
-"""""""""""""
+Các kiểu đặc biệt
+"""""""""""""""""
 
-These can be used as types in annotations. They do not support subscription
-using ``[]``.
+Có thể sử dụng chúng làm kiểu trong các annotation. Chúng không hỗ trợ phép subscription bằng ``[]``.
 
 .. data:: Any
 
-   Special type indicating an unconstrained type.
+   Kiểu đặc biệt biểu thị một kiểu không bị ràng buộc.
 
-   * Every type is assignable to :data:`Any`.
-   * :data:`Any` is assignable to every type.
+   * Mọi kiểu đều có thể gán cho :data:`Any`.
+   * :data:`Any` có thể gán cho mọi kiểu.
 
    .. versionchanged:: 3.11
       :data:`Any` can now be used as a base class. This can be useful for
-      avoiding type checker errors with classes that can duck type anywhere or
-      are highly dynamic.
+      tránh lỗi của trình kiểm tra kiểu với các lớp có thể duck type ở mọi nơi hoặc có tính động cao.
 
 .. data:: AnyStr
 
-   A :ref:`constrained type variable <typing-constrained-typevar>`.
+   Một :ref:`biến kiểu bị ràng buộc <typing-constrained-typevar>`.
 
-   Definition::
+   Định nghĩa::
 
       AnyStr = TypeVar('AnyStr', str, bytes)
 
-   ``AnyStr`` is meant to be used for functions that may accept :class:`str` or
-   :class:`bytes` arguments but cannot allow the two to mix.
+   ``AnyStr`` được dùng cho các hàm có thể chấp nhận :class:`str` hoặc
+   :class:`bytes` các đối số nhưng không thể cho phép trộn lẫn hai loại này.
 
-   For example::
+   Ví dụ::
 
       def concat(a: AnyStr, b: AnyStr) -> AnyStr:
           return a + b
 
-      concat("foo", "bar")    # OK, output has type 'str'
-      concat(b"foo", b"bar")  # OK, output has type 'bytes'
-      concat("foo", b"bar")   # Error, cannot mix str and bytes
+      concat("foo", "bar")    # OK, đầu ra có kiểu 'str'
+      concat(b"foo", b"bar")  # OK, đầu ra có kiểu 'bytes'
+      concat("foo", b"bar")   # Lỗi, không thể kết hợp str và bytes
 
-   Note that, despite its name, ``AnyStr`` has nothing to do with the
-   :class:`Any` type, nor does it mean "any string". In particular, ``AnyStr``
-   and ``str | bytes`` are different from each other and have different use
-   cases::
+   Lưu ý rằng, bất chấp tên gọi, ``AnyStr`` không liên quan gì đến
+   kiểu :class:`Any`, cũng không có nghĩa là "bất kỳ chuỗi nào". Cụ thể, ``AnyStr`` và ``str | bytes`` khác nhau và có các trường hợp sử dụng khác nhau::
 
-      # Invalid use of AnyStr:
-      # The type variable is used only once in the function signature,
-      # so cannot be "solved" by the type checker
+      # Sử dụng AnyStr không hợp lệ:
+      # Biến kiểu chỉ được sử dụng một lần trong chữ ký hàm,
+      # nên không thể được bộ kiểm tra kiểu "giải"
       def greet_bad(cond: bool) -> AnyStr:
           return "hi there!" if cond else b"greetings!"
 
-      # The better way of annotating this function:
+      # Cách tốt hơn để chú thích kiểu cho hàm này:
       def greet_proper(cond: bool) -> str | bytes:
           return "hi there!" if cond else b"greetings!"
 
    .. deprecated-removed:: 3.13 3.18
-      Deprecated in favor of the new :ref:`type parameter syntax <type-params>`.
-      Use ``class A[T: (str, bytes)]: ...`` instead of importing ``AnyStr``. See
-      :pep:`695` for more details.
+      Đã lỗi thời và được thay thế bằng cú pháp tham số :ref:`type mới <type-params>`. Sử dụng ``class A[T: (str, bytes)]: ...`` thay vì import ``AnyStr``. Xem
+      :pep:`695` để biết thêm chi tiết.
 
-      In Python 3.16, ``AnyStr`` will be removed from ``typing.__all__``, and
-      deprecation warnings will be emitted at runtime when it is accessed or
-      imported from ``typing``. ``AnyStr`` will be removed from ``typing``
-      in Python 3.18.
+      Trong Python 3.16, ``AnyStr`` sẽ bị xóa khỏi ``typing.__all__``, và cảnh báo ngừng sử dụng sẽ được phát ra tại runtime khi nó được truy cập hoặc import từ ``typing``. ``AnyStr`` sẽ bị xóa khỏi ``typing`` trong Python 3.18.
 
 .. data:: LiteralString
 
-   Special type that includes only literal strings.
+   Kiểu đặc biệt chỉ bao gồm các chuỗi literal.
 
-   Any string
-   literal is compatible with ``LiteralString``, as is another
-   ``LiteralString``. However, an object typed as just ``str`` is not.
-   A string created by composing ``LiteralString``-typed objects
-   is also acceptable as a ``LiteralString``.
+   Mọi chuỗi literal đều tương thích với ``LiteralString``, cũng như một ``LiteralString`` khác. Tuy nhiên, một đối tượng chỉ được định kiểu là ``str`` thì không. Một chuỗi được tạo bằng cách ghép các đối tượng có kiểu ``LiteralString`` cũng được chấp nhận là một ``LiteralString``.
 
-   Example:
+   Ví dụ:
 
    .. testcode::
 
@@ -925,70 +779,62 @@ using ``[]``.
           run_query("SELECT * FROM students")  # OK
           run_query(literal_string)  # OK
           run_query("SELECT * FROM " + literal_string)  # OK
-          run_query(arbitrary_string)  # type checker error
-          run_query(  # type checker error
+          run_query(arbitrary_string)  # lỗi trình kiểm tra kiểu
+          run_query(  # lỗi trình kiểm tra kiểu
               f"SELECT * FROM students WHERE name = {arbitrary_string}"
           )
 
-   ``LiteralString`` is useful for sensitive APIs where arbitrary user-generated
-   strings could generate problems. For example, the two cases above
-   that generate type checker errors could be vulnerable to an SQL
-   injection attack.
+   ``LiteralString`` hữu ích cho các API nhạy cảm, nơi các chuỗi tùy ý do người dùng tạo có thể gây ra sự cố. Ví dụ, hai trường hợp ở trên tạo ra lỗi trình kiểm tra kiểu có thể dễ bị tấn công SQL injection.
 
-   See :pep:`675` for more details.
+   Xem :pep:`675` để biết thêm chi tiết.
 
    .. versionadded:: 3.11
 
 .. data:: Never
           NoReturn
 
-   :data:`!Never` and :data:`!NoReturn` represent the
-   `bottom type <https://en.wikipedia.org/wiki/Bottom_type>`_,
-   a type that has no members.
+   :data:`!Never` và :data:`!NoReturn` đại diện cho `kiểu bottom <https://en.wikipedia.org/wiki/Bottom_type>`_, một kiểu không có thành viên nào.
 
-   They can be used to indicate that a function never returns,
-   such as :func:`sys.exit`::
+   Chúng có thể được dùng để chỉ ra rằng một hàm không bao giờ trả về, chẳng hạn như :func:`sys.exit`::
 
-      from typing import Never  # or NoReturn
+      from typing import Never  # hoặc NoReturn
 
       def stop() -> Never:
           raise RuntimeError('no way')
 
-   Or to define a function that should never be
-   called, as there are no valid arguments, such as
+   Hoặc để định nghĩa một hàm không nên được gọi, vì không có đối số hợp lệ nào, chẳng hạn như
    :func:`assert_never`::
 
-      from typing import Never  # or NoReturn
+      from typing import Never  # hoặc NoReturn
 
       def never_call_me(arg: Never) -> None:
           pass
 
       def int_or_str(arg: int | str) -> None:
-          never_call_me(arg)  # type checker error
+          never_call_me(arg)  # lỗi trình kiểm tra kiểu
           match arg:
               case int():
                   print("It's an int")
               case str():
                   print("It's a str")
               case _:
-                  never_call_me(arg)  # OK, arg is of type Never (or NoReturn)
+                  never_call_me(arg)  # OK, arg có kiểu Never (hoặc NoReturn)
 
-   :data:`!Never` and :data:`!NoReturn` have the same meaning in the type system
-   and static type checkers treat both equivalently.
+   :data:`!Never` và :data:`!NoReturn` có cùng ý nghĩa trong hệ thống kiểu, và các trình kiểm tra kiểu tĩnh xử lý cả hai tương đương nhau.
 
    .. versionadded:: 3.6.2
 
-      Added :data:`NoReturn`.
+      Đã thêm :data:`NoReturn`.
 
    .. versionadded:: 3.11
 
-      Added :data:`Never`.
+      Đã thêm :data:`Never`.
 
 .. data:: Self
 
-   Special type to represent the current enclosed class.
+   Kiểu đặc biệt để biểu thị class bao quanh hiện tại.
 
-   For example::
+   Ví dụ::
 
       from typing import Self, reveal_type
 
@@ -999,11 +845,10 @@ using ``[]``.
 
       class SubclassOfFoo(Foo): pass
 
-      reveal_type(Foo().return_self())  # Revealed type is "Foo"
-      reveal_type(SubclassOfFoo().return_self())  # Revealed type is "SubclassOfFoo"
+      reveal_type(Foo().return_self())  # Kiểu được xác định là "Foo"
+      reveal_type(SubclassOfFoo().return_self())  # Kiểu được xác định là "SubclassOfFoo"
 
-   This annotation is semantically equivalent to the following,
-   albeit in a more succinct fashion::
+   Chú thích này tương đương về mặt ngữ nghĩa với nội dung sau, mặc dù ngắn gọn hơn::
 
       from typing import TypeVar
 
@@ -1014,46 +859,37 @@ using ``[]``.
               ...
               return self
 
-   In general, if something returns ``self``, as in the above examples, you
-   should use ``Self`` as the return annotation. If ``Foo.return_self`` was
-   annotated as returning ``"Foo"``, then the type checker would infer the
-   object returned from ``SubclassOfFoo.return_self`` as being of type ``Foo``
-   rather than ``SubclassOfFoo``.
+   Nói chung, nếu một thứ trả về ``self``, như trong các ví dụ trên, bạn nên dùng ``Self`` làm chú thích kiểu trả về. Nếu ``Foo.return_self`` được chú thích là trả về ``"Foo"``, trình kiểm tra kiểu sẽ suy ra đối tượng được trả về từ ``SubclassOfFoo.return_self`` có kiểu ``Foo`` thay vì ``SubclassOfFoo``.
 
-   Other common use cases include:
+   Các trường hợp sử dụng phổ biến khác bao gồm:
 
-   - :class:`classmethod`\s that are used as alternative constructors and return instances
-     of the ``cls`` parameter.
-   - Annotating an :meth:`~object.__enter__` method which returns self.
+   - Các :class:`classmethod`\s được dùng làm hàm khởi tạo thay thế và trả về các thực thể của tham số ``cls``.
+   - Chú thích một phương thức :meth:`~object.__enter__` trả về chính nó.
 
-   You should not use ``Self`` as the return annotation if the method is not
-   guaranteed to return an instance of a subclass when the class is
-   subclassed::
+   Bạn không nên dùng ``Self`` làm chú thích kiểu trả về nếu phương thức không được đảm bảo sẽ trả về một thực thể của lớp con khi lớp được phân lớp::
 
       class Eggs:
-          # Self would be an incorrect return annotation here,
-          # as the object returned is always an instance of Eggs,
-          # even in subclasses
+          # Self sẽ là chú thích kiểu trả về không chính xác ở đây,
+          # vì đối tượng được trả về luôn là một thể hiện của Eggs,
+          # ngay cả trong các lớp con
           def returns_eggs(self) -> "Eggs":
               return Eggs()
 
-   See :pep:`673` for more details.
+   Xem :pep:`673` để biết thêm chi tiết.
 
    .. versionadded:: 3.11
 
 .. data:: TypeAlias
 
-   Special annotation for explicitly declaring a :ref:`type alias <type-aliases>`.
+   Chú thích đặc biệt để khai báo rõ ràng một :ref:`bí danh kiểu <type-aliases>`.
 
-   For example::
+   Ví dụ::
 
       from typing import TypeAlias
 
       Factors: TypeAlias = list[int]
 
-   ``TypeAlias`` is particularly useful on older Python versions for annotating
-   aliases that make use of forward references, as it can be hard for type
-   checkers to distinguish these from normal variable assignments:
+   ``TypeAlias`` đặc biệt hữu ích trên các phiên bản Python cũ để chú thích những bí danh sử dụng tham chiếu chuyển tiếp, vì các trình kiểm tra kiểu có thể khó phân biệt chúng với các phép gán biến thông thường:
 
    .. testcode::
 
@@ -1061,45 +897,38 @@ using ``[]``.
 
       T = TypeVar("T")
 
-      # "Box" does not exist yet,
-      # so we have to use quotes for the forward reference on Python <3.12.
-      # Using ``TypeAlias`` tells the type checker that this is a type alias declaration,
-      # not a variable assignment to a string.
+      # "Box" vẫn chưa tồn tại,
+      # vì vậy chúng ta phải dùng dấu ngoặc kép cho tham chiếu chuyển tiếp trên Python <3.12.
+      # Việc sử dụng ``TypeAlias`` cho trình kiểm tra kiểu biết rằng đây là một khai báo bí danh kiểu,
+      # chứ không phải phép gán một biến cho một chuỗi.
       BoxOfStrings: TypeAlias = "Box[str]"
 
       class Box(Generic[T]):
           @classmethod
           def make_box_of_strings(cls) -> BoxOfStrings: ...
 
-   See :pep:`613` for more details.
+   Xem :pep:`613` để biết thêm chi tiết.
 
    .. versionadded:: 3.10
 
    .. deprecated:: 3.12
       :data:`TypeAlias` is deprecated in favor of the :keyword:`type` statement,
-      which creates instances of :class:`TypeAliasType`
-      and which natively supports forward references.
-      Note that while :data:`TypeAlias` and :class:`TypeAliasType` serve
-      similar purposes and have similar names, they are distinct and the
-      latter is not the type of the former.
-      Removal of :data:`TypeAlias` is not currently planned, but users
-      are encouraged to migrate to :keyword:`type` statements.
+      tạo các instance của :class:`TypeAliasType` và hỗ trợ tham chiếu chuyển tiếp một cách tự nhiên. Lưu ý rằng mặc dù :data:`TypeAlias` và :class:`TypeAliasType` phục vụ các mục đích tương tự và có tên tương tự, chúng là các khái niệm riêng biệt, và cái sau không phải là kiểu của cái trước. Hiện chưa có kế hoạch loại bỏ :data:`TypeAlias`, nhưng người dùng được khuyến khích chuyển sang các câu lệnh :keyword:`type`.
 
-Special forms
-"""""""""""""
+Các dạng đặc biệt
+"""""""""""""""""
 
-These can be used as types in annotations. They all support subscription using
-``[]``, but each has a unique syntax.
+Các kiểu này có thể được dùng trong chú thích kiểu. Tất cả đều hỗ trợ cú pháp subscription bằng ``[]``, nhưng mỗi kiểu có cú pháp riêng.
 
 .. class:: Union
 
-   Union type; ``Union[X, Y]`` is equivalent to ``X | Y`` and means either X or Y.
+   Kiểu hợp (Union); ``Union[X, Y]`` tương đương với ``X | Y`` và có nghĩa là X hoặc Y.
 
-   To define a union, use e.g. ``Union[int, str]`` or the shorthand ``int | str``. Using that shorthand is recommended. Details:
+   Để định nghĩa một kiểu hợp, hãy dùng chẳng hạn ``Union[int, str]`` hoặc dạng viết tắt ``int | str``. Khuyến nghị sử dụng dạng viết tắt này. Chi tiết:
 
-   * The arguments must be types and there must be at least one.
+   * Các đối số phải là kiểu và phải có ít nhất một đối số.
 
-   * Unions of unions are flattened, e.g.::
+   * Các kiểu hợp của kiểu hợp sẽ được làm phẳng, chẳng hạn:::
 
        Union[Union[int, str], float] == Union[int, str, float]
 
@@ -1109,96 +938,75 @@ These can be used as types in annotations. They all support subscription using
        type A = Union[int, str]
        Union[A, float] != Union[int, str, float]
 
-   * Unions of a single argument vanish, e.g.::
+   * Các kiểu hợp chỉ có một đối số sẽ biến mất, chẳng hạn:::
 
-       Union[int] == int  # The constructor actually returns int
+       Union[int] == int  # Hàm khởi tạo thực sự trả về int
 
-   * Redundant arguments are skipped, e.g.::
+   * Các đối số dư thừa được bỏ qua, ví dụ:::
 
        Union[int, str, int] == Union[int, str] == int | str
 
-   * When comparing unions, the argument order is ignored, e.g.::
+   * Khi so sánh các union, thứ tự đối số bị bỏ qua, ví dụ:::
 
        Union[int, str] == Union[str, int]
 
-   * You cannot subclass or instantiate a ``Union``.
+   * Bạn không thể tạo lớp con hoặc khởi tạo một ``Union``.
 
-   * You cannot write ``Union[X][Y]``.
+   * Bạn không thể viết ``Union[X][Y]``.
 
    .. versionchanged:: 3.7
-      Don't remove explicit subclasses from unions at runtime.
+      Đừng loại bỏ các lớp con tường minh khỏi các union trong runtime.
 
    .. versionchanged:: 3.10
-      Unions can now be written as ``X | Y``. See
-      :ref:`union type expressions<types-union>`.
+      Giờ đây, các union có thể được viết dưới dạng ``X | Y``. Xem
+      :ref:`các biểu thức kiểu union <types-union>`.
 
    .. versionchanged:: 3.14
       :class:`types.UnionType` is now an alias for :class:`Union`, and both
-      ``Union[int, str]`` and ``int | str`` create instances of the same class.
-      To check whether an object is a ``Union`` at runtime, use
-      ``isinstance(obj, Union)``. For compatibility with earlier versions of
-      Python, use
-      ``get_origin(obj) is typing.Union or get_origin(obj) is types.UnionType``.
+      ``Union[int, str]`` và ``int | str`` tạo các instance của cùng một class. Để kiểm tra tại runtime xem một object có phải là ``Union`` hay không, hãy sử dụng ``isinstance(obj, Union)``. Để tương thích với các phiên bản Python trước đây, hãy sử dụng ``get_origin(obj) is typing.Union or get_origin(obj) is types.UnionType``.
 
 .. data:: Optional
 
-   ``Optional[X]`` is equivalent to ``X | None`` (or ``Union[X, None]``).
+   ``Optional[X]`` tương đương với ``X | None`` (hoặc ``Union[X, None]``).
 
-   Note that this is not the same concept as an optional argument,
-   which is one that has a default.  An optional argument with a
-   default does not require the ``Optional`` qualifier on its type
-   annotation just because it is optional. For example::
+   Lưu ý rằng đây không phải là cùng một khái niệm với một đối số tùy chọn, tức là đối số có giá trị mặc định. Một đối số tùy chọn có giá trị mặc định không cần qualifier ``Optional`` trong type annotation chỉ vì nó là tùy chọn. Ví dụ:::
 
       def foo(arg: int = 0) -> None:
           ...
 
-   On the other hand, if an explicit value of ``None`` is allowed, the
-   use of ``Optional`` is appropriate, whether the argument is optional
-   or not. For example::
+   Mặt khác, nếu cho phép giá trị ``None`` được chỉ định rõ ràng, thì việc sử dụng ``Optional`` là phù hợp, bất kể đối số đó có phải là tùy chọn hay không. Ví dụ:::
 
       def foo(arg: Optional[int] = None) -> None:
           ...
 
    .. versionchanged:: 3.10
-      Optional can now be written as ``X | None``. See
-      :ref:`union type expressions<types-union>`.
+      Giờ đây, Optional có thể được viết là ``X | None``. Xem
+      :ref:`các biểu thức kiểu union <types-union>`.
 
 .. data:: Concatenate
 
-   Special form for annotating higher-order functions.
+   Special form dùng để chú thích các hàm higher-order.
 
    .. index:: single: ...; ellipsis literal
 
-   ``Concatenate`` can be used in conjunction with :ref:`Callable <annotating-callables>` and
-   :class:`ParamSpec` to annotate a higher-order callable which adds, removes,
-   or transforms parameters of another
-   callable.  Usage is in the form
-   ``Concatenate[Arg1Type, Arg2Type, ..., ParamSpecVariable]``. ``Concatenate``
-   is valid when used in :ref:`Callable <annotating-callables>` type hints
-   and when instantiating user-defined generic classes with :class:`ParamSpec` parameters.
-   The last parameter to ``Concatenate`` must be a :class:`ParamSpec` or
-   ellipsis (``...``).
+   ``Concatenate`` có thể được sử dụng cùng với :ref:`Callable <annotating-callables>` và
+   :class:`ParamSpec` để chú thích một higher-order callable bổ sung, loại bỏ hoặc biến đổi các tham số của một callable khác. Cách sử dụng có dạng ``Concatenate[Arg1Type, Arg2Type, ..., ParamSpecVariable]``. ``Concatenate`` hợp lệ khi được sử dụng trong các type hint :ref:`Callable <annotating-callables>` và khi khởi tạo các generic class do người dùng định nghĩa với các tham số :class:`ParamSpec`. Tham số cuối cùng của ``Concatenate`` phải là :class:`ParamSpec` hoặc dấu ba chấm (``...``).
 
-   For example, to annotate a decorator ``with_lock`` which provides a
-   :class:`threading.Lock` to the decorated function,  ``Concatenate`` can be
-   used to indicate that ``with_lock`` expects a callable which takes in a
-   ``Lock`` as the first argument, and returns a callable with a different type
-   signature.  In this case, the :class:`ParamSpec` indicates that the returned
-   callable's parameter types are dependent on the parameter types of the
-   callable being passed in::
+   Ví dụ, để chú thích một decorator ``with_lock`` cung cấp một
+   :class:`threading.Lock` cho hàm được decorator, có thể sử dụng ``Concatenate`` để cho biết rằng ``with_lock`` mong đợi một callable nhận một ``Lock`` làm đối số đầu tiên và trả về một callable có chữ ký kiểu khác. Trong trường hợp này, :class:`ParamSpec` cho biết rằng các kiểu tham số của callable được trả về phụ thuộc vào các kiểu tham số của callable được truyền vào::
 
       from collections.abc import Callable
       from threading import Lock
       from typing import Concatenate
 
-      # Use this lock to ensure that only one thread is executing a function
-      # at any time.
+      # Sử dụng khóa này để đảm bảo rằng chỉ một thread thực thi một hàm
+      # tại một thời điểm.
       my_lock = Lock()
 
       def with_lock[**P, R](f: Callable[Concatenate[Lock, P], R]) -> Callable[P, R]:
           '''A type-safe decorator which provides a lock.'''
           def inner(*args: P.args, **kwargs: P.kwargs) -> R:
-              # Provide the lock as the first argument.
+              # Truyền khóa làm đối số đầu tiên.
               return f(my_lock, *args, **kwargs)
           return inner
 
@@ -1208,47 +1016,42 @@ These can be used as types in annotations. They all support subscription using
           with lock:
               return sum(numbers)
 
-      # We don't need to pass in the lock ourselves thanks to the decorator.
+      # Nhờ decorator, chúng ta không cần tự truyền lock vào.
       sum_threadsafe([1.1, 2.2, 3.3])
 
    .. versionadded:: 3.10
 
    .. seealso::
 
-      * :pep:`612` -- Parameter Specification Variables (the PEP which introduced
-        ``ParamSpec`` and ``Concatenate``)
+      * :pep:`612` -- Biến đặc tả tham số (PEP đã giới thiệu ``ParamSpec`` và ``Concatenate``)
       * :class:`ParamSpec`
       * :ref:`annotating-callables`
 
 .. data:: Literal
 
-   Special typing form to define "literal types".
+   Dạng typing đặc biệt để định nghĩa "literal types".
 
-   ``Literal`` can be used to indicate to type checkers that the
-   annotated object has a value equivalent to one of the
-   provided literals.
+   ``Literal`` có thể được dùng để cho các trình kiểm tra kiểu biết rằng đối tượng được chú thích có giá trị tương đương với một trong các literal được cung cấp.
 
-   For example::
+   Ví dụ::
 
-      def validate_simple(data: Any) -> Literal[True]:  # always returns True
+      def validate_simple(data: Any) -> Literal[True]:  # luôn trả về True
           ...
 
       type Mode = Literal['r', 'rb', 'w', 'wb']
       def open_helper(file: str, mode: Mode) -> str:
           ...
 
-      open_helper('/some/path', 'r')      # Passes type check
-      open_helper('/other/path', 'typo')  # Error in type checker
+      open_helper('/some/path', 'r')      # Vượt qua kiểm tra kiểu
+      open_helper('/other/path', 'typo')  # Lỗi trong trình kiểm tra kiểu
 
-   ``Literal[...]`` cannot be subclassed. At runtime, an arbitrary value
-   is allowed as type argument to ``Literal[...]``, but type checkers may
-   impose restrictions. See :pep:`586` for more details about literal types.
+   ``Literal[...]`` không thể được phân lớp. Trong runtime, một giá trị bất kỳ được phép làm đối số kiểu cho ``Literal[...]``, nhưng trình kiểm tra kiểu có thể áp đặt các hạn chế. Xem :pep:`586` để biết thêm chi tiết về các kiểu literal.
 
-   Additional details:
+   Chi tiết bổ sung:
 
-   * The arguments must be literal values and there must be at least one.
+   * Các đối số phải là giá trị literal và phải có ít nhất một đối số.
 
-   * Nested ``Literal`` types are flattened, e.g.::
+   * Các kiểu ``Literal`` lồng nhau được làm phẳng, ví dụ:::
 
       assert Literal[Literal[1, 2], 3] == Literal[1, 2, 3]
 
@@ -1258,153 +1061,125 @@ These can be used as types in annotations. They all support subscription using
       type A = Literal[1, 2]
       assert Literal[A, 3] != Literal[1, 2, 3]
 
-   * Redundant arguments are skipped, e.g.::
+   * Các đối số dư thừa được bỏ qua, ví dụ:::
 
       assert Literal[1, 2, 1] == Literal[1, 2]
 
-   * When comparing literals, the argument order is ignored, e.g.::
+   * Khi so sánh các literal, thứ tự của các đối số bị bỏ qua, ví dụ:::
 
       assert Literal[1, 2] == Literal[2, 1]
 
-   * You cannot subclass or instantiate a ``Literal``.
+   * Bạn không thể tạo lớp con hoặc khởi tạo một ``Literal``.
 
-   * You cannot write ``Literal[X][Y]``.
+   * Bạn không thể viết ``Literal[X][Y]``.
 
    .. versionadded:: 3.8
 
    .. versionchanged:: 3.9.1
-      ``Literal`` now de-duplicates parameters.  Equality comparisons of
-      ``Literal`` objects are no longer order dependent. ``Literal`` objects
-      will now raise a :exc:`TypeError` exception during equality comparisons
-      if one of their parameters are not :term:`hashable`.
+      ``Literal`` hiện đã loại bỏ các tham số trùng lặp. Các phép so sánh bằng của các đối tượng ``Literal`` không còn phụ thuộc vào thứ tự. Các đối tượng ``Literal`` giờ đây sẽ phát sinh ngoại lệ :exc:`TypeError` trong quá trình so sánh bằng nếu một trong các tham số của chúng không phải là :term:`hashable`.
 
 .. data:: ClassVar
 
-   Special type construct to mark class variables.
+   Cấu trúc kiểu đặc biệt để đánh dấu các biến lớp.
 
-   As introduced in :pep:`526`, a variable annotation wrapped in ClassVar
-   indicates that a given attribute is intended to be used as a class variable
-   and should not be set on instances of that class. Usage::
+   Như đã giới thiệu trong :pep:`526`, một chú thích biến được bọc trong ClassVar cho biết một thuộc tính nhất định được thiết kế để dùng làm biến lớp và không nên được thiết lập trên các instance của lớp đó. Cách sử dụng::
 
       class Starship:
-          stats: ClassVar[dict[str, int]] = {} # class variable
-          damage: int = 10                     # instance variable
+          stats: ClassVar[dict[str, int]] = {} # biến lớp
+          damage: int = 10                     # biến instance
 
-   :data:`ClassVar` accepts only types and cannot be further subscribed.
+   :data:`ClassVar` chỉ chấp nhận các kiểu và không thể được tham số hóa thêm.
 
-   :data:`ClassVar` is not a class itself, and cannot
-   be used with :func:`isinstance` or :func:`issubclass`.
-   :data:`ClassVar` does not change Python runtime behavior, but
-   it can be used by static type checkers. For example, a type checker
-   might flag the following code as an error::
+   :data:`ClassVar` bản thân không phải là một lớp và không thể được sử dụng với :func:`isinstance` hoặc :func:`issubclass`.
+   :data:`ClassVar` không thay đổi hành vi runtime của Python, nhưng có thể được các trình kiểm tra kiểu tĩnh sử dụng. Ví dụ: một trình kiểm tra kiểu có thể đánh dấu đoạn mã sau là lỗi::
 
       enterprise_d = Starship(3000)
-      enterprise_d.stats = {} # Error, setting class variable on instance
-      Starship.stats = {}     # This is OK
+      enterprise_d.stats = {} # Lỗi, đang đặt biến lớp trên thực thể
+      Starship.stats = {}     # Điều này hợp lệ
 
    .. versionadded:: 3.5.3
 
    .. versionchanged:: 3.13
 
-      :data:`ClassVar` can now be nested in :data:`Final` and vice versa.
+      Giờ đây, :data:`ClassVar` có thể được lồng trong :data:`Final` và ngược lại.
 
 .. data:: Final
 
-   Special typing construct to indicate final names to type checkers.
+   Cấu trúc typing đặc biệt để chỉ báo các tên final cho trình kiểm tra kiểu.
 
-   Final names cannot be reassigned in any scope. Final names declared in class
-   scopes cannot be overridden in subclasses.
+   Tên final không thể được gán lại trong bất kỳ phạm vi nào. Tên final được khai báo trong phạm vi lớp không thể bị ghi đè trong các lớp con.
 
-   For example::
+   Ví dụ::
 
       MAX_SIZE: Final = 9000
-      MAX_SIZE += 1  # Error reported by type checker
+      MAX_SIZE += 1  # Lỗi do type checker báo cáo
 
       class Connection:
           TIMEOUT: Final[int] = 10
 
       class FastConnector(Connection):
-          TIMEOUT = 1  # Error reported by type checker
+          TIMEOUT = 1  # Lỗi do type checker báo cáo
 
-   There is no runtime checking of these properties. See :pep:`591` for
-   more details.
+   Các thuộc tính này không được kiểm tra tại runtime. Xem :pep:`591` để biết thêm chi tiết.
 
    .. versionadded:: 3.8
 
    .. versionchanged:: 3.13
 
-      :data:`Final` can now be nested in :data:`ClassVar` and vice versa.
+      :data:`Final` giờ đây có thể được lồng trong :data:`ClassVar` và ngược lại.
 
 .. data:: Required
 
-   Special typing construct to mark a :class:`TypedDict` key as required.
+   Cấu trúc typing đặc biệt để đánh dấu một khóa :class:`TypedDict` là bắt buộc.
 
-   This is mainly useful for ``total=False`` TypedDicts. See :class:`TypedDict`
-   and :pep:`655` for more details.
+   Điều này chủ yếu hữu ích cho ``total=False`` TypedDict. Xem :class:`TypedDict` và :pep:`655` để biết thêm chi tiết.
 
    .. versionadded:: 3.11
 
 .. data:: NotRequired
 
-   Special typing construct to mark a :class:`TypedDict` key as potentially
-   missing.
+   Cấu trúc typing đặc biệt để đánh dấu một :class:`TypedDict` key có thể bị thiếu.
 
-   See :class:`TypedDict` and :pep:`655` for more details.
+   Xem :class:`TypedDict` và :pep:`655` để biết thêm chi tiết.
 
    .. versionadded:: 3.11
 
 .. data:: ReadOnly
 
-   A special typing construct to mark an item of a :class:`TypedDict` as read-only.
+   Cấu trúc typing đặc biệt để đánh dấu một phần tử của :class:`TypedDict` là chỉ đọc.
 
-   For example::
+   Ví dụ::
 
       class Movie(TypedDict):
          title: ReadOnly[str]
          year: int
 
       def mutate_movie(m: Movie) -> None:
-         m["year"] = 1999  # allowed
-         m["title"] = "The Matrix"  # type checker error
+         m["year"] = 1999  # được phép
+         m["title"] = "The Matrix"  # lỗi trình kiểm tra kiểu
 
-   There is no runtime checking for this property.
+   Không có việc kiểm tra thuộc tính này khi runtime.
 
-   See :class:`TypedDict` and :pep:`705` for more details.
+   Xem :class:`TypedDict` và :pep:`705` để biết thêm chi tiết.
 
    .. versionadded:: 3.13
 
 .. data:: Annotated
 
-   Special typing form to add context-specific metadata to an annotation.
+   Dạng typing đặc biệt để thêm metadata theo ngữ cảnh vào một annotation.
 
-   Add metadata ``x`` to a given type ``T`` by using the annotation
-   ``Annotated[T, x]``. Metadata added using ``Annotated`` can be used by
-   static analysis tools or at runtime. At runtime, the metadata is stored
-   in a :attr:`!__metadata__` attribute.
+   Thêm metadata ``x`` vào một type ``T`` nhất định bằng cách sử dụng annotation ``Annotated[T, x]``. Metadata được thêm bằng ``Annotated`` có thể được các công cụ static analysis hoặc runtime sử dụng. Khi runtime, metadata được lưu trong thuộc tính :attr:`!__metadata__`.
 
-   If a library or tool encounters an annotation ``Annotated[T, x]`` and has
-   no special logic for the metadata, it should ignore the metadata and simply
-   treat the annotation as ``T``. As such, ``Annotated`` can be useful for code
-   that wants to use annotations for purposes outside Python's static typing
-   system.
+   Nếu một thư viện hoặc công cụ gặp annotation ``Annotated[T, x]`` nhưng không có logic đặc biệt để xử lý metadata, thư viện hoặc công cụ đó nên bỏ qua metadata và chỉ coi annotation là ``T``. Vì vậy, ``Annotated`` có thể hữu ích cho mã muốn sử dụng annotation vào những mục đích nằm ngoài hệ thống static typing của Python.
 
-   Using ``Annotated[T, x]`` as an annotation still allows for static
-   typechecking of ``T``, as type checkers will simply ignore the metadata ``x``.
-   In this way, ``Annotated`` differs from the
-   :deco:`no_type_check` decorator, which can also be used for
-   adding annotations outside the scope of the typing system, but
-   completely disables typechecking for a function or class.
+   Việc sử dụng ``Annotated[T, x]`` làm annotation vẫn cho phép kiểm tra kiểu tĩnh đối với ``T``, vì các trình kiểm tra kiểu sẽ chỉ bỏ qua metadata ``x``. Theo cách này, ``Annotated`` khác với
+   decorator :deco:`no_type_check`, cũng có thể được dùng để thêm annotation bên ngoài phạm vi của hệ thống typing, nhưng sẽ vô hiệu hóa hoàn toàn việc kiểm tra kiểu đối với một hàm hoặc lớp.
 
-   The responsibility of how to interpret the metadata
-   lies with the tool or library encountering an
-   ``Annotated`` annotation. A tool or library encountering an ``Annotated`` type
-   can scan through the metadata elements to determine if they are of interest
-   (e.g., using :func:`isinstance`).
+   Trách nhiệm diễn giải metadata thuộc về công cụ hoặc thư viện gặp chú thích ``Annotated``. Công cụ hoặc thư viện gặp kiểu ``Annotated`` có thể quét qua các phần tử metadata để xác định xem chúng có đáng quan tâm hay không (ví dụ: sử dụng :func:`isinstance`).
 
    .. describe:: Annotated[<type>, <metadata>]
 
-   Here is an example of how you might use ``Annotated`` to add metadata to
-   type annotations if you were doing range analysis:
+   Dưới đây là ví dụ về cách bạn có thể sử dụng ``Annotated`` để thêm metadata vào các chú thích kiểu nếu đang thực hiện phân tích phạm vi:
 
    .. testcode::
 
@@ -1416,9 +1191,7 @@ These can be used as types in annotations. They all support subscription using
       T1 = Annotated[int, ValueRange(-10, 5)]
       T2 = Annotated[T1, ValueRange(-20, 3)]
 
-   The first argument to ``Annotated`` must be a valid type. Multiple metadata
-   elements can be supplied as ``Annotated`` supports variadic arguments. The
-   order of the metadata elements is preserved and matters for equality checks::
+   Đối số đầu tiên của ``Annotated`` phải là một kiểu hợp lệ. Có thể cung cấp nhiều phần tử metadata vì ``Annotated`` hỗ trợ các đối số biến thiên. Thứ tự của các phần tử metadata được giữ nguyên và có ý nghĩa khi kiểm tra tính bằng nhau::
 
       @dataclass
       class ctype:
@@ -1427,34 +1200,30 @@ These can be used as types in annotations. They all support subscription using
       a1 = Annotated[int, ValueRange(3, 10), ctype("char")]
       a2 = Annotated[int, ctype("char"), ValueRange(3, 10)]
 
-      assert a1 != a2  # Order matters
+      assert a1 != a2  # Thứ tự có ý nghĩa
 
-   It is up to the tool consuming the annotations to decide whether the
-   client is allowed to add multiple metadata elements to one annotation and how to
-   merge those annotations.
+   Công cụ sử dụng các chú thích sẽ quyết định liệu client có được phép thêm nhiều phần tử metadata vào một chú thích hay không, cũng như cách hợp nhất các chú thích đó.
 
-   Nested ``Annotated`` types are flattened. The order of the metadata elements
-   starts with the innermost annotation::
+   Các kiểu ``Annotated`` lồng nhau được làm phẳng. Thứ tự của các phần tử metadata bắt đầu từ chú thích bên trong cùng::
 
       assert Annotated[Annotated[int, ValueRange(3, 10)], ctype("char")] == Annotated[
           int, ValueRange(3, 10), ctype("char")
       ]
 
-   However, this does not apply to ``Annotated`` types referenced through a type
-   alias, to avoid forcing evaluation of the underlying :class:`TypeAliasType`::
+   Tuy nhiên, điều này không áp dụng cho các kiểu ``Annotated`` được tham chiếu thông qua bí danh kiểu, nhằm tránh buộc phải đánh giá :class:`TypeAliasType` bên dưới::
 
       type From3To10[T] = Annotated[T, ValueRange(3, 10)]
       assert Annotated[From3To10[int], ctype("char")] != Annotated[
          int, ValueRange(3, 10), ctype("char")
       ]
 
-   Duplicated metadata elements are not removed::
+   Các phần tử metadata trùng lặp không bị loại bỏ::
 
       assert Annotated[int, ValueRange(3, 10)] != Annotated[
           int, ValueRange(3, 10), ValueRange(3, 10)
       ]
 
-   ``Annotated`` can be used with nested and generic aliases:
+   ``Annotated`` có thể được sử dụng với các alias lồng nhau và alias generic:
 
      .. testcode::
 
@@ -1464,19 +1233,17 @@ These can be used as types in annotations. They all support subscription using
 
         type Vec[T] = Annotated[list[tuple[T, T]], MaxLen(10)]
 
-        # When used in a type annotation, a type checker will treat "V" the same as
+        # Khi được sử dụng trong chú thích kiểu, trình kiểm tra kiểu sẽ coi "V" giống như
         # ``Annotated[list[tuple[int, int]], MaxLen(10)]``:
         type V = Vec[int]
 
-   ``Annotated`` cannot be used with an unpacked :class:`TypeVarTuple`::
+   Không thể sử dụng ``Annotated`` với :class:`TypeVarTuple` đã được unpack::
 
-        type Variadic[*Ts] = Annotated[*Ts, Ann1] = Annotated[T1, T2, T3, ..., Ann1]  # NOT valid
+        type Variadic[*Ts] = Annotated[*Ts, Ann1] = Annotated[T1, T2, T3, ..., Ann1]  # KHÔNG hợp lệ
 
-   where ``T1``, ``T2``, ... are :class:`TypeVars <TypeVar>`. This is invalid as
-   only one type should be passed to Annotated.
+   trong đó ``T1``, ``T2``, ... là :class:`TypeVars <TypeVar>`. Điều này không hợp lệ vì chỉ nên truyền một kiểu vào Annotated.
 
-   By default, :func:`get_type_hints` strips the metadata from annotations.
-   Pass ``include_extras=True`` to have the metadata preserved:
+   Theo mặc định, :func:`get_type_hints` loại bỏ metadata khỏi các chú thích. Truyền ``include_extras=True`` để giữ lại metadata:
 
      .. doctest::
 
@@ -1488,8 +1255,7 @@ These can be used as types in annotations. They all support subscription using
         >>> get_type_hints(func, include_extras=True)
         {'x': typing.Annotated[int, 'metadata'], 'return': <class 'NoneType'>}
 
-   At runtime, the metadata associated with an ``Annotated`` type can be
-   retrieved via the :attr:`!__metadata__` attribute:
+   Trong runtime, bạn có thể truy xuất siêu dữ liệu liên kết với một kiểu ``Annotated`` thông qua thuộc tính :attr:`!__metadata__`:‌
 
      .. doctest::
 
@@ -1500,8 +1266,8 @@ These can be used as types in annotations. They all support subscription using
         >>> X.__metadata__
         ('very', 'important', 'metadata')
 
-   If you want to retrieve the original type wrapped by ``Annotated``, use the
-   :attr:`!__origin__` attribute:
+   Nếu muốn truy xuất kiểu ban đầu được bọc bởi ``Annotated``, hãy sử dụng
+   thuộc tính :attr:`!__origin__`:‌
 
      .. doctest::
 
@@ -1510,7 +1276,7 @@ These can be used as types in annotations. They all support subscription using
         >>> Password.__origin__
         <class 'str'>
 
-   Note that using :func:`get_origin` will return ``Annotated`` itself:
+   Lưu ý rằng việc sử dụng :func:`get_origin` sẽ trả về chính ``Annotated``:‌
 
      .. doctest::
 
@@ -1519,54 +1285,39 @@ These can be used as types in annotations. They all support subscription using
 
    .. seealso::
 
-      :pep:`593` - Flexible function and variable annotations
-         The PEP introducing ``Annotated`` to the standard library.
+      :pep:`593` - Chú thích linh hoạt cho hàm và biến
+         PEP giới thiệu ``Annotated`` vào thư viện chuẩn.
 
    .. versionadded:: 3.9
 
 
 .. data:: TypeIs
 
-   Special typing construct for marking user-defined type predicate functions.
+   Cấu trúc typing đặc biệt dùng để đánh dấu các hàm predicate kiểu do người dùng định nghĩa.
 
-   ``TypeIs`` can be used to annotate the return type of a user-defined
-   type predicate function.  ``TypeIs`` only accepts a single type argument.
-   At runtime, functions marked this way should return a boolean and take at
-   least one positional argument.
+   ``TypeIs`` có thể được dùng để chú thích kiểu trả về của một hàm type predicate do người dùng định nghĩa. ``TypeIs`` chỉ chấp nhận một đối số kiểu duy nhất. Khi chạy, các hàm được đánh dấu theo cách này phải trả về một giá trị boolean và nhận ít nhất một đối số vị trí.
 
-   ``TypeIs`` aims to benefit *type narrowing* -- a technique used by static
-   type checkers to determine a more precise type of an expression within a
-   program's code flow.  Usually type narrowing is done by analyzing
-   conditional code flow and applying the narrowing to a block of code.  The
-   conditional expression here is sometimes referred to as a "type predicate"::
+   ``TypeIs`` hướng đến việc hỗ trợ *thu hẹp kiểu* -- một kỹ thuật được các trình kiểm tra kiểu tĩnh sử dụng để xác định kiểu chính xác hơn của một biểu thức trong luồng mã của chương trình. Thông thường, việc thu hẹp kiểu được thực hiện bằng cách phân tích luồng mã điều kiện và áp dụng việc thu hẹp cho một khối mã. Biểu thức điều kiện ở đây đôi khi được gọi là "type predicate"::
 
       def is_str(val: str | float):
           # "isinstance" type predicate
           if isinstance(val, str):
-              # Type of ``val`` is narrowed to ``str``
+              # Kiểu của ``val`` được thu hẹp thành ``str``
               ...
           else:
               # Else, type of ``val`` is narrowed to ``float``.
               ...
 
-   Sometimes it would be convenient to use a user-defined boolean function
-   as a type predicate.  Such a function should use ``TypeIs[...]`` or
-   :data:`TypeGuard` as its return type to alert static type checkers to
-   this intention.  ``TypeIs`` usually has more intuitive behavior than
-   ``TypeGuard``, but it cannot be used when the input and output types
-   are incompatible (e.g., ``list[object]`` to ``list[int]``) or when the
-   function does not return ``True`` for all instances of the narrowed type.
+   Đôi khi sẽ rất tiện lợi nếu có thể dùng một hàm boolean do người dùng định nghĩa làm type predicate. Hàm như vậy nên dùng ``TypeIs[...]`` hoặc
+   :data:`TypeGuard` làm kiểu trả về để thông báo cho các trình kiểm tra kiểu tĩnh về ý định này. ``TypeIs`` thường có hành vi trực quan hơn ``TypeGuard``, nhưng không thể dùng khi kiểu đầu vào và kiểu đầu ra không tương thích (ví dụ: từ ``list[object]`` đến ``list[int]``) hoặc khi hàm không trả về ``True`` cho mọi thực thể thuộc kiểu đã được thu hẹp.
 
-   Using  ``-> TypeIs[NarrowedType]`` tells the static type checker that for a given
-   function:
+   Việc sử dụng ``-> TypeIs[NarrowedType]`` cho trình kiểm tra kiểu tĩnh biết rằng đối với một hàm nhất định:
 
-   1. The return value is a boolean.
-   2. If the return value is ``True``, the type of its argument
-      is the intersection of the argument's original type and ``NarrowedType``.
-   3. If the return value is ``False``, the type of its argument
-      is narrowed to exclude ``NarrowedType``.
+   1. Giá trị trả về là một boolean.
+   2. Nếu giá trị trả về là ``True``, kiểu của đối số là phép giao giữa kiểu ban đầu của đối số và ``NarrowedType``.
+   3. Nếu giá trị trả về là ``False``, kiểu của đối số được thu hẹp để loại trừ ``NarrowedType``.
 
-   For example::
+   Ví dụ::
 
         from typing import assert_type, final, TypeIs
 
@@ -1580,54 +1331,41 @@ These can be used as types in annotations. They all support subscription using
 
         def run(arg: Child | Unrelated):
             if is_parent(arg):
-                # Type of ``arg`` is narrowed to the intersection
-                # of ``Parent`` and ``Child``, which is equivalent to
+                # Kiểu của ``arg`` được thu hẹp thành phép giao
+                # của ``Parent`` và ``Child``, tương đương với
                 # ``Child``.
                 assert_type(arg, Child)
             else:
-                # Type of ``arg`` is narrowed to exclude ``Parent``,
-                # so only ``Unrelated`` is left.
+                # Kiểu của ``arg`` được thu hẹp để loại trừ ``Parent``,
+                # vì vậy chỉ còn ``Unrelated``.
                 assert_type(arg, Unrelated)
 
-   The type inside ``TypeIs`` must be consistent with the type of the
-   function's argument; if it is not, static type checkers will raise
-   an error.  An incorrectly written ``TypeIs`` function can lead to
-   unsound behavior in the type system; it is the user's responsibility
-   to write such functions in a type-safe manner.
+   Kiểu bên trong ``TypeIs`` phải nhất quán với kiểu của đối số của hàm; nếu không, các trình kiểm tra kiểu tĩnh sẽ báo lỗi. Một hàm ``TypeIs`` được viết không chính xác có thể dẫn đến hành vi không an toàn trong hệ thống kiểu; người dùng có trách nhiệm viết các hàm như vậy theo cách an toàn về kiểu.
 
-   If a ``TypeIs`` function is a class or instance method, then the type in
-   ``TypeIs`` maps to the type of the second parameter (after ``cls`` or
-   ``self``).
+   Nếu một hàm ``TypeIs`` là một phương thức lớp hoặc phương thức instance, thì kiểu trong ``TypeIs`` ánh xạ tới kiểu của tham số thứ hai (sau ``cls`` hoặc ``self``).
 
-   In short, the form ``def foo(arg: TypeA) -> TypeIs[TypeB]: ...``,
-   means that if ``foo(arg)`` returns ``True``, then ``arg`` is an instance
-   of ``TypeB``, and if it returns ``False``, it is not an instance of ``TypeB``.
+   Tóm lại, dạng ``def foo(arg: TypeA) -> TypeIs[TypeB]: ...`` có nghĩa là nếu ``foo(arg)`` trả về ``True``, thì ``arg`` là một instance của ``TypeB``, còn nếu nó trả về ``False``, thì nó không phải là một instance của ``TypeB``.
 
-   ``TypeIs`` also works with type variables.  For more information, see
-   :pep:`742` (Narrowing types with ``TypeIs``).
+   ``TypeIs`` cũng hoạt động với các biến kiểu. Để biết thêm thông tin, hãy xem
+   :pep:`742` (Thu hẹp kiểu bằng ``TypeIs``).
 
    .. versionadded:: 3.13
 
 
 .. data:: TypeGuard
 
-   Special typing construct for marking user-defined type predicate functions.
+   Cấu trúc typing đặc biệt dùng để đánh dấu các hàm predicate kiểu do người dùng định nghĩa.
 
-   Type predicate functions are user-defined functions that return whether their
-   argument is an instance of a particular type.
-   ``TypeGuard`` works similarly to :data:`TypeIs`, but has subtly different
-   effects on type checking behavior (see below).
+   Các hàm predicate kiểu là những hàm do người dùng định nghĩa, trả về thông tin cho biết đối số của chúng có phải là một instance của một kiểu cụ thể hay không. ``TypeGuard`` hoạt động tương tự như :data:`TypeIs`, nhưng có tác động hơi khác đến hành vi kiểm tra kiểu (xem bên dưới).
 
-   Using  ``-> TypeGuard`` tells the static type checker that for a given
-   function:
+   Việc sử dụng ``-> TypeGuard`` cho trình kiểm tra kiểu tĩnh biết rằng, đối với một hàm nhất định:
 
-   1. The return value is a boolean.
-   2. If the return value is ``True``, the type of its argument
-      is the type inside ``TypeGuard``.
+   1. Giá trị trả về là một boolean.
+   2. Nếu giá trị trả về là ``True``, kiểu của đối số của hàm là kiểu nằm trong ``TypeGuard``.
 
-   ``TypeGuard`` also works with type variables.  See :pep:`647` for more details.
+   ``TypeGuard`` cũng hoạt động với các biến kiểu. Xem :pep:`647` để biết thêm chi tiết.
 
-   For example::
+   Ví dụ::
 
          def is_str_list(val: list[object]) -> TypeGuard[list[str]]:
              '''Determines whether all objects in the list are strings'''
@@ -1635,58 +1373,45 @@ These can be used as types in annotations. They all support subscription using
 
          def func1(val: list[object]):
              if is_str_list(val):
-                 # Type of ``val`` is narrowed to ``list[str]``.
+                 # Kiểu của ``val`` được thu hẹp thành ``list[str]``.
                  print(" ".join(val))
              else:
-                 # Type of ``val`` remains as ``list[object]``.
+                 # Kiểu của ``val`` vẫn là ``list[object]``.
                  print("Not a list of strings!")
 
-   ``TypeIs`` and ``TypeGuard`` differ in the following ways:
+   ``TypeIs`` và ``TypeGuard`` khác nhau ở những điểm sau:
 
-   * ``TypeIs`` requires the narrowed type to be a subtype of the input type, while
-     ``TypeGuard`` does not.  The main reason is to allow for things like
-     narrowing ``list[object]`` to ``list[str]`` even though the latter
-     is not a subtype of the former, since ``list`` is invariant.
-   * When a ``TypeGuard`` function returns ``True``, type checkers narrow the type of the
-     variable to exactly the ``TypeGuard`` type. When a ``TypeIs`` function returns ``True``,
-     type checkers can infer a more precise type combining the previously known type of the
-     variable with the ``TypeIs`` type. (Technically, this is known as an intersection type.)
-   * When a ``TypeGuard`` function returns ``False``, type checkers cannot narrow the type of
-     the variable at all. When a ``TypeIs`` function returns ``False``, type checkers can narrow
-     the type of the variable to exclude the ``TypeIs`` type.
+   * ``TypeIs`` yêu cầu kiểu đã thu hẹp phải là subtype của kiểu đầu vào, còn ``TypeGuard`` thì không. Lý do chính là cho phép những thao tác như thu hẹp ``list[object]`` thành ``list[str]`` dù kiểu sau không phải là subtype của kiểu trước, vì ``list`` là bất biến.
+   * Khi một hàm ``TypeGuard`` trả về ``True``, type checker sẽ thu hẹp kiểu của biến thành đúng kiểu ``TypeGuard``. Khi một hàm ``TypeIs`` trả về ``True``, type checker có thể suy luận một kiểu chính xác hơn bằng cách kết hợp kiểu đã biết trước đó của biến với kiểu ``TypeIs``. (Về mặt kỹ thuật, đây được gọi là kiểu giao.)
+   * Khi một hàm ``TypeGuard`` trả về ``False``, type checker hoàn toàn không thể thu hẹp kiểu của biến. Khi một hàm ``TypeIs`` trả về ``False``, type checker có thể thu hẹp kiểu của biến để loại trừ kiểu ``TypeIs``.
 
    .. versionadded:: 3.10
 
 
 .. data:: Unpack
 
-   Typing operator to conceptually mark an object as having been unpacked.
+   Toán tử typing dùng để biểu thị về mặt khái niệm rằng một đối tượng đã được unpack.
 
-   For example, using the unpack operator ``*`` on a
-   :ref:`type variable tuple <typevartuple>` is equivalent to using ``Unpack``
-   to mark the type variable tuple as having been unpacked::
+   Ví dụ: sử dụng toán tử unpack ``*`` trên một
+   :ref:`tuple biến kiểu <typevartuple>` tương đương với việc sử dụng ``Unpack`` để đánh dấu tuple biến kiểu đã được unpack::
 
       Ts = TypeVarTuple('Ts')
       tup: tuple[*Ts]
-      # Effectively does:
+      # Thực chất là:
       tup: tuple[Unpack[Ts]]
 
-   In fact, ``Unpack`` can be used interchangeably with ``*`` in the context
-   of :class:`typing.TypeVarTuple <TypeVarTuple>` and
-   :class:`builtins.tuple <tuple>` types. You might see ``Unpack`` being used
-   explicitly in older versions of Python, where ``*`` couldn't be used in
-   certain places::
+   Thực tế, ``Unpack`` có thể được sử dụng thay thế cho ``*`` trong ngữ cảnh của :class:`typing.TypeVarTuple <TypeVarTuple>` và
+   :class:`builtins.tuple <tuple>` các kiểu. Bạn có thể thấy ``Unpack`` được sử dụng tường minh trong các phiên bản Python cũ hơn, khi ``*`` không thể được sử dụng ở một số vị trí nhất định::
 
-      # In older versions of Python, TypeVarTuple and Unpack
-      # are located in the `typing_extensions` backports package.
+      # Trong các phiên bản Python cũ hơn, TypeVarTuple và Unpack
+      # nằm trong package `typing_extensions` backports.
       from typing_extensions import TypeVarTuple, Unpack
 
       Ts = TypeVarTuple('Ts')
-      tup: tuple[*Ts]         # Syntax error on Python <= 3.10!
-      tup: tuple[Unpack[Ts]]  # Semantically equivalent, and backwards-compatible
+      tup: tuple[*Ts]         # Lỗi cú pháp trên Python <= 3.10!
+      tup: tuple[Unpack[Ts]]  # Tương đương về ngữ nghĩa và tương thích ngược
 
-   ``Unpack`` can also be used along with :class:`typing.TypedDict` for typing
-   ``**kwargs`` in a function signature::
+   ``Unpack`` cũng có thể được sử dụng cùng với :class:`typing.TypedDict` để định kiểu ``**kwargs`` trong chữ ký hàm::
 
       from typing import TypedDict, Unpack
 
@@ -1694,43 +1419,36 @@ These can be used as types in annotations. They all support subscription using
           name: str
           year: int
 
-      # This function expects two keyword arguments - `name` of type `str`
-      # and `year` of type `int`.
+      # Hàm này yêu cầu hai đối số keyword - `name` có kiểu `str`
+      # và `year` có kiểu `int`.
       def foo(**kwargs: Unpack[Movie]): ...
 
-   See :pep:`692` for more details on using ``Unpack`` for ``**kwargs`` typing.
+   Xem :pep:`692` để biết thêm chi tiết về cách sử dụng ``Unpack`` cho việc định kiểu ``**kwargs``.
 
    .. versionadded:: 3.11
 
-Building generic types and type aliases
-"""""""""""""""""""""""""""""""""""""""
+Xây dựng các kiểu generic và bí danh kiểu
+"""""""""""""""""""""""""""""""""""""""""
 
-The following classes should not be used directly as annotations.
-Their intended purpose is to be building blocks
-for creating generic types and type aliases.
+Không nên sử dụng trực tiếp các lớp sau làm chú thích kiểu. Mục đích của chúng là làm các khối xây dựng để tạo các kiểu generic và bí danh kiểu.
 
-These objects can be created through special syntax
-(:ref:`type parameter lists <type-params>` and the :keyword:`type` statement).
-For compatibility with Python 3.11 and earlier, they can also be created
-without the dedicated syntax, as documented below.
+Các đối tượng này có thể được tạo bằng cú pháp đặc biệt (danh sách :ref:`tham số kiểu <type-params>` và :keyword:`type` câu lệnh). Để tương thích với Python 3.11 trở về trước, chúng cũng có thể được tạo mà không cần cú pháp chuyên dụng, như được trình bày bên dưới.
 
 .. class:: Generic
 
-   Abstract base class for generic types.
+   Lớp cơ sở trừu tượng dành cho các kiểu generic.
 
-   A generic type is typically declared by adding a list of type parameters
-   after the class name::
+   Một kiểu generic thường được khai báo bằng cách thêm danh sách tham số kiểu sau tên lớp::
 
       class Mapping[KT, VT]:
           def __getitem__(self, key: KT) -> VT:
               ...
-              # Etc.
+              # V.v.
 
-   Such a class implicitly inherits from ``Generic``.
-   The runtime semantics of this syntax are discussed in the
-   :ref:`Language Reference <generic-classes>`.
+   Một lớp như vậy ngầm kế thừa từ ``Generic``. Ngữ nghĩa runtime của cú pháp này được thảo luận trong
+   :ref:`Tài liệu tham khảo ngôn ngữ <generic-classes>`.
 
-   This class can then be used as follows::
+   Sau đó, lớp này có thể được sử dụng như sau::
 
       def lookup_name[X, Y](mapping: Mapping[X, Y], key: X, default: Y) -> Y:
           try:
@@ -1738,13 +1456,10 @@ without the dedicated syntax, as documented below.
           except KeyError:
               return default
 
-   Here the brackets after the function name indicate a
-   :ref:`generic function <generic-functions>`.
+   Ở đây, dấu ngoặc sau tên hàm cho biết đây là một
+   :ref:`hàm generic <generic-functions>`.
 
-   For backwards compatibility, generic classes can also be
-   declared by explicitly inheriting from
-   ``Generic``. In this case, the type parameters must be declared
-   separately::
+   Để đảm bảo khả năng tương thích ngược, các lớp generic cũng có thể được khai báo bằng cách kế thừa rõ ràng từ ``Generic``. Trong trường hợp này, các tham số kiểu phải được khai báo riêng::
 
       KT = TypeVar('KT')
       VT = TypeVar('VT')
@@ -1752,43 +1467,37 @@ without the dedicated syntax, as documented below.
       class Mapping(Generic[KT, VT]):
           def __getitem__(self, key: KT) -> VT:
               ...
-              # Etc.
+              # V.v.
 
 .. _typevar:
 
 .. class:: TypeVar(name, *constraints, bound=None, covariant=False, contravariant=False, infer_variance=False, default=typing.NoDefault)
 
-   Type variable.
+   Biến kiểu.
 
-   The preferred way to construct a type variable is via the dedicated syntax
-   for :ref:`generic functions <generic-functions>`,
-   :ref:`generic classes <generic-classes>`, and
-   :ref:`generic type aliases <generic-type-aliases>`::
+   Cách ưu tiên để tạo một biến kiểu là sử dụng cú pháp chuyên dụng cho :ref:`hàm generic <generic-functions>`,
+   :ref:`lớp generic <generic-classes>`, và
+   :ref:`bí danh kiểu generic <generic-type-aliases>`::
 
-      class Sequence[T]:  # T is a TypeVar
+      class Sequence[T]:  # T là một TypeVar
           ...
 
-   This syntax can also be used to create bounded and constrained type
-   variables::
+   Cú pháp này cũng có thể được dùng để tạo các biến kiểu có giới hạn và có ràng buộc::
 
-      class StrSequence[S: str]:  # S is a TypeVar with a `str` upper bound;
-          ...                     # we can say that S is "bounded by `str`"
+      class StrSequence[S: str]:  # S là một TypeVar có `str` làm upper bound;
+          ...                     # ta có thể nói rằng S "bị giới hạn bởi `str`"
 
 
-      class StrOrBytesSequence[A: (str, bytes)]:  # A is a TypeVar constrained to str or bytes
+      class StrOrBytesSequence[A: (str, bytes)]:  # A là một TypeVar bị ràng buộc vào str hoặc bytes
           ...
 
-   However, if desired, reusable type variables can also be constructed manually, like so::
+   Tuy nhiên, nếu muốn, bạn cũng có thể tạo thủ công các biến kiểu có thể tái sử dụng như sau::
 
-      T = TypeVar('T')  # Can be anything
-      S = TypeVar('S', bound=str)  # Can be any subtype of str
-      A = TypeVar('A', str, bytes)  # Must be exactly str or bytes
+      T = TypeVar('T')  # Có thể là bất kỳ kiểu nào
+      S = TypeVar('S', bound=str)  # Có thể là bất kỳ kiểu con nào của str
+      A = TypeVar('A', str, bytes)  # Phải chính xác là str hoặc bytes
 
-   Type variables exist primarily for the benefit of static type
-   checkers.  They serve as the parameters for generic types as well
-   as for generic function and type alias definitions.
-   See :class:`Generic` for more
-   information on generic types.  Generic functions work as follows::
+   Các biến kiểu chủ yếu tồn tại để phục vụ các static type checker. Chúng đóng vai trò là các tham số cho generic type, cũng như cho các định nghĩa generic function và type alias. Xem :class:`Generic` để biết thêm thông tin về generic type. Generic function hoạt động như sau::
 
       def repeat[T](x: T, n: int) -> Sequence[T]:
           """Return a list containing n references to x."""
@@ -1805,165 +1514,132 @@ without the dedicated syntax, as documented below.
           """Add two strings or bytes objects together."""
           return x + y
 
-   Note that type variables can be *bounded*, *constrained*, or neither, but
-   cannot be both bounded *and* constrained.
+   Lưu ý rằng các biến kiểu có thể được *giới hạn*, *ràng buộc*, hoặc không thuộc cả hai loại, nhưng không thể vừa được giới hạn *vừa* bị ràng buộc.
 
-   The variance of type variables is inferred by type checkers when they are created
-   through the :ref:`type parameter syntax <type-params>` or when
-   ``infer_variance=True`` is passed.
-   Manually created type variables may be explicitly marked covariant or contravariant by passing
-   ``covariant=True`` or ``contravariant=True``.
-   By default, manually created type variables are invariant.
-   See :pep:`484` and :pep:`695` for more details.
+   Variance của các biến kiểu được type checker suy ra khi chúng được tạo thông qua :ref:`cú pháp type parameter <type-params>` hoặc khi ``infer_variance=True`` được truyền vào. Các biến kiểu được tạo thủ công có thể được đánh dấu rõ ràng là covariant hoặc contravariant bằng cách truyền ``covariant=True`` hoặc ``contravariant=True``. Theo mặc định, các biến kiểu được tạo thủ công là invariant. Xem :pep:`484` và :pep:`695` để biết thêm chi tiết.
 
-   Bounded type variables and constrained type variables have different
-   semantics in several important ways. Using a *bounded* type variable means
-   that the ``TypeVar`` will be solved using the most specific type possible::
+   Các biến kiểu bị giới hạn và các biến kiểu bị ràng buộc có ngữ nghĩa khác nhau theo một số cách quan trọng. Việc sử dụng một biến kiểu *bị giới hạn* có nghĩa là ``TypeVar`` sẽ được xác định bằng kiểu cụ thể nhất có thể::
 
       x = print_capitalized('a string')
-      reveal_type(x)  # revealed type is str
+      reveal_type(x)  # kiểu được suy luận là str
 
       class StringSubclass(str):
           pass
 
       y = print_capitalized(StringSubclass('another string'))
-      reveal_type(y)  # revealed type is StringSubclass
+      reveal_type(y)  # kiểu được suy luận là StringSubclass
 
-      z = print_capitalized(45)  # error: int is not a subtype of str
+      z = print_capitalized(45)  # lỗi: int không phải là kiểu con của str
 
-   The upper bound of a type variable can be a concrete type, abstract type
-   (ABC or Protocol), or even a union of types::
+   Giới hạn trên của một biến kiểu có thể là một kiểu cụ thể, kiểu trừu tượng (ABC hoặc Protocol), hoặc thậm chí là một union các kiểu::
 
-      # Can be anything with an __abs__ method
+      # Có thể là bất kỳ đối tượng nào có phương thức __abs__
       def print_abs[T: SupportsAbs](arg: T) -> None:
           print("Absolute value:", abs(arg))
 
-      U = TypeVar('U', bound=str|bytes)  # Can be any subtype of the union str|bytes
-      V = TypeVar('V', bound=SupportsAbs)  # Can be anything with an __abs__ method
+      U = TypeVar('U', bound=str|bytes)  # Có thể là bất kỳ kiểu con nào của union str|bytes
+      V = TypeVar('V', bound=SupportsAbs)  # Có thể là bất kỳ đối tượng nào có phương thức __abs__
 
    .. _typing-constrained-typevar:
 
-   Using a *constrained* type variable, however, means that the ``TypeVar``
-   can only ever be solved as being exactly one of the constraints given::
+   Tuy nhiên, việc sử dụng biến kiểu *constrained* có nghĩa là ``TypeVar`` chỉ có thể được giải quyết chính xác thành một trong các ràng buộc đã cho::
 
       a = concatenate('one', 'two')
-      reveal_type(a)  # revealed type is str
+      reveal_type(a)  # kiểu được suy luận là str
 
       b = concatenate(StringSubclass('one'), StringSubclass('two'))
-      reveal_type(b)  # revealed type is str, despite StringSubclass being passed in
+      reveal_type(b)  # kiểu được tiết lộ là str, mặc dù StringSubclass được truyền vào
 
-      c = concatenate('one', b'two')  # error: type variable 'A' can be either str or bytes in a function call, but not both
+      c = concatenate('one', b'two')  # lỗi: biến kiểu 'A' có thể là str hoặc bytes trong một lần gọi hàm, nhưng không thể là cả hai
 
-   At runtime, ``isinstance(x, T)`` will raise :exc:`TypeError`.
+   Trong runtime, ``isinstance(x, T)`` sẽ raise :exc:`TypeError`.
 
    .. attribute:: __name__
 
-      The name of the type variable.
+      Tên của biến kiểu.
 
    .. attribute:: __covariant__
 
-      Whether the type var has been explicitly marked as covariant.
+      Biến kiểu có được đánh dấu rõ ràng là covariant hay không.
 
    .. attribute:: __contravariant__
 
-      Whether the type var has been explicitly marked as contravariant.
+      Liệu type var có được đánh dấu rõ ràng là contravariant hay không.
 
    .. attribute:: __infer_variance__
 
-      Whether the type variable's variance should be inferred by type checkers.
+      Liệu variance của type variable có nên được trình kiểm tra kiểu suy luận hay không.
 
       .. versionadded:: 3.12
 
    .. attribute:: __bound__
 
-      The upper bound of the type variable, if any.
+      Cận trên của type variable, nếu có.
 
       .. versionchanged:: 3.12
 
-         For type variables created through :ref:`type parameter syntax <type-params>`,
-         the bound is evaluated only when the attribute is accessed, not when
-         the type variable is created (see :ref:`lazy-evaluation`).
+         Đối với các type variable được tạo thông qua cú pháp :ref:`type parameter syntax <type-params>`, bound chỉ được đánh giá khi thuộc tính được truy cập, không phải khi type variable được tạo (xem :ref:`lazy-evaluation`).
 
    .. method:: evaluate_bound
 
-      An :term:`evaluate function` corresponding to the :attr:`~TypeVar.__bound__` attribute.
-      When called directly, this method supports only the :attr:`~annotationlib.Format.VALUE`
-      format, which is equivalent to accessing the :attr:`~TypeVar.__bound__` attribute directly,
-      but the method object can be passed to :func:`annotationlib.call_evaluate_function`
-      to evaluate the value in a different format.
+      Một :term:`evaluate function` tương ứng với thuộc tính :attr:`~TypeVar.__bound__`. Khi được gọi trực tiếp, phương thức này chỉ hỗ trợ định dạng :attr:`~annotationlib.Format.VALUE`, tương đương với việc truy cập trực tiếp thuộc tính :attr:`~TypeVar.__bound__`, nhưng đối tượng phương thức có thể được truyền vào :func:`annotationlib.call_evaluate_function` để đánh giá giá trị theo một định dạng khác.
 
       .. versionadded:: 3.14
 
    .. attribute:: __constraints__
 
-      A tuple containing the constraints of the type variable, if any.
+      Một tuple chứa các ràng buộc của type variable, nếu có.
 
       .. versionchanged:: 3.12
 
-         For type variables created through :ref:`type parameter syntax <type-params>`,
-         the constraints are evaluated only when the attribute is accessed, not when
-         the type variable is created (see :ref:`lazy-evaluation`).
+         Đối với các type variable được tạo thông qua cú pháp :ref:`type parameter syntax <type-params>`, các ràng buộc chỉ được đánh giá khi thuộc tính được truy cập, không phải khi type variable được tạo (xem :ref:`lazy-evaluation`).
 
    .. method:: evaluate_constraints
 
-      An :term:`evaluate function` corresponding to the :attr:`~TypeVar.__constraints__` attribute.
-      When called directly, this method supports only the :attr:`~annotationlib.Format.VALUE`
-      format, which is equivalent to accessing the :attr:`~TypeVar.__constraints__` attribute directly,
-      but the method object can be passed to :func:`annotationlib.call_evaluate_function`
-      to evaluate the value in a different format.
+      Một :term:`evaluate function` tương ứng với thuộc tính :attr:`~TypeVar.__constraints__`. Khi được gọi trực tiếp, phương thức này chỉ hỗ trợ định dạng :attr:`~annotationlib.Format.VALUE`, tương đương với việc truy cập trực tiếp thuộc tính :attr:`~TypeVar.__constraints__`, nhưng đối tượng phương thức có thể được truyền cho :func:`annotationlib.call_evaluate_function` để đánh giá giá trị ở một định dạng khác.
 
       .. versionadded:: 3.14
 
    .. attribute:: __default__
 
-      The default value of the type variable, or :data:`typing.NoDefault` if it
-      has no default.
+      Giá trị mặc định của biến kiểu, hoặc :data:`typing.NoDefault` nếu biến không có giá trị mặc định.
 
       .. versionadded:: 3.13
 
    .. method:: evaluate_default
 
-      An :term:`evaluate function` corresponding to the :attr:`~TypeVar.__default__` attribute.
-      When called directly, this method supports only the :attr:`~annotationlib.Format.VALUE`
-      format, which is equivalent to accessing the :attr:`~TypeVar.__default__` attribute directly,
-      but the method object can be passed to :func:`annotationlib.call_evaluate_function`
-      to evaluate the value in a different format.
+      Một :term:`evaluate function` tương ứng với thuộc tính :attr:`~TypeVar.__default__`. Khi được gọi trực tiếp, phương thức này chỉ hỗ trợ định dạng :attr:`~annotationlib.Format.VALUE`, tương đương với việc truy cập trực tiếp thuộc tính :attr:`~TypeVar.__default__`, nhưng đối tượng phương thức có thể được truyền cho :func:`annotationlib.call_evaluate_function` để đánh giá giá trị ở một định dạng khác.
 
       .. versionadded:: 3.14
 
    .. method:: has_default()
 
-      Return whether or not the type variable has a default value. This is equivalent
-      to checking whether :attr:`__default__` is not the :data:`typing.NoDefault`
-      singleton, except that it does not force evaluation of the
-      :ref:`lazily evaluated <lazy-evaluation>` default value.
+      Trả về việc biến kiểu có giá trị mặc định hay không. Điều này tương đương với việc kiểm tra xem :attr:`__default__` có khác singleton :data:`typing.NoDefault` hay không, ngoại trừ việc không buộc đánh giá
+      :ref:`giá trị mặc định được đánh giá trì hoãn <lazy-evaluation>`.
 
       .. versionadded:: 3.13
 
    .. versionchanged:: 3.12
 
-      Type variables can now be declared using the
-      :ref:`type parameter <type-params>` syntax introduced by :pep:`695`.
-      The ``infer_variance`` parameter was added.
+      Giờ đây, có thể khai báo biến kiểu bằng
+      :ref:`cú pháp tham số kiểu <type-params>` được giới thiệu bởi :pep:`695`. Tham số ``infer_variance`` đã được thêm vào.
 
    .. versionchanged:: 3.13
 
-      Support for default values was added.
+      Đã bổ sung hỗ trợ cho các giá trị mặc định.
 
 .. _typevartuple:
 
 .. class:: TypeVarTuple(name, *, default=typing.NoDefault)
 
-   Type variable tuple. A specialized form of :ref:`type variable <typevar>`
-   that enables *variadic* generics.
+   Tuple biến kiểu. Một dạng chuyên biệt của :ref:`biến kiểu <typevar>`, cho phép tạo các generic *biến thiên*.
 
-   Type variable tuples can be declared in :ref:`type parameter lists <type-params>`
-   using a single asterisk (``*``) before the name::
+   Có thể khai báo tuple biến kiểu trong :ref:`danh sách tham số kiểu <type-params>` bằng một dấu hoa thị đơn (``*``) trước tên::
 
       def move_first_element_to_last[T, *Ts](tup: tuple[T, *Ts]) -> tuple[*Ts, T]:
           return (*tup[1:], tup[0])
 
-   Or by explicitly invoking the ``TypeVarTuple`` constructor::
+   Hoặc bằng cách gọi rõ ràng ``TypeVarTuple`` hàm khởi tạo::
 
       T = TypeVar("T")
       Ts = TypeVarTuple("Ts")
@@ -1971,76 +1647,63 @@ without the dedicated syntax, as documented below.
       def move_first_element_to_last(tup: tuple[T, *Ts]) -> tuple[*Ts, T]:
           return (*tup[1:], tup[0])
 
-   A normal type variable enables parameterization with a single type. A type
-   variable tuple, in contrast, allows parameterization with an
-   *arbitrary* number of types by acting like an *arbitrary* number of type
-   variables wrapped in a tuple. For example::
+   Một biến kiểu thông thường cho phép tham số hóa với một kiểu duy nhất. Ngược lại, tuple biến kiểu cho phép tham số hóa với một *bất kỳ* số kiểu bằng cách hoạt động như một *bất kỳ* số biến kiểu được bọc trong một tuple. Ví dụ::
 
-      # T is bound to int, Ts is bound to ()
-      # Return value is (1,), which has type tuple[int]
+      # T được gắn với int, Ts được gắn với ()
+      # Giá trị trả về là (1,), có kiểu tuple[int]
       move_first_element_to_last(tup=(1,))
 
-      # T is bound to int, Ts is bound to (str,)
-      # Return value is ('spam', 1), which has type tuple[str, int]
+      # T được ràng buộc với int, Ts được ràng buộc với (str,)
+      # Giá trị trả về là ('spam', 1), có kiểu tuple[str, int]
       move_first_element_to_last(tup=(1, 'spam'))
 
-      # T is bound to int, Ts is bound to (str, float)
-      # Return value is ('spam', 3.0, 1), which has type tuple[str, float, int]
+      # T được ràng buộc với int, Ts được ràng buộc với (str, float)
+      # Giá trị trả về là ('spam', 3.0, 1), có kiểu tuple[str, float, int]
       move_first_element_to_last(tup=(1, 'spam', 3.0))
 
-      # This fails to type check (and fails at runtime)
-      # because tuple[()] is not compatible with tuple[T, *Ts]
-      # (at least one element is required)
+      # Lệnh này không vượt qua bước kiểm tra kiểu (và sẽ lỗi khi chạy)
+      # vì tuple[()] không tương thích với tuple[T, *Ts]
+      # (cần ít nhất một phần tử)
       move_first_element_to_last(tup=())
 
-   Note the use of the unpacking operator ``*`` in ``tuple[T, *Ts]``.
-   Conceptually, you can think of ``Ts`` as a tuple of type variables
-   ``(T1, T2, ...)``. ``tuple[T, *Ts]`` would then become
-   ``tuple[T, *(T1, T2, ...)]``, which is equivalent to
-   ``tuple[T, T1, T2, ...]``. (Note that in older versions of Python, you might
-   see this written using :data:`Unpack <Unpack>` instead, as
-   ``Unpack[Ts]``.)
+   Lưu ý việc sử dụng toán tử unpacking ``*`` trong ``tuple[T, *Ts]``. Về mặt khái niệm, bạn có thể xem ``Ts`` là một tuple gồm các biến kiểu ``(T1, T2, ...)``. Khi đó, ``tuple[T, *Ts]`` sẽ trở thành ``tuple[T, *(T1, T2, ...)]``, tương đương với ``tuple[T, T1, T2, ...]``. (Lưu ý rằng trong các phiên bản Python cũ hơn, bạn có thể thấy cách viết này sử dụng :data:`Unpack <Unpack>` thay thế, như trong ``Unpack[Ts]``.)
 
-   Type variable tuples must *always* be unpacked. This helps distinguish type
-   variable tuples from normal type variables::
+   Các tuple biến kiểu phải *luôn luôn* được unpack. Điều này giúp phân biệt tuple biến kiểu với các biến kiểu thông thường::
 
-      x: Ts          # Not valid
-      x: tuple[Ts]   # Not valid
-      x: tuple[*Ts]  # The correct way to do it
+      x: Ts          # Không hợp lệ
+      x: tuple[Ts]   # Không hợp lệ
+      x: tuple[*Ts]  # Cách thực hiện đúng
 
-   Type variable tuples can be used in the same contexts as normal type
-   variables. For example, in class definitions, arguments, and return types::
+   Tuple biến kiểu có thể được sử dụng trong các ngữ cảnh giống như biến kiểu thông thường. Ví dụ: trong định nghĩa lớp, các đối số và kiểu trả về::
 
       class Array[*Shape]:
           def __getitem__(self, key: tuple[*Shape]) -> float: ...
           def __abs__(self) -> "Array[*Shape]": ...
           def get_shape(self) -> tuple[*Shape]: ...
 
-   Type variable tuples can be happily combined with normal type variables:
+   Tuple biến kiểu có thể dễ dàng kết hợp với các biến kiểu thông thường:
 
    .. testcode::
 
-      class Array[DType, *Shape]:  # This is fine
+      class Array[DType, *Shape]:  # Điều này ổn
           pass
 
-      class Array2[*Shape, DType]:  # This would also be fine
+      class Array2[*Shape, DType]:  # Cách này cũng ổn
           pass
 
       class Height: ...
       class Width: ...
 
-      float_array_1d: Array[float, Height] = Array()     # Totally fine
-      int_array_2d: Array[int, Height, Width] = Array()  # Yup, fine too
+      float_array_1d: Array[float, Height] = Array()     # Hoàn toàn ổn
+      int_array_2d: Array[int, Height, Width] = Array()  # Ừ, cách này cũng ổn
 
-   However, note that at most one type variable tuple may appear in a single
-   list of type arguments or type parameters::
+   Tuy nhiên, lưu ý rằng trong một danh sách các đối số kiểu hoặc tham số kiểu, chỉ có thể xuất hiện nhiều nhất một type variable tuple::
 
-      x: tuple[*Ts, *Ts]            # Not valid
-      class Array[*Shape, *Shape]:  # Not valid
+      x: tuple[*Ts, *Ts]            # Không hợp lệ
+      class Array[*Shape, *Shape]:  # Không hợp lệ
           pass
 
-   Finally, an unpacked type variable tuple can be used as the type annotation
-   of ``*args``::
+   Cuối cùng, một tuple biến kiểu chưa được unpack có thể được dùng làm chú thích kiểu của ``*args``::
 
       def call_soon[*Ts](
           callback: Callable[[*Ts], None],
@@ -2049,42 +1712,30 @@ without the dedicated syntax, as documented below.
           ...
           callback(*args)
 
-   In contrast to non-unpacked annotations of ``*args`` - e.g. ``*args: int``,
-   which would specify that *all* arguments are ``int`` - ``*args: *Ts``
-   enables reference to the types of the *individual* arguments in ``*args``.
-   Here, this allows us to ensure the types of the ``*args`` passed
-   to ``call_soon`` match the types of the (positional) arguments of
-   ``callback``.
+   Khác với các chú thích không unpack của ``*args`` - chẳng hạn như ``*args: int``, trong đó chỉ định rằng *all* đối số đều là ``int`` - ``*args: *Ts`` cho phép tham chiếu đến kiểu của các đối số *individual* trong ``*args``. Ở đây, điều này cho phép chúng ta đảm bảo kiểu của ``*args`` được truyền vào ``call_soon`` khớp với kiểu của các đối số (vị trí) của ``callback``.
 
-   See :pep:`646` for more details on type variable tuples.
+   Xem :pep:`646` để biết thêm chi tiết về các tuple biến kiểu.
 
    .. attribute:: __name__
 
-      The name of the type variable tuple.
+      Tên của tuple biến kiểu.
 
    .. attribute:: __default__
 
-      The default value of the type variable tuple, or :data:`typing.NoDefault` if it
-      has no default.
+      Giá trị mặc định của tuple biến kiểu, hoặc :data:`typing.NoDefault` nếu tuple không có giá trị mặc định.
 
       .. versionadded:: 3.13
 
    .. method:: evaluate_default
 
-      An :term:`evaluate function` corresponding to the :attr:`~TypeVarTuple.__default__` attribute.
-      When called directly, this method supports only the :attr:`~annotationlib.Format.VALUE`
-      format, which is equivalent to accessing the :attr:`~TypeVarTuple.__default__` attribute directly,
-      but the method object can be passed to :func:`annotationlib.call_evaluate_function`
-      to evaluate the value in a different format.
+      Một :term:`evaluate function` tương ứng với thuộc tính :attr:`~TypeVarTuple.__default__`. Khi được gọi trực tiếp, phương thức này chỉ hỗ trợ định dạng :attr:`~annotationlib.Format.VALUE`, tương đương với việc truy cập trực tiếp thuộc tính :attr:`~TypeVarTuple.__default__`, nhưng đối tượng phương thức có thể được truyền vào :func:`annotationlib.call_evaluate_function` để đánh giá giá trị ở một định dạng khác.
 
       .. versionadded:: 3.14
 
    .. method:: has_default()
 
-      Return whether or not the type variable tuple has a default value. This is equivalent
-      to checking whether :attr:`__default__` is not the :data:`typing.NoDefault`
-      singleton, except that it does not force evaluation of the
-      :ref:`lazily evaluated <lazy-evaluation>` default value.
+      Trả về việc tuple biến kiểu có giá trị mặc định hay không. Điều này tương đương với việc kiểm tra xem :attr:`__default__` không phải là singleton :data:`typing.NoDefault`, ngoại trừ việc không buộc đánh giá
+      :ref:`giá trị mặc định được đánh giá trì hoãn <lazy-evaluation>`.
 
       .. versionadded:: 3.13
 
@@ -2092,39 +1743,29 @@ without the dedicated syntax, as documented below.
 
    .. versionchanged:: 3.12
 
-      Type variable tuples can now be declared using the
-      :ref:`type parameter <type-params>` syntax introduced by :pep:`695`.
+      Các tuple biến kiểu giờ đây có thể được khai báo bằng
+      :ref:`cú pháp tham số kiểu <type-params>` được giới thiệu bởi :pep:`695`.
 
    .. versionchanged:: 3.13
 
-      Support for default values was added.
+      Đã bổ sung hỗ trợ cho các giá trị mặc định.
 
 .. class:: ParamSpec(name, *, bound=None, covariant=False, contravariant=False, infer_variance=False, default=typing.NoDefault)
 
-   Parameter specification variable.  A specialized version of
-   :ref:`type variables <typevar>`.
+   Biến đặc tả tham số. Một phiên bản chuyên biệt của
+   :ref:`biến kiểu <typevar>`.
 
-   In :ref:`type parameter lists <type-params>`, parameter specifications
-   can be declared with two asterisks (``**``)::
+   Trong :ref:`danh sách tham số kiểu <type-params>`, các đặc tả tham số có thể được khai báo bằng hai dấu hoa thị (``**``)::
 
       type IntFunc[**P] = Callable[P, int]
 
-   For compatibility with Python 3.11 and earlier, ``ParamSpec`` objects
-   can also be created as follows::
+   Để tương thích với Python 3.11 và các phiên bản cũ hơn, các đối tượng ``ParamSpec`` cũng có thể được tạo như sau::
 
       P = ParamSpec('P')
 
-   Parameter specification variables exist primarily for the benefit of static
-   type checkers.  They are used to forward the parameter types of one
-   callable to another callable -- a pattern commonly found in higher order
-   functions and decorators.  They are only valid when used in ``Concatenate``,
-   or as the first argument to ``Callable``, or as parameters for user-defined
-   Generics.  See :class:`Generic` for more information on generic types.
+   Các biến đặc tả tham số chủ yếu tồn tại để phục vụ các trình kiểm tra kiểu tĩnh. Chúng được dùng để chuyển tiếp các kiểu tham số của một callable này sang một callable khác -- một mẫu thường thấy trong các hàm bậc cao và decorator. Chúng chỉ hợp lệ khi được dùng trong ``Concatenate``, hoặc làm đối số đầu tiên cho ``Callable``, hoặc làm tham số cho các Generics do người dùng định nghĩa. Xem :class:`Generic` để biết thêm thông tin về các kiểu generic.
 
-   For example, to add basic logging to a function, one can create a decorator
-   ``add_logging`` to log function calls.  The parameter specification variable
-   tells the type checker that the callable passed into the decorator and the
-   new callable returned by it have inter-dependent type parameters::
+   Ví dụ, để thêm tính năng ghi nhật ký cơ bản vào một hàm, ta có thể tạo một decorator ``add_logging`` để ghi nhật ký các lần gọi hàm. Biến đặc tả tham số cho trình kiểm tra kiểu biết rằng callable được truyền vào decorator và callable mới do nó trả về có các tham số kiểu phụ thuộc lẫn nhau::
 
       from collections.abc import Callable
       import logging
@@ -2141,96 +1782,68 @@ without the dedicated syntax, as documented below.
           '''Add two numbers together.'''
           return x + y
 
-   Without ``ParamSpec``, the simplest way to annotate this previously was to
-   use a :class:`TypeVar` with upper bound ``Callable[..., Any]``.  However this
-   causes two problems:
+   Nếu không có ``ParamSpec``, trước đây cách đơn giản nhất để chú thích trường hợp này là sử dụng một :class:`TypeVar` với giới hạn trên là ``Callable[..., Any]``. Tuy nhiên, cách này gây ra hai vấn đề:
 
-   1. The type checker can't type check the ``inner`` function because
-      ``*args`` and ``**kwargs`` have to be typed :data:`Any`.
-   2. :func:`~cast` may be required in the body of the ``add_logging``
-      decorator when returning the ``inner`` function, or the static type
-      checker must be told to ignore the ``return inner``.
+   1. Trình kiểm tra kiểu không thể kiểm tra kiểu của hàm ``inner`` vì ``*args`` và ``**kwargs`` phải được định kiểu là :data:`Any`.
+   2. Có thể cần :func:`~cast` trong phần thân của decorator ``add_logging`` khi trả về hàm ``inner``, hoặc phải yêu cầu trình kiểm tra kiểu tĩnh bỏ qua ``return inner``.
 
    .. attribute:: args
    .. attribute:: kwargs
 
-      Since ``ParamSpec`` captures both positional and keyword parameters,
-      ``P.args`` and ``P.kwargs`` can be used to split a ``ParamSpec`` into its
-      components.  ``P.args`` represents the tuple of positional parameters in a
-      given call and should only be used to annotate ``*args``.  ``P.kwargs``
-      represents the mapping of keyword parameters to their values in a given call,
-      and should be only be used to annotate ``**kwargs``.  Both
-      attributes require the annotated parameter to be in scope. At runtime,
-      ``P.args`` and ``P.kwargs`` are instances respectively of
-      :class:`ParamSpecArgs` and :class:`ParamSpecKwargs`.
+      Vì ``ParamSpec`` nắm bắt cả tham số vị trí và tham số từ khóa, có thể dùng ``P.args`` và ``P.kwargs`` để tách một ``ParamSpec`` thành các thành phần của nó. ``P.args`` biểu diễn tuple gồm các tham số vị trí trong một lời gọi cụ thể và chỉ nên được dùng để chú thích ``*args``. ``P.kwargs`` biểu diễn ánh xạ từ các tham số từ khóa đến giá trị của chúng trong một lời gọi cụ thể và chỉ nên được dùng để chú thích ``**kwargs``. Cả hai thuộc tính đều yêu cầu tham số được chú thích phải nằm trong phạm vi. Tại thời điểm chạy, ``P.args`` và ``P.kwargs`` lần lượt là các thực thể của
+      :class:`ParamSpecArgs` và :class:`ParamSpecKwargs`.
 
    .. attribute:: __name__
 
-      The name of the parameter specification.
+      Tên của đặc tả tham số.
 
    .. attribute:: __default__
 
-      The default value of the parameter specification, or :data:`typing.NoDefault` if it
-      has no default.
+      Giá trị mặc định của đặc tả tham số, hoặc :data:`typing.NoDefault` nếu không có giá trị mặc định.
 
       .. versionadded:: 3.13
 
    .. method:: evaluate_default
 
-      An :term:`evaluate function` corresponding to the :attr:`~ParamSpec.__default__` attribute.
-      When called directly, this method supports only the :attr:`~annotationlib.Format.VALUE`
-      format, which is equivalent to accessing the :attr:`~ParamSpec.__default__` attribute directly,
-      but the method object can be passed to :func:`annotationlib.call_evaluate_function`
-      to evaluate the value in a different format.
+      Một :term:`evaluate function` tương ứng với thuộc tính :attr:`~ParamSpec.__default__`. Khi được gọi trực tiếp, phương thức này chỉ hỗ trợ định dạng :attr:`~annotationlib.Format.VALUE`, tương đương với việc truy cập trực tiếp thuộc tính :attr:`~ParamSpec.__default__`, nhưng đối tượng phương thức có thể được truyền vào :func:`annotationlib.call_evaluate_function` để đánh giá giá trị theo một định dạng khác.
 
       .. versionadded:: 3.14
 
    .. method:: has_default()
 
-      Return whether or not the parameter specification has a default value. This is equivalent
-      to checking whether :attr:`__default__` is not the :data:`typing.NoDefault`
-      singleton, except that it does not force evaluation of the
-      :ref:`lazily evaluated <lazy-evaluation>` default value.
+      Trả về việc đặc tả tham số có giá trị mặc định hay không. Điều này tương đương với việc kiểm tra xem :attr:`__default__` không phải là singleton :data:`typing.NoDefault`, ngoại trừ việc nó không buộc đánh giá
+      :ref:`giá trị mặc định được đánh giá trì hoãn <lazy-evaluation>`.
 
       .. versionadded:: 3.13
 
-   Parameter specification variables created with ``covariant=True`` or
-   ``contravariant=True`` can be used to declare covariant or contravariant
-   generic types.  The ``bound`` argument is also accepted, similar to
-   :class:`TypeVar`.  However the actual semantics of these keywords are yet to
-   be decided.
+   Các biến đặc tả tham số được tạo bằng ``covariant=True`` hoặc ``contravariant=True`` có thể được dùng để khai báo các kiểu generic đồng biến hoặc phản biến. Đối số ``bound`` cũng được chấp nhận, tương tự như
+   :class:`TypeVar`. Tuy nhiên, ngữ nghĩa thực tế của các từ khóa này vẫn chưa được quyết định.
 
    .. versionadded:: 3.10
 
    .. versionchanged:: 3.12
 
-      Parameter specifications can now be declared using the
-      :ref:`type parameter <type-params>` syntax introduced by :pep:`695`.
+      Giờ đây, các đặc tả tham số có thể được khai báo bằng
+      :ref:`cú pháp tham số kiểu <type-params>` được giới thiệu bởi :pep:`695`.
 
    .. versionchanged:: 3.13
 
-      Support for default values was added.
+      Đã bổ sung hỗ trợ cho các giá trị mặc định.
 
    .. note::
-      Only parameter specification variables defined in global scope can
-      be pickled.
+      Chỉ các biến đặc tả tham số được định nghĩa trong phạm vi toàn cục mới có thể được pickle.
 
    .. seealso::
-      * :pep:`612` -- Parameter Specification Variables (the PEP which introduced
-        ``ParamSpec`` and ``Concatenate``)
+      * :pep:`612` -- Các biến đặc tả tham số (PEP đã giới thiệu ``ParamSpec`` và ``Concatenate``)
       * :data:`Concatenate`
       * :ref:`annotating-callables`
 
 .. class:: ParamSpecArgs
            ParamSpecKwargs
 
-   Arguments and keyword arguments attributes of a :class:`ParamSpec`. The
-   ``P.args`` attribute of a ``ParamSpec`` is an instance of ``ParamSpecArgs``,
-   and ``P.kwargs`` is an instance of ``ParamSpecKwargs``. They are intended
-   for runtime introspection and have no special meaning to static type checkers.
+   Các thuộc tính arguments và keyword arguments của một :class:`ParamSpec`. Thuộc tính ``P.args`` của một ``ParamSpec`` là một thể hiện của ``ParamSpecArgs``, còn ``P.kwargs`` là một thể hiện của ``ParamSpecKwargs``. Chúng được dùng để kiểm tra nội tại runtime và không có ý nghĩa đặc biệt đối với các trình kiểm tra kiểu tĩnh.
 
-   Calling :func:`get_origin` on either of these objects will return the
-   original ``ParamSpec``:
+   Gọi :func:`get_origin` trên một trong hai đối tượng này sẽ trả về ``ParamSpec`` ban đầu:
 
    .. doctest::
 
@@ -2246,9 +1859,9 @@ without the dedicated syntax, as documented below.
 
 .. class:: TypeAliasType(name, value, *, type_params=())
 
-   The type of type aliases created through the :keyword:`type` statement.
+   Kiểu của các bí danh kiểu được tạo thông qua câu lệnh :keyword:`type`.
 
-   Example:
+   Ví dụ:
 
    .. doctest::
 
@@ -2260,7 +1873,7 @@ without the dedicated syntax, as documented below.
 
    .. attribute:: __name__
 
-      The name of the type alias:
+      Tên của bí danh kiểu:
 
       .. doctest::
 
@@ -2270,7 +1883,7 @@ without the dedicated syntax, as documented below.
 
    .. attribute:: __module__
 
-      The name of the module in which the type alias was defined::
+      Tên của module nơi bí danh kiểu được định nghĩa::
 
          >>> type Alias = int
          >>> Alias.__module__
@@ -2278,8 +1891,7 @@ without the dedicated syntax, as documented below.
 
    .. attribute:: __type_params__
 
-      The type parameters of the type alias, or an empty tuple if the alias is
-      not generic:
+      Các tham số kiểu của bí danh kiểu hoặc một tuple rỗng nếu bí danh không phải là generic:
 
       .. doctest::
 
@@ -2292,9 +1904,7 @@ without the dedicated syntax, as documented below.
 
    .. attribute:: __value__
 
-      The type alias's value. This is :ref:`lazily evaluated <lazy-evaluation>`,
-      so names used in the definition of the alias are not resolved until the
-      ``__value__`` attribute is accessed:
+      Giá trị của bí danh kiểu. Giá trị này được :ref:`đánh giá lười <lazy-evaluation>`, vì vậy các tên được sử dụng trong định nghĩa bí danh sẽ không được phân giải cho đến khi thuộc tính ``__value__`` được truy cập:
 
       .. doctest::
 
@@ -2311,11 +1921,7 @@ without the dedicated syntax, as documented below.
 
    .. method:: evaluate_value
 
-      An :term:`evaluate function` corresponding to the :attr:`__value__` attribute.
-      When called directly, this method supports only the :attr:`~annotationlib.Format.VALUE`
-      format, which is equivalent to accessing the :attr:`__value__` attribute directly,
-      but the method object can be passed to :func:`annotationlib.call_evaluate_function`
-      to evaluate the value in a different format:
+      Một :term:`evaluate function` tương ứng với thuộc tính :attr:`__value__`. Khi được gọi trực tiếp, phương thức này chỉ hỗ trợ định dạng :attr:`~annotationlib.Format.VALUE`, tương đương với việc truy cập trực tiếp thuộc tính :attr:`__value__`, nhưng đối tượng phương thức có thể được truyền cho :func:`annotationlib.call_evaluate_function` để đánh giá giá trị theo một định dạng khác:
 
       .. doctest::
 
@@ -2334,10 +1940,9 @@ without the dedicated syntax, as documented below.
 
       .. versionadded:: 3.14
 
-   .. rubric:: Unpacking
+   .. rubric:: Giải nén
 
-   Type aliases support star unpacking using the ``*Alias`` syntax.
-   This is equivalent to using ``Unpack[Alias]`` directly:
+   Bí danh kiểu hỗ trợ giải nén bằng dấu sao với cú pháp ``*Alias``. Điều này tương đương với việc sử dụng trực tiếp ``Unpack[Alias]``:
 
    .. doctest::
 
@@ -2349,28 +1954,26 @@ without the dedicated syntax, as documented below.
    .. versionadded:: 3.14
 
 
-Other special directives
-""""""""""""""""""""""""
+Các chỉ thị đặc biệt khác
+"""""""""""""""""""""""""
 
-These functions and classes should not be used directly as annotations.
-Their intended purpose is to be building blocks for creating and declaring
-types.
+Không nên sử dụng trực tiếp các hàm và lớp này làm chú thích. Mục đích của chúng là làm các khối xây dựng để tạo và khai báo kiểu.
 
 .. class:: NamedTuple
 
-   Typed version of :func:`collections.namedtuple`.
+   Phiên bản có kiểu của :func:`collections.namedtuple`.
 
-   Usage::
+   Cách sử dụng::
 
        class Employee(NamedTuple):
            name: str
            id: int
 
-   This is equivalent to::
+   Điều này tương đương với::
 
        Employee = collections.namedtuple('Employee', ['name', 'id'])
 
-   To give a field a default value, you can assign to it in the class body::
+   Để cung cấp giá trị mặc định cho một field, bạn có thể gán giá trị đó cho field trong phần thân class::
 
       class Employee(NamedTuple):
           name: str
@@ -2379,15 +1982,12 @@ types.
       employee = Employee('Guido')
       assert employee.id == 3
 
-   Fields with a default value must come after any fields without a default.
+   Các field có giá trị mặc định phải đứng sau mọi field không có giá trị mặc định.
 
-   The types for each field name can be retrieved by calling
-   :func:`annotationlib.get_annotations` on the resulting class. (The field
-   names are in the ``_fields`` attribute and the default values are in the
-   ``_field_defaults`` attribute, both of which are part of the :func:`~collections.namedtuple`
-   API.)
+   Có thể lấy các kiểu của từng tên field bằng cách gọi
+   :func:`annotationlib.get_annotations` trên class thu được. (Tên các field nằm trong thuộc tính ``_fields`` và các giá trị mặc định nằm trong thuộc tính ``_field_defaults``, cả hai đều thuộc API :func:`~collections.namedtuple`.)
 
-   ``NamedTuple`` subclasses can also have docstrings and methods::
+   Các lớp con của ``NamedTuple`` cũng có thể có docstring và các method::
 
       class Employee(NamedTuple):
           """Represents an employee."""
@@ -2397,103 +1997,90 @@ types.
           def __repr__(self) -> str:
               return f'<Employee {self.name}, id={self.id}>'
 
-   ``NamedTuple`` subclasses can be generic::
+   Các lớp con của ``NamedTuple`` có thể là generic::
 
       class Group[T](NamedTuple):
           key: T
           group: list[T]
 
-   Backward-compatible usage::
+   Cách sử dụng tương thích ngược::
 
-       # For creating a generic NamedTuple on Python 3.11
+       # Để tạo một NamedTuple generic trên Python 3.11
        T = TypeVar("T")
 
        class Group(NamedTuple, Generic[T]):
            key: T
            group: list[T]
 
-       # A functional syntax is also supported
+       # Cú pháp hàm cũng được hỗ trợ
        Employee = NamedTuple('Employee', [('name', str), ('id', int)])
 
    .. versionchanged:: 3.6
-      Added support for :pep:`526` variable annotation syntax.
+      Đã bổ sung hỗ trợ cho cú pháp chú thích biến :pep:`526`.
 
    .. versionchanged:: 3.6.1
-      Added support for default values, methods, and docstrings.
+      Đã bổ sung hỗ trợ cho các giá trị mặc định, phương thức và docstring.
 
    .. versionchanged:: 3.8
-      The ``_field_types`` and ``__annotations__`` attributes are
-      now regular dictionaries instead of instances of ``OrderedDict``.
+      Các thuộc tính ``_field_types`` và ``__annotations__`` giờ đây là các dictionary thông thường thay vì các instance của ``OrderedDict``.
 
    .. versionchanged:: 3.9
-      Removed the ``_field_types`` attribute in favor of the more
-      standard ``__annotations__`` attribute which has the same information.
+      Đã loại bỏ thuộc tính ``_field_types`` để thay bằng thuộc tính ``__annotations__`` tiêu chuẩn hơn, vốn chứa cùng thông tin.
 
    .. versionchanged:: 3.9
-      ``NamedTuple`` is now a function rather than a class.
-      It can still be used as a class base, as described above.
+      ``NamedTuple`` hiện là một function thay vì một class. Nó vẫn có thể được dùng làm class base, như mô tả ở trên.
 
    .. versionchanged:: 3.11
-      Added support for generic namedtuples.
+      Đã bổ sung hỗ trợ cho namedtuple tổng quát.
 
    .. versionchanged:: 3.14
-      Using :func:`super` (and the ``__class__`` :term:`closure variable`) in methods of ``NamedTuple`` subclasses
-      is unsupported and causes a :class:`TypeError`.
+      Việc sử dụng :func:`super` (và ``__class__`` :term:`closure variable`) trong các method của các subclass ``NamedTuple`` không được hỗ trợ và gây ra :class:`TypeError`.
 
    .. deprecated-removed:: 3.13 3.15
-      The undocumented keyword argument syntax for creating NamedTuple classes
-      (``NT = NamedTuple("NT", x=int)``) is deprecated, and will be disallowed
-      in 3.15. Use the class-based syntax or the functional syntax instead.
+      Cú pháp đối số keyword không được ghi nhận để tạo các class NamedTuple (``NT = NamedTuple("NT", x=int)``) đã không còn được khuyến nghị và sẽ bị vô hiệu hóa trong 3.15. Thay vào đó, hãy sử dụng cú pháp dựa trên class hoặc cú pháp functional.
 
    .. deprecated-removed:: 3.13 3.15
-      When using the functional syntax to create a NamedTuple class, failing to
-      pass a value to the 'fields' parameter (``NT = NamedTuple("NT")``) is
-      deprecated. Passing ``None`` to the 'fields' parameter
-      (``NT = NamedTuple("NT", None)``) is also deprecated. Both will be
-      disallowed in Python 3.15. To create a NamedTuple class with 0 fields,
-      use ``class NT(NamedTuple): pass`` or ``NT = NamedTuple("NT", [])``.
+      Khi sử dụng cú pháp functional để tạo một class NamedTuple, việc không truyền giá trị cho tham số 'fields' (``NT = NamedTuple("NT")``) đã không còn được khuyến nghị. Việc truyền ``None`` cho tham số 'fields' (``NT = NamedTuple("NT", None)``) cũng không còn được khuyến nghị. Cả hai cách này sẽ bị vô hiệu hóa trong Python 3.15. Để tạo một class NamedTuple có 0 field, hãy sử dụng ``class NT(NamedTuple): pass`` hoặc ``NT = NamedTuple("NT", [])``.
 
 .. class:: NewType(name, tp)
 
-   Helper class to create low-overhead :ref:`distinct types <distinct>`.
+   Lớp trợ giúp để tạo các kiểu :ref:`distinct có overhead thấp <distinct>`.
 
-   A ``NewType`` is considered a distinct type by a type checker. At runtime,
-   however, calling a ``NewType`` returns its argument unchanged.
+   ``NewType`` được trình kiểm tra kiểu xem là một kiểu riêng biệt. Tuy nhiên, trong runtime, việc gọi ``NewType`` sẽ trả về đối số của nó mà không thay đổi.
 
-   Usage::
+   Cách sử dụng::
 
-      UserId = NewType('UserId', int)  # Declare the NewType "UserId"
-      first_user = UserId(1)  # "UserId" returns the argument unchanged at runtime
+      UserId = NewType('UserId', int)  # Khai báo NewType "UserId"
+      first_user = UserId(1)  # "UserId" trả về đối số mà không thay đổi trong runtime
 
    .. attribute:: __module__
 
-      The name of the module in which the new type is defined.
+      Tên của module nơi kiểu mới được định nghĩa.
 
    .. attribute:: __name__
 
-      The name of the new type.
+      Tên của kiểu mới.
 
    .. attribute:: __supertype__
 
-      The type that the new type is based on.
+      Kiểu mà kiểu mới dựa trên.
 
    .. versionadded:: 3.5.2
 
    .. versionchanged:: 3.10
-      ``NewType`` is now a class rather than a function.
+      ``NewType`` hiện là một class thay vì một function.
 
 .. class:: Protocol(Generic)
 
-   Base class for protocol classes.
+   Class cơ sở cho các class protocol.
 
-   Protocol classes are defined like this::
+   Các class protocol được định nghĩa như sau::
 
       class Proto(Protocol):
           def meth(self) -> int:
               ...
 
-   Such classes are primarily used with static type checkers that recognize
-   structural subtyping (static duck-typing), for example::
+   Các class như vậy chủ yếu được dùng với các static type checker nhận diện structural subtyping (static duck-typing), chẳng hạn như::
 
       class C:
           def meth(self) -> int:
@@ -2502,22 +2089,18 @@ types.
       def func(x: Proto) -> int:
           return x.meth()
 
-      func(C())  # Passes static type check
+      func(C())  # Vượt qua kiểm tra kiểu tĩnh
 
-   See :pep:`544` for more details. Protocol classes decorated with
-   :deco:`runtime_checkable` (described later) act as simple-minded runtime
-   protocols that check only the presence of given attributes, ignoring their
-   type signatures. Protocol classes without this decorator cannot be used
-   as the second argument to :func:`isinstance` or :func:`issubclass`.
+   Xem :pep:`544` để biết thêm chi tiết. Các class protocol được trang trí bằng
+   :deco:`runtime_checkable` (được mô tả ở phần sau) hoạt động như các protocol runtime đơn giản, chỉ kiểm tra sự hiện diện của các thuộc tính được chỉ định và bỏ qua chữ ký kiểu của chúng. Không thể dùng các class protocol không có decorator này làm đối số thứ hai của :func:`isinstance` hoặc :func:`issubclass`.
 
-   Protocol classes can be generic, for example::
+   Các lớp Protocol có thể là generic, ví dụ như::
 
       class GenProto[T](Protocol):
           def meth(self) -> T:
               ...
 
-   In code that needs to be compatible with Python 3.11 or older, generic
-   Protocols can be written as follows::
+   Trong mã cần tương thích với Python 3.11 trở xuống, có thể viết các Protocol generic như sau::
 
       T = TypeVar("T")
 
@@ -2529,11 +2112,9 @@ types.
 
 .. decorator:: runtime_checkable
 
-   Mark a protocol class as a runtime protocol.
+   Đánh dấu một lớp protocol là runtime protocol.
 
-   Such a protocol can be used with :func:`isinstance` and :func:`issubclass`.
-   This allows a simple-minded structural check, very similar to "one-trick ponies"
-   in :mod:`collections.abc` such as :class:`~collections.abc.Iterable`.  For example::
+   Có thể sử dụng protocol như vậy với :func:`isinstance` và :func:`issubclass`. Điều này cho phép thực hiện một kiểm tra cấu trúc đơn giản, rất giống với các "one-trick ponies" trong :mod:`collections.abc` chẳng hạn như :class:`~collections.abc.Iterable`. Ví dụ::
 
       @runtime_checkable
       class Closable(Protocol):
@@ -2548,57 +2129,32 @@ types.
       import threading
       assert isinstance(threading.Thread(name='Bob'), Named)
 
-   This decorator raises :exc:`TypeError` when applied to a non-protocol class.
+   Decorator này phát sinh :exc:`TypeError` khi được áp dụng cho một lớp không phải protocol.
 
    .. note::
 
-        :deco:`!runtime_checkable` will check only the presence of the required
-        methods or attributes, not their type signatures or types.
-        For example, :class:`ssl.SSLObject`
-        is a class, therefore it passes an :func:`issubclass`
-        check against :ref:`Callable <annotating-callables>`. However, the
-        ``ssl.SSLObject.__init__`` method exists only to raise a
-        :exc:`TypeError` with a more informative message, therefore making
-        it impossible to call (instantiate) :class:`ssl.SSLObject`.
+        :deco:`!runtime_checkable` sẽ chỉ kiểm tra sự hiện diện của các phương thức hoặc thuộc tính bắt buộc, không kiểm tra chữ ký kiểu hoặc kiểu của chúng. Ví dụ, :class:`ssl.SSLObject` là một lớp, vì vậy nó vượt qua kiểm tra :func:`issubclass` đối với :ref:`Callable <annotating-callables>`. Tuy nhiên, phương thức ``ssl.SSLObject.__init__`` chỉ tồn tại để phát sinh một
+        :exc:`TypeError` với thông báo chi tiết hơn, do đó khiến không thể gọi (khởi tạo) :class:`ssl.SSLObject`.
 
    .. note::
 
-        An :func:`isinstance` check against a runtime-checkable protocol can be
-        surprisingly slow compared to an ``isinstance()`` check against
-        a non-protocol class. Consider using alternative idioms such as
-        :func:`hasattr` calls for structural checks in performance-sensitive
-        code.
+        Phép kiểm tra :func:`isinstance` đối với một protocol có thể kiểm tra tại runtime có thể chậm một cách đáng ngạc nhiên so với phép kiểm tra ``isinstance()`` đối với một class không phải protocol. Hãy cân nhắc sử dụng các cách viết thay thế như
+        :func:`hasattr` để thực hiện các phép kiểm tra cấu trúc trong mã nhạy cảm về hiệu năng.
 
    .. versionadded:: 3.8
 
    .. versionchanged:: 3.12
-      The internal implementation of :func:`isinstance` checks against
-      runtime-checkable protocols now uses :func:`inspect.getattr_static`
-      to look up attributes (previously, :func:`hasattr` was used).
-      As a result, some objects which used to be considered instances
-      of a runtime-checkable protocol may no longer be considered instances
-      of that protocol on Python 3.12+, and vice versa.
-      Most users are unlikely to be affected by this change.
+      Việc triển khai nội bộ các phép kiểm tra :func:`isinstance` đối với protocol có thể kiểm tra tại runtime hiện sử dụng :func:`inspect.getattr_static` để tra cứu các thuộc tính (trước đây sử dụng :func:`hasattr`). Do đó, một số đối tượng trước đây được xem là instance của một protocol có thể kiểm tra tại runtime có thể không còn được xem là instance của protocol đó trên Python 3.12+ và ngược lại. Hầu hết người dùng khó bị ảnh hưởng bởi thay đổi này.
 
    .. versionchanged:: 3.12
-      The members of a runtime-checkable protocol are now considered "frozen"
-      at runtime as soon as the class has been created. Monkey-patching
-      attributes onto a runtime-checkable protocol will still work, but will
-      have no impact on :func:`isinstance` checks comparing objects to the
-      protocol. See :ref:`What's new in Python 3.12 <whatsnew-typing-py312>`
-      for more details.
+      Các thành viên của một protocol có thể kiểm tra tại runtime hiện được xem là đã "đóng băng" tại runtime ngay khi class được tạo. Việc monkey-patch các thuộc tính vào một protocol có thể kiểm tra tại runtime vẫn hoạt động, nhưng sẽ không ảnh hưởng đến các phép kiểm tra :func:`isinstance` so sánh các đối tượng với protocol đó. Xem :ref:`Có gì mới trong Python 3.12 <whatsnew-typing-py312>` để biết thêm chi tiết.
 
 
 .. class:: TypedDict(dict)
 
-   Special construct to add type hints to a dictionary.
-   At runtime ":class:`!TypedDict` instances" are simply :class:`dicts <dict>`.
+   Một cấu trúc đặc biệt để thêm type hint vào một dictionary. Tại runtime, "các instance :class:`!TypedDict`" đơn giản chỉ là :class:`dicts <dict>`.
 
-   ``TypedDict`` declares a dictionary type that expects all of its
-   instances to have a certain set of keys, where each key is
-   associated with a value of a consistent type. This expectation
-   is not checked at runtime but is only enforced by type checkers.
-   Usage::
+   ``TypedDict`` khai báo một kiểu dictionary yêu cầu tất cả instance của nó phải có một tập khóa nhất định, trong đó mỗi khóa được liên kết với một giá trị có kiểu nhất quán. Yêu cầu này không được kiểm tra tại runtime mà chỉ được các trình kiểm tra kiểu thực thi. Cách sử dụng::
 
       class Point2D(TypedDict):
           x: int
@@ -2606,93 +2162,80 @@ types.
           label: str
 
       a: Point2D = {'x': 1, 'y': 2, 'label': 'good'}  # OK
-      b: Point2D = {'z': 3, 'label': 'bad'}           # Fails type check
+      b: Point2D = {'z': 3, 'label': 'bad'}           # Không vượt qua kiểm tra kiểu
 
       assert Point2D(x=1, y=2, label='first') == dict(x=1, y=2, label='first')
 
-   An alternative way to create a ``TypedDict`` is by using
-   function-call syntax. The second argument must be a literal :class:`dict`::
+   Một cách khác để tạo ``TypedDict`` là sử dụng cú pháp gọi hàm. Đối số thứ hai phải là một :class:`dict` literal::
 
       Point2D = TypedDict('Point2D', {'x': int, 'y': int, 'label': str})
 
-   This functional syntax allows defining keys which are not valid
-   :ref:`identifiers <identifiers>`, for example because they are
-   keywords or contain hyphens, or when key names must not be
-   :ref:`mangled <private-name-mangling>` like regular private names::
+   Cú pháp hàm này cho phép định nghĩa các khóa không hợp lệ
+   :ref:`định danh <identifiers>`, chẳng hạn vì chúng là từ khóa hoặc chứa dấu gạch nối, hoặc khi tên khóa không được
+   :ref:`biến đổi <private-name-mangling>` như các tên private thông thường::
 
-      # raises SyntaxError
+      # gây ra SyntaxError
       class Point2D(TypedDict):
-          in: int  # 'in' is a keyword
-          x-y: int  # name with hyphens
+          in: int  # 'in' là một từ khóa
+          x-y: int  # tên có dấu gạch ngang
 
       class Definition(TypedDict):
-          __schema: str  # mangled to `_Definition__schema`
+          __schema: str  # được biến đổi thành `_Definition__schema`
 
-      # OK, functional syntax
+      # Được, cú pháp hàm
       Point2D = TypedDict('Point2D', {'in': int, 'x-y': int})
-      Definition = TypedDict('Definition', {'__schema': str})  # not mangled
+      Definition = TypedDict('Definition', {'__schema': str})  # không được biến đổi
 
-   By default, all keys must be present in a ``TypedDict``. It is possible to
-   mark individual keys as non-required using :data:`NotRequired`::
+   Theo mặc định, tất cả các khóa phải có mặt trong một ``TypedDict``. Có thể đánh dấu từng khóa là không bắt buộc bằng :data:`NotRequired`::
 
       class Point2D(TypedDict):
           x: int
           y: int
           label: NotRequired[str]
 
-      # Alternative syntax
+      # Cú pháp thay thế
       Point2D = TypedDict('Point2D', {'x': int, 'y': int, 'label': NotRequired[str]})
 
-   This means that a ``Point2D`` ``TypedDict`` can have the ``label``
-   key omitted.
+   Điều này có nghĩa là một ``Point2D`` ``TypedDict`` có thể bỏ qua khóa ``label``.
 
-   It is also possible to mark all keys as non-required by default
-   by specifying a totality of ``False``::
+   Cũng có thể đánh dấu tất cả các key là không bắt buộc theo mặc định bằng cách chỉ định tính toàn phần là ``False``::
 
       class Point2D(TypedDict, total=False):
           x: int
           y: int
 
-      # Alternative syntax
+      # Cú pháp thay thế
       Point2D = TypedDict('Point2D', {'x': int, 'y': int}, total=False)
 
-   This means that a ``Point2D`` ``TypedDict`` can have any of the keys
-   omitted. A type checker is only expected to support a literal ``False`` or
-   ``True`` as the value of the ``total`` argument. ``True`` is the default,
-   and makes all items defined in the class body required.
+   Điều này có nghĩa là một ``Point2D`` ``TypedDict`` có thể bỏ qua bất kỳ key nào. Một type checker chỉ được yêu cầu hỗ trợ giá trị literal ``False`` hoặc ``True`` cho đối số ``total``. ``True`` là giá trị mặc định và khiến tất cả các item được định nghĩa trong phần thân class trở thành bắt buộc.
 
-   Individual keys of a ``total=False`` ``TypedDict`` can be marked as
-   required using :data:`Required`::
+   Có thể đánh dấu từng key riêng lẻ của một ``total=False`` ``TypedDict`` là bắt buộc bằng cách sử dụng :data:`Required`::
 
       class Point2D(TypedDict, total=False):
           x: Required[int]
           y: Required[int]
           label: str
 
-      # Alternative syntax
+      # Cú pháp thay thế
       Point2D = TypedDict('Point2D', {
           'x': Required[int],
           'y': Required[int],
           'label': str
       }, total=False)
 
-   It is possible for a ``TypedDict`` type to inherit from one or more other ``TypedDict`` types
-   using the class-based syntax.
-   Usage::
+   Một kiểu ``TypedDict`` có thể kế thừa từ một hoặc nhiều kiểu ``TypedDict`` khác bằng cú pháp dựa trên class. Cách sử dụng::
 
       class Point3D(Point2D):
           z: int
 
-   ``Point3D`` has three items: ``x``, ``y`` and ``z``. It is equivalent to this
-   definition::
+   ``Point3D`` có ba item: ``x``, ``y`` và ``z``. Nó tương đương với định nghĩa này::
 
       class Point3D(TypedDict):
           x: int
           y: int
           z: int
 
-   A ``TypedDict`` cannot inherit from a non-\ ``TypedDict`` class,
-   except for :class:`Generic`. For example::
+   Một ``TypedDict`` không thể kế thừa từ một lớp không phải \ ``TypedDict``, ngoại trừ :class:`Generic`. Ví dụ::
 
       class X(TypedDict):
           x: int
@@ -2700,20 +2243,19 @@ types.
       class Y(TypedDict):
           y: int
 
-      class Z(object): pass  # A non-TypedDict class
+      class Z(object): pass  # Một lớp không phải TypedDict
 
       class XY(X, Y): pass  # OK
 
-      class XZ(X, Z): pass  # raises TypeError
+      class XZ(X, Z): pass  # gây ra TypeError
 
-   A ``TypedDict`` can be generic::
+   Một ``TypedDict`` có thể là generic::
 
       class Group[T](TypedDict):
           key: T
           group: list[T]
 
-   To create a generic ``TypedDict`` that is compatible with Python 3.11
-   or lower, inherit from :class:`Generic` explicitly:
+   Để tạo một ``TypedDict`` generic tương thích với Python 3.11 trở xuống, hãy kế thừa rõ ràng từ :class:`Generic`:
 
    .. testcode::
 
@@ -2723,14 +2265,11 @@ types.
           key: T
           group: list[T]
 
-   A ``TypedDict`` can be introspected via :func:`annotationlib.get_annotations`
-   (see :ref:`annotations-howto` for more information on annotations best practices)
-   and the following attributes:
+   Có thể introspect một ``TypedDict`` thông qua :func:`annotationlib.get_annotations` (xem :ref:`annotations-howto` để biết thêm thông tin về các phương pháp hay nhất khi sử dụng annotations) và các thuộc tính sau:
 
    .. attribute:: __total__
 
-      ``Point2D.__total__`` gives the value of the ``total`` argument.
-      Example:
+      ``Point2D.__total__`` cung cấp giá trị của đối số ``total``. Ví dụ:
 
       .. doctest::
 
@@ -2745,12 +2284,8 @@ types.
          >>> Point3D.__total__
          True
 
-      This attribute reflects *only* the value of the ``total`` argument
-      to the current ``TypedDict`` class, not whether the class is semantically
-      total. For example, a ``TypedDict`` with ``__total__`` set to ``True`` may
-      have keys marked with :data:`NotRequired`, or it may inherit from another
-      ``TypedDict`` with ``total=False``. Therefore, it is generally better to use
-      :attr:`__required_keys__` and :attr:`__optional_keys__` for introspection.
+      Thuộc tính này chỉ phản ánh *only* giá trị của đối số ``total`` đối với lớp ``TypedDict`` hiện tại, chứ không phản ánh việc lớp đó có đầy đủ về mặt ngữ nghĩa hay không. Ví dụ, một ``TypedDict`` có ``__total__`` được đặt thành ``True`` có thể có các khóa được đánh dấu bằng :data:`NotRequired`, hoặc có thể kế thừa từ một ``TypedDict`` khác với ``total=False``. Vì vậy, nhìn chung nên sử dụng
+      :attr:`__required_keys__` và :attr:`__optional_keys__` để introspection.
 
    .. attribute:: __required_keys__
 
@@ -2758,18 +2293,12 @@ types.
 
    .. attribute:: __optional_keys__
 
-      ``Point2D.__required_keys__`` and ``Point2D.__optional_keys__`` return
-      :class:`frozenset` objects containing required and non-required keys, respectively.
+      ``Point2D.__required_keys__`` và ``Point2D.__optional_keys__`` trả về
+      các đối tượng :class:`frozenset` lần lượt chứa các khóa bắt buộc và không bắt buộc.
 
-      Keys marked with :data:`Required` will always appear in ``__required_keys__``
-      and keys marked with :data:`NotRequired` will always appear in ``__optional_keys__``.
+      Các khóa được đánh dấu bằng :data:`Required` sẽ luôn xuất hiện trong ``__required_keys__``, còn các khóa được đánh dấu bằng :data:`NotRequired` sẽ luôn xuất hiện trong ``__optional_keys__``.
 
-      For backwards compatibility with Python 3.10 and below,
-      it is also possible to use inheritance to declare both required and
-      non-required keys in the same ``TypedDict``. This is done by declaring a
-      ``TypedDict`` with one value for the ``total`` argument and then
-      inheriting from it in another ``TypedDict`` with a different value for
-      ``total``:
+      Để tương thích ngược với Python 3.10 trở xuống, bạn cũng có thể sử dụng tính kế thừa để khai báo cả khóa bắt buộc và không bắt buộc trong cùng một ``TypedDict``. Việc này được thực hiện bằng cách khai báo một ``TypedDict`` với một giá trị cho đối số ``total``, sau đó kế thừa từ nó trong một ``TypedDict`` khác với giá trị khác cho ``total``:
 
       .. doctest::
 
@@ -2789,168 +2318,139 @@ types.
 
       .. note::
 
-         If ``from __future__ import annotations`` is used or if annotations
-         are given as strings, annotations are not evaluated when the
-         ``TypedDict`` is defined. Therefore, the runtime introspection that
-         ``__required_keys__`` and ``__optional_keys__`` rely on may not work
-         properly, and the values of the attributes may be incorrect.
+         Nếu sử dụng ``from __future__ import annotations`` hoặc nếu các chú thích được cung cấp dưới dạng chuỗi, các chú thích sẽ không được đánh giá khi ``TypedDict`` được định nghĩa. Do đó, quá trình introspection tại runtime mà ``__required_keys__`` và ``__optional_keys__`` dựa vào có thể không hoạt động chính xác, và giá trị của các thuộc tính có thể không đúng.
 
-   Support for :data:`ReadOnly` is reflected in the following attributes:
+   Hỗ trợ cho :data:`ReadOnly` được thể hiện qua các thuộc tính sau:
 
    .. attribute:: __readonly_keys__
 
-      A :class:`frozenset` containing the names of all read-only keys. Keys
-      are read-only if they carry the :data:`ReadOnly` qualifier.
+      Một :class:`frozenset` chứa tên của tất cả các key chỉ đọc. Các key là chỉ đọc nếu có qualifier :data:`ReadOnly`.
 
       .. versionadded:: 3.13
 
    .. attribute:: __mutable_keys__
 
-      A :class:`frozenset` containing the names of all mutable keys. Keys
-      are mutable if they do not carry the :data:`ReadOnly` qualifier.
+      Một :class:`frozenset` chứa tên của tất cả các key có thể thay đổi. Các key có thể thay đổi nếu không có qualifier :data:`ReadOnly`.
 
       .. versionadded:: 3.13
 
-   See the `TypedDict <https://typing.python.org/en/latest/spec/typeddict.html#typeddict>`_ section in the typing documentation for more examples and detailed rules.
+   Xem phần `TypedDict <https://typing.python.org/en/latest/spec/typeddict.html#typeddict>`_ trong tài liệu typing để biết thêm ví dụ và các quy tắc chi tiết.
 
    .. versionadded:: 3.8
 
    .. versionchanged:: 3.9
-      ``TypedDict`` is now a function rather than a class.
-      It can still be used as a class base, as described above.
+      ``TypedDict`` hiện là một function thay vì một class. Nó vẫn có thể được sử dụng làm class base, như mô tả ở trên.
 
    .. versionchanged:: 3.11
-      Added support for marking individual keys as :data:`Required` or :data:`NotRequired`.
-      See :pep:`655`.
+      Đã thêm hỗ trợ đánh dấu từng key riêng lẻ là :data:`Required` hoặc :data:`NotRequired`. Xem :pep:`655`.
 
    .. versionchanged:: 3.11
-      Added support for generic ``TypedDict``\ s.
+      Đã thêm hỗ trợ cho các ``TypedDict``\ s tổng quát.
 
    .. versionchanged:: 3.13
-      Removed support for the keyword-argument method of creating ``TypedDict``\ s.
+      Đã loại bỏ hỗ trợ cho phương thức tạo ``TypedDict``\ s bằng đối số từ khóa.
 
    .. versionchanged:: 3.13
-      Support for the :data:`ReadOnly` qualifier was added.
+      Đã thêm hỗ trợ cho bộ định tính :data:`ReadOnly`.
 
    .. deprecated-removed:: 3.13 3.15
-      When using the functional syntax to create a TypedDict class, failing to
-      pass a value to the 'fields' parameter (``TD = TypedDict("TD")``) is
-      deprecated. Passing ``None`` to the 'fields' parameter
-      (``TD = TypedDict("TD", None)``) is also deprecated. Both will be
-      disallowed in Python 3.15. To create a TypedDict class with 0 fields,
-      use ``class TD(TypedDict): pass`` or ``TD = TypedDict("TD", {})``.
+      Khi sử dụng cú pháp hàm để tạo một lớp TypedDict, việc không truyền giá trị cho tham số 'fields' (``TD = TypedDict("TD")``) đã không còn được khuyến nghị. Việc truyền ``None`` vào tham số 'fields' (``TD = TypedDict("TD", None)``) cũng không còn được khuyến nghị. Cả hai cách sẽ bị cấm trong Python 3.15. Để tạo một lớp TypedDict không có trường nào, hãy sử dụng ``class TD(TypedDict): pass`` hoặc ``TD = TypedDict("TD", {})``.
 
-Protocols
----------
+Các protocol
+------------
 
-The following protocols are provided by the :mod:`!typing` module. All are decorated
-with :deco:`runtime_checkable`.
+Mô-đun :mod:`!typing` cung cấp các protocol sau. Tất cả đều được trang trí bằng :deco:`runtime_checkable`.
 
 .. class:: SupportsAbs
 
-    A protocol with one abstract method ``__abs__`` that is covariant
-    in its return type.
+    Một protocol có một phương thức trừu tượng ``__abs__`` duy nhất, với kiểu trả về có tính đồng biến.
 
 .. class:: SupportsBytes
 
-    A protocol with one abstract method ``__bytes__``.
+    Một giao thức có một phương thức trừu tượng ``__bytes__``.
 
 .. class:: SupportsComplex
 
-    A protocol with one abstract method ``__complex__``.
+    Một giao thức có một phương thức trừu tượng ``__complex__``.
 
 .. class:: SupportsFloat
 
-    A protocol with one abstract method ``__float__``.
+    Một giao thức có một phương thức trừu tượng ``__float__``.
 
 .. class:: SupportsIndex
 
-    A protocol with one abstract method ``__index__``.
+    Một giao thức có một phương thức trừu tượng ``__index__``.
 
     .. versionadded:: 3.8
 
 .. class:: SupportsInt
 
-    A protocol with one abstract method ``__int__``.
+    Một giao thức có một phương thức trừu tượng ``__int__``.
 
 .. class:: SupportsRound
 
-    A protocol with one abstract method ``__round__``
-    that is covariant in its return type.
+    Một giao thức có một phương thức trừu tượng ``__round__`` có tính đồng biến theo kiểu trả về.
 
 .. _typing-io:
 
-ABCs and Protocols for working with I/O
+Các ABC và Protocol để làm việc với I/O
 ---------------------------------------
 
 .. class:: IO[AnyStr]
-           TextIO
-           BinaryIO
+           TextIO BinaryIO
 
-   Generic class ``IO[AnyStr]`` and its subclasses ``TextIO(IO[str])``
-   and ``BinaryIO(IO[bytes])``
-   represent the types of I/O streams such as returned by
-   :func:`open`. Please note that these classes are not protocols, and
-   their interface is fairly broad.
+   Lớp generic ``IO[AnyStr]`` và các lớp con ``TextIO(IO[str])`` và ``BinaryIO(IO[bytes])`` biểu thị các kiểu stream I/O như được trả về bởi
+   :func:`open`. Lưu ý rằng các lớp này không phải là protocol và interface của chúng khá rộng.
 
-The protocols :class:`io.Reader` and :class:`io.Writer` offer a simpler
-alternative for argument types, when only the ``read()`` or ``write()``
-methods are accessed, respectively::
+Các protocol :class:`io.Reader` và :class:`io.Writer` cung cấp một lựa chọn đơn giản hơn cho kiểu đối số khi lần lượt chỉ truy cập các phương thức ``read()`` hoặc ``write()``::
 
    def read_and_write(reader: Reader[str], writer: Writer[bytes]):
        data = reader.read()
        writer.write(data.encode())
 
-Also consider using :class:`collections.abc.Iterable` for iterating over
-the lines of an input stream::
+Ngoài ra, hãy cân nhắc sử dụng :class:`collections.abc.Iterable` để lặp qua các dòng của input stream::
 
    def read_config(stream: Iterable[str]):
        for line in stream:
            ...
 
-Functions and decorators
-------------------------
+Các hàm và decorator
+--------------------
 
 .. function:: cast(typ, val)
 
-   Cast a value to a type.
+   Ép một giá trị về một kiểu.
 
-   This returns the value unchanged.  To the type checker this
-   signals that the return value has the designated type, but at
-   runtime we intentionally don't check anything (we want this
-   to be as fast as possible).
+   Giá trị này được trả về không thay đổi. Đối với trình kiểm tra kiểu, điều này cho biết giá trị trả về có kiểu được chỉ định, nhưng trong runtime, chúng ta cố ý không kiểm tra gì cả (chúng ta muốn thao tác này nhanh nhất có thể).
 
 .. function:: assert_type(val, typ, /)
 
-   Ask a static type checker to confirm that *val* has an inferred type of *typ*.
+   Yêu cầu trình kiểm tra kiểu tĩnh xác nhận rằng *val* có kiểu được suy luận là *typ*.
 
-   At runtime this does nothing: it returns the first argument unchanged with no
-   checks or side effects, no matter the actual type of the argument.
+   Trong runtime, thao tác này không làm gì cả: nó trả về đối số đầu tiên không thay đổi, không thực hiện kiểm tra hay gây ra side effect nào, bất kể kiểu thực tế của đối số là gì.
 
-   When a static type checker encounters a call to ``assert_type()``, it
-   emits an error if the value is not of the specified type::
+   Khi trình kiểm tra kiểu tĩnh gặp một lời gọi đến ``assert_type()``, nó sẽ phát sinh lỗi nếu giá trị không có kiểu được chỉ định::
 
        def greet(name: str) -> None:
-           assert_type(name, str)  # OK, inferred type of `name` is `str`
-           assert_type(name, int)  # type checker error
+           assert_type(name, str)  # OK, kiểu được suy luận của `name` là `str`
+           assert_type(name, int)  # lỗi của trình kiểm tra kiểu
 
-   This function is useful for ensuring the type checker's understanding of a
-   script is in line with the developer's intentions::
+   Hàm này hữu ích để đảm bảo cách trình kiểm tra kiểu hiểu về một script phù hợp với ý định của developer::
 
        def complex_function(arg: object):
-           # Do some complex type-narrowing logic,
-           # after which we hope the inferred type will be `int`
+           # Thực hiện một số logic thu hẹp kiểu phức tạp,
+           # sau đó chúng ta hy vọng kiểu được suy luận sẽ là `int`
            ...
-           # Test whether the type checker correctly understands our function
+           # Kiểm tra xem trình kiểm tra kiểu có hiểu đúng hàm của chúng ta hay không
            assert_type(arg, int)
 
    .. versionadded:: 3.11
 
 .. function:: assert_never(arg, /)
 
-   Ask a static type checker to confirm that a line of code is unreachable.
+   Yêu cầu trình kiểm tra kiểu tĩnh xác nhận rằng một dòng mã không thể được thực thi.
 
-   Example::
+   Ví dụ::
 
        def int_or_str(arg: int | str) -> None:
            match arg:
@@ -2961,73 +2461,50 @@ Functions and decorators
                case _ as unreachable:
                    assert_never(unreachable)
 
-   Here, the annotations allow the type checker to infer that the
-   last case can never execute, because ``arg`` is either
-   an :class:`int` or a :class:`str`, and both options are covered by
-   earlier cases.
+   Ở đây, các chú thích cho phép trình kiểm tra kiểu suy luận rằng trường hợp cuối cùng không bao giờ có thể được thực thi, vì ``arg`` hoặc là :class:`int` hoặc là :class:`str`, và cả hai tùy chọn đều đã được bao quát bởi các trường hợp trước đó.
 
-   If a type checker finds that a call to ``assert_never()`` is
-   reachable, it will emit an error. For example, if the type annotation
-   for ``arg`` was instead ``int | str | float``, the type checker would
-   emit an error pointing out that ``unreachable`` is of type :class:`float`.
-   For a call to ``assert_never`` to pass type checking, the inferred type of
-   the argument passed in must be the bottom type, :data:`Never`, and nothing
-   else.
+   Nếu trình kiểm tra kiểu phát hiện rằng một lệnh gọi đến ``assert_never()`` có thể đạt tới, nó sẽ phát ra một lỗi. Ví dụ: nếu chú thích kiểu của ``arg`` thay vào đó là ``int | str | float``, trình kiểm tra kiểu sẽ phát ra một lỗi chỉ ra rằng ``unreachable`` có kiểu :class:`float`. Để một lệnh gọi đến ``assert_never`` vượt qua kiểm tra kiểu, kiểu được suy luận của đối số được truyền vào phải là kiểu dưới, :data:`Never`, và không thể là kiểu nào khác.
 
-   At runtime, this throws an exception when called.
+   Trong runtime, lệnh gọi này sẽ ném ra một exception.
 
    .. seealso::
-      `Unreachable Code and Exhaustiveness Checking
-      <https://typing.python.org/en/latest/guides/unreachable.html>`__ has more
-      information about exhaustiveness checking with static typing.
+      `Kiểm tra mã không thể thực thi và tính đầy đủ <https://typing.python.org/en/latest/guides/unreachable.html>`__ cung cấp thêm thông tin về việc kiểm tra tính đầy đủ với static typing.
 
    .. versionadded:: 3.11
 
 .. function:: reveal_type(obj, /)
 
-   Ask a static type checker to reveal the inferred type of an expression.
+   Yêu cầu static type checker hiển thị kiểu được suy luận của một biểu thức.
 
-   When a static type checker encounters a call to this function,
-   it emits a diagnostic with the inferred type of the argument. For example::
+   Khi static type checker gặp lệnh gọi đến hàm này, nó sẽ phát diagnostic kèm kiểu được suy luận của đối số. Ví dụ::
 
       x: int = 1
-      reveal_type(x)  # Revealed type is "builtins.int"
+      reveal_type(x)  # Kiểu được tiết lộ là "builtins.int"
 
-   This can be useful when you want to debug how your type checker
-   handles a particular piece of code.
+   Điều này hữu ích khi bạn muốn gỡ lỗi cách type checker xử lý một đoạn mã cụ thể.
 
-   At runtime, this function prints the runtime type of its argument to
-   :data:`sys.stderr` and returns the argument unchanged (allowing the call to
-   be used within an expression)::
+   Trong runtime, hàm này in kiểu runtime của đối số ra
+   :data:`sys.stderr` và trả về đối số không thay đổi (cho phép sử dụng lời gọi trong một biểu thức)::
 
-      x = reveal_type(1)  # prints "Runtime type is int"
-      print(x)  # prints "1"
+      x = reveal_type(1)  # in ra "Runtime type is int"
+      print(x)  # in ra "1"
 
-   Note that the runtime type may be different from (more or less specific
-   than) the type statically inferred by a type checker.
+   Lưu ý rằng kiểu runtime có thể khác với kiểu được trình kiểm tra kiểu suy luận tĩnh (cụ thể hơn hoặc tổng quát hơn).
 
-   Most type checkers support ``reveal_type()`` anywhere, even if the
-   name is not imported from ``typing``. Importing the name from
-   ``typing``, however, allows your code to run without runtime errors and
-   communicates intent more clearly.
+   Hầu hết trình kiểm tra kiểu đều hỗ trợ ``reveal_type()`` ở bất kỳ đâu, ngay cả khi tên này không được import từ ``typing``. Tuy nhiên, việc import tên này từ ``typing`` cho phép mã của bạn chạy mà không gặp lỗi runtime và truyền đạt mục đích rõ ràng hơn.
 
    .. versionadded:: 3.11
 
 .. decorator:: dataclass_transform(*, eq_default=True, order_default=False, \
-                                   kw_only_default=False, frozen_default=False, \
-                                   field_specifiers=(), **kwargs)
+                                   kw_only_default=False, frozen_default=False, \ field_specifiers=(), ****kwargs)
 
-   Decorator to mark an object as providing
-   :func:`dataclass <dataclasses.dataclass>`-like behavior.
+   Decorator dùng để đánh dấu một đối tượng là đối tượng cung cấp
+   Hành vi tương tự :func:`dataclass <dataclasses.dataclass>`.
 
-   ``@dataclass_transform`` may be used to
-   decorate a class, metaclass, or a function that is itself a decorator.
-   The presence of ``@dataclass_transform()`` tells a static type checker that the
-   decorated object performs runtime "magic" that
-   transforms a class in a similar way to
+   ``@dataclass_transform`` có thể được dùng để trang trí một lớp, metaclass hoặc một hàm vốn là decorator. Sự hiện diện của ``@dataclass_transform()`` cho trình kiểm tra kiểu tĩnh biết rằng đối tượng được trang trí thực hiện "phép thuật" trong runtime để biến đổi một lớp theo cách tương tự như
    :deco:`dataclasses.dataclass`.
 
-   Example usage with a decorator function:
+   Ví dụ sử dụng với một hàm decorator:
 
    .. testcode::
 
@@ -3041,7 +2518,7 @@ Functions and decorators
           id: int
           name: str
 
-   On a base class::
+   Trên một lớp cơ sở::
 
       @dataclass_transform()
       class ModelBase: ...
@@ -3050,7 +2527,7 @@ Functions and decorators
           id: int
           name: str
 
-   On a metaclass::
+   Trên một metaclass::
 
       @dataclass_transform()
       class ModelMeta(type): ...
@@ -3061,95 +2538,53 @@ Functions and decorators
           id: int
           name: str
 
-   The ``CustomerModel`` classes defined above will
-   be treated by type checkers similarly to classes created with
-   :deco:`dataclasses.dataclass`.
-   For example, type checkers will assume these classes have
-   ``__init__`` methods that accept ``id`` and ``name``.
+   Các lớp ``CustomerModel`` được định nghĩa ở trên sẽ được trình kiểm tra kiểu xử lý tương tự như các lớp được tạo bằng
+   :deco:`dataclasses.dataclass`. Ví dụ, trình kiểm tra kiểu sẽ giả định rằng các lớp này có các phương thức ``__init__`` nhận ``id`` và ``name``.
 
-   The decorated class, metaclass, or function may accept the following bool
-   arguments which type checkers will assume have the same effect as they
-   would have on the
-   :deco:`dataclasses.dataclass` decorator: ``init``,
-   ``eq``, ``order``, ``unsafe_hash``, ``frozen``, ``match_args``,
-   ``kw_only``, and ``slots``. It must be possible for the value of these
-   arguments (``True`` or ``False``) to be statically evaluated.
+   Lớp, metaclass hoặc hàm được trang trí có thể chấp nhận các đối số bool sau đây mà các trình kiểm tra kiểu sẽ giả định là có cùng tác dụng như khi chúng được áp dụng cho
+   decorator :deco:`dataclasses.dataclass`: ``init``, ``eq``, ``order``, ``unsafe_hash``, ``frozen``, ``match_args``, ``kw_only`` và ``slots``. Giá trị của các đối số này (``True`` hoặc ``False``) phải có thể được đánh giá tĩnh.
 
-   The arguments to the ``@dataclass_transform`` decorator can be used to
-   customize the default behaviors of the decorated class, metaclass, or
-   function:
+   Có thể sử dụng các đối số của decorator ``@dataclass_transform`` để tùy chỉnh các hành vi mặc định của lớp, metaclass hoặc hàm được trang trí:
 
-   :param bool eq_default:
-       Indicates whether the ``eq`` parameter is assumed to be
-       ``True`` or ``False`` if it is omitted by the caller.
-       Defaults to ``True``.
+   :param bool eq_default:Cho biết liệu tham số ``eq`` được giả định là ``True`` hay ``False`` nếu bên gọi bỏ qua tham số này. Mặc định là ``True``.
 
-   :param bool order_default:
-       Indicates whether the ``order`` parameter is
-       assumed to be ``True`` or ``False`` if it is omitted by the caller.
-       Defaults to ``False``.
+   :param bool order_default:Cho biết liệu tham số ``order`` được giả định là ``True`` hay ``False`` nếu bên gọi bỏ qua tham số này. Mặc định là ``False``.
 
-   :param bool kw_only_default:
-       Indicates whether the ``kw_only`` parameter is
-       assumed to be ``True`` or ``False`` if it is omitted by the caller.
-       Defaults to ``False``.
+   :param bool kw_only_default:Cho biết liệu tham số ``kw_only`` được giả định là ``True`` hay ``False`` nếu bên gọi bỏ qua tham số này. Mặc định là ``False``.
 
-   :param bool frozen_default:
-       Indicates whether the ``frozen`` parameter is
-       assumed to be ``True`` or ``False`` if it is omitted by the caller.
-       Defaults to ``False``.
+   :param bool frozen_default:Cho biết liệu tham số ``frozen`` được giả định là ``True`` hay ``False`` nếu bên gọi bỏ qua tham số này. Mặc định là ``False``.
 
        .. versionadded:: 3.12
 
-   :param field_specifiers:
-       Specifies a static list of supported classes
-       or functions that describe fields, similar to :func:`dataclasses.field`.
-       Defaults to ``()``.
+   :param field_specifiers:Chỉ định một danh sách tĩnh gồm các class hoặc function được hỗ trợ để mô tả các trường, tương tự như :func:`dataclasses.field`. Mặc định là ``()``.
    :type field_specifiers: tuple[Callable[..., Any], ...]
 
-   :param Any \**kwargs:
-       Arbitrary other keyword arguments are accepted in order to allow for
-       possible future extensions.
+   :param Any \**kwargs:Các đối số keyword tùy ý khác được chấp nhận để cho phép các phần mở rộng có thể có trong tương lai.
 
-   Type checkers recognize the following optional parameters on field
-   specifiers:
+   Các type checker nhận diện những tham số tùy chọn sau đây trên các bộ chỉ định trường:
 
-   .. list-table:: **Recognised parameters for field specifiers**
+   .. list-table:: **Các tham số được nhận diện cho bộ chỉ định trường**
       :header-rows: 1
       :widths: 20 80
 
-      * - Parameter name
-        - Description
+      * - Tên tham số
+        - Mô tả
       * - ``init``
-        - Indicates whether the field should be included in the
-          synthesized ``__init__`` method. If unspecified, ``init`` defaults to
-          ``True``.
+        - Cho biết liệu trường có được đưa vào phương thức ``__init__`` được tổng hợp hay không. Nếu không được chỉ định, ``init`` mặc định là ``True``.
       * - ``default``
-        - Provides the default value for the field.
+        - Cung cấp giá trị mặc định cho trường.
       * - ``default_factory``
-        - Provides a runtime callback that returns the
-          default value for the field. If neither ``default`` nor
-          ``default_factory`` are specified, the field is assumed to have no
-          default value and must be provided a value when the class is
-          instantiated.
+        - Cung cấp một callback runtime trả về giá trị mặc định cho trường. Nếu không chỉ định ``default`` và ``default_factory``, trường được coi là không có giá trị mặc định và phải được cung cấp một giá trị khi khởi tạo lớp.
       * - ``factory``
-        - An alias for the ``default_factory`` parameter on field specifiers.
+        - Bí danh cho tham số ``default_factory`` trên các bộ chỉ định trường.
       * - ``kw_only``
-        - Indicates whether the field should be marked as
-          keyword-only. If ``True``, the field will be keyword-only. If
-          ``False``, it will not be keyword-only. If unspecified, the value of
-          the ``kw_only`` parameter on the object decorated with
-          ``@dataclass_transform`` will be used, or if that is unspecified, the
-          value of ``kw_only_default`` on ``@dataclass_transform`` will be used.
+        - Cho biết liệu trường có được đánh dấu là chỉ dùng keyword hay không. Nếu ``True``, trường sẽ chỉ dùng keyword. Nếu ``False``, trường sẽ không chỉ dùng keyword. Nếu không được chỉ định, giá trị của tham số ``kw_only`` trên đối tượng được trang trí bằng ``@dataclass_transform`` sẽ được sử dụng; nếu tham số đó cũng không được chỉ định, giá trị của ``kw_only_default`` trên ``@dataclass_transform`` sẽ được sử dụng.
       * - ``alias``
-        - Provides an alternative name for the field. This alternative
-          name is used in the synthesized ``__init__`` method.
+        - Cung cấp một tên thay thế cho trường. Tên thay thế này được sử dụng trong phương thức ``__init__`` được tổng hợp.
 
-   At runtime, this decorator records its arguments in the
-   ``__dataclass_transform__`` attribute on the decorated object.
-   It has no other runtime effect.
+   Trong runtime, decorator này ghi lại các đối số của nó vào thuộc tính ``__dataclass_transform__`` trên đối tượng được trang trí. Nó không có tác động runtime nào khác.
 
-   See :pep:`681` for more details.
+   Xem :pep:`681` để biết thêm chi tiết.
 
    .. versionadded:: 3.11
 
@@ -3157,23 +2592,14 @@ Functions and decorators
 
 .. decorator:: overload
 
-   Decorator for creating overloaded functions and methods.
+   Decorator dùng để tạo các hàm và phương thức overload.
 
-   The ``@overload`` decorator allows describing functions and methods
-   that support multiple different combinations of argument types. A series
-   of ``@overload``-decorated definitions must be followed by exactly one
-   non-``@overload``-decorated definition (for the same function/method).
+   Decorator ``@overload`` cho phép mô tả các hàm và phương thức hỗ trợ nhiều tổ hợp kiểu đối số khác nhau. Một chuỗi các định nghĩa được trang trí bằng ``@overload`` phải được theo sau chính xác một định nghĩa không được trang trí bằng ``@overload`` (cho cùng một hàm/phương thức).
 
-   ``@overload``-decorated definitions are for the benefit of the
-   type checker only, since they will be overwritten by the
-   non-``@overload``-decorated definition. The non-``@overload``-decorated
-   definition, meanwhile, will be used at
-   runtime but should be ignored by a type checker.  At runtime, calling
-   an ``@overload``-decorated function directly will raise
+   Các định nghĩa được trang trí bằng ``@overload`` chỉ phục vụ type checker, vì chúng sẽ bị định nghĩa không được trang trí bằng ``@overload`` ghi đè. Trong khi đó, định nghĩa không được trang trí bằng ``@overload`` sẽ được sử dụng tại runtime nhưng nên bị type checker bỏ qua. Khi chạy, việc gọi trực tiếp một hàm được trang trí bằng ``@overload`` sẽ gây ra
    :exc:`NotImplementedError`.
 
-   An example of overload that gives a more
-   precise type than can be expressed using a union or a type variable:
+   Một ví dụ về overload cho kiểu chính xác hơn kiểu có thể biểu diễn bằng union hoặc type variable:
 
    .. testcode::
 
@@ -3187,114 +2613,89 @@ Functions and decorators
       def process(response: bytes) -> str:
           ...
       def process(response):
-          ...  # actual implementation goes here
+          ...  # đặt phần triển khai thực tế ở đây
 
-   See :pep:`484` for more details and comparison with other typing semantics.
+   Xem :pep:`484` để biết thêm chi tiết và so sánh với các ngữ nghĩa typing khác.
 
    .. versionchanged:: 3.11
-      Overloaded functions can now be introspected at runtime using
+      Giờ đây, có thể introspect các hàm overloaded tại runtime bằng cách sử dụng
       :func:`get_overloads`.
 
 
 .. function:: get_overloads(func)
 
-   Return a sequence of :deco:`overload`-decorated definitions for
-   *func*.
+   Trả về một chuỗi các định nghĩa được trang trí bằng :deco:`overload` cho *func*.
 
-   *func* is the function object for the implementation of the
-   overloaded function. For example, given the definition of ``process`` in
-   the documentation for :deco:`overload`,
-   ``get_overloads(process)`` will return a sequence of three function objects
-   for the three defined overloads. If called on a function with no overloads,
-   ``get_overloads()`` returns an empty sequence.
+   *func* là đối tượng hàm dùng để triển khai hàm overloaded. Ví dụ, với định nghĩa của ``process`` trong tài liệu về :deco:`overload`, ``get_overloads(process)`` sẽ trả về một chuỗi gồm ba đối tượng hàm tương ứng với ba overload đã được định nghĩa. Nếu được gọi trên một hàm không có overload, ``get_overloads()`` sẽ trả về một chuỗi rỗng.
 
-   ``get_overloads()`` can be used for introspecting an overloaded function at
-   runtime.
+   Có thể sử dụng ``get_overloads()`` để introspect một hàm overloaded tại runtime.
 
    .. versionadded:: 3.11
 
 
 .. function:: clear_overloads()
 
-   Clear all registered overloads in the internal registry.
+   Xóa tất cả các overload đã đăng ký trong registry nội bộ.
 
-   This can be used to reclaim the memory used by the registry.
+   Có thể sử dụng thao tác này để thu hồi bộ nhớ mà registry đã sử dụng.
 
    .. versionadded:: 3.11
 
 
 .. decorator:: final
 
-   Decorator to indicate final methods and final classes.
+   Decorator dùng để chỉ báo các phương thức final và các lớp final.
 
-   Decorating a method with ``@final`` indicates to a type checker that the
-   method cannot be overridden in a subclass. Decorating a class with ``@final``
-   indicates that it cannot be subclassed.
+   Việc trang trí một phương thức bằng ``@final`` cho trình kiểm tra kiểu biết rằng phương thức đó không thể bị ghi đè trong một lớp con. Việc trang trí một lớp bằng ``@final`` cho biết lớp đó không thể được phân lớp.
 
-   For example::
+   Ví dụ::
 
       class Base:
           @final
           def done(self) -> None:
               ...
       class Sub(Base):
-          def done(self) -> None:  # Error reported by type checker
+          def done(self) -> None:  # Lỗi do trình kiểm tra kiểu báo cáo
               ...
 
       @final
       class Leaf:
           ...
-      class Other(Leaf):  # Error reported by type checker
+      class Other(Leaf):  # Lỗi do trình kiểm tra kiểu báo cáo
           ...
 
-   There is no runtime checking of these properties. See :pep:`591` for
-   more details.
+   Các thuộc tính này không được kiểm tra trong runtime. Xem :pep:`591` để biết thêm chi tiết.
 
    .. versionadded:: 3.8
 
    .. versionchanged:: 3.11
-      The decorator will now attempt to set a ``__final__`` attribute to ``True``
-      on the decorated object. Thus, a check like
-      ``if getattr(obj, "__final__", False)`` can be used at runtime
-      to determine whether an object ``obj`` has been marked as final.
-      If the decorated object does not support setting attributes,
-      the decorator returns the object unchanged without raising an exception.
+      Decorator giờ đây sẽ cố gắng đặt thuộc tính ``__final__`` thành ``True`` trên đối tượng được trang trí. Do đó, có thể sử dụng một phép kiểm tra như ``if getattr(obj, "__final__", False)`` trong runtime để xác định liệu một đối tượng ``obj`` đã được đánh dấu là final hay chưa. Nếu đối tượng được trang trí không hỗ trợ việc đặt thuộc tính, decorator sẽ trả về đối tượng đó mà không đưa ra ngoại lệ.
 
 
 .. decorator:: no_type_check
 
-   Decorator to indicate that annotations are not type hints.
+   Decorator dùng để cho biết rằng các annotation không phải là type hint.
 
-   This works as a class or function :term:`decorator`.  With a class, it
-   applies recursively to all methods and classes defined in that class
-   (but not to methods defined in its superclasses or subclasses). Type
-   checkers will ignore all annotations in a function or class with this
-   decorator.
+   Điều này hoạt động như một class hoặc function :term:`decorator`. Với một class, nó được áp dụng đệ quy cho tất cả method và class được định nghĩa trong class đó (nhưng không áp dụng cho các method được định nghĩa trong superclass hoặc subclass của nó). Các trình kiểm tra kiểu sẽ bỏ qua mọi annotation trong function hoặc class có decorator này.
 
-   ``@no_type_check`` mutates the decorated object in place.
+   ``@no_type_check`` thay đổi trực tiếp đối tượng được decorate.
 
 .. decorator:: no_type_check_decorator
 
-   Decorator to give another decorator the :func:`no_type_check` effect.
+   Decorator dùng để tạo hiệu ứng :func:`no_type_check` cho một decorator khác.
 
-   This wraps the decorator with something that wraps the decorated
-   function in :func:`no_type_check`.
+   Lệnh này bọc decorator bằng một thành phần bọc function được decorate trong :func:`no_type_check`.
 
    .. deprecated-removed:: 3.13 3.15
-      No type checker ever added support for ``@no_type_check_decorator``. It
-      is therefore deprecated, and will be removed in Python 3.15.
+      Không có trình kiểm tra kiểu nào từng hỗ trợ ``@no_type_check_decorator``. Vì vậy, nó đã bị deprecated và sẽ bị xóa trong Python 3.15.
 
 .. decorator:: override
 
-   Decorator to indicate that a method in a subclass is intended to override a
-   method or attribute in a superclass.
+   Decorator cho biết một method trong subclass được dự định ghi đè một method hoặc attribute trong superclass.
 
-   Type checkers should emit an error if a method decorated with ``@override``
-   does not, in fact, override anything.
-   This helps prevent bugs that may occur when a base class is changed without
-   an equivalent change to a child class.
+   Các trình kiểm tra kiểu nên phát hiện lỗi nếu một method được decorate bằng ``@override`` thực tế không ghi đè bất kỳ thành phần nào. Điều này giúp ngăn các lỗi có thể xảy ra khi một base class được thay đổi mà không có thay đổi tương ứng trong child class.
 
-   For example:
+   Ví dụ:
 
    .. testcode::
 
@@ -3304,128 +2705,89 @@ Functions and decorators
 
       class Sub(Base):
           @override
-          def log_status(self) -> None:  # Okay: overrides Base.log_status
+          def log_status(self) -> None:  # Được: ghi đè Base.log_status
               ...
 
           @override
-          def done(self) -> None:  # Error reported by type checker
+          def done(self) -> None:  # Lỗi được trình kiểm tra kiểu báo cáo
               ...
 
-   There is no runtime checking of this property.
+   Thuộc tính này không được kiểm tra trong runtime.
 
-   The decorator will attempt to set an ``__override__`` attribute to ``True`` on
-   the decorated object. Thus, a check like
-   ``if getattr(obj, "__override__", False)`` can be used at runtime to determine
-   whether an object ``obj`` has been marked as an override.  If the decorated object
-   does not support setting attributes, the decorator returns the object unchanged
-   without raising an exception.
+   Decorator sẽ cố gắng đặt thuộc tính ``__override__`` thành ``True`` trên đối tượng được áp dụng decorator. Do đó, có thể sử dụng một phép kiểm tra như ``if getattr(obj, "__override__", False)`` trong runtime để xác định xem đối tượng ``obj`` có được đánh dấu là một override hay không. Nếu đối tượng được áp dụng decorator không hỗ trợ việc đặt thuộc tính, decorator sẽ trả về đối tượng đó không thay đổi mà không phát sinh ngoại lệ.
 
-   See :pep:`698` for more details.
+   Xem :pep:`698` để biết thêm chi tiết.
 
    .. versionadded:: 3.12
 
 
 .. decorator:: type_check_only
 
-   Decorator to mark a class or function as unavailable at runtime.
+   Decorator dùng để đánh dấu một lớp hoặc hàm là không khả dụng trong runtime.
 
-   This decorator is itself not available at runtime. It is mainly
-   intended to mark classes that are defined in type stub files if
-   an implementation returns an instance of a private class::
+   Bản thân decorator này không khả dụng tại runtime. Nó chủ yếu được dùng để đánh dấu các lớp được định nghĩa trong các tệp type stub nếu một implementation trả về một instance của lớp private::
 
       @type_check_only
-      class Response:  # private or not available at runtime
+      class Response:  # private hoặc không khả dụng tại runtime
           code: int
           def get_header(self, name: str) -> str: ...
 
       def fetch_response() -> Response: ...
 
-   Note that returning instances of private classes is not recommended.
-   It is usually preferable to make such classes public.
+   Lưu ý rằng không nên trả về các instance của lớp private. Thông thường, tốt hơn là làm cho các lớp đó public.
 
-Introspection helpers
----------------------
+Các hàm hỗ trợ introspection
+----------------------------
 
 .. function:: get_type_hints(obj, globalns=None, localns=None, include_extras=False, *, format=Format.VALUE)
 
-   Return a dictionary containing type hints for a function, method, module,
-   class object, or other callable object.
+   Trả về một dictionary chứa các type hint cho một function, method, module, class object hoặc đối tượng callable khác.
 
-   This is often the same as :func:`annotationlib.get_annotations`, but this
-   function makes the following changes to the annotations dictionary:
+   Giá trị này thường giống với :func:`annotationlib.get_annotations`, nhưng function này thực hiện các thay đổi sau đối với dictionary annotations:
 
-   * Forward references encoded as string literals or :class:`ForwardRef`
-     objects are handled by evaluating them in *globalns*, *localns*, and
-     (where applicable) *obj*'s :ref:`type parameter <type-params>` namespace.
-     If *globalns* or *localns* is not given, appropriate namespace
-     dictionaries are inferred from *obj*.
-   * ``None`` is replaced with :class:`types.NoneType`.
-   * If :deco:`no_type_check` has been applied to *obj*, an
-     empty dictionary is returned.
-   * If *obj* is a class ``C``, the function returns a dictionary that merges
-     annotations from ``C``'s base classes with those on ``C`` directly. This
-     is done by traversing :attr:`C.__mro__ <type.__mro__>` and iteratively
-     combining
-     :term:`annotations <variable annotation>` of each base class. Annotations
-     on classes appearing earlier in the :term:`method resolution order` always
-     take precedence over annotations on classes appearing later in the method
-     resolution order.
-   * The function recursively replaces all occurrences of
-     ``Annotated[T, ...]``, ``Required[T]``, ``NotRequired[T]``, and ``ReadOnly[T]``
-     with ``T``, unless *include_extras* is set to ``True`` (see
-     :class:`Annotated` for more information).
+   * Các forward reference được mã hóa dưới dạng string literal hoặc đối tượng :class:`ForwardRef` sẽ được xử lý bằng cách đánh giá chúng trong *globalns*, *localns* và (khi thích hợp) namespace của *obj*'s :ref:`type parameter <type-params>`. Nếu *globalns* hoặc *localns* không được cung cấp, các dictionary namespace phù hợp sẽ được suy ra từ *obj*.
+   * ``None`` được thay thế bằng :class:`types.NoneType`.
+   * Nếu :deco:`no_type_check` đã được áp dụng cho *obj*, một từ điển rỗng sẽ được trả về.
+   * Nếu *obj* là một class ``C``, hàm sẽ trả về một từ điển hợp nhất các annotation từ các lớp cơ sở của ``C`` với những annotation được khai báo trực tiếp trên ``C``. Việc này được thực hiện bằng cách duyệt qua :attr:`C.__mro__ <type.__mro__>` và lần lượt kết hợp
+     :term:`annotations <variable annotation>` của từng lớp cơ sở. Các annotation trên những lớp xuất hiện sớm hơn trong :term:`method resolution order` luôn được ưu tiên hơn các annotation trên những lớp xuất hiện muộn hơn trong thứ tự phân giải phương thức.
+   * Hàm sẽ đệ quy thay thế mọi lần xuất hiện của ``Annotated[T, ...]``, ``Required[T]``, ``NotRequired[T]`` và ``ReadOnly[T]`` bằng ``T``, trừ khi *include_extras* được đặt thành ``True`` (xem
+     :class:`Annotated` để biết thêm thông tin).
 
    .. caution::
 
-      This function may execute arbitrary code contained in annotations.
-      See :ref:`annotationlib-security` for more information.
+      Hàm này có thể thực thi mã tùy ý được chứa trong các annotation. Xem :ref:`annotationlib-security` để biết thêm thông tin.
 
    .. note::
 
-      If :attr:`Format.VALUE <annotationlib.Format.VALUE>` is used and any
-      forward references in the annotations of *obj* are not resolvable, a
-      :exc:`NameError` exception is raised. For example, this can happen
-      with names imported under :data:`if TYPE_CHECKING <TYPE_CHECKING>`.
-      More generally, any kind of exception can be raised if an annotation
-      contains invalid Python code.
+      Nếu sử dụng :attr:`Format.VALUE <annotationlib.Format.VALUE>` và không thể phân giải bất kỳ tham chiếu tiến (forward reference) nào trong các chú thích của *obj*, một
+      ngoại lệ :exc:`NameError` sẽ được đưa ra. Ví dụ, điều này có thể xảy ra với các tên được nhập dưới :data:`if TYPE_CHECKING <TYPE_CHECKING>`. Tổng quát hơn, bất kỳ loại ngoại lệ nào cũng có thể được đưa ra nếu một chú thích chứa mã Python không hợp lệ.
 
    .. note::
 
-      Calling :func:`get_type_hints` on an instance is not supported.
-      To retrieve annotations for an instance, call
-      :func:`get_type_hints` on the instance's class instead
-      (for example, ``get_type_hints(type(obj))``).
+      Không hỗ trợ gọi :func:`get_type_hints` trên một instance. Để truy xuất các chú thích cho một instance, hãy gọi
+      :func:`get_type_hints` trên lớp của instance đó (ví dụ: ``get_type_hints(type(obj))``).
 
    .. versionchanged:: 3.9
-      Added ``include_extras`` parameter as part of :pep:`593`.
-      See the documentation on :data:`Annotated` for more information.
+      Đã thêm tham số ``include_extras`` như một phần của :pep:`593`. Xem tài liệu về :data:`Annotated` để biết thêm thông tin.
 
    .. versionchanged:: 3.11
-      Previously, ``Optional[t]`` was added for function and method annotations
-      if a default value equal to ``None`` was set.
-      Now the annotation is returned unchanged.
+      Trước đây, ``Optional[t]`` được thêm vào các chú thích của hàm và phương thức nếu một giá trị mặc định bằng ``None`` được thiết lập. Giờ đây, chú thích được trả về không thay đổi.
 
    .. versionchanged:: 3.14
-      Added the ``format`` parameter. See the documentation on
-      :func:`annotationlib.get_annotations` for more information.
+      Đã thêm tham số ``format``. Xem tài liệu về
+      :func:`annotationlib.get_annotations` để biết thêm thông tin.
 
    .. versionchanged:: 3.14
-      Calling :func:`get_type_hints` on instances is no longer supported.
-      Some instances were accepted in earlier versions as an undocumented
-      implementation detail.
+      Không còn hỗ trợ gọi :func:`get_type_hints` trên các instance. Một số instance từng được chấp nhận trong các phiên bản trước như một chi tiết triển khai không được ghi lại.
 
 .. function:: get_origin(tp)
 
-   Get the unsubscripted version of a type: for a typing object of the form
-   ``X[Y, Z, ...]`` return ``X``.
+   Lấy phiên bản không có chỉ số của một kiểu: đối với một đối tượng typing có dạng ``X[Y, Z, ...]``, trả về ``X``.
 
-   If ``X`` is a typing-module alias for a builtin or
-   :mod:`collections` class, it will be normalized to the original class.
-   If ``X`` is an instance of :class:`ParamSpecArgs` or :class:`ParamSpecKwargs`,
-   return the underlying :class:`ParamSpec`.
-   Return ``None`` for unsupported objects.
+   Nếu ``X`` là bí danh trong typing-module cho một builtin hoặc
+   :mod:`collections` class, nó sẽ được chuẩn hóa thành class gốc. Nếu ``X`` là một instance của :class:`ParamSpecArgs` hoặc :class:`ParamSpecKwargs`, trả về :class:`ParamSpec` cơ bản. Trả về ``None`` cho các đối tượng không được hỗ trợ.
 
-   Examples:
+   Ví dụ:
 
    .. testcode::
 
@@ -3441,15 +2803,11 @@ Introspection helpers
 
 .. function:: get_args(tp)
 
-   Get type arguments with all substitutions performed: for a typing object
-   of the form ``X[Y, Z, ...]`` return ``(Y, Z, ...)``.
+   Lấy các đối số kiểu với tất cả phép thay thế đã được thực hiện: đối với một đối tượng typing có dạng ``X[Y, Z, ...]``, trả về ``(Y, Z, ...)``.
 
-   If ``X`` is a union or :class:`Literal` contained in another
-   generic type, the order of ``(Y, Z, ...)`` may be different from the order
-   of the original arguments ``[Y, Z, ...]`` due to type caching.
-   Return ``()`` for unsupported objects.
+   Nếu ``X`` là một union hoặc :class:`Literal` nằm trong một kiểu generic khác, thứ tự của ``(Y, Z, ...)`` có thể khác với thứ tự của các đối số ban đầu ``[Y, Z, ...]`` do việc lưu vào bộ nhớ đệm kiểu. Trả về ``()`` đối với các đối tượng không được hỗ trợ.
 
-   Examples:
+   Ví dụ:
 
    .. testcode::
 
@@ -3461,7 +2819,7 @@ Introspection helpers
 
 .. function:: get_protocol_members(tp)
 
-   Return the set of members defined in a :class:`Protocol`.
+   Trả về tập hợp các thành viên được định nghĩa trong một :class:`Protocol`.
 
    .. doctest::
 
@@ -3472,15 +2830,15 @@ Introspection helpers
       >>> get_protocol_members(P) == frozenset({'a', 'b'})
       True
 
-   Raise :exc:`TypeError` for arguments that are not Protocols.
+   Ném :exc:`TypeError` đối với các đối số không phải là Protocol.
 
    .. versionadded:: 3.13
 
 .. function:: is_protocol(tp)
 
-   Determine if a type is a :class:`Protocol`.
+   Xác định xem một kiểu có phải là :class:`Protocol` hay không.
 
-   For example:
+   Ví dụ:
 
    .. testcode::
 
@@ -3491,8 +2849,8 @@ Introspection helpers
       assert is_protocol(P)
       assert not is_protocol(int)
 
-   This function only returns true for ``Protocol`` classes, not for
-   :ref:`generic aliases <types-genericalias>` of them:
+   Hàm này chỉ trả về true đối với các lớp ``Protocol``, không phải đối với
+   :ref:`bí danh generic <types-genericalias>` của chúng:
 
    .. testcode::
 
@@ -3506,9 +2864,9 @@ Introspection helpers
 
 .. function:: is_typeddict(tp)
 
-   Check if a type is a :class:`TypedDict`.
+   Kiểm tra xem một kiểu có phải là :class:`TypedDict` hay không.
 
-   For example:
+   Ví dụ:
 
    .. testcode::
 
@@ -3519,12 +2877,12 @@ Introspection helpers
       assert is_typeddict(Film)
       assert not is_typeddict(list | str)
 
-      # TypedDict is a factory for creating typed dicts,
-      # not a typed dict itself
+      # TypedDict là một factory để tạo các typed dict,
+      # chứ bản thân nó không phải là một typed dict
       assert not is_typeddict(TypedDict)
 
-   This function only returns true for ``TypedDict`` classes, not for
-   :ref:`generic aliases <types-genericalias>` of them:
+   Hàm này chỉ trả về true cho các lớp ``TypedDict``, không phải cho
+   :ref:`bí danh generic <types-genericalias>` của chúng:
 
    .. testcode::
 
@@ -3538,46 +2896,36 @@ Introspection helpers
 
 .. class:: ForwardRef
 
-   Class used for internal typing representation of string forward references.
+   Lớp được sử dụng để biểu diễn kiểu nội bộ cho các tham chiếu chuyển tiếp đến chuỗi.
 
-   For example, ``List["SomeClass"]`` is implicitly transformed into
-   ``List[ForwardRef("SomeClass")]``.  :class:`!ForwardRef` should not be instantiated by
-   a user, but may be used by introspection tools.
+   Ví dụ, ``List["SomeClass"]`` được chuyển đổi ngầm thành ``List[ForwardRef("SomeClass")]``. Người dùng không nên khởi tạo :class:`!ForwardRef`, nhưng các công cụ introspection có thể sử dụng nó.
 
    .. note::
       :pep:`585` generic types such as ``list["SomeClass"]`` will not be
-      implicitly transformed into ``list[ForwardRef("SomeClass")]`` and thus
-      will not automatically resolve to ``list[SomeClass]``.
+      được chuyển đổi ngầm thành ``list[ForwardRef("SomeClass")]`` và do đó sẽ không tự động phân giải thành ``list[SomeClass]``.
 
    .. versionadded:: 3.7.4
 
    .. versionchanged:: 3.14
-      This is now an alias for :class:`annotationlib.ForwardRef`. Several undocumented
-      behaviors of this class have been changed; for example, after a ``ForwardRef`` has
-      been evaluated, the evaluated value is no longer cached.
+      Hiện đây là bí danh của :class:`annotationlib.ForwardRef`. Một số hành vi chưa được ghi chép của lớp này đã thay đổi; ví dụ, sau khi ``ForwardRef`` được đánh giá, giá trị đã đánh giá sẽ không còn được lưu vào bộ nhớ đệm.
 
 .. function:: evaluate_forward_ref(forward_ref, *, owner=None, globals=None, locals=None, type_params=None, format=annotationlib.Format.VALUE)
 
-   Evaluate an :class:`annotationlib.ForwardRef` as a :term:`type hint`.
+   Đánh giá một :class:`annotationlib.ForwardRef` dưới dạng :term:`type hint`.
 
-   This is similar to calling :meth:`annotationlib.ForwardRef.evaluate`,
-   but unlike that method, :func:`!evaluate_forward_ref` also
-   recursively evaluates forward references nested within the type hint.
+   Điều này tương tự như việc gọi :meth:`annotationlib.ForwardRef.evaluate`, nhưng không giống phương thức đó, :func:`!evaluate_forward_ref` cũng đánh giá đệ quy các tham chiếu chuyển tiếp được lồng trong gợi ý kiểu.
 
-   See the documentation for :meth:`annotationlib.ForwardRef.evaluate` for
-   the meaning of the *owner*, *globals*, *locals*, *type_params*, and *format* parameters.
+   Xem tài liệu về :meth:`annotationlib.ForwardRef.evaluate` để biết ý nghĩa của các tham số *owner*, *globals*, *locals*, *type_params* và *format*.
 
    .. caution::
 
-      This function may execute arbitrary code contained in annotations.
-      See :ref:`annotationlib-security` for more information.
+      Hàm này có thể thực thi mã tùy ý được chứa trong các annotation. Xem :ref:`annotationlib-security` để biết thêm thông tin.
 
    .. versionadded:: 3.14
 
 .. data:: NoDefault
 
-   A sentinel object used to indicate that a type parameter has no default
-   value. For example:
+   Một đối tượng sentinel được dùng để cho biết rằng một tham số kiểu không có giá trị mặc định. Ví dụ:
 
    .. doctest::
 
@@ -3590,25 +2938,16 @@ Introspection helpers
 
    .. versionadded:: 3.13
 
-Constant
---------
+Hằng số
+-------
 
 .. data:: TYPE_CHECKING
 
-   A special constant that is assumed to be ``True`` by static
-   type checkers. It's ``False`` at runtime.
+   Một hằng số đặc biệt được các trình kiểm tra kiểu tĩnh giả định là ``True``. Khi runtime, nó là ``False``.
 
-   A module which is expensive to import, and which only contain types
-   used for typing annotations, can be safely imported inside an
-   ``if TYPE_CHECKING:`` block.  This prevents the module from actually
-   being imported at runtime; annotations aren't eagerly evaluated
-   (see :pep:`649`) so using undefined symbols in annotations is
-   harmless--as long as you don't later examine them.
-   Your static type analysis tool will set ``TYPE_CHECKING`` to
-   ``True`` during static type analysis, which means the module will
-   be imported and the types will be checked properly during such analysis.
+   Một module tốn nhiều chi phí để import và chỉ chứa các kiểu được dùng cho chú thích kiểu có thể được import an toàn bên trong khối ``if TYPE_CHECKING:``. Điều này ngăn module thực sự được import tại runtime; các chú thích không được đánh giá ngay (xem :pep:`649`), vì vậy việc sử dụng các ký hiệu chưa được định nghĩa trong chú thích là vô hại—miễn là sau đó bạn không kiểm tra chúng. Công cụ phân tích kiểu tĩnh sẽ đặt ``TYPE_CHECKING`` thành ``True`` trong quá trình phân tích kiểu tĩnh, nghĩa là module sẽ được import và các kiểu sẽ được kiểm tra đúng cách trong quá trình phân tích đó.
 
-   Usage::
+   Cách sử dụng::
 
       if TYPE_CHECKING:
           import expensive_mod
@@ -3616,201 +2955,173 @@ Constant
       def fun(arg: expensive_mod.SomeType) -> None:
           local_var: expensive_mod.AnotherType = other_fun()
 
-   If you occasionally need to examine type annotations at runtime
-   which may contain undefined symbols, use
-   :meth:`annotationlib.get_annotations` with a ``format`` parameter
-   of :attr:`annotationlib.Format.STRING` or
-   :attr:`annotationlib.Format.FORWARDREF` to safely retrieve the
-   annotations without raising :exc:`NameError`.
+   Nếu đôi khi bạn cần kiểm tra các chú thích kiểu tại runtime, trong đó có thể chứa các ký hiệu chưa được định nghĩa, hãy sử dụng
+   :meth:`annotationlib.get_annotations` với tham số ``format`` là :attr:`annotationlib.Format.STRING` hoặc
+   :attr:`annotationlib.Format.FORWARDREF` để truy xuất an toàn các chú thích mà không gây ra :exc:`NameError`.
 
    .. versionadded:: 3.5.2
 
 .. _generic-concrete-collections:
 .. _deprecated-aliases:
 
-Deprecated aliases
-------------------
+Bí danh đã lỗi thời
+-------------------
 
-This module defines several deprecated aliases to pre-existing
-standard library classes. These were originally included in the :mod:`!typing`
-module in order to support parameterizing these generic classes using ``[]``.
-However, the aliases became redundant in Python 3.9 when the
-corresponding pre-existing classes were enhanced to support ``[]`` (see
+Mô-đun này định nghĩa một số bí danh đã lỗi thời cho các lớp có sẵn trong thư viện chuẩn. Ban đầu, các bí danh này được đưa vào mô-đun :mod:`!typing` để hỗ trợ việc tham số hóa các lớp generic này bằng ``[]``. Tuy nhiên, các bí danh đã trở nên dư thừa trong Python 3.9, khi các lớp tương ứng có sẵn được nâng cấp để hỗ trợ ``[]`` (xem
 :pep:`585`).
 
-The redundant types are deprecated as of Python 3.9. However, while the aliases
-may be removed at some point, removal of these aliases is not currently
-planned. As such, no deprecation warnings are currently issued by the
-interpreter for these aliases.
+Các kiểu dư thừa này đã lỗi thời kể từ Python 3.9. Tuy nhiên, mặc dù các bí danh có thể bị xóa vào một thời điểm nào đó, hiện chưa có kế hoạch xóa chúng. Do đó, hiện tại interpreter không phát hành cảnh báo lỗi thời cho các bí danh này.
 
-If at some point it is decided to remove these deprecated aliases, a
-deprecation warning will be issued by the interpreter for at least two releases
-prior to removal. The aliases are guaranteed to remain in the :mod:`!typing` module
-without deprecation warnings until at least Python 3.14.
+Nếu sau này quyết định xóa các bí danh đã lỗi thời này, interpreter sẽ phát hành cảnh báo lỗi thời trong ít nhất hai bản phát hành trước khi xóa. Các bí danh được đảm bảo vẫn tồn tại trong mô-đun :mod:`!typing` mà không có cảnh báo lỗi thời cho đến ít nhất Python 3.14.
 
-Type checkers are encouraged to flag uses of the deprecated types if the
-program they are checking targets a minimum Python version of 3.9 or newer.
+Khuyến nghị các trình kiểm tra kiểu đánh dấu việc sử dụng những kiểu đã lỗi thời nếu chương trình mà chúng đang kiểm tra nhắm đến phiên bản Python tối thiểu là 3.9 hoặc mới hơn.
 
 .. _corresponding-to-built-in-types:
 
-Aliases to built-in types
-"""""""""""""""""""""""""
+Bí danh cho các kiểu tích hợp sẵn
+"""""""""""""""""""""""""""""""""
 
 .. class:: Dict(dict, MutableMapping[KT, VT])
 
-   Deprecated alias to :class:`dict`.
+   Bí danh không còn được khuyến nghị của :class:`dict`.
 
-   Note that to annotate arguments, it is preferred
-   to use an abstract collection type such as :class:`~collections.abc.Mapping`
-   rather than to use :class:`dict` or :class:`!typing.Dict`.
+   Lưu ý rằng khi chú thích các đối số, nên sử dụng một kiểu collection trừu tượng như :class:`~collections.abc.Mapping` thay vì sử dụng :class:`dict` hoặc :class:`!typing.Dict`.
 
    .. deprecated:: 3.9
       :class:`builtins.dict <dict>` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: List(list, MutableSequence[T])
 
-   Deprecated alias to :class:`list`.
+   Bí danh không còn được khuyến nghị của :class:`list`.
 
-   Note that to annotate arguments, it is preferred
-   to use an abstract collection type such as
-   :class:`~collections.abc.Sequence` or :class:`~collections.abc.Iterable`
-   rather than to use :class:`list` or :class:`!typing.List`.
+   Lưu ý rằng khi chú thích các đối số, nên sử dụng một kiểu collection trừu tượng như
+   :class:`~collections.abc.Sequence` hoặc :class:`~collections.abc.Iterable` thay vì sử dụng :class:`list` hoặc :class:`!typing.List`.
 
    .. deprecated:: 3.9
       :class:`builtins.list <list>` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: Set(set, MutableSet[T])
 
-   Deprecated alias to :class:`builtins.set <set>`.
+   Bí danh không còn được khuyến nghị cho :class:`builtins.set <set>`.
 
-   Note that to annotate arguments, it is preferred
-   to use an abstract collection type such as :class:`collections.abc.Set`
-   rather than to use :class:`set` or :class:`typing.Set`.
+   Lưu ý rằng để chú thích các đối số, nên sử dụng một kiểu collection trừu tượng như :class:`collections.abc.Set` thay vì sử dụng :class:`set` hoặc :class:`typing.Set`.
 
    .. deprecated:: 3.9
       :class:`builtins.set <set>` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: FrozenSet(frozenset, AbstractSet[T_co])
 
-   Deprecated alias to :class:`builtins.frozenset <frozenset>`.
+   Bí danh không còn được khuyến nghị cho :class:`builtins.frozenset <frozenset>`.
 
    .. deprecated:: 3.9
       :class:`builtins.frozenset <frozenset>`
-      now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      hiện hỗ trợ phép lập chỉ mục (``[]``). Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. data:: Tuple
 
-   Deprecated alias for :class:`tuple`.
+   Bí danh không còn được khuyến nghị cho :class:`tuple`.
 
-   :class:`tuple` and ``Tuple`` are special-cased in the type system; see
-   :ref:`annotating-tuples` for more details.
+   :class:`tuple` và ``Tuple`` được xử lý đặc biệt trong hệ thống kiểu; xem
+   :ref:`annotating-tuples` để biết thêm chi tiết.
 
    .. deprecated:: 3.9
       :class:`builtins.tuple <tuple>` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: Type(Generic[CT_co])
 
-   Deprecated alias to :class:`type`.
+   Bí danh không còn được khuyến nghị cho :class:`type`.
 
-   See :ref:`type-of-class-objects` for details on using :class:`type` or
-   ``typing.Type`` in type annotations.
+   Xem :ref:`type-of-class-objects` để biết chi tiết về cách sử dụng :class:`type` hoặc ``typing.Type`` trong chú thích kiểu.
 
    .. versionadded:: 3.5.2
 
    .. deprecated:: 3.9
       :class:`builtins.type <type>` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. _corresponding-to-types-in-collections:
 
-Aliases to types in :mod:`collections`
-""""""""""""""""""""""""""""""""""""""
+Bí danh cho các kiểu trong :mod:`collections`
+"""""""""""""""""""""""""""""""""""""""""""""
 
 .. class:: DefaultDict(collections.defaultdict, MutableMapping[KT, VT])
 
-   Deprecated alias to :class:`collections.defaultdict`.
+   Bí danh đã lỗi thời của :class:`collections.defaultdict`.
 
    .. versionadded:: 3.5.2
 
    .. deprecated:: 3.9
       :class:`collections.defaultdict` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: OrderedDict(collections.OrderedDict, MutableMapping[KT, VT])
 
-   Deprecated alias to :class:`collections.OrderedDict`.
+   Bí danh đã lỗi thời của :class:`collections.OrderedDict`.
 
    .. versionadded:: 3.7.2
 
    .. deprecated:: 3.9
       :class:`collections.OrderedDict` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: ChainMap(collections.ChainMap, MutableMapping[KT, VT])
 
-   Deprecated alias to :class:`collections.ChainMap`.
+   Bí danh đã lỗi thời của :class:`collections.ChainMap`.
 
    .. versionadded:: 3.6.1
 
    .. deprecated:: 3.9
       :class:`collections.ChainMap` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: Counter(collections.Counter, Dict[T, int])
 
-   Deprecated alias to :class:`collections.Counter`.
+   Bí danh đã lỗi thời của :class:`collections.Counter`.
 
    .. versionadded:: 3.6.1
 
    .. deprecated:: 3.9
       :class:`collections.Counter` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: Deque(deque, MutableSequence[T])
 
-   Deprecated alias to :class:`collections.deque`.
+   Bí danh không còn được khuyến nghị cho :class:`collections.deque`.
 
    .. versionadded:: 3.6.1
 
    .. deprecated:: 3.9
       :class:`collections.deque` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. _other-concrete-types:
 
-Aliases to other concrete types
-"""""""""""""""""""""""""""""""
+Bí danh cho các kiểu cụ thể khác
+""""""""""""""""""""""""""""""""
 
 .. class:: Pattern
            Match
 
-   Deprecated aliases corresponding to the return types from
-   :func:`re.compile` and :func:`re.match`.
+   Các bí danh không còn được khuyến nghị tương ứng với các kiểu trả về từ
+   :func:`re.compile` và :func:`re.match`.
 
-   These types (and the corresponding functions) are generic over
-   :data:`AnyStr`. ``Pattern`` can be specialised as ``Pattern[str]`` or
-   ``Pattern[bytes]``; ``Match`` can be specialised as ``Match[str]`` or
-   ``Match[bytes]``.
+   Các kiểu này (và các hàm tương ứng) được tổng quát theo
+   :data:`AnyStr`. ``Pattern`` có thể được chuyên biệt hóa thành ``Pattern[str]`` hoặc ``Pattern[bytes]``; ``Match`` có thể được chuyên biệt hóa thành ``Match[str]`` hoặc ``Match[bytes]``.
 
    .. deprecated:: 3.9
-      Classes ``Pattern`` and ``Match`` from :mod:`re` now support ``[]``.
-      See :pep:`585` and :ref:`types-genericalias`.
+      Các lớp ``Pattern`` và ``Match`` từ :mod:`re` hiện hỗ trợ ``[]``. Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: Text
 
-   Deprecated alias for :class:`str`.
+   Bí danh đã lỗi thời cho :class:`str`.
 
-   ``Text`` is provided to supply a forward
-   compatible path for Python 2 code: in Python 2, ``Text`` is an alias for
-   ``unicode``.
+   ``Text`` được cung cấp để tạo ra một hướng tương thích về sau cho mã Python 2: trong Python 2, ``Text`` là bí danh cho ``unicode``.
 
-   Use ``Text`` to indicate that a value must contain a unicode string in
-   a manner that is compatible with both Python 2 and Python 3::
+   Sử dụng ``Text`` để cho biết rằng một giá trị phải chứa chuỗi unicode theo cách tương thích với cả Python 2 và Python 3::
 
        def add_unicode_checkmark(text: Text) -> Text:
            return text + u' \u2713'
@@ -3818,339 +3129,309 @@ Aliases to other concrete types
    .. versionadded:: 3.5.2
 
    .. deprecated:: 3.11
-      Python 2 is no longer supported, and most type checkers also no longer
-      support type checking Python 2 code. Removal of the alias is not
-      currently planned, but users are encouraged to use
-      :class:`str` instead of ``Text``.
+      Python 2 không còn được hỗ trợ và hầu hết các trình kiểm tra kiểu cũng không còn hỗ trợ kiểm tra kiểu mã Python 2. Hiện chưa có kế hoạch loại bỏ bí danh này, nhưng người dùng được khuyến khích sử dụng
+      :class:`str` thay cho ``Text``.
 
 .. _abstract-base-classes:
 .. _corresponding-to-collections-in-collections-abc:
 
-Aliases to container ABCs in :mod:`collections.abc`
-"""""""""""""""""""""""""""""""""""""""""""""""""""
+Các bí danh cho ABC container trong :mod:`collections.abc`
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. class:: AbstractSet(Collection[T_co])
 
-   Deprecated alias to :class:`collections.abc.Set`.
+   Bí danh không còn được khuyến nghị cho :class:`collections.abc.Set`.
 
    .. deprecated:: 3.9
       :class:`collections.abc.Set` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: ByteString(Sequence[int])
 
-   Deprecated alias to :class:`collections.abc.ByteString`.
+   Bí danh không còn được khuyến nghị cho :class:`collections.abc.ByteString`.
 
-   Use ``isinstance(obj, collections.abc.Buffer)`` to test if ``obj``
-   implements the :ref:`buffer protocol <bufferobjects>` at runtime. For use in
-   type annotations, either use :class:`~collections.abc.Buffer` or a union
-   that explicitly specifies the types your code supports (e.g.,
-   ``bytes | bytearray | memoryview``).
+   Sử dụng ``isinstance(obj, collections.abc.Buffer)`` để kiểm tra tại runtime xem ``obj`` có triển khai :ref:`giao thức buffer <bufferobjects>` hay không. Khi dùng trong type annotation, hãy sử dụng :class:`~collections.abc.Buffer` hoặc một union chỉ định rõ các kiểu mà mã của bạn hỗ trợ (ví dụ: ``bytes | bytearray | memoryview``).
 
-   :class:`!ByteString` was originally intended to be an abstract class that
-   would serve as a supertype of both :class:`bytes` and :class:`bytearray`.
-   However, since the ABC never had any methods, knowing that an object was an
-   instance of :class:`!ByteString` never actually told you anything useful
-   about the object. Other common buffer types such as :class:`memoryview` were
-   also never understood as subtypes of :class:`!ByteString` (either at runtime
-   or by static type checkers).
+   :class:`!ByteString` ban đầu được dự định là một lớp trừu tượng đóng vai trò là siêu kiểu của cả :class:`bytes` và :class:`bytearray`. Tuy nhiên, vì ABC này chưa bao giờ có phương thức nào, việc biết một đối tượng là một thể hiện của :class:`!ByteString` thực sự không cho bạn biết điều gì hữu ích về đối tượng đó. Các kiểu buffer phổ biến khác như :class:`memoryview` cũng chưa bao giờ được hiểu là kiểu con của :class:`!ByteString` (dù ở runtime hay bởi các trình kiểm tra kiểu tĩnh).
 
-   See :pep:`PEP 688 <688#current-options>` for more details.
+   Xem :pep:`PEP 688 <688#current-options>` để biết thêm chi tiết.
 
    .. deprecated-removed:: 3.9 3.17
 
 .. class:: Collection(Sized, Iterable[T_co], Container[T_co])
 
-   Deprecated alias to :class:`collections.abc.Collection`.
+   Bí danh đã lỗi thời của :class:`collections.abc.Collection`.
 
    .. versionadded:: 3.6
 
    .. deprecated:: 3.9
       :class:`collections.abc.Collection` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: Container(Generic[T_co])
 
-   Deprecated alias to :class:`collections.abc.Container`.
+   Bí danh đã lỗi thời của :class:`collections.abc.Container`.
 
    .. deprecated:: 3.9
       :class:`collections.abc.Container` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: ItemsView(MappingView, AbstractSet[tuple[KT_co, VT_co]])
 
-   Deprecated alias to :class:`collections.abc.ItemsView`.
+   Bí danh đã lỗi thời của :class:`collections.abc.ItemsView`.
 
    .. deprecated:: 3.9
       :class:`collections.abc.ItemsView` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: KeysView(MappingView, AbstractSet[KT_co])
 
-   Deprecated alias to :class:`collections.abc.KeysView`.
+   Bí danh không còn được khuyến nghị dùng cho :class:`collections.abc.KeysView`.
 
    .. deprecated:: 3.9
       :class:`collections.abc.KeysView` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: Mapping(Collection[KT], Generic[KT, VT_co])
 
-   Deprecated alias to :class:`collections.abc.Mapping`.
+   Bí danh không còn được khuyến nghị dùng cho :class:`collections.abc.Mapping`.
 
    .. deprecated:: 3.9
       :class:`collections.abc.Mapping` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: MappingView(Sized)
 
-   Deprecated alias to :class:`collections.abc.MappingView`.
+   Bí danh không còn được khuyến nghị dùng cho :class:`collections.abc.MappingView`.
 
    .. deprecated:: 3.9
       :class:`collections.abc.MappingView` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: MutableMapping(Mapping[KT, VT])
 
-   Deprecated alias to :class:`collections.abc.MutableMapping`.
+   Bí danh không còn được khuyến nghị dùng cho :class:`collections.abc.MutableMapping`.
 
    .. deprecated:: 3.9
       :class:`collections.abc.MutableMapping`
-      now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      hiện hỗ trợ phép lập chỉ mục (``[]``). Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: MutableSequence(Sequence[T])
 
-   Deprecated alias to :class:`collections.abc.MutableSequence`.
+   Bí danh đã lỗi thời của :class:`collections.abc.MutableSequence`.
 
    .. deprecated:: 3.9
       :class:`collections.abc.MutableSequence`
-      now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      hiện hỗ trợ phép lập chỉ mục (``[]``). Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: MutableSet(AbstractSet[T])
 
-   Deprecated alias to :class:`collections.abc.MutableSet`.
+   Bí danh đã lỗi thời của :class:`collections.abc.MutableSet`.
 
    .. deprecated:: 3.9
       :class:`collections.abc.MutableSet` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: Sequence(Reversible[T_co], Collection[T_co])
 
-   Deprecated alias to :class:`collections.abc.Sequence`.
+   Bí danh đã lỗi thời của :class:`collections.abc.Sequence`.
 
    .. deprecated:: 3.9
       :class:`collections.abc.Sequence` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: ValuesView(MappingView, Collection[_VT_co])
 
-   Deprecated alias to :class:`collections.abc.ValuesView`.
+   Bí danh không còn được khuyến nghị cho :class:`collections.abc.ValuesView`.
 
    .. deprecated:: 3.9
       :class:`collections.abc.ValuesView` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. _asynchronous-programming:
 
-Aliases to asynchronous ABCs in :mod:`collections.abc`
-""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Các bí danh cho ABC bất đồng bộ trong :mod:`collections.abc`
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. class:: Coroutine(Awaitable[ReturnType], Generic[YieldType, SendType, ReturnType])
 
-   Deprecated alias to :class:`collections.abc.Coroutine`.
+   Bí danh không còn được khuyến nghị cho :class:`collections.abc.Coroutine`.
 
-   See :ref:`annotating-generators-and-coroutines`
-   for details on using :class:`collections.abc.Coroutine`
-   and ``typing.Coroutine`` in type annotations.
+   Xem :ref:`annotating-generators-and-coroutines` để biết chi tiết về cách sử dụng :class:`collections.abc.Coroutine` và ``typing.Coroutine`` trong chú thích kiểu.
 
    .. versionadded:: 3.5.3
 
    .. deprecated:: 3.9
       :class:`collections.abc.Coroutine` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: AsyncGenerator(AsyncIterator[YieldType], Generic[YieldType, SendType])
 
-   Deprecated alias to :class:`collections.abc.AsyncGenerator`.
+   Bí danh không còn được khuyến nghị cho :class:`collections.abc.AsyncGenerator`.
 
-   See :ref:`annotating-generators-and-coroutines`
-   for details on using :class:`collections.abc.AsyncGenerator`
-   and ``typing.AsyncGenerator`` in type annotations.
+   Xem :ref:`annotating-generators-and-coroutines` để biết chi tiết về cách sử dụng :class:`collections.abc.AsyncGenerator` và ``typing.AsyncGenerator`` trong các chú thích kiểu.
 
    .. versionadded:: 3.6.1
 
    .. deprecated:: 3.9
       :class:`collections.abc.AsyncGenerator`
-      now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      hiện hỗ trợ phép lập chỉ mục (``[]``). Xem :pep:`585` và :ref:`types-genericalias`.
 
    .. versionchanged:: 3.13
-      The ``SendType`` parameter now has a default.
+      Tham số ``SendType`` hiện có giá trị mặc định.
 
 .. class:: AsyncIterable(Generic[T_co])
 
-   Deprecated alias to :class:`collections.abc.AsyncIterable`.
+   Bí danh đã lỗi thời của :class:`collections.abc.AsyncIterable`.
 
    .. versionadded:: 3.5.2
 
    .. deprecated:: 3.9
       :class:`collections.abc.AsyncIterable` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: AsyncIterator(AsyncIterable[T_co])
 
-   Deprecated alias to :class:`collections.abc.AsyncIterator`.
+   Bí danh đã lỗi thời của :class:`collections.abc.AsyncIterator`.
 
    .. versionadded:: 3.5.2
 
    .. deprecated:: 3.9
       :class:`collections.abc.AsyncIterator` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: Awaitable(Generic[T_co])
 
-   Deprecated alias to :class:`collections.abc.Awaitable`.
+   Bí danh không còn được khuyến nghị cho :class:`collections.abc.Awaitable`.
 
    .. versionadded:: 3.5.2
 
    .. deprecated:: 3.9
       :class:`collections.abc.Awaitable` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. _corresponding-to-other-types-in-collections-abc:
 
-Aliases to other ABCs in :mod:`collections.abc`
-"""""""""""""""""""""""""""""""""""""""""""""""
+Bí danh cho các ABC khác trong :mod:`collections.abc`
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. class:: Iterable(Generic[T_co])
 
-   Deprecated alias to :class:`collections.abc.Iterable`.
+   Bí danh không còn được khuyến nghị cho :class:`collections.abc.Iterable`.
 
    .. deprecated:: 3.9
       :class:`collections.abc.Iterable` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: Iterator(Iterable[T_co])
 
-   Deprecated alias to :class:`collections.abc.Iterator`.
+   Bí danh không còn được khuyến nghị cho :class:`collections.abc.Iterator`.
 
    .. deprecated:: 3.9
       :class:`collections.abc.Iterator` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. data:: Callable
 
-   Deprecated alias to :class:`collections.abc.Callable`.
+   Bí danh không được khuyến nghị cho :class:`collections.abc.Callable`.
 
-   See :ref:`annotating-callables` for details on how to use
-   :class:`collections.abc.Callable` and ``typing.Callable`` in type annotations.
+   Xem :ref:`annotating-callables` để biết chi tiết về cách sử dụng
+   :class:`collections.abc.Callable` và ``typing.Callable`` trong chú thích kiểu.
 
    .. deprecated:: 3.9
       :class:`collections.abc.Callable` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
    .. versionchanged:: 3.10
-      ``Callable`` now supports :class:`ParamSpec` and :data:`Concatenate`.
-      See :pep:`612` for more details.
+      ``Callable`` hiện hỗ trợ :class:`ParamSpec` và :data:`Concatenate`. Xem :pep:`612` để biết thêm chi tiết.
 
 .. class:: Generator(Iterator[YieldType], Generic[YieldType, SendType, ReturnType])
 
-   Deprecated alias to :class:`collections.abc.Generator`.
+   Bí danh không được khuyến nghị cho :class:`collections.abc.Generator`.
 
-   See :ref:`annotating-generators-and-coroutines`
-   for details on using :class:`collections.abc.Generator`
-   and ``typing.Generator`` in type annotations.
+   Xem :ref:`annotating-generators-and-coroutines` để biết chi tiết về cách sử dụng :class:`collections.abc.Generator` và ``typing.Generator`` trong chú thích kiểu.
 
    .. deprecated:: 3.9
       :class:`collections.abc.Generator` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
    .. versionchanged:: 3.13
-      Default values for the send and return types were added.
+      Các giá trị mặc định cho kiểu send và return đã được thêm.
 
 .. class:: Hashable
 
-   Deprecated alias to :class:`collections.abc.Hashable`.
+   Bí danh không còn được khuyến nghị cho :class:`collections.abc.Hashable`.
 
    .. deprecated:: 3.12
-      Use :class:`collections.abc.Hashable` directly instead.
+      Thay vào đó, hãy sử dụng trực tiếp :class:`collections.abc.Hashable`.
 
 .. class:: Reversible(Iterable[T_co])
 
-   Deprecated alias to :class:`collections.abc.Reversible`.
+   Bí danh không còn được khuyến nghị cho :class:`collections.abc.Reversible`.
 
    .. deprecated:: 3.9
       :class:`collections.abc.Reversible` now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      Xem :pep:`585` và :ref:`types-genericalias`.
 
 .. class:: Sized
 
-   Deprecated alias to :class:`collections.abc.Sized`.
+   Bí danh không còn được khuyến nghị cho :class:`collections.abc.Sized`.
 
    .. deprecated:: 3.12
-      Use :class:`collections.abc.Sized` directly instead.
+      Thay vào đó, hãy sử dụng :class:`collections.abc.Sized` trực tiếp.
 
 .. _context-manager-types:
 
-Aliases to :mod:`contextlib` ABCs
-"""""""""""""""""""""""""""""""""
+Bí danh cho các ABC :mod:`contextlib`
+"""""""""""""""""""""""""""""""""""""
 
 .. class:: ContextManager(Generic[T_co, ExitT_co])
 
-   Deprecated alias to :class:`contextlib.AbstractContextManager`.
+   Bí danh đã lỗi thời cho :class:`contextlib.AbstractContextManager`.
 
-   The first type parameter, ``T_co``, represents the type returned by
-   the :meth:`~object.__enter__` method. The optional second type parameter, ``ExitT_co``,
-   which defaults to ``bool | None``, represents the type returned by the
-   :meth:`~object.__exit__` method.
+   Tham số kiểu đầu tiên, ``T_co``, đại diện cho kiểu được phương thức :meth:`~object.__enter__` trả về. Tham số kiểu thứ hai tùy chọn, ``ExitT_co``, mặc định là ``bool | None``, đại diện cho kiểu được
+   phương thức :meth:`~object.__exit__` trả về.
 
    .. versionadded:: 3.5.4
 
    .. deprecated:: 3.9
       :class:`contextlib.AbstractContextManager`
-      now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      hiện hỗ trợ phép tham số hóa bằng chỉ số (``[]``). Xem :pep:`585` và :ref:`types-genericalias`.
 
    .. versionchanged:: 3.13
-      Added the optional second type parameter, ``ExitT_co``.
+      Đã thêm tham số kiểu thứ hai tùy chọn, ``ExitT_co``.
 
 .. class:: AsyncContextManager(Generic[T_co, AExitT_co])
 
-   Deprecated alias to :class:`contextlib.AbstractAsyncContextManager`.
+   Bí danh đã ngừng sử dụng cho :class:`contextlib.AbstractAsyncContextManager`.
 
-   The first type parameter, ``T_co``, represents the type returned by
-   the :meth:`~object.__aenter__` method. The optional second type parameter, ``AExitT_co``,
-   which defaults to ``bool | None``, represents the type returned by the
-   :meth:`~object.__aexit__` method.
+   Tham số kiểu đầu tiên, ``T_co``, đại diện cho kiểu được trả về bởi phương thức :meth:`~object.__aenter__`. Tham số kiểu thứ hai tùy chọn, ``AExitT_co``, có giá trị mặc định là ``bool | None``, đại diện cho kiểu được trả về bởi
+   phương thức :meth:`~object.__aexit__`.
 
    .. versionadded:: 3.6.2
 
    .. deprecated:: 3.9
       :class:`contextlib.AbstractAsyncContextManager`
-      now supports subscripting (``[]``).
-      See :pep:`585` and :ref:`types-genericalias`.
+      hiện hỗ trợ phép tham số hóa bằng chỉ số (``[]``). Xem :pep:`585` và :ref:`types-genericalias`.
 
    .. versionchanged:: 3.13
-      Added the optional second type parameter, ``AExitT_co``.
+      Đã thêm tham số kiểu thứ hai tùy chọn, ``AExitT_co``.
 
-Deprecation Timeline of Major Features
-======================================
+Lộ trình ngừng sử dụng các tính năng chính
+==========================================
 
-Certain features in ``typing`` are deprecated and may be removed in a future
-version of Python. The following table summarizes major deprecations for your
-convenience. This is subject to change, and not all deprecations are listed.
+Một số tính năng trong ``typing`` đã ngừng sử dụng và có thể bị xóa trong phiên bản Python tương lai. Bảng sau đây tóm tắt các tính năng chính đã ngừng sử dụng để bạn tiện tham khảo. Nội dung này có thể thay đổi và không phải tất cả các tính năng đã ngừng sử dụng đều được liệt kê.
 
 .. list-table::
    :header-rows: 1
 
-   * - Feature
-     - Deprecated in
-     - Projected removal
+   * - Tính năng
+     - Không dùng nữa từ
+     - Dự kiến loại bỏ
      - PEP/issue
-   * - ``typing`` versions of standard collections
+   * - ``typing`` phiên bản của các collection chuẩn
      - 3.9
-     - Undecided (see :ref:`deprecated-aliases` for more information)
+     - Chưa quyết định (xem :ref:`deprecated-aliases` để biết thêm thông tin)
      - :pep:`585`
    * - :class:`typing.ByteString`
      - 3.9
@@ -4158,15 +3439,15 @@ convenience. This is subject to change, and not all deprecations are listed.
      - :gh:`91896`
    * - :data:`typing.Text`
      - 3.11
-     - Undecided
+     - Chưa quyết định
      - :gh:`92332`
-   * - :class:`typing.Hashable` and :class:`typing.Sized`
+   * - :class:`typing.Hashable` và :class:`typing.Sized`
      - 3.12
-     - Undecided
+     - Chưa quyết định
      - :gh:`94309`
    * - :data:`typing.TypeAlias`
      - 3.12
-     - Undecided
+     - Chưa quyết định
      - :pep:`695`
    * - :func:`@typing.no_type_check_decorator <no_type_check_decorator>`
      - 3.13
@@ -4176,3 +3457,10 @@ convenience. This is subject to change, and not all deprecations are listed.
      - 3.13
      - 3.18
      - :gh:`105578`
+
+.. _`Typing cheat sheet`: https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html
+.. _`the mypy docs`: https://mypy.readthedocs.io/en/stable/index.html
+.. _`Static Typing with Python`: https://typing.python.org/en/latest/
+.. _`Specification for the Python type system`: https://typing.python.org/en/latest/spec/index.html
+.. _`bottom type`: https://en.wikipedia.org/wiki/Bottom_type
+.. _`TypedDict`: https://typing.python.org/en/latest/spec/typeddict.html#typeddict

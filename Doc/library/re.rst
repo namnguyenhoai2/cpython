@@ -1,144 +1,81 @@
-:mod:`!re` --- Regular expression operations
-============================================
+:mod:`!re` --- Các thao tác với biểu thức chính quy
+===================================================
 
 .. module:: re
-   :synopsis: Regular expression operations.
+   :synopsis: Các thao tác với biểu thức chính quy.
 
 .. moduleauthor:: Fredrik Lundh <fredrik@pythonware.com>
 .. sectionauthor:: Andrew M. Kuchling <amk@amk.ca>
 
-**Source code:** :source:`Lib/re/`
+**Mã nguồn:** :source:`Lib/re/`
 
 --------------
 
-This module provides regular expression matching operations similar to
-those found in Perl.
+Module này cung cấp các thao tác so khớp biểu thức chính quy tương tự như các thao tác trong Perl.
 
-Both patterns and strings to be searched can be Unicode strings (:class:`str`)
-as well as 8-bit strings (:class:`bytes`).
-However, Unicode strings and 8-bit strings cannot be mixed:
-that is, you cannot match a Unicode string with a bytes pattern or
-vice-versa; similarly, when asking for a substitution, the replacement
-string must be of the same type as both the pattern and the search string.
+Cả pattern và chuỗi được tìm kiếm đều có thể là chuỗi Unicode (:class:`str`) cũng như chuỗi 8-bit (:class:`bytes`). Tuy nhiên, không thể trộn chuỗi Unicode và chuỗi 8-bit: tức là bạn không thể so khớp một chuỗi Unicode với một pattern bytes hoặc ngược lại; tương tự, khi yêu cầu thay thế, chuỗi thay thế phải có cùng kiểu với cả pattern và chuỗi tìm kiếm.
 
-Regular expressions use the backslash character (``'\'``) to indicate
-special forms or to allow special characters to be used without invoking
-their special meaning.  This collides with Python's usage of the same
-character for the same purpose in string literals; for example, to match
-a literal backslash, one might have to write ``'\\\\'`` as the pattern
-string, because the regular expression must be ``\\``, and each
-backslash must be expressed as ``\\`` inside a regular Python string
-literal. Also, please note that any invalid escape sequences in Python's
-usage of the backslash in string literals now generate a :exc:`SyntaxWarning`
-and in the future this will become a :exc:`SyntaxError`. This behaviour
-will happen even if it is a valid escape sequence for a regular expression.
+Biểu thức chính quy sử dụng ký tự dấu gạch chéo ngược (``'\'``) để chỉ các dạng đặc biệt hoặc cho phép sử dụng các ký tự đặc biệt mà không kích hoạt ý nghĩa đặc biệt của chúng. Điều này xung đột với cách Python sử dụng cùng ký tự đó cho cùng mục đích trong các string literal; chẳng hạn, để so khớp một dấu gạch chéo ngược literal, bạn có thể phải viết ``'\\\\'`` làm chuỗi pattern, vì biểu thức chính quy phải là ``\\``, và mỗi dấu gạch chéo ngược phải được biểu diễn dưới dạng ``\\`` bên trong một string literal Python thông thường. Ngoài ra, xin lưu ý rằng mọi chuỗi escape không hợp lệ khi Python sử dụng dấu gạch chéo ngược trong string literal hiện sẽ tạo ra một :exc:`SyntaxWarning`, và trong tương lai điều này sẽ trở thành một :exc:`SyntaxError`. Hành vi này sẽ xảy ra ngay cả khi đó là một chuỗi escape hợp lệ đối với biểu thức chính quy.
 
-The solution is to use Python's raw string notation for regular expression
-patterns; backslashes are not handled in any special way in a string literal
-prefixed with ``'r'``.  So ``r"\n"`` is a two-character string containing
-``'\'`` and ``'n'``, while ``"\n"`` is a one-character string containing a
-newline.  Usually patterns will be expressed in Python code using this raw
-string notation.
+Giải pháp là sử dụng ký hiệu chuỗi raw của Python cho các pattern biểu thức chính quy; dấu gạch chéo ngược không được xử lý theo bất kỳ cách đặc biệt nào trong một string literal có tiền tố ``'r'``. Vì vậy, ``r"\n"`` là một chuỗi gồm hai ký tự chứa ``'\'`` và ``'n'``, trong khi ``"\n"`` là một chuỗi một ký tự chứa ký tự xuống dòng. Thông thường, các pattern sẽ được biểu diễn trong mã Python bằng ký hiệu chuỗi raw này.
 
-It is important to note that most regular expression operations are available as
-module-level functions and methods on
-:ref:`compiled regular expressions <re-objects>`.  The functions are shortcuts
-that don't require you to compile a regex object first, but miss some
-fine-tuning parameters.
+Điều quan trọng cần lưu ý là hầu hết các thao tác biểu thức chính quy đều có sẵn dưới dạng các hàm cấp mô-đun và các phương thức trên
+:ref:`biểu thức chính quy đã biên dịch <re-objects>`. Các hàm này là những lối tắt không yêu cầu bạn phải biên dịch một đối tượng regex trước, nhưng thiếu một số tham số tinh chỉnh.
 
 .. seealso::
 
-   The third-party :pypi:`regex` module,
-   which has an API compatible with the standard library :mod:`!re` module,
-   but offers additional functionality and a more thorough Unicode support.
+   Mô-đun :pypi:`regex` của bên thứ ba, có API tương thích với mô-đun :mod:`!re` trong thư viện chuẩn, nhưng cung cấp thêm chức năng và khả năng hỗ trợ Unicode toàn diện hơn.
 
 
 .. _re-syntax:
 
-Regular Expression Syntax
--------------------------
+Cú pháp biểu thức chính quy
+---------------------------
 
-A regular expression (or RE) specifies a set of strings that matches it; the
-functions in this module let you check if a particular string matches a given
-regular expression (or if a given regular expression matches a particular
-string, which comes down to the same thing).
+Một biểu thức chính quy (hoặc RE) chỉ định một tập hợp các chuỗi khớp với nó; các hàm trong mô-đun này cho phép bạn kiểm tra xem một chuỗi cụ thể có khớp với một biểu thức chính quy cho trước hay không (hoặc một biểu thức chính quy cho trước có khớp với một chuỗi cụ thể hay không; về bản chất thì hai cách diễn đạt này giống nhau).
 
-Regular expressions can be concatenated to form new regular expressions; if *A*
-and *B* are both regular expressions, then *AB* is also a regular expression.
-In general, if a string *p* matches *A* and another string *q* matches *B*, the
-string *pq* will match AB.  This holds unless *A* or *B* contain low precedence
-operations; boundary conditions between *A* and *B*; or have numbered group
-references.  Thus, complex expressions can easily be constructed from simpler
-primitive expressions like the ones described here.  For details of the theory
-and implementation of regular expressions, consult the Friedl book [Frie09]_,
-or almost any textbook about compiler construction.
+Các biểu thức chính quy có thể được nối với nhau để tạo thành các biểu thức chính quy mới; nếu *A* và *B* đều là các biểu thức chính quy, thì *AB* cũng là một biểu thức chính quy. Nói chung, nếu một chuỗi *p* khớp với *A* và một chuỗi khác *q* khớp với *B*, thì chuỗi *pq* sẽ khớp với AB. Điều này đúng trừ khi *A* hoặc *B* chứa các phép toán có độ ưu tiên thấp; có các điều kiện biên giữa *A* và *B*; hoặc có các tham chiếu nhóm được đánh số. Vì vậy, có thể dễ dàng xây dựng các biểu thức phức tạp từ những biểu thức nguyên thủy đơn giản hơn như các biểu thức được mô tả ở đây. Để biết chi tiết về lý thuyết và cách triển khai biểu thức chính quy, hãy tham khảo cuốn sách của Friedl [Frie09]_, hoặc gần như bất kỳ giáo trình nào về xây dựng trình biên dịch.
 
-A brief explanation of the format of regular expressions follows.  For further
-information and a gentler presentation, consult the :ref:`regex-howto`.
+Sau đây là phần giải thích ngắn gọn về định dạng của các biểu thức chính quy. Để biết thêm thông tin và có phần trình bày dễ tiếp cận hơn, hãy tham khảo :ref:`regex-howto`.
 
-Regular expressions can contain both special and ordinary characters. Most
-ordinary characters, like ``'A'``, ``'a'``, or ``'0'``, are the simplest regular
-expressions; they simply match themselves.  You can concatenate ordinary
-characters, so ``last`` matches the string ``'last'``.  (In the rest of this
-section, we'll write RE's in ``this special style``, usually without quotes, and
-strings to be matched ``'in single quotes'``.)
+Biểu thức chính quy có thể chứa cả ký tự đặc biệt và ký tự thông thường. Hầu hết các ký tự thông thường, như ``'A'``, ``'a'`` hoặc ``'0'``, đều là những biểu thức chính quy đơn giản nhất; chúng chỉ khớp với chính chúng. Bạn có thể nối các ký tự thông thường, vì vậy ``last`` khớp với chuỗi ``'last'``. (Trong phần còn lại của mục này, chúng ta sẽ viết các RE dưới dạng ``this special style``, thường không có dấu ngoặc kép, còn các chuỗi cần khớp dưới dạng ``'in single quotes'``.)
 
-Some characters, like ``'|'`` or ``'('``, are special. Special
-characters either stand for classes of ordinary characters, or affect
-how the regular expressions around them are interpreted.
+Một số ký tự, như ``'|'`` hoặc ``'('``, là ký tự đặc biệt. Ký tự đặc biệt biểu thị các lớp ký tự thông thường hoặc ảnh hưởng đến cách diễn giải các biểu thức chính quy xung quanh chúng.
 
-Repetition operators or quantifiers (``*``, ``+``, ``?``, ``{m,n}``, etc) cannot be
-directly nested. This avoids ambiguity with the non-greedy modifier suffix
-``?``, and with other modifiers in other implementations. To apply a second
-repetition to an inner repetition, parentheses may be used. For example,
-the expression ``(?:a{6})*`` matches any multiple of six ``'a'`` characters.
+Các toán tử lặp hoặc bộ định lượng (``*``, ``+``, ``?``, ``{m,n}``, v.v.) không thể được lồng trực tiếp. Điều này tránh sự mơ hồ với hậu tố bổ nghĩa không tham lam ``?`` và với các bộ bổ nghĩa khác trong những triển khai khác. Để áp dụng phép lặp thứ hai cho một phép lặp bên trong, có thể dùng dấu ngoặc đơn. Ví dụ, biểu thức ``(?:a{6})*`` khớp với mọi bội số của sáu ký tự ``'a'``.
 
 
-The special characters are:
+Các ký tự đặc biệt gồm:
 
 .. index:: single: . (dot); in regular expressions
 
 ``.``
-   (Dot.)  In the default mode, this matches any character except a newline.  If
-   the :const:`DOTALL` flag has been specified, this matches any character
-   including a newline.  ``(?s:.)`` matches any character regardless of flags.
+   (Dấu chấm.)  Ở chế độ mặc định, ký tự này khớp với mọi ký tự ngoại trừ ký tự xuống dòng. Nếu cờ :const:`DOTALL` được chỉ định, ký tự này khớp với mọi ký tự, bao gồm cả ký tự xuống dòng. ``(?s:.)`` khớp với mọi ký tự bất kể cờ nào.
 
 .. index:: single: ^ (caret); in regular expressions
 
 ``^``
-   (Caret.)  Matches the start of the string, and in :const:`MULTILINE` mode also
-   matches immediately after each newline.
+   (Dấu mũ.)  Khớp với đầu chuỗi, và ở chế độ :const:`MULTILINE` cũng khớp ngay sau mỗi ký tự xuống dòng.
 
 .. index:: single: $ (dollar); in regular expressions
 
 ``$``
-   Matches the end of the string or just before the newline at the end of the
-   string, and in :const:`MULTILINE` mode also matches before a newline.  ``foo``
-   matches both 'foo' and 'foobar', while the regular expression ``foo$`` matches
-   only 'foo'.  More interestingly, searching for ``foo.$`` in ``'foo1\nfoo2\n'``
-   matches 'foo2' normally, but 'foo1' in :const:`MULTILINE` mode; searching for
-   a single ``$`` in ``'foo\n'`` will find two (empty) matches: one just before
-   the newline, and one at the end of the string.
+   Khớp với cuối chuỗi hoặc ngay trước ký tự xuống dòng ở cuối chuỗi, và ở chế độ :const:`MULTILINE` cũng khớp trước một ký tự xuống dòng. ``foo`` khớp cả 'foo' và 'foobar', trong khi biểu thức chính quy ``foo$`` chỉ khớp 'foo'. Thú vị hơn, việc tìm ``foo.$`` trong ``'foo1\nfoo2\n'`` thường khớp với 'foo2', nhưng khớp với 'foo1' ở chế độ :const:`MULTILINE`; việc tìm một ``$`` đơn trong ``'foo\n'`` sẽ tìm thấy hai khớp (rỗng): một ngay trước ký tự xuống dòng và một ở cuối chuỗi.
 
 .. index:: single: * (asterisk); in regular expressions
 
 ``*``
-   Causes the resulting RE to match 0 or more repetitions of the preceding RE, as
-   many repetitions as are possible.  ``ab*`` will match 'a', 'ab', or 'a' followed
-   by any number of 'b's.
+   Khiến RE kết quả khớp với 0 hoặc nhiều lần lặp của RE đứng trước, nhiều nhất có thể. ``ab*`` sẽ khớp với 'a', 'ab' hoặc 'a' theo sau bởi bất kỳ số lượng 'b' nào.
 
 .. index:: single: + (plus); in regular expressions
 
 ``+``
-   Causes the resulting RE to match 1 or more repetitions of the preceding RE.
-   ``ab+`` will match 'a' followed by any non-zero number of 'b's; it will not
-   match just 'a'.
+   Khiến RE kết quả khớp với 1 hoặc nhiều lần lặp của RE đứng trước. ``ab+`` sẽ khớp với 'a' theo sau bởi một số lượng 'b' khác 0; nó sẽ không chỉ khớp với 'a'.
 
 .. index:: single: ? (question mark); in regular expressions
 
 ``?``
-   Causes the resulting RE to match 0 or 1 repetitions of the preceding RE.
-   ``ab?`` will match either 'a' or 'ab'.
+   Khiến RE kết quả khớp với 0 hoặc 1 lần lặp của RE đứng trước. ``ab?`` sẽ khớp với 'a' hoặc 'ab'.
 
 .. index::
    single: *?; in regular expressions
@@ -146,13 +83,7 @@ The special characters are:
    single: ??; in regular expressions
 
 ``*?``, ``+?``, ``??``
-   The ``'*'``, ``'+'``, and ``'?'`` quantifiers are all :dfn:`greedy`; they match
-   as much text as possible.  Sometimes this behaviour isn't desired; if the RE
-   ``<.*>`` is matched against ``'<a> b <c>'``, it will match the entire
-   string, and not just ``'<a>'``.  Adding ``?`` after the quantifier makes it
-   perform the match in :dfn:`non-greedy` or :dfn:`minimal` fashion; as *few*
-   characters as possible will be matched.  Using the RE ``<.*?>`` will match
-   only ``'<a>'``.
+   Các quantifier ``'*'``, ``'+'`` và ``'?'`` đều là :dfn:`greedy`; chúng khớp với nhiều văn bản nhất có thể. Đôi khi hành vi này không được mong muốn; nếu RE ``<.*>`` được áp dụng cho ``'<a> b <c>'``, nó sẽ khớp với toàn bộ chuỗi chứ không chỉ ``'<a>'``. Thêm ``?`` sau quantifier khiến nó thực hiện việc khớp theo cách :dfn:`non-greedy` hoặc :dfn:`minimal`; sẽ khớp với số ký tự *few* nhất có thể. Sử dụng RE ``<.*?>`` sẽ chỉ khớp với ``'<a>'``.
 
 .. index::
    single: *+; in regular expressions
@@ -160,21 +91,7 @@ The special characters are:
    single: ?+; in regular expressions
 
 ``*+``, ``++``, ``?+``
-  Like the ``'*'``, ``'+'``, and ``'?'`` quantifiers, those where ``'+'`` is
-  appended also match as many times as possible.
-  However, unlike the true greedy quantifiers, these do not allow
-  back-tracking when the expression following it fails to match.
-  These are known as :dfn:`possessive` quantifiers.
-  For example, ``a*a`` will match ``'aaaa'`` because the ``a*`` will match
-  all 4 ``'a'``\ s, but, when the final ``'a'`` is encountered, the
-  expression is backtracked so that in the end the ``a*`` ends up matching
-  3 ``'a'``\ s total, and the fourth ``'a'`` is matched by the final ``'a'``.
-  However, when ``a*+a`` is used to match ``'aaaa'``, the ``a*+`` will
-  match all 4 ``'a'``, but when the final ``'a'`` fails to find any more
-  characters to match, the expression cannot be backtracked and will thus
-  fail to match.
-  ``x*+``, ``x++`` and ``x?+`` are equivalent to ``(?>x*)``, ``(?>x+)``
-  and ``(?>x?)`` correspondingly.
+  Giống các quantifier ``'*'``, ``'+'`` và ``'?'``, những quantifier có ``'+'`` được thêm vào cũng khớp nhiều lần nhất có thể. Tuy nhiên, không giống các quantifier greedy thực sự, chúng không cho phép backtracking khi biểu thức theo sau không khớp. Chúng được gọi là các quantifier :dfn:`possessive`. Ví dụ, ``a*a`` sẽ khớp với ``'aaaa'`` vì ``a*`` sẽ khớp cả 4 ``'a'``\ s, nhưng khi gặp ``'a'`` cuối cùng, biểu thức sẽ được backtrack để cuối cùng ``a*`` khớp tổng cộng 3 ``'a'``\ s, còn ``'a'`` thứ tư được ``'a'`` cuối cùng khớp. Tuy nhiên, khi dùng ``a*+a`` để khớp với ``'aaaa'``, ``a*+`` sẽ khớp cả 4 ``'a'``, nhưng khi ``'a'`` cuối cùng không tìm thấy thêm ký tự nào để khớp, biểu thức không thể backtrack và do đó sẽ không khớp. ``x*+``, ``x++`` và ``x?+`` tương đương lần lượt với ``(?>x*)``, ``(?>x+)`` và ``(?>x?)``.
 
   .. versionadded:: 3.11
 
@@ -182,496 +99,306 @@ The special characters are:
    single: {} (curly brackets); in regular expressions
 
 ``{m}``
-   Specifies that exactly *m* copies of the previous RE should be matched; fewer
-   matches cause the entire RE not to match.  For example, ``a{6}`` will match
-   exactly six ``'a'`` characters, but not five.
+   Chỉ định rằng phải khớp chính xác *m* bản sao của RE trước đó; nếu khớp ít hơn thì toàn bộ RE sẽ không khớp. Ví dụ, ``a{6}`` sẽ khớp chính xác sáu ký tự ``'a'``, nhưng không khớp năm ký tự.
 
 ``{m,n}``
-   Causes the resulting RE to match from *m* to *n* repetitions of the preceding
-   RE, attempting to match as many repetitions as possible.  For example,
-   ``a{3,5}`` will match from 3 to 5 ``'a'`` characters.  Omitting *m* specifies a
-   lower bound of zero,  and omitting *n* specifies an infinite upper bound.  As an
-   example, ``a{4,}b`` will match ``'aaaab'`` or a thousand ``'a'`` characters
-   followed by a ``'b'``, but not ``'aaab'``. The comma may not be omitted or the
-   modifier would be confused with the previously described form.
+   Khiến RE kết quả khớp từ *m* đến *n* lần lặp của RE đứng trước, cố gắng khớp nhiều lần lặp nhất có thể. Ví dụ, ``a{3,5}`` sẽ khớp từ 3 đến 5 ký tự ``'a'``. Bỏ *m* sẽ chỉ định giới hạn dưới là 0, còn bỏ *n* sẽ chỉ định giới hạn trên là vô hạn. Ví dụ, ``a{4,}b`` sẽ khớp với ``'aaaab'`` hoặc một nghìn ký tự ``'a'`` theo sau bởi một ``'b'``, nhưng không khớp với ``'aaab'``. Không được bỏ dấu phẩy, nếu không modifier sẽ bị nhầm với dạng được mô tả trước đó.
 
 ``{m,n}?``
-   Causes the resulting RE to match from *m* to *n* repetitions of the preceding
-   RE, attempting to match as *few* repetitions as possible.  This is the
-   non-greedy version of the previous quantifier.  For example, on the
-   6-character string ``'aaaaaa'``, ``a{3,5}`` will match 5 ``'a'`` characters,
-   while ``a{3,5}?`` will only match 3 characters.
+   Khiến RE kết quả khớp từ *m* đến *n* lần lặp của RE đứng trước, cố gắng khớp với số lần lặp *ít* nhất có thể. Đây là phiên bản không tham lam (non-greedy) của quantifier trước đó. Ví dụ, trên chuỗi gồm 6 ký tự ``'aaaaaa'``, ``a{3,5}`` sẽ khớp 5 ký tự ``'a'``, còn ``a{3,5}?`` chỉ khớp 3 ký tự.
 
 ``{m,n}+``
-   Causes the resulting RE to match from *m* to *n* repetitions of the
-   preceding RE, attempting to match as many repetitions as possible
-   *without* establishing any backtracking points.
-   This is the possessive version of the quantifier above.
-   For example, on the 6-character string ``'aaaaaa'``, ``a{3,5}+aa``
-   attempt to match 5 ``'a'`` characters, then, requiring 2 more ``'a'``\ s,
-   will need more characters than available and thus fail, while
-   ``a{3,5}aa`` will match with ``a{3,5}`` capturing 5, then 4 ``'a'``\ s
-   by backtracking and then the final 2 ``'a'``\ s are matched by the final
-   ``aa`` in the pattern.
-   ``x{m,n}+`` is equivalent to ``(?>x{m,n})``.
+   Khiến RE kết quả khớp từ *m* đến *n* lần lặp của RE đứng trước, cố gắng khớp nhiều lần lặp nhất có thể *mà không* tạo ra bất kỳ điểm quay lui nào. Đây là phiên bản chiếm hữu (possessive) của quantifier ở trên. Ví dụ, trên chuỗi gồm 6 ký tự ``'aaaaaa'``, ``a{3,5}+aa`` sẽ cố gắng khớp 5 ký tự ``'a'``, sau đó, vì cần thêm 2 ``'a'``\ s, sẽ cần nhiều ký tự hơn số ký tự hiện có và do đó thất bại, trong khi ``a{3,5}aa`` sẽ khớp với ``a{3,5}`` bắt giữ 5, sau đó quay lui để khớp 4 ``'a'``\ s, rồi 2 ``'a'``\ s cuối cùng được khớp bởi ``aa`` cuối cùng trong mẫu. ``x{m,n}+`` tương đương với ``(?>x{m,n})``.
 
    .. versionadded:: 3.11
 
 .. index:: single: \ (backslash); in regular expressions
 
 ``\``
-   Either escapes special characters (permitting you to match characters like
-   ``'*'``, ``'?'``, and so forth), or signals a special sequence; special
-   sequences are discussed below.
+   Hoặc dùng để thoát các ký tự đặc biệt (cho phép bạn khớp những ký tự như ``'*'``, ``'?'``, v.v.), hoặc báo hiệu một chuỗi đặc biệt; các chuỗi đặc biệt được thảo luận bên dưới.
 
-   If you're not using a raw string to express the pattern, remember that Python
-   also uses the backslash as an escape sequence in string literals; if the escape
-   sequence isn't recognized by Python's parser, the backslash and subsequent
-   character are included in the resulting string.  However, if Python would
-   recognize the resulting sequence, the backslash should be repeated twice.  This
-   is complicated and hard to understand, so it's highly recommended that you use
-   raw strings for all but the simplest expressions.
+   Nếu bạn không dùng chuỗi raw để biểu diễn mẫu, hãy nhớ rằng Python cũng sử dụng dấu gạch chéo ngược làm chuỗi escape trong các string literal; nếu chuỗi escape không được trình phân tích cú pháp của Python nhận diện, dấu gạch chéo ngược và ký tự tiếp theo sẽ được đưa vào chuỗi kết quả. Tuy nhiên, nếu Python nhận diện chuỗi kết quả, dấu gạch chéo ngược phải được lặp lại hai lần. Điều này phức tạp và khó hiểu, vì vậy bạn nên dùng chuỗi raw cho tất cả biểu thức, trừ những biểu thức đơn giản nhất.
 
 .. index::
    single: [] (square brackets); in regular expressions
 
 ``[]``
-   Used to indicate a set of characters.  In a set:
+   Dùng để chỉ một tập hợp các ký tự. Trong một tập hợp:
 
-   * Characters can be listed individually, e.g. ``[amk]`` will match ``'a'``,
-     ``'m'``, or ``'k'``.
+   * Các ký tự có thể được liệt kê riêng lẻ; ví dụ, ``[amk]`` sẽ khớp ``'a'``, ``'m'`` hoặc ``'k'``.
 
    .. index:: single: - (minus); in regular expressions
 
-   * Ranges of characters can be indicated by giving two characters and separating
-     them by a ``'-'``, for example ``[a-z]`` will match any lowercase ASCII letter,
-     ``[0-5][0-9]`` will match all the two-digits numbers from ``00`` to ``59``, and
-     ``[0-9A-Fa-f]`` will match any hexadecimal digit.  If ``-`` is escaped (e.g.
-     ``[a\-z]``) or if it's placed as the first or last character
-     (e.g. ``[-a]`` or ``[a-]``), it will match a literal ``'-'``.
+   * Có thể chỉ định các khoảng ký tự bằng cách đưa ra hai ký tự và phân tách chúng bằng ``'-'``; ví dụ, ``[a-z]`` sẽ khớp bất kỳ chữ cái ASCII viết thường nào, ``[0-5][0-9]`` sẽ khớp tất cả các số có hai chữ số từ ``00`` đến ``59``, còn ``[0-9A-Fa-f]`` sẽ khớp bất kỳ chữ số thập lục phân nào. Nếu ``-`` được escape (ví dụ: ``[a\-z]``) hoặc được đặt làm ký tự đầu tiên hay cuối cùng (ví dụ: ``[-a]`` hoặc ``[a-]``), nó sẽ khớp một ``'-'`` theo nghĩa đen.
 
-   * Special characters except backslash lose their special meaning inside sets.
-     For example,
-     ``[(+*)]`` will match any of the literal characters ``'('``, ``'+'``,
-     ``'*'``, or ``')'``.
+   * Các ký tự đặc biệt, ngoại trừ dấu gạch chéo ngược, sẽ mất ý nghĩa đặc biệt bên trong các tập. Ví dụ: ``[(+*)]`` sẽ khớp với bất kỳ ký tự nguyên văn nào trong số ``'('``, ``'+'``, ``'*'`` hoặc ``')'``.
 
    .. index:: single: \ (backslash); in regular expressions
 
-   * Backslash either escapes characters which have special meaning in a set
-     such as ``'-'``, ``']'``, ``'^'`` and ``'\\'`` itself or signals
-     a special sequence which represents a single character such as
-     ``\xa0`` or ``\n`` or a character class such as ``\w`` or ``\S``
-     (defined below).
-     Note that ``\b`` represents a single "backspace" character,
-     not a word boundary as outside a set, and numeric escapes
-     such as ``\1`` are always octal escapes, not group references.
-     Special sequences which do not match a single character such as ``\A``
-     and ``\z`` are not allowed.
+   * Dấu gạch chéo ngược либо dùng để escape các ký tự có ý nghĩa đặc biệt trong một tập, chẳng hạn như chính ``'-'``, ``']'``, ``'^'`` và ``'\\'``, либо báo hiệu một chuỗi đặc biệt biểu diễn một ký tự đơn, chẳng hạn như ``\xa0`` hoặc ``\n``, hoặc một lớp ký tự, chẳng hạn như ``\w`` hoặc ``\S`` (được định nghĩa bên dưới). Lưu ý rằng ``\b`` biểu diễn một ký tự "backspace" đơn, không phải ranh giới từ như khi ở bên ngoài một tập, và các escape số như ``\1`` luôn là escape bát phân, không phải tham chiếu nhóm. Các chuỗi đặc biệt không khớp với một ký tự đơn, chẳng hạn như ``\A`` và ``\z``, không được phép sử dụng.
 
    .. index:: single: ^ (caret); in regular expressions
 
-   * Characters that are not within a range can be matched by :dfn:`complementing`
-     the set.  If the first character of the set is ``'^'``, all the characters
-     that are *not* in the set will be matched.  For example, ``[^5]`` will match
-     any character except ``'5'``, and ``[^^]`` will match any character except
-     ``'^'``.  ``^`` has no special meaning if it's not the first character in
-     the set.
+   * Có thể khớp các ký tự không nằm trong một khoảng bằng cách :dfn:`lấy phần bù` của tập. Nếu ký tự đầu tiên của tập là ``'^'``, tất cả các ký tự *không* nằm trong tập sẽ được khớp. Ví dụ: ``[^5]`` sẽ khớp với mọi ký tự ngoại trừ ``'5'``, còn ``[^^]`` sẽ khớp với mọi ký tự ngoại trừ ``'^'``. ``^`` không có ý nghĩa đặc biệt nếu không phải là ký tự đầu tiên trong tập.
 
-   * To match a literal ``']'`` inside a set, precede it with a backslash, or
-     place it at the beginning of the set.  For example, both ``[()[\]{}]`` and
-     ``[]()[{}]`` will match a right bracket, as well as left bracket, braces,
-     and parentheses.
+   * Để khớp một ``']'`` nguyên văn bên trong một tập, đặt trước nó một dấu gạch chéo ngược hoặc đặt nó ở đầu tập. Ví dụ, cả ``[()[\]{}]`` và ``[]()[{}]`` đều sẽ khớp với dấu ngoặc vuông phải, cũng như dấu ngoặc vuông trái, dấu ngoặc nhọn và dấu ngoặc tròn.
 
    .. .. index:: single: --; in regular expressions
    .. .. index:: single: &&; in regular expressions
    .. .. index:: single: ~~; in regular expressions
    .. .. index:: single: ||; in regular expressions
 
-   * Support of nested sets and set operations as in `Unicode Technical
-     Standard #18`_ might be added in the future.  This would change the
-     syntax, so to facilitate this change a :exc:`FutureWarning` will be raised
-     in ambiguous cases for the time being.
-     That includes sets starting with a literal ``'['`` or containing literal
-     character sequences ``'--'``, ``'&&'``, ``'~~'``, and ``'||'``.  To
-     avoid a warning escape them with a backslash.
+   * Hỗ trợ các tập lồng nhau và các phép toán trên tập như trong `Unicode Technical Standard #18 <Unicode Technical Standard #18_>`_ có thể được bổ sung trong tương lai. Điều này sẽ làm thay đổi cú pháp, vì vậy để tạo điều kiện cho thay đổi đó, hiện tại một :exc:`FutureWarning` sẽ được phát sinh trong các trường hợp mơ hồ. Điều đó bao gồm các tập bắt đầu bằng một ``'['`` nguyên văn hoặc chứa các chuỗi ký tự nguyên văn ``'--'``, ``'&&'``, ``'~~'`` và ``'||'``. Để tránh cảnh báo, hãy escape chúng bằng dấu gạch chéo ngược.
 
    .. _Unicode Technical Standard #18: https://unicode.org/reports/tr18/
 
    .. versionchanged:: 3.7
       :exc:`FutureWarning` is raised if a character set contains constructs
-      that will change semantically in the future.
+      điều đó sẽ thay đổi về mặt ngữ nghĩa trong tương lai.
 
 .. index:: single: | (vertical bar); in regular expressions
 
 ``|``
-   ``A|B``, where *A* and *B* can be arbitrary REs, creates a regular expression that
-   will match either *A* or *B*.  An arbitrary number of REs can be separated by the
-   ``'|'`` in this way.  This can be used inside groups (see below) as well.  As
-   the target string is scanned, REs separated by ``'|'`` are tried from left to
-   right. When one pattern completely matches, that branch is accepted. This means
-   that once *A* matches, *B* will not be tested further, even if it would
-   produce a longer overall match.  In other words, the ``'|'`` operator is never
-   greedy.  To match a literal ``'|'``, use ``\|``, or enclose it inside a
-   character class, as in ``[|]``.
+   ``A|B``, trong đó *A* và *B* có thể là các RE bất kỳ, tạo ra một biểu thức chính quy khớp với either *A* hoặc *B*. Có thể phân tách một số lượng RE bất kỳ bằng ``'|'`` theo cách này. Cách này cũng có thể được sử dụng bên trong các nhóm (xem bên dưới). Khi chuỗi đích được quét, các RE được phân tách bằng ``'|'`` sẽ được thử từ trái sang phải. Khi một mẫu khớp hoàn toàn, nhánh đó được chấp nhận. Điều này có nghĩa là một khi *A* khớp, *B* sẽ không được kiểm tra thêm, ngay cả khi nó tạo ra kết quả khớp tổng thể dài hơn. Nói cách khác, toán tử ``'|'`` không bao giờ là greedy. Để khớp một ``'|'`` nguyên văn, hãy sử dụng ``\|`` hoặc đặt nó bên trong một lớp ký tự, như trong ``[|]``.
 
 .. index::
    single: () (parentheses); in regular expressions
 
 ``(...)``
-   Matches whatever regular expression is inside the parentheses, and indicates the
-   start and end of a group; the contents of a group can be retrieved after a match
-   has been performed, and can be matched later in the string with the ``\number``
-   special sequence, described below.  To match the literals ``'('`` or ``')'``,
-   use ``\(`` or ``\)``, or enclose them inside a character class: ``[(]``, ``[)]``.
+   Khớp với bất kỳ biểu thức chính quy nào nằm bên trong dấu ngoặc đơn, đồng thời biểu thị điểm bắt đầu và kết thúc của một nhóm; nội dung của một nhóm có thể được lấy ra sau khi thực hiện khớp, và có thể được khớp lại ở vị trí sau đó trong chuỗi bằng chuỗi đặc biệt ``\number``, được mô tả bên dưới. Để khớp các ký tự nguyên văn ``'('`` hoặc ``')'``, hãy sử dụng ``\(`` hoặc ``\)``, hoặc đặt chúng bên trong một character class: ``[(]``, ``[)]``.
 
 .. index:: single: (?; in regular expressions
 
 ``(?...)``
-   This is an extension notation (a ``'?'`` following a ``'('`` is not meaningful
-   otherwise).  The first character after the ``'?'`` determines what the meaning
-   and further syntax of the construct is. Extensions usually do not create a new
-   group; ``(?P<name>...)`` is the only exception to this rule. Following are the
-   currently supported extensions.
+   Đây là ký hiệu mở rộng (một ``'?'`` theo sau ``'('`` vốn không có ý nghĩa). Ký tự đầu tiên sau ``'?'`` xác định ý nghĩa và cú pháp tiếp theo của cấu trúc này. Các phần mở rộng thường không tạo một nhóm mới; ``(?P<name>...)`` là ngoại lệ duy nhất của quy tắc này. Sau đây là các phần mở rộng hiện được hỗ trợ.
 
 ``(?aiLmsux)``
-   (One or more letters from the set
-   ``'a'``, ``'i'``, ``'L'``, ``'m'``, ``'s'``, ``'u'``, ``'x'``.)
-   The group matches the empty string;
-   the letters set the corresponding flags for the entire regular expression:
+   (Một hoặc nhiều chữ cái thuộc tập ``'a'``, ``'i'``, ``'L'``, ``'m'``, ``'s'``, ``'u'``, ``'x'``.) Nhóm này khớp với chuỗi rỗng; các chữ cái thiết lập những cờ tương ứng cho toàn bộ biểu thức chính quy:
 
-   * :const:`re.A` (ASCII-only matching)
-   * :const:`re.I` (ignore case)
-   * :const:`re.L` (locale dependent)
-   * :const:`re.M` (multi-line)
-   * :const:`re.S` (dot matches all)
-   * :const:`re.U` (Unicode matching)
+   * :const:`re.A` (khớp chỉ ASCII)
+   * :const:`re.I` (bỏ qua chữ hoa chữ thường)
+   * :const:`re.L` (phụ thuộc vào locale)
+   * :const:`re.M` (nhiều dòng)
+   * :const:`re.S` (dấu chấm khớp với mọi ký tự)
+   * :const:`re.U` (khớp Unicode)
    * :const:`re.X` (verbose)
 
-   (The flags are described in :ref:`contents-of-module-re`.)
-   This is useful if you wish to include the flags as part of the
-   regular expression, instead of passing a *flag* argument to the
-   :func:`re.compile` function.
-   Flags should be used first in the expression string.
+   (Các cờ được mô tả trong :ref:`contents-of-module-re`.) Điều này hữu ích nếu bạn muốn đưa các cờ vào một phần của biểu thức chính quy, thay vì truyền một đối số *flag* cho
+   :func:`re.compile` hàm. Các cờ nên được sử dụng ở đầu chuỗi biểu thức.
 
    .. versionchanged:: 3.11
-      This construction can only be used at the start of the expression.
+      Cấu trúc này chỉ có thể được sử dụng ở đầu biểu thức.
 
 .. index:: single: (?:; in regular expressions
 
 ``(?:...)``
-   A non-capturing version of regular parentheses.  Matches whatever regular
-   expression is inside the parentheses, but the substring matched by the group
-   *cannot* be retrieved after performing a match or referenced later in the
-   pattern.
+   Một phiên bản không bắt giữ của dấu ngoặc đơn trong biểu thức chính quy. Khớp với bất kỳ biểu thức chính quy nào nằm bên trong dấu ngoặc đơn, nhưng chuỗi con được khớp bởi nhóm *không thể* được truy xuất sau khi thực hiện khớp hoặc được tham chiếu ở phần sau của mẫu.
 
 ``(?aiLmsux-imsx:...)``
-   (Zero or more letters from the set
-   ``'a'``, ``'i'``, ``'L'``, ``'m'``, ``'s'``, ``'u'``, ``'x'``,
-   optionally followed by ``'-'`` followed by
-   one or more letters from the ``'i'``, ``'m'``, ``'s'``, ``'x'``.)
-   The letters set or remove the corresponding flags for the part of the expression:
+   (Không hoặc nhiều chữ cái thuộc tập ``'a'``, ``'i'``, ``'L'``, ``'m'``, ``'s'``, ``'u'``, ``'x'``, tùy chọn theo sau bởi ``'-'`` rồi đến một hoặc nhiều chữ cái thuộc tập ``'i'``, ``'m'``, ``'s'``, ``'x'``.) Các chữ cái sẽ thiết lập hoặc xóa các cờ tương ứng cho phần biểu thức:
 
-   * :const:`re.A` (ASCII-only matching)
-   * :const:`re.I` (ignore case)
-   * :const:`re.L` (locale dependent)
-   * :const:`re.M` (multi-line)
-   * :const:`re.S` (dot matches all)
-   * :const:`re.U` (Unicode matching)
+   * :const:`re.A` (khớp chỉ ASCII)
+   * :const:`re.I` (bỏ qua chữ hoa chữ thường)
+   * :const:`re.L` (phụ thuộc vào locale)
+   * :const:`re.M` (nhiều dòng)
+   * :const:`re.S` (dấu chấm khớp với mọi ký tự)
+   * :const:`re.U` (khớp Unicode)
    * :const:`re.X` (verbose)
 
-   (The flags are described in :ref:`contents-of-module-re`.)
+   (Các cờ được mô tả trong :ref:`contents-of-module-re`.)
 
-   The letters ``'a'``, ``'L'`` and ``'u'`` are mutually exclusive when used
-   as inline flags, so they can't be combined or follow ``'-'``.  Instead,
-   when one of them appears in an inline group, it overrides the matching mode
-   in the enclosing group.  In Unicode patterns ``(?a:...)`` switches to
-   ASCII-only matching, and ``(?u:...)`` switches to Unicode matching
-   (default).  In bytes patterns ``(?L:...)`` switches to locale dependent
-   matching, and ``(?a:...)`` switches to ASCII-only matching (default).
-   This override is only in effect for the narrow inline group, and the
-   original matching mode is restored outside of the group.
+   Các chữ cái ``'a'``, ``'L'`` và ``'u'`` loại trừ lẫn nhau khi được dùng làm cờ inline, vì vậy chúng không thể được kết hợp hoặc đi sau ``'-'``. Thay vào đó, khi một trong số chúng xuất hiện trong một nhóm inline, nó sẽ ghi đè chế độ khớp trong nhóm bao quanh. Trong các mẫu Unicode, ``(?a:...)`` chuyển sang chế độ khớp chỉ ASCII, còn ``(?u:...)`` chuyển sang chế độ khớp Unicode (mặc định). Trong các mẫu bytes, ``(?L:...)`` chuyển sang chế độ khớp phụ thuộc locale, còn ``(?a:...)`` chuyển sang chế độ khớp chỉ ASCII (mặc định). Việc ghi đè này chỉ có hiệu lực trong nhóm inline giới hạn đó, và chế độ khớp ban đầu được khôi phục bên ngoài nhóm.
 
    .. versionadded:: 3.6
 
    .. versionchanged:: 3.7
-      The letters ``'a'``, ``'L'`` and ``'u'`` also can be used in a group.
+      Các chữ cái ``'a'``, ``'L'`` và ``'u'`` cũng có thể được sử dụng trong một nhóm.
 
 ``(?>...)``
-   Attempts to match ``...`` as if it was a separate regular expression, and
-   if successful, continues to match the rest of the pattern following it.
-   If the subsequent pattern fails to match, the stack can only be unwound
-   to a point *before* the ``(?>...)`` because once exited, the expression,
-   known as an :dfn:`atomic group`, has thrown away all stack points within
-   itself.
-   Thus, ``(?>.*).`` would never match anything because first the ``.*``
-   would match all characters possible, then, having nothing left to match,
-   the final ``.`` would fail to match.
-   Since there are no stack points saved in the Atomic Group, and there is
-   no stack point before it, the entire expression would thus fail to match.
+   Cố gắng khớp ``...`` như thể đó là một biểu thức chính quy riêng biệt; nếu thành công, nó tiếp tục khớp phần còn lại của mẫu theo sau nó. Nếu mẫu tiếp theo không khớp, ngăn xếp chỉ có thể được quay lui đến một điểm *trước* ``(?>...)``, vì sau khi thoát, biểu thức được gọi là :dfn:`nhóm atomic` đã loại bỏ mọi điểm trên ngăn xếp bên trong nó. Do đó, ``(?>.*).`` sẽ không bao giờ khớp được gì, vì trước tiên ``.*`` sẽ khớp mọi ký tự có thể, sau đó, do không còn gì để khớp, ``.`` cuối cùng sẽ không khớp. Vì không có điểm nào được lưu trên ngăn xếp trong Nhóm Atomic và cũng không có điểm nào trước nó, toàn bộ biểu thức sẽ không khớp.
 
    .. versionadded:: 3.11
 
 .. index:: single: (?P<; in regular expressions
 
 ``(?P<name>...)``
-   Similar to regular parentheses, but the substring matched by the group is
-   accessible via the symbolic group name *name*.  Group names must be valid
-   Python identifiers, and in :class:`bytes` patterns they can only contain
-   bytes in the ASCII range.  Each group name must be defined only once within
-   a regular expression.  A symbolic group is also a numbered group, just as if
-   the group were not named.
+   Tương tự như dấu ngoặc đơn thông thường, nhưng chuỗi con được nhóm khớp có thể được truy cập thông qua tên nhóm ký hiệu *name*. Tên nhóm phải là các định danh Python hợp lệ, và trong các mẫu :class:`bytes`, chúng chỉ có thể chứa các byte trong phạm vi ASCII. Mỗi tên nhóm chỉ được định nghĩa một lần trong một biểu thức chính quy. Một nhóm ký hiệu cũng là một nhóm được đánh số, giống như khi nhóm đó không được đặt tên.
 
-   Named groups can be referenced in three contexts.  If the pattern is
-   ``(?P<quote>['"]).*?(?P=quote)`` (i.e. matching a string quoted with either
-   single or double quotes):
+   Các nhóm có tên có thể được tham chiếu trong ba ngữ cảnh. Nếu mẫu là ``(?P<quote>['"]).*?(?P=quote)`` (tức là khớp với một chuỗi được đặt trong dấu nháy đơn hoặc dấu nháy kép):
 
-   +---------------------------------------+----------------------------------+
-   | Context of reference to group "quote" | Ways to reference it             |
-   +=======================================+==================================+
-   | in the same pattern itself            | * ``(?P=quote)`` (as shown)      |
-   |                                       | * ``\1``                         |
-   +---------------------------------------+----------------------------------+
-   | when processing match object *m*      | * ``m.group('quote')``           |
-   |                                       | * ``m.end('quote')`` (etc.)      |
-   +---------------------------------------+----------------------------------+
-   | in a string passed to the *repl*      | * ``\g<quote>``                  |
-   | argument of ``re.sub()``              | * ``\g<1>``                      |
-   |                                       | * ``\1``                         |
-   +---------------------------------------+----------------------------------+
+   +----------------------------------------------------------------+----------------------------------+
+   | Ngữ cảnh tham chiếu đến nhóm "quote"                           | Các cách tham chiếu đến nhóm này |
+   +================================================================+==================================+
+   | trong chính pattern đó                                         | * ``(?P=quote)`` (như minh họa)  |
+   |                                                                | * ``\1``                         |
+   +----------------------------------------------------------------+----------------------------------+
+   | khi xử lý đối tượng match *m*                                  | * ``m.group('quote')``           |
+   |                                                                | * ``m.end('quote')`` (v.v.)      |
+   +----------------------------------------------------------------+----------------------------------+
+   | trong một chuỗi được truyền vào đối số *repl* của ``re.sub()`` | * ``\g<quote>``                  |
+   |                                                                | * ``\g<1>``                      |
+   |                                                                | * ``\1``                         |
+   +----------------------------------------------------------------+----------------------------------+
 
    .. versionchanged:: 3.12
-      In :class:`bytes` patterns, group *name* can only contain bytes
-      in the ASCII range (``b'\x00'``-``b'\x7f'``).
+      Trong các mẫu :class:`bytes`, nhóm *name* chỉ có thể chứa các byte trong phạm vi ASCII (``b'\x00'``-``b'\x7f'``).
 
 .. index:: single: (?P=; in regular expressions
 
 ``(?P=name)``
-   A backreference to a named group; it matches whatever text was matched by the
-   earlier group named *name*.
+   Một tham chiếu ngược đến một nhóm có tên; nó khớp với bất kỳ văn bản nào đã được khớp bởi nhóm trước đó có tên *name*.
 
 .. index:: single: (?#; in regular expressions
 
 ``(?#...)``
-   A comment; the contents of the parentheses are simply ignored.
+   Một chú thích; nội dung bên trong dấu ngoặc đơn đơn giản là bị bỏ qua.
 
 .. index:: single: (?=; in regular expressions
 
 ``(?=...)``
-   Matches if ``...`` matches next, but doesn't consume any of the string.  This is
-   called a :dfn:`lookahead assertion`.  For example, ``Isaac (?=Asimov)`` will match
-   ``'Isaac '`` only if it's followed by ``'Asimov'``.
+   Khớp nếu ``...`` khớp ở vị trí tiếp theo, nhưng không tiêu thụ bất kỳ phần nào của chuỗi. Đây được gọi là :dfn:`lookahead assertion`. Ví dụ, ``Isaac (?=Asimov)`` sẽ khớp với ``'Isaac '`` chỉ khi theo sau nó là ``'Asimov'``.
 
 .. index:: single: (?!; in regular expressions
 
 ``(?!...)``
-   Matches if ``...`` doesn't match next.  This is a :dfn:`negative lookahead assertion`.
-   For example, ``Isaac (?!Asimov)`` will match ``'Isaac '`` only if it's *not*
-   followed by ``'Asimov'``.
+   Khớp nếu ``...`` không khớp ở vị trí tiếp theo. Đây là một :dfn:`negative lookahead assertion`. Ví dụ, ``Isaac (?!Asimov)`` sẽ khớp với ``'Isaac '`` chỉ khi nó *không* được theo sau bởi ``'Asimov'``.
 
 .. index:: single: (?<=; in regular expressions
 
 ``(?<=...)``
-   Matches if the current position in the string is preceded by a match for ``...``
-   that ends at the current position.  This is called a :dfn:`positive lookbehind
-   assertion`. ``(?<=abc)def`` will find a match in ``'abcdef'``, since the
-   lookbehind will back up 3 characters and check if the contained pattern matches.
-   The contained pattern must only match strings of some fixed length, meaning that
-   ``abc`` or ``a|b`` are allowed, but ``a*`` and ``a{3,4}`` are not.  Note that
-   patterns which start with positive lookbehind assertions will not match at the
-   beginning of the string being searched; you will most likely want to use the
-   :func:`search` function rather than the :func:`match` function:
+   Khớp nếu vị trí hiện tại trong chuỗi đứng sau một kết quả khớp với ``...`` kết thúc tại vị trí hiện tại. Đây được gọi là :dfn:`positive lookbehind assertion`. ``(?<=abc)def`` sẽ tìm thấy kết quả khớp trong ``'abcdef'``, vì lookbehind sẽ lùi lại 3 ký tự và kiểm tra xem mẫu bên trong có khớp hay không. Mẫu bên trong chỉ được khớp với các chuỗi có một độ dài cố định nào đó, nghĩa là ``abc`` hoặc ``a|b`` được phép, nhưng ``a*`` và ``a{3,4}`` thì không. Lưu ý rằng các mẫu bắt đầu bằng positive lookbehind assertion sẽ không khớp ở đầu chuỗi được tìm kiếm; nhiều khả năng bạn sẽ muốn sử dụng
+   hàm :func:`search` thay vì hàm :func:`match`:
 
       >>> import re
       >>> m = re.search('(?<=abc)def', 'abcdef')
       >>> m.group(0)
       'def'
 
-   This example looks for a word following a hyphen:
+   Ví dụ này tìm một từ đứng sau dấu gạch nối:
 
       >>> m = re.search(r'(?<=-)\w+', 'spam-egg')
       >>> m.group(0)
       'egg'
 
    .. versionchanged:: 3.5
-      Added support for group references of fixed length.
+      Đã bổ sung hỗ trợ tham chiếu nhóm có độ dài cố định.
 
 .. index:: single: (?<!; in regular expressions
 
 ``(?<!...)``
-   Matches if the current position in the string is not preceded by a match for
-   ``...``.  This is called a :dfn:`negative lookbehind assertion`.  Similar to
-   positive lookbehind assertions, the contained pattern must only match strings of
-   some fixed length.  Patterns which start with negative lookbehind assertions may
-   match at the beginning of the string being searched.
+   Khớp nếu vị trí hiện tại trong chuỗi không đứng trước một kết quả khớp với ``...``. Đây được gọi là :dfn:`khẳng định lookbehind phủ định`. Tương tự như các khẳng định lookbehind dương, mẫu được chứa chỉ được khớp với các chuỗi có độ dài cố định nào đó. Các mẫu bắt đầu bằng khẳng định lookbehind phủ định có thể khớp ở đầu chuỗi đang được tìm kiếm.
 
 .. _re-conditional-expression:
 .. index:: single: (?(; in regular expressions
 
 ``(?(id/name)yes-pattern|no-pattern)``
-   Will try to match with ``yes-pattern`` if the group with given *id* or
-   *name* exists, and with ``no-pattern`` if it doesn't. ``no-pattern`` is
-   optional and can be omitted. For example,
-   ``(<)?(\w+@\w+(?:\.\w+)+)(?(1)>|$)`` is a poor email matching pattern, which
-   matches ``'<user@host.com>'`` as well as ``'user@host.com'``, but does not
-   match ``'<user@host.com'`` nor ``'user@host.com>'`` in their entirety
-   (:func:`re.search` finds only ``'user@host.com'`` in the former).
+   Sẽ thử khớp với ``yes-pattern`` nếu nhóm có *id* hoặc *name* đã cho tồn tại, và với ``no-pattern`` nếu nhóm đó không tồn tại. ``no-pattern`` là tùy chọn và có thể được bỏ qua. Ví dụ, ``(<)?(\w+@\w+(?:\.\w+)+)(?(1)>|$)`` là một mẫu khớp email kém, khớp với cả ``'<user@host.com>'`` và ``'user@host.com'``, nhưng không khớp toàn bộ ``'<user@host.com'`` cũng như ``'user@host.com>'`` (:func:`re.search` chỉ tìm thấy ``'user@host.com'`` trong chuỗi đầu tiên).
 
    .. versionchanged:: 3.12
-      Group *id* can only contain ASCII digits.
-      In :class:`bytes` patterns, group *name* can only contain bytes
-      in the ASCII range (``b'\x00'``-``b'\x7f'``).
+      Nhóm *id* chỉ có thể chứa các chữ số ASCII. Trong các mẫu :class:`bytes`, nhóm *name* chỉ có thể chứa các byte trong dải ASCII (``b'\x00'``-``b'\x7f'``).
 
 
 .. _re-special-sequences:
 
-The special sequences consist of ``'\'`` and a character from the list below.
-If the ordinary character is not an ASCII digit or an ASCII letter, then the
-resulting RE will match the second character.  For example, ``\$`` matches the
-character ``'$'``.
+Các chuỗi đặc biệt bao gồm ``'\'`` và một ký tự trong danh sách bên dưới. Nếu ký tự thông thường không phải là chữ số ASCII hoặc chữ cái ASCII, thì RE kết quả sẽ khớp với ký tự thứ hai. Ví dụ, ``\$`` khớp với ký tự ``'$'``.
 
 .. index:: single: \ (backslash); in regular expressions
 
 ``\number``
-   Matches the contents of the group of the same number.  Groups are numbered
-   starting from 1.  For example, ``(.+) \1`` matches ``'the the'`` or ``'55 55'``,
-   but not ``'thethe'`` (note the space after the group).  This special sequence
-   can only be used to match one of the first 99 groups.  If the first digit of
-   *number* is 0, or *number* is 3 octal digits long, it will not be interpreted as
-   a group match, but as the character with octal value *number*. Inside the
-   ``'['`` and ``']'`` of a character class, all numeric escapes are treated as
-   characters.
+   Khớp với nội dung của nhóm có cùng số. Các nhóm được đánh số bắt đầu từ 1. Ví dụ, ``(.+) \1`` khớp với ``'the the'`` hoặc ``'55 55'``, nhưng không khớp với ``'thethe'`` (lưu ý khoảng trắng sau nhóm). Chuỗi đặc biệt này chỉ có thể được dùng để khớp một trong 99 nhóm đầu tiên. Nếu chữ số đầu tiên của *number* là 0, hoặc *number* dài 3 chữ số bát phân, thì nó sẽ không được diễn giải là một kết quả khớp nhóm mà là ký tự có giá trị bát phân *number*. Bên trong ``'['`` và ``']'`` của một character class, tất cả escape số đều được xử lý như các ký tự.
 
 .. index:: single: \A; in regular expressions
 
 ``\A``
-   Matches only at the start of the string.
+   Chỉ khớp ở đầu chuỗi.
 
 .. index:: single: \b; in regular expressions
 
 ``\b``
-   Matches the empty string, but only at the beginning or end of a word.
-   A word is defined as a sequence of word characters.
-   Note that formally, ``\b`` is defined as the boundary
-   between a ``\w`` and a ``\W`` character (or vice versa),
-   or between ``\w`` and the beginning or end of the string.
-   This means that ``r'\bat\b'`` matches ``'at'``, ``'at.'``, ``'(at)'``,
-   and ``'as at ay'`` but not ``'attempt'`` or ``'atlas'``.
+   Khớp với chuỗi rỗng, nhưng chỉ ở đầu hoặc cuối một từ. Một từ được định nghĩa là một chuỗi các ký tự từ. Lưu ý rằng về mặt hình thức, ``\b`` được định nghĩa là ranh giới giữa một ký tự ``\w`` và một ký tự ``\W`` (hoặc ngược lại), hoặc giữa ``\w`` và đầu hoặc cuối chuỗi. Điều này có nghĩa là ``r'\bat\b'`` khớp với ``'at'``, ``'at.'``, ``'(at)'`` và ``'as at ay'``, nhưng không khớp với ``'attempt'`` hoặc ``'atlas'``.
 
-   The default word characters in Unicode (str) patterns
-   are Unicode alphanumerics and the underscore,
-   but this can be changed by using the :py:const:`~re.ASCII` flag.
-   Word boundaries are determined by the current locale
-   if the :py:const:`~re.LOCALE` flag is used.
+   Các ký tự từ mặc định trong các pattern Unicode (str) là các ký tự chữ và số Unicode cùng với dấu gạch dưới, nhưng có thể thay đổi bằng cách sử dụng cờ :py:const:`~re.ASCII`. Ranh giới từ được xác định theo locale hiện tại nếu sử dụng cờ :py:const:`~re.LOCALE`.
 
    .. note::
 
-      Inside a character range, ``\b`` represents the backspace character,
-      for compatibility with Python's string literals.
+      Bên trong một phạm vi ký tự, ``\b`` biểu diễn ký tự backspace, để tương thích với string literal của Python.
 
 .. index:: single: \B; in regular expressions
 
 ``\B``
-   Matches the empty string,
-   but only when it is *not* at the beginning or end of a word.
-   This means that ``r'at\B'`` matches ``'athens'``, ``'atom'``,
-   ``'attorney'``, but not ``'at'``, ``'at.'``, or ``'at!'``.
-   ``\B`` is the opposite of ``\b``,
-   so word characters in Unicode (str) patterns
-   are Unicode alphanumerics or the underscore,
-   although this can be changed by using the :py:const:`~re.ASCII` flag.
-   Word boundaries are determined by the current locale
-   if the :py:const:`~re.LOCALE` flag is used.
+   Khớp với chuỗi rỗng, nhưng chỉ khi nó *not* ở đầu hoặc cuối một từ. Điều này có nghĩa là ``r'at\B'`` khớp với ``'athens'``, ``'atom'``, ``'attorney'``, nhưng không khớp với ``'at'``, ``'at.'`` hoặc ``'at!'``. ``\B`` ngược lại với ``\b``, vì vậy các ký tự từ trong các pattern Unicode (str) là các ký tự chữ và số Unicode hoặc dấu gạch dưới, mặc dù có thể thay đổi điều này bằng cách sử dụng cờ :py:const:`~re.ASCII`. Ranh giới từ được xác định theo locale hiện tại nếu sử dụng cờ :py:const:`~re.LOCALE`.
 
    .. versionchanged:: 3.14
-      ``\B`` now matches empty input string.
+      ``\B`` hiện khớp với chuỗi đầu vào rỗng.
 
 .. index:: single: \d; in regular expressions
 
 ``\d``
-   For Unicode (str) patterns:
-      Matches any Unicode decimal digit
-      (that is, any character in Unicode character category `[Nd]`__).
-      This includes ``[0-9]``, and also many other digit characters.
+   Đối với các pattern Unicode (str):
+      Khớp với mọi chữ số thập phân Unicode (tức là mọi ký tự thuộc danh mục ký tự Unicode `[Nd]`__). Danh mục này bao gồm ``[0-9]`` và nhiều ký tự chữ số khác.
 
-      Matches ``[0-9]`` if the :py:const:`~re.ASCII` flag is used.
+      Khớp với ``[0-9]`` nếu sử dụng cờ :py:const:`~re.ASCII`.
 
       __ https://www.unicode.org/versions/Unicode15.0.0/ch04.pdf#G134153
 
-   For 8-bit (bytes) patterns:
-      Matches any decimal digit in the ASCII character set;
-      this is equivalent to ``[0-9]``.
+   Đối với các mẫu 8-bit (bytes):
+      Khớp với mọi chữ số thập phân trong bộ ký tự ASCII; tương đương với ``[0-9]``.
 
 .. index:: single: \D; in regular expressions
 
 ``\D``
-   Matches any character which is not a decimal digit.
-   This is the opposite of ``\d``.
+   Khớp với mọi ký tự không phải là chữ số thập phân. Đây là ngược lại với ``\d``.
 
-   Matches ``[^0-9]`` if the :py:const:`~re.ASCII` flag is used.
+   Khớp với ``[^0-9]`` nếu sử dụng cờ :py:const:`~re.ASCII`.
 
 .. index:: single: \s; in regular expressions
 
 ``\s``
-   For Unicode (str) patterns:
-      Matches Unicode whitespace characters (as defined by :py:meth:`str.isspace`).
-      This includes ``[ \t\n\r\f\v]``, and also many other characters, for example the
-      non-breaking spaces mandated by typography rules in many languages.
+   Đối với các pattern Unicode (str):
+      Khớp với các ký tự khoảng trắng Unicode (như được định nghĩa bởi :py:meth:`str.isspace`). Bao gồm ``[ \t\n\r\f\v]`` và nhiều ký tự khác, chẳng hạn như các khoảng trắng không ngắt dòng được yêu cầu bởi các quy tắc kiểu chữ trong nhiều ngôn ngữ.
 
-      Matches ``[ \t\n\r\f\v]`` if the :py:const:`~re.ASCII` flag is used.
+      Khớp với ``[ \t\n\r\f\v]`` nếu sử dụng cờ :py:const:`~re.ASCII`.
 
-   For 8-bit (bytes) patterns:
-      Matches characters considered whitespace in the ASCII character set;
-      this is equivalent to ``[ \t\n\r\f\v]``.
+   Đối với các mẫu 8-bit (bytes):
+      Khớp với các ký tự được xem là khoảng trắng trong bộ ký tự ASCII; tương đương với ``[ \t\n\r\f\v]``.
 
 .. index:: single: \S; in regular expressions
 
 ``\S``
-   Matches any character which is not a whitespace character. This is
-   the opposite of ``\s``.
+   Khớp với mọi ký tự không phải là ký tự khoảng trắng. Đây là giá trị ngược lại của ``\s``.
 
-   Matches ``[^ \t\n\r\f\v]`` if the :py:const:`~re.ASCII` flag is used.
+   Khớp với ``[^ \t\n\r\f\v]`` nếu sử dụng cờ :py:const:`~re.ASCII`.
 
 .. index:: single: \w; in regular expressions
 
 ``\w``
-   For Unicode (str) patterns:
-      Matches Unicode word characters;
-      this includes all Unicode alphanumeric characters
-      (as defined by :py:meth:`str.isalnum`),
-      as well as the underscore (``_``).
+   Đối với các pattern Unicode (str):
+      Khớp với các ký tự từ Unicode; bao gồm tất cả các ký tự chữ và số Unicode (như được định nghĩa bởi :py:meth:`str.isalnum`), cũng như dấu gạch dưới (``_``).
 
-      Matches ``[a-zA-Z0-9_]`` if the :py:const:`~re.ASCII` flag is used.
+      Khớp với ``[a-zA-Z0-9_]`` nếu sử dụng cờ :py:const:`~re.ASCII`.
 
-   For 8-bit (bytes) patterns:
-      Matches characters considered alphanumeric in the ASCII character set;
-      this is equivalent to ``[a-zA-Z0-9_]``.
-      If the :py:const:`~re.LOCALE` flag is used,
-      matches characters considered alphanumeric in the current locale and the underscore.
+   Đối với các mẫu 8-bit (bytes):
+      Khớp với các ký tự được xem là chữ và số trong bộ ký tự ASCII; tương đương với ``[a-zA-Z0-9_]``. Nếu sử dụng cờ :py:const:`~re.LOCALE`, khớp với các ký tự được xem là chữ và số trong locale hiện tại và dấu gạch dưới.
 
 .. index:: single: \W; in regular expressions
 
 ``\W``
-   Matches any character which is not a word character.
-   This is the opposite of ``\w``.
-   By default, matches non-underscore (``_``) characters
-   for which :py:meth:`str.isalnum` returns ``False``.
+   Khớp với mọi ký tự không phải là ký tự từ. Đây là phần đối lập của ``\w``. Theo mặc định, khớp với các ký tự không phải dấu gạch dưới (``_``) mà :py:meth:`str.isalnum` trả về ``False``.
 
-   Matches ``[^a-zA-Z0-9_]`` if the :py:const:`~re.ASCII` flag is used.
+   Khớp với ``[^a-zA-Z0-9_]`` nếu sử dụng cờ :py:const:`~re.ASCII`.
 
-   If the :py:const:`~re.LOCALE` flag is used,
-   matches characters which are neither alphanumeric in the current locale
-   nor the underscore.
+   Nếu sử dụng cờ :py:const:`~re.LOCALE`, khớp với các ký tự không phải là chữ và số trong locale hiện tại cũng không phải dấu gạch dưới.
 
 .. index:: single: \z; in regular expressions
            single: \Z; in regular expressions
 
 ``\z``
-   Matches only at the end of the string.
+   Chỉ khớp ở cuối chuỗi.
 
    .. versionadded:: 3.14
 
 ``\Z``
-   The same as ``\z``.  For compatibility with old Python versions.
+   Giống với ``\z``. Để tương thích với các phiên bản Python cũ.
 
 .. index::
    single: \a; in regular expressions
@@ -687,155 +414,110 @@ character ``'$'``.
    single: \x; in regular expressions
    single: \\; in regular expressions
 
-Most of the :ref:`escape sequences <escape-sequences>` supported by Python
-string literals are also accepted by the regular expression parser::
+Hầu hết các :ref:`chuỗi thoát <escape-sequences>` được hỗ trợ bởi các string literal của Python cũng được bộ phân tích cú pháp biểu thức chính quy chấp nhận::
 
    \a      \b      \f      \n
    \N      \r      \t      \u
    \U      \v      \x      \\
 
-(Note that ``\b`` is used to represent word boundaries, and means "backspace"
-only inside character classes.)
+(Lưu ý rằng ``\b`` được dùng để biểu diễn ranh giới từ và chỉ có nghĩa là "backspace" bên trong các character class.)
 
-``'\u'``, ``'\U'``, and ``'\N'`` escape sequences are
-only recognized in Unicode (str) patterns.
-In bytes patterns they are errors.
-Unknown escapes of ASCII letters are reserved
-for future use and treated as errors.
+Các chuỗi thoát ``'\u'``, ``'\U'`` và ``'\N'`` chỉ được nhận dạng trong các pattern Unicode (str). Trong các pattern bytes, chúng gây ra lỗi. Các chuỗi thoát không xác định của các chữ cái ASCII được dành cho mục đích sử dụng trong tương lai và được xem là lỗi.
 
-Octal escapes are included in a limited form.  If the first digit is a 0, or if
-there are three octal digits, it is considered an octal escape. Otherwise, it is
-a group reference.  As for string literals, octal escapes are always at most
-three digits in length.
+Các chuỗi thoát bát phân được hỗ trợ ở dạng giới hạn. Nếu chữ số đầu tiên là 0 hoặc có ba chữ số bát phân thì chuỗi này được coi là chuỗi thoát bát phân. Nếu không, nó là tham chiếu nhóm. Tương tự như string literal, chuỗi thoát bát phân luôn có độ dài tối đa là ba chữ số.
 
 .. versionchanged:: 3.3
-   The ``'\u'`` and ``'\U'`` escape sequences have been added.
+   Các chuỗi thoát ``'\u'`` và ``'\U'`` đã được thêm vào.
 
 .. versionchanged:: 3.6
-   Unknown escapes consisting of ``'\'`` and an ASCII letter now are errors.
+   Các escape không xác định bao gồm ``'\'`` và một chữ cái ASCII giờ đây sẽ gây ra lỗi.
 
 .. versionchanged:: 3.8
-   The :samp:`'\\N\\{{name}\\}'` escape sequence has been added. As in string literals,
-   it expands to the named Unicode character (e.g. ``'\N{EM DASH}'``).
+   Chuỗi escape :samp:`'\\N\\{{name}\\}'` đã được thêm vào. Tương tự như trong các string literal, nó mở rộng thành ký tự Unicode có tên (ví dụ: ``'\N{EM DASH}'``).
 
 
 .. _contents-of-module-re:
 
-Module Contents
+Nội dung module
 ---------------
 
-The module defines several functions, constants, and an exception. Some of the
-functions are simplified versions of the full featured methods for compiled
-regular expressions.  Most non-trivial applications always use the compiled
-form.
+Module này định nghĩa một số hàm, hằng số và một ngoại lệ. Một số hàm là các phiên bản đơn giản hóa của những phương thức đầy đủ tính năng dành cho regular expression đã biên dịch. Hầu hết các ứng dụng không tầm thường luôn sử dụng dạng đã biên dịch.
 
+
+.. _`Flags`:
 
 Flags
 ^^^^^
 
 .. versionchanged:: 3.6
-   Flag constants are now instances of :class:`RegexFlag`, which is a subclass of
+   Các hằng số flag giờ đây là các instance của :class:`RegexFlag`, vốn là một lớp con của
    :class:`enum.IntFlag`.
 
 
 .. class:: RegexFlag
 
-   An :class:`enum.IntFlag` class containing the regex options listed below.
+   Một lớp :class:`enum.IntFlag` chứa các tùy chọn regex được liệt kê bên dưới.
 
-   .. versionadded:: 3.11 - added to ``__all__``
+   .. versionadded:: 3.11 - được thêm vào ``__all__``
 
 .. data:: A
           ASCII
 
-   Make ``\w``, ``\W``, ``\b``, ``\B``, ``\d``, ``\D``, ``\s`` and ``\S``
-   perform ASCII-only matching instead of full Unicode matching.  This is only
-   meaningful for Unicode (str) patterns, and is ignored for bytes patterns.
+   Khiến ``\w``, ``\W``, ``\b``, ``\B``, ``\d``, ``\D``, ``\s`` và ``\S`` thực hiện việc so khớp chỉ ASCII thay vì so khớp Unicode đầy đủ. Điều này chỉ có ý nghĩa đối với các pattern Unicode (str) và bị bỏ qua đối với các pattern bytes.
 
-   Corresponds to the inline flag ``(?a)``.
+   Tương ứng với inline flag ``(?a)``.
 
    .. note::
 
-      The :py:const:`~re.U` flag still exists for backward compatibility,
-      but is redundant in Python 3 since
-      matches are Unicode by default for ``str`` patterns,
-      and Unicode matching isn't allowed for bytes patterns.
-      :py:const:`~re.UNICODE` and the inline flag ``(?u)`` are similarly redundant.
+      Flag :py:const:`~re.U` vẫn tồn tại để tương thích ngược, nhưng là dư thừa trong Python 3 vì việc so khớp mặc định là Unicode đối với các pattern ``str``, và không cho phép so khớp Unicode đối với các pattern bytes.
+      :py:const:`~re.UNICODE` và inline flag ``(?u)`` cũng tương tự là dư thừa.
 
 
 .. data:: DEBUG
 
-   Display debug information about compiled expression.
+   Hiển thị thông tin gỡ lỗi về biểu thức đã biên dịch.
 
-   No corresponding inline flag.
+   Không có cờ inline tương ứng.
 
 
 .. data:: I
           IGNORECASE
 
-   Perform case-insensitive matching;
-   expressions like ``[A-Z]`` will also  match lowercase letters.
-   Full Unicode matching (such as ``Ü`` matching ``ü``)
-   also works unless the :py:const:`~re.ASCII` flag
-   is used to disable non-ASCII matches.
-   The current locale does not change the effect of this flag
-   unless the :py:const:`~re.LOCALE` flag is also used.
+   Thực hiện đối sánh không phân biệt chữ hoa chữ thường; các biểu thức như ``[A-Z]`` cũng sẽ đối sánh với các chữ cái viết thường. Đối sánh Unicode đầy đủ (chẳng hạn ``Ü`` đối sánh với ``ü``) cũng hoạt động, trừ khi sử dụng cờ :py:const:`~re.ASCII` để tắt việc đối sánh các ký tự không phải ASCII. Locale hiện tại không làm thay đổi tác dụng của cờ này, trừ khi cờ :py:const:`~re.LOCALE` cũng được sử dụng.
 
-   Corresponds to the inline flag ``(?i)``.
+   Tương ứng với cờ inline ``(?i)``.
 
-   Note that when the Unicode patterns ``[a-z]`` or ``[A-Z]`` are used in
-   combination with the :const:`IGNORECASE` flag, they will match the 52 ASCII
-   letters and 4 additional non-ASCII letters: 'İ' (U+0130, Latin capital
-   letter I with dot above), 'ı' (U+0131, Latin small letter dotless i),
-   'ſ' (U+017F, Latin small letter long s) and 'K' (U+212A, Kelvin sign).
-   If the :py:const:`~re.ASCII` flag is used, only letters 'a' to 'z'
-   and 'A' to 'Z' are matched.
+   Lưu ý rằng khi sử dụng các mẫu Unicode ``[a-z]`` hoặc ``[A-Z]`` kết hợp với cờ :const:`IGNORECASE`, chúng sẽ đối sánh với 52 chữ cái ASCII và 4 chữ cái không phải ASCII bổ sung: 'İ' (U+0130, chữ I hoa Latin có dấu chấm bên trên), 'ı' (U+0131, chữ i thường Latin không có dấu chấm), 'ſ' (U+017F, chữ s dài Latin) và 'K' (U+212A, ký hiệu Kelvin). Nếu sử dụng cờ :py:const:`~re.ASCII`, chỉ các chữ cái từ 'a' đến 'z' và từ 'A' đến 'Z' được đối sánh.
 
 .. data:: L
           LOCALE
 
-   Make ``\w``, ``\W``, ``\b``, ``\B`` and case-insensitive matching
-   dependent on the current locale.
-   This flag can be used only with bytes patterns.
+   Làm cho ``\w``, ``\W``, ``\b``, ``\B`` và việc đối sánh không phân biệt chữ hoa chữ thường phụ thuộc vào locale hiện tại. Chỉ có thể sử dụng cờ này với các mẫu bytes.
 
-   Corresponds to the inline flag ``(?L)``.
+   Tương ứng với cờ inline ``(?L)``.
 
    .. warning::
 
-      This flag is discouraged; consider Unicode matching instead.
-      The locale mechanism is very unreliable
-      as it only handles one "culture" at a time
-      and only works with 8-bit locales.
-      Unicode matching is enabled by default for Unicode (str) patterns
-      and it is able to handle different locales and languages.
+      Không khuyến khích sử dụng cờ này; thay vào đó, hãy cân nhắc việc so khớp Unicode. Cơ chế locale rất không đáng tin cậy vì chỉ xử lý một "culture" tại một thời điểm và chỉ hoạt động với các locale 8-bit. So khớp Unicode được bật theo mặc định cho các mẫu Unicode (str) và có thể xử lý nhiều locale và ngôn ngữ khác nhau.
 
    .. versionchanged:: 3.6
       :py:const:`~re.LOCALE` can be used only with bytes patterns
-      and is not compatible with :py:const:`~re.ASCII`.
+      và không tương thích với :py:const:`~re.ASCII`.
 
    .. versionchanged:: 3.7
-      Compiled regular expression objects with the :py:const:`~re.LOCALE` flag
-      no longer depend on the locale at compile time.
-      Only the locale at matching time affects the result of matching.
+      Các đối tượng biểu thức chính quy đã biên dịch có cờ :py:const:`~re.LOCALE` không còn phụ thuộc vào locale tại thời điểm biên dịch. Chỉ locale tại thời điểm so khớp mới ảnh hưởng đến kết quả so khớp.
 
 
 .. data:: M
           MULTILINE
 
-   When specified, the pattern character ``'^'`` matches at the beginning of the
-   string and at the beginning of each line (immediately following each newline);
-   and the pattern character ``'$'`` matches at the end of the string and at the
-   end of each line (immediately preceding each newline).  By default, ``'^'``
-   matches only at the beginning of the string, and ``'$'`` only at the end of the
-   string and immediately before the newline (if any) at the end of the string.
+   Khi được chỉ định, ký tự mẫu ``'^'`` khớp ở đầu chuỗi và ở đầu mỗi dòng (ngay sau mỗi ký tự xuống dòng); còn ký tự mẫu ``'$'`` khớp ở cuối chuỗi và ở cuối mỗi dòng (ngay trước mỗi ký tự xuống dòng). Theo mặc định, ``'^'`` chỉ khớp ở đầu chuỗi, còn ``'$'`` chỉ khớp ở cuối chuỗi và ngay trước ký tự xuống dòng (nếu có) ở cuối chuỗi.
 
-   Corresponds to the inline flag ``(?m)``.
+   Tương ứng với cờ inline ``(?m)``.
 
 .. data:: NOFLAG
 
-   Indicates no flag being applied, the value is ``0``.  This flag may be used
-   as a default value for a function keyword argument or as a base value that
-   will be conditionally ORed with other flags.  Example of use as a default
-   value::
+   Cho biết không có cờ nào được áp dụng, giá trị là ``0``. Cờ này có thể được dùng làm giá trị mặc định cho một đối số từ khóa của hàm hoặc làm giá trị cơ sở sẽ được OR có điều kiện với các cờ khác. Ví dụ sử dụng làm giá trị mặc định::
 
       def myfunc(text, flag=re.NOFLAG):
           return re.match(text, flag)
@@ -845,133 +527,92 @@ Flags
 .. data:: S
           DOTALL
 
-   Make the ``'.'`` special character match any character at all, including a
-   newline; without this flag, ``'.'`` will match anything *except* a newline.
+   Khiến ký tự đặc biệt ``'.'`` khớp với mọi ký tự, bao gồm cả ký tự xuống dòng; nếu không có cờ này, ``'.'`` sẽ khớp với mọi thứ *ngoại trừ* ký tự xuống dòng.
 
-   Corresponds to the inline flag ``(?s)``.
+   Tương ứng với cờ inline ``(?s)``.
 
 
 .. data:: U
           UNICODE
 
-   In Python 3, Unicode characters are matched by default
-   for ``str`` patterns.
-   This flag is therefore redundant with **no effect**
-   and is only kept for backward compatibility.
+   Trong Python 3, các ký tự Unicode được khớp theo mặc định đối với các mẫu ``str``. Vì vậy, cờ này là dư thừa với **không có tác dụng** và chỉ được giữ lại để tương thích ngược.
 
-   See :py:const:`~re.ASCII` to restrict matching to ASCII characters instead.
+   Xem :py:const:`~re.ASCII` để giới hạn việc khớp chỉ ở các ký tự ASCII.
 
 .. data:: X
           VERBOSE
 
    .. index:: single: # (hash); in regular expressions
 
-   This flag allows you to write regular expressions that look nicer and are
-   more readable by allowing you to visually separate logical sections of the
-   pattern and add comments. Whitespace within the pattern is ignored, except
-   when in a character class, or when preceded by an unescaped backslash,
-   or within tokens like ``*?``, ``(?:`` or ``(?P<...>``. For example, ``(? :``
-   and ``* ?`` are not allowed.
-   When a line contains a ``#`` that is not in a character class and is not
-   preceded by an unescaped backslash, all characters from the leftmost such
-   ``#`` through the end of the line are ignored.
+   Cờ này cho phép bạn viết các biểu thức chính quy trông đẹp mắt và dễ đọc hơn bằng cách cho phép bạn phân tách trực quan các phần logic của mẫu và thêm chú thích. Khoảng trắng trong mẫu sẽ bị bỏ qua, ngoại trừ khi nằm trong một character class, khi đứng trước một dấu gạch chéo ngược chưa được escape, hoặc khi nằm trong các token như ``*?``, ``(?:`` hay ``(?P<...>``. Ví dụ: ``(? :`` và ``* ?`` không được phép. Khi một dòng chứa ``#`` không nằm trong một character class và không đứng trước một dấu gạch chéo ngược chưa được escape, tất cả ký tự từ ``#`` ngoài cùng bên trái như vậy cho đến cuối dòng sẽ bị bỏ qua.
 
-   This means that the two following regular expression objects that match a
-   decimal number are functionally equal::
+   Điều này có nghĩa là hai đối tượng biểu thức chính quy sau đây, dùng để khớp một số thập phân, về mặt chức năng là tương đương::
 
       a = re.compile(r"""\d +  # the integral part
-                         \.    # the decimal point
-                         \d *  # some fractional digits""", re.X)
+                         \.    # dấu thập phân
+                         \d *  # một vài chữ số phần thập phân""", re.X)
       b = re.compile(r"\d+\.\d*")
 
-   Corresponds to the inline flag ``(?x)``.
+   Tương ứng với cờ inline ``(?x)``.
 
 
-Functions
-^^^^^^^^^
+Các hàm
+^^^^^^^
 
 .. function:: compile(pattern, flags=0)
 
-   Compile a regular expression pattern into a :ref:`regular expression object
-   <re-objects>`, which can be used for matching using its
-   :func:`~Pattern.match`, :func:`~Pattern.search` and other methods, described
-   below.
+   Biên dịch một mẫu biểu thức chính quy thành :ref:`đối tượng biểu thức chính quy <re-objects>`, có thể được dùng để so khớp bằng cách sử dụng nó
+   :func:`~Pattern.match`, :func:`~Pattern.search` và các phương thức khác được mô tả bên dưới.
 
-   The expression's behaviour can be modified by specifying a *flags* value.
-   Values can be any of the `flags`_ variables, combined using bitwise OR
-   (the ``|`` operator).
+   Hành vi của biểu thức có thể được thay đổi bằng cách chỉ định giá trị *flags*. Các giá trị có thể là bất kỳ biến nào trong số `flags`_, được kết hợp bằng phép OR theo bit (toán tử ``|``).
 
-   The sequence ::
+   Chuỗi lệnh::
 
       prog = re.compile(pattern)
       result = prog.match(string)
 
-   is equivalent to ::
+   tương đương với::
 
       result = re.match(pattern, string)
 
-   but using :func:`re.compile` and saving the resulting regular expression
-   object for reuse is more efficient when the expression will be used several
-   times in a single program.
+   nhưng việc sử dụng :func:`re.compile` và lưu đối tượng biểu thức chính quy thu được để tái sử dụng sẽ hiệu quả hơn khi biểu thức được sử dụng nhiều lần trong cùng một chương trình.
 
    .. note::
 
-      The compiled versions of the most recent patterns passed to
-      :func:`re.compile` and the module-level matching functions are cached, so
-      programs that use only a few regular expressions at a time needn't worry
-      about compiling regular expressions.
+      Các phiên bản đã biên dịch của những mẫu gần đây nhất được truyền cho
+      :func:`re.compile` và các hàm matching ở cấp module được lưu vào bộ nhớ đệm, vì vậy các chương trình chỉ sử dụng một vài regular expression tại một thời điểm không cần lo lắng về việc biên dịch regular expression.
 
 
 .. function:: search(pattern, string, flags=0)
 
-   Scan through *string* looking for the first location where the regular expression
-   *pattern* produces a match, and return a corresponding :class:`~re.Match`. Return
-   ``None`` if no position in the string matches the pattern; note that this is
-   different from finding a zero-length match at some point in the string.
+   Quét qua *string* để tìm vị trí đầu tiên mà regular expression *pattern* tạo ra một kết quả khớp, rồi trả về một :class:`~re.Match` tương ứng. Trả về ``None`` nếu không có vị trí nào trong chuỗi khớp với pattern; lưu ý rằng điều này khác với việc tìm thấy một kết quả khớp có độ dài bằng 0 tại một vị trí nào đó trong chuỗi.
 
-   The expression's behaviour can be modified by specifying a *flags* value.
-   Values can be any of the `flags`_ variables, combined using bitwise OR
-   (the ``|`` operator).
+   Hành vi của biểu thức có thể được thay đổi bằng cách chỉ định giá trị *flags*. Các giá trị có thể là bất kỳ biến nào trong số `flags`_, được kết hợp bằng phép OR theo bit (toán tử ``|``).
 
 
 .. function:: match(pattern, string, flags=0)
 
-   If zero or more characters at the beginning of *string* match the regular
-   expression *pattern*, return a corresponding :class:`~re.Match`.  Return
-   ``None`` if the string does not match the pattern; note that this is
-   different from a zero-length match.
+   Nếu không hoặc có một hay nhiều ký tự ở đầu *string* khớp với regular expression *pattern*, hãy trả về một :class:`~re.Match` tương ứng. Trả về ``None`` nếu chuỗi không khớp với pattern; lưu ý rằng điều này khác với một kết quả khớp có độ dài bằng 0.
 
-   Note that even in :const:`MULTILINE` mode, :func:`re.match` will only match
-   at the beginning of the string and not at the beginning of each line.
+   Lưu ý rằng ngay cả trong chế độ :const:`MULTILINE`, :func:`re.match` chỉ khớp ở đầu chuỗi, không phải ở đầu mỗi dòng.
 
-   If you want to locate a match anywhere in *string*, use :func:`search`
-   instead (see also :ref:`search-vs-match`).
+   Nếu bạn muốn tìm một kết quả khớp ở bất kỳ vị trí nào trong *string*, hãy sử dụng :func:`search` thay vào đó (xem thêm :ref:`search-vs-match`).
 
-   The expression's behaviour can be modified by specifying a *flags* value.
-   Values can be any of the `flags`_ variables, combined using bitwise OR
-   (the ``|`` operator).
+   Hành vi của biểu thức có thể được thay đổi bằng cách chỉ định giá trị *flags*. Các giá trị có thể là bất kỳ biến nào trong số `flags`_, được kết hợp bằng phép OR theo bit (toán tử ``|``).
 
 
 .. function:: fullmatch(pattern, string, flags=0)
 
-   If the whole *string* matches the regular expression *pattern*, return a
-   corresponding :class:`~re.Match`.  Return ``None`` if the string does not match
-   the pattern; note that this is different from a zero-length match.
+   Nếu toàn bộ *string* khớp với biểu thức chính quy *pattern*, hãy trả về một :class:`~re.Match` tương ứng. Trả về ``None`` nếu chuỗi không khớp với mẫu; lưu ý rằng điều này khác với kết quả khớp có độ dài bằng không.
 
-   The expression's behaviour can be modified by specifying a *flags* value.
-   Values can be any of the `flags`_ variables, combined using bitwise OR
-   (the ``|`` operator).
+   Hành vi của biểu thức có thể được thay đổi bằng cách chỉ định giá trị *flags*. Các giá trị có thể là bất kỳ biến nào trong số `flags`_, được kết hợp bằng phép OR theo bit (toán tử ``|``).
 
    .. versionadded:: 3.4
 
 
 .. function:: split(pattern, string, maxsplit=0, flags=0)
 
-   Split *string* by the occurrences of *pattern*.  If capturing parentheses are
-   used in *pattern*, then the text of all groups in the pattern are also returned
-   as part of the resulting list. If *maxsplit* is nonzero, at most *maxsplit*
-   splits occur, and the remainder of the string is returned as the final element
-   of the list. ::
+   Tách *string* tại các vị trí xuất hiện của *pattern*. Nếu sử dụng các dấu ngoặc bắt giữ trong *pattern*, thì văn bản của tất cả các nhóm trong mẫu cũng được trả về như một phần của danh sách kết quả. Nếu *maxsplit* khác không, sẽ xảy ra nhiều nhất *maxsplit* lần tách, và phần còn lại của chuỗi được trả về dưới dạng phần tử cuối cùng của danh sách.::
 
       >>> re.split(r'\W+', 'Words, words, words.')
       ['Words', 'words', 'words', '']
@@ -982,18 +623,14 @@ Functions
       >>> re.split('[a-f]+', '0a3B9', flags=re.IGNORECASE)
       ['0', '3', '9']
 
-   If there are capturing groups in the separator and it matches at the start of
-   the string, the result will start with an empty string.  The same holds for
-   the end of the string::
+   Nếu dấu phân cách có các nhóm bắt giữ và khớp ở đầu chuỗi, kết quả sẽ bắt đầu bằng một chuỗi rỗng. Điều tương tự cũng đúng với cuối chuỗi.::
 
       >>> re.split(r'(\W+)', '...words, words...')
       ['', '...', 'words', ', ', 'words', '...', '']
 
-   That way, separator components are always found at the same relative
-   indices within the result list.
+   Nhờ đó, các thành phần dấu phân cách luôn được tìm thấy tại cùng các chỉ mục tương đối trong danh sách kết quả.
 
-   Adjacent empty matches are not possible, but an empty match can occur
-   immediately after a non-empty match.
+   Không thể có các kết quả khớp rỗng liền kề, nhưng một kết quả khớp rỗng có thể xuất hiện ngay sau một kết quả khớp không rỗng.
 
    .. code:: pycon
 
@@ -1004,84 +641,56 @@ Functions
       >>> re.split(r'(\W*)', '...words...')
       ['', '...', '', '', 'w', '', 'o', '', 'r', '', 'd', '', 's', '...', '', '', '']
 
-   The expression's behaviour can be modified by specifying a *flags* value.
-   Values can be any of the `flags`_ variables, combined using bitwise OR
-   (the ``|`` operator).
+   Hành vi của biểu thức có thể được thay đổi bằng cách chỉ định giá trị *flags*. Các giá trị có thể là bất kỳ biến nào trong số `flags`_, được kết hợp bằng phép OR theo bit (toán tử ``|``).
 
    .. versionchanged:: 3.1
-      Added the optional flags argument.
+      Đã thêm đối số flags tùy chọn.
 
    .. versionchanged:: 3.7
-      Added support of splitting on a pattern that could match an empty string.
+      Đã thêm hỗ trợ tách theo một pattern có thể khớp với chuỗi rỗng.
 
    .. deprecated:: 3.13
-      Passing *maxsplit* and *flags* as positional arguments is deprecated.
-      In future Python versions they will be
-      :ref:`keyword-only parameters <keyword-only_parameter>`.
+      Việc truyền *maxsplit* và *flags* dưới dạng đối số vị trí không còn được khuyến nghị. Trong các phiên bản Python tương lai, chúng sẽ là
+      :ref:`các tham số chỉ dùng từ khóa <keyword-only_parameter>`.
 
 
 .. function:: findall(pattern, string, flags=0)
 
-   Return all non-overlapping matches of *pattern* in *string*, as a list of
-   strings or tuples.  The *string* is scanned left-to-right, and matches
-   are returned in the order found.  Empty matches are included in the result.
+   Trả về tất cả các kết quả khớp không chồng lấp của *pattern* trong *string*, dưới dạng danh sách các chuỗi hoặc tuple. *string* được quét từ trái sang phải và các kết quả khớp được trả về theo thứ tự tìm thấy. Các kết quả khớp rỗng cũng được đưa vào kết quả.
 
-   The result depends on the number of capturing groups in the pattern.
-   If there are no groups, return a list of strings matching the whole
-   pattern.  If there is exactly one group, return a list of strings
-   matching that group.  If multiple groups are present, return a list
-   of tuples of strings matching the groups.  Non-capturing groups do not
-   affect the form of the result.
+   Kết quả phụ thuộc vào số lượng nhóm capturing trong pattern. Nếu không có nhóm nào, trả về danh sách các chuỗi khớp với toàn bộ pattern. Nếu có đúng một nhóm, trả về danh sách các chuỗi khớp với nhóm đó. Nếu có nhiều nhóm, trả về danh sách các tuple gồm các chuỗi khớp với các nhóm. Các nhóm non-capturing không ảnh hưởng đến dạng của kết quả.
 
       >>> re.findall(r'\bf[a-z]*', 'which foot or hand fell fastest')
       ['foot', 'fell', 'fastest']
       >>> re.findall(r'(\w+)=(\d+)', 'set width=20 and height=10')
       [('width', '20'), ('height', '10')]
 
-   The expression's behaviour can be modified by specifying a *flags* value.
-   Values can be any of the `flags`_ variables, combined using bitwise OR
-   (the ``|`` operator).
+   Hành vi của biểu thức có thể được thay đổi bằng cách chỉ định giá trị *flags*. Các giá trị có thể là bất kỳ biến nào trong số `flags`_, được kết hợp bằng phép OR theo bit (toán tử ``|``).
 
    .. versionchanged:: 3.7
-      Non-empty matches can now start just after a previous empty match.
+      Các kết quả khớp không rỗng giờ đây có thể bắt đầu ngay sau một kết quả khớp rỗng trước đó.
 
 
 .. function:: finditer(pattern, string, flags=0)
 
-   Return an :term:`iterator` yielding :class:`~re.Match` objects over
-   all non-overlapping matches for the RE *pattern* in *string*.  The *string*
-   is scanned left-to-right, and matches are returned in the order found.  Empty
-   matches are included in the result.
+   Trả về một :term:`iterator` tạo ra các đối tượng :class:`~re.Match` cho tất cả các kết quả khớp không chồng lấp của mẫu RE *pattern* trong *string*. *string* được quét từ trái sang phải và các kết quả khớp được trả về theo thứ tự tìm thấy. Các kết quả khớp rỗng được đưa vào kết quả.
 
-   The expression's behaviour can be modified by specifying a *flags* value.
-   Values can be any of the `flags`_ variables, combined using bitwise OR
-   (the ``|`` operator).
+   Hành vi của biểu thức có thể được thay đổi bằng cách chỉ định giá trị *flags*. Các giá trị có thể là bất kỳ biến nào trong số `flags`_, được kết hợp bằng phép OR theo bit (toán tử ``|``).
 
    .. versionchanged:: 3.7
-      Non-empty matches can now start just after a previous empty match.
+      Các kết quả khớp không rỗng giờ đây có thể bắt đầu ngay sau một kết quả khớp rỗng trước đó.
 
 
 .. function:: sub(pattern, repl, string, count=0, flags=0)
 
-   Return the string obtained by replacing the leftmost non-overlapping occurrences
-   of *pattern* in *string* by the replacement *repl*.  If the pattern isn't found,
-   *string* is returned unchanged.  *repl* can be a string or a function; if it is
-   a string, any backslash escapes in it are processed.  That is, ``\n`` is
-   converted to a single newline character, ``\r`` is converted to a carriage return, and
-   so forth.  Unknown escapes of ASCII letters are reserved for future use and
-   treated as errors.  Other unknown escapes such as ``\&`` are left alone.
-   Backreferences, such
-   as ``\6``, are replaced with the substring matched by group 6 in the pattern.
-   For example::
+   Trả về chuỗi thu được bằng cách thay thế các lần xuất hiện không chồng lấp ở ngoài cùng bên trái của *pattern* trong *string* bằng chuỗi thay thế *repl*. Nếu không tìm thấy mẫu, *string* được trả về nguyên trạng. *repl* có thể là một chuỗi hoặc một hàm; nếu là chuỗi, mọi escape bằng dấu gạch chéo ngược trong đó sẽ được xử lý. Cụ thể, ``\n`` được chuyển thành một ký tự xuống dòng, ``\r`` được chuyển thành ký tự xuống dòng kiểu carriage return, v.v. Các escape không xác định của các chữ cái ASCII được dành cho mục đích sử dụng trong tương lai và được xử lý như lỗi. Các escape không xác định khác, chẳng hạn như ``\&``, được giữ nguyên. Các backreference, chẳng hạn như ``\6``, được thay thế bằng chuỗi con khớp với group 6 trong mẫu. Ví dụ::
 
       >>> re.sub(r'def\s+([a-zA-Z_][a-zA-Z_0-9]*)\s*\(\s*\):',
       ...        r'static PyObject*\npy_\1(void)\n{',
       ...        'def myfunc():')
       'static PyObject*\npy_myfunc(void)\n{'
 
-   If *repl* is a function, it is called for every non-overlapping occurrence of
-   *pattern*.  The function takes a single :class:`~re.Match` argument, and returns
-   the replacement string.  For example::
+   Nếu *repl* là một hàm, hàm này được gọi cho mỗi lần xuất hiện không chồng lấp của *pattern*. Hàm nhận một đối số :class:`~re.Match` duy nhất và trả về chuỗi thay thế. Ví dụ::
 
       >>> def dashrepl(matchobj):
       ...     if matchobj.group(0) == '-': return ' '
@@ -1092,74 +701,48 @@ Functions
       >>> re.sub(r'\sAND\s', ' & ', 'Baked Beans And Spam', flags=re.IGNORECASE)
       'Baked Beans & Spam'
 
-   The pattern may be a string or a :class:`~re.Pattern`.
+   Mẫu có thể là một chuỗi hoặc một :class:`~re.Pattern`.
 
-   The optional argument *count* is the maximum number of pattern occurrences to be
-   replaced; *count* must be a non-negative integer.  If omitted or zero, all
-   occurrences will be replaced.
+   Đối số tùy chọn *count* là số lần xuất hiện tối đa của mẫu sẽ được thay thế; *count* phải là một số nguyên không âm. Nếu bị bỏ qua hoặc bằng không, tất cả các lần xuất hiện sẽ được thay thế.
 
-   Adjacent empty matches are not possible, but an empty match can occur
-   immediately after a non-empty match.
-   As a result, ``sub('x*', '-', 'abxd')`` returns ``'-a-b--d-'``
-   instead of ``'-a-b-d-'``.
+   Không thể có các kết quả khớp rỗng liền kề, nhưng một kết quả khớp rỗng có thể xuất hiện ngay sau một kết quả khớp không rỗng. Do đó, ``sub('x*', '-', 'abxd')`` trả về ``'-a-b--d-'`` thay vì ``'-a-b-d-'``.
 
    .. index:: single: \g; in regular expressions
 
-   In string-type *repl* arguments, in addition to the character escapes and
-   backreferences described above,
-   ``\g<name>`` will use the substring matched by the group named ``name``, as
-   defined by the ``(?P<name>...)`` syntax. ``\g<number>`` uses the corresponding
-   group number; ``\g<2>`` is therefore equivalent to ``\2``, but isn't ambiguous
-   in a replacement such as ``\g<2>0``.  ``\20`` would be interpreted as a
-   reference to group 20, not a reference to group 2 followed by the literal
-   character ``'0'``.  The backreference ``\g<0>`` substitutes in the entire
-   substring matched by the RE.
+   Trong các đối số *repl* dạng chuỗi, ngoài các escape ký tự và backreference được mô tả ở trên, ``\g<name>`` sẽ sử dụng chuỗi con được khớp bởi nhóm có tên ``name``, được định nghĩa bằng cú pháp ``(?P<name>...)``. ``\g<number>`` sử dụng số nhóm tương ứng; vì vậy ``\g<2>`` tương đương với ``\2``, nhưng không gây nhầm lẫn trong một chuỗi thay thế như ``\g<2>0``. ``\20`` sẽ được hiểu là tham chiếu đến nhóm 20, không phải tham chiếu đến nhóm 2 theo sau bởi ký tự chữ ``'0'``. Backreference ``\g<0>`` thay thế bằng toàn bộ chuỗi con được RE khớp.
 
-   The expression's behaviour can be modified by specifying a *flags* value.
-   Values can be any of the `flags`_ variables, combined using bitwise OR
-   (the ``|`` operator).
+   Hành vi của biểu thức có thể được thay đổi bằng cách chỉ định giá trị *flags*. Các giá trị có thể là bất kỳ biến nào trong số `flags`_, được kết hợp bằng phép OR theo bit (toán tử ``|``).
 
    .. versionchanged:: 3.1
-      Added the optional flags argument.
+      Đã thêm đối số flags tùy chọn.
 
    .. versionchanged:: 3.5
-      Unmatched groups are replaced with an empty string.
+      Các nhóm không khớp được thay thế bằng chuỗi rỗng.
 
    .. versionchanged:: 3.6
-      Unknown escapes in *pattern* consisting of ``'\'`` and an ASCII letter
-      now are errors.
+      Các escape không xác định trong *pattern* bao gồm ``'\'`` và một chữ cái ASCII hiện sẽ gây ra lỗi.
 
    .. versionchanged:: 3.7
-      Unknown escapes in *repl* consisting of ``'\'`` and an ASCII letter
-      now are errors.
-      An empty match can occur immediately after a non-empty match.
+      Các escape không xác định trong *repl* gồm ``'\'`` và một chữ cái ASCII hiện được xem là lỗi. Một kết quả khớp rỗng có thể xuất hiện ngay sau một kết quả khớp không rỗng.
 
    .. versionchanged:: 3.12
-      Group *id* can only contain ASCII digits.
-      In :class:`bytes` replacement strings, group *name* can only contain bytes
-      in the ASCII range (``b'\x00'``-``b'\x7f'``).
+      Nhóm *id* chỉ có thể chứa các chữ số ASCII. Trong chuỗi thay thế :class:`bytes`, nhóm *name* chỉ có thể chứa các byte trong phạm vi ASCII (``b'\x00'``-``b'\x7f'``).
 
    .. deprecated:: 3.13
-      Passing *count* and *flags* as positional arguments is deprecated.
-      In future Python versions they will be
-      :ref:`keyword-only parameters <keyword-only_parameter>`.
+      Việc truyền *count* và *flags* dưới dạng đối số vị trí đã bị loại bỏ dần. Trong các phiên bản Python tương lai, chúng sẽ
+      :ref:`các tham số chỉ dùng từ khóa <keyword-only_parameter>`.
 
 
 .. function:: subn(pattern, repl, string, count=0, flags=0)
 
-   Perform the same operation as :func:`sub`, but return a tuple ``(new_string,
-   number_of_subs_made)``.
+   Thực hiện cùng thao tác như :func:`sub`, nhưng trả về một tuple ``(new_string, number_of_subs_made)``.
 
-   The expression's behaviour can be modified by specifying a *flags* value.
-   Values can be any of the `flags`_ variables, combined using bitwise OR
-   (the ``|`` operator).
+   Hành vi của biểu thức có thể được thay đổi bằng cách chỉ định giá trị *flags*. Các giá trị có thể là bất kỳ biến nào trong số `flags`_, được kết hợp bằng phép OR theo bit (toán tử ``|``).
 
 
 .. function:: escape(pattern)
 
-   Escape special characters in *pattern*.
-   This is useful if you want to match an arbitrary literal string that may
-   have regular expression metacharacters in it.  For example::
+   Escape các ký tự đặc biệt trong *pattern*. Điều này hữu ích nếu bạn muốn khớp một chuỗi ký tự literal tùy ý có thể chứa các siêu ký tự của regular expression. Ví dụ::
 
       >>> print(re.escape('https://www.python.org'))
       https://www\.python\.org
@@ -1172,8 +755,7 @@ Functions
       >>> print('|'.join(map(re.escape, sorted(operators, reverse=True))))
       /|\-|\+|\*\*|\*
 
-   This function must not be used for the replacement string in :func:`sub`
-   and :func:`subn`, only backslashes should be escaped.  For example::
+   Không được sử dụng hàm này cho chuỗi thay thế trong :func:`sub` và :func:`subn`; chỉ escape dấu gạch chéo ngược. Ví dụ::
 
       >>> digits_re = r'\d+'
       >>> sample = '/usr/sbin/sendmail - 0 errors, 12 warnings'
@@ -1181,132 +763,107 @@ Functions
       /usr/sbin/sendmail - \d+ errors, \d+ warnings
 
    .. versionchanged:: 3.3
-      The ``'_'`` character is no longer escaped.
+      Ký tự ``'_'`` không còn được escape nữa.
 
    .. versionchanged:: 3.7
-      Only characters that can have special meaning in a regular expression
-      are escaped. As a result, ``'!'``, ``'"'``, ``'%'``, ``"'"``, ``','``,
-      ``'/'``, ``':'``, ``';'``, ``'<'``, ``'='``, ``'>'``, ``'@'``, and
-      ``"`"`` are no longer escaped.
+      Chỉ những ký tự có thể mang ý nghĩa đặc biệt trong biểu thức chính quy mới được escape. Do đó, ``'!'``, ``'"'``, ``'%'``, ``"'"``, ``','``, ``'/'``, ``':'``, ``';'``, ``'<'``, ``'='``, ``'>'``, ``'@'`` và ``"`"`` không còn được escape nữa.
 
 
 .. function:: purge()
 
-   Clear the regular expression cache.
+   Xóa bộ nhớ đệm biểu thức chính quy.
 
 
-Exceptions
-^^^^^^^^^^
+Ngoại lệ
+^^^^^^^^
 
 .. exception:: PatternError(msg, pattern=None, pos=None)
 
-   Exception raised when a string passed to one of the functions here is not a
-   valid regular expression (for example, it might contain unmatched parentheses)
-   or when some other error occurs during compilation or matching.  It is never an
-   error if a string contains no match for a pattern.  The ``PatternError`` instance has
-   the following additional attributes:
+   Ngoại lệ được phát sinh khi một chuỗi được truyền vào một trong các hàm ở đây không phải là biểu thức chính quy hợp lệ (ví dụ: chuỗi có thể chứa các dấu ngoặc không khớp) hoặc khi xảy ra lỗi khác trong quá trình biên dịch hay đối sánh. Chuỗi không khớp với mẫu không bao giờ là lỗi. Đối tượng ``PatternError`` có thêm các thuộc tính sau:
 
    .. attribute:: msg
 
-      The unformatted error message.
+      Thông báo lỗi chưa được định dạng.
 
    .. attribute:: pattern
 
-      The regular expression pattern.
+      Mẫu biểu thức chính quy.
 
    .. attribute:: pos
 
-      The index in *pattern* where compilation failed (may be ``None``).
+      Chỉ mục trong *pattern* tại đó quá trình biên dịch không thành công (có thể là ``None``).
 
    .. attribute:: lineno
 
-      The line corresponding to *pos* (may be ``None``).
+      Dòng tương ứng với *pos* (có thể là ``None``).
 
    .. attribute:: colno
 
-      The column corresponding to *pos* (may be ``None``).
+      Cột tương ứng với *pos* (có thể là ``None``).
 
    .. versionchanged:: 3.5
-      Added additional attributes.
+      Đã thêm các thuộc tính bổ sung.
 
    .. versionchanged:: 3.13
-      ``PatternError`` was originally named ``error``; the latter is kept as an alias for
-      backward compatibility.
+      ``PatternError`` ban đầu có tên là ``error``; tên sau được giữ lại làm bí danh để đảm bảo khả năng tương thích ngược.
 
 .. _re-objects:
 
-Regular Expression Objects
---------------------------
+Đối tượng Regular Expression
+----------------------------
 
 .. class:: Pattern
 
-   Compiled regular expression object returned by :func:`re.compile`.
+   Đối tượng regular expression đã biên dịch được trả về bởi :func:`re.compile`.
 
-   Patterns are :ref:`generic <generics>` over the type of string they handle
-   (:class:`str` or :class:`bytes`).
+   Các pattern là :ref:`generic <generics>` theo kiểu chuỗi mà chúng xử lý (:class:`str` hoặc :class:`bytes`).
 
    .. versionchanged:: 3.9
       :py:class:`re.Pattern` supports ``[]`` to indicate a Unicode (str) or bytes pattern.
-      See :ref:`types-genericalias`.
+      Xem :ref:`types-genericalias`.
 
 .. method:: Pattern.search(string[, pos[, endpos]])
 
-   Scan through *string* looking for the first location where this regular
-   expression produces a match, and return a corresponding :class:`~re.Match`.
-   Return ``None`` if no position in the string matches the pattern; note that
-   this is different from finding a zero-length match at some point in the string.
+   Quét qua *string* để tìm vị trí đầu tiên mà regular expression này tạo ra một kết quả khớp, rồi trả về :class:`~re.Match` tương ứng. Trả về ``None`` nếu không có vị trí nào trong chuỗi khớp với pattern; lưu ý rằng điều này khác với việc tìm thấy một kết quả khớp có độ dài bằng không tại một điểm nào đó trong chuỗi.
 
-   The optional second parameter *pos* gives an index in the string where the
-   search is to start; it defaults to ``0``.  This is not completely equivalent to
-   slicing the string; the ``'^'`` pattern character matches at the real beginning
-   of the string and at positions just after a newline, but not necessarily at the
-   index where the search is to start.
+   Tham số thứ hai tùy chọn *pos* cung cấp một chỉ mục trong chuỗi, tại đó bắt đầu tìm kiếm; giá trị mặc định là ``0``. Điều này không hoàn toàn tương đương với việc cắt chuỗi; ký tự pattern ``'^'`` khớp ở đầu thực của chuỗi và tại các vị trí ngay sau ký tự xuống dòng, nhưng không nhất thiết khớp tại chỉ mục nơi bắt đầu tìm kiếm.
 
-   The optional parameter *endpos* limits how far the string will be searched; it
-   will be as if the string is *endpos* characters long, so only the characters
-   from *pos* to ``endpos - 1`` will be searched for a match.  If *endpos* is less
-   than *pos*, no match will be found; otherwise, if *rx* is a compiled regular
-   expression object, ``rx.search(string, 0, 50)`` is equivalent to
-   ``rx.search(string[:50], 0)``. ::
+   Tham số tùy chọn *endpos* giới hạn phạm vi tìm kiếm trong chuỗi; chuỗi sẽ được coi như có độ dài *endpos* ký tự, vì vậy chỉ các ký tự từ *pos* đến ``endpos - 1`` mới được tìm kiếm để tìm kết quả khớp. Nếu *endpos* nhỏ hơn *pos*, sẽ không tìm thấy kết quả khớp; nếu không, khi *rx* là một đối tượng regular expression đã biên dịch, ``rx.search(string, 0, 50)`` tương đương với ``rx.search(string[:50], 0)``.::
 
       >>> pattern = re.compile("d")
-      >>> pattern.search("dog")     # Match at index 0
+      >>> pattern.search("dog")     # Khớp tại chỉ mục 0
       <re.Match object; span=(0, 1), match='d'>
-      >>> pattern.search("dog", 1)  # No match; search doesn't include the "d"
+      >>> pattern.search("dog", 1)  # Không khớp; tìm kiếm không bao gồm "d"
 
 
 .. method:: Pattern.match(string[, pos[, endpos]])
 
-   If zero or more characters at the *beginning* of *string* match this regular
-   expression, return a corresponding :class:`~re.Match`. Return ``None`` if the
-   string does not match the pattern; note that this is different from a
-   zero-length match.
+   Nếu không hoặc nhiều ký tự ở *đầu* của *chuỗi* khớp với biểu thức chính quy này, trả về một :class:`~re.Match` tương ứng. Trả về ``None`` nếu chuỗi không khớp với mẫu; lưu ý rằng điều này khác với một kết quả khớp có độ dài bằng không.
 
-   The optional *pos* and *endpos* parameters have the same meaning as for the
-   :meth:`~Pattern.search` method. ::
+   Các tham số tùy chọn *pos* và *endpos* có ý nghĩa giống như đối với
+   :meth:`~Pattern.search` method.::
 
       >>> pattern = re.compile("o")
-      >>> pattern.match("dog")      # No match as "o" is not at the start of "dog".
-      >>> pattern.match("dog", 1)   # Match as "o" is the 2nd character of "dog".
+      >>> pattern.match("dog")      # Không khớp vì "o" không nằm ở đầu "dog".
+      >>> pattern.match("dog", 1)   # Khớp vì "o" là ký tự thứ 2 của "dog".
       <re.Match object; span=(1, 2), match='o'>
 
-   If you want to locate a match anywhere in *string*, use
-   :meth:`~Pattern.search` instead (see also :ref:`search-vs-match`).
+   Nếu bạn muốn tìm một kết quả khớp ở bất kỳ vị trí nào trong *string*, hãy sử dụng
+   :meth:`~Pattern.search` thay vào đó (xem thêm :ref:`search-vs-match`).
 
 
 .. method:: Pattern.fullmatch(string[, pos[, endpos]])
 
-   If the whole *string* matches this regular expression, return a corresponding
-   :class:`~re.Match`.  Return ``None`` if the string does not match the pattern;
-   note that this is different from a zero-length match.
+   Nếu toàn bộ *string* khớp với biểu thức chính quy này, hãy trả về một
+   :class:`~re.Match` tương ứng. Trả về ``None`` nếu chuỗi không khớp với mẫu; lưu ý rằng điều này khác với một kết quả khớp có độ dài bằng không.
 
-   The optional *pos* and *endpos* parameters have the same meaning as for the
-   :meth:`~Pattern.search` method. ::
+   Các tham số tùy chọn *pos* và *endpos* có ý nghĩa giống như đối với
+   :meth:`~Pattern.search` method.::
 
       >>> pattern = re.compile("o[gh]")
-      >>> pattern.fullmatch("dog")      # No match as "o" is not at the start of "dog".
-      >>> pattern.fullmatch("ogre")     # No match as not the full string matches.
-      >>> pattern.fullmatch("doggie", 1, 3)   # Matches within given limits.
+      >>> pattern.fullmatch("dog")      # Không khớp vì "o" không nằm ở đầu "dog".
+      >>> pattern.fullmatch("ogre")     # Không khớp vì toàn bộ chuỗi không khớp.
+      >>> pattern.fullmatch("doggie", 1, 3)   # Khớp trong các giới hạn đã cho.
       <re.Match object; span=(1, 3), match='og'>
 
    .. versionadded:: 3.4
@@ -1314,71 +871,60 @@ Regular Expression Objects
 
 .. method:: Pattern.split(string, maxsplit=0)
 
-   Identical to the :func:`split` function, using the compiled pattern.
+   Giống hệt hàm :func:`split`, sử dụng mẫu đã biên dịch.
 
 
 .. method:: Pattern.findall(string[, pos[, endpos]])
 
-   Similar to the :func:`findall` function, using the compiled pattern, but
-   also accepts optional *pos* and *endpos* parameters that limit the search
-   region like for :meth:`search`.
+   Tương tự hàm :func:`findall`, sử dụng mẫu đã biên dịch, nhưng cũng chấp nhận các tham số tùy chọn *pos* và *endpos*, giới hạn vùng tìm kiếm tương tự như đối với :meth:`search`.
 
 
 .. method:: Pattern.finditer(string[, pos[, endpos]])
 
-   Similar to the :func:`finditer` function, using the compiled pattern, but
-   also accepts optional *pos* and *endpos* parameters that limit the search
-   region like for :meth:`search`.
+   Tương tự hàm :func:`finditer`, sử dụng mẫu đã biên dịch, nhưng cũng chấp nhận các tham số tùy chọn *pos* và *endpos*, giới hạn vùng tìm kiếm tương tự như đối với :meth:`search`.
 
 
 .. method:: Pattern.sub(repl, string, count=0)
 
-   Identical to the :func:`sub` function, using the compiled pattern.
+   Giống hệt hàm :func:`sub`, sử dụng mẫu đã biên dịch.
 
 
 .. method:: Pattern.subn(repl, string, count=0)
 
-   Identical to the :func:`subn` function, using the compiled pattern.
+   Giống hệt hàm :func:`subn`, sử dụng mẫu đã biên dịch.
 
 
 .. attribute:: Pattern.flags
 
-   The regex matching flags.  This is a combination of the flags given to
-   :func:`.compile`, any ``(?...)`` inline flags in the pattern, and implicit
-   flags such as :py:const:`~re.UNICODE` if the pattern is a Unicode string.
+   Các cờ so khớp regex. Đây là sự kết hợp của các cờ được truyền vào
+   :func:`.compile`, mọi cờ inline ``(?...)`` trong pattern và các cờ ngầm định như :py:const:`~re.UNICODE` nếu pattern là một chuỗi Unicode.
 
 
 .. attribute:: Pattern.groups
 
-   The number of capturing groups in the pattern.
+   Số lượng nhóm capturing trong pattern.
 
 
 .. attribute:: Pattern.groupindex
 
-   A dictionary mapping any symbolic group names defined by ``(?P<id>)`` to group
-   numbers.  The dictionary is empty if no symbolic groups were used in the
-   pattern.
+   Một dictionary ánh xạ mọi tên nhóm mang tính biểu tượng được định nghĩa bởi ``(?P<id>)`` đến số nhóm. Dictionary này rỗng nếu không sử dụng nhóm mang tính biểu tượng nào trong pattern.
 
 
 .. attribute:: Pattern.pattern
 
-   The pattern string from which the pattern object was compiled.
+   Chuỗi pattern từ đó đối tượng pattern được biên dịch.
 
 
 .. versionchanged:: 3.7
-   Added support of :func:`copy.copy` and :func:`copy.deepcopy`.  Compiled
-   regular expression objects are considered atomic.
+   Đã bổ sung hỗ trợ cho :func:`copy.copy` và :func:`copy.deepcopy`. Các đối tượng regular expression đã biên dịch được xem là atomic.
 
 
 .. _match-objects:
 
-Match Objects
--------------
+Đối tượng Match
+---------------
 
-Match objects always have a boolean value of ``True``.
-Since :meth:`~Pattern.match` and :meth:`~Pattern.search` return ``None``
-when there is no match, you can test whether there was a match with a simple
-``if`` statement::
+Các đối tượng Match luôn có giá trị boolean là ``True``. Vì :meth:`~Pattern.match` và :meth:`~Pattern.search` trả về ``None`` khi không có kết quả khớp, bạn có thể kiểm tra xem có kết quả khớp hay không bằng một câu lệnh ``if`` đơn giản::
 
    match = re.search(pattern, string)
    if match:
@@ -1386,58 +932,39 @@ when there is no match, you can test whether there was a match with a simple
 
 .. class:: Match
 
-   Match object returned by successful ``match``\ es and ``search``\ es.
+   Đối tượng Match được trả về bởi các ``match``\ es và ``search``\ es thành công.
 
-   Matches are :ref:`generic <generics>` over the type of string which was
-   matched (:class:`str` or :class:`bytes`).
+   Các kết quả khớp mang tính :ref:`generic <generics>` đối với kiểu chuỗi được khớp (:class:`str` hoặc :class:`bytes`).
 
    .. versionchanged:: 3.9
       :py:class:`re.Match` supports ``[]`` to indicate a Unicode (str) or bytes match.
-      See :ref:`types-genericalias`.
+      Xem :ref:`types-genericalias`.
 
 .. method:: Match.expand(template)
 
-   Return the string obtained by doing backslash substitution on the template
-   string *template*, as done by the :meth:`~Pattern.sub` method.
-   Escapes such as ``\n`` are converted to the appropriate characters,
-   and numeric backreferences (``\1``, ``\2``) and named backreferences
-   (``\g<1>``, ``\g<name>``) are replaced by the contents of the
-   corresponding group. The backreference ``\g<0>`` will be
-   replaced by the entire match.
+   Trả về chuỗi thu được bằng cách thực hiện phép thay thế dấu gạch chéo ngược trên chuỗi mẫu *template*, như được thực hiện bởi phương thức :meth:`~Pattern.sub`. Các escape như ``\n`` được chuyển đổi thành những ký tự tương ứng, còn các backreference dạng số (``\1``, ``\2``) và backreference được đặt tên (``\g<1>``, ``\g<name>``) được thay thế bằng nội dung của nhóm tương ứng. Backreference ``\g<0>`` sẽ được thay thế bằng toàn bộ kết quả khớp.
 
    .. versionchanged:: 3.5
-      Unmatched groups are replaced with an empty string.
+      Các nhóm không khớp được thay thế bằng một chuỗi rỗng.
 
 .. method:: Match.group([group1, ...])
 
-   Returns one or more subgroups of the match.  If there is a single argument, the
-   result is a single string; if there are multiple arguments, the result is a
-   tuple with one item per argument. Without arguments, *group1* defaults to zero
-   (the whole match is returned). If a *groupN* argument is zero, the corresponding
-   return value is the entire matching string; if it is a positive integer, it is
-   the string matching the corresponding parenthesized group.  If a group number is
-   negative or larger than the number of groups defined in the pattern, an
-   :exc:`IndexError` exception is raised. If a group is contained in a
-   part of the pattern that did not match, the corresponding result is ``None``.
-   If a group is contained in a part of the pattern that matched multiple times,
-   the last match is returned. ::
+   Trả về một hoặc nhiều nhóm con của kết quả khớp. Nếu chỉ có một đối số, kết quả là một chuỗi đơn; nếu có nhiều đối số, kết quả là một tuple với một phần tử cho mỗi đối số. Khi không có đối số, *group1* mặc định là zero (toàn bộ kết quả khớp được trả về). Nếu đối số *groupN* là zero, giá trị trả về tương ứng là toàn bộ chuỗi khớp; nếu là một số nguyên dương, đó là chuỗi khớp với nhóm được đặt trong ngoặc tương ứng. Nếu số nhóm là số âm hoặc lớn hơn số nhóm được định nghĩa trong pattern, một
+   Ngoại lệ :exc:`IndexError` được phát sinh. Nếu một group nằm trong phần của pattern không khớp, kết quả tương ứng là ``None``. Nếu một group nằm trong phần của pattern khớp nhiều lần, kết quả khớp cuối cùng sẽ được trả về.::
 
       >>> m = re.match(r"(\w+) (\w+)", "Isaac Newton, physicist")
-      >>> m.group(0)       # The entire match
+      >>> m.group(0)       # Toàn bộ kết quả khớp
       'Isaac Newton'
-      >>> m.group(1)       # The first parenthesized subgroup.
+      >>> m.group(1)       # Nhóm con được đặt trong cặp ngoặc đầu tiên.
       'Isaac'
-      >>> m.group(2)       # The second parenthesized subgroup.
+      >>> m.group(2)       # Nhóm con được đặt trong cặp ngoặc thứ hai.
       'Newton'
-      >>> m.group(1, 2)    # Multiple arguments give us a tuple.
+      >>> m.group(1, 2)    # Nhiều đối số sẽ tạo thành một tuple.
       ('Isaac', 'Newton')
 
-   If the regular expression uses the ``(?P<name>...)`` syntax, the *groupN*
-   arguments may also be strings identifying groups by their group name.  If a
-   string argument is not used as a group name in the pattern, an :exc:`IndexError`
-   exception is raised.
+   Nếu regular expression sử dụng cú pháp ``(?P<name>...)``, các đối số *groupN* cũng có thể là các chuỗi xác định group bằng tên của group đó. Nếu một đối số chuỗi không được dùng làm tên group trong pattern, ngoại lệ :exc:`IndexError` sẽ được phát sinh.
 
-   A moderately complicated example::
+   Một ví dụ khá phức tạp::
 
       >>> m = re.match(r"(?P<first_name>\w+) (?P<last_name>\w+)", "Malcolm Reynolds")
       >>> m.group('first_name')
@@ -1445,34 +972,33 @@ when there is no match, you can test whether there was a match with a simple
       >>> m.group('last_name')
       'Reynolds'
 
-   Named groups can also be referred to by their index::
+   Các nhóm được đặt tên cũng có thể được tham chiếu bằng chỉ mục của chúng::
 
       >>> m.group(1)
       'Malcolm'
       >>> m.group(2)
       'Reynolds'
 
-   If a group matches multiple times, only the last match is accessible::
+   Nếu một nhóm khớp nhiều lần, chỉ có kết quả khớp cuối cùng có thể được truy cập::
 
-      >>> m = re.match(r"(..)+", "a1b2c3")  # Matches 3 times.
-      >>> m.group(1)                        # Returns only the last match.
+      >>> m = re.match(r"(..)+", "a1b2c3")  # Khớp 3 lần.
+      >>> m.group(1)                        # Chỉ trả về kết quả khớp cuối cùng.
       'c3'
 
 
 .. method:: Match.__getitem__(g)
 
-   This is identical to ``m.group(g)``.  This allows easier access to
-   an individual group from a match::
+   Điều này giống hệt ``m.group(g)``. Điều này giúp truy cập một nhóm riêng lẻ từ một kết quả khớp dễ dàng hơn::
 
       >>> m = re.match(r"(\w+) (\w+)", "Isaac Newton, physicist")
-      >>> m[0]       # The entire match
+      >>> m[0]       # Toàn bộ kết quả khớp
       'Isaac Newton'
-      >>> m[1]       # The first parenthesized subgroup.
+      >>> m[1]       # Nhóm con được đặt trong cặp ngoặc đầu tiên.
       'Isaac'
-      >>> m[2]       # The second parenthesized subgroup.
+      >>> m[2]       # Nhóm con được đặt trong cặp ngoặc thứ hai.
       'Newton'
 
-   Named groups are supported as well::
+   Các nhóm được đặt tên cũng được hỗ trợ::
 
       >>> m = re.match(r"(?P<first_name>\w+) (?P<last_name>\w+)", "Isaac Newton")
       >>> m['first_name']
@@ -1485,32 +1011,26 @@ when there is no match, you can test whether there was a match with a simple
 
 .. method:: Match.groups(default=None)
 
-   Return a tuple containing all the subgroups of the match, from 1 up to however
-   many groups are in the pattern.  The *default* argument is used for groups that
-   did not participate in the match; it defaults to ``None``.
+   Trả về một tuple chứa tất cả các nhóm con của kết quả khớp, từ 1 đến số lượng nhóm có trong pattern. Đối số *default* được dùng cho các nhóm không tham gia vào kết quả khớp; giá trị mặc định là ``None``.
 
-   For example::
+   Ví dụ::
 
       >>> m = re.match(r"(\d+)\.(\d+)", "24.1632")
       >>> m.groups()
       ('24', '1632')
 
-   If we make the decimal place and everything after it optional, not all groups
-   might participate in the match.  These groups will default to ``None`` unless
-   the *default* argument is given::
+   Nếu chúng ta đặt phần thập phân và mọi thứ sau đó là tùy chọn, có thể không phải tất cả các nhóm đều tham gia vào kết quả khớp. Các nhóm này sẽ mặc định là ``None`` trừ khi cung cấp đối số *default*::
 
       >>> m = re.match(r"(\d+)\.?(\d+)?", "24")
-      >>> m.groups()      # Second group defaults to None.
+      >>> m.groups()      # Nhóm thứ hai mặc định là None.
       ('24', None)
-      >>> m.groups('0')   # Now, the second group defaults to '0'.
+      >>> m.groups('0')   # Bây giờ, nhóm thứ hai mặc định là '0'.
       ('24', '0')
 
 
 .. method:: Match.groupdict(default=None)
 
-   Return a dictionary containing all the *named* subgroups of the match, keyed by
-   the subgroup name.  The *default* argument is used for groups that did not
-   participate in the match; it defaults to ``None``.  For example::
+   Trả về một dictionary chứa tất cả các nhóm con *có tên* của kết quả khớp, với khóa là tên nhóm con. Đối số *mặc định* được dùng cho các nhóm không tham gia vào kết quả khớp; đối số này mặc định là ``None``. Ví dụ::
 
       >>> m = re.match(r"(?P<first_name>\w+) (?P<last_name>\w+)", "Malcolm Reynolds")
       >>> m.groupdict()
@@ -1520,20 +1040,13 @@ when there is no match, you can test whether there was a match with a simple
 .. method:: Match.start([group])
             Match.end([group])
 
-   Return the indices of the start and end of the substring matched by *group*;
-   *group* defaults to zero (meaning the whole matched substring). Return ``-1`` if
-   *group* exists but did not contribute to the match.  For a match object *m*, and
-   a group *g* that did contribute to the match, the substring matched by group *g*
-   (equivalent to ``m.group(g)``) is ::
+   Trả về các chỉ số của vị trí bắt đầu và kết thúc của chuỗi con được khớp bởi *nhóm*; *nhóm* mặc định là số không (nghĩa là toàn bộ chuỗi con được khớp). Trả về ``-1`` nếu *nhóm* tồn tại nhưng không đóng góp vào kết quả khớp. Với đối tượng kết quả khớp *m* và một nhóm *g* đã đóng góp vào kết quả khớp, chuỗi con được khớp bởi nhóm *g* (tương đương với ``m.group(g)``) là::
 
       m.string[m.start(g):m.end(g)]
 
-   Note that ``m.start(group)`` will equal ``m.end(group)`` if *group* matched a
-   null string.  For example, after ``m = re.search('b(c?)', 'cba')``,
-   ``m.start(0)`` is 1, ``m.end(0)`` is 2, ``m.start(1)`` and ``m.end(1)`` are both
-   2, and ``m.start(2)`` raises an :exc:`IndexError` exception.
+   Lưu ý rằng ``m.start(group)`` sẽ bằng ``m.end(group)`` nếu *nhóm* khớp một chuỗi rỗng. Ví dụ, sau ``m = re.search('b(c?)', 'cba')`` , ``m.start(0)`` là 1, ``m.end(0)`` là 2, ``m.start(1)`` và ``m.end(1)`` đều là 2, và ``m.start(2)`` phát sinh một ngoại lệ :exc:`IndexError`.
 
-   An example that will remove *remove_this* from email addresses::
+   Một ví dụ sẽ loại bỏ *remove_this* khỏi các địa chỉ email::
 
       >>> email = "tony@tiremove_thisger.net"
       >>> m = re.search("remove_this", email)
@@ -1543,100 +1056,85 @@ when there is no match, you can test whether there was a match with a simple
 
 .. method:: Match.span([group])
 
-   For a match *m*, return the 2-tuple ``(m.start(group), m.end(group))``. Note
-   that if *group* did not contribute to the match, this is ``(-1, -1)``.
-   *group* defaults to zero, the entire match.
+   Với một match *m*, trả về tuple 2 phần tử ``(m.start(group), m.end(group))``. Lưu ý rằng nếu group *group* không đóng góp vào kết quả khớp thì giá trị này là ``(-1, -1)``. group *group* mặc định là zero, tức toàn bộ kết quả khớp.
 
 
 .. attribute:: Match.pos
 
-   The value of *pos* which was passed to the :meth:`~Pattern.search` or
-   :meth:`~Pattern.match` method of a :ref:`regex object <re-objects>`.  This is
-   the index into the string at which the RE engine started looking for a match.
+   Giá trị của *pos* được truyền vào :meth:`~Pattern.search` hoặc
+   Phương thức :meth:`~Pattern.match` của một :ref:`đối tượng regex <re-objects>`. Đây là chỉ mục trong chuỗi tại đó công cụ RE bắt đầu tìm kiếm kết quả khớp.
 
 
 .. attribute:: Match.endpos
 
-   The value of *endpos* which was passed to the :meth:`~Pattern.search` or
-   :meth:`~Pattern.match` method of a :ref:`regex object <re-objects>`.  This is
-   the index into the string beyond which the RE engine will not go.
+   Giá trị của *endpos* được truyền cho :meth:`~Pattern.search` hoặc
+   phương thức :meth:`~Pattern.match` của một :ref:`đối tượng regex <re-objects>`. Đây là chỉ mục trong chuỗi mà sau đó công cụ RE sẽ không tiếp tục.
 
 
 .. attribute:: Match.lastindex
 
-   The integer index of the last matched capturing group, or ``None`` if no group
-   was matched at all. For example, the expressions ``(a)b``, ``((a)(b))``, and
-   ``((ab))`` will have ``lastindex == 1`` if applied to the string ``'ab'``, while
-   the expression ``(a)(b)`` will have ``lastindex == 2``, if applied to the same
-   string.
+   Chỉ mục số nguyên của nhóm bắt giữ khớp cuối cùng, hoặc ``None`` nếu hoàn toàn không có nhóm nào khớp. Ví dụ, các biểu thức ``(a)b``, ``((a)(b))`` và ``((ab))`` sẽ có giá trị ``lastindex == 1`` nếu được áp dụng cho chuỗi ``'ab'``, trong khi biểu thức ``(a)(b)`` sẽ có giá trị ``lastindex == 2`` nếu được áp dụng cho cùng chuỗi đó.
 
 
 .. attribute:: Match.lastgroup
 
-   The name of the last matched capturing group, or ``None`` if the group didn't
-   have a name, or if no group was matched at all.
+   Tên của nhóm bắt giữ khớp cuối cùng, hoặc ``None`` nếu nhóm đó không có tên hoặc hoàn toàn không có nhóm nào khớp.
 
 
 .. attribute:: Match.re
 
-   The :ref:`regular expression object <re-objects>` whose :meth:`~Pattern.match` or
-   :meth:`~Pattern.search` method produced this match instance.
+   :ref:`Đối tượng biểu thức chính quy <re-objects>` mà phương thức :meth:`~Pattern.match` hoặc
+   phương thức :meth:`~Pattern.search` đã tạo ra thực thể khớp này.
 
 
 .. attribute:: Match.string
 
-   The string passed to :meth:`~Pattern.match` or :meth:`~Pattern.search`.
+   Chuỗi được truyền vào :meth:`~Pattern.match` hoặc :meth:`~Pattern.search`.
 
 
 .. versionchanged:: 3.7
-   Added support of :func:`copy.copy` and :func:`copy.deepcopy`.  Match objects
-   are considered atomic.
+   Đã bổ sung hỗ trợ cho :func:`copy.copy` và :func:`copy.deepcopy`. Các đối tượng match được xem là nguyên tử.
 
 
 .. _re-examples:
 
-Regular Expression Examples
+Ví dụ về Regular Expression
 ---------------------------
 
 
-Checking for a Pair
-^^^^^^^^^^^^^^^^^^^
+Kiểm tra một đôi
+^^^^^^^^^^^^^^^^
 
-In this example, we'll use the following helper function to display match
-objects a little more gracefully::
+Trong ví dụ này, chúng ta sẽ sử dụng hàm trợ giúp sau để hiển thị các đối tượng match dễ đọc hơn một chút::
 
    def displaymatch(match):
        if match is None:
            return None
        return '<Match: %r, groups=%r>' % (match.group(), match.groups())
 
-Suppose you are writing a poker program where a player's hand is represented as
-a 5-character string with each character representing a card, "a" for ace, "k"
-for king, "q" for queen, "j" for jack, "t" for 10, and "2" through "9"
-representing the card with that value.
+Giả sử bạn đang viết một chương trình poker, trong đó bài trên tay của người chơi được biểu diễn bằng một chuỗi gồm 5 ký tự, mỗi ký tự đại diện cho một lá bài: "a" là ace, "k" là king, "q" là queen, "j" là jack, "t" là 10, còn "2" đến "9" đại diện cho lá bài có giá trị tương ứng.
 
-To see if a given string is a valid hand, one could do the following::
+Để kiểm tra xem một chuỗi đã cho có phải là một bộ bài hợp lệ hay không, bạn có thể làm như sau::
 
    >>> valid = re.compile(r"^[a2-9tjqk]{5}$")
-   >>> displaymatch(valid.match("akt5q"))  # Valid.
+   >>> displaymatch(valid.match("akt5q"))  # Hợp lệ.
    "<Match: 'akt5q', groups=()>"
-   >>> displaymatch(valid.match("akt5e"))  # Invalid.
-   >>> displaymatch(valid.match("akt"))    # Invalid.
-   >>> displaymatch(valid.match("727ak"))  # Valid.
+   >>> displaymatch(valid.match("akt5e"))  # Không hợp lệ.
+   >>> displaymatch(valid.match("akt"))    # Không hợp lệ.
+   >>> displaymatch(valid.match("727ak"))  # Hợp lệ.
    "<Match: '727ak', groups=()>"
 
-That last hand, ``"727ak"``, contained a pair, or two of the same valued cards.
-To match this with a regular expression, one could use backreferences as such::
+Bộ bài cuối cùng đó, ``"727ak"``, có một đôi, tức là hai lá bài có cùng giá trị. Để khớp mẫu này bằng biểu thức chính quy, ta có thể sử dụng backreference như sau::
 
    >>> pair = re.compile(r".*(.).*\1")
-   >>> displaymatch(pair.match("717ak"))     # Pair of 7s.
+   >>> displaymatch(pair.match("717ak"))     # Đôi 7.
    "<Match: '717', groups=('7',)>"
-   >>> displaymatch(pair.match("718ak"))     # No pairs.
-   >>> displaymatch(pair.match("354aa"))     # Pair of aces.
+   >>> displaymatch(pair.match("718ak"))     # Không có đôi.
+   >>> displaymatch(pair.match("354aa"))     # Đôi Át.
    "<Match: '354aa', groups=('a',)>"
 
-To find out what card the pair consists of, one could use the
-:meth:`~Match.group` method of the match object in the following manner::
+Để tìm ra đôi bài gồm những lá nào, có thể sử dụng
+:meth:`~Match.group` của đối tượng match theo cách sau::
 
    >>> pair = re.compile(r".*(.).*\1")
    >>> pair.match("717ak").group(1)
@@ -1653,19 +1151,16 @@ To find out what card the pair consists of, one could use the
    'a'
 
 
-Simulating scanf()
-^^^^^^^^^^^^^^^^^^
+Mô phỏng scanf()
+^^^^^^^^^^^^^^^^
 
 .. index:: single: scanf (C function)
 
-Python does not currently have an equivalent to :c:func:`!scanf`.  Regular
-expressions are generally more powerful, though also more verbose, than
-:c:func:`!scanf` format strings.  The table below offers some more-or-less
-equivalent mappings between :c:func:`!scanf` format tokens and regular
-expressions.
+Python hiện chưa có tương đương với :c:func:`!scanf`. Biểu thức chính quy thường mạnh hơn, dù cũng dài dòng hơn,
+các chuỗi định dạng :c:func:`!scanf`. Bảng dưới đây cung cấp một số ánh xạ tương đương tương đối giữa các token định dạng :c:func:`!scanf` và biểu thức chính quy.
 
 +--------------------------------+---------------------------------------------+
-| :c:func:`!scanf` Token         | Regular Expression                          |
+| Token :c:func:`!scanf`         | Biểu thức chính quy                         |
 +================================+=============================================+
 | ``%c``                         | ``.``                                       |
 +--------------------------------+---------------------------------------------+
@@ -1686,70 +1181,62 @@ expressions.
 | ``%x``, ``%X``                 | ``[-+]?(0[xX])?[\dA-Fa-f]+``                |
 +--------------------------------+---------------------------------------------+
 
-To extract the filename and numbers from a string like ::
+Để trích xuất tên tệp và các số từ một chuỗi như::
 
    /usr/sbin/sendmail - 0 errors, 4 warnings
 
-you would use a :c:func:`!scanf` format like ::
+bạn sẽ sử dụng định dạng :c:func:`!scanf` như sau::
 
    %s - %d errors, %d warnings
 
-The equivalent regular expression would be ::
+Biểu thức chính quy tương đương sẽ là::
 
    (\S+) - (\d+) errors, (\d+) warnings
 
 
 .. _search-vs-match:
 
-search() vs. match()
-^^^^^^^^^^^^^^^^^^^^
+search() so với match()
+^^^^^^^^^^^^^^^^^^^^^^^
 
 .. sectionauthor:: Fred L. Drake, Jr. <fdrake@acm.org>
 
-Python offers different primitive operations based on regular expressions:
+Python cung cấp các thao tác nguyên thủy khác nhau dựa trên biểu thức chính quy:
 
-+ :func:`re.match` checks for a match only at the beginning of the string
-+ :func:`re.search` checks for a match anywhere in the string
-  (this is what Perl does by default)
-+ :func:`re.fullmatch` checks for entire string to be a match
++ :func:`re.match` chỉ kiểm tra kết quả khớp ở đầu chuỗi
++ :func:`re.search` kiểm tra xem có khớp ở bất kỳ vị trí nào trong chuỗi (đây là cách Perl hoạt động theo mặc định)
++ :func:`re.fullmatch` kiểm tra xem toàn bộ chuỗi có khớp hay không
 
 
-For example::
+Ví dụ::
 
-   >>> re.match("c", "abcdef")    # No match
-   >>> re.search("c", "abcdef")   # Match
+   >>> re.match("c", "abcdef")    # Không khớp
+   >>> re.search("c", "abcdef")   # Khớp
    <re.Match object; span=(2, 3), match='c'>
-   >>> re.fullmatch("p.*n", "python") # Match
+   >>> re.fullmatch("p.*n", "python") # Khớp
    <re.Match object; span=(0, 6), match='python'>
-   >>> re.fullmatch("r.*n", "python") # No match
+   >>> re.fullmatch("r.*n", "python") # Không khớp
 
-Regular expressions beginning with ``'^'`` can be used with :func:`search` to
-restrict the match at the beginning of the string::
+Các biểu thức chính quy bắt đầu bằng ``'^'`` có thể được sử dụng với :func:`search` để giới hạn kết quả khớp ở đầu chuỗi::
 
-   >>> re.match("c", "abcdef")    # No match
-   >>> re.search("^c", "abcdef")  # No match
-   >>> re.search("^a", "abcdef")  # Match
+   >>> re.match("c", "abcdef")    # Không khớp
+   >>> re.search("^c", "abcdef")  # Không khớp
+   >>> re.search("^a", "abcdef")  # Khớp
    <re.Match object; span=(0, 1), match='a'>
 
-Note however that in :const:`MULTILINE` mode :func:`match` only matches at the
-beginning of the string, whereas using :func:`search` with a regular expression
-beginning with ``'^'`` will match at the beginning of each line. ::
+Tuy nhiên, lưu ý rằng ở chế độ :const:`MULTILINE`, :func:`match` chỉ khớp ở đầu chuỗi, trong khi việc sử dụng :func:`search` với một biểu thức chính quy bắt đầu bằng ``'^'`` sẽ khớp ở đầu mỗi dòng.::
 
-   >>> re.match("X", "A\nB\nX", re.MULTILINE)  # No match
-   >>> re.search("^X", "A\nB\nX", re.MULTILINE)  # Match
+   >>> re.match("X", "A\nB\nX", re.MULTILINE)  # Không khớp
+   >>> re.search("^X", "A\nB\nX", re.MULTILINE)  # Khớp
    <re.Match object; span=(4, 5), match='X'>
 
 
-Making a Phonebook
-^^^^^^^^^^^^^^^^^^
+Tạo danh bạ điện thoại
+^^^^^^^^^^^^^^^^^^^^^^
 
-:func:`split` splits a string into a list delimited by the passed pattern.  The
-method is invaluable for converting textual data into data structures that can be
-easily read and modified by Python as demonstrated in the following example that
-creates a phonebook.
+:func:`split` tách một chuỗi thành một danh sách, được phân cách theo mẫu đã truyền vào. Phương thức này vô cùng hữu ích để chuyển đổi dữ liệu dạng văn bản thành các cấu trúc dữ liệu mà Python có thể dễ dàng đọc và sửa đổi, như được minh họa trong ví dụ sau đây để tạo một danh bạ điện thoại.
 
-First, here is the input.  Normally it may come from a file, here we are using
-triple-quoted string syntax
+Trước tiên, đây là dữ liệu đầu vào. Thông thường, dữ liệu có thể đến từ một tệp; ở đây, chúng ta sử dụng cú pháp chuỗi ba dấu nháy
 
 .. doctest::
 
@@ -1761,8 +1248,7 @@ triple-quoted string syntax
    ...
    ... Heather Albrecht: 548.326.4584 919 Park Place"""
 
-The entries are separated by one or more newlines. Now we convert the string
-into a list with each nonempty line having its own entry:
+Các mục được phân tách bằng một hoặc nhiều ký tự xuống dòng. Bây giờ, chúng ta chuyển chuỗi thành một danh sách, trong đó mỗi dòng không rỗng có một mục riêng:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -1774,9 +1260,7 @@ into a list with each nonempty line having its own entry:
    'Frank Burger: 925.541.7625 662 South Dogwood Way',
    'Heather Albrecht: 548.326.4584 919 Park Place']
 
-Finally, split each entry into a list with first name, last name, telephone
-number, and address.  We use the ``maxsplit`` parameter of :func:`split`
-because the address has spaces, our splitting pattern, in it:
+Cuối cùng, hãy tách mỗi mục thành một danh sách gồm tên, họ, số điện thoại và địa chỉ. Chúng ta sử dụng tham số ``maxsplit`` của :func:`split` vì địa chỉ có chứa khoảng trắng, tức là mẫu tách của chúng ta:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -1787,9 +1271,7 @@ because the address has spaces, our splitting pattern, in it:
    ['Frank', 'Burger', '925.541.7625', '662 South Dogwood Way'],
    ['Heather', 'Albrecht', '548.326.4584', '919 Park Place']]
 
-The ``:?`` pattern matches the colon after the last name, so that it does not
-occur in the result list.  With a ``maxsplit`` of ``4``, we could separate the
-house number from the street name:
+Mẫu ``:?`` khớp với dấu hai chấm sau họ, để dấu này không xuất hiện trong danh sách kết quả. Với ``maxsplit`` là ``4``, chúng ta có thể tách số nhà khỏi tên đường:
 
 .. doctest::
    :options: +NORMALIZE_WHITESPACE
@@ -1801,13 +1283,10 @@ house number from the street name:
    ['Heather', 'Albrecht', '548.326.4584', '919', 'Park Place']]
 
 
-Text Munging
-^^^^^^^^^^^^
+Xử lý văn bản
+^^^^^^^^^^^^^
 
-:func:`sub` replaces every occurrence of a pattern with a string or the
-result of a function.  This example demonstrates using :func:`sub` with
-a function to "munge" text, or randomize the order of all the characters
-in each word of a sentence except for the first and last characters::
+:func:`sub` thay thế mọi lần xuất hiện của một mẫu bằng một chuỗi hoặc kết quả của một hàm. Ví dụ này minh họa cách sử dụng :func:`sub` với một hàm để “xáo trộn” văn bản, tức là ngẫu nhiên hóa thứ tự của tất cả các ký tự trong mỗi từ của một câu, ngoại trừ ký tự đầu tiên và cuối cùng::
 
    >>> def repl(m):
    ...     inner_word = list(m.group(2))
@@ -1821,27 +1300,21 @@ in each word of a sentence except for the first and last characters::
    'Pofsroser Aodlambelk, plasee reoprt yuor asnebces potlmrpy.'
 
 
-Finding all Adverbs
+Tìm tất cả trạng từ
 ^^^^^^^^^^^^^^^^^^^
 
-:func:`findall` matches *all* occurrences of a pattern, not just the first
-one as :func:`search` does.  For example, if a writer wanted to
-find all of the adverbs in some text, they might use :func:`findall` in
-the following manner::
+:func:`findall` khớp với *tất cả* lần xuất hiện của một mẫu, chứ không chỉ lần đầu tiên như :func:`search`. Ví dụ: nếu một tác giả muốn tìm tất cả trạng từ trong một đoạn văn bản, họ có thể sử dụng :func:`findall` theo cách sau::
 
    >>> text = "He was carefully disguised but captured quickly by police."
    >>> re.findall(r"\w+ly\b", text)
    ['carefully', 'quickly']
 
 
-Finding all Adverbs and their Positions
+Tìm tất cả trạng từ và vị trí của chúng
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If one wants more information about all matches of a pattern than the matched
-text, :func:`finditer` is useful as it provides :class:`~re.Match` objects
-instead of strings.  Continuing with the previous example, if a writer wanted
-to find all of the adverbs *and their positions* in some text, they would use
-:func:`finditer` in the following manner::
+Nếu muốn biết nhiều thông tin hơn về tất cả các kết quả khớp của một mẫu ngoài phần văn bản được khớp, :func:`finditer` rất hữu ích vì nó cung cấp các đối tượng :class:`~re.Match` thay vì các chuỗi. Tiếp tục với ví dụ trước, nếu một tác giả muốn tìm tất cả trạng từ *và vị trí của chúng* trong một đoạn văn bản, họ sẽ sử dụng
+:func:`finditer` theo cách sau::
 
    >>> text = "He was carefully disguised but captured quickly by police."
    >>> for m in re.finditer(r"\w+ly\b", text):
@@ -1850,23 +1323,17 @@ to find all of the adverbs *and their positions* in some text, they would use
    40-47: quickly
 
 
-Raw String Notation
-^^^^^^^^^^^^^^^^^^^
+Ký hiệu chuỗi thô
+^^^^^^^^^^^^^^^^^
 
-Raw string notation (``r"text"``) keeps regular expressions sane.  Without it,
-every backslash (``'\'``) in a regular expression would have to be prefixed with
-another one to escape it.  For example, the two following lines of code are
-functionally identical::
+Ký hiệu chuỗi thô (``r"text"``) giúp các biểu thức chính quy dễ quản lý hơn. Nếu không có nó, mọi dấu gạch chéo ngược (``'\'``) trong biểu thức chính quy đều phải được thêm một dấu gạch chéo ngược khác ở trước để thoát. Ví dụ, hai dòng mã sau đây có chức năng giống hệt nhau::
 
    >>> re.match(r"\W(.)\1\W", " ff ")
    <re.Match object; span=(0, 4), match=' ff '>
    >>> re.match("\\W(.)\\1\\W", " ff ")
    <re.Match object; span=(0, 4), match=' ff '>
 
-When one wants to match a literal backslash, it must be escaped in the regular
-expression.  With raw string notation, this means ``r"\\"``.  Without raw string
-notation, one must use ``"\\\\"``, making the following lines of code
-functionally identical::
+Khi muốn khớp một dấu gạch chéo ngược theo nghĩa đen, dấu đó phải được thoát trong biểu thức chính quy. Với ký hiệu chuỗi thô, điều này có nghĩa là ``r"\\"``. Nếu không dùng ký hiệu chuỗi thô, phải sử dụng ``"\\\\"``, khiến các dòng mã sau đây có chức năng giống hệt nhau::
 
    >>> re.match(r"\\", r"\\")
    <re.Match object; span=(0, 1), match='\\'>
@@ -1874,16 +1341,12 @@ functionally identical::
    <re.Match object; span=(0, 1), match='\\'>
 
 
-Writing a Tokenizer
-^^^^^^^^^^^^^^^^^^^
+Viết Tokenizer
+^^^^^^^^^^^^^^
 
-A `tokenizer or scanner <https://en.wikipedia.org/wiki/Lexical_analysis>`_
-analyzes a string to categorize groups of characters.  This is a useful first
-step in writing a compiler or interpreter.
+`Tokenizer hoặc scanner <https://en.wikipedia.org/wiki/Lexical_analysis>`_ phân tích một chuỗi để phân loại các nhóm ký tự. Đây là bước đầu tiên hữu ích khi viết một compiler hoặc interpreter.
 
-The text categories are specified with regular expressions.  The technique is
-to combine those into a single master regular expression and to loop over
-successive matches::
+Các danh mục văn bản được chỉ định bằng các biểu thức chính quy. Kỹ thuật này là kết hợp chúng thành một biểu thức chính quy tổng thể duy nhất và lặp qua các kết quả khớp liên tiếp::
 
     from typing import NamedTuple
     import re
@@ -1897,14 +1360,14 @@ successive matches::
     def tokenize(code):
         keywords = {'IF', 'THEN', 'ENDIF', 'FOR', 'NEXT', 'GOSUB', 'RETURN'}
         token_specification = [
-            ('NUMBER',   r'\d+(\.\d*)?'),  # Integer or decimal number
-            ('ASSIGN',   r':='),           # Assignment operator
-            ('END',      r';'),            # Statement terminator
-            ('ID',       r'[A-Za-z]+'),    # Identifiers
-            ('OP',       r'[+\-*/]'),      # Arithmetic operators
-            ('NEWLINE',  r'\n'),           # Line endings
-            ('SKIP',     r'[ \t]+'),       # Skip over spaces and tabs
-            ('MISMATCH', r'.'),            # Any other character
+            ('NUMBER',   r'\d+(\.\d*)?'),  # Số nguyên hoặc số thập phân
+            ('ASSIGN',   r':='),           # Toán tử gán
+            ('END',      r';'),            # Dấu kết thúc câu lệnh
+            ('ID',       r'[A-Za-z]+'),    # Định danh
+            ('OP',       r'[+\-*/]'),      # Toán tử số học
+            ('NEWLINE',  r'\n'),           # Ký tự kết thúc dòng
+            ('SKIP',     r'[ \t]+'),       # Bỏ qua khoảng trắng và tab
+            ('MISMATCH', r'.'),            # Mọi ký tự khác
         ]
         tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
         line_num = 1
@@ -1937,7 +1400,7 @@ successive matches::
     for token in tokenize(statements):
         print(token)
 
-The tokenizer produces the following output::
+Tokenizer tạo ra kết quả sau::
 
     Token(type='IF', value='IF', line=2, column=4)
     Token(type='ID', value='quantity', line=2, column=7)
@@ -1960,7 +1423,6 @@ The tokenizer produces the following output::
     Token(type='END', value=';', line=5, column=9)
 
 
-.. [Frie09] Friedl, Jeffrey. Mastering Regular Expressions. 3rd ed., O'Reilly
-   Media, 2009. The third edition of the book no longer covers Python at all,
-   but the first edition covered writing good regular expression patterns in
-   great detail.
+.. [Frie09] Friedl, Jeffrey. Mastering Regular Expressions. Ấn bản thứ 3, O'Reilly Media, 2009. Ấn bản thứ ba của cuốn sách không còn đề cập đến Python, nhưng ấn bản đầu tiên trình bày rất chi tiết về cách viết các mẫu regular expression tốt.
+
+.. _`tokenizer or scanner`: https://en.wikipedia.org/wiki/Lexical_analysis

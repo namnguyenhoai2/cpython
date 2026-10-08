@@ -1,11 +1,10 @@
 .. _fileformats:
 
-************
-File Formats
-************
+*************
+Định dạng tệp
+*************
 
-The modules described in this chapter parse various miscellaneous file formats
-that aren't markup languages and are not related to e-mail.
+Các module được mô tả trong chương này phân tích nhiều định dạng tệp linh tinh khác nhau, không phải là ngôn ngữ đánh dấu và không liên quan đến e-mail.
 
 
 .. toctree::

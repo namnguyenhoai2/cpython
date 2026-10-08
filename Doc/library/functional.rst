@@ -1,11 +1,10 @@
-******************************
-Functional Programming Modules
-******************************
+************************
+Các mô-đun Lập trình Hàm
+************************
 
-The modules described in this chapter provide functions and classes that support
-a functional programming style, and general operations on callables.
+Các mô-đun được mô tả trong chương này cung cấp các hàm và lớp hỗ trợ phong cách lập trình hàm, cùng các thao tác chung trên các đối tượng có thể gọi (callable).
 
-The following modules are documented in this chapter:
+Các mô-đun sau được trình bày trong chương này:
 
 
 .. toctree::

@@ -1,221 +1,175 @@
-:mod:`!faulthandler` --- Dump the Python traceback
+:mod:`!faulthandler` --- Kết xuất traceback Python
 ==================================================
 
 .. module:: faulthandler
-   :synopsis: Dump the Python traceback.
+   :synopsis: Kết xuất traceback Python.
 
 .. versionadded:: 3.3
 
 ----------------
 
-This module contains functions to dump Python tracebacks explicitly, on a fault,
-after a timeout, or on a user signal. Call :func:`faulthandler.enable` to
-install fault handlers for the :const:`~signal.SIGSEGV`,
-:const:`~signal.SIGFPE`, :const:`~signal.SIGABRT`, :const:`~signal.SIGBUS`, and
-:const:`~signal.SIGILL` signals. You can also
-enable them at startup by setting the :envvar:`PYTHONFAULTHANDLER` environment
-variable or by using the :option:`-X` ``faulthandler`` command line option.
+Mô-đun này chứa các hàm để kết xuất traceback Python một cách rõ ràng khi xảy ra lỗi, sau một khoảng thời gian chờ hoặc khi nhận được tín hiệu người dùng. Gọi :func:`faulthandler.enable` để cài đặt các trình xử lý lỗi cho :const:`~signal.SIGSEGV`,
+:const:`~signal.SIGFPE`, :const:`~signal.SIGABRT`, :const:`~signal.SIGBUS` và
+:const:`~signal.SIGILL`. Bạn cũng có thể bật chúng khi khởi động bằng cách đặt biến môi trường :envvar:`PYTHONFAULTHANDLER` hoặc sử dụng tùy chọn dòng lệnh :option:`-X` ``faulthandler``.
 
-The fault handler is compatible with system fault handlers like Apport or the
-Windows fault handler. The module uses an alternative stack for signal handlers
-if the :c:func:`!sigaltstack` function is available. This allows it to dump the
-traceback even on a stack overflow.
+Trình xử lý lỗi tương thích với các trình xử lý lỗi hệ thống như Apport hoặc trình xử lý lỗi của Windows. Mô-đun này sử dụng một ngăn xếp thay thế cho các trình xử lý tín hiệu nếu hàm :c:func:`!sigaltstack` khả dụng. Nhờ đó, mô-đun vẫn có thể kết xuất traceback ngay cả khi bị tràn ngăn xếp.
 
-The fault handler is called on catastrophic cases and therefore can only use
-signal-safe functions (e.g. it cannot allocate memory on the heap). Because of
-this limitation traceback dumping is minimal compared to normal Python
-tracebacks:
+Trình xử lý lỗi được gọi trong các trường hợp nghiêm trọng, do đó chỉ có thể sử dụng các hàm an toàn với tín hiệu (ví dụ: không thể cấp phát bộ nhớ trên heap). Vì hạn chế này, việc kết xuất traceback có mức độ chi tiết tối thiểu so với traceback Python thông thường:
 
-* Only ASCII is supported. The ``backslashreplace`` error handler is used on
-  encoding.
-* Each string is limited to 500 characters.
-* Only the filename, the function name and the line number are
-  displayed. (no source code)
-* It is limited to 100 frames and 100 threads.
-* The order is reversed: the most recent call is shown first.
+* Chỉ ASCII được hỗ trợ. Trình xử lý lỗi ``backslashreplace`` được sử dụng khi mã hóa.
+* Mỗi chuỗi được giới hạn ở 500 ký tự.
+* Chỉ tên tệp, tên hàm và số dòng được hiển thị. (không có mã nguồn)
+* Giới hạn là 100 frame và 100 thread.
+* Thứ tự bị đảo ngược: lệnh gọi gần đây nhất được hiển thị trước.
 
-By default, the Python traceback is written to :data:`sys.stderr`. To see
-tracebacks, applications must be run in the terminal. A log file can
-alternatively be passed to :func:`faulthandler.enable`.
+Theo mặc định, traceback của Python được ghi vào :data:`sys.stderr`. Để xem traceback, ứng dụng phải được chạy trong terminal. Ngoài ra, có thể truyền tệp nhật ký cho :func:`faulthandler.enable`.
 
-The module is implemented in C, so tracebacks can be dumped on a crash or when
-Python is deadlocked.
+Mô-đun này được triển khai bằng C, vì vậy traceback có thể được kết xuất khi xảy ra sự cố hoặc khi Python bị deadlock.
 
-The :ref:`Python Development Mode <devmode>` calls :func:`faulthandler.enable`
-at Python startup.
+:ref:`Python Development Mode <devmode>` gọi :func:`faulthandler.enable` khi Python khởi động.
 
 .. seealso::
 
-   Module :mod:`pdb`
-      Interactive source code debugger for Python programs.
+   Mô-đun :mod:`pdb`
+      Trình gỡ lỗi mã nguồn tương tác cho các chương trình Python.
 
-   Module :mod:`traceback`
-      Standard interface to extract, format and print stack traces of Python programs.
+   Mô-đun :mod:`traceback`
+      Giao diện tiêu chuẩn để trích xuất, định dạng và in stack trace của các chương trình Python.
 
-Dumping the traceback
----------------------
+Ghi traceback
+-------------
 
 .. function:: dump_traceback(file=sys.stderr, all_threads=True)
 
-   Dump the tracebacks of all threads into *file*. If *all_threads* is
-   ``False``, dump only the current thread.
+   Ghi traceback của tất cả các thread vào *file*. Nếu *all_threads* là ``False``, chỉ ghi thread hiện tại.
 
-   .. seealso:: :func:`traceback.print_tb`, which can be used to print a traceback object.
+   .. seealso:: :func:`traceback.print_tb`, có thể được dùng để in một đối tượng traceback.
 
    .. versionchanged:: 3.5
-      Added support for passing file descriptor to this function.
+      Đã bổ sung hỗ trợ truyền file descriptor cho hàm này.
 
 
-Dumping the C stack
--------------------
+Kết xuất stack C
+----------------
 
 .. versionadded:: 3.14
 
 .. function:: dump_c_stack(file=sys.stderr)
 
-   Dump the C stack trace of the current thread into *file*.
+   Kết xuất stack trace C của thread hiện tại vào *tệp*.
 
-   If the Python build does not support it or the operating system
-   does not provide a stack trace, then this prints an error in place
-   of a dumped C stack.
+   Nếu bản dựng Python không hỗ trợ tính năng này hoặc hệ điều hành không cung cấp stack trace, thì một lỗi sẽ được in ra thay cho C stack được kết xuất.
 
 .. _c-stack-compatibility:
 
-C Stack Compatibility
-*********************
+Khả năng tương thích của C stack
+********************************
 
-If the system does not support the C-level :manpage:`backtrace(3)`
-or :manpage:`dladdr1(3)`, then C stack dumps will not work.
-An error will be printed instead of the stack.
+Nếu hệ thống không hỗ trợ :manpage:`backtrace(3)` hoặc :manpage:`dladdr1(3)` ở cấp C, thì việc kết xuất C stack sẽ không hoạt động. Thay vào đó, một lỗi sẽ được in ra.
 
-Additionally, some compilers do not support :term:`CPython's <CPython>`
-implementation of C stack dumps. As a result, a different error may be printed
-instead of the stack, even if the operating system supports dumping stacks.
+Ngoài ra, một số compiler không hỗ trợ việc triển khai kết xuất ngăn xếp C của :term:`CPython's <CPython>`. Do đó, một lỗi khác có thể được in ra thay vì ngăn xếp, ngay cả khi hệ điều hành hỗ trợ kết xuất ngăn xếp.
 
 .. note::
 
-   Dumping C stacks can be arbitrarily slow, depending on the DWARF level
-   of the binaries in the call stack.
+   Việc kết xuất ngăn xếp C có thể chậm tùy ý, tùy thuộc vào cấp độ DWARF của các binary trong call stack.
 
-Fault handler state
--------------------
+Trạng thái fault handler
+------------------------
 
 .. function:: enable(file=sys.stderr, all_threads=True, c_stack=True)
 
-   Enable the fault handler: install handlers for the :const:`~signal.SIGSEGV`,
-   :const:`~signal.SIGFPE`, :const:`~signal.SIGABRT`, :const:`~signal.SIGBUS`
-   and :const:`~signal.SIGILL`
-   signals to dump the Python traceback. If *all_threads* is ``True``,
-   produce tracebacks for every running thread. Otherwise, dump only the current
-   thread.
+   Bật fault handler: cài đặt các handler cho :const:`~signal.SIGSEGV`,
+   :const:`~signal.SIGFPE`, :const:`~signal.SIGABRT`, :const:`~signal.SIGBUS` và :const:`~signal.SIGILL` để kết xuất Python traceback. Nếu *all_threads* là ``True``, tạo traceback cho mọi thread đang chạy. Nếu không, chỉ kết xuất thread hiện tại.
 
-   The *file* must be kept open until the fault handler is disabled: see
+   *file* phải được giữ mở cho đến khi fault handler bị tắt: xem
    :ref:`issue with file descriptors <faulthandler-fd>`.
 
-   If *c_stack* is ``True``, then the C stack trace is printed after the Python
-   traceback, unless the system does not support it. See :func:`dump_c_stack` for
-   more information on compatibility.
+   Nếu *c_stack* là ``True``, thì dấu vết ngăn xếp C sẽ được in sau traceback Python, trừ khi hệ thống không hỗ trợ tính năng này. Xem :func:`dump_c_stack` để biết thêm thông tin về khả năng tương thích.
 
    .. versionchanged:: 3.5
-      Added support for passing file descriptor to this function.
+      Đã bổ sung hỗ trợ truyền file descriptor vào hàm này.
 
    .. versionchanged:: 3.6
-      On Windows, a handler for Windows exception is also installed.
+      Trên Windows, một handler cho ngoại lệ Windows cũng được cài đặt.
 
    .. versionchanged:: 3.10
-      The dump now mentions if a garbage collector collection is running
-      if *all_threads* is true.
+      Kết quả kết xuất hiện cho biết liệu một lần thu gom của garbage collector có đang chạy hay không nếu *all_threads* là true.
 
    .. versionchanged:: 3.14
-      Only the current thread is dumped if the :term:`GIL` is disabled to
-      prevent the risk of data races.
+      Chỉ thread hiện tại được kết xuất nếu :term:`GIL` bị tắt để ngăn ngừa nguy cơ xảy ra data race.
 
    .. versionchanged:: 3.14
-      The dump now displays the C stack trace if *c_stack* is true.
+      Kết quả kết xuất hiện hiển thị dấu vết ngăn xếp C nếu *c_stack* là true.
 
 .. function:: disable()
 
-   Disable the fault handler: uninstall the signal handlers installed by
+   Tắt fault handler: gỡ cài đặt các signal handler được cài đặt bởi
    :func:`enable`.
 
 .. function:: is_enabled()
 
-   Check if the fault handler is enabled.
+   Kiểm tra xem fault handler đã được bật hay chưa.
 
 
-Dumping the tracebacks after a timeout
---------------------------------------
+Dump traceback sau khi hết thời gian chờ
+----------------------------------------
 
 .. function:: dump_traceback_later(timeout, repeat=False, file=sys.stderr, exit=False)
 
-   Dump the tracebacks of all threads, after a timeout of *timeout* seconds, or
-   every *timeout* seconds if *repeat* is ``True``.  If *exit* is ``True``, call
-   :c:func:`!_exit` with status=1 after dumping the tracebacks.  (Note
-   :c:func:`!_exit` exits the process immediately, which means it doesn't do any
-   cleanup like flushing file buffers.) If the function is called twice, the new
-   call replaces previous parameters and resets the timeout. The timer has a
-   sub-second resolution.
+   Dump traceback của tất cả các thread sau *timeout* giây, hoặc cứ mỗi *timeout* giây nếu *repeat* là ``True``. Nếu *exit* là ``True``, hãy gọi
+   :c:func:`!_exit` với status=1 sau khi dump traceback. (Lưu ý
+   :c:func:`!_exit` thoát khỏi process ngay lập tức, nghĩa là nó không thực hiện bất kỳ thao tác cleanup nào, chẳng hạn như flush file buffer.) Nếu hàm được gọi hai lần, lần gọi mới sẽ thay thế các tham số trước đó và đặt lại thời gian chờ. Bộ hẹn giờ có độ phân giải dưới một giây.
 
-   The *file* must be kept open until the traceback is dumped or
-   :func:`cancel_dump_traceback_later` is called: see :ref:`issue with file
-   descriptors <faulthandler-fd>`.
+   Phải giữ *file* mở cho đến khi traceback được dump hoặc
+   :func:`cancel_dump_traceback_later` được gọi: xem :ref:`issue with file descriptors <faulthandler-fd>`.
 
-   This function is implemented using a watchdog thread.
+   Hàm này được triển khai bằng một watchdog thread.
 
    .. versionchanged:: 3.5
-      Added support for passing file descriptor to this function.
+      Đã bổ sung hỗ trợ truyền file descriptor cho hàm này.
 
    .. versionchanged:: 3.7
-      This function is now always available.
+      Hàm này hiện luôn khả dụng.
 
 .. function:: cancel_dump_traceback_later()
 
-   Cancel the last call to :func:`dump_traceback_later`.
+   Hủy lệnh gọi cuối cùng tới :func:`dump_traceback_later`.
 
 
-Dumping the traceback on a user signal
---------------------------------------
+Dump traceback khi nhận tín hiệu từ người dùng
+----------------------------------------------
 
 .. function:: register(signum, file=sys.stderr, all_threads=True, chain=False)
 
-   Register a user signal: install a handler for the *signum* signal to dump
-   the traceback of all threads, or of the current thread if *all_threads* is
-   ``False``, into *file*. Call the previous handler if chain is ``True``.
+   Đăng ký một tín hiệu từ người dùng: cài đặt một handler cho tín hiệu *signum* để dump traceback của tất cả các thread, hoặc của thread hiện tại nếu *all_threads* là ``False``, vào *file*. Gọi handler trước đó nếu chain là ``True``.
 
-   The *file* must be kept open until the signal is unregistered by
-   :func:`unregister`: see :ref:`issue with file descriptors <faulthandler-fd>`.
+   *file* phải được mở cho đến khi tín hiệu được hủy đăng ký bởi
+   :func:`unregister`: xem :ref:`vấn đề với file descriptor <faulthandler-fd>`.
 
-   Not available on Windows.
+   Không khả dụng trên Windows.
 
    .. versionchanged:: 3.5
-      Added support for passing file descriptor to this function.
+      Đã bổ sung hỗ trợ truyền file descriptor cho hàm này.
 
 .. function:: unregister(signum)
 
-   Unregister a user signal: uninstall the handler of the *signum* signal
-   installed by :func:`register`. Return ``True`` if the signal was registered,
-   ``False`` otherwise.
+   Hủy đăng ký một user signal: gỡ handler của signal *signum* do :func:`register` cài đặt. Trả về ``True`` nếu signal đã được đăng ký, ngược lại trả về ``False``.
 
-   Not available on Windows.
+   Không khả dụng trên Windows.
 
 
 .. _faulthandler-fd:
 
-Issue with file descriptors
----------------------------
+Vấn đề với file descriptor
+--------------------------
 
-:func:`enable`, :func:`dump_traceback_later` and :func:`register` keep the
-file descriptor of their *file* argument. If the file is closed and its file
-descriptor is reused by a new file, or if :func:`os.dup2` is used to replace
-the file descriptor, the traceback will be written into a different file. Call
-these functions again each time that the file is replaced.
+:func:`enable`, :func:`dump_traceback_later` và :func:`register` giữ file descriptor của đối số *file*. Nếu tệp bị đóng và file descriptor của nó được một tệp mới sử dụng lại, hoặc nếu :func:`os.dup2` được dùng để thay thế file descriptor, traceback sẽ được ghi vào một tệp khác. Hãy gọi lại các hàm này mỗi khi tệp được thay thế.
 
 
-Example
--------
+Ví dụ
+-----
 
-Example of a segmentation fault on Linux with and without enabling the fault
-handler:
+Ví dụ về lỗi segmentation fault trên Linux khi bật và không bật trình xử lý lỗi:
 
 .. code-block:: shell-session
 

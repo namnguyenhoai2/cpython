@@ -1,10 +1,10 @@
-:mod:`!html.parser` --- Simple HTML and XHTML parser
-====================================================
+:mod:`!html.parser` --- Trình phân tích cú pháp HTML và XHTML đơn giản
+======================================================================
 
 .. module:: html.parser
-   :synopsis: A simple parser that can handle HTML and XHTML.
+   :synopsis: Một trình phân tích cú pháp đơn giản có thể xử lý HTML và XHTML.
 
-**Source code:** :source:`Lib/html/parser.py`
+**Mã nguồn:** :source:`Lib/html/parser.py`
 
 .. index::
    single: HTML
@@ -12,45 +12,35 @@
 
 --------------
 
-This module defines a class :class:`HTMLParser` which serves as the basis for
-parsing text files formatted in HTML (HyperText Mark-up Language) and XHTML.
+Mô-đun này định nghĩa một lớp :class:`HTMLParser`, làm nền tảng cho việc phân tích các tệp văn bản được định dạng bằng HTML (HyperText Mark-up Language) và XHTML.
 
 .. class:: HTMLParser(*, convert_charrefs=True, scripting=False)
 
-   Create a parser instance able to parse invalid markup.
+   Tạo một phiên bản trình phân tích cú pháp có khả năng phân tích mã đánh dấu không hợp lệ.
 
-   If *convert_charrefs* is true (the default), all character
-   references (except the ones in elements like ``script`` and ``style``) are
-   automatically converted to the corresponding Unicode characters.
+   Nếu *convert_charrefs* là true (mặc định), tất cả các tham chiếu ký tự (ngoại trừ những tham chiếu trong các phần tử như ``script`` và ``style``) sẽ tự động được chuyển đổi thành các ký tự Unicode tương ứng.
 
-   If *scripting* is false (the default), the content of the ``noscript``
-   element is parsed normally; if it's true, it's returned as is without
-   being parsed.
+   Nếu *scripting* là false (mặc định), nội dung của phần tử ``noscript`` sẽ được phân tích bình thường; nếu là true, nội dung được trả về nguyên trạng mà không được phân tích.
 
-   An :class:`.HTMLParser` instance is fed HTML data and calls handler methods
-   when start tags, end tags, text, comments, and other markup elements are
-   encountered.  The user should subclass :class:`.HTMLParser` and override its
-   methods to implement the desired behavior.
+   Một thực thể :class:`.HTMLParser` được cung cấp dữ liệu HTML và gọi các phương thức handler khi gặp thẻ bắt đầu, thẻ kết thúc, văn bản, chú thích và các phần tử markup khác. Người dùng nên tạo lớp con của :class:`.HTMLParser` và ghi đè các phương thức của lớp đó để triển khai hành vi mong muốn.
 
-   This parser does not check that end tags match start tags or call the end-tag
-   handler for elements which are closed implicitly by closing an outer element.
+   Parser này không kiểm tra xem thẻ kết thúc có khớp với thẻ bắt đầu hay không, cũng không gọi handler của thẻ kết thúc đối với các phần tử được đóng ngầm khi một phần tử bên ngoài được đóng.
 
    .. versionchanged:: 3.4
-      *convert_charrefs* keyword argument added.
+      Đã thêm keyword argument *convert_charrefs*.
 
    .. versionchanged:: 3.5
-      The default value for argument *convert_charrefs* is now ``True``.
+      Giá trị mặc định của đối số *convert_charrefs* hiện là ``True``.
 
    .. versionchanged:: 3.14.1
-      Added the *scripting* parameter.
+      Đã thêm tham số *scripting*.
 
 
-Example HTML Parser Application
--------------------------------
+Ứng dụng parser HTML mẫu
+------------------------
 
-As a basic example, below is a simple HTML parser that uses the
-:class:`HTMLParser` class to print out start tags, end tags, and data
-as they are encountered:
+Dưới đây là một ví dụ cơ bản về một parser HTML đơn giản sử dụng
+:class:`HTMLParser` lớp để in ra các thẻ mở, thẻ đóng và dữ liệu khi chúng được gặp:
 
 .. testcode::
 
@@ -70,7 +60,7 @@ as they are encountered:
    parser.feed('<html><head><title>Test</title></head>'
                '<body><h1>Parse me!</h1></body></html>')
 
-The output will then be:
+Kết quả sau đó sẽ là:
 
 .. testoutput::
 
@@ -88,158 +78,117 @@ The output will then be:
    Encountered an end tag : html
 
 
-:class:`.HTMLParser` Methods
-----------------------------
+:class:`.HTMLParser` Phương thức
+--------------------------------
 
-:class:`HTMLParser` instances have the following methods:
+Các instance :class:`HTMLParser` có những phương thức sau:
 
 
 .. method:: HTMLParser.feed(data)
 
-   Feed some text to the parser.  It is processed insofar as it consists of
-   complete elements; incomplete data is buffered until more data is fed or
-   :meth:`close` is called.  *data* must be :class:`str`.
+   Cung cấp một phần văn bản cho parser. Văn bản được xử lý khi bao gồm các phần tử hoàn chỉnh; dữ liệu chưa hoàn chỉnh sẽ được lưu vào bộ đệm cho đến khi có thêm dữ liệu được cung cấp hoặc
+   :meth:`close` được gọi. *data* phải là :class:`str`.
 
 
 .. method:: HTMLParser.close()
 
-   Force processing of all buffered data as if it were followed by an end-of-file
-   mark.  This method may be redefined by a derived class to define additional
-   processing at the end of the input, but the redefined version should always call
-   the :class:`HTMLParser` base class method :meth:`close`.
+   Buộc xử lý toàn bộ dữ liệu đang được lưu trong bộ đệm như thể dữ liệu đó được theo sau bởi một dấu hiệu cuối tệp. Phương thức này có thể được định nghĩa lại trong một lớp dẫn xuất để xác định quá trình xử lý bổ sung ở cuối dữ liệu đầu vào, nhưng phiên bản được định nghĩa lại luôn phải gọi :class:`HTMLParser` phương thức của lớp cơ sở :meth:`close`.
 
 
 .. method:: HTMLParser.reset()
 
-   Reset the instance.  Loses all unprocessed data.  This is called implicitly at
-   instantiation time.
+   Đặt lại instance. Làm mất toàn bộ dữ liệu chưa xử lý. Phương thức này được gọi ngầm tại thời điểm khởi tạo.
 
 
 .. method:: HTMLParser.getpos()
 
-   Return current line number and offset.
+   Trả về số dòng và offset hiện tại.
 
 
 .. method:: HTMLParser.get_starttag_text()
 
-   Return the text of the most recently opened start tag.  This should not normally
-   be needed for structured processing, but may be useful in dealing with HTML "as
-   deployed" or for re-generating input with minimal changes (whitespace between
-   attributes can be preserved, etc.).
+   Trả về nội dung của thẻ bắt đầu được mở gần đây nhất. Thông thường, điều này không cần thiết khi xử lý có cấu trúc, nhưng có thể hữu ích khi xử lý HTML "được triển khai" hoặc tạo lại đầu vào với số thay đổi tối thiểu (chẳng hạn như có thể giữ nguyên khoảng trắng giữa các thuộc tính).
 
 
-The following methods are called when data or markup elements are encountered
-and they are meant to be overridden in a subclass.  The base class
-implementations do nothing (except for :meth:`~HTMLParser.handle_startendtag`):
+Các phương thức sau được gọi khi gặp dữ liệu hoặc phần tử markup và được thiết kế để ghi đè trong một lớp con. Các triển khai của lớp cơ sở không thực hiện thao tác nào (ngoại trừ :meth:`~HTMLParser.handle_startendtag`):
 
 
 .. method:: HTMLParser.handle_starttag(tag, attrs)
 
-   This method is called to handle the start tag of an element (e.g. ``<div id="main">``).
+   Phương thức này được gọi để xử lý thẻ bắt đầu của một phần tử (ví dụ: ``<div id="main">``).
 
-   The *tag* argument is the name of the tag converted to lower case. The *attrs*
-   argument is a list of ``(name, value)`` pairs containing the attributes found
-   inside the tag's ``<>`` brackets.  The *name* will be translated to lower case,
-   and quotes in the *value* have been removed, and character and entity references
-   have been replaced.  For empty attributes, *value* is ``None``.
+   Đối số *tag* là tên của thẻ được chuyển thành chữ thường. Đối số *attrs* là một danh sách các cặp ``(name, value)`` chứa những thuộc tính được tìm thấy bên trong dấu ngoặc ``<>`` của thẻ. *name* sẽ được chuyển thành chữ thường, các dấu ngoặc kép trong *value* đã được loại bỏ, đồng thời các tham chiếu ký tự và thực thể đã được thay thế. Đối với các thuộc tính rỗng, *value* là ``None``.
 
-   For instance, for the tag ``<A HREF="https://www.cwi.nl/">``, this method
-   would be called as ``handle_starttag('a', [('href', 'https://www.cwi.nl/')])``.
+   Ví dụ, đối với thẻ ``<A HREF="https://www.cwi.nl/">``, phương thức này sẽ được gọi như sau: ``handle_starttag('a', [('href', 'https://www.cwi.nl/')])``.
 
-   All entity references from :mod:`html.entities` are replaced in the attribute
-   values.
+   Tất cả các tham chiếu thực thể từ :mod:`html.entities` đều được thay thế trong các giá trị thuộc tính.
 
 
 .. method:: HTMLParser.handle_endtag(tag)
 
-   This method is called to handle the end tag of an element (e.g. ``</div>``).
+   Phương thức này được gọi để xử lý thẻ kết thúc của một phần tử (ví dụ: ``</div>``).
 
-   The *tag* argument is the name of the tag converted to lower case.
+   Đối số *tag* là tên của thẻ được chuyển thành chữ thường.
 
 
 .. method:: HTMLParser.handle_startendtag(tag, attrs)
 
-   Similar to :meth:`handle_starttag`, but called when the parser encounters an
-   XHTML-style empty tag (``<img ... />``).  This method may be overridden by
-   subclasses which require this particular lexical information; the default
-   implementation simply calls :meth:`handle_starttag` and :meth:`handle_endtag`.
+   Tương tự như :meth:`handle_starttag`, nhưng được gọi khi parser gặp một thẻ rỗng kiểu XHTML (``<img ... />``). Các lớp con có yêu cầu thông tin từ vựng cụ thể này có thể ghi đè phương thức này; phần triển khai mặc định chỉ đơn giản gọi :meth:`handle_starttag` và :meth:`handle_endtag`.
 
 
 .. method:: HTMLParser.handle_data(data)
 
-   This method is called to process arbitrary data (e.g. text nodes and the
-   content of elements like ``script`` and ``style``).
+   Phương thức này được gọi để xử lý dữ liệu tùy ý (ví dụ: các nút văn bản và nội dung của những phần tử như ``script`` và ``style``).
 
 
 .. method:: HTMLParser.handle_entityref(name)
 
-   This method is called to process a named character reference of the form
-   ``&name;`` (e.g. ``&gt;``), where *name* is a general entity reference
-   (e.g. ``'gt'``).
-   This method is only called if *convert_charrefs* is false.
+   Phương thức này được gọi để xử lý một tham chiếu ký tự có tên theo dạng ``&name;`` (ví dụ: ``&gt;``), trong đó *name* là một tham chiếu thực thể tổng quát (ví dụ: ``'gt'``). Phương thức này chỉ được gọi nếu *convert_charrefs* là false.
 
 
 .. method:: HTMLParser.handle_charref(name)
 
-   This method is called to process decimal and hexadecimal numeric character
-   references of the form :samp:`&#{NNN};` and :samp:`&#x{NNN};`.  For example, the decimal
-   equivalent for ``&gt;`` is ``&#62;``, whereas the hexadecimal is ``&#x3E;``;
-   in this case the method will receive ``'62'`` or ``'x3E'``.
-   This method is only called if *convert_charrefs* is false.
+   Phương thức này được gọi để xử lý các tham chiếu ký tự số thập phân và thập lục phân theo dạng :samp:`&#{NNN};` và :samp:`&#x{NNN};`. Ví dụ, giá trị thập phân tương đương với ``&gt;`` là ``&#62;``, trong khi giá trị thập lục phân là ``&#x3E;``; trong trường hợp này, phương thức sẽ nhận ``'62'`` hoặc ``'x3E'``. Phương thức này chỉ được gọi nếu *convert_charrefs* là false.
 
 
 .. method:: HTMLParser.handle_comment(data)
 
-   This method is called when a comment is encountered (e.g. ``<!--comment-->``).
+   Phương thức này được gọi khi gặp một chú thích (ví dụ ``<!--comment-->``).
 
-   For example, the comment ``<!-- comment -->`` will cause this method to be
-   called with the argument ``' comment '``.
+   Ví dụ, chú thích ``<!-- comment -->`` sẽ khiến phương thức này được gọi với đối số ``' comment '``.
 
-   The content of Internet Explorer conditional comments (condcoms) will also be
-   sent to this method, so, for ``<!--[if IE 9]>IE9-specific content<![endif]-->``,
-   this method will receive ``'[if IE 9]>IE9-specific content<![endif]'``.
+   Nội dung của các chú thích điều kiện (condcoms) của Internet Explorer cũng sẽ được gửi đến phương thức này, vì vậy, với ``<!--[if IE 9]>IE9-specific content<![endif]-->``, phương thức này sẽ nhận được ``'[if IE 9]>IE9-specific content<![endif]'``.
 
 
 .. method:: HTMLParser.handle_decl(decl)
 
-   This method is called to handle an HTML doctype declaration (e.g.
-   ``<!DOCTYPE html>``).
+   Phương thức này được gọi để xử lý khai báo doctype HTML (ví dụ ``<!DOCTYPE html>``).
 
-   The *decl* parameter will be the entire contents of the declaration inside
-   the ``<!...>`` markup (e.g. ``'DOCTYPE html'``).
+   Tham số *decl* sẽ là toàn bộ nội dung của khai báo bên trong phần đánh dấu ``<!...>`` (ví dụ ``'DOCTYPE html'``).
 
 
 .. method:: HTMLParser.handle_pi(data)
 
-   Method called when a processing instruction is encountered.  The *data*
-   parameter will contain the entire processing instruction. For example, for the
-   processing instruction ``<?proc color='red'>``, this method would be called as
-   ``handle_pi("proc color='red'")``.  It is intended to be overridden by a derived
-   class; the base class implementation does nothing.
+   Phương thức được gọi khi gặp một processing instruction. Tham số *data* sẽ chứa toàn bộ processing instruction. Ví dụ, đối với processing instruction ``<?proc color='red'>``, phương thức này sẽ được gọi như sau ``handle_pi("proc color='red'")``. Phương thức này được thiết kế để được ghi đè bởi một lớp dẫn xuất; phần triển khai của lớp cơ sở không thực hiện gì.
 
    .. note::
 
-      The :class:`HTMLParser` class uses the SGML syntactic rules for processing
-      instructions.  An XHTML processing instruction using the trailing ``'?'`` will
-      cause the ``'?'`` to be included in *data*.
+      Lớp :class:`HTMLParser` sử dụng các quy tắc cú pháp SGML cho processing instruction. Một processing instruction XHTML sử dụng ``'?'`` ở cuối sẽ khiến ``'?'`` được đưa vào *data*.
 
 
 .. method:: HTMLParser.unknown_decl(data)
 
-   This method is called when an unrecognized declaration is read by the parser.
+   Phương thức này được gọi khi parser đọc một khai báo không được nhận dạng.
 
-   The *data* parameter will be the entire contents of the declaration inside
-   the ``<![...]>`` markup.  It is sometimes useful to be overridden by a
-   derived class.  The base class implementation does nothing.
+   Tham số *data* sẽ chứa toàn bộ nội dung của khai báo bên trong markup ``<![...]>``. Đôi khi, một lớp dẫn xuất cần ghi đè phương thức này. Phần triển khai của lớp cơ sở không thực hiện thao tác nào.
 
 
 .. _htmlparser-examples:
 
-Examples
---------
+Ví dụ
+-----
 
-The following class implements a parser that will be used to illustrate more
-examples:
+Lớp sau đây triển khai một parser được dùng để minh họa thêm các ví dụ:
 
 .. testcode::
 
@@ -277,7 +226,7 @@ examples:
 
    parser = MyHTMLParser()
 
-Parsing a doctype:
+Phân tích một doctype:
 
 .. doctest::
 
@@ -285,7 +234,7 @@ Parsing a doctype:
    ...             '"http://www.w3.org/TR/html4/strict.dtd">')
    Decl     : DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd"
 
-Parsing an element with a few attributes and a title:
+Phân tích một element có một vài thuộc tính và tiêu đề:
 
 .. doctest::
 
@@ -299,8 +248,7 @@ Parsing an element with a few attributes and a title:
    Data     : Python
    End tag  : h1
 
-The content of elements like ``script`` and ``style`` is returned as is,
-without further parsing:
+Nội dung của các element như ``script`` và ``style`` được trả về nguyên trạng, không phân tích thêm:
 
 .. doctest::
 
@@ -317,8 +265,7 @@ without further parsing:
    Data     : alert("<strong>hello! &#9786;</strong>");
    End tag  : script
 
-Attribute names are converted to lowercase, quotes from attribute values removed,
-and ``None`` is returned as *value* for empty attributes (such as ``checked``):
+Tên thuộc tính được chuyển thành chữ thường, dấu ngoặc kép trong giá trị thuộc tính được loại bỏ, và ``None`` được trả về dưới dạng *value* đối với các thuộc tính rỗng (chẳng hạn như ``checked``):
 
 .. doctest::
 
@@ -329,7 +276,7 @@ and ``None`` is returned as *value* for empty attributes (such as ``checked``):
         attr: ('required', '')
         attr: ('disabled', 'disabled')
 
-Parsing comments:
+Phân tích cú pháp các chú thích:
 
 .. doctest::
 
@@ -338,8 +285,7 @@ Parsing comments:
    Comment  : a comment
    Comment  : [if IE 9]>IE-specific content<![endif]
 
-Parsing named and numeric character references and converting them to the
-correct char (note: these 3 references are all equivalent to ``'>'``):
+Phân tích cú pháp các tham chiếu ký tự có tên và dạng số rồi chuyển chúng thành ký tự tương ứng (lưu ý: cả 3 tham chiếu này đều tương đương với ``'>'``):
 
 .. doctest::
 
@@ -353,9 +299,8 @@ correct char (note: these 3 references are all equivalent to ``'>'``):
    Num ent  : >
    Num ent  : >
 
-Feeding incomplete chunks to :meth:`~HTMLParser.feed` works, but
-:meth:`~HTMLParser.handle_data` might be called more than once
-if *convert_charrefs* is false:
+Việc truyền các đoạn chưa hoàn chỉnh vào :meth:`~HTMLParser.feed` vẫn hoạt động, nhưng
+:meth:`~HTMLParser.handle_data` có thể được gọi nhiều hơn một lần nếu *convert_charrefs* là false:
 
 .. doctest::
 
@@ -368,7 +313,7 @@ if *convert_charrefs* is false:
    Data     :  text
    End tag  : span
 
-Parsing invalid HTML (e.g. unquoted attributes) also works:
+Việc phân tích cú pháp HTML không hợp lệ (ví dụ: thuộc tính không được đặt trong dấu ngoặc kép) cũng hoạt động:
 
 .. doctest::
 

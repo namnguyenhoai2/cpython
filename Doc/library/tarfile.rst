@@ -1,1244 +1,954 @@
-:mod:`!tarfile` --- Read and write tar archive files
-====================================================
+:mod:`!tarfile` --- Đọc và ghi các tệp lưu trữ tar
+==================================================
 
 .. module:: tarfile
-   :synopsis: Read and write tar-format archive files.
+   :synopsis: Đọc và ghi các tệp lưu trữ định dạng tar.
 
 .. moduleauthor:: Lars Gustäbel <lars@gustaebel.de>
 .. sectionauthor:: Lars Gustäbel <lars@gustaebel.de>
 
-**Source code:** :source:`Lib/tarfile.py`
+**Mã nguồn:** :source:`Lib/tarfile.py`
 
 --------------
 
-The :mod:`!tarfile` module makes it possible to read and write tar
-archives, including those using gzip, bz2 and lzma compression.
-Use the :mod:`zipfile` module to read or write :file:`.zip` files, or the
-higher-level functions in :ref:`shutil <archiving-operations>`.
+Mô-đun :mod:`!tarfile` cho phép đọc và ghi các kho lưu trữ tar, bao gồm cả những kho sử dụng tính năng nén gzip, bz2 và lzma. Sử dụng mô-đun :mod:`zipfile` để đọc hoặc ghi các tệp :file:`.zip`, hoặc sử dụng các hàm cấp cao hơn trong :ref:`shutil <archiving-operations>`.
 
-Some facts and figures:
+Một số thông tin và số liệu:
 
-* reads and writes :mod:`gzip`, :mod:`bz2`, :mod:`compression.zstd`, and
-  :mod:`lzma` compressed archives if the respective modules are available.
+* đọc và ghi :mod:`gzip`, :mod:`bz2`, :mod:`compression.zstd`, và
+  :mod:`lzma` các kho lưu trữ được nén nếu có các mô-đun tương ứng.
 
   ..
-     The following paragraph should be similar to ../includes/optional-module.rst
+     Đoạn văn sau đây phải tương tự như ../includes/optional-module.rst
 
-  If any of these :term:`optional modules <optional module>` are missing from
-  your copy of CPython, look for documentation from your distributor (that is,
-  whoever provided Python to you).
-  If you are the distributor, see :ref:`optional-module-requirements`.
+  Nếu bất kỳ :term:`mô-đun tùy chọn <optional module>` nào trong số này bị thiếu trong bản CPython của bạn, hãy tìm tài liệu từ nhà phân phối của bạn (tức là bên đã cung cấp Python cho bạn). Nếu bạn là nhà phân phối, hãy xem :ref:`optional-module-requirements`.
 
-* read/write support for the POSIX.1-1988 (ustar) format.
+* hỗ trợ đọc/ghi định dạng POSIX.1-1988 (ustar).
 
-* read/write support for the GNU tar format including *longname* and *longlink*
-  extensions, read-only support for all variants of the *sparse* extension
-  including restoration of sparse files.
+* hỗ trợ đọc/ghi định dạng GNU tar, bao gồm các phần mở rộng *longname* và *longlink*, hỗ trợ chỉ đọc cho mọi biến thể của phần mở rộng *sparse*, bao gồm cả việc khôi phục các tệp sparse.
 
-* read/write support for the POSIX.1-2001 (pax) format.
+* hỗ trợ đọc/ghi định dạng POSIX.1-2001 (pax).
 
-* handles directories, regular files, hardlinks, symbolic links, fifos,
-  character devices and block devices and is able to acquire and restore file
-  information like timestamp, access permissions and owner.
+* xử lý thư mục, tệp thông thường, hardlink, symbolic link, FIFO, thiết bị ký tự và thiết bị khối, đồng thời có thể lấy và khôi phục thông tin tệp như dấu thời gian, quyền truy cập và chủ sở hữu.
 
 .. versionchanged:: 3.3
-   Added support for :mod:`lzma` compression.
+   Đã bổ sung hỗ trợ nén :mod:`lzma`.
 
 .. versionchanged:: 3.12
-   Archives are extracted using a :ref:`filter <tarfile-extraction-filter>`,
-   which makes it possible to either limit surprising/dangerous features,
-   or to acknowledge that they are expected and the archive is fully trusted.
+   Các archive được giải nén bằng :ref:`filter <tarfile-extraction-filter>`, cho phép либо giới hạn các tính năng bất ngờ/nguy hiểm, либо xác nhận rằng chúng được mong đợi và archive hoàn toàn đáng tin cậy.
 
 .. versionchanged:: 3.14
-   Set the default extraction filter to :func:`data <data_filter>`,
-   which disallows some dangerous features such as links to absolute paths
-   or paths outside of the destination. Previously, the filter strategy
-   was equivalent to :func:`fully_trusted <fully_trusted_filter>`.
+   Đặt extraction filter mặc định thành :func:`data <data_filter>`, bộ lọc này không cho phép một số tính năng nguy hiểm, chẳng hạn như liên kết đến đường dẫn tuyệt đối hoặc đường dẫn nằm ngoài đích. Trước đây, chiến lược lọc tương đương với :func:`fully_trusted <fully_trusted_filter>`.
 
 .. versionchanged:: 3.14
 
-   Added support for Zstandard compression using :mod:`compression.zstd`.
+   Đã thêm hỗ trợ nén Zstandard bằng :mod:`compression.zstd`.
 
 .. function:: open(name=None, mode='r', fileobj=None, bufsize=10240, **kwargs)
 
-   Return a :class:`TarFile` object for the pathname *name*. For detailed
-   information on :class:`TarFile` objects and the keyword arguments that are
-   allowed, see :ref:`tarfile-objects`.
+   Trả về một đối tượng :class:`TarFile` cho pathname *name*. Để biết thông tin chi tiết về các đối tượng :class:`TarFile` và các đối số từ khóa được phép, hãy xem :ref:`tarfile-objects`.
 
-   *mode* has to be a string of the form ``'filemode[:compression]'``, it defaults
-   to ``'r'``. Here is a full list of mode combinations:
+   *mode* phải là một chuỗi có dạng ``'filemode[:compression]'``, mặc định là ``'r'``. Sau đây là danh sách đầy đủ các tổ hợp mode:
 
-   +------------------+---------------------------------------------+
-   | mode             | action                                      |
-   +==================+=============================================+
-   | ``'r'`` or       | Open for reading with transparent           |
-   | ``'r:*'``        | compression (recommended).                  |
-   +------------------+---------------------------------------------+
-   | ``'r:'``         | Open for reading exclusively without        |
-   |                  | compression.                                |
-   +------------------+---------------------------------------------+
-   | ``'r:gz'``       | Open for reading with gzip compression.     |
-   +------------------+---------------------------------------------+
-   | ``'r:bz2'``      | Open for reading with bzip2 compression.    |
-   +------------------+---------------------------------------------+
-   | ``'r:xz'``       | Open for reading with lzma compression.     |
-   +------------------+---------------------------------------------+
-   | ``'r:zst'``      | Open for reading with Zstandard compression.|
-   +------------------+---------------------------------------------+
-   | ``'x'`` or       | Create a tarfile exclusively without        |
-   | ``'x:'``         | compression.                                |
-   |                  | Raise a :exc:`FileExistsError` exception    |
-   |                  | if it already exists.                       |
-   +------------------+---------------------------------------------+
-   | ``'x:gz'``       | Create a tarfile with gzip compression.     |
-   |                  | Raise a :exc:`FileExistsError` exception    |
-   |                  | if it already exists.                       |
-   +------------------+---------------------------------------------+
-   | ``'x:bz2'``      | Create a tarfile with bzip2 compression.    |
-   |                  | Raise a :exc:`FileExistsError` exception    |
-   |                  | if it already exists.                       |
-   +------------------+---------------------------------------------+
-   | ``'x:xz'``       | Create a tarfile with lzma compression.     |
-   |                  | Raise a :exc:`FileExistsError` exception    |
-   |                  | if it already exists.                       |
-   +------------------+---------------------------------------------+
-   | ``'x:zst'``      | Create a tarfile with Zstandard compression.|
-   |                  | Raise a :exc:`FileExistsError` exception    |
-   |                  | if it already exists.                       |
-   +------------------+---------------------------------------------+
-   | ``'a'`` or       | Open for appending with no compression. The |
-   | ``'a:'``         | file is created if it does not exist.       |
-   +------------------+---------------------------------------------+
-   | ``'w'`` or       | Open for uncompressed writing.              |
-   | ``'w:'``         |                                             |
-   +------------------+---------------------------------------------+
-   | ``'w:gz'``       | Open for gzip compressed writing.           |
-   +------------------+---------------------------------------------+
-   | ``'w:bz2'``      | Open for bzip2 compressed writing.          |
-   +------------------+---------------------------------------------+
-   | ``'w:xz'``       | Open for lzma compressed writing.           |
-   +------------------+---------------------------------------------+
-   | ``'w:zst'``      | Open for Zstandard compressed writing.      |
-   +------------------+---------------------------------------------+
+   +------------------------+--------------------------------------------------------------------------------------------------------------------+
+   | mode                   | action                                                                                                             |
+   +========================+====================================================================================================================+
+   | ``'r'`` hoặc ``'r:*'`` | Mở để đọc với tính năng nén tự động (khuyến nghị).                                                                 |
+   +------------------------+--------------------------------------------------------------------------------------------------------------------+
+   | ``'r:'``               | Mở chỉ để đọc mà không nén.                                                                                        |
+   +------------------------+--------------------------------------------------------------------------------------------------------------------+
+   | ``'r:gz'``             | Mở để đọc với tính năng nén gzip.                                                                                  |
+   +------------------------+--------------------------------------------------------------------------------------------------------------------+
+   | ``'r:bz2'``            | Mở để đọc với tính năng nén bzip2.                                                                                 |
+   +------------------------+--------------------------------------------------------------------------------------------------------------------+
+   | ``'r:xz'``             | Mở để đọc với tính năng nén lzma.                                                                                  |
+   +------------------------+--------------------------------------------------------------------------------------------------------------------+
+   | ``'r:zst'``            | Mở để đọc với tính năng nén Zstandard.                                                                             |
+   +------------------------+--------------------------------------------------------------------------------------------------------------------+
+   | ``'x'`` hoặc ``'x:'``  | Tạo một tarfile chỉ sử dụng chế độ không nén. Phát sinh ngoại lệ :exc:`FileExistsError` nếu tarfile đó đã tồn tại. |
+   +------------------------+--------------------------------------------------------------------------------------------------------------------+
+   | ``'x:gz'``             | Tạo một tarfile với compression gzip. Phát sinh ngoại lệ :exc:`FileExistsError` nếu tarfile đó đã tồn tại.         |
+   +------------------------+--------------------------------------------------------------------------------------------------------------------+
+   | ``'x:bz2'``            | Tạo một tarfile với compression bzip2. Phát sinh ngoại lệ :exc:`FileExistsError` nếu tarfile đó đã tồn tại.        |
+   +------------------------+--------------------------------------------------------------------------------------------------------------------+
+   | ``'x:xz'``             | Tạo một tarfile với compression lzma. Phát sinh ngoại lệ :exc:`FileExistsError` nếu tarfile đó đã tồn tại.         |
+   +------------------------+--------------------------------------------------------------------------------------------------------------------+
+   | ``'x:zst'``            | Tạo một tarfile với compression Zstandard. Phát sinh ngoại lệ :exc:`FileExistsError` nếu tarfile đó đã tồn tại.    |
+   +------------------------+--------------------------------------------------------------------------------------------------------------------+
+   | ``'a'`` hoặc ``'a:'``  | Mở để ghi nối tiếp không nén. Tệp sẽ được tạo nếu chưa tồn tại.                                                    |
+   +------------------------+--------------------------------------------------------------------------------------------------------------------+
+   | ``'w'`` hoặc ``'w:'``  | Mở để ghi không nén.                                                                                               |
+   +------------------------+--------------------------------------------------------------------------------------------------------------------+
+   | ``'w:gz'``             | Mở để ghi bằng nén gzip.                                                                                           |
+   +------------------------+--------------------------------------------------------------------------------------------------------------------+
+   | ``'w:bz2'``            | Mở để ghi bằng nén bzip2.                                                                                          |
+   +------------------------+--------------------------------------------------------------------------------------------------------------------+
+   | ``'w:xz'``             | Mở để ghi bằng nén lzma.                                                                                           |
+   +------------------------+--------------------------------------------------------------------------------------------------------------------+
+   | ``'w:zst'``            | Mở để ghi bằng nén Zstandard.                                                                                      |
+   +------------------------+--------------------------------------------------------------------------------------------------------------------+
 
-   Note that ``'a:gz'``, ``'a:bz2'`` or ``'a:xz'`` is not possible. If *mode*
-   is not suitable to open a certain (compressed) file for reading,
-   :exc:`ReadError` is raised. Use *mode* ``'r'`` to avoid this.  If a
-   compression method is not supported, :exc:`CompressionError` is raised.
+   Lưu ý rằng không thể sử dụng ``'a:gz'``, ``'a:bz2'`` hoặc ``'a:xz'``. Nếu *mode* không phù hợp để mở một tệp (đã nén) nhất định ở chế độ đọc,
+   :exc:`ReadError` sẽ được phát sinh. Hãy sử dụng *mode* ``'r'`` để tránh điều này. Nếu phương thức nén không được hỗ trợ, :exc:`CompressionError` sẽ được phát sinh.
 
-   If *fileobj* is specified, it is used as an alternative to a :term:`file object`
-   opened in binary mode for *name*. It is supposed to be at position 0.
+   Nếu chỉ định *fileobj*, đối tượng này sẽ được sử dụng thay cho một :term:`file object` được mở ở chế độ nhị phân cho *name*. Đối tượng này được cho là đang ở vị trí 0.
 
-   For modes ``'w:gz'``, ``'x:gz'``, ``'w|gz'``, ``'w:bz2'``, ``'x:bz2'``,
-   ``'w|bz2'``, :func:`tarfile.open` accepts the keyword argument
-   *compresslevel* (default ``9``) to specify the compression level of the file.
+   Đối với các mode ``'w:gz'``, ``'x:gz'``, ``'w|gz'``, ``'w:bz2'``, ``'x:bz2'``, ``'w|bz2'``, :func:`tarfile.open` chấp nhận keyword argument *compresslevel* (mặc định là ``9``) để chỉ định mức nén của tệp.
 
-   For modes ``'w:xz'``, ``'x:xz'`` and ``'w|xz'``, :func:`tarfile.open` accepts the
-   keyword argument *preset* to specify the compression level of the file.
+   Đối với các mode ``'w:xz'``, ``'x:xz'`` và ``'w|xz'``, :func:`tarfile.open` chấp nhận keyword argument *preset* để chỉ định mức nén của tệp.
 
-   For modes ``'w:zst'``, ``'x:zst'`` and ``'w|zst'``, :func:`tarfile.open`
-   accepts the keyword argument *level* to specify the compression level of
-   the file. The keyword argument *options* may also be passed, providing
-   advanced Zstandard compression parameters described by
-   :class:`~compression.zstd.CompressionParameter`. The keyword argument
-   *zstd_dict* can be passed to provide a :class:`~compression.zstd.ZstdDict`,
-   a Zstandard dictionary used to improve compression of smaller amounts of
-   data.
+   Đối với các mode ``'w:zst'``, ``'x:zst'`` và ``'w|zst'``, :func:`tarfile.open` chấp nhận keyword argument *level* để chỉ định mức nén của tệp. Cũng có thể truyền keyword argument *options*, cung cấp các tham số nén Zstandard nâng cao được mô tả bởi
+   :class:`~compression.zstd.CompressionParameter`. Có thể truyền keyword argument *zstd_dict* để cung cấp một :class:`~compression.zstd.ZstdDict`, tức dictionary Zstandard được sử dụng nhằm cải thiện việc nén các lượng dữ liệu nhỏ hơn.
 
-   For special purposes, there is a second format for *mode*:
-   ``'filemode|[compression]'``.  :func:`tarfile.open` will return a :class:`TarFile`
-   object that processes its data as a stream of blocks.  No random seeking will
-   be done on the file. If given, *fileobj* may be any object that has a
-   :meth:`~io.RawIOBase.read` or :meth:`~io.RawIOBase.write` method
-   (depending on the *mode*) that works with bytes.
-   *bufsize* specifies the blocksize and defaults to ``20 * 512`` bytes.
-   Use this variant in combination with e.g. ``sys.stdin.buffer``, a socket
-   :term:`file object` or a tape device.
-   However, such a :class:`TarFile` object is limited in that it does
-   not allow random access, see :ref:`tar-examples`.  The currently
-   possible modes:
+   Vì các mục đích đặc biệt, có định dạng thứ hai cho *mode*: ``'filemode|[compression]'``. :func:`tarfile.open` sẽ trả về một đối tượng :class:`TarFile` xử lý dữ liệu dưới dạng một stream các khối. Tệp sẽ không được truy cập ngẫu nhiên. Nếu được cung cấp, *fileobj* có thể là bất kỳ đối tượng nào có một
+   :meth:`~io.RawIOBase.read` hoặc :meth:`~io.RawIOBase.write` method (tùy thuộc vào *mode*) hoạt động với bytes. *bufsize* chỉ định kích thước khối và mặc định là ``20 * 512`` byte. Sử dụng biến thể này kết hợp với, chẳng hạn như ``sys.stdin.buffer``, một socket
+   :term:`file object` hoặc thiết bị băng. Tuy nhiên, một đối tượng :class:`TarFile` như vậy bị giới hạn vì không cho phép truy cập ngẫu nhiên; xem :ref:`tar-examples`. Các mode hiện có:
 
-   +-------------+--------------------------------------------+
-   | Mode        | Action                                     |
-   +=============+============================================+
-   | ``'r|*'``   | Open a *stream* of tar blocks for reading  |
-   |             | with transparent compression.              |
-   +-------------+--------------------------------------------+
-   | ``'r|'``    | Open a *stream* of uncompressed tar blocks |
-   |             | for reading.                               |
-   +-------------+--------------------------------------------+
-   | ``'r|gz'``  | Open a gzip compressed *stream* for        |
-   |             | reading.                                   |
-   +-------------+--------------------------------------------+
-   | ``'r|bz2'`` | Open a bzip2 compressed *stream* for       |
-   |             | reading.                                   |
-   +-------------+--------------------------------------------+
-   | ``'r|xz'``  | Open an lzma compressed *stream* for       |
-   |             | reading.                                   |
-   +-------------+--------------------------------------------+
-   | ``'r|zst'`` | Open a Zstandard compressed *stream* for   |
-   |             | reading.                                   |
-   +-------------+--------------------------------------------+
-   | ``'w|'``    | Open an uncompressed *stream* for writing. |
-   +-------------+--------------------------------------------+
-   | ``'w|gz'``  | Open a gzip compressed *stream* for        |
-   |             | writing.                                   |
-   +-------------+--------------------------------------------+
-   | ``'w|bz2'`` | Open a bzip2 compressed *stream* for       |
-   |             | writing.                                   |
-   +-------------+--------------------------------------------+
-   | ``'w|xz'``  | Open an lzma compressed *stream* for       |
-   |             | writing.                                   |
-   +-------------+--------------------------------------------+
-   | ``'w|zst'`` | Open a Zstandard compressed *stream* for   |
-   |             | writing.                                   |
-   +-------------+--------------------------------------------+
+   +-------------+---------------------------------------------------------------------------+
+   | Mode        | Action                                                                    |
+   +=============+===========================================================================+
+   | ``'r|*'``   | Mở một *stream* các khối tar để đọc với tính năng compression trong suốt. |
+   +-------------+---------------------------------------------------------------------------+
+   | ``'r|'``    | Mở một *stream* các khối tar không nén để đọc.                            |
+   +-------------+---------------------------------------------------------------------------+
+   | ``'r|gz'``  | Mở một *stream* được nén bằng gzip để đọc.                                |
+   +-------------+---------------------------------------------------------------------------+
+   | ``'r|bz2'`` | Mở một *stream* được nén bằng bzip2 để đọc.                               |
+   +-------------+---------------------------------------------------------------------------+
+   | ``'r|xz'``  | Mở một *stream* được nén bằng lzma để đọc.                                |
+   +-------------+---------------------------------------------------------------------------+
+   | ``'r|zst'`` | Mở một *stream* được nén bằng Zstandard để đọc.                           |
+   +-------------+---------------------------------------------------------------------------+
+   | ``'w|'``    | Mở một *stream* không nén để ghi.                                         |
+   +-------------+---------------------------------------------------------------------------+
+   | ``'w|gz'``  | Mở một *stream* được nén bằng gzip để ghi.                                |
+   +-------------+---------------------------------------------------------------------------+
+   | ``'w|bz2'`` | Mở một *stream* được nén bằng bzip2 để ghi.                               |
+   +-------------+---------------------------------------------------------------------------+
+   | ``'w|xz'``  | Mở một *luồng* nén lzma để ghi.                                           |
+   +-------------+---------------------------------------------------------------------------+
+   | ``'w|zst'`` | Mở một *luồng* nén Zstandard để ghi.                                      |
+   +-------------+---------------------------------------------------------------------------+
 
    .. versionchanged:: 3.5
-      The ``'x'`` (exclusive creation) mode was added.
+      Đã bổ sung chế độ ``'x'`` (tạo độc quyền).
 
    .. versionchanged:: 3.6
-      The *name* parameter accepts a :term:`path-like object`.
+      Tham số *name* chấp nhận một :term:`path-like object`.
 
    .. versionchanged:: 3.12
-      The *compresslevel* keyword argument also works for streams.
+      Đối số từ khóa *compresslevel* cũng hoạt động với các luồng.
 
    .. versionchanged:: 3.14
-      The *preset* keyword argument also works for streams.
+      Đối số từ khóa *preset* cũng hoạt động với các luồng.
 
 
 .. class:: TarFile
    :noindex:
 
-   Class for reading and writing tar archives. Do not use this class directly:
-   use :func:`tarfile.open` instead. See :ref:`tarfile-objects`.
+   Lớp dùng để đọc và ghi các kho lưu trữ tar. Không sử dụng trực tiếp lớp này: thay vào đó, hãy sử dụng :func:`tarfile.open`. Xem :ref:`tarfile-objects`.
 
 
 .. function:: is_tarfile(name)
 
-   Return :const:`True` if *name* is a tar archive file, that the :mod:`!tarfile`
-   module can read. *name* may be a :class:`str`, file, or file-like object.
+   Trả về :const:`True` nếu *name* là một tệp tar archive mà module :mod:`!tarfile` có thể đọc. *name* có thể là một :class:`str`, tệp hoặc đối tượng giống tệp.
 
    .. versionchanged:: 3.9
-      Support for file and file-like objects.
+      Hỗ trợ các đối tượng tệp và giống tệp.
 
 
-The :mod:`!tarfile` module defines the following exceptions:
+Module :mod:`!tarfile` định nghĩa các ngoại lệ sau:
 
 
 .. exception:: TarError
 
-   Base class for all :mod:`!tarfile` exceptions.
+   Lớp cơ sở cho tất cả các ngoại lệ :mod:`!tarfile`.
 
 
 .. exception:: ReadError
 
-   Is raised when a tar archive is opened, that either cannot be handled by the
-   :mod:`!tarfile` module or is somehow invalid.
+   Được phát sinh khi một tar archive được mở nhưng không thể được xử lý bởi
+   module :mod:`!tarfile` hoặc không hợp lệ vì lý do nào đó.
 
 
 .. exception:: CompressionError
 
-   Is raised when a compression method is not supported or when the data cannot be
-   decoded properly.
+   Được phát sinh khi một phương thức nén không được hỗ trợ hoặc khi dữ liệu không thể được giải mã đúng cách.
 
 
 .. exception:: StreamError
 
-   Is raised for the limitations that are typical for stream-like :class:`TarFile`
-   objects.
+   Được phát sinh đối với các giới hạn thường gặp ở các đối tượng :class:`TarFile` dạng stream.
 
 
 .. exception:: ExtractError
 
-   Is raised for *non-fatal* errors when using :meth:`TarFile.extract`, but only if
+   Được phát sinh đối với các lỗi *không nghiêm trọng* khi sử dụng :meth:`TarFile.extract`, nhưng chỉ khi
    :attr:`TarFile.errorlevel`\ ``== 2``.
 
 
 .. exception:: HeaderError
 
-   Is raised by :meth:`TarInfo.frombuf` if the buffer it gets is invalid.
+   Được :meth:`TarInfo.frombuf` phát sinh nếu bộ đệm nhận được không hợp lệ.
 
 
 .. exception:: FilterError
 
-   Base class for members :ref:`refused <tarfile-extraction-refuse>` by
-   filters.
+   Lớp cơ sở cho các mục :ref:`bị bộ lọc từ chối <tarfile-extraction-refuse>`.
 
    .. attribute:: tarinfo
 
-      Information about the member that the filter refused to extract,
-      as :ref:`TarInfo <tarinfo-objects>`.
+      Thông tin về mục mà bộ lọc từ chối giải nén, dưới dạng :ref:`TarInfo <tarinfo-objects>`.
 
 .. exception:: AbsolutePathError
 
-   Raised to refuse extracting a member with an absolute path.
+   Được phát sinh để từ chối giải nén một mục có đường dẫn tuyệt đối.
 
 .. exception:: OutsideDestinationError
 
-   Raised to refuse extracting a member outside the destination directory.
+   Được phát sinh để từ chối giải nén một mục nằm ngoài thư mục đích.
 
 .. exception:: SpecialFileError
 
-   Raised to refuse extracting a special file (e.g. a device or pipe).
+   Được phát sinh khi từ chối giải nén một tệp đặc biệt (ví dụ: thiết bị hoặc pipe).
 
 .. exception:: AbsoluteLinkError
 
-   Raised to refuse extracting a symbolic link with an absolute path.
+   Được phát sinh khi từ chối giải nén một symbolic link có đường dẫn tuyệt đối.
 
 .. exception:: LinkOutsideDestinationError
 
-   Raised to refuse extracting a symbolic link pointing outside the destination
-   directory.
+   Được phát sinh khi từ chối giải nén một symbolic link trỏ ra ngoài thư mục đích.
 
 .. exception:: LinkFallbackError
 
-   Raised to refuse emulating a link (hard or symbolic) by extracting another
-   archive member, when that member would be rejected by the filter location.
-   The exception that was raised to reject the replacement member is available
-   as :attr:`!BaseException.__context__`.
+   Được phát sinh khi từ chối mô phỏng một liên kết (cứng hoặc symbolic) bằng cách giải nén một thành viên khác trong archive, khi thành viên đó bị bộ lọc tại vị trí đích từ chối. Ngoại lệ được phát sinh để từ chối thành viên thay thế có sẵn trong :attr:`!BaseException.__context__`.
 
    .. versionadded:: 3.14
 
 
-The following constants are available at the module level:
+Các hằng số sau có sẵn ở cấp module:
 
 .. data:: ENCODING
 
-   The default character encoding: ``'utf-8'`` on Windows, the value returned by
-   :func:`sys.getfilesystemencoding` otherwise.
+   Encoding ký tự mặc định: ``'utf-8'`` trên Windows, giá trị do
+   :func:`sys.getfilesystemencoding` trả về trong các trường hợp khác.
 
 .. data:: REGTYPE
           AREGTYPE
 
-   A regular file :attr:`~TarInfo.type`.
+   Một tệp thông thường :attr:`~TarInfo.type`.
 
 .. data:: LNKTYPE
 
-   A link (inside tarfile) :attr:`~TarInfo.type`.
+   Một liên kết (bên trong tarfile) :attr:`~TarInfo.type`.
 
 .. data:: SYMTYPE
 
-   A symbolic link :attr:`~TarInfo.type`.
+   Một symbolic link :attr:`~TarInfo.type`.
 
 .. data:: CHRTYPE
 
-   A character special device :attr:`~TarInfo.type`.
+   Một thiết bị đặc biệt dạng ký tự :attr:`~TarInfo.type`.
 
 .. data:: BLKTYPE
 
-   A block special device :attr:`~TarInfo.type`.
+   Một thiết bị đặc biệt dạng khối :attr:`~TarInfo.type`.
 
 .. data:: DIRTYPE
 
-   A directory :attr:`~TarInfo.type`.
+   Một thư mục :attr:`~TarInfo.type`.
 
 .. data:: FIFOTYPE
 
-   A FIFO special device :attr:`~TarInfo.type`.
+   Một thiết bị đặc biệt FIFO :attr:`~TarInfo.type`.
 
 .. data:: CONTTYPE
 
-   A contiguous file :attr:`~TarInfo.type`.
+   Một tệp liền mạch :attr:`~TarInfo.type`.
 
 .. data:: GNUTYPE_LONGNAME
 
-   A GNU tar longname :attr:`~TarInfo.type`.
+   Một longname của GNU tar :attr:`~TarInfo.type`.
 
 .. data:: GNUTYPE_LONGLINK
 
-   A GNU tar longlink :attr:`~TarInfo.type`.
+   Một longlink của GNU tar :attr:`~TarInfo.type`.
 
 .. data:: GNUTYPE_SPARSE
 
-   A GNU tar sparse file :attr:`~TarInfo.type`.
+   Một tệp sparse của GNU tar :attr:`~TarInfo.type`.
 
 
-Each of the following constants defines a tar archive format that the
-:mod:`!tarfile` module is able to create. See section :ref:`tar-formats` for
-details.
+Mỗi hằng số sau đây xác định một định dạng kho lưu trữ tar mà
+mô-đun :mod:`!tarfile` có thể tạo. Xem phần :ref:`tar-formats` để biết chi tiết.
 
 
 .. data:: USTAR_FORMAT
 
-   POSIX.1-1988 (ustar) format.
+   Định dạng POSIX.1-1988 (ustar).
 
 
 .. data:: GNU_FORMAT
 
-   GNU tar format.
+   Định dạng GNU tar.
 
 
 .. data:: PAX_FORMAT
 
-   POSIX.1-2001 (pax) format.
+   Định dạng POSIX.1-2001 (pax).
 
 
 .. data:: DEFAULT_FORMAT
 
-   The default format for creating archives. This is currently :const:`PAX_FORMAT`.
+   Định dạng mặc định để tạo các kho lưu trữ. Hiện tại, đây là :const:`PAX_FORMAT`.
 
    .. versionchanged:: 3.8
-      The default format for new archives was changed to
-      :const:`PAX_FORMAT` from :const:`GNU_FORMAT`.
+      Định dạng mặc định cho các kho lưu trữ mới đã được thay đổi thành
+      :const:`PAX_FORMAT` từ :const:`GNU_FORMAT`.
 
 
 .. seealso::
 
-   Module :mod:`zipfile`
-      Documentation of the :mod:`zipfile` standard module.
+   Mô-đun :mod:`zipfile`
+      Tài liệu về mô-đun tiêu chuẩn :mod:`zipfile`.
 
    :ref:`archiving-operations`
-      Documentation of the higher-level archiving facilities provided by the
-      standard :mod:`shutil` module.
+      Tài liệu về các tiện ích lưu trữ cấp cao hơn do mô-đun tiêu chuẩn :mod:`shutil` cung cấp.
 
-   `GNU tar manual, Basic Tar Format <https://www.gnu.org/software/tar/manual/html_node/Standard.html>`_
-      Documentation for tar archive files, including GNU tar extensions.
+   `Sổ tay GNU tar, Định dạng Tar cơ bản <https://www.gnu.org/software/tar/manual/html_node/Standard.html>`_
+      Tài liệu về các tệp lưu trữ tar, bao gồm các phần mở rộng của GNU tar.
 
 
 .. _tarfile-objects:
 
-TarFile Objects
----------------
+Đối tượng TarFile
+-----------------
 
-The :class:`TarFile` object provides an interface to a tar archive. A tar
-archive is a sequence of blocks. An archive member (a stored file) is made up of
-a header block followed by data blocks. It is possible to store a file in a tar
-archive several times. Each archive member is represented by a :class:`TarInfo`
-object, see :ref:`tarinfo-objects` for details.
+Đối tượng :class:`TarFile` cung cấp giao diện cho một kho lưu trữ tar. Một kho lưu trữ tar là một chuỗi các khối. Một thành viên của kho lưu trữ (một tệp được lưu trữ) gồm một khối tiêu đề theo sau là các khối dữ liệu. Có thể lưu một tệp trong kho lưu trữ tar nhiều lần. Mỗi thành viên của kho lưu trữ được biểu diễn bằng một đối tượng :class:`TarInfo`; xem :ref:`tarinfo-objects` để biết chi tiết.
 
-A :class:`TarFile` object can be used as a context manager in a :keyword:`with`
-statement. It will automatically be closed when the block is completed. Please
-note that in the event of an exception an archive opened for writing will not
-be finalized; only the internally used file object will be closed. See the
-:ref:`tar-examples` section for a use case.
+Có thể sử dụng đối tượng :class:`TarFile` làm context manager trong câu lệnh :keyword:`with`. Đối tượng này sẽ tự động được đóng khi khối lệnh hoàn tất. Lưu ý rằng trong trường hợp xảy ra ngoại lệ, kho lưu trữ được mở để ghi sẽ không được hoàn tất; chỉ đối tượng tệp được sử dụng nội bộ mới được đóng. Xem
+:ref:`tar-examples` phần dành cho một trường hợp sử dụng.
 
 .. versionadded:: 3.2
-   Added support for the context management protocol.
+   Đã bổ sung hỗ trợ cho context management protocol.
 
 .. class:: TarFile(name=None, mode='r', fileobj=None, format=DEFAULT_FORMAT, tarinfo=TarInfo, dereference=False, ignore_zeros=False, encoding=ENCODING, errors='surrogateescape', pax_headers=None, debug=0, errorlevel=1, stream=False)
 
-   All following arguments are optional and can be accessed as instance attributes
-   as well.
+   Tất cả các đối số sau đây đều là tùy chọn và cũng có thể được truy cập dưới dạng thuộc tính của instance.
 
-   *name* is the pathname of the archive. *name* may be a :term:`path-like object`.
-   It can be omitted if *fileobj* is given.
-   In this case, the file object's :attr:`!name` attribute is used if it exists.
+   *name* là đường dẫn của archive. *name* có thể là một :term:`path-like object`. Có thể bỏ qua đối số này nếu cung cấp *fileobj*. Trong trường hợp đó, thuộc tính :attr:`!name` của đối tượng tệp sẽ được sử dụng nếu thuộc tính này tồn tại.
 
-   *mode* is either ``'r'`` to read from an existing archive, ``'a'`` to append
-   data to an existing file, ``'w'`` to create a new file overwriting an existing
-   one, or ``'x'`` to create a new file only if it does not already exist.
+   *mode* có thể là ``'r'`` để đọc từ một archive hiện có, ``'a'`` để nối dữ liệu vào một tệp hiện có, ``'w'`` để tạo một tệp mới và ghi đè tệp hiện có, hoặc ``'x'`` để chỉ tạo một tệp mới nếu tệp đó chưa tồn tại.
 
-   If *fileobj* is given, it is used for reading or writing data. If it can be
-   determined, *mode* is overridden by *fileobj*'s mode. *fileobj* will be used
-   from position 0.
+   Nếu cung cấp *fileobj*, đối tượng này sẽ được dùng để đọc hoặc ghi dữ liệu. Nếu xác định được, *mode* sẽ được ghi đè bằng chế độ của *fileobj*. *fileobj* sẽ được sử dụng từ vị trí 0.
 
    .. note::
 
-      *fileobj* is not closed, when :class:`TarFile` is closed.
+      *fileobj* không bị đóng khi :class:`TarFile` được đóng.
 
-   *format* controls the archive format for writing. It must be one of the constants
-   :const:`USTAR_FORMAT`, :const:`GNU_FORMAT` or :const:`PAX_FORMAT` that are
-   defined at module level. When reading, format will be automatically detected, even
-   if different formats are present in a single archive.
+   *format* kiểm soát định dạng lưu trữ khi ghi. Nó phải là một trong các hằng số
+   :const:`USTAR_FORMAT`, :const:`GNU_FORMAT` hoặc :const:`PAX_FORMAT` được định nghĩa ở cấp mô-đun. Khi đọc, định dạng sẽ được tự động phát hiện, ngay cả khi có nhiều định dạng khác nhau trong cùng một kho lưu trữ.
 
-   The *tarinfo* argument can be used to replace the default :class:`TarInfo` class
-   with a different one.
+   Đối số *tarinfo* có thể được dùng để thay thế lớp :class:`TarInfo` mặc định bằng một lớp khác.
 
-   If *dereference* is :const:`False`, add symbolic and hard links to the archive. If it
-   is :const:`True`, add the content of the target files to the archive. This has no
-   effect on systems that do not support symbolic links.
+   Nếu *dereference* là :const:`False`, hãy thêm các liên kết tượng trưng và liên kết cứng vào kho lưu trữ. Nếu là :const:`True`, hãy thêm nội dung của các tệp đích vào kho lưu trữ. Điều này không có tác dụng trên các hệ thống không hỗ trợ liên kết tượng trưng.
 
-   If *ignore_zeros* is :const:`False`, treat an empty block as the end of the archive.
-   If it is :const:`True`, skip empty (and invalid) blocks and try to get as many members
-   as possible. This is only useful for reading concatenated or damaged archives.
+   Nếu *ignore_zeros* là :const:`False`, hãy xem một khối trống là phần kết thúc của kho lưu trữ. Nếu là :const:`True`, hãy bỏ qua các khối trống (và không hợp lệ) rồi cố lấy được nhiều thành viên nhất có thể. Điều này chỉ hữu ích khi đọc các kho lưu trữ được nối hoặc bị hỏng.
 
-   *debug* can be set from ``0`` (no debug messages) up to ``3`` (all debug
-   messages). The messages are written to ``sys.stderr``.
+   *debug* có thể được đặt từ ``0`` (không có thông báo debug) đến ``3`` (tất cả thông báo debug). Các thông báo được ghi vào ``sys.stderr``.
 
-   *errorlevel* controls how extraction errors are handled,
-   see :attr:`the corresponding attribute <TarFile.errorlevel>`.
+   *errorlevel* kiểm soát cách xử lý các lỗi khi giải nén, xem :attr:`the corresponding attribute <TarFile.errorlevel>`.
 
-   The *encoding* and *errors* arguments define the character encoding to be
-   used for reading or writing the archive and how conversion errors are going
-   to be handled. The default settings will work for most users.
-   See section :ref:`tar-unicode` for in-depth information.
+   Các đối số *encoding* và *errors* xác định encoding ký tự được sử dụng để đọc hoặc ghi archive, cũng như cách xử lý các lỗi chuyển đổi. Các thiết lập mặc định sẽ phù hợp với hầu hết người dùng. Xem phần :ref:`tar-unicode` để biết thông tin chuyên sâu.
 
-   The *pax_headers* argument is an optional dictionary of strings which
-   will be added as a pax global header if *format* is :const:`PAX_FORMAT`.
+   Đối số *pax_headers* là một dictionary tùy chọn gồm các chuỗi, được thêm dưới dạng global header pax nếu *format* là :const:`PAX_FORMAT`.
 
-   If *stream* is set to :const:`True` then while reading the archive info about files
-   in the archive are not cached, saving memory.
+   Nếu *stream* được đặt thành :const:`True`, thì trong khi đọc archive, thông tin về các tệp trong archive sẽ không được lưu vào bộ nhớ đệm, giúp tiết kiệm bộ nhớ.
 
    .. versionchanged:: 3.2
-      Use ``'surrogateescape'`` as the default for the *errors* argument.
+      Sử dụng ``'surrogateescape'`` làm giá trị mặc định cho đối số *errors*.
 
    .. versionchanged:: 3.5
-      The ``'x'`` (exclusive creation) mode was added.
+      Chế độ ``'x'`` (tạo độc quyền) đã được thêm vào.
 
    .. versionchanged:: 3.6
-      The *name* parameter accepts a :term:`path-like object`.
+      Tham số *name* chấp nhận một :term:`path-like object`.
 
    .. versionchanged:: 3.13
-      Add the *stream* parameter.
+      Thêm tham số *stream*.
 
 .. classmethod:: TarFile.open(...)
 
-   Alternative constructor. The :func:`tarfile.open` function is actually a
-   shortcut to this classmethod.
+   Hàm khởi tạo thay thế. Hàm :func:`tarfile.open` thực chất là cách viết tắt cho classmethod này.
 
 
 .. method:: TarFile.getmember(name)
 
-   Return a :class:`TarInfo` object for member *name*. If *name* can not be found
-   in the archive, :exc:`KeyError` is raised.
+   Trả về một đối tượng :class:`TarInfo` cho thành viên *name*. Nếu không tìm thấy *name* trong archive, :exc:`KeyError` sẽ được ném ra.
 
    .. note::
 
-      If a member occurs more than once in the archive, its last occurrence is assumed
-      to be the most up-to-date version.
+      Nếu một thành viên xuất hiện nhiều hơn một lần trong archive, lần xuất hiện cuối cùng được xem là phiên bản cập nhật mới nhất.
 
 
 .. method:: TarFile.getmembers()
 
-   Return the members of the archive as a list of :class:`TarInfo` objects. The
-   list has the same order as the members in the archive.
+   Trả về các thành viên của archive dưới dạng danh sách các đối tượng :class:`TarInfo`. Danh sách có cùng thứ tự với các thành viên trong archive.
 
 
 .. method:: TarFile.getnames()
 
-   Return the members as a list of their names. It has the same order as the list
-   returned by :meth:`getmembers`.
+   Trả về các thành viên dưới dạng danh sách tên của chúng. Danh sách này có cùng thứ tự với danh sách được trả về bởi :meth:`getmembers`.
 
 
 .. method:: TarFile.list(verbose=True, *, members=None)
 
-   Print a table of contents to ``sys.stdout``. If *verbose* is :const:`False`,
-   only the names of the members are printed. If it is :const:`True`, output
-   similar to that of :program:`ls -l` is produced. If optional *members* is
-   given, it must be a subset of the list returned by :meth:`getmembers`.
+   In mục lục vào ``sys.stdout``. Nếu *verbose* là :const:`False`, chỉ tên của các thành viên được in. Nếu là :const:`True`, đầu ra tương tự :program:`ls -l` sẽ được tạo ra. Nếu cung cấp *members* tùy chọn, nó phải là tập con của danh sách được trả về bởi :meth:`getmembers`.
 
    .. versionchanged:: 3.5
-      Added the *members* parameter.
+      Đã thêm tham số *members*.
 
 
 .. method:: TarFile.next()
 
-   Return the next member of the archive as a :class:`TarInfo` object, when
-   :class:`TarFile` is opened for reading. Return :const:`None` if there is no more
-   available.
+   Trả về thành viên tiếp theo của kho lưu trữ dưới dạng đối tượng :class:`TarInfo`, khi
+   :class:`TarFile` được mở để đọc. Trả về :const:`None` nếu không còn thành viên nào.
 
 
 .. method:: TarFile.extractall(path=".", members=None, *, numeric_owner=False, filter=None)
 
-   Extract all members from the archive to the current working directory or
-   directory *path*. If optional *members* is given, it must be a subset of the
-   list returned by :meth:`getmembers`. Directory information like owner,
-   modification time and permissions are set after all members have been extracted.
-   This is done to work around two problems: A directory's modification time is
-   reset each time a file is created in it. And, if a directory's permissions do
-   not allow writing, extracting files to it will fail.
+   Giải nén tất cả thành viên từ kho lưu trữ vào thư mục làm việc hiện tại hoặc thư mục *path*. Nếu cung cấp *members* tùy chọn, nó phải là một tập con của danh sách do :meth:`getmembers` trả về. Thông tin thư mục như chủ sở hữu, thời gian sửa đổi và quyền được thiết lập sau khi tất cả thành viên đã được giải nén. Cách này nhằm khắc phục hai vấn đề: Thời gian sửa đổi của thư mục được đặt lại mỗi khi một tệp được tạo trong đó. Ngoài ra, nếu quyền của thư mục không cho phép ghi, việc giải nén tệp vào đó sẽ thất bại.
 
-   If *numeric_owner* is :const:`True`, the uid and gid numbers from the tarfile
-   are used to set the owner/group for the extracted files. Otherwise, the named
-   values from the tarfile are used.
+   Nếu *numeric_owner* là :const:`True`, các số uid và gid từ tarfile sẽ được dùng để thiết lập chủ sở hữu/nhóm cho các tệp được giải nén. Nếu không, các giá trị dạng tên từ tarfile sẽ được dùng.
 
-   The *filter* argument specifies how ``members`` are modified or rejected
-   before extraction.
-   See :ref:`tarfile-extraction-filter` for details.
-   It is recommended to set this explicitly only if specific *tar* features
-   are required, or as ``filter='data'`` to support Python versions with a less
-   secure default (3.13 and lower).
+   Đối số *filter* chỉ định cách các ``members`` được sửa đổi hoặc từ chối trước khi giải nén. Xem :ref:`tarfile-extraction-filter` để biết chi tiết. Bạn chỉ nên thiết lập rõ ràng đối số này nếu cần các tính năng cụ thể của *tar*, hoặc đặt thành ``filter='data'`` để hỗ trợ các phiên bản Python có giá trị mặc định kém an toàn hơn (3.13 trở xuống).
 
    .. warning::
 
-      Never extract archives from untrusted sources without prior inspection.
+      Không bao giờ giải nén kho lưu trữ từ các nguồn không đáng tin cậy mà chưa kiểm tra trước.
 
-      Since Python 3.14, the default (:func:`data <data_filter>`) will prevent
-      the most dangerous security issues.
-      However, it will not prevent *all* unintended or insecure behavior.
-      Read the :ref:`tarfile-extraction-filter` section for details.
+      Kể từ Python 3.14, giá trị mặc định (:func:`data <data_filter>`) sẽ ngăn chặn những vấn đề bảo mật nguy hiểm nhất. Tuy nhiên, nó sẽ không ngăn chặn *all* hành vi ngoài ý muốn hoặc không an toàn. Đọc phần :ref:`tarfile-extraction-filter` để biết chi tiết.
 
    .. versionchanged:: 3.5
-      Added the *numeric_owner* parameter.
+      Đã thêm tham số *numeric_owner*.
 
    .. versionchanged:: 3.6
-      The *path* parameter accepts a :term:`path-like object`.
+      Tham số *path* chấp nhận một :term:`path-like object`.
 
    .. versionchanged:: 3.12
-      Added the *filter* parameter.
+      Đã thêm tham số *filter*.
 
    .. versionchanged:: 3.14
-      The *filter* parameter now defaults to ``'data'``.
+      Tham số *filter* hiện mặc định là ``'data'``.
 
 
 .. method:: TarFile.extract(member, path="", set_attrs=True, *, numeric_owner=False, filter=None)
 
-   Extract a member from the archive to the current working directory, using its
-   full name. Its file information is extracted as accurately as possible. *member*
-   may be a filename or a :class:`TarInfo` object. You can specify a different
-   directory using *path*. *path* may be a :term:`path-like object`.
-   File attributes (owner, mtime, mode) are set unless *set_attrs* is false.
+   Trích xuất một thành viên từ kho lưu trữ vào thư mục làm việc hiện tại bằng tên đầy đủ của thành viên đó. Thông tin tệp được trích xuất chính xác nhất có thể. *member* có thể là tên tệp hoặc một đối tượng :class:`TarInfo`. Bạn có thể chỉ định một thư mục khác bằng *path*. *path* có thể là một :term:`path-like object`. Các thuộc tính tệp (chủ sở hữu, mtime, mode) được thiết lập trừ khi *set_attrs* là false.
 
-   The *numeric_owner* and *filter* arguments are the same as
-   for :meth:`extractall`.
+   Các đối số *numeric_owner* và *filter* giống như đối số của :meth:`extractall`.
 
    .. note::
 
-      The :meth:`extract` method does not take care of several extraction issues.
-      In most cases you should consider using the :meth:`extractall` method.
+      Phương thức :meth:`extract` không xử lý một số vấn đề khi trích xuất. Trong hầu hết các trường hợp, bạn nên cân nhắc sử dụng phương thức :meth:`extractall`.
 
    .. warning::
 
-      Never extract archives from untrusted sources without prior inspection.
-      See the warning for :meth:`extractall` for details.
+      Không bao giờ giải nén các archive từ nguồn không đáng tin cậy nếu chưa kiểm tra trước. Xem cảnh báo về :meth:`extractall` để biết chi tiết.
 
    .. versionchanged:: 3.2
-      Added the *set_attrs* parameter.
+      Đã thêm tham số *set_attrs*.
 
    .. versionchanged:: 3.5
-      Added the *numeric_owner* parameter.
+      Đã thêm tham số *numeric_owner*.
 
    .. versionchanged:: 3.6
-      The *path* parameter accepts a :term:`path-like object`.
+      Tham số *path* chấp nhận một :term:`path-like object`.
 
    .. versionchanged:: 3.12
-      Added the *filter* parameter.
+      Đã thêm tham số *filter*.
 
 
 .. method:: TarFile.extractfile(member)
 
-   Extract a member from the archive as a file object. *member* may be
-   a filename or a :class:`TarInfo` object. If *member* is a regular file or
-   a link, an :class:`io.BufferedReader` object is returned. For all other
-   existing members, :const:`None` is returned. If *member* does not appear
-   in the archive, :exc:`KeyError` is raised.
+   Trích xuất một thành viên từ archive dưới dạng file object. *member* có thể là tên tệp hoặc một đối tượng :class:`TarInfo`. Nếu *member* là tệp thông thường hoặc liên kết, một đối tượng :class:`io.BufferedReader` sẽ được trả về. Với tất cả các thành viên hiện có khác, :const:`None` được trả về. Nếu *member* không xuất hiện trong archive, :exc:`KeyError` sẽ được nêu.
 
    .. versionchanged:: 3.3
-      Return an :class:`io.BufferedReader` object.
+      Trả về một đối tượng :class:`io.BufferedReader`.
 
    .. versionchanged:: 3.13
-      The returned :class:`io.BufferedReader` object has the :attr:`!mode`
-      attribute which is always equal to ``'rb'``.
+      Đối tượng :class:`io.BufferedReader` được trả về có thuộc tính :attr:`!mode`, luôn bằng ``'rb'``.
 
 .. attribute:: TarFile.errorlevel
    :type: int
 
-   If *errorlevel* is ``0``, errors are ignored when using :meth:`TarFile.extract`
-   and :meth:`TarFile.extractall`.
-   Nevertheless, they appear as error messages in the debug output when
-   *debug* is greater than 0.
-   If ``1`` (the default), all *fatal* errors are raised as :exc:`OSError` or
-   :exc:`FilterError` exceptions. If ``2``, all *non-fatal* errors are raised
-   as :exc:`TarError` exceptions as well.
+   Nếu *errorlevel* là ``0``, các lỗi sẽ bị bỏ qua khi sử dụng :meth:`TarFile.extract` và :meth:`TarFile.extractall`. Tuy nhiên, chúng xuất hiện dưới dạng thông báo lỗi trong đầu ra gỡ lỗi khi *debug* lớn hơn 0. Nếu ``1`` (giá trị mặc định), tất cả các lỗi *fatal* đều được phát sinh dưới dạng :exc:`OSError` hoặc
+   :exc:`FilterError` ngoại lệ. Nếu ``2``, tất cả các lỗi *non-fatal* cũng được phát sinh dưới dạng ngoại lệ :exc:`TarError`.
 
-   Some exceptions, e.g. ones caused by wrong argument types or data
-   corruption, are always raised.
+   Một số ngoại lệ, chẳng hạn như các ngoại lệ do kiểu đối số không đúng hoặc dữ liệu bị hỏng, luôn được phát sinh.
 
-   Custom :ref:`extraction filters <tarfile-extraction-filter>`
-   should raise :exc:`FilterError` for *fatal* errors
-   and :exc:`ExtractError` for *non-fatal* ones.
+   Các :ref:`extraction filters <tarfile-extraction-filter>` tùy chỉnh nên phát sinh :exc:`FilterError` đối với các lỗi *fatal* và :exc:`ExtractError` đối với các lỗi *non-fatal*.
 
-   Note that when an exception is raised, the archive may be partially
-   extracted. It is the user’s responsibility to clean up.
+   Lưu ý rằng khi một ngoại lệ được phát sinh, kho lưu trữ có thể đã được giải nén một phần. Người dùng có trách nhiệm dọn dẹp.
 
 .. attribute:: TarFile.extraction_filter
 
    .. versionadded:: 3.12
 
-   The :ref:`extraction filter <tarfile-extraction-filter>` used
-   as a default for the *filter* argument of :meth:`~TarFile.extract`
-   and :meth:`~TarFile.extractall`.
+   :ref:`extraction filter <tarfile-extraction-filter>` được sử dụng làm giá trị mặc định cho đối số *filter* của :meth:`~TarFile.extract` và :meth:`~TarFile.extractall`.
 
-   The attribute may be ``None`` or a callable.
-   String names are not allowed for this attribute, unlike the *filter*
-   argument to :meth:`~TarFile.extract`.
+   Thuộc tính này có thể là ``None`` hoặc một callable. Không cho phép tên chuỗi đối với thuộc tính này, không giống như đối số *filter* của :meth:`~TarFile.extract`.
 
-   If ``extraction_filter`` is ``None`` (the default), extraction methods
-   will use the :func:`data <data_filter>` filter by default.
+   Nếu ``extraction_filter`` là ``None`` (giá trị mặc định), các phương thức extraction sẽ mặc định sử dụng bộ lọc :func:`data <data_filter>`.
 
-   The attribute may be set on instances or overridden in subclasses.
-   It also is possible to set it on the ``TarFile`` class itself to set a
-   global default, although, since it affects all uses of *tarfile*,
-   it is best practice to only do so in top-level applications or
-   :mod:`site configuration <site>`.
-   To set a global default this way, a filter function needs to be wrapped in
-   :deco:`staticmethod` to prevent injection of a ``self`` argument.
+   Có thể đặt thuộc tính này trên các instance hoặc ghi đè trong các subclass. Bạn cũng có thể đặt thuộc tính này trên chính lớp ``TarFile`` để thiết lập giá trị mặc định trên toàn cục. Tuy nhiên, vì nó ảnh hưởng đến mọi lần sử dụng *tarfile*, cách tốt nhất là chỉ thực hiện việc này trong các ứng dụng cấp cao nhất hoặc
+   :mod:`site configuration <site>`. Để thiết lập giá trị mặc định trên toàn cục theo cách này, cần bọc một hàm filter trong
+   :deco:`staticmethod` để ngăn việc chèn một đối số ``self``.
 
    .. versionchanged:: 3.14
 
-      The default filter is set to :func:`data <data_filter>`,
-      which disallows some dangerous features such as links to absolute paths
-      or paths outside of the destination.
-      Previously, the default was equivalent to
+      Bộ lọc mặc định được đặt thành :func:`data <data_filter>`, bộ lọc này không cho phép một số tính năng nguy hiểm, chẳng hạn như liên kết đến các đường dẫn tuyệt đối hoặc các đường dẫn nằm ngoài đích. Trước đây, giá trị mặc định tương đương với
       :func:`fully_trusted <fully_trusted_filter>`.
 
 .. method:: TarFile.add(name, arcname=None, recursive=True, *, filter=None)
 
-   Add the file *name* to the archive. *name* may be any type of file
-   (directory, fifo, symbolic link, etc.). If given, *arcname* specifies an
-   alternative name for the file in the archive. Directories are added
-   recursively by default. This can be avoided by setting *recursive* to
-   :const:`False`. Recursion adds entries in sorted order.
-   If *filter* is given, it
-   should be a function that takes a :class:`TarInfo` object argument and
-   returns the changed :class:`TarInfo` object. If it instead returns
-   :const:`None` the :class:`TarInfo` object will be excluded from the
-   archive. See :ref:`tar-examples` for an example.
+   Thêm tệp *name* vào archive. *name* có thể là bất kỳ loại tệp nào (thư mục, fifo, symbolic link, v.v.). Nếu được cung cấp, *arcname* chỉ định một tên thay thế cho tệp trong archive. Theo mặc định, các thư mục được thêm đệ quy. Có thể tránh điều này bằng cách đặt *recursive* thành
+   :const:`False`. Việc đệ quy thêm các mục theo thứ tự đã sắp xếp. Nếu cung cấp *filter*, thì đó phải là một hàm nhận đối số là đối tượng :class:`TarInfo` và trả về đối tượng :class:`TarInfo` đã thay đổi. Nếu thay vào đó hàm trả về
+   :const:`None` đối tượng :class:`TarInfo` sẽ bị loại khỏi archive. Xem :ref:`tar-examples` để biết ví dụ.
 
    .. versionchanged:: 3.2
-      Added the *filter* parameter.
+      Đã thêm tham số *filter*.
 
    .. versionchanged:: 3.7
-      Recursion adds entries in sorted order.
+      Việc đệ quy thêm các mục theo thứ tự đã sắp xếp.
 
 
 .. method:: TarFile.addfile(tarinfo, fileobj=None)
 
-   Add the :class:`TarInfo` object *tarinfo* to the archive. If *tarinfo* represents
-   a non zero-size regular file, the *fileobj* argument should be a :term:`binary file`,
-   and ``tarinfo.size`` bytes are read from it and added to the archive.  You can
-   create :class:`TarInfo` objects directly, or by using :meth:`gettarinfo`.
+   Thêm đối tượng :class:`TarInfo` *tarinfo* vào archive. Nếu *tarinfo* đại diện cho một tệp thông thường có kích thước khác 0, đối số *fileobj* phải là một :term:`binary file`, và ``tarinfo.size`` byte sẽ được đọc từ đó rồi thêm vào archive. Bạn có thể tạo trực tiếp các đối tượng :class:`TarInfo`, hoặc sử dụng :meth:`gettarinfo`.
 
    .. versionchanged:: 3.13
 
-      *fileobj* must be given for non-zero-sized regular files.
+      Phải cung cấp *fileobj* cho các tệp thông thường có kích thước khác 0.
 
 
 .. method:: TarFile.gettarinfo(name=None, arcname=None, fileobj=None)
 
-   Create a :class:`TarInfo` object from the result of :func:`os.stat` or
-   equivalent on an existing file.  The file is either named by *name*, or
-   specified as a :term:`file object` *fileobj* with a file descriptor.
-   *name* may be a :term:`path-like object`.  If
-   given, *arcname* specifies an alternative name for the file in the
-   archive, otherwise, the name is taken from *fileobj*’s
-   :attr:`~io.FileIO.name` attribute, or the *name* argument.  The name
-   should be a text string.
+   Tạo một đối tượng :class:`TarInfo` từ kết quả của :func:`os.stat` hoặc tương đương trên một tệp hiện có. Tệp được đặt tên bằng *name*, hoặc được chỉ định dưới dạng :term:`file object` *fileobj* có file descriptor. *name* có thể là một :term:`path-like object`. Nếu được cung cấp, *arcname* chỉ định một tên thay thế cho tệp trong archive; nếu không, tên được lấy từ *fileobj*’s
+   thuộc tính :attr:`~io.FileIO.name`, hoặc đối số *name*. Tên này phải là một chuỗi văn bản.
 
-   You can modify
-   some of the :class:`TarInfo`’s attributes before you add it using :meth:`addfile`.
-   If the file object is not an ordinary file object positioned at the
-   beginning of the file, attributes such as :attr:`~TarInfo.size` may need
-   modifying.  This is the case for objects such as :class:`~gzip.GzipFile`.
-   The :attr:`~TarInfo.name` may also be modified, in which case *arcname*
-   could be a dummy string.
+   Bạn có thể sửa đổi một số thuộc tính của :class:`TarInfo` trước khi thêm nó bằng :meth:`addfile`. Nếu đối tượng tệp không phải là một đối tượng tệp thông thường được định vị ở đầu tệp, bạn có thể cần sửa đổi các thuộc tính như :attr:`~TarInfo.size`. Điều này áp dụng cho các đối tượng như :class:`~gzip.GzipFile`. Bạn cũng có thể sửa đổi :attr:`~TarInfo.name`, trong trường hợp đó *arcname* có thể là một chuỗi giả.
 
    .. versionchanged:: 3.6
-      The *name* parameter accepts a :term:`path-like object`.
+      Tham số *name* chấp nhận một :term:`path-like object`.
 
 
 .. method:: TarFile.close()
 
-   Close the :class:`TarFile`. In write mode, two finishing zero blocks are
-   appended to the archive.
+   Đóng :class:`TarFile`. Ở chế độ ghi, hai khối số 0 kết thúc được nối vào archive.
 
 
 .. attribute:: TarFile.pax_headers
    :type: dict
 
-   A dictionary containing key-value pairs of pax global headers.
+   Một dictionary chứa các cặp khóa-giá trị của các global header pax.
 
 
 
 .. _tarinfo-objects:
 
-TarInfo Objects
----------------
+Đối tượng TarInfo
+-----------------
 
-A :class:`TarInfo` object represents one member in a :class:`TarFile`. Aside
-from storing all required attributes of a file (like file type, size, time,
-permissions, owner etc.), it provides some useful methods to determine its type.
-It does *not* contain the file's data itself.
+Một đối tượng :class:`TarInfo` đại diện cho một thành viên trong :class:`TarFile`. Ngoài việc lưu trữ tất cả các thuộc tính bắt buộc của một tệp (chẳng hạn như loại tệp, kích thước, thời gian, quyền, chủ sở hữu, v.v.), đối tượng này cung cấp một số phương thức hữu ích để xác định loại của nó. Đối tượng này *không* chứa dữ liệu của tệp.
 
-:class:`TarInfo` objects are returned by :class:`TarFile`'s methods
-:meth:`~TarFile.getmember`, :meth:`~TarFile.getmembers` and
+Các đối tượng :class:`TarInfo` được trả về bởi các phương thức của :class:`TarFile`
+:meth:`~TarFile.getmember`, :meth:`~TarFile.getmembers` và
 :meth:`~TarFile.gettarinfo`.
 
-Modifying the objects returned by :meth:`~TarFile.getmember` or
-:meth:`~TarFile.getmembers` will affect all subsequent
-operations on the archive.
-For cases where this is unwanted, you can use :mod:`copy.copy() <copy>` or
-call the :meth:`~TarInfo.replace` method to create a modified copy in one step.
+Việc sửa đổi các đối tượng được :meth:`~TarFile.getmember` trả về hoặc
+:meth:`~TarFile.getmembers` sẽ ảnh hưởng đến tất cả các thao tác tiếp theo trên archive. Trong những trường hợp không mong muốn điều này, bạn có thể sử dụng :mod:`copy.copy() <copy>` hoặc gọi phương thức :meth:`~TarInfo.replace` để tạo một bản sao đã sửa đổi chỉ trong một bước.
 
-Several attributes can be set to ``None`` to indicate that a piece of metadata
-is unused or unknown.
-Different :class:`TarInfo` methods handle ``None`` differently:
+Có thể đặt một số thuộc tính thành ``None`` để cho biết một phần metadata không được sử dụng hoặc không xác định. Các phương thức :class:`TarInfo` khác nhau xử lý ``None`` theo những cách khác nhau:
 
-- The :meth:`~TarFile.extract` or :meth:`~TarFile.extractall` methods will
-  ignore the corresponding metadata, leaving it set to a default.
-- :meth:`~TarFile.addfile` will fail.
-- :meth:`~TarFile.list` will print a placeholder string.
+- Các phương thức :meth:`~TarFile.extract` hoặc :meth:`~TarFile.extractall` sẽ bỏ qua metadata tương ứng, giữ nguyên giá trị mặc định cho metadata đó.
+- :meth:`~TarFile.addfile` sẽ thất bại.
+- :meth:`~TarFile.list` sẽ in một chuỗi giữ chỗ.
 
 .. class:: TarInfo(name="")
 
-   Create a :class:`TarInfo` object.
+   Tạo một đối tượng :class:`TarInfo`.
 
 
 .. classmethod:: TarInfo.frombuf(buf, encoding, errors)
 
-   Create and return a :class:`TarInfo` object from string buffer *buf*.
+   Tạo và trả về một đối tượng :class:`TarInfo` từ bộ đệm chuỗi *buf*.
 
-   Raises :exc:`HeaderError` if the buffer is invalid.
+   Phát sinh :exc:`HeaderError` nếu bộ đệm không hợp lệ.
 
 
 .. classmethod:: TarInfo.fromtarfile(tarfile)
 
-   Read the next member from the :class:`TarFile` object *tarfile* and return it as
-   a :class:`TarInfo` object.
+   Đọc thành viên tiếp theo từ đối tượng :class:`TarFile` *tarfile* và trả về thành viên đó dưới dạng đối tượng :class:`TarInfo`.
 
 
 .. method:: TarInfo.tobuf(format=DEFAULT_FORMAT, encoding=ENCODING, errors='surrogateescape')
 
-   Create a string buffer from a :class:`TarInfo` object. For information on the
-   arguments see the constructor of the :class:`TarFile` class.
+   Tạo một bộ đệm chuỗi từ đối tượng :class:`TarInfo`. Để biết thông tin về các đối số, hãy xem hàm khởi tạo của lớp :class:`TarFile`.
 
    .. versionchanged:: 3.2
-      Use ``'surrogateescape'`` as the default for the *errors* argument.
+      Sử dụng ``'surrogateescape'`` làm giá trị mặc định cho đối số *errors*.
 
 
-A ``TarInfo`` object has the following public data attributes:
+Một đối tượng ``TarInfo`` có các thuộc tính dữ liệu công khai sau:
 
 
 .. attribute:: TarInfo.name
    :type: str
 
-   Name of the archive member.
+   Tên của thành viên trong kho lưu trữ.
 
 
 .. attribute:: TarInfo.size
    :type: int
 
-   Size in bytes.
+   Kích thước tính bằng byte.
 
 
 .. attribute:: TarInfo.mtime
    :type: int | float
 
-   Time of last modification in seconds since the :ref:`epoch <epoch>`,
-   as in :attr:`os.stat_result.st_mtime`.
+   Thời điểm sửa đổi lần cuối tính bằng giây kể từ :ref:`epoch <epoch>`, như trong :attr:`os.stat_result.st_mtime`.
 
    .. versionchanged:: 3.12
 
-      Can be set to ``None`` for :meth:`~TarFile.extract` and
-      :meth:`~TarFile.extractall`, causing extraction to skip applying this
-      attribute.
+      Có thể được đặt thành ``None`` cho :meth:`~TarFile.extract` và
+      :meth:`~TarFile.extractall`, khiến quá trình trích xuất bỏ qua việc áp dụng thuộc tính này.
 
 .. attribute:: TarInfo.mode
    :type: int
 
-   Permission bits, as for :func:`os.chmod`.
+   Các bit quyền, như đối với :func:`os.chmod`.
 
    .. versionchanged:: 3.12
 
-      Can be set to ``None`` for :meth:`~TarFile.extract` and
-      :meth:`~TarFile.extractall`, causing extraction to skip applying this
-      attribute.
+      Có thể được đặt thành ``None`` cho :meth:`~TarFile.extract` và
+      :meth:`~TarFile.extractall`, khiến quá trình trích xuất bỏ qua việc áp dụng thuộc tính này.
 
 .. attribute:: TarInfo.type
 
-   File type.  *type* is usually one of these constants: :const:`REGTYPE`,
+   Loại tệp.  *type* thường là một trong các hằng số sau: :const:`REGTYPE`,
    :const:`AREGTYPE`, :const:`LNKTYPE`, :const:`SYMTYPE`, :const:`DIRTYPE`,
    :const:`FIFOTYPE`, :const:`CONTTYPE`, :const:`CHRTYPE`, :const:`BLKTYPE`,
-   :const:`GNUTYPE_SPARSE`.  To determine the type of a :class:`TarInfo` object
-   more conveniently, use the ``is*()`` methods below.
+   :const:`GNUTYPE_SPARSE`.  Để xác định loại đối tượng :class:`TarInfo` thuận tiện hơn, hãy sử dụng các phương thức ``is*()`` bên dưới.
 
 
 .. attribute:: TarInfo.linkname
    :type: str
 
-   Name of the target file name, which is only present in :class:`TarInfo` objects
-   of type :const:`LNKTYPE` and :const:`SYMTYPE`.
+   Tên của tệp đích, chỉ xuất hiện trong các đối tượng :class:`TarInfo` thuộc loại :const:`LNKTYPE` và :const:`SYMTYPE`.
 
-   For symbolic links (``SYMTYPE``), the *linkname* is relative to the directory
-   that contains the link.
-   For hard links (``LNKTYPE``), the *linkname* is relative to the root of
-   the archive.
+   Đối với các symbolic link (``SYMTYPE``), *linkname* là đường dẫn tương đối so với thư mục chứa liên kết. Đối với các hard link (``LNKTYPE``), *linkname* là đường dẫn tương đối so với thư mục gốc của archive.
 
 
 .. attribute:: TarInfo.uid
    :type: int
 
-   User ID of the user who originally stored this member.
+   ID người dùng của người dùng đã lưu mục này ban đầu.
 
    .. versionchanged:: 3.12
 
-      Can be set to ``None`` for :meth:`~TarFile.extract` and
-      :meth:`~TarFile.extractall`, causing extraction to skip applying this
-      attribute.
+      Có thể được đặt thành ``None`` cho :meth:`~TarFile.extract` và
+      :meth:`~TarFile.extractall`, khiến quá trình trích xuất bỏ qua việc áp dụng thuộc tính này.
 
 .. attribute:: TarInfo.gid
    :type: int
 
-   Group ID of the user who originally stored this member.
+   ID nhóm của người dùng đã lưu thành viên này ban đầu.
 
    .. versionchanged:: 3.12
 
-      Can be set to ``None`` for :meth:`~TarFile.extract` and
-      :meth:`~TarFile.extractall`, causing extraction to skip applying this
-      attribute.
+      Có thể được đặt thành ``None`` cho :meth:`~TarFile.extract` và
+      :meth:`~TarFile.extractall`, khiến quá trình trích xuất bỏ qua việc áp dụng thuộc tính này.
 
 .. attribute:: TarInfo.uname
    :type: str
 
-   User name.
+   Tên người dùng.
 
    .. versionchanged:: 3.12
 
-      Can be set to ``None`` for :meth:`~TarFile.extract` and
-      :meth:`~TarFile.extractall`, causing extraction to skip applying this
-      attribute.
+      Có thể được đặt thành ``None`` cho :meth:`~TarFile.extract` và
+      :meth:`~TarFile.extractall`, khiến quá trình trích xuất bỏ qua việc áp dụng thuộc tính này.
 
 .. attribute:: TarInfo.gname
    :type: str
 
-   Group name.
+   Tên nhóm.
 
    .. versionchanged:: 3.12
 
-      Can be set to ``None`` for :meth:`~TarFile.extract` and
-      :meth:`~TarFile.extractall`, causing extraction to skip applying this
-      attribute.
+      Có thể được đặt thành ``None`` cho :meth:`~TarFile.extract` và
+      :meth:`~TarFile.extractall`, khiến quá trình trích xuất bỏ qua việc áp dụng thuộc tính này.
 
 .. attribute:: TarInfo.chksum
    :type: int
 
-   Header checksum.
+   Checksum của header.
 
 
 .. attribute:: TarInfo.devmajor
    :type: int
 
-   Device major number.
+   Số major của thiết bị.
 
 
 .. attribute:: TarInfo.devminor
    :type: int
 
-   Device minor number.
+   Số minor của thiết bị.
 
 
 .. attribute:: TarInfo.offset
    :type: int
 
-   The tar header starts here.
+   Phần header tar bắt đầu tại đây.
 
 
 .. attribute:: TarInfo.offset_data
    :type: int
 
-   The file's data starts here.
+   Dữ liệu của tệp bắt đầu tại đây.
 
 
 .. attribute:: TarInfo.sparse
 
-   Sparse member information.
+   Thông tin về member thưa.
 
 
 .. attribute:: TarInfo.pax_headers
    :type: dict
 
-   A dictionary containing key-value pairs of an associated pax extended header.
+   Một dictionary chứa các cặp key-value của extended header pax liên kết.
 
 .. method:: TarInfo.replace(name=..., mtime=..., mode=..., linkname=..., \
-                            uid=..., gid=..., uname=..., gname=..., \
-                            deep=True)
+                            uid=..., gid=..., uname=..., gname=..., \ deep=True)
 
    .. versionadded:: 3.12
 
-   Return a *new* copy of the :class:`!TarInfo` object with the given attributes
-   changed. For example, to return a ``TarInfo`` with the group name set to
-   ``'staff'``, use::
+   Trả về một bản sao *new* của đối tượng :class:`!TarInfo` với các thuộc tính đã cho được thay đổi. Ví dụ, để trả về một ``TarInfo`` với tên group được đặt thành ``'staff'``, hãy dùng::
 
        new_tarinfo = old_tarinfo.replace(gname='staff')
 
-   By default, a deep copy is made.
-   If *deep* is false, the copy is shallow, i.e. ``pax_headers``
-   and any custom attributes are shared with the original ``TarInfo`` object.
+   Theo mặc định, một bản sao sâu được tạo. Nếu *deep* là false, bản sao sẽ là bản sao nông, tức là ``pax_headers`` và mọi thuộc tính tùy chỉnh được dùng chung với đối tượng ``TarInfo`` ban đầu.
 
-A :class:`TarInfo` object also provides some convenient query methods:
+Một đối tượng :class:`TarInfo` cũng cung cấp một số phương thức truy vấn tiện lợi:
 
 
 .. method:: TarInfo.isfile()
 
-   Return :const:`True` if the :class:`TarInfo` object is a regular file.
+   Trả về :const:`True` nếu đối tượng :class:`TarInfo` là một tệp thông thường.
 
 
 .. method:: TarInfo.isreg()
 
-   Same as :meth:`isfile`.
+   Giống như :meth:`isfile`.
 
 
 .. method:: TarInfo.isdir()
 
-   Return :const:`True` if it is a directory.
+   Trả về :const:`True` nếu đó là một thư mục.
 
 
 .. method:: TarInfo.issym()
 
-   Return :const:`True` if it is a symbolic link.
+   Trả về :const:`True` nếu đó là một symbolic link.
 
 
 .. method:: TarInfo.islnk()
 
-   Return :const:`True` if it is a hard link.
+   Trả về :const:`True` nếu đó là một hard link.
 
 
 .. method:: TarInfo.ischr()
 
-   Return :const:`True` if it is a character device.
+   Trả về :const:`True` nếu đó là một character device.
 
 
 .. method:: TarInfo.isblk()
 
-   Return :const:`True` if it is a block device.
+   Trả về :const:`True` nếu đó là thiết bị khối.
 
 
 .. method:: TarInfo.isfifo()
 
-   Return :const:`True` if it is a FIFO.
+   Trả về :const:`True` nếu đó là FIFO.
 
 
 .. method:: TarInfo.isdev()
 
-   Return :const:`True` if it is one of character device, block device or FIFO.
+   Trả về :const:`True` nếu đó là thiết bị ký tự, thiết bị khối hoặc FIFO.
 
 
 .. _tarfile-extraction-filter:
 
-Extraction filters
-------------------
+Bộ lọc giải nén
+---------------
 
 .. versionadded:: 3.12
 
-The *tar* format is designed to capture all details of a UNIX-like filesystem,
-which makes it very powerful.
-Unfortunately, the features make it easy to create tar files that have
-unintended -- and possibly malicious -- effects when extracted.
-For example, extracting a tar file can overwrite arbitrary files in various
-ways (e.g.  by using absolute paths, ``..`` path components, or symlinks that
-affect later members).
+Định dạng *tar* được thiết kế để nắm bắt mọi chi tiết của một hệ thống tệp tương tự UNIX, khiến nó rất mạnh mẽ. Đáng tiếc là các tính năng này khiến việc tạo các tệp tar có những tác động ngoài ý muốn -- và có thể là độc hại -- khi được giải nén trở nên dễ dàng. Ví dụ: việc giải nén một tệp tar có thể ghi đè các tệp tùy ý theo nhiều cách (chẳng hạn như sử dụng đường dẫn tuyệt đối, các thành phần đường dẫn ``..``, hoặc các symlink ảnh hưởng đến những thành viên tiếp theo).
 
-In most cases, the full functionality is not needed.
-Therefore, *tarfile* supports extraction filters: a mechanism to limit
-functionality, and thus mitigate some of the security issues.
+Trong hầu hết trường hợp, không cần đến đầy đủ chức năng. Vì vậy, *tarfile* hỗ trợ các bộ lọc giải nén: một cơ chế để giới hạn chức năng và qua đó giảm thiểu một số vấn đề bảo mật.
 
 .. warning::
 
-   None of the available filters blocks *all* dangerous archive features.
-   Never extract archives from untrusted sources without prior inspection.
-   See also :ref:`tarfile-further-verification`.
+   Không có bộ lọc nào hiện có thể chặn *tất cả* các tính năng nguy hiểm của kho lưu trữ. Không bao giờ giải nén các kho lưu trữ từ những nguồn không đáng tin cậy mà chưa kiểm tra trước. Xem thêm :ref:`tarfile-further-verification`.
 
 .. seealso::
 
    :pep:`706`
-      Contains further motivation and rationale behind the design.
+      Chứa thêm động cơ và lý do đằng sau thiết kế.
 
-The *filter* argument to :meth:`TarFile.extract` or :meth:`~TarFile.extractall`
-can be:
+Đối số *filter* của :meth:`TarFile.extract` hoặc :meth:`~TarFile.extractall` có thể là:
 
-* the string ``'fully_trusted'``: Honor all metadata as specified in the
-  archive.
-  Should be used if the user trusts the archive completely, or implements
-  their own complex verification.
+* chuỗi ``'fully_trusted'``: Tôn trọng toàn bộ siêu dữ liệu như được chỉ định trong archive. Nên sử dụng nếu người dùng hoàn toàn tin tưởng archive hoặc tự triển khai quy trình xác minh phức tạp.
 
-* the string ``'tar'``: Honor most *tar*-specific features (i.e. features of
-  UNIX-like filesystems), but block features that are very likely to be
-  surprising or malicious. See :func:`tar_filter` for details.
+* chuỗi ``'tar'``: Tôn trọng hầu hết các tính năng dành riêng cho *tar* (tức là các tính năng của hệ thống tệp tương tự UNIX), nhưng chặn những tính năng rất có khả năng gây bất ngờ hoặc độc hại. Xem :func:`tar_filter` để biết chi tiết.
 
-* the string ``'data'``: Ignore or block most features specific to UNIX-like
-  filesystems. Intended for extracting cross-platform data archives.
-  See :func:`data_filter` for details.
+* chuỗi ``'data'``: Bỏ qua hoặc chặn hầu hết các tính năng dành riêng cho hệ thống tệp tương tự UNIX. Dành cho việc giải nén các archive dữ liệu đa nền tảng. Xem :func:`data_filter` để biết chi tiết.
 
-* ``None`` (default): Use :attr:`TarFile.extraction_filter`.
+* ``None`` (mặc định): Sử dụng :attr:`TarFile.extraction_filter`.
 
-  If that is also ``None`` (the default), the ``'data'`` filter will be used.
+  Nếu giá trị đó cũng là ``None`` (mặc định), filter ``'data'`` sẽ được sử dụng.
 
    .. versionchanged:: 3.14
 
-      The default filter is set to :func:`data <data_filter>`.
-      Previously, the default was equivalent to
+      Bộ lọc mặc định được đặt thành :func:`data <data_filter>`. Trước đây, giá trị mặc định tương đương với
       :func:`fully_trusted <fully_trusted_filter>`.
 
-* A callable which will be called for each extracted member with a
-  :ref:`TarInfo <tarinfo-objects>` describing the member and the destination
-  path to where the archive is extracted (i.e. the same path is used for all
-  members)::
+* Một callable sẽ được gọi cho từng member được trích xuất với một
+  :ref:`TarInfo <tarinfo-objects>` mô tả member và đường dẫn đích nơi archive được trích xuất (tức là cùng một đường dẫn được sử dụng cho tất cả member)::
 
       filter(member: TarInfo, path: str, /) -> TarInfo | None
 
-  The callable is called just before each member is extracted, so it can
-  take the current state of the disk into account.
-  It can:
+  Callable được gọi ngay trước khi từng member được trích xuất, vì vậy nó có thể xem xét trạng thái hiện tại của disk. Callable có thể:
 
-  - return a :class:`TarInfo` object which will be used instead of the metadata
-    in the archive, or
-  - return ``None``, in which case the member will be skipped, or
-  - raise an exception to abort the operation or skip the member,
-    depending on :attr:`~TarFile.errorlevel`.
-    Note that when extraction is aborted, :meth:`~TarFile.extractall` may leave
-    the archive partially extracted. It does not attempt to clean up.
+  - trả về một object :class:`TarInfo` sẽ được sử dụng thay cho metadata trong archive, hoặc
+  - trả về ``None``, trong trường hợp đó member sẽ bị bỏ qua, hoặc
+  - phát sinh một exception để hủy operation hoặc bỏ qua member, tùy thuộc vào :attr:`~TarFile.errorlevel`. Lưu ý rằng khi việc trích xuất bị hủy, :meth:`~TarFile.extractall` có thể khiến archive chỉ được trích xuất một phần. Nó không cố gắng dọn dẹp.
 
-Default named filters
-~~~~~~~~~~~~~~~~~~~~~
+Các bộ lọc có tên mặc định
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The pre-defined, named filters are available as functions, so they can be
-reused in custom filters:
+Các bộ lọc có tên được định nghĩa sẵn khả dụng dưới dạng các hàm, vì vậy chúng có thể được sử dụng lại trong các bộ lọc tùy chỉnh:
 
 .. function:: fully_trusted_filter(member, path)
 
-   Return *member* unchanged.
+   Trả về *member* không thay đổi.
 
-   This implements the ``'fully_trusted'`` filter.
+   Điều này triển khai bộ lọc ``'fully_trusted'``.
 
 .. function:: tar_filter(member, path)
 
-  Implements the ``'tar'`` filter.
+  Triển khai bộ lọc ``'tar'``.
 
-  - Strip leading slashes (``/`` and :data:`os.sep`) from filenames.
-  - :ref:`Refuse <tarfile-extraction-refuse>` to extract files with absolute
-    paths (in case the name is absolute
-    even after stripping slashes, e.g. ``C:/foo`` on Windows).
-    This raises :class:`~tarfile.AbsolutePathError`.
-  - Normalize filenames (:attr:`TarInfo.name`) that contain ``..`` components
-    using :func:`os.path.normpath`.
-    Note that this removes internal ``..`` components, which may change the
-    meaning of the name if it traverses symbolic links.
-  - :ref:`Refuse <tarfile-extraction-refuse>` to extract files whose absolute
-    path (after following symlinks) would end up outside the destination.
-    This raises :class:`~tarfile.OutsideDestinationError`.
-  - Clear high mode bits (setuid, setgid, sticky) and group/other write bits
-    (:const:`~stat.S_IWGRP` | :const:`~stat.S_IWOTH`).
+  - Loại bỏ các dấu gạch chéo ở đầu (``/`` và :data:`os.sep`) khỏi tên tệp.
+  - :ref:`Từ chối <tarfile-extraction-refuse>` trích xuất các tệp có đường dẫn tuyệt đối (trong trường hợp tên vẫn là tuyệt đối ngay cả sau khi loại bỏ dấu gạch chéo, chẳng hạn như ``C:/foo`` trên Windows). Điều này phát sinh :class:`~tarfile.AbsolutePathError`.
+  - Chuẩn hóa tên tệp (:attr:`TarInfo.name`) chứa các thành phần ``..`` bằng :func:`os.path.normpath`. Lưu ý rằng thao tác này loại bỏ các thành phần ``..`` bên trong, điều này có thể làm thay đổi ý nghĩa của tên nếu tên đó đi qua các liên kết tượng trưng.
+  - :ref:`Từ chối <tarfile-extraction-refuse>` trích xuất các tệp có đường dẫn tuyệt đối (sau khi đi theo các liên kết tượng trưng) sẽ kết thúc bên ngoài đích. Thao tác này gây ra :class:`~tarfile.OutsideDestinationError`.
+  - Xóa các bit mode cấp cao (setuid, setgid, sticky) và các bit ghi của group/other (:const:`~stat.S_IWGRP` | :const:`~stat.S_IWOTH`).
 
-  Return the modified ``TarInfo`` member.
+  Trả về thành viên ``TarInfo`` đã sửa đổi.
 
   .. versionchanged:: 3.14.8
 
-     Filenames containing ``..`` components are now normalized.
+     Các tên tệp chứa các thành phần ``..`` hiện đã được chuẩn hóa.
 
 .. function:: data_filter(member, path)
 
-  Implements the ``'data'`` filter.
-  In addition to what ``tar_filter`` does:
+  Triển khai bộ lọc ``'data'``. Ngoài những gì ``tar_filter`` thực hiện:
 
-  - Normalize link targets (:attr:`TarInfo.linkname`) using
-    :func:`os.path.normpath`.
-    Note that this removes internal ``..`` components, which may change the
-    meaning of the link if the path in :attr:`!TarInfo.linkname` traverses
-    symbolic links.
+  - Chuẩn hóa các đích liên kết (:attr:`TarInfo.linkname`) bằng
+    :func:`os.path.normpath`. Lưu ý rằng thao tác này loại bỏ các thành phần ``..`` nội bộ, điều này có thể làm thay đổi ý nghĩa của liên kết nếu đường dẫn trong :attr:`!TarInfo.linkname` đi qua các liên kết tượng trưng.
 
-  - :ref:`Refuse <tarfile-extraction-refuse>` to extract links (hard or soft)
-    that link to absolute paths, or ones that link outside the destination.
+  - :ref:`Refuse <tarfile-extraction-refuse>` để từ chối trích xuất các liên kết (cứng hoặc mềm) liên kết đến các đường dẫn tuyệt đối hoặc liên kết ra ngoài đích.
 
-    This raises :class:`~tarfile.AbsoluteLinkError` or
+    Điều này gây ra :class:`~tarfile.AbsoluteLinkError` hoặc
     :class:`~tarfile.LinkOutsideDestinationError`.
 
-    Note that such files are refused even on platforms that do not support
-    symbolic links.
+    Lưu ý rằng các tệp như vậy sẽ bị từ chối ngay cả trên những nền tảng không hỗ trợ liên kết tượng trưng.
 
-  - :ref:`Refuse <tarfile-extraction-refuse>` to extract device files
-    (including pipes).
-    This raises :class:`~tarfile.SpecialFileError`.
+  - :ref:`Refuse <tarfile-extraction-refuse>` để từ chối trích xuất các tệp thiết bị (bao gồm cả pipe). Điều này gây ra :class:`~tarfile.SpecialFileError`.
 
-  - For regular files, including hard links:
+  - Đối với các tệp thông thường, bao gồm cả liên kết cứng:
 
-    - Set the owner read and write permissions
-      (:const:`~stat.S_IRUSR` | :const:`~stat.S_IWUSR`).
-    - Remove the group & other executable permission
-      (:const:`~stat.S_IXGRP` | :const:`~stat.S_IXOTH`)
-      if the owner doesn’t have it (:const:`~stat.S_IXUSR`).
+    - Đặt quyền đọc và ghi cho chủ sở hữu (:const:`~stat.S_IRUSR` | :const:`~stat.S_IWUSR`).
+    - Xóa quyền thực thi của nhóm và các đối tượng khác (:const:`~stat.S_IXGRP` | :const:`~stat.S_IXOTH`) nếu chủ sở hữu không có quyền đó (:const:`~stat.S_IXUSR`).
 
-  - For other files (directories), set ``mode`` to ``None``, so
-    that extraction methods skip applying permission bits.
-  - Set user and group info (``uid``, ``gid``, ``uname``, ``gname``)
-    to ``None``, so that extraction methods skip setting it.
+  - Đối với các tệp khác (thư mục), đặt ``mode`` thành ``None``, để các phương thức trích xuất bỏ qua việc áp dụng các bit quyền.
+  - Đặt thông tin người dùng và nhóm (``uid``, ``gid``, ``uname``, ``gname``) thành ``None``, để các phương thức trích xuất bỏ qua việc thiết lập thông tin này.
 
-  Return the modified ``TarInfo`` member.
+  Trả về thành viên ``TarInfo`` đã sửa đổi.
 
-  Note that this filter does not block *all* dangerous archive features.
-  See :ref:`tarfile-further-verification`  for details.
+  Lưu ý rằng bộ lọc này không chặn *tất cả* các tính năng lưu trữ nguy hiểm. Xem :ref:`tarfile-further-verification` để biết chi tiết.
 
   .. versionchanged:: 3.14
 
-     Link targets are now normalized.
+     Các đích liên kết hiện đã được chuẩn hóa.
 
 
 .. _tarfile-extraction-refuse:
 
-Filter errors
-~~~~~~~~~~~~~
+Lỗi bộ lọc
+~~~~~~~~~~
 
-When a filter refuses to extract a file, it will raise an appropriate exception,
-a subclass of :class:`~tarfile.FilterError`.
-This will abort the extraction if :attr:`TarFile.errorlevel` is 1 or more.
-With ``errorlevel=0`` the error will be logged and the member will be skipped,
-but extraction will continue.
+Khi một filter từ chối giải nén một tệp, nó sẽ đưa ra một exception thích hợp, là lớp con của :class:`~tarfile.FilterError`. Thao tác này sẽ hủy quá trình giải nén nếu :attr:`TarFile.errorlevel` là 1 trở lên. Với ``errorlevel=0``, lỗi sẽ được ghi vào log và member sẽ bị bỏ qua, nhưng quá trình giải nén vẫn tiếp tục.
 
 
 .. _tarfile-further-verification:
 
-Hints for further verification
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Gợi ý để kiểm tra thêm
+~~~~~~~~~~~~~~~~~~~~~~
 
-Even with ``filter='data'``, *tarfile* is not suited for extracting untrusted
-files without prior inspection.
-Among other issues, the pre-defined filters do not prevent denial-of-service
-attacks. Users should do additional checks.
+Ngay cả khi có ``filter='data'``, *tarfile* vẫn không phù hợp để giải nén các tệp không đáng tin cậy mà chưa kiểm tra trước. Trong số các vấn đề khác, những filter được định nghĩa sẵn không ngăn chặn các cuộc tấn công từ chối dịch vụ. Người dùng nên thực hiện thêm các bước kiểm tra.
 
-Here is an incomplete list of things to consider:
+Dưới đây là danh sách chưa đầy đủ những điều cần cân nhắc:
 
-* Extract to a :func:`new temporary directory <tempfile.mkdtemp>`
-  to prevent e.g. exploiting pre-existing links, and to make it easier to
-  clean up after a failed extraction.
-* Disallow symbolic links if you do not need the functionality.
-* When working with untrusted data, use external (e.g. OS-level) limits on
-  disk, memory and CPU usage.
-* Check filenames against an allow-list of characters
-  (to filter out control characters, confusables, foreign path separators,
-  and so on).
-* Check that filenames have expected extensions (discouraging files that
-  execute when you “click on them”, or extension-less files like Windows
-  special device names).
-* Limit the number of extracted files, total size of extracted data,
-  filename length (including symlink length), and size of individual files.
-* Check for files that would be shadowed on case-insensitive filesystems.
+* Giải nén vào một :func:`new temporary directory <tempfile.mkdtemp>` để ngăn việc khai thác, chẳng hạn như thông qua các liên kết có sẵn, đồng thời giúp dễ dàng dọn dẹp hơn sau khi quá trình giải nén thất bại.
+* Không cho phép symbolic link nếu bạn không cần chức năng này.
+* Khi làm việc với dữ liệu không đáng tin cậy, hãy sử dụng các giới hạn bên ngoài (chẳng hạn như ở cấp độ hệ điều hành) đối với việc sử dụng ổ đĩa, bộ nhớ và CPU.
+* Kiểm tra tên tệp dựa trên danh sách ký tự được cho phép (để lọc các ký tự điều khiển, ký tự dễ gây nhầm lẫn, dấu phân cách đường dẫn ngoại lai, v.v.).
+* Kiểm tra để bảo đảm tên tệp có phần mở rộng như dự kiến (không khuyến khích các tệp được thực thi khi bạn “bấm vào chúng”, hoặc các tệp không có phần mở rộng như tên thiết bị đặc biệt của Windows).
+* Giới hạn số lượng tệp được giải nén, tổng kích thước dữ liệu được giải nén, độ dài tên tệp (bao gồm cả độ dài symlink) và kích thước của từng tệp.
+* Kiểm tra các tệp có thể bị che khuất trên các filesystem không phân biệt chữ hoa chữ thường.
 
-Also note that:
+Cũng lưu ý rằng:
 
-* Tar files may contain multiple versions of the same file.
-  Later ones are expected to overwrite any earlier ones.
-  This feature is crucial to allow updating tape archives, but can be abused
-  maliciously.
-* *tarfile* does not protect against issues with “live” data,
-  e.g. an attacker tinkering with the destination (or source) directory while
-  extraction (or archiving) is in progress.
+* Các tệp Tar có thể chứa nhiều phiên bản của cùng một tệp. Những phiên bản xuất hiện sau được cho là sẽ ghi đè lên các phiên bản trước đó. Tính năng này rất quan trọng để cho phép cập nhật các tape archive, nhưng có thể bị lạm dụng với mục đích xấu.
+* *tarfile* không bảo vệ trước các vấn đề với dữ liệu “trực tiếp”, chẳng hạn như kẻ tấn công can thiệp vào thư mục đích (hoặc thư mục nguồn) trong khi quá trình giải nén (hoặc lưu trữ) đang diễn ra.
 
 
-Supporting older Python versions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Hỗ trợ các phiên bản Python cũ hơn
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Extraction filters were added to Python 3.12, but may be backported to older
-versions as security updates.
-To check whether the feature is available, use e.g.
-``hasattr(tarfile, 'data_filter')`` rather than checking the Python version.
+Các bộ lọc trích xuất được thêm vào Python 3.12, nhưng có thể được backport sang các phiên bản cũ hơn dưới dạng bản cập nhật bảo mật. Để kiểm tra xem tính năng này có khả dụng hay không, hãy sử dụng ví dụ như ``hasattr(tarfile, 'data_filter')`` thay vì kiểm tra phiên bản Python.
 
-The following examples show how to support Python versions with and without
-the feature.
-Note that setting ``extraction_filter`` will affect any subsequent operations.
+Các ví dụ sau đây cho thấy cách hỗ trợ các phiên bản Python có và không có tính năng này. Lưu ý rằng việc đặt ``extraction_filter`` sẽ ảnh hưởng đến mọi thao tác tiếp theo.
 
-* Fully trusted archive::
+* Kho lưu trữ hoàn toàn đáng tin cậy::
 
     my_tarfile.extraction_filter = (lambda member, path: member)
     my_tarfile.extractall()
 
-* Use the ``'data'`` filter if available, but revert to Python 3.11 behavior
-  (``'fully_trusted'``) if this feature is not available::
+* Sử dụng bộ lọc ``'data'`` nếu khả dụng, nhưng quay lại hành vi của Python 3.11 (``'fully_trusted'``) nếu tính năng này không khả dụng::
 
     my_tarfile.extraction_filter = getattr(tarfile, 'data_filter',
                                            (lambda member, path: member))
     my_tarfile.extractall()
 
-* Use the ``'data'`` filter; *fail* if it is not available::
+* Sử dụng bộ lọc ``'data'``; *fail* nếu bộ lọc không khả dụng::
 
     my_tarfile.extractall(filter=tarfile.data_filter)
 
@@ -1247,27 +957,25 @@ Note that setting ``extraction_filter`` will affect any subsequent operations.
     my_tarfile.extraction_filter = tarfile.data_filter
     my_tarfile.extractall()
 
-* Use the ``'data'`` filter; *warn* if it is not available::
+* Sử dụng bộ lọc ``'data'``; *warn* nếu bộ lọc không khả dụng::
 
    if hasattr(tarfile, 'data_filter'):
        my_tarfile.extractall(filter='data')
    else:
-       # remove this when no longer needed
+       # xóa mục này khi không còn cần thiết
        warn_the_user('Extracting may be unsafe; consider updating Python')
        my_tarfile.extractall()
 
 
-Stateful extraction filter example
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Ví dụ về bộ lọc trích xuất có trạng thái
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-While *tarfile*'s extraction methods take a simple *filter* callable,
-custom filters may be more complex objects with an internal state.
-It may be useful to write these as context managers, to be used like this::
+Mặc dù các phương thức trích xuất của *tarfile*'s nhận một callable *filter* đơn giản, các bộ lọc tùy chỉnh có thể là những đối tượng phức tạp hơn với trạng thái nội bộ. Có thể sẽ hữu ích nếu viết chúng dưới dạng context manager để sử dụng như sau::
 
     with StatefulFilter() as filter_func:
         tar.extractall(path, filter=filter_func)
 
-Such a filter can be written as, for example::
+Ví dụ, có thể viết một bộ lọc như vậy như sau::
 
     class StatefulFilter:
         def __init__(self):
@@ -1288,99 +996,91 @@ Such a filter can be written as, for example::
 .. program:: tarfile
 
 
-Command-Line Interface
-----------------------
+Giao diện dòng lệnh
+-------------------
 
 .. versionadded:: 3.4
 
-The :mod:`!tarfile` module provides a simple command-line interface to interact
-with tar archives.
+Mô-đun :mod:`!tarfile` cung cấp một giao diện dòng lệnh đơn giản để tương tác với các tar archive.
 
-If you want to create a new tar archive, specify its name after the :option:`-c`
-option and then list the filename(s) that should be included:
+Nếu muốn tạo một tar archive mới, hãy chỉ định tên của nó sau tùy chọn :option:`-c` rồi liệt kê (các) tên tệp cần đưa vào:
 
 .. code-block:: shell-session
 
     $ python -m tarfile -c monty.tar  spam.txt eggs.txt
 
-Passing a directory is also acceptable:
+Truyền một thư mục cũng được chấp nhận:
 
 .. code-block:: shell-session
 
     $ python -m tarfile -c monty.tar life-of-brian_1979/
 
-If you want to extract a tar archive into the current directory, use
-the :option:`-e` option:
+Nếu muốn giải nén một tar archive vào thư mục hiện tại, hãy sử dụng tùy chọn :option:`-e`:
 
 .. code-block:: shell-session
 
     $ python -m tarfile -e monty.tar
 
-You can also extract a tar archive into a different directory by passing the
-directory's name:
+Bạn cũng có thể giải nén một tar archive vào một thư mục khác bằng cách truyền tên thư mục đó:
 
 .. code-block:: shell-session
 
     $ python -m tarfile -e monty.tar  other-dir/
 
-For a list of the files in a tar archive, use the :option:`-l` option:
+Để liệt kê các tệp trong một tar archive, hãy sử dụng tùy chọn :option:`-l`:
 
 .. code-block:: shell-session
 
     $ python -m tarfile -l monty.tar
 
 
-Command-line options
-~~~~~~~~~~~~~~~~~~~~
+Tùy chọn dòng lệnh
+~~~~~~~~~~~~~~~~~~
 
 .. option:: -l <tarfile>
             --list <tarfile>
 
-   List files in a tarfile.
+   Liệt kê các tệp trong tarfile.
 
 .. option:: -c <tarfile> <source1> ... <sourceN>
             --create <tarfile> <source1> ... <sourceN>
 
-   Create tarfile from source files.
+   Tạo tarfile từ các tệp nguồn.
 
 .. option:: -e <tarfile> [<output_dir>]
             --extract <tarfile> [<output_dir>]
 
-   Extract tarfile into the current directory if *output_dir* is not specified.
+   Giải nén tarfile vào thư mục hiện tại nếu không chỉ định *output_dir*.
 
 .. option:: -t <tarfile>
             --test <tarfile>
 
-   Test whether the tarfile is valid or not.
+   Kiểm tra tarfile có hợp lệ hay không.
 
 .. option:: -v, --verbose
 
-   Verbose output.
+   Đầu ra chi tiết.
 
 .. option:: --filter <filtername>
 
-   Specifies the *filter* for ``--extract``.
-   See :ref:`tarfile-extraction-filter` for details.
-   Only string names are accepted (that is, ``fully_trusted``, ``tar``,
-   and ``data``).
+   Chỉ định *filter* cho ``--extract``. Xem :ref:`tarfile-extraction-filter` để biết chi tiết. Chỉ chấp nhận tên chuỗi (tức là ``fully_trusted``, ``tar`` và ``data``).
 
 .. _tar-examples:
 
-Examples
---------
+Ví dụ
+-----
 
-Reading examples
-~~~~~~~~~~~~~~~~~~~
+Ví dụ về cách đọc
+~~~~~~~~~~~~~~~~~
 
-How to extract an entire tar archive to the current working directory::
+Cách giải nén toàn bộ kho lưu trữ tar vào thư mục làm việc hiện tại::
 
    import tarfile
    tar = tarfile.open("sample.tar.gz")
    tar.extractall(filter='data')
    tar.close()
 
-How to extract a subset of a tar archive with :meth:`TarFile.extractall` using
-a generator function instead of a list::
+Cách giải nén một phần kho lưu trữ tar bằng :meth:`TarFile.extractall` sử dụng hàm generator thay vì một danh sách::
 
    import os
    import tarfile
@@ -1394,7 +1094,7 @@ a generator function instead of a list::
    tar.extractall(members=py_files(tar))
    tar.close()
 
-How to read a gzip compressed tar archive and display some member information::
+Cách đọc kho lưu trữ tar được nén bằng gzip và hiển thị thông tin về một số thành viên::
 
    import tarfile
    tar = tarfile.open("sample.tar.gz", "r:gz")
@@ -1408,10 +1108,10 @@ How to read a gzip compressed tar archive and display some member information::
            print("something else.")
    tar.close()
 
-Writing examples
-~~~~~~~~~~~~~~~~
+Ví dụ về cách ghi
+~~~~~~~~~~~~~~~~~
 
-How to create an uncompressed tar archive from a list of filenames::
+Cách tạo một tar archive không nén từ danh sách tên tệp::
 
    import tarfile
    tar = tarfile.open("sample.tar", "w")
@@ -1419,16 +1119,15 @@ How to create an uncompressed tar archive from a list of filenames::
        tar.add(name)
    tar.close()
 
-The same example using the :keyword:`with` statement::
+Ví dụ tương tự sử dụng câu lệnh :keyword:`with`::
 
     import tarfile
     with tarfile.open("sample.tar", "w") as tar:
         for name in ["foo", "bar", "quux"]:
             tar.add(name)
 
-How to create and write an archive to stdout using
-:data:`sys.stdout.buffer <sys.stdout>` in the *fileobj* parameter
-in :meth:`TarFile.add`::
+Cách tạo và ghi một archive vào stdout bằng cách sử dụng
+:data:`sys.stdout.buffer <sys.stdout>` trong tham số *fileobj* của :meth:`TarFile.add`::
 
     import sys
     import tarfile
@@ -1436,8 +1135,7 @@ in :meth:`TarFile.add`::
         for name in ["foo", "bar", "quux"]:
             tar.add(name)
 
-How to create an archive and reset the user information using the *filter*
-parameter in :meth:`TarFile.add`::
+Cách tạo một archive và đặt lại thông tin người dùng bằng tham số *filter* trong :meth:`TarFile.add`::
 
     import tarfile
     def reset(tarinfo):
@@ -1451,78 +1149,38 @@ parameter in :meth:`TarFile.add`::
 
 .. _tar-formats:
 
-Supported tar formats
----------------------
+Các định dạng tar được hỗ trợ
+-----------------------------
 
-There are three tar formats that can be created with the :mod:`!tarfile` module:
+Có ba định dạng tar có thể được tạo bằng module :mod:`!tarfile`:
 
-* The POSIX.1-1988 ustar format (:const:`USTAR_FORMAT`). It supports filenames
-  up to a length of at best 256 characters and linknames up to 100 characters.
-  The maximum file size is 8 GiB. This is an old and limited but widely
-  supported format.
+* Định dạng POSIX.1-1988 ustar (:const:`USTAR_FORMAT`). Định dạng này hỗ trợ tên tệp dài tối đa 256 ký tự và tên liên kết dài tối đa 100 ký tự. Kích thước tệp tối đa là 8 GiB. Đây là một định dạng cũ và hạn chế, nhưng được hỗ trợ rộng rãi.
 
-* The GNU tar format (:const:`GNU_FORMAT`). It supports long filenames and
-  linknames, files bigger than 8 GiB and sparse files. It is the de facto
-  standard on GNU/Linux systems. :mod:`!tarfile` fully supports the GNU tar
-  extensions for long names, sparse file support is read-only.
+* Định dạng GNU tar (:const:`GNU_FORMAT`). Định dạng này hỗ trợ tên tệp và tên liên kết dài, các tệp lớn hơn 8 GiB và các tệp thưa. Đây là tiêu chuẩn trên thực tế trên các hệ thống GNU/Linux. :mod:`!tarfile` hỗ trợ đầy đủ các phần mở rộng của GNU tar cho tên dài; tính năng hỗ trợ tệp thưa chỉ có thể đọc.
 
-* The POSIX.1-2001 pax format (:const:`PAX_FORMAT`). It is the most flexible
-  format with virtually no limits. It supports long filenames and linknames, large
-  files and stores pathnames in a portable way. Modern tar implementations,
-  including GNU tar, bsdtar/libarchive and star, fully support extended *pax*
-  features; some old or unmaintained libraries may not, but should treat
-  *pax* archives as if they were in the universally supported *ustar* format.
-  It is the current default format for new archives.
+* Định dạng POSIX.1-2001 pax (:const:`PAX_FORMAT`). Đây là định dạng linh hoạt nhất, hầu như không có giới hạn. Định dạng này hỗ trợ tên tệp và tên liên kết dài, các tệp lớn, đồng thời lưu tên đường dẫn theo cách di động. Các triển khai tar hiện đại, bao gồm GNU tar, bsdtar/libarchive và star, hỗ trợ đầy đủ các tính năng *pax* mở rộng; một số thư viện cũ hoặc không còn được duy trì có thể không hỗ trợ, nhưng vẫn nên xử lý các kho lưu trữ *pax* như thể chúng ở định dạng *ustar* được hỗ trợ phổ biến. Đây là định dạng mặc định hiện tại cho các kho lưu trữ mới.
 
-  It extends the existing *ustar* format with extra headers for information
-  that cannot be stored otherwise. There are two flavours of pax headers:
-  Extended headers only affect the subsequent file header, global
-  headers are valid for the complete archive and affect all following files.
-  All the data in a pax header is encoded in *UTF-8* for portability reasons.
+  Định dạng này mở rộng định dạng *ustar* hiện có bằng các header bổ sung để lưu trữ thông tin không thể được lưu theo cách khác. Có hai loại header pax: header mở rộng chỉ ảnh hưởng đến header của tệp ngay sau đó, còn header toàn cục có hiệu lực trên toàn bộ kho lưu trữ và ảnh hưởng đến tất cả các tệp tiếp theo. Vì lý do khả chuyển, toàn bộ dữ liệu trong header pax được mã hóa bằng *UTF-8*.
 
-There are some more variants of the tar format which can be read, but not
-created:
+Có thêm một số biến thể của định dạng tar có thể được đọc nhưng không thể tạo:
 
-* The ancient V7 format. This is the first tar format from Unix Seventh Edition,
-  storing only regular files and directories. Names must not be longer than 100
-  characters, there is no user/group name information. Some archives have
-  miscalculated header checksums in case of fields with non-ASCII characters.
+* Định dạng V7 cổ. Đây là định dạng tar đầu tiên của Unix Seventh Edition, chỉ lưu trữ các tệp thông thường và thư mục. Tên không được dài quá 100 ký tự và không có thông tin về tên người dùng/nhóm. Một số kho lưu trữ có checksum header bị tính sai khi các trường chứa ký tự không phải ASCII.
 
-* The SunOS tar extended format. This format is a variant of the POSIX.1-2001
-  pax format, but is not compatible.
+* Định dạng tar mở rộng của SunOS. Định dạng này là một biến thể của định dạng POSIX.1-2001 pax nhưng không tương thích với định dạng đó.
 
 .. _tar-unicode:
 
-Unicode issues
---------------
+Các vấn đề về Unicode
+---------------------
 
-The tar format was originally conceived to make backups on tape drives with the
-main focus on preserving file system information. Nowadays tar archives are
-commonly used for file distribution and exchanging archives over networks. One
-problem of the original format (which is the basis of all other formats) is
-that there is no concept of supporting different character encodings. For
-example, an ordinary tar archive created on a *UTF-8* system cannot be read
-correctly on a *Latin-1* system if it contains non-*ASCII* characters. Textual
-metadata (like filenames, linknames, user/group names) will appear damaged.
-Unfortunately, there is no way to autodetect the encoding of an archive. The
-pax format was designed to solve this problem. It stores non-ASCII metadata
-using the universal character encoding *UTF-8*.
+Định dạng tar ban đầu được thiết kế để tạo bản sao lưu trên ổ băng từ, tập trung chủ yếu vào việc bảo toàn thông tin hệ thống tệp. Ngày nay, các kho lưu trữ tar thường được dùng để phân phối tệp và trao đổi kho lưu trữ qua mạng. Một vấn đề của định dạng ban đầu (là nền tảng cho tất cả các định dạng khác) là không có khái niệm hỗ trợ các encoding ký tự khác nhau. Ví dụ, một kho lưu trữ tar thông thường được tạo trên hệ thống *UTF-8* không thể được đọc chính xác trên hệ thống *Latin-1* nếu chứa các ký tự không thuộc *ASCII*. Siêu dữ liệu dạng văn bản (chẳng hạn như tên tệp, linkname, tên người dùng/nhóm) sẽ bị hiển thị sai lệch. Đáng tiếc là không có cách nào tự động phát hiện encoding của một kho lưu trữ. Định dạng pax được thiết kế để giải quyết vấn đề này. Định dạng này lưu siêu dữ liệu không phải ASCII bằng encoding ký tự phổ quát *UTF-8*.
 
-The details of character conversion in :mod:`!tarfile` are controlled by the
-*encoding* and *errors* keyword arguments of the :class:`TarFile` class.
+Chi tiết về việc chuyển đổi ký tự trong :mod:`!tarfile` được điều khiển bởi các đối số từ khóa *encoding* và *errors* của lớp :class:`TarFile`.
 
-*encoding* defines the character encoding to use for the metadata in the
-archive. The default value is :func:`sys.getfilesystemencoding` or ``'ascii'``
-as a fallback. Depending on whether the archive is read or written, the
-metadata must be either decoded or encoded. If *encoding* is not set
-appropriately, this conversion may fail.
+*encoding* xác định encoding ký tự sẽ dùng cho siêu dữ liệu trong kho lưu trữ. Giá trị mặc định là :func:`sys.getfilesystemencoding` hoặc ``'ascii'`` làm phương án dự phòng. Tùy thuộc vào việc kho lưu trữ được đọc hay ghi, siêu dữ liệu phải được giải mã hoặc mã hóa. Nếu *encoding* không được đặt phù hợp, quá trình chuyển đổi này có thể thất bại.
 
-The *errors* argument defines how characters are treated that cannot be
-converted. Possible values are listed in section :ref:`error-handlers`.
-The default scheme is ``'surrogateescape'`` which Python also uses for its
-file system calls, see :ref:`os-filenames`.
+Đối số *errors* xác định cách xử lý các ký tự không thể chuyển đổi. Các giá trị có thể có được liệt kê trong phần :ref:`error-handlers`. Cơ chế mặc định là ``'surrogateescape'``, cơ chế mà Python cũng sử dụng cho các lệnh gọi hệ thống tệp của mình; xem :ref:`os-filenames`.
 
-For :const:`PAX_FORMAT` archives (the default), *encoding* is generally not needed
-because all the metadata is stored using *UTF-8*. *encoding* is only used in
-the rare cases when binary pax headers are decoded or when strings with
-surrogate characters are stored.
+Đối với các kho lưu trữ :const:`PAX_FORMAT` (mặc định), *encoding* nhìn chung không cần thiết vì toàn bộ siêu dữ liệu được lưu bằng *UTF-8*. *encoding* chỉ được sử dụng trong những trường hợp hiếm gặp khi các header pax nhị phân được giải mã hoặc khi các chuỗi chứa ký tự surrogate được lưu trữ.
+
+.. _`GNU tar manual, Basic Tar Format`: https://www.gnu.org/software/tar/manual/html_node/Standard.html

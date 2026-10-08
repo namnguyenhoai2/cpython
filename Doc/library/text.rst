@@ -1,16 +1,13 @@
 .. _stringservices:
 .. _textservices:
 
-************************
-Text Processing Services
-************************
+*************************
+Các dịch vụ xử lý văn bản
+*************************
 
-The modules described in this chapter provide a wide range of string
-manipulation operations and other text processing services.
+Các mô-đun được mô tả trong chương này cung cấp nhiều thao tác xử lý chuỗi và các dịch vụ xử lý văn bản khác.
 
-The :mod:`codecs` module described under :ref:`binaryservices` is also
-highly relevant to text processing. In addition, see the documentation for
-Python's built-in string type in :ref:`textseq`.
+Mô-đun :mod:`codecs` được mô tả trong :ref:`binaryservices` cũng rất liên quan đến việc xử lý văn bản. Ngoài ra, hãy xem tài liệu về kiểu chuỗi tích hợp sẵn của Python trong :ref:`textseq`.
 
 
 .. toctree::

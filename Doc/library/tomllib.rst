@@ -1,115 +1,98 @@
-:mod:`!tomllib` --- Parse TOML files
-====================================
+:mod:`!tomllib` --- Phân tích tệp TOML
+======================================
 
 .. module:: tomllib
-   :synopsis: Parse TOML files.
+   :synopsis: Phân tích tệp TOML.
 
 .. versionadded:: 3.11
 
 .. moduleauthor:: Taneli Hukkinen
 .. sectionauthor:: Taneli Hukkinen
 
-**Source code:** :source:`Lib/tomllib`
+**Mã nguồn:** :source:`Lib/tomllib`
 
 --------------
 
-This module provides an interface for parsing TOML 1.0.0 (Tom's Obvious Minimal
-Language, `https://toml.io <https://toml.io/en/>`_). This module does not
-support writing TOML.
+Mô-đun này cung cấp giao diện để phân tích TOML 1.0.0 (Tom's Obvious Minimal Language, `https://toml.io <https://toml.io/en/>`_). Mô-đun này không hỗ trợ ghi TOML.
 
 .. warning::
 
-   Be cautious when parsing data from untrusted sources.
-   A malicious TOML string may cause the decoder to consume considerable
-   CPU and memory resources.
-   Limiting the size of data to be parsed is recommended.
+   Hãy thận trọng khi phân tích dữ liệu từ các nguồn không đáng tin cậy. Một chuỗi TOML độc hại có thể khiến bộ giải mã tiêu tốn đáng kể tài nguyên CPU và bộ nhớ. Bạn nên giới hạn kích thước dữ liệu cần phân tích.
 
 .. seealso::
 
-    The :pypi:`Tomli-W package <tomli-w>`
-    is a TOML writer that can be used in conjunction with this module,
-    providing a write API familiar to users of the standard library
-    :mod:`marshal` and :mod:`pickle` modules.
+    :pypi:`Tomli-W package <tomli-w>` là một trình ghi TOML có thể được sử dụng cùng với mô-đun này, cung cấp một API ghi quen thuộc với người dùng thư viện chuẩn
+    các mô-đun :mod:`marshal` và :mod:`pickle`.
 
 .. seealso::
 
-    The :pypi:`TOML Kit package <tomlkit>`
-    is a style-preserving TOML library with both read and write capability.
-    It is a recommended replacement for this module for editing already
-    existing TOML files.
+    :pypi:`TOML Kit package <tomlkit>` là một thư viện TOML bảo toàn kiểu định dạng, có cả khả năng đọc và ghi. Đây là thư viện được khuyến nghị thay thế cho mô-đun này khi chỉnh sửa các tệp TOML đã tồn tại.
 
 
-This module defines the following functions:
+Mô-đun này định nghĩa các hàm sau:
 
 .. function:: load(fp, /, *, parse_float=float)
 
-   Read a TOML file. The first argument should be a readable and binary file object.
-   Return a :class:`dict`. Convert TOML types to Python using this
-   :ref:`conversion table <toml-to-py-table>`.
+   Đọc một tệp TOML. Đối số đầu tiên phải là một đối tượng tệp nhị phân có thể đọc được. Trả về một :class:`dict`. Chuyển đổi các kiểu TOML sang Python bằng
+   :ref:`bảng chuyển đổi <toml-to-py-table>` này.
 
-   *parse_float* will be called with the string of every TOML
-   float to be decoded.  By default, this is equivalent to ``float(num_str)``.
-   This can be used to use another datatype or parser for TOML floats
-   (e.g. :class:`decimal.Decimal`). The callable must not return a
-   :class:`dict` or a :class:`list`, else a :exc:`ValueError` is raised.
+   *parse_float* sẽ được gọi với chuỗi của mỗi số thực TOML cần giải mã. Theo mặc định, hàm này tương đương với ``float(num_str)``. Có thể dùng cách này để sử dụng một kiểu dữ liệu hoặc trình phân tích cú pháp khác cho các số thực TOML (ví dụ: :class:`decimal.Decimal`). Hàm gọi được không được trả về một
+   :class:`dict` hoặc một :class:`list`, nếu không sẽ phát sinh :exc:`ValueError`.
 
-   A :exc:`TOMLDecodeError` will be raised on an invalid TOML document.
+   :exc:`TOMLDecodeError` sẽ được phát sinh khi tài liệu TOML không hợp lệ.
 
 
 .. function:: loads(s, /, *, parse_float=float)
 
-   Load TOML from a :class:`str` object. Return a :class:`dict`. Convert TOML
-   types to Python using this :ref:`conversion table <toml-to-py-table>`. The
-   *parse_float* argument has the same meaning as in :func:`load`.
+   Tải TOML từ một đối tượng :class:`str`. Trả về một :class:`dict`. Chuyển đổi các kiểu TOML sang Python bằng :ref:`bảng chuyển đổi <toml-to-py-table>` này. Đối số *parse_float* có cùng ý nghĩa như trong :func:`load`.
 
-   A :exc:`TOMLDecodeError` will be raised on an invalid TOML document.
+   :exc:`TOMLDecodeError` sẽ được phát sinh khi tài liệu TOML không hợp lệ.
 
 
-The following exceptions are available:
+Các ngoại lệ sau đây khả dụng:
 
 .. exception:: TOMLDecodeError(msg, doc, pos)
 
-   Subclass of :exc:`ValueError` with the following additional attributes:
+   Lớp con của :exc:`ValueError` với các thuộc tính bổ sung sau:
 
    .. attribute:: msg
 
-      The unformatted error message.
+      Thông báo lỗi chưa được định dạng.
 
    .. attribute:: doc
 
-      The TOML document being parsed.
+      Tài liệu TOML đang được phân tích cú pháp.
 
    .. attribute:: pos
 
-      The index of *doc* where parsing failed.
+      Chỉ mục của *doc* tại đó quá trình phân tích cú pháp thất bại.
 
    .. attribute:: lineno
 
-      The line corresponding to *pos*.
+      Dòng tương ứng với *pos*.
 
    .. attribute:: colno
 
-      The column corresponding to *pos*.
+      Cột tương ứng với *pos*.
 
    .. versionchanged:: 3.14
-      Added the *msg*, *doc* and *pos* parameters.
-      Added the :attr:`msg`, :attr:`doc`, :attr:`pos`, :attr:`lineno` and :attr:`colno` attributes.
+      Đã thêm các tham số *msg*, *doc* và *pos*. Đã thêm các thuộc tính :attr:`msg`, :attr:`doc`, :attr:`pos`, :attr:`lineno` và :attr:`colno`.
 
    .. deprecated:: 3.14
-      Passing free-form positional arguments is deprecated.
+      Việc truyền các đối số positional tùy ý đã không còn được khuyến nghị.
 
 
-Examples
---------
+Ví dụ
+-----
 
-Parsing a TOML file::
+Phân tích tệp TOML::
 
     import tomllib
 
     with open("pyproject.toml", "rb") as f:
         data = tomllib.load(f)
 
-Parsing a TOML string::
+Phân tích chuỗi TOML::
 
     import tomllib
 
@@ -121,37 +104,39 @@ Parsing a TOML string::
     data = tomllib.loads(toml_str)
 
 
-Conversion Table
-----------------
+Bảng chuyển đổi
+---------------
 
 .. _toml-to-py-table:
 
-+------------------+--------------------------------------------------------------------------------------+
-| TOML             | Python                                                                               |
-+==================+======================================================================================+
-| TOML document    | dict                                                                                 |
-+------------------+--------------------------------------------------------------------------------------+
-| string           | str                                                                                  |
-+------------------+--------------------------------------------------------------------------------------+
-| integer          | int                                                                                  |
-+------------------+--------------------------------------------------------------------------------------+
-| float            | float (configurable with *parse_float*)                                              |
-+------------------+--------------------------------------------------------------------------------------+
-| boolean          | bool                                                                                 |
-+------------------+--------------------------------------------------------------------------------------+
-| offset date-time | datetime.datetime (``tzinfo`` attribute set to an instance of ``datetime.timezone``) |
-+------------------+--------------------------------------------------------------------------------------+
-| local date-time  | datetime.datetime (``tzinfo`` attribute set to ``None``)                             |
-+------------------+--------------------------------------------------------------------------------------+
-| local date       | datetime.date                                                                        |
-+------------------+--------------------------------------------------------------------------------------+
-| local time       | datetime.time                                                                        |
-+------------------+--------------------------------------------------------------------------------------+
-| array            | list                                                                                 |
-+------------------+--------------------------------------------------------------------------------------+
-| table            | dict                                                                                 |
-+------------------+--------------------------------------------------------------------------------------+
-| inline table     | dict                                                                                 |
-+------------------+--------------------------------------------------------------------------------------+
-| array of tables  | list of dicts                                                                        |
-+------------------+--------------------------------------------------------------------------------------+
++---------------------+--------------------------------------------------------------------------------------+
+| TOML                | Python                                                                               |
++=====================+======================================================================================+
+| tài liệu TOML       | dict                                                                                 |
++---------------------+--------------------------------------------------------------------------------------+
+| chuỗi               | str                                                                                  |
++---------------------+--------------------------------------------------------------------------------------+
+| số nguyên           | int                                                                                  |
++---------------------+--------------------------------------------------------------------------------------+
+| số thực             | float (có thể cấu hình bằng *parse_float*)                                           |
++---------------------+--------------------------------------------------------------------------------------+
+| boolean             | bool                                                                                 |
++---------------------+--------------------------------------------------------------------------------------+
+| ngày-giờ có độ lệch | datetime.datetime (``tzinfo`` được đặt thành một instance của ``datetime.timezone``) |
++---------------------+--------------------------------------------------------------------------------------+
+| ngày-giờ cục bộ     | datetime.datetime (``tzinfo`` được đặt thành ``None``)                               |
++---------------------+--------------------------------------------------------------------------------------+
+| ngày cục bộ         | datetime.date                                                                        |
++---------------------+--------------------------------------------------------------------------------------+
+| giờ cục bộ          | datetime.time                                                                        |
++---------------------+--------------------------------------------------------------------------------------+
+| mảng                | danh sách                                                                            |
++---------------------+--------------------------------------------------------------------------------------+
+| bảng                | dict                                                                                 |
++---------------------+--------------------------------------------------------------------------------------+
+| bảng nội tuyến      | dict                                                                                 |
++---------------------+--------------------------------------------------------------------------------------+
+| mảng các bảng       | danh sách các dict                                                                   |
++---------------------+--------------------------------------------------------------------------------------+
+
+.. _`https://toml.io`: https://toml.io/en/

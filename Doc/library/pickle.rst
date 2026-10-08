@@ -1,13 +1,13 @@
-:mod:`!pickle` --- Python object serialization
-==============================================
+:mod:`!pickle` --- Tuần tự hóa đối tượng Python
+===============================================
 
 .. module:: pickle
-   :synopsis: Convert Python objects to streams of bytes and back.
+   :synopsis: Chuyển đổi các đối tượng Python thành các luồng byte và ngược lại.
 
 .. sectionauthor:: Jim Kerr <jbkerr@sr.hp.com>.
 .. sectionauthor:: Barry Warsaw <barry@python.org>
 
-**Source code:** :source:`Lib/pickle.py`
+**Mã nguồn:** :source:`Lib/pickle.py`
 
 .. index::
    single: persistence
@@ -19,561 +19,373 @@
 
 --------------
 
-The :mod:`!pickle` module implements binary protocols for serializing and
-de-serializing a Python object structure.  *"Pickling"* is the process
-whereby a Python object hierarchy is converted into a byte stream, and
-*"unpickling"* is the inverse operation, whereby a byte stream
-(from a :term:`binary file` or :term:`bytes-like object`) is converted
-back into an object hierarchy.  Pickling (and unpickling) is alternatively
-known as "serialization", "marshalling," [#]_ or "flattening"; however, to
-avoid confusion, the terms used here are "pickling" and "unpickling".
+Mô-đun :mod:`!pickle` triển khai các giao thức nhị phân để tuần tự hóa và giải tuần tự hóa một cấu trúc đối tượng Python.  *"Pickling"* là quá trình chuyển một hệ phân cấp đối tượng Python thành một luồng byte, còn *"unpickling"* là thao tác ngược lại, trong đó một luồng byte (từ :term:`binary file` hoặc :term:`bytes-like object`) được chuyển đổi trở lại thành một hệ phân cấp đối tượng.  Pickling (và unpickling) còn được gọi là "serialization", "marshalling," [#]_ hoặc "flattening"; tuy nhiên, để tránh nhầm lẫn, các thuật ngữ được sử dụng ở đây là "pickling" và "unpickling".
 
 .. warning::
 
-   The ``pickle`` module **is not secure**. Only unpickle data you trust.
+   Mô-đun ``pickle`` **không an toàn**. Chỉ unpickle dữ liệu mà bạn tin cậy.
 
-   It is possible to construct malicious pickle data which will **execute
-   arbitrary code during unpickling**. Never unpickle data that could have come
-   from an untrusted source, or that could have been tampered with.
+   Có thể tạo dữ liệu pickle độc hại khiến **thực thi mã tùy ý trong quá trình unpickling**. Không bao giờ unpickle dữ liệu có thể đến từ một nguồn không đáng tin cậy hoặc đã bị giả mạo.
 
-   Consider signing data with :mod:`hmac` if you need to ensure that it has not
-   been tampered with.
+   Hãy cân nhắc việc ký dữ liệu bằng :mod:`hmac` nếu bạn cần đảm bảo dữ liệu chưa bị giả mạo.
 
-   Safer serialization formats such as :mod:`json` may be more appropriate if
-   you are processing untrusted data. See :ref:`comparison-with-json`.
+   Các định dạng serialization an toàn hơn như :mod:`json` có thể phù hợp hơn nếu bạn đang xử lý dữ liệu không đáng tin cậy. Xem :ref:`comparison-with-json`.
 
 
-Relationship to other Python modules
-------------------------------------
+Mối quan hệ với các module Python khác
+--------------------------------------
 
-Comparison with ``marshal``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+So sánh với ``marshal``
+^^^^^^^^^^^^^^^^^^^^^^^
 
-Python has a more primitive serialization module called :mod:`marshal`, but in
-general :mod:`!pickle` should always be the preferred way to serialize Python
-objects.  :mod:`marshal` exists primarily to support Python's :file:`.pyc`
-files.
+Python có một module serialization nguyên thủy hơn có tên là :mod:`marshal`, nhưng nhìn chung :mod:`!pickle` luôn nên là cách ưu tiên để serialize các object Python. :mod:`marshal` chủ yếu tồn tại để hỗ trợ các tệp :file:`.pyc` của Python.
 
-The :mod:`!pickle` module differs from :mod:`marshal` in several significant ways:
+Module :mod:`!pickle` khác với :mod:`marshal` ở một số điểm quan trọng:
 
-* :mod:`marshal` cannot be used to serialize user-defined classes and their
-  instances.  :mod:`!pickle` can save and restore class instances transparently,
-  however the class definition must be importable and live in the same module as
-  when the object was pickled.
+* Không thể sử dụng :mod:`marshal` để serialize các class do người dùng định nghĩa và các instance của chúng. Tuy nhiên, :mod:`!pickle` có thể lưu và khôi phục các instance của class một cách minh bạch; nhưng định nghĩa class phải có thể import được và nằm trong cùng module như khi object được pickle.
 
-* The :mod:`marshal` serialization format is not guaranteed to be portable
-  across Python versions.  Because its primary job in life is to support
-  :file:`.pyc` files, the Python implementers reserve the right to change the
-  serialization format in non-backwards compatible ways should the need arise.
-  The :mod:`!pickle` serialization format is guaranteed to be backwards compatible
-  across Python releases provided a compatible pickle protocol is chosen and
-  pickling and unpickling code deals with Python 2 to Python 3 type differences
-  if your data is crossing that unique breaking change language boundary.
+* Định dạng serialization :mod:`marshal` không được đảm bảo là portable giữa các phiên bản Python. Vì nhiệm vụ chính của nó là hỗ trợ
+  Đối với các tệp :file:`.pyc`, các nhà triển khai Python bảo lưu quyền thay đổi định dạng tuần tự hóa theo những cách không tương thích ngược nếu nhu cầu phát sinh. Định dạng tuần tự hóa :mod:`!pickle` được đảm bảo tương thích ngược giữa các bản phát hành Python, miễn là chọn một pickle protocol tương thích và mã pickling, unpickling xử lý các khác biệt về kiểu dữ liệu giữa Python 2 và Python 3 nếu dữ liệu của bạn đi qua ranh giới ngôn ngữ đặc biệt gây gián đoạn đó.
 
 
 .. _comparison-with-json:
 
-Comparison with ``json``
-^^^^^^^^^^^^^^^^^^^^^^^^
+So sánh với ``json``
+^^^^^^^^^^^^^^^^^^^^
 
-There are fundamental differences between the pickle protocols and
-`JSON (JavaScript Object Notation) <https://json.org>`_:
+Có những khác biệt cơ bản giữa các pickle protocol và `JSON (JavaScript Object Notation) <https://json.org>`_:
 
-* JSON is a text serialization format (it outputs unicode text, although
-  most of the time it is then encoded to ``utf-8``), while pickle is
-  a binary serialization format;
+* JSON là một định dạng tuần tự hóa dạng văn bản (nó xuất ra văn bản unicode, mặc dù phần lớn thời gian văn bản này sau đó được mã hóa thành ``utf-8``), trong khi pickle là một định dạng tuần tự hóa nhị phân;
 
-* JSON is human-readable, while pickle is not;
+* JSON có thể đọc được bởi con người, còn pickle thì không;
 
-* JSON is interoperable and widely used outside of the Python ecosystem,
-  while pickle is Python-specific;
+* JSON có khả năng tương tác và được sử dụng rộng rãi bên ngoài hệ sinh thái Python, còn pickle chỉ dành riêng cho Python;
 
-* JSON, by default, can only represent a subset of the Python built-in
-  types, and no custom classes; pickle can represent an extremely large
-  number of Python types (many of them automatically, by clever usage
-  of Python's introspection facilities; complex cases can be tackled by
-  implementing :ref:`specific object APIs <pickle-inst>`);
+* Theo mặc định, JSON chỉ có thể biểu diễn một tập hợp con các kiểu dựng sẵn của Python và không thể biểu diễn các lớp tùy chỉnh; pickle có thể biểu diễn một số lượng cực lớn các kiểu Python (nhiều kiểu trong số đó được xử lý tự động nhờ sử dụng khéo léo các cơ chế introspection của Python; những trường hợp phức tạp có thể được giải quyết bằng cách triển khai :ref:`specific object APIs <pickle-inst>`);
 
-* Unlike pickle, deserializing untrusted JSON does not in itself create an
-  arbitrary code execution vulnerability.
+* Không giống pickle, việc deserialize JSON không đáng tin cậy tự nó không tạo ra lỗ hổng cho phép thực thi mã tùy ý.
 
 .. seealso::
-   The :mod:`json` module: a standard library module allowing JSON
-   serialization and deserialization.
+   Mô-đun :mod:`json`: một mô-đun trong standard library cho phép serialize và deserialize JSON.
 
 
 .. _pickle-protocols:
 
-Data stream format
-------------------
+Định dạng luồng dữ liệu
+-----------------------
 
 .. index::
    single: External Data Representation
 
-The data format used by :mod:`!pickle` is Python-specific.  This has the
-advantage that there are no restrictions imposed by external standards such as
-JSON (which can't represent pointer sharing); however it means that
-non-Python programs may not be able to reconstruct pickled Python objects.
+Định dạng dữ liệu được :mod:`!pickle` sử dụng dành riêng cho Python. Điều này có ưu điểm là không bị các tiêu chuẩn bên ngoài như JSON áp đặt hạn chế (JSON không thể biểu diễn việc chia sẻ con trỏ); tuy nhiên, điều đó có nghĩa là các chương trình không viết bằng Python có thể không tái tạo được các đối tượng Python đã được pickle.
 
-By default, the :mod:`!pickle` data format uses a relatively compact binary
-representation.  If you need optimal size characteristics, you can efficiently
-:doc:`compress <archiving>` pickled data.
+Theo mặc định, định dạng dữ liệu :mod:`!pickle` sử dụng biểu diễn nhị phân tương đối nhỏ gọn. Nếu cần kích thước tối ưu, bạn có thể
+:doc:`nén <archiving>` dữ liệu đã được pickle.
 
-The module :mod:`pickletools` contains tools for analyzing data streams
-generated by :mod:`!pickle`.  :mod:`pickletools` source code has extensive
-comments about opcodes used by pickle protocols.
+Mô-đun :mod:`pickletools` chứa các công cụ để phân tích các luồng dữ liệu được tạo bởi :mod:`!pickle`. Mã nguồn :mod:`pickletools` có các chú thích chi tiết về những opcode được các giao thức pickle sử dụng.
 
-There are currently 6 different protocols which can be used for pickling.
-The higher the protocol used, the more recent the version of Python needed
-to read the pickle produced.
+Hiện có 6 protocol khác nhau có thể được sử dụng để pickling. Protocol được sử dụng càng cao thì phiên bản Python cần thiết để đọc pickle được tạo ra càng mới.
 
-* Protocol version 0 is the original "human-readable" protocol and is
-  backwards compatible with earlier versions of Python.
+* Protocol phiên bản 0 là protocol "con người có thể đọc được" ban đầu và tương thích ngược với các phiên bản Python trước đó.
 
-* Protocol version 1 is an old binary format which is also compatible with
-  earlier versions of Python.
+* Protocol phiên bản 1 là một định dạng nhị phân cũ, cũng tương thích với các phiên bản Python trước đó.
 
-* Protocol version 2 was introduced in Python 2.3.  It provides much more
-  efficient pickling of :term:`new-style classes <new-style class>`.  Refer to :pep:`307` for
-  information about improvements brought by protocol 2.
+* Protocol phiên bản 2 được giới thiệu trong Python 2.3. Protocol này cung cấp khả năng pickling hiệu quả hơn nhiều cho :term:`new-style classes <new-style class>`. Tham khảo :pep:`307` để biết thông tin về những cải tiến do protocol 2 mang lại.
 
-* Protocol version 3 was added in Python 3.0.  It has explicit support for
-  :class:`bytes` objects and cannot be unpickled by Python 2.x.  This was
-  the default protocol in Python 3.0--3.7.
+* Protocol phiên bản 3 được bổ sung trong Python 3.0. Protocol này có hỗ trợ rõ ràng cho
+  :class:`bytes` objects và không thể được unpickle bằng Python 2.x. Đây là protocol mặc định trong Python 3.0--3.7.
 
-* Protocol version 4 was added in Python 3.4.  It adds support for very large
-  objects, pickling more kinds of objects, and some data format
-  optimizations.  This was the default protocol in Python 3.8--3.13.
-  Refer to :pep:`3154` for information about improvements brought by
-  protocol 4.
+* Protocol phiên bản 4 được bổ sung trong Python 3.4. Protocol này bổ sung hỗ trợ cho các đối tượng rất lớn, pickling nhiều loại đối tượng hơn và một số tối ưu hóa định dạng dữ liệu. Đây là protocol mặc định trong Python 3.8--3.13. Tham khảo :pep:`3154` để biết thông tin về những cải tiến do protocol 4 mang lại.
 
-* Protocol version 5 was added in Python 3.8.  It adds support for out-of-band
-  data and speedup for in-band data.  It is the default protocol starting with
-  Python 3.14.  Refer to :pep:`574` for information about improvements brought
-  by protocol 5.
+* Protocol phiên bản 5 được bổ sung trong Python 3.8. Nó hỗ trợ dữ liệu ngoài luồng và tăng tốc dữ liệu trong luồng. Đây là protocol mặc định bắt đầu từ Python 3.14. Tham khảo :pep:`574` để biết thông tin về những cải tiến do protocol 5 mang lại.
 
 .. note::
-   Serialization is a more primitive notion than persistence; although
-   :mod:`!pickle` reads and writes file objects, it does not handle the issue of
-   naming persistent objects, nor the (even more complicated) issue of concurrent
-   access to persistent objects.  The :mod:`!pickle` module can transform a complex
-   object into a byte stream and it can transform the byte stream into an object
-   with the same internal structure.  Perhaps the most obvious thing to do with
-   these byte streams is to write them onto a file, but it is also conceivable to
-   send them across a network or store them in a database.  The :mod:`shelve`
-   module provides a simple interface to pickle and unpickle objects on
-   DBM-style database files.
+   Serialization là một khái niệm nguyên thủy hơn persistence; mặc dù
+   :mod:`!pickle` đọc và ghi các đối tượng tệp, nhưng không xử lý vấn đề đặt tên cho các đối tượng persistent, cũng như vấn đề (thậm chí phức tạp hơn) về việc truy cập đồng thời vào các đối tượng persistent. Module :mod:`!pickle` có thể chuyển đổi một đối tượng phức tạp thành một luồng byte và chuyển đổi luồng byte đó thành một đối tượng có cùng cấu trúc bên trong. Có lẽ cách hiển nhiên nhất để sử dụng các luồng byte này là ghi chúng vào một tệp, nhưng cũng có thể gửi chúng qua mạng hoặc lưu trữ chúng trong cơ sở dữ liệu. Module :mod:`shelve` cung cấp một giao diện đơn giản để pickle và unpickle các đối tượng trên các tệp cơ sở dữ liệu kiểu DBM.
 
 
-Module Interface
+Giao diện module
 ----------------
 
-To serialize an object hierarchy, you simply call the :func:`dumps` function.
-Similarly, to de-serialize a data stream, you call the :func:`loads` function.
-However, if you want more control over serialization and de-serialization,
-you can create a :class:`Pickler` or an :class:`Unpickler` object, respectively.
+Để serialize một hệ phân cấp đối tượng, bạn chỉ cần gọi hàm :func:`dumps`. Tương tự, để de-serialize một luồng dữ liệu, bạn gọi hàm :func:`loads`. Tuy nhiên, nếu muốn kiểm soát nhiều hơn việc serialize và de-serialize, bạn có thể lần lượt tạo một đối tượng :class:`Pickler` hoặc :class:`Unpickler`.
 
-The :mod:`!pickle` module provides the following constants:
+Module :mod:`!pickle` cung cấp các hằng số sau:
 
 
 .. data:: HIGHEST_PROTOCOL
 
-   An integer, the highest :ref:`protocol version <pickle-protocols>`
-   available.  This value can be passed as a *protocol* value to functions
-   :func:`dump` and :func:`dumps` as well as the :class:`Pickler`
-   constructor.
+   Một số nguyên, :ref:`phiên bản giao thức <pickle-protocols>` cao nhất hiện có. Giá trị này có thể được truyền dưới dạng *giao thức* cho các hàm
+   :func:`dump` và :func:`dumps`, cũng như constructor :class:`Pickler`.
 
 .. data:: DEFAULT_PROTOCOL
 
-   An integer, the default :ref:`protocol version <pickle-protocols>` used
-   for pickling.  May be less than :data:`HIGHEST_PROTOCOL`.  Currently the
-   default protocol is 5, introduced in Python 3.8 and incompatible
-   with previous versions. This version introduces support for out-of-band
-   buffers, where :pep:`3118`-compatible data can be transmitted separately
-   from the main pickle stream.
+   Một số nguyên, phiên bản protocol mặc định :ref:`protocol version <pickle-protocols>` được sử dụng để pickle. Có thể nhỏ hơn :data:`HIGHEST_PROTOCOL`. Hiện tại, protocol mặc định là 5, được giới thiệu trong Python 3.8 và không tương thích với các phiên bản trước đó. Phiên bản này bổ sung hỗ trợ cho các buffer ngoài luồng, trong đó dữ liệu tương thích với :pep:`3118` có thể được truyền riêng khỏi luồng pickle chính.
 
    .. versionchanged:: 3.0
 
-      The default protocol is 3.
+      Protocol mặc định là 3.
 
    .. versionchanged:: 3.8
 
-      The default protocol is 4.
+      Protocol mặc định là 4.
 
    .. versionchanged:: 3.14
 
-      The default protocol is 5.
+      Protocol mặc định là 5.
 
-The :mod:`!pickle` module provides the following functions to make the pickling
-process more convenient:
+Module :mod:`!pickle` cung cấp các hàm sau để giúp quá trình pickle thuận tiện hơn:
 
 .. function:: dump(obj, file, protocol=None, *, fix_imports=True, buffer_callback=None)
 
-   Write the pickled representation of the object *obj* to the open
-   :term:`file object` *file*.  This is equivalent to
-   ``Pickler(file, protocol).dump(obj)``.
+   Ghi biểu diễn đã pickle của đối tượng *obj* vào tệp đã mở
+   :term:`file object` *file*.  Điều này tương đương với ``Pickler(file, protocol).dump(obj)``.
 
-   Arguments *file*, *protocol*, *fix_imports* and *buffer_callback* have
-   the same meaning as in the :class:`Pickler` constructor.
+   Các đối số *file*, *protocol*, *fix_imports* và *buffer_callback* có cùng ý nghĩa như trong hàm khởi tạo :class:`Pickler`.
 
    .. versionchanged:: 3.8
-      The *buffer_callback* argument was added.
+      Đối số *buffer_callback* đã được thêm.
 
 .. function:: dumps(obj, protocol=None, *, fix_imports=True, buffer_callback=None)
 
-   Return the pickled representation of the object *obj* as a :class:`bytes` object,
-   instead of writing it to a file.
+   Trả về biểu diễn đã được pickle của đối tượng *obj* dưới dạng một đối tượng :class:`bytes`, thay vì ghi đối tượng đó vào tệp.
 
-   Arguments *protocol*, *fix_imports* and *buffer_callback* have the same
-   meaning as in the :class:`Pickler` constructor.
+   Các đối số *protocol*, *fix_imports* và *buffer_callback* có cùng ý nghĩa như trong hàm khởi tạo :class:`Pickler`.
 
    .. versionchanged:: 3.8
-      The *buffer_callback* argument was added.
+      Đối số *buffer_callback* đã được thêm.
 
 .. function:: load(file, *, fix_imports=True, encoding="ASCII", errors="strict", buffers=None)
 
-   Read the pickled representation of an object from the open :term:`file object`
-   *file* and return the reconstituted object hierarchy specified therein.
-   This is equivalent to ``Unpickler(file).load()``.
+   Đọc biểu diễn đã được pickle của một đối tượng từ :term:`file object` *file* đang mở và trả về hệ phân cấp đối tượng được tái tạo như đã chỉ định trong đó. Điều này tương đương với ``Unpickler(file).load()``.
 
-   The protocol version of the pickle is detected automatically, so no
-   protocol argument is needed.  Bytes past the pickled representation
-   of the object are ignored.
+   Phiên bản protocol của pickle được tự động phát hiện, vì vậy không cần đối số protocol. Các byte nằm sau phần biểu diễn pickle của đối tượng sẽ bị bỏ qua.
 
-   Arguments *file*, *fix_imports*, *encoding*, *errors*, *strict* and *buffers*
-   have the same meaning as in the :class:`Unpickler` constructor.
+   Các đối số *file*, *fix_imports*, *encoding*, *errors*, *strict* và *buffers* có cùng ý nghĩa như trong constructor :class:`Unpickler`.
 
    .. versionchanged:: 3.8
-      The *buffers* argument was added.
+      Đối số *buffers* đã được bổ sung.
 
 .. function:: loads(data, /, *, fix_imports=True, encoding="ASCII", errors="strict", buffers=None)
 
-   Return the reconstituted object hierarchy of the pickled representation
-   *data* of an object. *data* must be a :term:`bytes-like object`.
+   Trả về cấu trúc phân cấp đối tượng đã được tái tạo từ biểu diễn pickle *data* của một đối tượng. *data* phải là một :term:`bytes-like object`.
 
-   The protocol version of the pickle is detected automatically, so no
-   protocol argument is needed.  Bytes past the pickled representation
-   of the object are ignored.
+   Phiên bản protocol của pickle được tự động phát hiện, vì vậy không cần đối số protocol. Các byte nằm sau phần biểu diễn pickle của đối tượng sẽ bị bỏ qua.
 
-   Arguments *fix_imports*, *encoding*, *errors*, *strict* and *buffers*
-   have the same meaning as in the :class:`Unpickler` constructor.
+   Các đối số *fix_imports*, *encoding*, *errors*, *strict* và *buffers* có cùng ý nghĩa như trong constructor :class:`Unpickler`.
 
    .. versionchanged:: 3.8
-      The *buffers* argument was added.
+      Đối số *buffers* đã được bổ sung.
 
 
-The :mod:`!pickle` module defines three exceptions:
+Mô-đun :mod:`!pickle` định nghĩa ba ngoại lệ:
 
 .. exception:: PickleError
 
-   Common base class for the other pickling exceptions.  It inherits from
+   Lớp cơ sở chung cho các ngoại lệ pickling khác. Lớp này kế thừa từ
    :exc:`Exception`.
 
 .. exception:: PicklingError
 
-   Error raised when an unpicklable object is encountered by :class:`Pickler`.
-   It inherits from :exc:`PickleError`.
+   Ngoại lệ được phát sinh khi :class:`Pickler` gặp một đối tượng không thể pickling. Lớp này kế thừa từ :exc:`PickleError`.
 
-   Refer to :ref:`pickle-picklable` to learn what kinds of objects can be
-   pickled.
+   Tham khảo :ref:`pickle-picklable` để tìm hiểu những loại đối tượng nào có thể được pickling.
 
 .. exception:: UnpicklingError
 
-   Error raised when there is a problem unpickling an object, such as a data
-   corruption or a security violation.  It inherits from :exc:`PickleError`.
+   Ngoại lệ được phát sinh khi xảy ra sự cố trong quá trình unpickling một đối tượng, chẳng hạn như dữ liệu bị hỏng hoặc vi phạm bảo mật. Lớp này kế thừa từ :exc:`PickleError`.
 
-   Note that other exceptions may also be raised during unpickling, including
-   (but not necessarily limited to) AttributeError, EOFError, ImportError, and
-   IndexError.
+   Lưu ý rằng các ngoại lệ khác cũng có thể được phát sinh trong quá trình unpickling, bao gồm nhưng không nhất thiết giới hạn ở AttributeError, EOFError, ImportError và IndexError.
 
 
-The :mod:`!pickle` module exports three classes, :class:`Pickler`,
-:class:`Unpickler` and :class:`PickleBuffer`:
+Mô-đun :mod:`!pickle` xuất ba lớp, :class:`Pickler`,
+:class:`Unpickler` và :class:`PickleBuffer`:​
 
 .. class:: Pickler(file, protocol=None, *, fix_imports=True, buffer_callback=None)
 
-   This takes a binary file for writing a pickle data stream.
+   Hàm này nhận một tệp nhị phân để ghi luồng dữ liệu pickle.
 
-   The optional *protocol* argument, an integer, tells the pickler to use
-   the given protocol; supported protocols are 0 to :data:`HIGHEST_PROTOCOL`.
-   If not specified, the default is :data:`DEFAULT_PROTOCOL`.  If a negative
-   number is specified, :data:`HIGHEST_PROTOCOL` is selected.
+   Đối số *protocol*, là một số nguyên, cho biết pickler sẽ sử dụng protocol được chỉ định; các protocol được hỗ trợ là từ 0 đến :data:`HIGHEST_PROTOCOL`. Nếu không được chỉ định, giá trị mặc định là :data:`DEFAULT_PROTOCOL`. Nếu chỉ định một số âm, :data:`HIGHEST_PROTOCOL` sẽ được chọn.
 
-   The *file* argument must have a write() method that accepts a single bytes
-   argument.  It can thus be an on-disk file opened for binary writing, an
-   :class:`io.BytesIO` instance, or any other custom object that meets this
-   interface.
+   Đối số *file* phải có phương thức write() chấp nhận một đối số bytes duy nhất. Do đó, đối số này có thể là một tệp trên đĩa được mở để ghi nhị phân, một
+   :class:`io.BytesIO` instance hoặc bất kỳ đối tượng tùy chỉnh nào khác đáp ứng giao diện này.
 
-   If *fix_imports* is true and *protocol* is less than 3, pickle will try to
-   map the new Python 3 names to the old module names used in Python 2, so
-   that the pickle data stream is readable with Python 2.
+   Nếu *fix_imports* là true và *protocol* nhỏ hơn 3, pickle sẽ cố ánh xạ các tên mới trong Python 3 sang tên module cũ được sử dụng trong Python 2, để luồng dữ liệu pickle có thể đọc được bằng Python 2.
 
-   If *buffer_callback* is ``None`` (the default), buffer views are
-   serialized into *file* as part of the pickle stream.
+   Nếu *buffer_callback* là ``None`` (mặc định), các buffer view sẽ được tuần tự hóa vào *file* như một phần của luồng pickle.
 
-   If *buffer_callback* is not ``None``, then it can be called any number
-   of times with a buffer view.  If the callback returns a false value
-   (such as ``None``), the given buffer is :ref:`out-of-band <pickle-oob>`;
-   otherwise the buffer is serialized in-band, i.e. inside the pickle stream.
+   Nếu *buffer_callback* không phải là ``None``, thì nó có thể được gọi nhiều lần với một buffer view. Nếu callback trả về một giá trị false (chẳng hạn như ``None``), buffer được cung cấp sẽ được xử lý :ref:`out-of-band <pickle-oob>`; nếu không, buffer sẽ được tuần tự hóa in-band, tức là bên trong pickle stream.
 
-   It is an error if *buffer_callback* is not ``None`` and *protocol* is
-   ``None`` or smaller than 5.
+   Đây là lỗi nếu *buffer_callback* không phải là ``None`` và *protocol* là ``None`` hoặc nhỏ hơn 5.
 
    .. versionchanged:: 3.8
-      The *buffer_callback* argument was added.
+      Đối số *buffer_callback* đã được thêm.
 
    .. method:: dump(obj)
 
-      Write the pickled representation of *obj* to the open file object given in
-      the constructor.
+      Ghi biểu diễn đã được pickle của *obj* vào đối tượng file đang mở được cung cấp trong constructor.
 
    .. method:: persistent_id(obj)
 
-      Do nothing by default.  This exists so a subclass can override it.
+      Mặc định, không làm gì cả. Phương thức này tồn tại để subclass có thể override.
 
-      If :meth:`persistent_id` returns ``None``, *obj* is pickled as usual.  Any
-      other value causes :class:`Pickler` to emit the returned value as a
-      persistent ID for *obj*.  The meaning of this persistent ID should be
-      defined by :meth:`Unpickler.persistent_load`.  Note that the value
-      returned by :meth:`persistent_id` cannot itself have a persistent ID.
+      Nếu :meth:`persistent_id` trả về ``None``, *obj* sẽ được pickle như bình thường. Bất kỳ giá trị nào khác sẽ khiến :class:`Pickler` phát ra giá trị được trả về dưới dạng persistent ID cho *obj*. Ý nghĩa của persistent ID này phải được định nghĩa bởi :meth:`Unpickler.persistent_load`. Lưu ý rằng giá trị được :meth:`persistent_id` trả về bản thân nó không thể có persistent ID.
 
-      See :ref:`pickle-persistent` for details and examples of uses.
+      Xem :ref:`pickle-persistent` để biết chi tiết và các ví dụ về cách sử dụng.
 
       .. versionchanged:: 3.13
-         Add the default implementation of this method in the C implementation
-         of :class:`!Pickler`.
+         Thêm phần triển khai mặc định của phương thức này trong phần triển khai bằng C của :class:`!Pickler`.
 
    .. attribute:: dispatch_table
 
-      A pickler object's dispatch table is a registry of *reduction
-      functions* of the kind which can be declared using
-      :func:`copyreg.pickle`.  It is a mapping whose keys are classes
-      and whose values are reduction functions.  A reduction function
-      takes a single argument of the associated class and should
-      conform to the same interface as a :meth:`~object.__reduce__`
-      method.
+      Bảng điều phối của một đối tượng pickler là một registry gồm các *hàm reduction* thuộc loại có thể được khai báo bằng
+      :func:`copyreg.pickle`. Đây là một ánh xạ trong đó các khóa là các lớp, còn các giá trị là các hàm reduction. Một hàm reduction nhận một đối số thuộc lớp tương ứng và phải tuân theo cùng interface như một phương thức :meth:`~object.__reduce__`.
 
-      By default, a pickler object will not have a
-      :attr:`dispatch_table` attribute, and it will instead use the
-      global dispatch table managed by the :mod:`copyreg` module.
-      However, to customize the pickling for a specific pickler object
-      one can set the :attr:`dispatch_table` attribute to a dict-like
-      object.  Alternatively, if a subclass of :class:`Pickler` has a
-      :attr:`dispatch_table` attribute then this will be used as the
-      default dispatch table for instances of that class.
+      Theo mặc định, một đối tượng pickler sẽ không có một
+      :attr:`dispatch_table` attribute và thay vào đó sẽ sử dụng bảng điều phối toàn cục do module :mod:`copyreg` quản lý. Tuy nhiên, để tùy chỉnh việc pickling cho một đối tượng pickler cụ thể, bạn có thể đặt attribute :attr:`dispatch_table` thành một đối tượng dạng dict. Ngoài ra, nếu một subclass của :class:`Pickler` có một
+      :attr:`dispatch_table` attribute thì attribute này sẽ được sử dụng làm bảng điều phối mặc định cho các instance của lớp đó.
 
-      See :ref:`pickle-dispatch` for usage examples.
+      Xem :ref:`pickle-dispatch` để biết các ví dụ sử dụng.
 
       .. versionadded:: 3.3
 
    .. method:: reducer_override(obj)
 
-      Special reducer that can be defined in :class:`Pickler` subclasses. This
-      method has priority over any reducer in the :attr:`dispatch_table`.  It
-      should conform to the same interface as a :meth:`~object.__reduce__` method, and
-      can optionally return :data:`NotImplemented` to fallback on
-      :attr:`dispatch_table`-registered reducers to pickle ``obj``.
+      Reducer đặc biệt có thể được định nghĩa trong các lớp con của :class:`Pickler`. Phương thức này được ưu tiên hơn mọi reducer trong :attr:`dispatch_table`. Nó phải tuân theo cùng interface như một phương thức :meth:`~object.__reduce__`, và tùy chọn có thể trả về :data:`NotImplemented` để chuyển sang dùng
+      Các reducer đã được đăng ký với :attr:`dispatch_table` để pickle ``obj``.
 
-      For a detailed example, see :ref:`reducer_override`.
+      Để xem ví dụ chi tiết, hãy xem :ref:`reducer_override`.
 
       .. versionadded:: 3.8
 
    .. attribute:: fast
 
-      Deprecated. Enable fast mode if set to a true value.  The fast mode
-      disables the usage of memo, therefore speeding the pickling process by not
-      generating superfluous PUT opcodes.  It should not be used with
-      self-referential objects, doing otherwise will cause :class:`Pickler` to
-      recurse infinitely.
+      Đã lỗi thời. Bật fast mode nếu được đặt thành giá trị true. Fast mode vô hiệu hóa việc sử dụng memo, nhờ đó tăng tốc quá trình pickling bằng cách không tạo các opcode PUT thừa. Không nên sử dụng chế độ này với các đối tượng tự tham chiếu; nếu làm vậy, :class:`Pickler` sẽ đệ quy vô hạn.
 
-      Use :func:`pickletools.optimize` if you need more compact pickles.
+      Sử dụng :func:`pickletools.optimize` nếu bạn cần các pickle nhỏ gọn hơn.
 
    .. method:: clear_memo()
 
-      Clears the pickler's "memo".
+      Xóa "memo" của pickler.
 
-      The memo is the data structure that remembers which objects the
-      pickler has already seen, so that shared or recursive objects
-      are pickled by reference and not by value.  This method is
-      useful when re-using picklers.
+      Memo là cấu trúc dữ liệu ghi nhớ những đối tượng mà pickler đã thấy, nhờ đó các đối tượng dùng chung hoặc đệ quy được pickle bằng tham chiếu thay vì bằng giá trị. Phương thức này hữu ích khi tái sử dụng pickler.
 
 
 .. class:: Unpickler(file, *, fix_imports=True, encoding="ASCII", errors="strict", buffers=None)
 
-   This takes a binary file for reading a pickle data stream.
+   Đối tượng này nhận một tệp nhị phân để đọc một luồng dữ liệu pickle.
 
-   The protocol version of the pickle is detected automatically, so no
-   protocol argument is needed.
+   Phiên bản protocol của pickle được tự động phát hiện, vì vậy không cần cung cấp đối số protocol.
 
-   The argument *file* must have three methods, a read() method that takes an
-   integer argument, a readinto() method that takes a buffer argument
-   and a readline() method that requires no arguments, as in the
-   :class:`io.BufferedIOBase` interface.  Thus *file* can be an on-disk file
-   opened for binary reading, an :class:`io.BytesIO` object, or any other
-   custom object that meets this interface.
+   Đối số *file* phải có ba phương thức: phương thức read() nhận một đối số số nguyên, phương thức readinto() nhận một đối số bộ đệm và phương thức readline() không yêu cầu đối số nào, như trong
+   :class:`io.BufferedIOBase` interface.  Vì vậy, *file* có thể là một tệp trên ổ đĩa được mở để đọc nhị phân, một đối tượng :class:`io.BytesIO`, hoặc bất kỳ đối tượng tùy chỉnh nào khác đáp ứng interface này.
 
-   The optional arguments *fix_imports*, *encoding* and *errors* are used
-   to control compatibility support for pickle stream generated by Python 2.
-   If *fix_imports* is true, pickle will try to map the old Python 2 names
-   to the new names used in Python 3.  The *encoding* and *errors* tell
-   pickle how to decode 8-bit string instances pickled by Python 2;
-   these default to 'ASCII' and 'strict', respectively.  The *encoding* can
-   be 'bytes' to read these 8-bit string instances as bytes objects.
-   Using ``encoding='latin1'`` is required for unpickling NumPy arrays and
-   instances of :class:`~datetime.datetime`, :class:`~datetime.date` and
-   :class:`~datetime.time` pickled by Python 2.
+   Các đối số tùy chọn *fix_imports*, *encoding* và *errors* được dùng để kiểm soát khả năng tương thích với các pickle stream được tạo bởi Python 2. Nếu *fix_imports* là true, pickle sẽ cố gắng ánh xạ các tên cũ của Python 2 sang các tên mới được dùng trong Python 3.  *encoding* và *errors* cho pickle biết cách giải mã các thực thể chuỗi 8-bit được pickle bởi Python 2; các giá trị mặc định lần lượt là 'ASCII' và 'strict'.  *encoding* có thể là 'bytes' để đọc các thực thể chuỗi 8-bit này dưới dạng đối tượng bytes. Việc sử dụng ``encoding='latin1'`` là bắt buộc khi unpickle các mảng NumPy và các thực thể của :class:`~datetime.datetime`, :class:`~datetime.date` và
+   :class:`~datetime.time` được pickle bởi Python 2.
 
-   If *buffers* is ``None`` (the default), then all data necessary for
-   deserialization must be contained in the pickle stream.  This means
-   that the *buffer_callback* argument was ``None`` when a :class:`Pickler`
-   was instantiated (or when :func:`dump` or :func:`dumps` was called).
+   Nếu *buffers* là ``None`` (mặc định), thì mọi dữ liệu cần thiết cho quá trình deserialization phải được chứa trong pickle stream.  Điều này có nghĩa là đối số *buffer_callback* đã là ``None`` khi một :class:`Pickler` được khởi tạo (hoặc khi :func:`dump` hoặc :func:`dumps` được gọi).
 
-   If *buffers* is not ``None``, it should be an iterable of buffer-enabled
-   objects that is consumed each time the pickle stream references
-   an :ref:`out-of-band <pickle-oob>` buffer view.  Such buffers have been
-   given in order to the *buffer_callback* of a Pickler object.
+   Nếu *buffers* không phải là ``None``, thì đó phải là một iterable gồm các đối tượng hỗ trợ buffer, được sử dụng mỗi khi luồng pickle tham chiếu đến một buffer view :ref:`out-of-band <pickle-oob>`. Các buffer như vậy đã được truyền cho *buffer_callback* của một đối tượng Pickler.
 
    .. versionchanged:: 3.8
-      The *buffers* argument was added.
+      Đối số *buffers* đã được bổ sung.
 
    .. method:: load()
 
-      Read the pickled representation of an object from the open file object
-      given in the constructor, and return the reconstituted object hierarchy
-      specified therein.  Bytes past the pickled representation of the object
-      are ignored.
+      Đọc biểu diễn pickle của một đối tượng từ đối tượng tệp đang mở được cung cấp trong hàm khởi tạo, rồi trả về cấu trúc phân cấp đối tượng được tái tạo như đã chỉ định trong đó. Các byte nằm sau biểu diễn pickle của đối tượng sẽ bị bỏ qua.
 
    .. method:: persistent_load(pid)
 
-      Raise an :exc:`UnpicklingError` by default.
+      Theo mặc định, sẽ phát sinh một :exc:`UnpicklingError`.
 
-      If defined, :meth:`persistent_load` should return the object specified by
-      the persistent ID *pid*.  If an invalid persistent ID is encountered, an
-      :exc:`UnpicklingError` should be raised.
+      Nếu được định nghĩa, :meth:`persistent_load` sẽ trả về đối tượng được chỉ định bởi persistent ID *pid*. Nếu gặp một persistent ID không hợp lệ thì
+      cần phát sinh :exc:`UnpicklingError`.
 
-      See :ref:`pickle-persistent` for details and examples of uses.
+      Xem :ref:`pickle-persistent` để biết chi tiết và các ví dụ về cách sử dụng.
 
       .. versionchanged:: 3.13
-         Add the default implementation of this method in the C implementation
-         of :class:`!Unpickler`.
+         Thêm phần triển khai mặc định của phương thức này trong phần triển khai C của :class:`!Unpickler`.
 
    .. method:: find_class(module, name)
 
-      Import *module* if necessary and return the object called *name* from it,
-      where the *module* and *name* arguments are :class:`str` objects.  Note,
-      unlike its name suggests, :meth:`find_class` is also used for finding
-      functions.
+      Nhập *module* nếu cần và trả về đối tượng có tên *name* từ đó, trong đó các đối số *module* và *name* là các đối tượng :class:`str`. Lưu ý rằng, trái với tên gọi của nó, :meth:`find_class` cũng được dùng để tìm các hàm.
 
-      Subclasses may override this to gain control over what type of objects and
-      how they can be loaded, potentially reducing security risks. Refer to
-      :ref:`pickle-restrict` for details.
+      Các lớp con có thể ghi đè phương thức này để kiểm soát loại đối tượng nào và cách chúng được tải, từ đó có khả năng giảm thiểu các rủi ro bảo mật. Tham khảo
+      :ref:`pickle-restrict` để biết chi tiết.
 
       .. audit-event:: pickle.find_class module,name pickle.Unpickler.find_class
 
 .. class:: PickleBuffer(buffer)
 
-   A wrapper for a buffer representing picklable data.  *buffer* must be a
-   :ref:`buffer-providing <bufferobjects>` object, such as a
-   :term:`bytes-like object` or a N-dimensional array.
+   Một wrapper cho một buffer biểu diễn dữ liệu có thể pickle. *buffer* phải là một
+   đối tượng :ref:`buffer-providing <bufferobjects>`, chẳng hạn như một
+   :term:`bytes-like object` hoặc một mảng N chiều.
 
-   :class:`PickleBuffer` is itself a buffer provider, therefore it is
-   possible to pass it to other APIs expecting a buffer-providing object,
-   such as :class:`memoryview`.
+   Bản thân :class:`PickleBuffer` cũng là một bộ cung cấp buffer, vì vậy có thể truyền nó cho các API khác yêu cầu một đối tượng cung cấp buffer, chẳng hạn như :class:`memoryview`.
 
-   :class:`PickleBuffer` objects can only be serialized using pickle
-   protocol 5 or higher.  They are eligible for
-   :ref:`out-of-band serialization <pickle-oob>`.
+   Các đối tượng :class:`PickleBuffer` chỉ có thể được tuần tự hóa bằng pickle protocol 5 trở lên. Chúng đủ điều kiện để thực hiện
+   :ref:`tuần tự hóa ngoài băng <pickle-oob>`.
 
    .. versionadded:: 3.8
 
    .. method:: raw()
 
-      Return a :class:`memoryview` of the memory area underlying this buffer.
-      The returned object is a one-dimensional, C-contiguous memoryview
-      with format ``B`` (unsigned bytes).  :exc:`BufferError` is raised if
-      the buffer is neither C- nor Fortran-contiguous.
+      Trả về một :class:`memoryview` của vùng bộ nhớ nằm bên dưới buffer này. Đối tượng được trả về là một memoryview một chiều, liên tục theo C với định dạng ``B`` (các byte không dấu). :exc:`BufferError` được phát sinh nếu buffer không liên tục theo C hoặc Fortran.
 
    .. method:: release()
 
-      Release the underlying buffer exposed by the PickleBuffer object.
+      Giải phóng buffer bên dưới được đối tượng PickleBuffer cung cấp.
 
 
 .. _pickle-picklable:
 
-What can be pickled and unpickled?
-----------------------------------
+Những gì có thể được pickle và unpickle?
+----------------------------------------
 
-The following types can be pickled:
+Các kiểu sau đây có thể được pickle:
 
-* built-in constants (``None``, ``True``, ``False``, ``Ellipsis``, and
+* các hằng số tích hợp sẵn (``None``, ``True``, ``False``, ``Ellipsis``, và
   :data:`NotImplemented`);
 
-* integers, floating-point numbers, complex numbers;
+* số nguyên, số dấu phẩy động, số phức;
 
-* strings, bytes, bytearrays;
+* chuỗi, bytes, bytearray;
 
-* tuples, lists, sets, and dictionaries containing only picklable objects;
+* tuple, list, set và dictionary chỉ chứa các đối tượng có thể pickle;
 
-* functions (built-in and user-defined) accessible from the top level of a
-  module (using :keyword:`def`, not :keyword:`lambda`);
+* các hàm (tích hợp sẵn và do người dùng định nghĩa) có thể truy cập từ cấp cao nhất của một module (sử dụng :keyword:`def`, không phải :keyword:`lambda`);
 
-* classes accessible from the top level of a module;
+* các lớp có thể truy cập từ cấp cao nhất của một module;
 
-* instances of such classes for which the result of calling :meth:`~object.__getstate__`
-  is picklable  (see section :ref:`pickle-inst` for details).
+* các instance của những lớp như vậy mà kết quả của việc gọi :meth:`~object.__getstate__` có thể pickle (xem phần :ref:`pickle-inst` để biết chi tiết).
 
-Attempts to pickle unpicklable objects will raise the :exc:`PicklingError`
-exception; when this happens, an unspecified number of bytes may have already
-been written to the underlying file.  Trying to pickle a highly recursive data
-structure may exceed the maximum recursion depth, a :exc:`RecursionError` will be
-raised in this case.  You can carefully raise this limit with
+Việc thử pickle các đối tượng không thể pickle sẽ gây ra ngoại lệ :exc:`PicklingError`; khi điều này xảy ra, một số byte không xác định có thể đã được ghi vào tệp bên dưới. Việc thử pickle một cấu trúc dữ liệu có tính đệ quy cao có thể vượt quá độ sâu đệ quy tối đa; trong trường hợp này, :exc:`RecursionError` sẽ được phát sinh. Bạn có thể thận trọng tăng giới hạn này bằng cách
 :func:`sys.setrecursionlimit`.
 
-Note that functions (built-in and user-defined) are pickled by fully
-:term:`qualified name`, not by value. [#]_  This means that only the function name is
-pickled, along with the name of the containing module and classes.  Neither
-the function's code, nor any of its function attributes are pickled.  Thus the
-defining module must be importable in the unpickling environment, and the module
-must contain the named object, otherwise an exception will be raised. [#]_
+Lưu ý rằng các hàm (hàm tích hợp và hàm do người dùng định nghĩa) được pickle theo đầy đủ
+:term:`qualified name`, chứ không theo giá trị. [#]_ Điều này có nghĩa là chỉ tên hàm được pickle, cùng với tên của module và các lớp chứa hàm đó. Cả mã của hàm lẫn bất kỳ thuộc tính hàm nào của nó đều không được pickle. Vì vậy, module định nghĩa phải có thể được import trong môi trường unpickling, và module đó phải chứa đối tượng có tên tương ứng; nếu không, một ngoại lệ sẽ được phát sinh. [#]_
 
-Similarly, classes are pickled by fully qualified name, so the same restrictions in
-the unpickling environment apply.  Note that none of the class's code or data is
-pickled, so in the following example the class attribute ``attr`` is not
-restored in the unpickling environment::
+Tương tự, các lớp được pickle theo tên đầy đủ, vì vậy các hạn chế tương tự cũng được áp dụng trong môi trường unpickling. Lưu ý rằng không có mã hoặc dữ liệu nào của lớp được pickle, nên trong ví dụ sau, thuộc tính lớp ``attr`` không được khôi phục trong môi trường unpickling::
 
    class Foo:
        attr = 'A class attribute'
 
    picklestring = pickle.dumps(Foo)
 
-These restrictions are why picklable functions and classes must be defined at
-the top level of a module.
+Những hạn chế này là lý do các hàm và lớp có thể pickle phải được định nghĩa ở cấp cao nhất của một module.
 
-Similarly, when class instances are pickled, their class's code and data are not
-pickled along with them.  Only the instance data are pickled.  This is done on
-purpose, so you can fix bugs in a class or add methods to the class and still
-load objects that were created with an earlier version of the class.  If you
-plan to have long-lived objects that will see many versions of a class, it may
-be worthwhile to put a version number in the objects so that suitable
-conversions can be made by the class's :meth:`~object.__setstate__` method.
+Tương tự, khi các instance của lớp được pickle, mã và dữ liệu của lớp đó cũng không được pickle cùng với chúng. Chỉ dữ liệu của instance được pickle. Điều này được thực hiện có chủ đích, để bạn có thể sửa lỗi trong một lớp hoặc thêm các phương thức vào lớp mà vẫn tải được những đối tượng đã được tạo bằng phiên bản trước đó của lớp. Nếu dự định có các đối tượng tồn tại lâu dài và sẽ trải qua nhiều phiên bản của một lớp, bạn nên đặt một số phiên bản trong các đối tượng để phương thức :meth:`~object.__setstate__` của lớp có thể thực hiện các chuyển đổi phù hợp.
 
 
 .. _pickle-inst:
 
-Pickling Class Instances
-------------------------
+Pickle các Instance của Lớp
+---------------------------
 
 .. currentmodule:: None
 
-In this section, we describe the general mechanisms available to you to define,
-customize, and control how class instances are pickled and unpickled.
+Trong phần này, chúng tôi mô tả các cơ chế chung có sẵn để bạn định nghĩa, tùy chỉnh và kiểm soát cách các instance của lớp được pickle và unpickle.
 
-In most cases, no additional code is needed to make instances picklable.  By
-default, pickle will retrieve the class and the attributes of an instance via
-introspection. When a class instance is unpickled, its :meth:`~object.__init__` method
-is usually *not* invoked.  The default behaviour first creates an uninitialized
-instance and then restores the saved attributes.  The following code shows an
-implementation of this behaviour::
+Trong hầu hết trường hợp, không cần thêm mã để các instance có thể được pickle. Theo mặc định, pickle sẽ lấy lớp và các thuộc tính của một instance bằng cách kiểm tra nội quan. Khi một instance của lớp được unpickle, phương thức :meth:`~object.__init__` của nó thường *không* được gọi. Hành vi mặc định trước hết tạo một instance chưa được khởi tạo, sau đó khôi phục các thuộc tính đã lưu. Đoạn mã sau đây minh họa cách triển khai hành vi này::
 
    def save(obj):
        return (obj.__class__, obj.__dict__)
@@ -583,22 +395,15 @@ implementation of this behaviour::
        obj.__dict__.update(attributes)
        return obj
 
-Classes can alter the default behaviour by providing one or several special
-methods:
+Các lớp có thể thay đổi hành vi mặc định bằng cách cung cấp một hoặc một số phương thức đặc biệt:
 
 .. method:: object.__getnewargs_ex__()
 
-   In protocols 2 and newer, classes that implement the
-   :meth:`__getnewargs_ex__` method can dictate the values passed to the
-   :meth:`__new__` method upon unpickling.  The method must return a pair
-   ``(args, kwargs)`` where *args* is a tuple of positional arguments
-   and *kwargs* a dictionary of named arguments for constructing the
-   object.  Those will be passed to the :meth:`__new__` method upon
-   unpickling.
+   Trong các protocol 2 trở lên, những lớp triển khai
+   phương thức :meth:`__getnewargs_ex__` có thể chỉ định các giá trị được truyền cho
+   phương thức :meth:`__new__` khi unpickle. Phương thức này phải trả về một cặp ``(args, kwargs)`` trong đó *args* là một tuple gồm các đối số vị trí và *kwargs* là một dictionary gồm các đối số được đặt tên để tạo đối tượng. Các đối số này sẽ được truyền cho phương thức :meth:`__new__` khi unpickle.
 
-   You should implement this method if the :meth:`__new__` method of your
-   class requires keyword-only arguments.  Otherwise, it is recommended for
-   compatibility to implement :meth:`__getnewargs__`.
+   Bạn nên triển khai phương thức này nếu phương thức :meth:`__new__` của lớp yêu cầu các đối số chỉ dành cho keyword. Nếu không, để đảm bảo khả năng tương thích, bạn nên triển khai :meth:`__getnewargs__`.
 
    .. versionchanged:: 3.6
       :meth:`__getnewargs_ex__` is now used in protocols 2 and 3.
@@ -606,214 +411,134 @@ methods:
 
 .. method:: object.__getnewargs__()
 
-   This method serves a similar purpose as :meth:`__getnewargs_ex__`, but
-   supports only positional arguments.  It must return a tuple of arguments
-   ``args`` which will be passed to the :meth:`__new__` method upon unpickling.
+   Phương thức này có mục đích tương tự như :meth:`__getnewargs_ex__`, nhưng chỉ hỗ trợ các đối số vị trí. Phương thức phải trả về một tuple chứa các đối số ``args``, các đối số này sẽ được truyền cho phương thức :meth:`__new__` khi unpickling.
 
-   :meth:`__getnewargs__` will not be called if :meth:`__getnewargs_ex__` is
-   defined.
+   :meth:`__getnewargs__` sẽ không được gọi nếu :meth:`__getnewargs_ex__` được định nghĩa.
 
    .. versionchanged:: 3.6
-      Before Python 3.6, :meth:`__getnewargs__` was called instead of
-      :meth:`__getnewargs_ex__` in protocols 2 and 3.
+      Trước Python 3.6, :meth:`__getnewargs__` được gọi thay cho
+      :meth:`__getnewargs_ex__` trong các protocol 2 và 3.
 
 
 .. method:: object.__getstate__()
 
-   Classes can further influence how their instances are pickled by overriding
-   the method :meth:`__getstate__`.  It is called and the returned object
-   is pickled as the contents for the instance, instead of a default state.
-   There are several cases:
+   Các class có thể kiểm soát thêm cách các instance của chúng được pickle bằng cách ghi đè phương thức :meth:`__getstate__`. Phương thức này được gọi và object được trả về sẽ được pickle làm nội dung của instance, thay cho state mặc định. Có một số trường hợp:
 
-   * For a class that has no instance :attr:`~object.__dict__` and no
-     :attr:`~object.__slots__`, the default state is ``None``.
+   * Đối với một class không có :attr:`~object.__dict__` của instance và không có
+     :attr:`~object.__slots__`, state mặc định là ``None``.
 
-   * For a class that has an instance :attr:`~object.__dict__` and no
-     :attr:`~object.__slots__`, the default state is ``self.__dict__``.
+   * Đối với một class có :attr:`~object.__dict__` của instance và không có
+     :attr:`~object.__slots__`, trạng thái mặc định là ``self.__dict__``.
 
-   * For a class that has an instance :attr:`~object.__dict__` and
-     :attr:`~object.__slots__`, the default state is a tuple consisting of two
-     dictionaries:  ``self.__dict__``, and a dictionary mapping slot
-     names to slot values.  Only slots that have a value are
-     included in the latter.
+   * Đối với một class có :attr:`~object.__dict__` và
+     :attr:`~object.__slots__`, trạng thái mặc định là một tuple gồm hai dictionary:  ``self.__dict__``, và một dictionary ánh xạ tên slot với các giá trị slot.  Chỉ những slot có giá trị mới được đưa vào dictionary sau.
 
-   * For a class that has :attr:`~object.__slots__` and no instance
-     :attr:`~object.__dict__`, the default state is a tuple whose first item
-     is ``None`` and whose second item is a dictionary mapping slot names
-     to slot values described in the previous bullet.
+   * Đối với một class có :attr:`~object.__slots__` và không có instance
+     :attr:`~object.__dict__`, trạng thái mặc định là một tuple mà phần tử đầu tiên là ``None`` và phần tử thứ hai là một dictionary ánh xạ tên slot với các giá trị slot được mô tả trong mục trước.
 
    .. versionchanged:: 3.11
-      Added the default implementation of the ``__getstate__()`` method in the
-      :class:`object` class.
+      Đã thêm implementation mặc định của phương thức ``__getstate__()`` trong
+      :class:`object` lớp.
 
 
 .. method:: object.__setstate__(state)
 
-   Upon unpickling, if the class defines :meth:`__setstate__`, it is called with
-   the unpickled state.  In that case, there is no requirement for the state
-   object to be a dictionary.  Otherwise, the pickled state must be a dictionary
-   and its items are assigned to the new instance's dictionary.
+   Khi giải tuần tự hóa, nếu lớp định nghĩa :meth:`__setstate__`, phương thức này sẽ được gọi với trạng thái đã giải tuần tự. Trong trường hợp đó, đối tượng trạng thái không nhất thiết phải là một từ điển. Nếu không, trạng thái đã được pickle phải là một từ điển và các mục của nó được gán vào từ điển của thực thể mới.
 
    .. note::
 
-      If :meth:`__reduce__` returns a state with value ``None`` at pickling,
-      the :meth:`__setstate__` method will not be called upon unpickling.
+      Nếu :meth:`__reduce__` trả về một trạng thái có giá trị ``None`` khi pickle, phương thức :meth:`__setstate__` sẽ không được gọi khi giải tuần tự hóa.
 
 
-Refer to the section :ref:`pickle-state` for more information about how to use
-the methods :meth:`~object.__getstate__` and :meth:`~object.__setstate__`.
+Tham khảo phần :ref:`pickle-state` để biết thêm thông tin về cách sử dụng các phương thức :meth:`~object.__getstate__` và :meth:`~object.__setstate__`.
 
 .. note::
 
-   At unpickling time, some methods like :meth:`~object.__getattr__`,
-   :meth:`~object.__getattribute__`, or :meth:`~object.__setattr__` may be called upon the
-   instance.  In case those methods rely on some internal invariant being
-   true, the type should implement :meth:`~object.__new__` to establish such an
-   invariant, as :meth:`~object.__init__` is not called when unpickling an
-   instance.
+   Khi giải tuần tự hóa, một số phương thức như :meth:`~object.__getattr__`,
+   :meth:`~object.__getattribute__`, hoặc :meth:`~object.__setattr__` có thể được gọi trên thực thể. Nếu các phương thức đó dựa vào một bất biến nội bộ nào đó đang đúng, kiểu này phải triển khai :meth:`~object.__new__` để thiết lập bất biến đó, vì :meth:`~object.__init__` không được gọi khi giải tuần tự hóa một thực thể.
 
 .. index:: pair: copy; protocol
 
-As we shall see, pickle does not use directly the methods described above.  In
-fact, these methods are part of the copy protocol which implements the
-:meth:`~object.__reduce__` special method.  The copy protocol provides a unified
-interface for retrieving the data necessary for pickling and copying
-objects. [#]_
+Như chúng ta sẽ thấy, pickle không trực tiếp sử dụng các phương thức được mô tả ở trên. Thực tế, các phương thức này là một phần của giao thức sao chép, giao thức này triển khai
+phương thức đặc biệt :meth:`~object.__reduce__`. Giao thức copy cung cấp một giao diện thống nhất để lấy dữ liệu cần thiết cho việc pickle và sao chép đối tượng. [#]_
 
-Although powerful, implementing :meth:`~object.__reduce__` directly in your classes is
-error prone.  For this reason, class designers should use the high-level
-interface (i.e., :meth:`~object.__getnewargs_ex__`, :meth:`~object.__getstate__` and
-:meth:`~object.__setstate__`) whenever possible.  We will show, however, cases where
-using :meth:`!__reduce__` is the only option or leads to more efficient pickling
-or both.
+Mặc dù mạnh mẽ, việc triển khai :meth:`~object.__reduce__` trực tiếp trong các lớp của bạn dễ xảy ra lỗi. Vì lý do này, những người thiết kế lớp nên sử dụng giao diện cấp cao (tức là :meth:`~object.__getnewargs_ex__`, :meth:`~object.__getstate__` và
+:meth:`~object.__setstate__`) bất cứ khi nào có thể. Tuy nhiên, chúng tôi sẽ trình bày những trường hợp mà việc sử dụng :meth:`!__reduce__` là lựa chọn duy nhất hoặc giúp pickle hiệu quả hơn, hoặc cả hai.
 
 .. method:: object.__reduce__()
 
-   The interface is currently defined as follows.  The :meth:`__reduce__` method
-   takes no argument and shall return either a string or preferably a tuple (the
-   returned object is often referred to as the "reduce value").
+   Giao diện hiện được định nghĩa như sau. Phương thức :meth:`__reduce__` không nhận đối số nào và phải trả về một chuỗi hoặc tốt nhất là một tuple (đối tượng được trả về thường được gọi là "giá trị reduce").
 
-   If a string is returned, the string should be interpreted as the name of a
-   global variable.  It should be the object's local name relative to its
-   module; the pickle module searches the module namespace to determine the
-   object's module: for a given ``obj`` to be pickled, the ``__module__``
-   attribute is looked up on ``obj`` directly, which falls back to a lookup
-   on the type of ``obj`` if no ``__module__`` instance attribute is set.
-   This behaviour is typically useful for singletons.
+   Nếu trả về một chuỗi, chuỗi đó phải được hiểu là tên của một biến toàn cục. Đó phải là tên cục bộ của đối tượng xét theo module của đối tượng; module pickle sẽ tìm kiếm trong namespace của module để xác định module của đối tượng: đối với một ``obj`` cần được pickle, thuộc tính ``__module__`` được tra cứu trực tiếp trên ``obj``, sau đó chuyển sang tra cứu trên kiểu của ``obj`` nếu không thiết lập thuộc tính instance ``__module__``. Hành vi này thường hữu ích cho các singleton.
 
-   When a tuple is returned, it must be between two and six items long.
-   Optional items can either be omitted, or ``None`` can be provided as their
-   value.  The semantics of each item are in order:
+   Khi trả về một tuple, tuple đó phải có từ hai đến sáu mục. Có thể bỏ qua các mục tùy chọn hoặc cung cấp ``None`` làm giá trị của chúng. Ý nghĩa của từng mục theo thứ tự là:
 
    .. XXX Mention __newobj__ special-case?
 
-   * A callable object that will be called to create the initial version of the
-     object.
+   * Một đối tượng callable sẽ được gọi để tạo phiên bản ban đầu của đối tượng.
 
-   * A tuple of arguments for the callable object.  An empty tuple must be given
-     if the callable does not accept any argument.
+   * Một tuple các đối số dành cho đối tượng callable. Phải cung cấp một tuple rỗng nếu callable không nhận bất kỳ đối số nào.
 
-   * Optionally, the object's state, which will be passed to the object's
-     :meth:`__setstate__` method as previously described.  If the object has no
-     such method then, the value must be a dictionary and it will be added to
-     the object's :attr:`~object.__dict__` attribute.
+   * Tùy chọn, trạng thái của đối tượng, trạng thái này sẽ được truyền cho
+     phương thức :meth:`__setstate__` như đã mô tả trước đó. Nếu đối tượng không có phương thức như vậy thì giá trị phải là một dictionary và sẽ được thêm vào thuộc tính :attr:`~object.__dict__` của đối tượng.
 
-   * Optionally, an iterator (and not a sequence) yielding successive items.
-     These items will be appended to the object either using
-     ``obj.append(item)`` or, in batch, using ``obj.extend(list_of_items)``.
-     This is primarily used for list subclasses, but may be used by other
-     classes as long as they have :meth:`~sequence.append`
-     and :meth:`~sequence.extend` methods with
-     the appropriate signature.  (Whether :meth:`!append` or :meth:`!extend` is
-     used depends on which pickle protocol version is used as well as the number
-     of items to append, so both must be supported.)
+   * Tùy chọn, một iterator (không phải sequence) tạo ra các mục liên tiếp. Các mục này sẽ được nối vào đối tượng bằng ``obj.append(item)`` hoặc theo lô bằng ``obj.extend(list_of_items)``. Điều này chủ yếu được dùng cho các lớp con của list, nhưng cũng có thể được dùng bởi các lớp khác miễn là chúng có các phương thức :meth:`~sequence.append` và :meth:`~sequence.extend` với chữ ký phù hợp. (Việc sử dụng :meth:`!append` hay :meth:`!extend` phụ thuộc vào phiên bản giao thức pickle được dùng cũng như số lượng mục cần nối, vì vậy cả hai đều phải được hỗ trợ.)
 
-   * Optionally, an iterator (not a sequence) yielding successive key-value
-     pairs.  These items will be stored to the object using ``obj[key] =
-     value``.  This is primarily used for dictionary subclasses, but may be used
-     by other classes as long as they implement :meth:`__setitem__`.
+   * Tùy chọn, một iterator (không phải sequence) tạo ra các cặp khóa-giá trị liên tiếp. Các mục này sẽ được lưu vào đối tượng bằng ``obj[key] = value``. Điều này chủ yếu được dùng cho các lớp con của dictionary, nhưng cũng có thể được dùng bởi các lớp khác miễn là chúng triển khai :meth:`__setitem__`.
 
-   * Optionally, a callable with a ``(obj, state)`` signature. This
-     callable allows the user to programmatically control the state-updating
-     behavior of a specific object, instead of using ``obj``'s static
-     :meth:`__setstate__` method. If not ``None``, this callable will have
-     priority over ``obj``'s :meth:`__setstate__`.
+   * Tùy chọn, một callable có chữ ký ``(obj, state)``. Callable này cho phép người dùng kiểm soát bằng lập trình hành vi cập nhật trạng thái của một đối tượng cụ thể, thay vì sử dụng phương thức ``obj`` tĩnh
+     :meth:`__setstate__`. Nếu không phải ``None``, callable này sẽ được ưu tiên hơn ``obj``'s :meth:`__setstate__`.
 
      .. versionadded:: 3.8
-        The optional sixth tuple item, ``(obj, state)``, was added.
+        Mục tuple thứ sáu tùy chọn, ``(obj, state)``, đã được thêm vào.
 
 
 .. method:: object.__reduce_ex__(protocol)
 
-   Alternatively, a :meth:`__reduce_ex__` method may be defined.  The only
-   difference is this method should take a single integer argument, the protocol
-   version.  When defined, pickle will prefer it over the :meth:`__reduce__`
-   method.  In addition, :meth:`__reduce__` automatically becomes a synonym for
-   the extended version.  The main use for this method is to provide
-   backwards-compatible reduce values for older Python releases.
+   Ngoài ra, có thể định nghĩa một phương thức :meth:`__reduce_ex__`. Điểm khác biệt duy nhất là phương thức này phải nhận một đối số số nguyên, là phiên bản giao thức. Khi được định nghĩa, pickle sẽ ưu tiên phương thức này hơn phương thức :meth:`__reduce__`. Ngoài ra, :meth:`__reduce__` tự động trở thành bí danh cho phiên bản mở rộng. Mục đích sử dụng chính của phương thức này là cung cấp các giá trị reduce tương thích ngược cho những bản phát hành Python cũ hơn.
 
 .. currentmodule:: pickle
 
 .. _pickle-persistent:
 
-Persistence of External Objects
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Lưu trữ đối tượng bên ngoài
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. index::
    single: persistent_id (pickle protocol)
    single: persistent_load (pickle protocol)
 
-For the benefit of object persistence, the :mod:`!pickle` module supports the
-notion of a reference to an object outside the pickled data stream.  Such
-objects are referenced by a persistent ID, which should be either a string of
-alphanumeric characters (for protocol 0) [#]_ or just an arbitrary object (for
-any newer protocol).
+Để hỗ trợ việc lưu trữ đối tượng, module :mod:`!pickle` hỗ trợ khái niệm tham chiếu đến một đối tượng nằm ngoài luồng dữ liệu đã được pickle. Những đối tượng như vậy được tham chiếu bằng một ID bền vững, ID này phải là một chuỗi gồm các ký tự chữ và số (đối với protocol 0) [#]_ hoặc chỉ là một đối tượng bất kỳ (đối với mọi protocol mới hơn).
 
-The resolution of such persistent IDs is not defined by the :mod:`!pickle`
-module; it will delegate this resolution to the user-defined methods on the
-pickler and unpickler, :meth:`~Pickler.persistent_id` and
-:meth:`~Unpickler.persistent_load` respectively.
+Việc phân giải các ID bền vững như vậy không được module :mod:`!pickle` định nghĩa; module này sẽ ủy quyền việc phân giải cho các phương thức do người dùng định nghĩa trên pickler và unpickler, :meth:`~Pickler.persistent_id` và
+:meth:`~Unpickler.persistent_load` tương ứng.
 
-To pickle objects that have an external persistent ID, the pickler must have a
-custom :meth:`~Pickler.persistent_id` method that takes an object as an
-argument and returns either ``None`` or the persistent ID for that object.
-When ``None`` is returned, the pickler simply pickles the object as normal.
-When a persistent ID string is returned, the pickler will pickle that object,
-along with a marker so that the unpickler will recognize it as a persistent ID.
+Để pickle các đối tượng có ID bền vững bên ngoài, pickler phải có một phương thức :meth:`~Pickler.persistent_id` tùy chỉnh, nhận một đối tượng làm đối số và trả về ``None`` hoặc ID bền vững của đối tượng đó. Khi trả về ``None``, pickler chỉ pickle đối tượng như bình thường. Khi trả về một chuỗi ID bền vững, pickler sẽ pickle đối tượng đó cùng với một dấu đánh dấu để unpickler nhận diện nó là một ID bền vững.
 
-To unpickle external objects, the unpickler must have a custom
-:meth:`~Unpickler.persistent_load` method that takes a persistent ID object and
-returns the referenced object.
+Để unpickle các đối tượng bên ngoài, unpickler phải có một phương thức tùy chỉnh
+:meth:`~Unpickler.persistent_load` nhận một đối tượng persistent ID và trả về đối tượng được tham chiếu.
 
-Here is a comprehensive example presenting how persistent ID can be used to
-pickle external objects by reference.
+Sau đây là một ví dụ toàn diện minh họa cách sử dụng persistent ID để pickle các đối tượng bên ngoài bằng tham chiếu.
 
 .. literalinclude:: ../includes/dbpickle.py
 
 .. _pickle-dispatch:
 
-Dispatch Tables
-^^^^^^^^^^^^^^^
+Bảng dispatch
+^^^^^^^^^^^^^
 
-If one wants to customize pickling of some classes without disturbing
-any other code which depends on pickling, then one can create a
-pickler with a private dispatch table.
+Nếu muốn tùy chỉnh cách pickle một số lớp mà không ảnh hưởng đến bất kỳ mã nào khác phụ thuộc vào pickling, bạn có thể tạo một pickler với dispatch table riêng.
 
-The global dispatch table managed by the :mod:`copyreg` module is
-available as :data:`!copyreg.dispatch_table`.  Therefore, one may
-choose to use a modified copy of :data:`!copyreg.dispatch_table` as a
-private dispatch table.
+Dispatch table toàn cục do module :mod:`copyreg` quản lý có sẵn dưới dạng :data:`!copyreg.dispatch_table`. Vì vậy, bạn có thể chọn sử dụng một bản sao đã chỉnh sửa của :data:`!copyreg.dispatch_table` làm dispatch table riêng.
 
-For example ::
+Ví dụ::
 
    f = io.BytesIO()
    p = pickle.Pickler(f)
    p.dispatch_table = copyreg.dispatch_table.copy()
    p.dispatch_table[SomeClass] = reduce_SomeClass
 
-creates an instance of :class:`pickle.Pickler` with a private dispatch
-table which handles the ``SomeClass`` class specially.  Alternatively,
-the code ::
+tạo một thể hiện của :class:`pickle.Pickler` với một bảng dispatch riêng, trong đó xử lý đặc biệt lớp ``SomeClass``. Ngoài ra, đoạn mã::
 
    class MyPickler(pickle.Pickler):
        dispatch_table = copyreg.dispatch_table.copy()
@@ -821,31 +546,26 @@ the code ::
    f = io.BytesIO()
    p = MyPickler(f)
 
-does the same but all instances of ``MyPickler`` will by default
-share the private dispatch table.  On the other hand, the code ::
+thực hiện điều tương tự, nhưng theo mặc định, tất cả các thể hiện của ``MyPickler`` sẽ dùng chung bảng dispatch riêng. Mặt khác, đoạn mã::
 
    copyreg.pickle(SomeClass, reduce_SomeClass)
    f = io.BytesIO()
    p = pickle.Pickler(f)
 
-modifies the global dispatch table shared by all users of the :mod:`copyreg` module.
+sửa đổi bảng dispatch toàn cục được dùng chung bởi tất cả người dùng của mô-đun :mod:`copyreg`.
 
 .. _pickle-state:
 
-Handling Stateful Objects
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Xử lý các đối tượng có trạng thái
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. index::
    single: __getstate__() (copy protocol)
    single: __setstate__() (copy protocol)
 
-Here's an example that shows how to modify pickling behavior for a class.
-The :class:`!TextReader` class below opens a text file, and returns the line number and
-line contents each time its :meth:`!readline` method is called. If a
-:class:`!TextReader` instance is pickled, all attributes *except* the file object
-member are saved. When the instance is unpickled, the file is reopened, and
-reading resumes from the last location. The :meth:`!__setstate__` and
-:meth:`!__getstate__` methods are used to implement this behavior. ::
+Dưới đây là một ví dụ cho thấy cách sửa đổi hành vi pickling cho một lớp. Lớp :class:`!TextReader` bên dưới mở một tệp văn bản và trả về số dòng cùng nội dung dòng mỗi khi phương thức :meth:`!readline` của nó được gọi. Nếu một
+thể hiện :class:`!TextReader` được pickle, tất cả các thuộc tính *ngoại trừ* thành viên đối tượng tệp đều được lưu. Khi thể hiện được giải pickle, tệp được mở lại và việc đọc tiếp tục từ vị trí trước đó. Các phương thức :meth:`!__setstate__` và
+:meth:`!__getstate__` được dùng để triển khai hành vi này.::
 
    class TextReader:
        """Print and number lines in a text file."""
@@ -865,27 +585,27 @@ reading resumes from the last location. The :meth:`!__setstate__` and
            return "%i: %s" % (self.lineno, line)
 
        def __getstate__(self):
-           # Copy the object's state from self.__dict__ which contains
-           # all our instance attributes. Always use the dict.copy()
-           # method to avoid modifying the original state.
+           # Sao chép trạng thái của đối tượng từ self.__dict__, trong đó chứa
+           # tất cả thuộc tính instance của chúng ta. Luôn sử dụng phương thức dict.copy()
+           # để tránh sửa đổi trạng thái ban đầu.
            state = self.__dict__.copy()
-           # Remove the unpicklable entries.
+           # Xóa các mục không thể pickle.
            del state['file']
            return state
 
        def __setstate__(self, state):
-           # Restore instance attributes (i.e., filename and lineno).
+           # Khôi phục các thuộc tính instance (tức là filename và lineno).
            self.__dict__.update(state)
-           # Restore the previously opened file's state. To do so, we need to
-           # reopen it and read from it until the line count is restored.
+           # Khôi phục trạng thái của tệp đã mở trước đó. Để làm vậy, chúng ta cần
+           # mở lại tệp và đọc từ đó cho đến khi số dòng được khôi phục.
            file = open(self.filename)
            for _ in range(self.lineno):
                file.readline()
-           # Finally, save the file.
+           # Cuối cùng, lưu tệp.
            self.file = file
 
 
-A sample usage might be something like this::
+Một cách sử dụng mẫu có thể như sau::
 
    >>> reader = TextReader("hello.txt")
    >>> reader.readline()
@@ -898,34 +618,25 @@ A sample usage might be something like this::
 
 .. _reducer_override:
 
-Custom Reduction for Types, Functions, and Other Objects
---------------------------------------------------------
+Tùy chỉnh reduction cho các kiểu, hàm và đối tượng khác
+-------------------------------------------------------
 
 .. versionadded:: 3.8
 
-Sometimes, :attr:`~Pickler.dispatch_table` may not be flexible enough.
-In particular we may want to customize pickling based on another criterion
-than the object's type, or we may want to customize the pickling of
-functions and classes.
+Đôi khi, :attr:`~Pickler.dispatch_table` có thể chưa đủ linh hoạt. Cụ thể, chúng ta có thể muốn tùy chỉnh quá trình pickling dựa trên một tiêu chí khác với kiểu của đối tượng, hoặc muốn tùy chỉnh quá trình pickling của các hàm và lớp.
 
-For those cases, it is possible to subclass from the :class:`Pickler` class and
-implement a :meth:`~Pickler.reducer_override` method. This method can return an
-arbitrary reduction tuple (see :meth:`~object.__reduce__`). It can alternatively return
-:data:`NotImplemented` to fallback to the traditional behavior.
+Trong những trường hợp đó, có thể tạo lớp con từ lớp :class:`Pickler` và triển khai phương thức :meth:`~Pickler.reducer_override`. Phương thức này có thể trả về một tuple reduction tùy ý (xem :meth:`~object.__reduce__`). Ngoài ra, phương thức có thể trả về
+:data:`NotImplemented` để quay lại hành vi truyền thống.
 
-If both the :attr:`~Pickler.dispatch_table` and
-:meth:`~Pickler.reducer_override` are defined, then
-:meth:`~Pickler.reducer_override` method takes priority.
+Nếu cả :attr:`~Pickler.dispatch_table` và
+Sau khi :meth:`~Pickler.reducer_override` được định nghĩa, thì
+Phương thức :meth:`~Pickler.reducer_override` được ưu tiên.
 
 .. Note::
-   For performance reasons, :meth:`~Pickler.reducer_override` may not be
-   called for the following objects: ``None``, ``True``, ``False``, and
-   exact instances of :class:`int`, :class:`float`, :class:`bytes`,
-   :class:`str`, :class:`dict`, :class:`set`, :class:`frozenset`, :class:`list`
-   and :class:`tuple`.
+   Vì lý do hiệu năng, :meth:`~Pickler.reducer_override` có thể không được gọi đối với các đối tượng sau: ``None``, ``True``, ``False`` và các thực thể chính xác của :class:`int`, :class:`float`, :class:`bytes`,
+   :class:`str`, :class:`dict`, :class:`set`, :class:`frozenset`, :class:`list` và :class:`tuple`.
 
-Here is a simple example where we allow pickling and reconstructing
-a given class::
+Sau đây là một ví dụ đơn giản cho phép pickling và tái tạo một class nhất định::
 
    import io
    import pickle
@@ -940,7 +651,7 @@ a given class::
                return type, (obj.__name__, obj.__bases__,
                              {'my_attribute': obj.my_attribute})
            else:
-               # For any other object, fallback to usual reduction
+               # Đối với mọi đối tượng khác, dùng cơ chế reduction thông thường
                return NotImplemented
 
    f = io.BytesIO()
@@ -958,68 +669,41 @@ a given class::
 
 .. _pickle-oob:
 
-Out-of-band Buffers
--------------------
+Bộ đệm ngoài băng
+-----------------
 
 .. versionadded:: 3.8
 
-In some contexts, the :mod:`!pickle` module is used to transfer massive amounts
-of data.  Therefore, it can be important to minimize the number of memory
-copies, to preserve performance and resource consumption.  However, normal
-operation of the :mod:`!pickle` module, as it transforms a graph-like structure
-of objects into a sequential stream of bytes, intrinsically involves copying
-data to and from the pickle stream.
+Trong một số ngữ cảnh, module :mod:`!pickle` được dùng để truyền một lượng dữ liệu khổng lồ. Vì vậy, việc giảm thiểu số lần sao chép bộ nhớ để duy trì hiệu năng và mức tiêu thụ tài nguyên có thể rất quan trọng. Tuy nhiên, hoạt động bình thường của module :mod:`!pickle`, khi chuyển đổi một cấu trúc đối tượng dạng đồ thị thành một luồng byte tuần tự, về bản chất bao gồm việc sao chép dữ liệu đến và đi từ luồng pickle.
 
-This constraint can be eschewed if both the *provider* (the implementation
-of the object types to be transferred) and the *consumer* (the implementation
-of the communications system) support the out-of-band transfer facilities
-provided by pickle protocol 5 and higher.
+Có thể bỏ qua ràng buộc này nếu cả *provider* (phần triển khai các kiểu đối tượng cần truyền) và *consumer* (phần triển khai hệ thống liên lạc) đều hỗ trợ các cơ chế truyền ngoài luồng do pickle protocol 5 trở lên cung cấp.
 
-Provider API
-^^^^^^^^^^^^
+API của provider
+^^^^^^^^^^^^^^^^
 
-The large data objects to be pickled must implement a :meth:`~object.__reduce_ex__`
-method specialized for protocol 5 and higher, which returns a
-:class:`PickleBuffer` instance (instead of e.g. a :class:`bytes` object)
-for any large data.
+Các đối tượng dữ liệu lớn cần được pickle phải triển khai một phương thức :meth:`~object.__reduce_ex__` chuyên biệt cho protocol 5 trở lên, phương thức này trả về một
+đối tượng :class:`PickleBuffer` (thay vì, chẳng hạn, một đối tượng :class:`bytes`) cho mọi dữ liệu lớn.
 
-A :class:`PickleBuffer` object *signals* that the underlying buffer is
-eligible for out-of-band data transfer.  Those objects remain compatible
-with normal usage of the :mod:`!pickle` module.  However, consumers can also
-opt-in to tell :mod:`!pickle` that they will handle those buffers by
-themselves.
+Một đối tượng :class:`PickleBuffer` *báo hiệu* rằng bộ đệm bên dưới đủ điều kiện để truyền dữ liệu ngoài luồng. Các đối tượng đó vẫn tương thích với cách sử dụng module :mod:`!pickle` thông thường. Tuy nhiên, consumer cũng có thể chủ động cho :mod:`!pickle` biết rằng họ sẽ tự xử lý các bộ đệm đó.
 
-Consumer API
-^^^^^^^^^^^^
+API của consumer
+^^^^^^^^^^^^^^^^
 
-A communications system can enable custom handling of the :class:`PickleBuffer`
-objects generated when serializing an object graph.
+Một hệ thống truyền thông có thể cho phép xử lý tùy chỉnh các đối tượng :class:`PickleBuffer` được tạo ra khi tuần tự hóa một đồ thị đối tượng.
 
-On the sending side, it needs to pass a *buffer_callback* argument to
-:class:`Pickler` (or to the :func:`dump` or :func:`dumps` function), which
-will be called with each :class:`PickleBuffer` generated while pickling
-the object graph.  Buffers accumulated by the *buffer_callback* will not
-see their data copied into the pickle stream, only a cheap marker will be
-inserted.
+Ở phía gửi, hệ thống cần truyền một đối số *buffer_callback* cho
+:class:`Pickler` (hoặc cho hàm :func:`dump` hay :func:`dumps`), hàm này sẽ được gọi với mỗi :class:`PickleBuffer` được tạo ra trong quá trình pickle đồ thị đối tượng. Dữ liệu của các bộ đệm được tích lũy bởi *buffer_callback* sẽ không được sao chép vào luồng pickle; thay vào đó, chỉ một dấu đánh dấu nhẹ sẽ được chèn vào.
 
-On the receiving side, it needs to pass a *buffers* argument to
-:class:`Unpickler` (or to the :func:`load` or :func:`loads` function),
-which is an iterable of the buffers which were passed to *buffer_callback*.
-That iterable should produce buffers in the same order as they were passed
-to *buffer_callback*.  Those buffers will provide the data expected by the
-reconstructors of the objects whose pickling produced the original
-:class:`PickleBuffer` objects.
+Ở phía nhận, hệ thống cần truyền một đối số *buffers* cho
+:class:`Unpickler` (hoặc cho hàm :func:`load` hay :func:`loads`), đây là một iterable gồm các bộ đệm đã được truyền cho *buffer_callback*. Iterable đó phải tạo ra các bộ đệm theo đúng thứ tự chúng đã được truyền cho *buffer_callback*. Các bộ đệm đó sẽ cung cấp dữ liệu mà các hàm tái tạo của những đối tượng có quá trình pickle tạo ra
+các đối tượng :class:`PickleBuffer` ban đầu cần.
 
-Between the sending side and the receiving side, the communications system
-is free to implement its own transfer mechanism for out-of-band buffers.
-Potential optimizations include the use of shared memory or datatype-dependent
-compression.
+Giữa phía gửi và phía nhận, hệ thống truyền thông có thể tự do triển khai cơ chế truyền riêng cho các bộ đệm ngoài băng. Các tối ưu hóa có thể bao gồm việc sử dụng bộ nhớ dùng chung hoặc nén phụ thuộc vào kiểu dữ liệu.
 
-Example
-^^^^^^^
+Ví dụ
+^^^^^
 
-Here is a trivial example where we implement a :class:`bytearray` subclass
-able to participate in out-of-band buffer pickling::
+Sau đây là một ví dụ đơn giản, trong đó chúng ta triển khai một lớp con :class:`bytearray` có thể tham gia vào quá trình pickle bộ đệm ngoài băng thông::
 
    class ZeroCopyByteArray(bytearray):
 
@@ -1027,84 +711,68 @@ able to participate in out-of-band buffer pickling::
            if protocol >= 5:
                return type(self)._reconstruct, (PickleBuffer(self),), None
            else:
-               # PickleBuffer is forbidden with pickle protocols <= 4.
+               # Không được sử dụng PickleBuffer với các giao thức pickle <= 4.
                return type(self)._reconstruct, (bytearray(self),)
 
        @classmethod
        def _reconstruct(cls, obj):
            with memoryview(obj) as m:
-               # Get a handle over the original buffer object
+               # Lấy handle đến đối tượng bộ đệm ban đầu
                obj = m.obj
                if type(obj) is cls:
-                   # Original buffer object is a ZeroCopyByteArray, return it
-                   # as-is.
+                   # Đối tượng bộ đệm ban đầu là ZeroCopyByteArray, trả về đối tượng đó
+                   # nguyên trạng.
                    return obj
                else:
                    return cls(obj)
 
-The reconstructor (the ``_reconstruct`` class method) returns the buffer's
-providing object if it has the right type.  This is an easy way to simulate
-zero-copy behaviour on this toy example.
+Hàm tái tạo (phương thức lớp ``_reconstruct``) trả về đối tượng cung cấp bộ đệm nếu đối tượng đó có đúng kiểu. Đây là một cách dễ dàng để mô phỏng hành vi zero-copy trong ví dụ đơn giản này.
 
-On the consumer side, we can pickle those objects the usual way, which
-when unserialized will give us a copy of the original object::
+Ở phía consumer, chúng ta có thể pickle các đối tượng đó theo cách thông thường; khi được unserialize, chúng sẽ cho chúng ta một bản sao của đối tượng ban đầu::
 
    b = ZeroCopyByteArray(b"abc")
    data = pickle.dumps(b, protocol=5)
    new_b = pickle.loads(data)
-   print(b == new_b)  # True
-   print(b is new_b)  # False: a copy was made
+   print(b == new_b)  # Đúng
+   print(b is new_b)  # Sai: một bản sao đã được tạo
 
-But if we pass a *buffer_callback* and then give back the accumulated
-buffers when unserializing, we are able to get back the original object::
+Nhưng nếu chúng ta truyền một *buffer_callback* rồi cung cấp lại các buffer đã tích lũy khi unserialize, chúng ta có thể lấy lại đối tượng ban đầu::
 
    b = ZeroCopyByteArray(b"abc")
    buffers = []
    data = pickle.dumps(b, protocol=5, buffer_callback=buffers.append)
    new_b = pickle.loads(data, buffers=buffers)
-   print(b == new_b)  # True
-   print(b is new_b)  # True: no copy was made
+   print(b == new_b)  # Đúng
+   print(b is new_b)  # Đúng: không có bản sao nào được tạo
 
-This example is limited by the fact that :class:`bytearray` allocates its
-own memory: you cannot create a :class:`bytearray` instance that is backed
-by another object's memory.  However, third-party datatypes such as NumPy
-arrays do not have this limitation, and allow use of zero-copy pickling
-(or making as few copies as possible) when transferring between distinct
-processes or systems.
+Ví dụ này bị giới hạn bởi thực tế là :class:`bytearray` tự cấp phát bộ nhớ: bạn không thể tạo một thực thể :class:`bytearray` được hỗ trợ bởi bộ nhớ của một đối tượng khác. Tuy nhiên, các kiểu dữ liệu của bên thứ ba như mảng NumPy không gặp giới hạn này và cho phép sử dụng pickle không sao chép (hoặc tạo ít bản sao nhất có thể) khi truyền dữ liệu giữa các process hoặc hệ thống riêng biệt.
 
-.. seealso:: :pep:`574` -- Pickle protocol 5 with out-of-band data
+.. seealso:: :pep:`574` -- Pickle giao thức 5 với dữ liệu ngoài băng
 
 
 .. _pickle-restrict:
 
-Restricting Globals
--------------------
+Hạn chế các đối tượng toàn cục
+------------------------------
 
 .. index::
    single: find_class() (pickle protocol)
 
-By default, unpickling will import any class or function that it finds in the
-pickle data.  For many applications, this behaviour is unacceptable as it
-permits the unpickler to import and invoke arbitrary code.  Just consider what
-this hand-crafted pickle data stream does when loaded::
+Theo mặc định, thao tác unpickle sẽ import bất kỳ class hoặc function nào mà nó tìm thấy trong dữ liệu pickle. Đối với nhiều ứng dụng, hành vi này không thể chấp nhận được vì nó cho phép unpickler import và gọi mã tùy ý. Hãy xem luồng dữ liệu pickle được tạo thủ công này thực hiện điều gì khi được tải::
 
     >>> import pickle
     >>> pickle.loads(b"cos\nsystem\n(S'echo hello world'\ntR.")
     hello world
     0
 
-In this example, the unpickler imports the :func:`os.system` function and then
-apply the string argument "echo hello world".  Although this example is
-inoffensive, it is not difficult to imagine one that could damage your system.
+Trong ví dụ này, unpickler import function :func:`os.system` rồi áp dụng đối số chuỗi "echo hello world". Mặc dù ví dụ này vô hại, không khó để hình dung một ví dụ có thể gây hư hại cho hệ thống của bạn.
 
-For this reason, you may want to control what gets unpickled by customizing
-:meth:`Unpickler.find_class`.  Unlike its name suggests,
-:meth:`Unpickler.find_class` is called whenever a global (i.e., a class or
-a function) is requested.  Thus it is possible to either completely forbid
-globals or restrict them to a safe subset.
+Vì lý do này, bạn có thể muốn kiểm soát những gì được unpickle bằng cách tùy chỉnh
+:meth:`Unpickler.find_class`. Không giống như tên gọi của nó,
+:meth:`Unpickler.find_class` được gọi mỗi khi một global (tức là một class hoặc một function) được yêu cầu. Vì vậy, bạn có thể hoàn toàn cấm các global hoặc giới hạn chúng vào một tập con an toàn.
 
-Here is an example of an unpickler allowing only few safe classes from the
-:mod:`builtins` module to be loaded::
+Dưới đây là ví dụ về một unpickler chỉ cho phép một vài class an toàn từ
+:mod:`builtins` module được tải::
 
    import builtins
    import io
@@ -1121,10 +789,10 @@ Here is an example of an unpickler allowing only few safe classes from the
    class RestrictedUnpickler(pickle.Unpickler):
 
        def find_class(self, module, name):
-           # Only allow safe classes from builtins.
+           # Chỉ cho phép các class an toàn từ builtins.
            if module == "builtins" and name in safe_builtins:
                return getattr(builtins, name)
-           # Forbid everything else.
+           # Cấm mọi thành phần khác.
            raise pickle.UnpicklingError("global '%s.%s' is forbidden" %
                                         (module, name))
 
@@ -1132,7 +800,7 @@ Here is an example of an unpickler allowing only few safe classes from the
        """Helper function analogous to pickle.loads()."""
        return RestrictedUnpickler(io.BytesIO(s)).load()
 
-A sample usage of our unpickler working as intended::
+Ví dụ sử dụng unpickler của chúng ta hoạt động như mong đợi::
 
     >>> restricted_loads(pickle.dumps([1, 2, range(15)]))
     [1, 2, range(0, 15)]
@@ -1151,30 +819,25 @@ A sample usage of our unpickler working as intended::
 .. XXX Add note about how extension codes could evade our protection
    mechanism (e.g. cached classes do not invokes find_class()).
 
-As our examples shows, you have to be careful with what you allow to be
-unpickled.  Therefore if security is a concern, you may want to consider
-alternatives such as the marshalling API in :mod:`xmlrpc.client` or
-third-party solutions.
+Như các ví dụ của chúng ta cho thấy, bạn phải cẩn thận với những gì cho phép được unpickle. Vì vậy, nếu bảo mật là mối quan tâm, bạn có thể cân nhắc các giải pháp thay thế như marshalling API trong :mod:`xmlrpc.client` hoặc các giải pháp của bên thứ ba.
 
 
-Performance
------------
+Hiệu năng
+---------
 
-Recent versions of the pickle protocol (from protocol 2 and upwards) feature
-efficient binary encodings for several common features and built-in types.
-Also, the :mod:`!pickle` module has a transparent optimizer written in C.
+Các phiên bản gần đây của pickle protocol (từ protocol 2 trở lên) có các mã hóa nhị phân hiệu quả cho một số tính năng và kiểu dựng sẵn phổ biến. Ngoài ra, module :mod:`!pickle` còn có một trình tối ưu hóa trong suốt được viết bằng C.
 
 
 .. _pickle-example:
 
-Examples
---------
+Ví dụ
+-----
 
-For the simplest code, use the :func:`dump` and :func:`load` functions. ::
+Đối với đoạn mã đơn giản nhất, hãy sử dụng các hàm :func:`dump` và :func:`load`.::
 
    import pickle
 
-   # An arbitrary collection of objects supported by pickle.
+   # Một tập hợp tùy ý gồm các đối tượng được pickle hỗ trợ.
    data = {
        'a': [1, 2.0, 3+4j],
        'b': ("character string", b"byte string"),
@@ -1182,17 +845,17 @@ For the simplest code, use the :func:`dump` and :func:`load` functions. ::
    }
 
    with open('data.pickle', 'wb') as f:
-       # Pickle the 'data' dictionary using the highest protocol available.
+       # Pickle từ điển 'data' bằng protocol cao nhất hiện có.
        pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
 
 
-The following example reads the resulting pickled data. ::
+Ví dụ sau đọc dữ liệu đã được pickle.::
 
    import pickle
 
    with open('data.pickle', 'rb') as f:
-       # The protocol version used is detected automatically, so we do not
-       # have to specify it.
+       # Phiên bản protocol được sử dụng sẽ được tự động phát hiện, vì vậy chúng ta không
+       # cần chỉ định nó.
        data = pickle.load(f)
 
 
@@ -1202,60 +865,55 @@ The following example reads the resulting pickled data. ::
 
 .. _pickle-cli:
 
-Command-line interface
-----------------------
+Giao diện dòng lệnh
+-------------------
 
-The :mod:`!pickle` module can be invoked as a script from the command line,
-it will display contents of the pickle files. However, when the pickle file
-that you want to examine comes from an untrusted source, ``-m pickletools``
-is a safer option because it does not execute pickle bytecode, see
-:ref:`pickletools CLI usage <pickletools-cli>`.
+Mô-đun :mod:`!pickle` có thể được gọi như một script từ dòng lệnh và sẽ hiển thị nội dung của các tệp pickle. Tuy nhiên, khi tệp pickle bạn muốn kiểm tra đến từ một nguồn không đáng tin cậy, ``-m pickletools`` là lựa chọn an toàn hơn vì nó không thực thi bytecode pickle, xem
+:ref:`cách sử dụng CLI của pickletools <pickletools-cli>`.
 
 .. code-block:: bash
 
    python -m pickle pickle_file [pickle_file ...]
 
-The following option is accepted:
+Tùy chọn sau được chấp nhận:
 
 .. program:: pickle
 
 .. option:: pickle_file
 
-   A pickle file to read, or ``-`` to indicate reading from standard input.
+   Một tệp pickle cần đọc hoặc ``-`` để chỉ ra rằng sẽ đọc từ đầu vào chuẩn.
 
 
 .. seealso::
 
-   Module :mod:`copyreg`
-      Pickle interface constructor registration for extension types.
+   Mô-đun :mod:`copyreg`
+      Đăng ký constructor giao diện Pickle cho các extension type.
 
-   Module :mod:`pickletools`
-      Tools for working with and analyzing pickled data.
+   Mô-đun :mod:`pickletools`
+      Các công cụ để làm việc với và phân tích dữ liệu đã được pickle.
 
-   Module :mod:`shelve`
-      Indexed databases of objects; uses :mod:`!pickle`.
+   Mô-đun :mod:`shelve`
+      Cơ sở dữ liệu đối tượng được lập chỉ mục; sử dụng :mod:`!pickle`.
 
-   Module :mod:`copy`
-      Shallow and deep object copying.
+   Mô-đun :mod:`copy`
+      Sao chép đối tượng nông và sâu.
 
-   Module :mod:`marshal`
-      High-performance serialization of built-in types.
+   Mô-đun :mod:`marshal`
+      Serialization hiệu năng cao cho các kiểu dựng sẵn.
 
 
-.. rubric:: Footnotes
+.. rubric:: Chú thích
 
-.. [#] Don't confuse this with the :mod:`marshal` module
+.. [#] Đừng nhầm mô-đun này với mô-đun :mod:`marshal`
 
-.. [#] This is why :keyword:`lambda` functions cannot be pickled:  all
-    :keyword:`!lambda` functions share the same name:  ``<lambda>``.
+.. [#] Đây là lý do các hàm :keyword:`lambda` không thể được pickle:  tất cả
+    các hàm :keyword:`!lambda` đều dùng chung một tên:  ``<lambda>``.
 
-.. [#] The exception raised will likely be an :exc:`ImportError` or an
-   :exc:`AttributeError` but it could be something else.
+.. [#] Ngoại lệ được phát sinh nhiều khả năng sẽ là :exc:`ImportError` hoặc một
+   :exc:`AttributeError` nhưng nó có thể là thứ khác.
 
-.. [#] The :mod:`copy` module uses this protocol for shallow and deep copying
-   operations.
+.. [#] Mô-đun :mod:`copy` sử dụng giao thức này cho các thao tác sao chép nông và sao chép sâu.
 
-.. [#] The limitation on alphanumeric characters is due to the fact
-   that persistent IDs in protocol 0 are delimited by the newline
-   character.  Therefore if any kind of newline characters occurs in
-   persistent IDs, the resulting pickled data will become unreadable.
+.. [#] Giới hạn đối với các ký tự chữ và số là do các ID bền vững trong giao thức 0 được phân cách bằng ký tự xuống dòng. Do đó, nếu bất kỳ loại ký tự xuống dòng nào xuất hiện trong các ID bền vững, dữ liệu đã pickle tạo ra sẽ trở nên không thể đọc được.
+
+.. _`JSON (JavaScript Object Notation)`: https://json.org

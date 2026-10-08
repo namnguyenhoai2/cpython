@@ -1,670 +1,445 @@
-:mod:`!locale` --- Internationalization services
-================================================
+:mod:`!locale` --- Dịch vụ quốc tế hóa
+======================================
 
 .. module:: locale
-   :synopsis: Internationalization services.
+   :synopsis: Dịch vụ quốc tế hóa.
 
 .. moduleauthor:: Martin von Löwis <martin@v.loewis.de>
 .. sectionauthor:: Martin von Löwis <martin@v.loewis.de>
 
-**Source code:** :source:`Lib/locale.py`
+**Mã nguồn:** :source:`Lib/locale.py`
 
 --------------
 
-The :mod:`!locale` module opens access to the POSIX locale database and
-functionality. The POSIX locale mechanism allows programmers to deal with
-certain cultural issues in an application, without requiring the programmer to
-know all the specifics of each country where the software is executed.
+Mô-đun :mod:`!locale` cung cấp quyền truy cập vào cơ sở dữ liệu locale POSIX và các chức năng liên quan. Cơ chế locale POSIX cho phép lập trình viên xử lý một số vấn đề văn hóa trong ứng dụng mà không cần biết mọi đặc điểm cụ thể của từng quốc gia nơi phần mềm được thực thi.
 
 .. index:: pair: module; _locale
 
-The :mod:`!locale` module is implemented on top of the :mod:`!_locale` module,
-which in turn uses an ANSI C locale implementation if available.
+Mô-đun :mod:`!locale` được triển khai dựa trên mô-đun :mod:`!_locale`, đến lượt mô-đun này sử dụng triển khai locale ANSI C nếu có.
 
-The :mod:`!locale` module defines the following exception and functions:
+Mô-đun :mod:`!locale` định nghĩa ngoại lệ và các hàm sau đây:
 
 
 .. exception:: Error
 
-   Exception raised when the locale passed to :func:`setlocale` is not
-   recognized.
+   Ngoại lệ được phát sinh khi locale được truyền vào :func:`setlocale` không được nhận dạng.
 
 
 .. function:: setlocale(category, locale=None)
 
-   If *locale* is given and not ``None``, :func:`setlocale` modifies the locale
-   setting for the *category*. The available categories are listed in the data
-   description below. *locale* may be a :ref:`string <locale_name>`, or a pair,
-   language code and encoding. An empty string specifies the user's
-   default settings. If the modification of the locale fails, the exception
-   :exc:`Error` is raised. If successful, the new locale setting is returned.
+   Nếu *locale* được cung cấp và không phải ``None``, :func:`setlocale` sẽ thay đổi thiết lập locale cho *category*. Các category khả dụng được liệt kê trong phần mô tả dữ liệu bên dưới. *locale* có thể là một :ref:`string <locale_name>`, hoặc một cặp gồm mã ngôn ngữ và encoding. Chuỗi rỗng chỉ định các thiết lập mặc định của người dùng. Nếu việc thay đổi locale không thành công, ngoại lệ
+   :exc:`Error` sẽ được nêu ra. Nếu thành công, thiết lập locale mới sẽ được trả về.
 
-   If *locale* is a pair, it is converted to a locale name using
-   the locale aliasing engine.
-   The language code has the same format as a :ref:`locale name <locale_name>`,
-   but without encoding and ``@``-modifier.
-   The language code and encoding can be ``None``.
+   Nếu *locale* là một cặp, cặp này được chuyển đổi thành tên locale bằng công cụ alias locale. Mã ngôn ngữ có cùng định dạng với :ref:`locale name <locale_name>`, nhưng không có encoding và bộ sửa đổi ``@``. Mã ngôn ngữ và encoding có thể được ``None``.
 
-   If *locale* is omitted or ``None``, the current setting for *category* is
-   returned.
+   Nếu *locale* bị bỏ qua hoặc là ``None``, thiết lập hiện tại cho *category* sẽ được trả về.
 
-   Example::
+   Ví dụ::
 
       >>> import locale
-      >>> loc = locale.setlocale(locale.LC_ALL)  # get current locale
-      # use German locale; name and availability varies with platform
+      >>> loc = locale.setlocale(locale.LC_ALL)  # lấy locale hiện tại
+      # sử dụng locale tiếng Đức; tên và khả năng cung cấp thay đổi tùy nền tảng
       >>> locale.setlocale(locale.LC_ALL, 'de_DE.UTF-8')
-      >>> locale.strcoll('f\xe4n', 'foo')  # compare a string containing an umlaut
-      >>> locale.setlocale(locale.LC_ALL, '')   # use user's preferred locale
-      >>> locale.setlocale(locale.LC_ALL, 'C')  # use default (C) locale
-      >>> locale.setlocale(locale.LC_ALL, loc)  # restore saved locale
+      >>> locale.strcoll('f\xe4n', 'foo')  # so sánh một chuỗi chứa ký tự umlaut
+      >>> locale.setlocale(locale.LC_ALL, '')   # sử dụng locale người dùng предпоч thích
+      >>> locale.setlocale(locale.LC_ALL, 'C')  # sử dụng locale mặc định (C)
+      >>> locale.setlocale(locale.LC_ALL, loc)  # khôi phục locale đã lưu
 
-   :func:`setlocale` is not thread-safe on most systems. Applications typically
-   start with a call of::
+   :func:`setlocale` không an toàn với luồng trên hầu hết các hệ thống. Các ứng dụng thường bắt đầu bằng một lệnh gọi đến::
 
       import locale
       locale.setlocale(locale.LC_ALL, '')
 
-   This sets the locale for all categories to the user's default setting (typically
-   specified in the :envvar:`LANG` environment variable).  If the locale is not
-   changed thereafter, using multithreading should not cause problems.
+   Thao tác này đặt locale cho tất cả các danh mục thành thiết lập mặc định của người dùng (thường được chỉ định trong biến môi trường :envvar:`LANG`). Nếu locale không được thay đổi sau đó, việc sử dụng đa luồng sẽ không gây ra vấn đề.
 
 
 .. function:: localeconv()
 
-   Returns the database of the local conventions as a dictionary. This dictionary
-   has the following strings as keys:
+   Trả về cơ sở dữ liệu về các quy ước địa phương dưới dạng một dictionary. Dictionary này có các chuỗi sau làm khóa:
 
    .. tabularcolumns:: |l|l|L|
 
-   +----------------------+-------------------------------------+--------------------------------+
-   | Category             | Key                                 | Meaning                        |
-   +======================+=====================================+================================+
-   | :const:`LC_NUMERIC`  | ``'decimal_point'``                 | Decimal point character.       |
-   +----------------------+-------------------------------------+--------------------------------+
-   |                      | ``'grouping'``                      | Sequence of numbers specifying |
-   |                      |                                     | which relative positions the   |
-   |                      |                                     | ``'thousands_sep'`` is         |
-   |                      |                                     | expected.  If the sequence is  |
-   |                      |                                     | terminated with                |
-   |                      |                                     | :const:`CHAR_MAX`, no further  |
-   |                      |                                     | grouping is performed. If the  |
-   |                      |                                     | sequence terminates with a     |
-   |                      |                                     | ``0``,  the last group size is |
-   |                      |                                     | repeatedly used.               |
-   +----------------------+-------------------------------------+--------------------------------+
-   |                      | ``'thousands_sep'``                 | Character used between groups. |
-   +----------------------+-------------------------------------+--------------------------------+
-   | :const:`LC_MONETARY` | ``'int_curr_symbol'``               | International currency symbol. |
-   +----------------------+-------------------------------------+--------------------------------+
-   |                      | ``'currency_symbol'``               | Local currency symbol.         |
-   +----------------------+-------------------------------------+--------------------------------+
-   |                      | ``'p_cs_precedes/n_cs_precedes'``   | Whether the currency symbol    |
-   |                      |                                     | precedes the value (for        |
-   |                      |                                     | positive resp. negative        |
-   |                      |                                     | values).                       |
-   +----------------------+-------------------------------------+--------------------------------+
-   |                      | ``'p_sep_by_space/n_sep_by_space'`` | Whether the currency symbol is |
-   |                      |                                     | separated from the value  by a |
-   |                      |                                     | space (for positive resp.      |
-   |                      |                                     | negative values).              |
-   +----------------------+-------------------------------------+--------------------------------+
-   |                      | ``'mon_decimal_point'``             | Decimal point used for         |
-   |                      |                                     | monetary values.               |
-   +----------------------+-------------------------------------+--------------------------------+
-   |                      | ``'frac_digits'``                   | Number of fractional digits    |
-   |                      |                                     | used in local formatting of    |
-   |                      |                                     | monetary values.               |
-   +----------------------+-------------------------------------+--------------------------------+
-   |                      | ``'int_frac_digits'``               | Number of fractional digits    |
-   |                      |                                     | used in international          |
-   |                      |                                     | formatting of monetary values. |
-   +----------------------+-------------------------------------+--------------------------------+
-   |                      | ``'mon_thousands_sep'``             | Group separator used for       |
-   |                      |                                     | monetary values.               |
-   +----------------------+-------------------------------------+--------------------------------+
-   |                      | ``'mon_grouping'``                  | Equivalent to ``'grouping'``,  |
-   |                      |                                     | used for monetary values.      |
-   +----------------------+-------------------------------------+--------------------------------+
-   |                      | ``'positive_sign'``                 | Symbol used to annotate a      |
-   |                      |                                     | positive monetary value.       |
-   +----------------------+-------------------------------------+--------------------------------+
-   |                      | ``'negative_sign'``                 | Symbol used to annotate a      |
-   |                      |                                     | negative monetary value.       |
-   +----------------------+-------------------------------------+--------------------------------+
-   |                      | ``'p_sign_posn/n_sign_posn'``       | The position of the sign (for  |
-   |                      |                                     | positive resp. negative        |
-   |                      |                                     | values), see below.            |
-   +----------------------+-------------------------------------+--------------------------------+
+   +----------------------+-------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+   | Danh mục             | Khóa                                | Ý nghĩa                                                                                                                               |
+   +======================+=====================================+=======================================================================================================================================+
+   | :const:`LC_NUMERIC`  | ``'decimal_point'``                 | Ký tự dấu thập phân.                                                                                                                  |
+   +----------------------+-------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+   |                      | ``'grouping'``                      | Chuỗi các số chỉ định những vị trí tương đối mà ``'thousands_sep'`` được mong đợi. Nếu chuỗi kết thúc bằng                            |
+   |                      |                                     | :const:`CHAR_MAX`, sẽ không thực hiện nhóm nào nữa. Nếu chuỗi kết thúc bằng ``0``, kích thước nhóm cuối cùng sẽ được sử dụng lặp lại. |
+   +----------------------+-------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+   |                      | ``'thousands_sep'``                 | Ký tự được sử dụng giữa các nhóm.                                                                                                     |
+   +----------------------+-------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+   | :const:`LC_MONETARY` | ``'int_curr_symbol'``               | Ký hiệu tiền tệ quốc tế.                                                                                                              |
+   +----------------------+-------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+   |                      | ``'currency_symbol'``               | Ký hiệu tiền tệ địa phương.                                                                                                           |
+   +----------------------+-------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+   |                      | ``'p_cs_precedes/n_cs_precedes'``   | Ký hiệu tiền tệ có đứng trước giá trị hay không (đối với các giá trị dương và âm tương ứng).                                          |
+   +----------------------+-------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+   |                      | ``'p_sep_by_space/n_sep_by_space'`` | Ký hiệu tiền tệ có được ngăn cách với giá trị bằng một dấu cách hay không (đối với các giá trị dương và âm tương ứng).                |
+   +----------------------+-------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+   |                      | ``'mon_decimal_point'``             | Dấu thập phân được sử dụng cho các giá trị tiền tệ.                                                                                   |
+   +----------------------+-------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+   |                      | ``'frac_digits'``                   | Số chữ số phần thập phân được sử dụng khi định dạng các giá trị tiền tệ theo địa phương.                                              |
+   +----------------------+-------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+   |                      | ``'int_frac_digits'``               | Số chữ số phần thập phân được sử dụng khi định dạng các giá trị tiền tệ theo quốc tế.                                                 |
+   +----------------------+-------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+   |                      | ``'mon_thousands_sep'``             | Dấu phân cách nhóm được dùng cho các giá trị tiền tệ.                                                                                 |
+   +----------------------+-------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+   |                      | ``'mon_grouping'``                  | Tương đương với ``'grouping'``, được dùng cho các giá trị tiền tệ.                                                                    |
+   +----------------------+-------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+   |                      | ``'positive_sign'``                 | Ký hiệu dùng để chú thích một giá trị tiền tệ dương.                                                                                  |
+   +----------------------+-------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+   |                      | ``'negative_sign'``                 | Ký hiệu dùng để chú thích một giá trị tiền tệ âm.                                                                                     |
+   +----------------------+-------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
+   |                      | ``'p_sign_posn/n_sign_posn'``       | Vị trí của dấu (tương ứng với các giá trị dương và âm), xem bên dưới.                                                                 |
+   +----------------------+-------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------+
 
-   All numeric values can be set to :const:`CHAR_MAX` to indicate that there is no
-   value specified in this locale.
+   Tất cả các giá trị số có thể được đặt thành :const:`CHAR_MAX` để cho biết rằng không có giá trị nào được chỉ định trong locale này.
 
-   The possible values for ``'p_sign_posn'`` and ``'n_sign_posn'`` are given below.
+   Các giá trị có thể có của ``'p_sign_posn'`` và ``'n_sign_posn'`` được nêu bên dưới.
 
-   +--------------+-----------------------------------------+
-   | Value        | Explanation                             |
-   +==============+=========================================+
-   | ``0``        | Currency and value are surrounded by    |
-   |              | parentheses.                            |
-   +--------------+-----------------------------------------+
-   | ``1``        | The sign should precede the value and   |
-   |              | currency symbol.                        |
-   +--------------+-----------------------------------------+
-   | ``2``        | The sign should follow the value and    |
-   |              | currency symbol.                        |
-   +--------------+-----------------------------------------+
-   | ``3``        | The sign should immediately precede the |
-   |              | value.                                  |
-   +--------------+-----------------------------------------+
-   | ``4``        | The sign should immediately follow the  |
-   |              | value.                                  |
-   +--------------+-----------------------------------------+
-   | ``CHAR_MAX`` | Nothing is specified in this locale.    |
-   +--------------+-----------------------------------------+
+   +--------------+---------------------------------------------------------+
+   | Giá trị      | Giải thích                                              |
+   +==============+=========================================================+
+   | ``0``        | Đơn vị tiền tệ và giá trị được đặt trong dấu ngoặc đơn. |
+   +--------------+---------------------------------------------------------+
+   | ``1``        | Dấu phải đứng trước giá trị và ký hiệu tiền tệ.         |
+   +--------------+---------------------------------------------------------+
+   | ``2``        | Dấu phải đứng sau giá trị và ký hiệu tiền tệ.           |
+   +--------------+---------------------------------------------------------+
+   | ``3``        | Dấu phải đứng ngay trước giá trị.                       |
+   +--------------+---------------------------------------------------------+
+   | ``4``        | Dấu phải đứng ngay sau giá trị.                         |
+   +--------------+---------------------------------------------------------+
+   | ``CHAR_MAX`` | Không có thông tin nào được chỉ định trong locale này.  |
+   +--------------+---------------------------------------------------------+
 
-   The function temporarily sets the ``LC_CTYPE`` locale to the ``LC_NUMERIC``
-   locale or the ``LC_MONETARY`` locale if locales are different and numeric or
-   monetary strings are non-ASCII. This temporary change affects other threads.
+   Hàm này tạm thời đặt locale ``LC_CTYPE`` thành locale ``LC_NUMERIC`` hoặc locale ``LC_MONETARY`` nếu các locale khác nhau và các chuỗi số hoặc tiền tệ không phải ASCII. Thay đổi tạm thời này ảnh hưởng đến các thread khác.
 
    .. versionchanged:: 3.7
-      The function now temporarily sets the ``LC_CTYPE`` locale to the
-      ``LC_NUMERIC`` locale in some cases.
+      Trong một số trường hợp, hàm này hiện tạm thời đặt locale ``LC_CTYPE`` thành locale ``LC_NUMERIC``.
 
 
 .. function:: nl_langinfo(option)
 
-   Return some locale-specific information as a string.  This function is not
-   available on all systems, and the set of possible options might also vary
-   across platforms.  The possible argument values are numbers, for which
-   symbolic constants are available in the locale module.
+   Trả về một số thông tin dành riêng cho locale dưới dạng chuỗi. Hàm này không có trên tất cả các hệ thống và tập hợp tùy chọn có thể có cũng khác nhau giữa các nền tảng. Các giá trị đối số có thể có là các số, với các hằng số tượng trưng tương ứng có trong module locale.
 
-   The :func:`nl_langinfo` function accepts one of the following keys.  Most
-   descriptions are taken from the corresponding description in the GNU C
-   library.
+   Hàm :func:`nl_langinfo` chấp nhận một trong các khóa sau. Phần lớn mô tả được lấy từ mô tả tương ứng trong thư viện GNU C.
 
    .. data:: CODESET
 
-      Get a string with the name of the character encoding used in the
-      selected locale.
+      Lấy một chuỗi chứa tên của encoding ký tự được sử dụng trong locale đã chọn.
 
    .. data:: D_T_FMT
 
-      Get a string that can be used as a format string for :func:`time.strftime` to
-      represent date and time in a locale-specific way.
+      Lấy một chuỗi có thể được sử dụng làm chuỗi định dạng cho :func:`time.strftime` để biểu diễn ngày và giờ theo cách dành riêng cho locale.
 
    .. data:: D_FMT
 
-      Get a string that can be used as a format string for :func:`time.strftime` to
-      represent a date in a locale-specific way.
+      Lấy một chuỗi có thể được dùng làm chuỗi định dạng cho :func:`time.strftime` để biểu diễn ngày theo cách phù hợp với từng locale.
 
    .. data:: T_FMT
 
-      Get a string that can be used as a format string for :func:`time.strftime` to
-      represent a time in a locale-specific way.
+      Lấy một chuỗi có thể được dùng làm chuỗi định dạng cho :func:`time.strftime` để biểu diễn thời gian theo cách phù hợp với từng locale.
 
    .. data:: T_FMT_AMPM
 
-      Get a format string for :func:`time.strftime` to represent time in the am/pm
-      format.
+      Lấy một chuỗi định dạng cho :func:`time.strftime` để biểu diễn thời gian theo định dạng am/pm.
 
    .. data:: DAY_1
-             DAY_2
-             DAY_3
-             DAY_4
-             DAY_5
-             DAY_6
-             DAY_7
+             DAY_2 DAY_3 DAY_4 DAY_5 DAY_6 DAY_7
 
-      Get the name of the n-th day of the week.
+      Lấy tên của ngày thứ n trong tuần.
 
       .. note::
 
-         This follows the US convention of :const:`DAY_1` being Sunday, not the
-         international convention (ISO 8601) that Monday is the first day of the
-         week.
+         Điều này tuân theo quy ước của Hoa Kỳ, trong đó :const:`DAY_1` là Chủ nhật, thay vì quy ước quốc tế (ISO 8601), theo đó thứ Hai là ngày đầu tiên trong tuần.
 
    .. data:: ABDAY_1
-             ABDAY_2
-             ABDAY_3
-             ABDAY_4
-             ABDAY_5
-             ABDAY_6
-             ABDAY_7
+             ABDAY_2 ABDAY_3 ABDAY_4 ABDAY_5 ABDAY_6 ABDAY_7
 
-      Get the abbreviated name of the n-th day of the week.
+      Lấy tên viết tắt của ngày thứ n trong tuần.
 
    .. data:: MON_1
-             MON_2
-             MON_3
-             MON_4
-             MON_5
-             MON_6
-             MON_7
-             MON_8
-             MON_9
-             MON_10
-             MON_11
-             MON_12
+             MON_2 MON_3 MON_4 MON_5 MON_6 MON_7 MON_8 MON_9 MON_10 MON_11 MON_12
 
-      Get the name of the n-th month.
+      Lấy tên của tháng thứ n.
 
    .. data:: ABMON_1
-             ABMON_2
-             ABMON_3
-             ABMON_4
-             ABMON_5
-             ABMON_6
-             ABMON_7
-             ABMON_8
-             ABMON_9
-             ABMON_10
-             ABMON_11
-             ABMON_12
+             ABMON_2 ABMON_3 ABMON_4 ABMON_5 ABMON_6 ABMON_7 ABMON_8 ABMON_9 ABMON_10 ABMON_11 ABMON_12
 
-      Get the abbreviated name of the n-th month.
+      Lấy tên viết tắt của tháng thứ n.
 
    .. data:: RADIXCHAR
 
-      Get the radix character (decimal dot, decimal comma, etc.).
+      Lấy ký tự cơ số (dấu chấm thập phân, dấu phẩy thập phân, v.v.).
 
    .. data:: THOUSEP
 
-      Get the separator character for thousands (groups of three digits).
+      Lấy ký tự phân cách hàng nghìn (các nhóm gồm ba chữ số).
 
    .. data:: YESEXPR
 
-      Get a regular expression that can be used with the regex function to
-      recognize a positive response to a yes/no question.
+      Lấy một biểu thức chính quy có thể được sử dụng với hàm regex để nhận diện câu trả lời khẳng định cho câu hỏi có/không.
 
    .. data:: NOEXPR
 
-      Get a regular expression that can be used with the ``regex(3)`` function to
-      recognize a negative response to a yes/no question.
+      Lấy một biểu thức chính quy có thể được sử dụng với hàm ``regex(3)`` để nhận diện câu trả lời phủ định cho câu hỏi có/không.
 
       .. note::
 
-         The regular expressions for :const:`YESEXPR` and
-         :const:`NOEXPR` use syntax suitable for the
-         ``regex`` function from the C library, which might
-         differ from the syntax used in :mod:`re`.
+         Các biểu thức chính quy cho :const:`YESEXPR` và
+         :const:`NOEXPR` sử dụng cú pháp phù hợp với hàm ``regex`` từ thư viện C, có thể khác với cú pháp được sử dụng trong :mod:`re`.
 
    .. data:: CRNCYSTR
 
-      Get the currency symbol, preceded by "-" if the symbol should appear before
-      the value, "+" if the symbol should appear after the value, or "." if the
-      symbol should replace the radix character.
+      Lấy ký hiệu tiền tệ, có thêm "-" ở trước nếu ký hiệu phải xuất hiện trước giá trị, "+" nếu ký hiệu phải xuất hiện sau giá trị hoặc "." nếu ký hiệu phải thay thế ký tự phân cách phần nguyên.
 
    .. data:: ERA
 
-      Get a string which describes how years are counted and displayed for
-      each era in a locale.
+      Lấy một chuỗi mô tả cách tính và hiển thị năm cho từng thời đại trong một locale.
 
-      Most locales do not define this value.  An example of a locale which does
-      define this value is the Japanese one.  In Japan, the traditional
-      representation of dates includes the name of the era corresponding to the
-      then-emperor's reign.
+      Hầu hết locale không định nghĩa giá trị này. Một ví dụ về locale có định nghĩa giá trị này là locale Nhật Bản. Ở Nhật Bản, cách biểu diễn ngày tháng truyền thống bao gồm tên thời đại tương ứng với triều đại của vị hoàng đế đương thời.
 
-      Normally it should not be necessary to use this value directly. Specifying
-      the ``E`` modifier in their format strings causes the :func:`time.strftime`
-      function to use this information.
-      The format of the returned string is specified in *The Open Group Base
-      Specifications Issue 8*, paragraph `7.3.5.2 LC_TIME C-Language Access
-      <https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap07.html#tag_07_03_05_02>`_.
+      Thông thường, không cần thiết phải sử dụng trực tiếp giá trị này. Việc chỉ định bổ từ ``E`` trong các chuỗi định dạng của chúng khiến hàm :func:`time.strftime` sử dụng thông tin này. Định dạng của chuỗi được trả về được quy định trong *The Open Group Base Specifications Issue 8*, đoạn `7.3.5.2 LC_TIME C-Language Access <https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap07.html#tag_07_03_05_02>`_.
 
    .. data:: ERA_D_T_FMT
 
-      Get a format string for :func:`time.strftime` to represent date and time in a
-      locale-specific era-based way.
+      Lấy một chuỗi định dạng cho :func:`time.strftime` để biểu diễn ngày và giờ theo cách dựa trên kỷ nguyên, đặc thù theo locale.
 
    .. data:: ERA_D_FMT
 
-      Get a format string for :func:`time.strftime` to represent a date in a
-      locale-specific era-based way.
+      Lấy một chuỗi định dạng cho :func:`time.strftime` để biểu diễn ngày theo cách dựa trên kỷ nguyên, đặc thù theo locale.
 
    .. data:: ERA_T_FMT
 
-      Get a format string for :func:`time.strftime` to represent a time in a
-      locale-specific era-based way.
+      Lấy một chuỗi định dạng cho :func:`time.strftime` để biểu diễn giờ theo cách dựa trên kỷ nguyên, đặc thù theo locale.
 
    .. data:: ALT_DIGITS
 
-      Get a string consisting of up to 100 semicolon-separated symbols used
-      to represent the values 0 to 99 in a locale-specific way.
-      In most locales this is an empty string.
+      Lấy một chuỗi gồm tối đa 100 ký hiệu, được phân tách bằng dấu chấm phẩy, dùng để biểu diễn các giá trị từ 0 đến 99 theo cách đặc thù theo locale. Trong hầu hết locale, đây là một chuỗi rỗng.
 
-   The function temporarily sets the ``LC_CTYPE`` locale to the locale
-   of the category that determines the requested value (``LC_TIME``,
-   ``LC_NUMERIC``, ``LC_MONETARY`` or ``LC_MESSAGES``) if locales are
-   different and the resulting string is non-ASCII.
-   This temporary change affects other threads.
+   Hàm tạm thời đặt locale ``LC_CTYPE`` thành locale của category xác định giá trị được yêu cầu (``LC_TIME``, ``LC_NUMERIC``, ``LC_MONETARY`` hoặc ``LC_MESSAGES``) nếu các locale khác nhau và chuỗi kết quả không phải ASCII. Thay đổi tạm thời này ảnh hưởng đến các thread khác.
 
    .. versionchanged:: 3.14
-      The function now temporarily sets the ``LC_CTYPE`` locale in some cases.
+      Hàm hiện tạm thời đặt locale ``LC_CTYPE`` trong một số trường hợp.
 
 
 .. function:: getdefaultlocale([envvars])
 
-   Tries to determine the default locale settings and returns them as a tuple of
-   the form ``(language code, encoding)``.
+   Cố gắng xác định các thiết lập locale mặc định và trả về chúng dưới dạng một tuple có dạng ``(language code, encoding)``.
 
-   According to POSIX, a program which has not called ``setlocale(LC_ALL, '')``
-   runs using the portable ``'C'`` locale.  Calling ``setlocale(LC_ALL, '')`` lets
-   it use the default locale as defined by the :envvar:`LANG` variable.  Since we
-   do not want to interfere with the current locale setting we thus emulate the
-   behavior in the way described above.
+   Theo POSIX, một chương trình chưa gọi ``setlocale(LC_ALL, '')`` sẽ chạy bằng locale ``'C'`` khả chuyển. Việc gọi ``setlocale(LC_ALL, '')`` cho phép chương trình sử dụng locale mặc định được xác định bởi biến :envvar:`LANG`. Vì không muốn can thiệp vào thiết lập locale hiện tại, chúng ta mô phỏng hành vi theo cách được mô tả ở trên.
 
-   To maintain compatibility with other platforms, not only the :envvar:`LANG`
-   variable is tested, but a list of variables given as envvars parameter.  The
-   first found to be defined will be used.  *envvars* defaults to the search
-   path used in GNU gettext; it must always contain the variable name
-   ``'LANG'``.  The GNU gettext search path contains ``'LC_ALL'``,
-   ``'LC_CTYPE'``, ``'LANG'`` and ``'LANGUAGE'``, in that order.
+   Để duy trì khả năng tương thích với các nền tảng khác, không chỉ biến :envvar:`LANG` được kiểm tra mà còn có một danh sách các biến được cung cấp dưới dạng tham số envvars. Biến đầu tiên được tìm thấy là đã được định nghĩa sẽ được sử dụng. *envvars* mặc định là đường dẫn tìm kiếm được GNU gettext sử dụng; đường dẫn này luôn phải chứa tên biến ``'LANG'``. Đường dẫn tìm kiếm của GNU gettext chứa ``'LC_ALL'``, ``'LC_CTYPE'``, ``'LANG'`` và ``'LANGUAGE'``, theo thứ tự đó.
 
-   The language code has the same format as a :ref:`locale name <locale_name>`,
-   but without encoding and ``@``-modifier.
-   The language code and encoding may be ``None`` if their values cannot be
-   determined.
-   The "C" locale is represented as ``(None, None)``.
+   Mã ngôn ngữ có cùng định dạng với :ref:`tên locale <locale_name>`, nhưng không có encoding và ``@``-modifier. Mã ngôn ngữ và encoding có thể là ``None`` nếu không thể xác định được giá trị của chúng. Locale "C" được biểu diễn bằng ``(None, None)``.
 
 
 .. function:: getlocale(category=LC_CTYPE)
 
-   Returns the current setting for the given locale category as a tuple containing
-   the language code and encoding. *category* may be one of the :const:`!LC_\*`
-   values except :const:`LC_ALL`.  It defaults to :const:`LC_CTYPE`.
+   Trả về thiết lập hiện tại của danh mục locale đã cho dưới dạng một tuple chứa mã ngôn ngữ và encoding. *category* có thể là một trong các giá trị :const:`!LC_\*`, ngoại trừ :const:`LC_ALL`. Giá trị mặc định là :const:`LC_CTYPE`.
 
-   The language code has the same format as a :ref:`locale name <locale_name>`,
-   but without encoding and ``@``-modifier.
-   The language code and encoding may be ``None`` if their values cannot be
-   determined.
-   The "C" locale is represented as ``(None, None)``.
+   Mã ngôn ngữ có cùng định dạng với :ref:`tên locale <locale_name>`, nhưng không có encoding và ``@``-modifier. Mã ngôn ngữ và encoding có thể là ``None`` nếu không thể xác định được giá trị của chúng. Locale "C" được biểu diễn bằng ``(None, None)``.
 
 
 .. function:: getpreferredencoding(do_setlocale=True)
 
-   Return the :term:`locale encoding` used for text data, according to user
-   preferences.  User preferences are expressed differently on different
-   systems, and might not be available programmatically on some systems, so
-   this function only returns a guess.
+   Trả về :term:`locale encoding` được sử dụng cho dữ liệu văn bản theo tùy chọn của người dùng. Tùy chọn của người dùng được biểu đạt khác nhau trên các hệ thống khác nhau và có thể không khả dụng theo cách lập trình trên một số hệ thống, vì vậy hàm này chỉ trả về một phỏng đoán.
 
-   On some systems, it is necessary to invoke :func:`setlocale` to obtain the
-   user preferences, so this function is not thread-safe. If invoking setlocale
-   is not necessary or desired, *do_setlocale* should be set to ``False``.
+   Trên một số hệ thống, cần gọi :func:`setlocale` để lấy tùy chọn của người dùng, vì vậy hàm này không an toàn khi sử dụng trong nhiều luồng. Nếu không cần hoặc không muốn gọi setlocale, *do_setlocale* nên được đặt thành ``False``.
 
-   On Android or if the :ref:`Python UTF-8 Mode <utf8-mode>` is enabled, always
-   return ``'utf-8'``, the :term:`locale encoding` and the *do_setlocale*
-   argument are ignored.
+   Trên Android hoặc khi :ref:`Python UTF-8 Mode <utf8-mode>` được bật, luôn trả về ``'utf-8'``; đối số :term:`locale encoding` và *do_setlocale* sẽ bị bỏ qua.
 
-   The :ref:`Python preinitialization <c-preinit>` configures the LC_CTYPE
-   locale. See also the :term:`filesystem encoding and error handler`.
+   :ref:`Python preinitialization <c-preinit>` cấu hình locale LC_CTYPE. Xem thêm :term:`filesystem encoding and error handler`.
 
    .. versionchanged:: 3.7
-      The function now always returns ``"utf-8"`` on Android or if the
-      :ref:`Python UTF-8 Mode <utf8-mode>` is enabled.
+      Hàm này hiện luôn trả về ``"utf-8"`` trên Android hoặc khi
+      :ref:`Python UTF-8 Mode <utf8-mode>` được bật.
 
 
 .. function:: getencoding()
 
-   Get the current :term:`locale encoding`:
+   Lấy :term:`locale encoding` hiện tại:
 
-   * On Android and VxWorks, return ``"utf-8"``.
-   * On Unix, return the encoding of the current :data:`LC_CTYPE` locale.
-     Return ``"utf-8"`` if ``nl_langinfo(CODESET)`` returns an empty string:
-     for example, if the current LC_CTYPE locale is not supported.
-   * On Windows, return the ANSI code page.
+   * Trên Android và VxWorks, trả về ``"utf-8"``.
+   * Trên Unix, trả về encoding của locale :data:`LC_CTYPE` hiện tại. Trả về ``"utf-8"`` nếu ``nl_langinfo(CODESET)`` trả về chuỗi rỗng, chẳng hạn khi locale LC_CTYPE hiện tại không được hỗ trợ.
+   * Trên Windows, trả về trang mã ANSI.
 
-   The :ref:`Python preinitialization <c-preinit>` configures the LC_CTYPE
-   locale. See also the :term:`filesystem encoding and error handler`.
+   :ref:`Python preinitialization <c-preinit>` cấu hình locale LC_CTYPE. Xem thêm :term:`filesystem encoding and error handler`.
 
-   This function is similar to
-   :func:`getpreferredencoding(False) <getpreferredencoding>` except this
-   function ignores the :ref:`Python UTF-8 Mode <utf8-mode>`.
+   Hàm này tương tự như
+   :func:`getpreferredencoding(False) <getpreferredencoding>`, ngoại trừ việc hàm này bỏ qua :ref:`Python UTF-8 Mode <utf8-mode>`.
 
    .. versionadded:: 3.11
 
 
 .. function:: normalize(localename)
 
-   Returns a normalized locale code for the given locale name.  The returned locale
-   code is formatted for use with :func:`setlocale`.  If normalization fails, the
-   original name is returned unchanged.
+   Trả về mã locale đã được chuẩn hóa cho tên locale đã cho. Mã locale được trả về có định dạng để sử dụng với :func:`setlocale`. Nếu chuẩn hóa không thành công, tên ban đầu được trả về mà không thay đổi.
 
-   If the given encoding is not known, the function defaults to the default
-   encoding for the locale code just like :func:`setlocale`.
+   Nếu encoding đã cho không xác định, hàm sẽ sử dụng encoding mặc định cho mã locale, giống như :func:`setlocale`.
 
 
 .. function:: strcoll(string1, string2)
 
-   Compares two strings according to the current :const:`LC_COLLATE` setting. As
-   any other compare function, returns a negative, or a positive value, or ``0``,
-   depending on whether *string1* collates before or after *string2* or is equal to
-   it.
+   So sánh hai chuỗi theo thiết lập :const:`LC_COLLATE` hiện tại. Giống như mọi hàm so sánh khác, hàm này trả về một giá trị âm, dương hoặc ``0``, tùy thuộc vào việc *string1* được sắp xếp trước hay sau *string2*, hoặc bằng với chuỗi đó.
 
 
 .. function:: strxfrm(string)
 
-   Transforms a string to one that can be used in locale-aware
-   comparisons.  For example, ``strxfrm(s1) < strxfrm(s2)`` is
-   equivalent to ``strcoll(s1, s2) < 0``.  This function can be used
-   when the same string is compared repeatedly, e.g. when collating a
-   sequence of strings.
+   Chuyển đổi một chuỗi thành chuỗi có thể được dùng trong các phép so sánh phụ thuộc vào locale. Ví dụ: ``strxfrm(s1) < strxfrm(s2)`` tương đương với ``strcoll(s1, s2) < 0``. Có thể dùng hàm này khi một chuỗi được so sánh nhiều lần, chẳng hạn như khi sắp xếp một chuỗi các chuỗi.
 
 
 .. function:: format_string(format, val, grouping=False, monetary=False)
 
-   Formats a number *val* according to the current :const:`LC_NUMERIC` setting.
-   The format follows the conventions of the ``%`` operator.  For floating-point
-   values, the decimal point is modified if appropriate.  If *grouping* is ``True``,
-   also takes the grouping into account.
+   Định dạng một số *val* theo thiết lập :const:`LC_NUMERIC` hiện tại. Định dạng này tuân theo quy ước của toán tử ``%``. Đối với các giá trị dấu phẩy động, dấu thập phân sẽ được thay đổi nếu thích hợp. Nếu *grouping* là ``True``, hàm cũng tính đến việc phân nhóm.
 
-   If *monetary* is true, the conversion uses monetary thousands separator and
-   grouping strings.
+   Nếu *monetary* là true, phép chuyển đổi sẽ sử dụng chuỗi phân cách hàng nghìn và phân nhóm tiền tệ.
 
-   Processes formatting specifiers as in ``format % val``, but takes the current
-   locale settings into account.
+   Xử lý các bộ chỉ định định dạng như trong ``format % val``, nhưng có tính đến các thiết lập locale hiện tại.
 
    .. versionchanged:: 3.7
-      The *monetary* keyword parameter was added.
+      Đã thêm tham số từ khóa *monetary*.
 
 
 .. function:: currency(val, symbol=True, grouping=False, international=False)
 
-   Formats a number *val* according to the current :const:`LC_MONETARY` settings.
+   Định dạng một số *val* theo các thiết lập :const:`LC_MONETARY` hiện tại.
 
-   The returned string includes the currency symbol if *symbol* is true, which is
-   the default. If *grouping* is ``True`` (which is not the default), grouping is done
-   with the value. If *international* is ``True`` (which is not the default), the
-   international currency symbol is used.
+   Chuỗi được trả về bao gồm ký hiệu tiền tệ nếu *symbol* là true, đây là giá trị mặc định. Nếu *grouping* là ``True`` (không phải giá trị mặc định), việc nhóm được thực hiện bằng giá trị đó. Nếu *international* là ``True`` (không phải giá trị mặc định), ký hiệu tiền tệ quốc tế sẽ được sử dụng.
 
    .. note::
 
-     This function will not work with the 'C' locale, so you have to set a
-     locale via :func:`setlocale` first.
+     Hàm này sẽ không hoạt động với locale 'C', vì vậy trước tiên bạn phải đặt locale thông qua :func:`setlocale`.
 
 
 .. function:: str(float)
 
-   Formats a floating-point number using the same format as the built-in function
-   ``str(float)``, but takes the decimal point into account.
+   Định dạng một số dấu phẩy động bằng cùng định dạng với hàm tích hợp sẵn ``str(float)``, nhưng có tính đến dấu thập phân.
 
 
 .. function:: delocalize(string)
 
-    Converts a string into a normalized number string, following the
-    :const:`LC_NUMERIC` settings.
+    Chuyển đổi một chuỗi thành chuỗi số đã chuẩn hóa, theo các
+    thiết lập :const:`LC_NUMERIC`.
 
     .. versionadded:: 3.5
 
 
 .. function:: localize(string, grouping=False, monetary=False)
 
-    Converts a normalized number string into a formatted string following the
-    :const:`LC_NUMERIC` settings.
+    Chuyển đổi một chuỗi số đã chuẩn hóa thành chuỗi đã định dạng theo các
+    thiết lập :const:`LC_NUMERIC`.
 
     .. versionadded:: 3.10
 
 
 .. function:: atof(string, func=float)
 
-   Converts a string to a number, following the :const:`LC_NUMERIC` settings,
-   by calling *func* on the result of calling :func:`delocalize` on *string*.
+   Chuyển đổi một chuỗi thành một số theo các thiết lập :const:`LC_NUMERIC`, bằng cách gọi *func* trên kết quả của việc gọi :func:`delocalize` với *string*.
 
 
 .. function:: atoi(string)
 
-   Converts a string to an integer, following the :const:`LC_NUMERIC` conventions.
+   Chuyển đổi một chuỗi thành một số nguyên theo các quy ước :const:`LC_NUMERIC`.
 
 
 .. data:: LC_CTYPE
 
-   Locale category for the character type functions.  Most importantly, this
-   category defines the text encoding, i.e. how bytes are interpreted as
-   Unicode codepoints.  See :pep:`538` and :pep:`540` for how this variable
-   might be automatically coerced to ``C.UTF-8`` to avoid issues created by
-   invalid settings in containers or incompatible settings passed over remote
-   SSH connections.
+   Danh mục locale dành cho các hàm về kiểu ký tự. Quan trọng nhất, danh mục này xác định mã hóa văn bản, tức là cách diễn giải các byte thành các codepoint Unicode. Xem :pep:`538` và :pep:`540` để biết cách biến này có thể được tự động chuyển thành ``C.UTF-8`` nhằm tránh các vấn đề do thiết lập không hợp lệ trong container hoặc các thiết lập không tương thích được truyền qua kết nối SSH từ xa.
 
-   Python doesn't internally use locale-dependent character transformation functions
-   from ``ctype.h``. Instead, ``pyctype.h`` provides locale-independent
-   equivalents like :c:macro:`Py_TOLOWER`.
+   Python không sử dụng nội bộ các hàm chuyển đổi ký tự phụ thuộc vào locale từ ``ctype.h``. Thay vào đó, ``pyctype.h`` cung cấp các hàm tương đương không phụ thuộc vào locale như :c:macro:`Py_TOLOWER`.
 
 
 .. data:: LC_COLLATE
 
-   Locale category for sorting strings.  The functions :func:`strcoll` and
-   :func:`strxfrm` of the :mod:`!locale` module are affected.
+   Danh mục locale dành cho việc sắp xếp chuỗi. Các hàm :func:`strcoll` và
+   :func:`strxfrm` của mô-đun :mod:`!locale` bị ảnh hưởng.
 
 
 .. data:: LC_TIME
 
-   Locale category for the formatting of time.  The function :func:`time.strftime`
-   follows these conventions.
+   Danh mục locale dành cho việc định dạng thời gian. Hàm :func:`time.strftime` tuân theo các quy ước này.
 
 
 .. data:: LC_MONETARY
 
-   Locale category for formatting of monetary values.  The available options are
-   available from the :func:`localeconv` function.
+   Loại locale dùng để định dạng các giá trị tiền tệ. Các tùy chọn khả dụng được cung cấp bởi hàm :func:`localeconv`.
 
 
 .. data:: LC_MESSAGES
 
-   Locale category for message display. Python currently does not support
-   application specific locale-aware messages.  Messages displayed by the operating
-   system, like those returned by :func:`os.strerror` might be affected by this
-   category.
+   Loại locale dùng để hiển thị thông báo. Hiện tại Python không hỗ trợ các thông báo phụ thuộc locale dành riêng cho ứng dụng. Các thông báo do hệ điều hành hiển thị, chẳng hạn như những thông báo được trả về bởi :func:`os.strerror`, có thể bị ảnh hưởng bởi loại này.
 
-   This value may not be available on operating systems not conforming to the
-   POSIX standard, most notably Windows.
+   Giá trị này có thể không khả dụng trên các hệ điều hành không tuân theo tiêu chuẩn POSIX, đặc biệt là Windows.
 
 
 .. data:: LC_NUMERIC
 
-   Locale category for formatting numbers.  The functions :func:`format_string`,
-   :func:`atoi`, :func:`atof` and :func:`.str` of the :mod:`!locale` module are
-   affected by that category.  All other numeric formatting operations are not
-   affected.
+   Loại locale dùng để định dạng số. Các hàm :func:`format_string`,
+   :func:`atoi`, :func:`atof` và :func:`.str` của mô-đun :mod:`!locale` chịu ảnh hưởng của loại này. Tất cả các thao tác định dạng số khác đều không bị ảnh hưởng.
 
 
 .. data:: LC_ALL
 
-   Combination of all locale settings.  If this flag is used when the locale is
-   changed, setting the locale for all categories is attempted. If that fails for
-   any category, no category is changed at all.  When the locale is retrieved using
-   this flag, a string indicating the setting for all categories is returned. This
-   string can be later used to restore the settings.
+   Kết hợp tất cả các thiết lập locale. Nếu cờ này được sử dụng khi locale được thay đổi, hệ thống sẽ cố gắng thiết lập locale cho tất cả các loại. Nếu việc đó thất bại đối với bất kỳ loại nào, sẽ không có loại nào bị thay đổi. Khi locale được truy xuất bằng cờ này, một chuỗi cho biết thiết lập của tất cả các loại sẽ được trả về. Sau đó, có thể sử dụng chuỗi này để khôi phục các thiết lập.
 
 
 .. data:: CHAR_MAX
 
-   This is a symbolic constant used for different values returned by
+   Đây là một hằng số tượng trưng được sử dụng cho các giá trị khác nhau được trả về bởi
    :func:`localeconv`.
 
 
-Background, details, hints, tips and caveats
---------------------------------------------
+Bối cảnh, chi tiết, gợi ý, mẹo và lưu ý
+---------------------------------------
 
-The C standard defines the locale as a program-wide property that may be
-relatively expensive to change.  On top of that, some implementations are broken
-in such a way that frequent locale changes may cause core dumps.  This makes the
-locale somewhat painful to use correctly.
+Tiêu chuẩn C định nghĩa locale là một thuộc tính trên toàn chương trình và việc thay đổi nó có thể tương đối tốn kém. Ngoài ra, một số implementation bị lỗi đến mức việc thay đổi locale thường xuyên có thể gây ra core dump. Vì vậy, việc sử dụng locale đúng cách có phần khó khăn.
 
-Initially, when a program is started, the locale is the ``C`` locale, no matter
-what the user's preferred locale is.  There is one exception: the
-:data:`LC_CTYPE` category is changed at startup to set the current locale
-encoding to the user's preferred locale encoding. The program must explicitly
-say that it wants the user's preferred locale settings for other categories by
-calling ``setlocale(LC_ALL, '')``.
+Ban đầu, khi một chương trình được khởi động, locale là locale ``C``, bất kể locale ưa thích của người dùng là gì. Có một ngoại lệ:
+category :data:`LC_CTYPE` được thay đổi khi khởi động để đặt encoding locale hiện tại thành encoding locale ưa thích của người dùng. Chương trình phải nói rõ rằng nó muốn sử dụng các cài đặt locale ưa thích của người dùng cho những category khác bằng cách gọi ``setlocale(LC_ALL, '')``.
 
-It is generally a bad idea to call :func:`setlocale` in some library routine,
-since as a side effect it affects the entire program.  Saving and restoring it
-is almost as bad: it is expensive and affects other threads that happen to run
-before the settings have been restored.
+Nhìn chung, gọi :func:`setlocale` trong một routine của library là một ý tưởng tồi, vì như một tác dụng phụ, nó ảnh hưởng đến toàn bộ chương trình. Việc lưu và khôi phục nó cũng gần như tệ không kém: thao tác này tốn kém và ảnh hưởng đến các thread khác tình cờ chạy trước khi cài đặt được khôi phục.
 
-If, when coding a module for general use, you need a locale independent version
-of an operation that is affected by the locale (such as
-certain formats used with :func:`time.strftime`), you will have to find a way to
-do it without using the standard library routine.  Even better is convincing
-yourself that using locale settings is okay.  Only as a last resort should you
-document that your module is not compatible with non-\ ``C`` locale settings.
+Nếu khi viết một module dùng chung, bạn cần một phiên bản không phụ thuộc vào locale của một thao tác chịu ảnh hưởng bởi locale (chẳng hạn như một số format được dùng với :func:`time.strftime`), bạn sẽ phải tìm cách thực hiện việc đó mà không sử dụng routine của standard library. Tốt hơn nữa là tự thuyết phục mình rằng việc sử dụng các cài đặt locale là ổn. Chỉ nên xem việc ghi rõ rằng module của bạn không tương thích với các cài đặt locale không phải \ ``C`` là phương án cuối cùng.
 
-The only way to perform numeric operations according to the locale is to use the
-special functions defined by this module: :func:`atof`, :func:`atoi`,
+Cách duy nhất để thực hiện các thao tác số theo locale là sử dụng các hàm đặc biệt được định nghĩa bởi module này: :func:`atof`, :func:`atoi`,
 :func:`format_string`, :func:`.str`.
 
-There is no way to perform case conversions and character classifications
-according to the locale.  For (Unicode) text strings these are done according
-to the character value only, while for byte strings, the conversions and
-classifications are done according to the ASCII value of the byte, and bytes
-whose high bit is set (i.e., non-ASCII bytes) are never converted or considered
-part of a character class such as letter or whitespace.
+Không có cách nào thực hiện việc chuyển đổi kiểu chữ và phân loại ký tự theo locale. Đối với các chuỗi văn bản (Unicode), những thao tác này chỉ dựa trên giá trị ký tự, còn đối với các chuỗi byte, việc chuyển đổi và phân loại dựa trên giá trị ASCII của byte; các byte có bit cao được bật (tức là các byte không phải ASCII) không bao giờ được chuyển đổi hoặc được xem là thuộc một lớp ký tự như chữ cái hay khoảng trắng.
 
 
 .. _locale_name:
 
-Locale names
-------------
+Tên locale
+----------
 
-The format of the locale name is platform dependent, and the set of supported
-locales can depend on the system configuration.
+Định dạng của tên locale phụ thuộc vào nền tảng và tập hợp locale được hỗ trợ có thể phụ thuộc vào cấu hình hệ thống.
 
-On Posix platforms, it usually has the format [1]_:
+Trên các nền tảng Posix, tên này thường có định dạng [1]_:
 
 .. productionlist:: locale_name
    : language ["_" territory] ["." charset] ["@" modifier]
 
-where *language* is a two- or three-letter language code from `ISO 639`_,
-*territory* is a two-letter country or region code from `ISO 3166`_,
-*charset* is a locale encoding, and *modifier* is a script name,
-a language subtag, a sort order identifier, or other locale modifier
-(for example, "latin", "valencia", "stroke" and "euro").
+trong đó *language* là mã ngôn ngữ gồm hai hoặc ba chữ cái theo `ISO 639 <ISO 639_>`_, *territory* là mã quốc gia hoặc khu vực gồm hai chữ cái theo `ISO 3166 <ISO 3166_>`_, *charset* là encoding của locale, còn *modifier* là tên tập lệnh, language subtag, mã nhận dạng thứ tự sắp xếp hoặc modifier khác của locale (ví dụ: "latin", "valencia", "stroke" và "euro").
 
-On Windows, several formats are supported. [2]_ [3]_
-A subset of `IETF BCP 47`_ tags:
+Trên Windows, có một số định dạng được hỗ trợ. [2]_ [3]_ Một tập con các thẻ `IETF BCP 47 <IETF BCP 47_>`_:
 
 .. productionlist:: locale_name
    : language ["-" script] ["-" territory] ["." charset]
    : language ["-" script] "-" territory "-" modifier
 
-where *language* and *territory* have the same meaning as in Posix,
-*script* is a four-letter script code from `ISO 15924`_,
-and *modifier* is a language subtag, a sort order identifier
-or custom modifier (for example, "valencia", "stroke" or "x-python").
-Both hyphen (``'-'``) and underscore (``'_'``) separators are supported.
-Only UTF-8 encoding is allowed for BCP 47 tags.
+trong đó *language* và *territory* có cùng ý nghĩa như trên Posix, *script* là mã tập lệnh gồm bốn chữ cái theo `ISO 15924 <ISO 15924_>`_, còn *modifier* là language subtag, mã nhận dạng thứ tự sắp xếp hoặc modifier tùy chỉnh (ví dụ: "valencia", "stroke" hoặc "x-python"). Cả dấu gạch nối (``'-'``) và dấu gạch dưới (``'_'``) đều được hỗ trợ làm dấu phân cách. Chỉ cho phép encoding UTF-8 đối với các thẻ BCP 47.
 
-Windows also supports locale names in the format:
+Windows cũng hỗ trợ tên locale theo định dạng:
 
 .. productionlist:: locale_name
    : language ["_" territory] ["." charset]
 
-where *language* and *territory* are full names, such as "English" and
-"United States", and *charset* is either a code page number (for example, "1252")
-or UTF-8.
-Only the underscore separator is supported in this format.
+trong đó *ngôn ngữ* và *lãnh thổ* là tên đầy đủ, chẳng hạn như "English" và "United States", còn *bộ ký tự* là số code page (ví dụ: "1252") hoặc UTF-8. Chỉ dấu phân cách dấu gạch dưới được hỗ trợ trong định dạng này.
 
-The "C" locale is supported on all platforms.
+Locale "C" được hỗ trợ trên mọi nền tảng.
 
 .. _ISO 639: https://www.iso.org/iso-639-language-code
 .. _ISO 3166: https://www.iso.org/iso-3166-country-codes.html
@@ -678,26 +453,18 @@ The "C" locale is supported on all platforms.
 
 .. _embedding-locale:
 
-For extension writers and programs that embed Python
-----------------------------------------------------
+Dành cho người viết extension và các chương trình nhúng Python
+--------------------------------------------------------------
 
-Extension modules should never call :func:`setlocale`, except to find out what
-the current locale is.  But since the return value can only be used portably to
-restore it, that is not very useful (except perhaps to find out whether or not
-the locale is ``C``).
+Các module mở rộng không bao giờ được gọi :func:`setlocale`, ngoại trừ để tìm hiểu locale hiện tại là gì. Tuy nhiên, vì giá trị trả về chỉ có thể được sử dụng một cách khả chuyển để khôi phục locale, nên việc này không mấy hữu ích (ngoại trừ có lẽ để tìm hiểu locale có phải là ``C`` hay không).
 
-When Python code uses the :mod:`!locale` module to change the locale, this also
-affects the embedding application.  If the embedding application doesn't want
-this to happen, it should remove the :mod:`!_locale` extension module (which does
-all the work) from the table of built-in modules in the :file:`config.c` file,
-and make sure that the :mod:`!_locale` module is not accessible as a shared
-library.
+Khi mã Python sử dụng module :mod:`!locale` để thay đổi locale, điều này cũng ảnh hưởng đến ứng dụng nhúng. Nếu ứng dụng nhúng không muốn điều này xảy ra, ứng dụng đó nên loại bỏ module mở rộng :mod:`!_locale` (module thực hiện toàn bộ công việc) khỏi bảng các module dựng sẵn trong tệp :file:`config.c`, đồng thời bảo đảm module :mod:`!_locale` không thể được truy cập dưới dạng shared library.
 
 
 .. _locale-gettext:
 
-Access to message catalogs
---------------------------
+Truy cập các message catalog
+----------------------------
 
 .. function:: gettext(msg)
 .. function:: dgettext(domain, msg)
@@ -706,16 +473,12 @@ Access to message catalogs
 .. function:: bindtextdomain(domain, dir)
 .. function:: bind_textdomain_codeset(domain, codeset)
 
-The locale module exposes the C library's gettext interface on systems that
-provide this interface.  It consists of the functions :func:`gettext`,
-:func:`dgettext`, :func:`dcgettext`, :func:`textdomain`, :func:`bindtextdomain`,
-and :func:`bind_textdomain_codeset`.  These are similar to the same functions in
-the :mod:`gettext` module, but use the C library's binary format for message
-catalogs, and the C library's search algorithms for locating message catalogs.
+Module locale cung cấp interface gettext của thư viện C trên các hệ thống có hỗ trợ interface này. Interface này gồm các hàm :func:`gettext`,
+:func:`dgettext`, :func:`dcgettext`, :func:`textdomain`, :func:`bindtextdomain`, và :func:`bind_textdomain_codeset`. Các hàm này tương tự những hàm cùng tên trong module :mod:`gettext`, nhưng sử dụng định dạng nhị phân của thư viện C cho message catalog và các thuật toán tìm kiếm của thư viện C để định vị message catalog.
 
-Python applications should normally find no need to invoke these functions, and
-should use :mod:`gettext` instead.  A known exception to this rule are
-applications that link with additional C libraries which internally invoke
-C functions ``gettext`` or ``dcgettext``.  For these applications, it may be
-necessary to bind the text domain, so that the libraries can properly locate
-their message catalogs.
+Các ứng dụng Python thông thường không cần gọi những hàm này và nên sử dụng :mod:`gettext` thay vào đó. Một ngoại lệ đã biết đối với quy tắc này là các ứng dụng liên kết với những thư viện C bổ sung, vốn gọi nội bộ các hàm C ``gettext`` hoặc ``dcgettext``. Với các ứng dụng này, có thể cần bind text domain để các thư viện có thể định vị đúng message catalog của chúng.
+
+.. _`7.3.5.2 LC_TIME C-Language Access`: https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap07.html#tag_07_03_05_02
+.. _`IEEE Std 1003.1-2024; 8.2 Internationalization Variables`: https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap08.html#tag_08_02
+.. _`UCRT Locale names, Languages, and Country/Region strings`: https://learn.microsoft.com/en-us/cpp/c-runtime-library/locale-names-languages-and-country-region-strings
+.. _`Locale Names`: https://learn.microsoft.com/en-us/windows/win32/intl/locale-names

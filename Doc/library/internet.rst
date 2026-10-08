@@ -1,8 +1,8 @@
 .. _internet:
 
-******************************
-Internet Protocols and Support
-******************************
+******************************************
+Các giao thức Internet và tính năng hỗ trợ
+******************************************
 
 .. index::
    single: WWW
@@ -11,10 +11,7 @@ Internet Protocols and Support
 
 .. index:: pair: module; socket
 
-The modules described in this chapter implement internet protocols and  support
-for related technology.  They are all implemented in Python. Most of these
-modules require the presence of the system-dependent module :mod:`socket`, which
-is currently supported on most popular platforms.  Here is an overview:
+Các module được mô tả trong chương này triển khai các giao thức Internet và tính năng hỗ trợ cho công nghệ liên quan. Tất cả đều được triển khai bằng Python. Hầu hết các module này yêu cầu có module phụ thuộc hệ thống :mod:`socket`, hiện được hỗ trợ trên hầu hết các nền tảng phổ biến. Dưới đây là tổng quan:
 
 
 .. toctree::

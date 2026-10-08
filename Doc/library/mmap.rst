@@ -1,73 +1,38 @@
-:mod:`!mmap` --- Memory-mapped file support
-===========================================
+:mod:`!mmap` --- Hỗ trợ tệp ánh xạ bộ nhớ
+=========================================
 
 .. module:: mmap
-   :synopsis: Interface to memory-mapped files for Unix and Windows.
+   :synopsis: Giao diện cho các tệp ánh xạ bộ nhớ trên Unix và Windows.
 
 --------------
 
 .. include:: ../includes/wasm-notavail.rst
 
-Memory-mapped file objects behave like both :class:`bytearray` and like
-:term:`file objects <file object>`.  You can use mmap objects in most places
-where :class:`bytearray` are expected; for example, you can use the :mod:`re`
-module to search through a memory-mapped file.  You can also change a single
-byte by doing ``obj[index] = 97``, or change a subsequence by assigning to a
-slice: ``obj[i1:i2] = b'...'``.  You can also read and write data starting at
-the current file position, and :meth:`seek` through the file to different positions.
+Các đối tượng tệp ánh xạ bộ nhớ hoạt động vừa như :class:`bytearray` vừa như
+:term:`các đối tượng tệp <file object>`. Bạn có thể sử dụng các đối tượng mmap ở hầu hết những nơi cần :class:`bytearray`; ví dụ, bạn có thể sử dụng module :mod:`re` để tìm kiếm trong một tệp ánh xạ bộ nhớ. Bạn cũng có thể thay đổi một byte bằng cách thực hiện ``obj[index] = 97``, hoặc thay đổi một dãy con bằng cách gán cho một lát cắt: ``obj[i1:i2] = b'...'``. Bạn cũng có thể đọc và ghi dữ liệu bắt đầu từ vị trí hiện tại trong tệp, đồng thời :meth:`seek` qua tệp đến các vị trí khác nhau.
 
-A memory-mapped file is created by the :class:`~mmap.mmap` constructor, which is
-different on Unix and on Windows.  In either case you must provide a file
-descriptor for a file opened for update. If you wish to map an existing Python
-file object, use its :meth:`~io.IOBase.fileno` method to obtain the correct value for the
-*fileno* parameter.  Otherwise, you can open the file using the
-:func:`os.open` function, which returns a file descriptor directly (the file
-still needs to be closed when done).
+Tệp ánh xạ bộ nhớ được tạo bởi hàm dựng :class:`~mmap.mmap`, hàm này khác nhau trên Unix và Windows. Trong cả hai trường hợp, bạn phải cung cấp một bộ mô tả tệp cho một tệp được mở để cập nhật. Nếu muốn ánh xạ một đối tượng tệp Python hiện có, hãy sử dụng phương thức :meth:`~io.IOBase.fileno` của đối tượng đó để lấy giá trị chính xác cho tham số *fileno*. Nếu không, bạn có thể mở tệp bằng
+hàm :func:`os.open`, hàm này trả về trực tiếp một bộ mô tả tệp (tệp vẫn cần được đóng lại khi hoàn tất).
 
 .. note::
-   If you want to create a memory-mapping for a writable, buffered file, you
-   should :func:`~io.IOBase.flush` the file first.  This is necessary to ensure
-   that local modifications to the buffers are actually available to the
-   mapping.
+   Nếu muốn tạo ánh xạ bộ nhớ cho một tệp có thể ghi và được đệm, trước tiên bạn nên :func:`~io.IOBase.flush` tệp. Điều này cần thiết để bảo đảm các thay đổi cục bộ đối với các bộ đệm thực sự khả dụng cho ánh xạ.
 
-For both the Unix and Windows versions of the constructor, *access* may be
-specified as an optional keyword parameter. *access* accepts one of four
-values: :const:`ACCESS_READ`, :const:`ACCESS_WRITE`, or :const:`ACCESS_COPY` to
-specify read-only, write-through or copy-on-write memory respectively, or
-:const:`ACCESS_DEFAULT` to defer to *prot*.  *access* can be used on both Unix
-and Windows.  If *access* is not specified, Windows mmap returns a
-write-through mapping.  The initial memory values for all three access types
-are taken from the specified file.  Assignment to an :const:`ACCESS_READ`
-memory map raises a :exc:`TypeError` exception.  Assignment to an
-:const:`ACCESS_WRITE` memory map affects both memory and the underlying file.
-Assignment to an :const:`ACCESS_COPY` memory map affects memory but does not
-update the underlying file.
+Đối với cả hai phiên bản Unix và Windows của constructor, *access* có thể được chỉ định dưới dạng tham số từ khóa tùy chọn. *access* chấp nhận một trong bốn giá trị: :const:`ACCESS_READ`, :const:`ACCESS_WRITE` hoặc :const:`ACCESS_COPY` để lần lượt chỉ định bộ nhớ chỉ đọc, write-through hoặc copy-on-write, hoặc
+:const:`ACCESS_DEFAULT` để sử dụng *prot*.  *access* có thể được sử dụng trên cả Unix và Windows.  Nếu không chỉ định *access*, mmap trên Windows sẽ trả về một ánh xạ write-through.  Các giá trị bộ nhớ ban đầu cho cả ba loại access đều được lấy từ tệp được chỉ định.  Phép gán cho một ánh xạ bộ nhớ :const:`ACCESS_READ` sẽ gây ra ngoại lệ :exc:`TypeError`.  Phép gán cho một
+:const:`ACCESS_WRITE` ánh xạ bộ nhớ sẽ ảnh hưởng đến cả bộ nhớ và tệp bên dưới. Phép gán cho một ánh xạ bộ nhớ :const:`ACCESS_COPY` sẽ ảnh hưởng đến bộ nhớ nhưng không cập nhật tệp bên dưới.
 
 .. versionchanged:: 3.7
-   Added :const:`ACCESS_DEFAULT` constant.
+   Đã thêm hằng số :const:`ACCESS_DEFAULT`.
 
-To map anonymous memory, -1 should be passed as the fileno along with the length.
+Để ánh xạ bộ nhớ ẩn danh, cần truyền -1 làm fileno cùng với độ dài.
 
 .. class:: mmap(fileno, length, tagname=None, access=ACCESS_DEFAULT, offset=0)
 
-   **(Windows version)** Maps *length* bytes from the file specified by the
-   file handle *fileno*, and creates a mmap object.  If *length* is larger
-   than the current size of the file, the file is extended to contain *length*
-   bytes.  If *length* is ``0``, the maximum length of the map is the current
-   size of the file, except that if the file is empty Windows raises an
-   exception (you cannot create an empty mapping on Windows).
+   **(Windows version)** Ánh xạ *length* byte từ tệp được chỉ định bởi file handle *fileno* và tạo một đối tượng mmap. Nếu *length* lớn hơn kích thước hiện tại của tệp, tệp sẽ được mở rộng để chứa *length* byte. Nếu *length* là ``0``, độ dài tối đa của ánh xạ là kích thước hiện tại của tệp, ngoại trừ trường hợp tệp trống thì Windows sẽ phát sinh ngoại lệ (bạn không thể tạo ánh xạ trống trên Windows).
 
-   *tagname*, if specified and not ``None``, is a string giving a tag name for
-   the mapping.  Windows allows you to have many different mappings against
-   the same file.  If you specify the name of an existing tag, that tag is
-   opened, otherwise a new tag of this name is created.  If this parameter is
-   omitted or ``None``, the mapping is created without a name.  Avoiding the
-   use of the *tagname* parameter will assist in keeping your code portable
-   between Unix and Windows.
+   *tagname*, nếu được chỉ định và không phải là ``None``, là một chuỗi cung cấp tên thẻ cho ánh xạ. Windows cho phép bạn có nhiều ánh xạ khác nhau trên cùng một tệp. Nếu chỉ định tên của một thẻ hiện có, thẻ đó sẽ được mở; nếu không, một thẻ mới với tên này sẽ được tạo. Nếu bỏ qua tham số này hoặc tham số là ``None``, ánh xạ sẽ được tạo mà không có tên. Tránh sử dụng tham số *tagname* sẽ giúp mã của bạn có tính di động giữa Unix và Windows.
 
-   *offset* may be specified as a non-negative integer offset. mmap references
-   will be relative to the offset from the beginning of the file. *offset*
-   defaults to 0.  *offset* must be a multiple of the :const:`ALLOCATIONGRANULARITY`.
+   *offset* có thể được chỉ định dưới dạng một offset số nguyên không âm. Các tham chiếu mmap sẽ tương đối với offset tính từ đầu tệp. *offset* mặc định là 0.  *offset* phải là bội số của :const:`ALLOCATIONGRANULARITY`.
 
    .. audit-event:: mmap.__new__ fileno,length,access,offset mmap.mmap
 
@@ -75,75 +40,52 @@ To map anonymous memory, -1 should be passed as the fileno along with the length
                 access=ACCESS_DEFAULT, offset=0, *, trackfd=True)
    :noindex:
 
-   **(Unix version)** Maps *length* bytes from the file specified by the file
-   descriptor *fileno*, and returns a mmap object.  If *length* is ``0``, the
-   maximum length of the map will be the current size of the file when
-   :class:`~mmap.mmap` is called.
+   **(Unix version)** ánh xạ *length* byte từ tệp được chỉ định bởi file descriptor *fileno*, rồi trả về một đối tượng mmap.  Nếu *length* là ``0``, độ dài tối đa của ánh xạ sẽ là kích thước hiện tại của tệp khi
+   :class:`~mmap.mmap` được gọi.
 
-   *flags* specifies the nature of the mapping. :const:`MAP_PRIVATE` creates a
-   private copy-on-write mapping, so changes to the contents of the mmap
-   object will be private to this process, and :const:`MAP_SHARED` creates a
-   mapping that's shared with all other processes mapping the same areas of
-   the file.  The default value is :const:`MAP_SHARED`. Some systems have
-   additional possible flags with the full list specified in
+   *flags* chỉ định bản chất của ánh xạ. :const:`MAP_PRIVATE` tạo một ánh xạ copy-on-write riêng tư, vì vậy các thay đổi đối với nội dung của đối tượng mmap sẽ chỉ dành riêng cho process này, còn :const:`MAP_SHARED` tạo một ánh xạ được chia sẻ với tất cả các process khác ánh xạ cùng những vùng của tệp.  Giá trị mặc định là :const:`MAP_SHARED`. Một số hệ thống có thêm các flag khả dụng; danh sách đầy đủ được chỉ định trong
    :ref:`MAP_* constants <map-constants>`.
 
-   *prot*, if specified, gives the desired memory protection; the two most
-   useful values are :const:`PROT_READ` and :const:`PROT_WRITE`, to specify
-   that the pages may be read or written.  *prot* defaults to
+   *prot*, nếu được chỉ định, cho biết cơ chế bảo vệ bộ nhớ mong muốn; hai giá trị hữu ích nhất là :const:`PROT_READ` và :const:`PROT_WRITE`, dùng để chỉ định rằng các trang có thể được đọc hoặc ghi.  *prot* mặc định là
    :const:`PROT_READ \| PROT_WRITE`.
 
-   *access* may be specified in lieu of *flags* and *prot* as an optional
-   keyword parameter.  It is an error to specify both *flags*, *prot* and
-   *access*.  See the description of *access* above for information on how to
-   use this parameter.
+   *access* có thể được chỉ định thay cho *flags* và *prot* dưới dạng tham số từ khóa tùy chọn. Việc chỉ định đồng thời *flags*, *prot* và *access* sẽ gây ra lỗi. Xem phần mô tả về *access* ở trên để biết cách sử dụng tham số này.
 
-   *offset* may be specified as a non-negative integer offset. mmap references
-   will be relative to the offset from the beginning of the file. *offset*
-   defaults to 0. *offset* must be a multiple of :const:`ALLOCATIONGRANULARITY`
-   which is equal to :const:`PAGESIZE` on Unix systems.
+   *offset* có thể được chỉ định dưới dạng một độ lệch số nguyên không âm. Các tham chiếu mmap sẽ tương đối so với độ lệch tính từ đầu tệp. *offset* mặc định là 0. *offset* phải là bội số của :const:`ALLOCATIONGRANULARITY`, có giá trị bằng :const:`PAGESIZE` trên các hệ thống Unix.
 
-   If *trackfd* is ``False``, the file descriptor specified by *fileno* will
-   not be duplicated, and the resulting :class:`!mmap` object will not
-   be associated with the map's underlying file.
-   This means that the :meth:`~mmap.mmap.size` and :meth:`~mmap.mmap.resize`
-   methods will fail.
-   This mode is useful to limit the number of open file descriptors.
+   Nếu *trackfd* là ``False``, bộ mô tả tệp được chỉ định bởi *fileno* sẽ không được nhân bản và đối tượng :class:`!mmap` kết quả sẽ không được liên kết với tệp bên dưới của map. Điều này có nghĩa là các phương thức :meth:`~mmap.mmap.size` và :meth:`~mmap.mmap.resize` sẽ không hoạt động. Chế độ này hữu ích để giới hạn số lượng bộ mô tả tệp đang mở.
 
-   To ensure validity of the created memory mapping the file specified
-   by the descriptor *fileno* is internally automatically synchronized
-   with the physical backing store on macOS.
+   Để đảm bảo tính hợp lệ của memory mapping được tạo, tệp được chỉ định bởi bộ mô tả *fileno* sẽ tự động được đồng bộ nội bộ với vùng lưu trữ vật lý trên macOS.
 
    .. versionchanged:: 3.13
-      The *trackfd* parameter was added.
+      Tham số *trackfd* đã được thêm vào.
 
-   This example shows a simple way of using :class:`~mmap.mmap`::
+   Ví dụ này minh họa một cách đơn giản để sử dụng :class:`~mmap.mmap`::
 
       import mmap
 
-      # write a simple example file
+      # viết một tệp ví dụ đơn giản
       with open("hello.txt", "wb") as f:
           f.write(b"Hello Python!\n")
 
       with open("hello.txt", "r+b") as f:
-          # memory-map the file, size 0 means whole file
+          # ánh xạ bộ nhớ cho tệp, kích thước 0 nghĩa là toàn bộ tệp
           mm = mmap.mmap(f.fileno(), 0)
-          # read content via standard file methods
-          print(mm.readline())  # prints b"Hello Python!\n"
-          # read content via slice notation
-          print(mm[:5])  # prints b"Hello"
-          # update content using slice notation;
-          # note that new content must have same size
+          # đọc nội dung bằng các phương thức tệp tiêu chuẩn
+          print(mm.readline())  # in ra b"Hello Python!\n"
+          # đọc nội dung bằng cú pháp lát cắt
+          print(mm[:5])  # in ra b"Hello"
+          # cập nhật nội dung bằng cú pháp lát cắt;
+          # lưu ý rằng nội dung mới phải có cùng kích thước
           mm[6:] = b" world!\n"
-          # ... and read again using standard file methods
+          # ... và đọc lại bằng các phương thức tệp tiêu chuẩn
           mm.seek(0)
-          print(mm.readline())  # prints b"Hello  world!\n"
-          # close the map
+          print(mm.readline())  # in ra b"Hello  world!\n"
+          # đóng map
           mm.close()
 
 
-   :class:`~mmap.mmap` can also be used as a context manager in a :keyword:`with`
-   statement::
+   :class:`~mmap.mmap` cũng có thể được sử dụng như một context manager trong câu lệnh :keyword:`with`::
 
       import mmap
 
@@ -151,11 +93,10 @@ To map anonymous memory, -1 should be passed as the fileno along with the length
           mm.write(b"Hello world!")
 
    .. versionadded:: 3.2
-      Context manager support.
+      Hỗ trợ context manager.
 
 
-   The next example demonstrates how to create an anonymous map and exchange
-   data between the parent and child processes::
+   Ví dụ tiếp theo minh họa cách tạo một map ẩn danh và trao đổi dữ liệu giữa tiến trình cha và tiến trình con::
 
       import mmap
       import os
@@ -165,7 +106,7 @@ To map anonymous memory, -1 should be passed as the fileno along with the length
 
       pid = os.fork()
 
-      if pid == 0:  # In a child process
+      if pid == 0:  # Trong một tiến trình con
           mm.seek(0)
           print(mm.readline())
 
@@ -173,257 +114,168 @@ To map anonymous memory, -1 should be passed as the fileno along with the length
 
    .. audit-event:: mmap.__new__ fileno,length,access,offset mmap.mmap
 
-   Memory-mapped file objects support the following methods:
+   Các đối tượng tệp được ánh xạ vào bộ nhớ hỗ trợ các phương thức sau:
 
    .. method:: close()
 
-      Closes the mmap. Subsequent calls to other methods of the object will
-      result in a ValueError exception being raised. This will not close
-      the open file.
+      Đóng mmap. Các lần gọi tiếp theo đến những phương thức khác của đối tượng sẽ khiến một ngoại lệ ValueError được phát sinh. Thao tác này không đóng tệp đang mở.
 
 
    .. attribute:: closed
 
-      ``True`` if the file is closed.
+      ``True`` nếu tệp đã đóng.
 
       .. versionadded:: 3.2
 
 
    .. method:: find(sub[, start[, end]])
 
-      Returns the lowest index in the object where the subsequence *sub* is
-      found, such that *sub* is contained in the range [*start*, *end*].
-      Optional arguments *start* and *end* are interpreted as in slice notation.
-      Returns ``-1`` on failure.
+      Trả về chỉ mục nhỏ nhất trong đối tượng tại đó tìm thấy dãy con *sub*, sao cho *sub* nằm trong phạm vi [*start*, *end*]. Các đối số tùy chọn *start* và *end* được diễn giải như trong ký hiệu lát cắt. Trả về ``-1`` nếu không tìm thấy.
 
       .. versionchanged:: 3.5
-         Writable :term:`bytes-like object` is now accepted.
+         Các đối tượng có thể ghi :term:`bytes-like object` hiện được chấp nhận.
 
 
    .. method:: flush()
                flush(offset, size, /)
 
-      Flushes changes made to the in-memory copy of a file back to disk. Without
-      use of this call there is no guarantee that changes are written back before
-      the object is destroyed.  If *offset* and *size* are specified, only
-      changes to the given range of bytes will be flushed to disk; otherwise, the
-      whole extent of the mapping is flushed.  *offset* must be a multiple of the
-      :const:`PAGESIZE` or :const:`ALLOCATIONGRANULARITY`.
+      Ghi các thay đổi được thực hiện trên bản sao trong bộ nhớ của tệp trở lại đĩa. Nếu không sử dụng lệnh gọi này, không có gì đảm bảo rằng các thay đổi sẽ được ghi trở lại trước khi đối tượng bị hủy. Nếu chỉ định *offset* và *size*, chỉ các thay đổi trong phạm vi byte đã cho mới được ghi vào đĩa; nếu không, toàn bộ phạm vi của ánh xạ sẽ được ghi. *offset* phải là bội số của
+      :const:`PAGESIZE` hoặc :const:`ALLOCATIONGRANULARITY`.
 
-      ``None`` is returned to indicate success.  An exception is raised when the
-      call failed.
+      ``None`` được trả về để cho biết thao tác thành công. Một ngoại lệ được phát sinh khi lệnh gọi thất bại.
 
       .. versionchanged:: 3.8
-         Previously, a nonzero value was returned on success; zero was returned
-         on error under Windows.  A zero value was returned on success; an
-         exception was raised on error under Unix.
+         Trước đây, một giá trị khác không được trả về khi thao tác thành công; giá trị không được trả về khi có lỗi trên Windows. Trên Unix, giá trị không được trả về khi thao tác thành công; một ngoại lệ được phát sinh khi có lỗi.
 
 
    .. method:: madvise(option[, start[, length]])
 
-      Send advice *option* to the kernel about the memory region beginning at
-      *start* and extending *length* bytes.  *option* must be one of the
-      :ref:`MADV_* constants <madvise-constants>` available on the system.  If
-      *start* and *length* are omitted, the entire mapping is spanned.  On
-      some systems (including Linux), *start* must be a multiple of the
+      Gửi advice *option* đến kernel về vùng bộ nhớ bắt đầu tại *start* và có độ dài *length* byte. *option* phải là một trong các
+      :ref:`MADV_* hằng số <madvise-constants>` có sẵn trên hệ thống. Nếu *start* và *length* bị bỏ qua, toàn bộ mapping sẽ được bao phủ. Trên một số hệ thống (bao gồm Linux), *start* phải là bội số của
       :const:`PAGESIZE`.
 
-      Availability: Systems with the ``madvise()`` system call.
+      Khả dụng: Các hệ thống có lời gọi hệ thống ``madvise()``.
 
       .. versionadded:: 3.8
 
 
    .. method:: move(dest, src, count)
 
-      Copy the *count* bytes starting at offset *src* to the destination index
-      *dest*.  If the mmap was created with :const:`ACCESS_READ`, then calls to
-      move will raise a :exc:`TypeError` exception.
+      Sao chép *count* byte bắt đầu từ offset *src* đến chỉ mục đích *dest*. Nếu mmap được tạo với :const:`ACCESS_READ`, các lệnh gọi đến move sẽ phát sinh ngoại lệ :exc:`TypeError`.
 
 
    .. method:: read([n])
 
-      Return a :class:`bytes` containing up to *n* bytes starting from the
-      current file position. If the argument is omitted, ``None`` or negative,
-      return all bytes from the current file position to the end of the
-      mapping. The file position is updated to point after the bytes that were
-      returned.
+      Trả về một :class:`bytes` chứa tối đa *n* byte, bắt đầu từ vị trí hiện tại trong tệp. Nếu đối số bị bỏ qua, là ``None`` hoặc số âm, trả về tất cả byte từ vị trí hiện tại trong tệp đến cuối vùng ánh xạ. Vị trí trong tệp được cập nhật để trỏ đến sau các byte đã được trả về.
 
       .. versionchanged:: 3.3
-         Argument can be omitted or ``None``.
+         Đối số có thể được bỏ qua hoặc là ``None``.
 
    .. method:: read_byte()
 
-      Returns a byte at the current file position as an integer, and advances
-      the file position by 1.
+      Trả về một byte tại vị trí hiện tại trong tệp dưới dạng số nguyên và tiến vị trí trong tệp lên 1.
 
 
    .. method:: readline()
 
-      Returns a single line, starting at the current file position and up to the
-      next newline. The file position is updated to point after the bytes that were
-      returned.
+      Trả về một dòng đơn, bắt đầu từ vị trí hiện tại trong tệp và kéo dài đến ký tự xuống dòng tiếp theo. Vị trí trong tệp được cập nhật để trỏ đến sau các byte đã được trả về.
 
 
    .. method:: resize(newsize)
 
-      Resizes the map and the underlying file, if any.
+      Thay đổi kích thước vùng ánh xạ và tệp bên dưới, nếu có.
 
-      Resizing a map created with *access* of :const:`ACCESS_READ` or
-      :const:`ACCESS_COPY`, will raise a :exc:`TypeError` exception.
-      Resizing a map created with *trackfd* set to ``False``,
-      will raise a :exc:`ValueError` exception.
+      Việc thay đổi kích thước một vùng ánh xạ được tạo với *access* là :const:`ACCESS_READ` hoặc
+      :const:`ACCESS_COPY`, sẽ gây ra ngoại lệ :exc:`TypeError`. Việc thay đổi kích thước một vùng ánh xạ được tạo với *trackfd* được đặt thành ``False``, sẽ gây ra ngoại lệ :exc:`ValueError`.
 
-      **On Windows**: Resizing the map will raise an :exc:`OSError` if there are other
-      maps against the same named file. Resizing an anonymous map (ie against the
-      pagefile) will silently create a new map with the original data copied over
-      up to the length of the new size.
+      **Trên Windows**: Việc thay đổi kích thước bản đồ sẽ phát sinh một :exc:`OSError` nếu có các bản đồ khác đang trỏ đến cùng một tệp được đặt tên. Việc thay đổi kích thước một bản đồ ẩn danh (tức là trỏ đến pagefile) sẽ âm thầm tạo một bản đồ mới, trong đó dữ liệu ban đầu được sao chép đến độ dài của kích thước mới.
 
       .. versionchanged:: 3.11
-         Correctly fails if attempting to resize when another map is held
-         Allows resize against an anonymous map on Windows
+         Không thành công đúng cách nếu cố gắng thay đổi kích thước khi đang có một bản đồ khác được giữ Cho phép thay đổi kích thước đối với bản đồ ẩn danh trên Windows
 
    .. method:: rfind(sub[, start[, end]])
 
-      Returns the highest index in the object where the subsequence *sub* is
-      found, such that *sub* is contained in the range [*start*, *end*].
-      Optional arguments *start* and *end* are interpreted as in slice notation.
-      Returns ``-1`` on failure.
+      Trả về chỉ số lớn nhất trong đối tượng tại đó dãy con *sub* được tìm thấy, sao cho *sub* nằm trong phạm vi [*start*, *end*]. Các đối số tùy chọn *start* và *end* được diễn giải như trong ký hiệu lát cắt. Trả về ``-1`` nếu không tìm thấy.
 
       .. versionchanged:: 3.5
-         Writable :term:`bytes-like object` is now accepted.
+         Các đối tượng có thể ghi :term:`bytes-like object` hiện được chấp nhận.
 
 
    .. method:: seek(pos[, whence])
 
-      Set the file's current position.  *whence* argument is optional and
-      defaults to ``os.SEEK_SET`` or ``0`` (absolute file positioning); other
-      values are ``os.SEEK_CUR`` or ``1`` (seek relative to the current
-      position) and ``os.SEEK_END`` or ``2`` (seek relative to the file's end).
+      Đặt vị trí hiện tại của tệp. Đối số *whence* là tùy chọn và mặc định là ``os.SEEK_SET`` hoặc ``0`` (định vị tệp tuyệt đối); các giá trị khác là ``os.SEEK_CUR`` hoặc ``1`` (tìm kiếm tương đối so với vị trí hiện tại) và ``os.SEEK_END`` hoặc ``2`` (tìm kiếm tương đối so với cuối tệp).
 
       .. versionchanged:: 3.13
-         Return the new absolute position instead of ``None``.
+         Trả về vị trí tuyệt đối mới thay vì ``None``.
 
    .. method:: seekable()
 
-      Return whether the file supports seeking, and the return value is always ``True``.
+      Trả về việc tệp có hỗ trợ tìm kiếm hay không; giá trị trả về luôn là ``True``.
 
       .. versionadded:: 3.13
 
    .. method:: size()
 
-      Return the length of the file, which can be larger than the size of the
-      memory-mapped area.
+      Trả về độ dài của tệp, có thể lớn hơn kích thước của vùng được ánh xạ vào bộ nhớ.
 
 
    .. method:: tell()
 
-      Returns the current position of the file pointer.
+      Trả về vị trí hiện tại của con trỏ tệp.
 
 
    .. method:: write(bytes)
 
-      Write the bytes in *bytes* into memory at the current position of the
-      file pointer and return the number of bytes written (never less than
-      ``len(bytes)``, since if the write fails, a :exc:`ValueError` will be
-      raised).  The file position is updated to point after the bytes that
-      were written.  If the mmap was created with :const:`ACCESS_READ`, then
-      writing to it will raise a :exc:`TypeError` exception.
+      Ghi các byte trong *bytes* vào bộ nhớ tại vị trí hiện tại của con trỏ tệp và trả về số byte đã ghi (không bao giờ nhỏ hơn ``len(bytes)``, vì nếu thao tác ghi thất bại, một :exc:`ValueError` sẽ được phát sinh). Vị trí tệp được cập nhật để trỏ đến sau các byte đã ghi. Nếu mmap được tạo với :const:`ACCESS_READ`, thao tác ghi vào đó sẽ phát sinh ngoại lệ :exc:`TypeError`.
 
       .. versionchanged:: 3.5
-         Writable :term:`bytes-like object` is now accepted.
+         Các đối tượng có thể ghi :term:`bytes-like object` hiện được chấp nhận.
 
       .. versionchanged:: 3.6
-         The number of bytes written is now returned.
+         Số byte đã ghi hiện được trả về.
 
 
    .. method:: write_byte(byte)
 
-      Write the integer *byte* into memory at the current
-      position of the file pointer; the file position is advanced by ``1``. If
-      the mmap was created with :const:`ACCESS_READ`, then writing to it will
-      raise a :exc:`TypeError` exception.
+      Ghi số nguyên *byte* vào bộ nhớ tại vị trí hiện tại của con trỏ tệp; vị trí tệp được tiến lên ``1``. Nếu mmap được tạo với :const:`ACCESS_READ`, thao tác ghi vào đó sẽ phát sinh ngoại lệ :exc:`TypeError`.
 
 .. _madvise-constants:
 
-MADV_* Constants
-++++++++++++++++
+MADV_* Hằng số
+++++++++++++++
 
 .. data:: MADV_NORMAL
-          MADV_RANDOM
-          MADV_SEQUENTIAL
-          MADV_WILLNEED
-          MADV_DONTNEED
-          MADV_REMOVE
-          MADV_DONTFORK
-          MADV_DOFORK
-          MADV_HWPOISON
-          MADV_MERGEABLE
-          MADV_UNMERGEABLE
-          MADV_SOFT_OFFLINE
-          MADV_HUGEPAGE
-          MADV_NOHUGEPAGE
-          MADV_DONTDUMP
-          MADV_DODUMP
-          MADV_FREE
-          MADV_NOSYNC
-          MADV_AUTOSYNC
-          MADV_NOCORE
-          MADV_CORE
-          MADV_PROTECT
-          MADV_FREE_REUSABLE
-          MADV_FREE_REUSE
+          MADV_RANDOM MADV_SEQUENTIAL MADV_WILLNEED MADV_DONTNEED MADV_REMOVE MADV_DONTFORK MADV_DOFORK MADV_HWPOISON MADV_MERGEABLE MADV_UNMERGEABLE MADV_SOFT_OFFLINE MADV_HUGEPAGE MADV_NOHUGEPAGE MADV_DONTDUMP MADV_DODUMP MADV_FREE MADV_NOSYNC MADV_AUTOSYNC MADV_NOCORE MADV_CORE MADV_PROTECT MADV_FREE_REUSABLE MADV_FREE_REUSE
 
-   These options can be passed to :meth:`mmap.madvise`.  Not every option will
-   be present on every system.
+   Các tùy chọn này có thể được truyền vào :meth:`mmap.madvise`. Không phải tùy chọn nào cũng có trên mọi hệ thống.
 
-   Availability: Systems with the madvise() system call.
+   Tính khả dụng: Các hệ thống có lời gọi hệ thống madvise().
 
    .. versionadded:: 3.8
 
 .. _map-constants:
 
-MAP_* Constants
-+++++++++++++++
+MAP_* Hằng số
++++++++++++++
 
 .. data:: MAP_SHARED
-          MAP_PRIVATE
-          MAP_32BIT
-          MAP_ALIGNED_SUPER
-          MAP_ANON
-          MAP_ANONYMOUS
-          MAP_CONCEAL
-          MAP_DENYWRITE
-          MAP_EXECUTABLE
-          MAP_HASSEMAPHORE
-          MAP_JIT
-          MAP_NOCACHE
-          MAP_NOEXTEND
-          MAP_NORESERVE
-          MAP_POPULATE
-          MAP_RESILIENT_CODESIGN
-          MAP_RESILIENT_MEDIA
-          MAP_STACK
-          MAP_TPRO
-          MAP_TRANSLATED_ALLOW_EXECUTE
-          MAP_UNIX03
+          MAP_PRIVATE MAP_32BIT MAP_ALIGNED_SUPER MAP_ANON MAP_ANONYMOUS MAP_CONCEAL MAP_DENYWRITE MAP_EXECUTABLE MAP_HASSEMAPHORE MAP_JIT MAP_NOCACHE MAP_NOEXTEND MAP_NORESERVE MAP_POPULATE MAP_RESILIENT_CODESIGN MAP_RESILIENT_MEDIA MAP_STACK MAP_TPRO MAP_TRANSLATED_ALLOW_EXECUTE MAP_UNIX03
 
-    These are the various flags that can be passed to :meth:`mmap.mmap`.  :data:`MAP_ALIGNED_SUPER`
-    is only available at FreeBSD and :data:`MAP_CONCEAL` is only available at OpenBSD.  Note
-    that some options might not be present on some systems.
+    Đây là các cờ khác nhau có thể được truyền vào :meth:`mmap.mmap`. :data:`MAP_ALIGNED_SUPER` chỉ có trên FreeBSD và :data:`MAP_CONCEAL` chỉ có trên OpenBSD. Lưu ý rằng một số tùy chọn có thể không có trên một số hệ thống.
 
     .. versionchanged:: 3.10
-       Added :data:`MAP_POPULATE` constant.
+       Đã thêm hằng số :data:`MAP_POPULATE`.
 
     .. versionadded:: 3.11
-       Added :data:`MAP_STACK` constant.
+       Đã thêm hằng số :data:`MAP_STACK`.
 
     .. versionadded:: 3.12
-       Added :data:`MAP_ALIGNED_SUPER` and :data:`MAP_CONCEAL` constants.
+       Đã thêm các hằng số :data:`MAP_ALIGNED_SUPER` và :data:`MAP_CONCEAL`.
 
     .. versionadded:: 3.13
-       Added :data:`MAP_32BIT`, :data:`MAP_HASSEMAPHORE`, :data:`MAP_JIT`,
+       Đã thêm các hằng số :data:`MAP_32BIT`, :data:`MAP_HASSEMAPHORE`, :data:`MAP_JIT`,
        :data:`MAP_NOCACHE`, :data:`MAP_NOEXTEND`, :data:`MAP_NORESERVE`,
        :data:`MAP_RESILIENT_CODESIGN`, :data:`MAP_RESILIENT_MEDIA`,
-       :data:`MAP_TPRO`, :data:`MAP_TRANSLATED_ALLOW_EXECUTE`, and
-       :data:`MAP_UNIX03` constants.
+       :data:`MAP_TPRO`, :data:`MAP_TRANSLATED_ALLOW_EXECUTE`, và
+       các hằng số :data:`MAP_UNIX03`.
 

@@ -1,13 +1,13 @@
-:mod:`!ssl` --- TLS/SSL wrapper for socket objects
-==================================================
+:mod:`!ssl` --- Trình bọc TLS/SSL cho các đối tượng socket
+==========================================================
 
 .. module:: ssl
-   :synopsis: TLS/SSL wrapper for socket objects
+   :synopsis: Trình bọc TLS/SSL cho các đối tượng socket
 
 .. moduleauthor:: Bill Janssen <bill.janssen@gmail.com>
 .. sectionauthor::  Bill Janssen <bill.janssen@gmail.com>
 
-**Source code:** :source:`Lib/ssl.py`
+**Mã nguồn:** :source:`Lib/ssl.py`
 
 .. index:: single: OpenSSL; (use in module ssl)
 
@@ -15,74 +15,53 @@
 
 --------------
 
-This module provides access to Transport Layer Security (often known as "Secure
-Sockets Layer") encryption and peer authentication facilities for network
-sockets, both client-side and server-side.  This module uses the OpenSSL
-library.
+Mô-đun này cung cấp quyền truy cập vào các tính năng mã hóa Transport Layer Security (thường được gọi là "Secure Sockets Layer") và xác thực đối tác cho các socket mạng, cả phía client lẫn phía server. Mô-đun này sử dụng thư viện OpenSSL.
 
 .. include:: ../includes/optional-module.rst
 
 .. note::
 
-   Some behavior may be platform dependent, since calls are made to the
-   operating system socket APIs.  The installed version of OpenSSL may also
-   cause variations in behavior. For example, TLSv1.3 comes with OpenSSL version
-   1.1.1.
+   Một số hành vi có thể phụ thuộc vào nền tảng, vì các lời gọi được thực hiện đến các API socket của hệ điều hành. Phiên bản OpenSSL được cài đặt cũng có thể gây ra những khác biệt trong hành vi. Ví dụ, TLSv1.3 đi kèm với OpenSSL phiên bản 1.1.1.
 
 .. warning::
-   Don't use this module without reading the :ref:`ssl-security`.  Doing so
-   may lead to a false sense of security, as the default settings of the
-   ssl module are not necessarily appropriate for your application.
+   Đừng sử dụng mô-đun này nếu chưa đọc :ref:`ssl-security`. Làm như vậy có thể tạo ra cảm giác an toàn sai lầm, vì các cài đặt mặc định của mô-đun ssl không nhất thiết phù hợp với ứng dụng của bạn.
 
 .. include:: ../includes/wasm-notavail.rst
 
-This section documents the objects and functions in the ``ssl`` module; for more
-general information about TLS, SSL, and certificates, the reader is referred to
-the documents in the "See Also" section at the bottom.
+Phần này ghi lại các đối tượng và hàm trong mô-đun ``ssl``; để biết thêm thông tin chung về TLS, SSL và chứng chỉ, bạn đọc được khuyến nghị xem các tài liệu trong phần "Xem thêm" ở cuối trang.
 
-This module provides a class, :class:`ssl.SSLSocket`, which is derived from the
-:class:`socket.socket` type, and provides a socket-like wrapper that also
-encrypts and decrypts the data going over the socket with SSL.  It supports
-additional methods such as :meth:`getpeercert`, which retrieves the
-certificate of the other side of the connection, :meth:`cipher`, which
-retrieves the cipher being used for the secure connection or
-:meth:`get_verified_chain`, :meth:`get_unverified_chain` which retrieves
-certificate chain.
+Mô-đun này cung cấp một class, :class:`ssl.SSLSocket`, được dẫn xuất từ
+kiểu :class:`socket.socket`, và cung cấp một wrapper giống socket, đồng thời mã hóa và giải mã dữ liệu truyền qua socket bằng SSL. Nó hỗ trợ các phương thức bổ sung như :meth:`getpeercert`, dùng để lấy chứng chỉ của phía bên kia kết nối, :meth:`cipher`, dùng để lấy cipher đang được sử dụng cho kết nối bảo mật hoặc
+:meth:`get_verified_chain`, :meth:`get_unverified_chain` dùng để lấy chuỗi chứng chỉ.
 
-For more sophisticated applications, the :class:`ssl.SSLContext` class
-helps manage settings and certificates, which can then be inherited
-by SSL sockets created through the :meth:`SSLContext.wrap_socket` method.
+Đối với các ứng dụng phức tạp hơn, class :class:`ssl.SSLContext` giúp quản lý các cài đặt và chứng chỉ, sau đó có thể được kế thừa bởi các SSL socket được tạo thông qua phương thức :meth:`SSLContext.wrap_socket`.
 
 .. versionchanged:: 3.5.3
-   Updated to support linking with OpenSSL 1.1.0
+   Đã cập nhật để hỗ trợ liên kết với OpenSSL 1.1.0
 
 .. versionchanged:: 3.6
 
-   OpenSSL 0.9.8, 1.0.0 and 1.0.1 are deprecated and no longer supported.
-   In the future the ssl module will require at least OpenSSL 1.0.2 or
-   1.1.0.
+   OpenSSL 0.9.8, 1.0.0 và 1.0.1 đã lỗi thời và không còn được hỗ trợ. Trong tương lai, mô-đun ssl sẽ yêu cầu ít nhất OpenSSL 1.0.2 hoặc 1.1.0.
 
 .. versionchanged:: 3.10
 
-   :pep:`644` has been implemented. The ssl module requires OpenSSL 1.1.1
-   or newer.
+   :pep:`644` đã được triển khai. Mô-đun ssl yêu cầu OpenSSL 1.1.1 hoặc mới hơn.
 
-   Use of deprecated constants and functions result in deprecation warnings.
-
-
-Functions, constants, and exceptions
-------------------------------------
+   Việc sử dụng các hằng số và hàm đã lỗi thời sẽ tạo ra cảnh báo về việc ngừng hỗ trợ.
 
 
-Socket creation
-^^^^^^^^^^^^^^^
+Các hàm, hằng số và ngoại lệ
+----------------------------
 
-Instances of :class:`SSLSocket` must be created using the
-:meth:`SSLContext.wrap_socket` method. The helper function
-:func:`create_default_context` returns a new context with secure default
-settings.
 
-Client socket example with default context and IPv4/IPv6 dual stack::
+Tạo socket
+^^^^^^^^^^
+
+Các thực thể :class:`SSLSocket` phải được tạo bằng
+phương thức :meth:`SSLContext.wrap_socket`. Hàm trợ giúp
+:func:`create_default_context` trả về một context mới với các thiết lập mặc định an toàn.
+
+Ví dụ về socket phía client với context mặc định và dual stack IPv4/IPv6::
 
     import socket
     import ssl
@@ -95,10 +74,10 @@ Client socket example with default context and IPv4/IPv6 dual stack::
             print(ssock.version())
 
 
-Client socket example with custom context and IPv4::
+Ví dụ về client socket với context tùy chỉnh và IPv4::
 
     hostname = 'www.python.org'
-    # PROTOCOL_TLS_CLIENT requires valid cert chain and hostname
+    # PROTOCOL_TLS_CLIENT yêu cầu chuỗi chứng chỉ và hostname hợp lệ
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
     context.load_verify_locations('path/to/cabundle.pem')
 
@@ -107,7 +86,7 @@ Client socket example with custom context and IPv4::
             print(ssock.version())
 
 
-Server socket example listening on localhost IPv4::
+Ví dụ về server socket lắng nghe trên localhost IPv4::
 
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     context.load_cert_chain('/path/to/certchain.pem', '/path/to/private.key')
@@ -120,71 +99,44 @@ Server socket example listening on localhost IPv4::
             ...
 
 
-Context creation
-^^^^^^^^^^^^^^^^
+Tạo context
+^^^^^^^^^^^
 
-A convenience function helps create :class:`SSLContext` objects for common
-purposes.
+Một hàm tiện ích giúp tạo các đối tượng :class:`SSLContext` cho những mục đích phổ biến.
 
 .. function:: create_default_context(purpose=Purpose.SERVER_AUTH, *,\
                                      cafile=None, capath=None, cadata=None)
 
-   Return a new :class:`SSLContext` object with default settings for
-   the given *purpose*.  The settings are chosen by the :mod:`!ssl` module,
-   and usually represent a higher security level than when calling the
-   :class:`SSLContext` constructor directly.
+   Trả về một đối tượng :class:`SSLContext` mới với các thiết lập mặc định cho *mục đích* đã cho. Các thiết lập được chọn bởi mô-đun :mod:`!ssl`, và thường biểu thị mức bảo mật cao hơn so với khi gọi
+   :class:`SSLContext` constructor trực tiếp.
 
-   *cafile*, *capath*, *cadata* represent optional CA certificates to
-   trust for certificate verification, as in
-   :meth:`SSLContext.load_verify_locations`.  If all three are
-   :const:`None`, this function can choose to trust the system's default
-   CA certificates instead.
+   *cafile*, *capath*, *cadata* đại diện cho các chứng chỉ CA tùy chọn được tin cậy để xác minh chứng chỉ, như trong
+   :meth:`SSLContext.load_verify_locations`. Nếu cả ba đều là
+   :const:`None`, hàm này có thể chọn tin cậy các chứng chỉ CA mặc định của hệ thống.
 
-   The settings are: :data:`PROTOCOL_TLS_CLIENT` or
-   :data:`PROTOCOL_TLS_SERVER`, :data:`OP_NO_SSLv2`, and :data:`OP_NO_SSLv3`
-   with high encryption cipher suites without RC4 and
-   without unauthenticated cipher suites. Passing :const:`~Purpose.SERVER_AUTH`
-   as *purpose* sets :data:`~SSLContext.verify_mode` to :data:`CERT_REQUIRED`
-   and either loads CA certificates (when at least one of *cafile*, *capath* or
-   *cadata* is given) or uses :meth:`SSLContext.load_default_certs` to load
-   default CA certificates.
+   Các thiết lập là: :data:`PROTOCOL_TLS_CLIENT` hoặc
+   :data:`PROTOCOL_TLS_SERVER`, :data:`OP_NO_SSLv2` và :data:`OP_NO_SSLv3` với các bộ mật mã mã hóa mạnh, không có RC4 và không có các bộ mật mã không xác thực. Truyền :const:`~Purpose.SERVER_AUTH` làm *purpose* sẽ đặt :data:`~SSLContext.verify_mode` thành :data:`CERT_REQUIRED` và либо tải các chứng chỉ CA (khi có ít nhất một trong các giá trị *cafile*, *capath* hoặc *cadata*) hoặc sử dụng :meth:`SSLContext.load_default_certs` để tải các chứng chỉ CA mặc định.
 
-   When :attr:`~SSLContext.keylog_filename` is supported and the environment
-   variable :envvar:`SSLKEYLOGFILE` is set, :func:`create_default_context`
-   enables key logging.
+   Khi :attr:`~SSLContext.keylog_filename` được hỗ trợ và biến môi trường :envvar:`SSLKEYLOGFILE` được đặt, :func:`create_default_context` sẽ bật tính năng ghi nhật ký khóa.
 
-   The default settings for this context include
-   :data:`VERIFY_X509_PARTIAL_CHAIN` and :data:`VERIFY_X509_STRICT`.
-   These make the underlying OpenSSL implementation behave more like
-   a conforming implementation of :rfc:`5280`, in exchange for a small
-   amount of incompatibility with older X.509 certificates.
+   Các cài đặt mặc định cho context này bao gồm
+   :data:`VERIFY_X509_PARTIAL_CHAIN` và :data:`VERIFY_X509_STRICT`. Các cài đặt này khiến triển khai OpenSSL bên dưới hoạt động giống hơn với một triển khai tuân thủ :rfc:`5280`, đổi lại là một mức độ không tương thích nhỏ với các chứng chỉ X.509 cũ hơn.
 
    .. note::
-      The protocol, options, cipher and other settings may change to more
-      restrictive values anytime without prior deprecation.  The values
-      represent a fair balance between compatibility and security.
+      Giao thức, tùy chọn, cipher và các cài đặt khác có thể được thay đổi thành các giá trị hạn chế hơn bất kỳ lúc nào mà không cần thông báo ngừng hỗ trợ trước. Các giá trị này thể hiện sự cân bằng hợp lý giữa khả năng tương thích và bảo mật.
 
-      If your application needs specific settings, you should create a
-      :class:`SSLContext` and apply the settings yourself.
+      Nếu ứng dụng của bạn cần các cài đặt cụ thể, bạn nên tạo một
+      :class:`SSLContext` và tự áp dụng các cài đặt đó.
 
    .. note::
-      If you find that when certain older clients or servers attempt to connect
-      with a :class:`SSLContext` created by this function that they get an error
-      stating "Protocol or cipher suite mismatch", it may be that they only
-      support SSL3.0 which this function excludes using the
-      :data:`OP_NO_SSLv3`. SSL3.0 is widely considered to be `completely broken
-      <https://en.wikipedia.org/wiki/POODLE>`_. If you still wish to continue to
-      use this function but still allow SSL 3.0 connections you can re-enable
-      them using::
+      Nếu bạn nhận thấy rằng khi một số client hoặc server cũ cố gắng kết nối bằng một :class:`SSLContext` được tạo bởi hàm này, chúng nhận được lỗi có nội dung "Protocol or cipher suite mismatch", có thể là do chúng chỉ hỗ trợ SSL3.0, vốn bị hàm này loại trừ bằng cách sử dụng
+      :data:`OP_NO_SSLv3`. SSL3.0 được nhiều người xem là `hoàn toàn bị phá vỡ <https://en.wikipedia.org/wiki/POODLE>`_. Nếu bạn vẫn muốn tiếp tục sử dụng hàm này nhưng vẫn cho phép các kết nối SSL 3.0, bạn có thể bật lại chúng bằng cách sử dụng::
 
          ctx = ssl.create_default_context(Purpose.CLIENT_AUTH)
          ctx.options &= ~ssl.OP_NO_SSLv3
 
    .. note::
-      This context enables :data:`VERIFY_X509_STRICT` by default, which
-      may reject pre-:rfc:`5280` or malformed certificates that the
-      underlying OpenSSL implementation otherwise would accept. While disabling
-      this is not recommended, you can do so using::
+      Ngữ cảnh này mặc định bật :data:`VERIFY_X509_STRICT`, điều này có thể khiến các chứng chỉ trước :rfc:`5280` hoặc chứng chỉ không hợp lệ bị từ chối, dù triển khai OpenSSL bên dưới vẫn chấp nhận chúng. Mặc dù không khuyến nghị vô hiệu hóa tùy chọn này, bạn có thể thực hiện bằng cách sử dụng::
 
          ctx = ssl.create_default_context()
          ctx.verify_flags &= ~ssl.VERIFY_X509_STRICT
@@ -193,165 +145,133 @@ purposes.
 
    .. versionchanged:: 3.4.4
 
-     RC4 was dropped from the default cipher string.
+     RC4 đã bị loại khỏi chuỗi cipher mặc định.
 
    .. versionchanged:: 3.6
 
-     ChaCha20/Poly1305 was added to the default cipher string.
+     ChaCha20/Poly1305 đã được thêm vào chuỗi cipher mặc định.
 
-     3DES was dropped from the default cipher string.
+     3DES đã bị loại khỏi chuỗi cipher mặc định.
 
    .. versionchanged:: 3.8
 
-      Support for key logging to :envvar:`SSLKEYLOGFILE` was added.
+      Đã thêm hỗ trợ ghi nhật ký khóa vào :envvar:`SSLKEYLOGFILE`.
 
    .. versionchanged:: 3.10
 
-      The context now uses :data:`PROTOCOL_TLS_CLIENT` or
-      :data:`PROTOCOL_TLS_SERVER` protocol instead of generic
+      Ngữ cảnh hiện sử dụng :data:`PROTOCOL_TLS_CLIENT` hoặc
+      giao thức :data:`PROTOCOL_TLS_SERVER` thay vì giao thức chung
       :data:`PROTOCOL_TLS`.
 
    .. versionchanged:: 3.13
 
-      The context now uses :data:`VERIFY_X509_PARTIAL_CHAIN` and
-      :data:`VERIFY_X509_STRICT` in its default verify flags.
+      Context hiện sử dụng :data:`VERIFY_X509_PARTIAL_CHAIN` và
+      :data:`VERIFY_X509_STRICT` trong các cờ verify mặc định của nó.
 
 
-Exceptions
-^^^^^^^^^^
+Ngoại lệ
+^^^^^^^^
 
 .. exception:: SSLError
 
-   Raised to signal an error from the underlying SSL implementation
-   (currently provided by the OpenSSL library).  This signifies some
-   problem in the higher-level encryption and authentication layer that's
-   superimposed on the underlying network connection.  This error
-   is a subtype of :exc:`OSError`.  The error code and message of
-   :exc:`SSLError` instances are provided by the OpenSSL library.
+   Được phát sinh để báo hiệu lỗi từ triển khai SSL bên dưới (hiện do thư viện OpenSSL cung cấp). Điều này cho biết có vấn đề trong lớp mã hóa và xác thực cấp cao hơn được phủ lên kết nối mạng bên dưới. Lỗi này là một kiểu con của :exc:`OSError`. Mã lỗi và thông báo của
+   các thực thể :exc:`SSLError` được thư viện OpenSSL cung cấp.
 
    .. versionchanged:: 3.3
       :exc:`SSLError` used to be a subtype of :exc:`socket.error`.
 
    .. attribute:: library
 
-      A string mnemonic designating the OpenSSL submodule in which the error
-      occurred, such as ``SSL``, ``PEM`` or ``X509``.  The range of possible
-      values depends on the OpenSSL version.
+      Một mnemonic dạng chuỗi chỉ định phân hệ OpenSSL nơi xảy ra lỗi, chẳng hạn như ``SSL``, ``PEM`` hoặc ``X509``. Phạm vi các giá trị có thể có phụ thuộc vào phiên bản OpenSSL.
 
       .. versionadded:: 3.3
 
    .. attribute:: reason
 
-      A string mnemonic designating the reason this error occurred, for
-      example ``CERTIFICATE_VERIFY_FAILED``.  The range of possible
-      values depends on the OpenSSL version.
+      Một mnemonic dạng chuỗi chỉ định lý do xảy ra lỗi này, ví dụ ``CERTIFICATE_VERIFY_FAILED``. Phạm vi các giá trị có thể có phụ thuộc vào phiên bản OpenSSL.
 
       .. versionadded:: 3.3
 
 .. exception:: SSLZeroReturnError
 
-   A subclass of :exc:`SSLError` raised when trying to read or write and
-   the SSL connection has been closed cleanly.  Note that this doesn't
-   mean that the underlying transport (read TCP) has been closed.
+   Một lớp con của :exc:`SSLError` được phát sinh khi cố gắng đọc hoặc ghi và kết nối SSL đã được đóng một cách an toàn. Lưu ý rằng điều này không có nghĩa là transport bên dưới (read TCP) đã được đóng.
 
    .. versionadded:: 3.3
 
 .. exception:: SSLWantReadError
 
-   A subclass of :exc:`SSLError` raised by a :ref:`non-blocking SSL socket
-   <ssl-nonblocking>` when trying to read or write data, but more data needs
-   to be received on the underlying TCP transport before the request can be
-   fulfilled.
+   Một lớp con của :exc:`SSLError` được phát sinh bởi một socket SSL không chặn :ref:`non-blocking SSL socket <ssl-nonblocking>` khi cố gắng đọc hoặc ghi dữ liệu, nhưng cần nhận thêm dữ liệu trên transport TCP bên dưới trước khi có thể hoàn tất yêu cầu.
 
    .. versionadded:: 3.3
 
 .. exception:: SSLWantWriteError
 
-   A subclass of :exc:`SSLError` raised by a :ref:`non-blocking SSL socket
-   <ssl-nonblocking>` when trying to read or write data, but more data needs
-   to be sent on the underlying TCP transport before the request can be
-   fulfilled.
+   Một lớp con của :exc:`SSLError` được phát sinh bởi một socket SSL không chặn :ref:`non-blocking SSL socket <ssl-nonblocking>` khi cố gắng đọc hoặc ghi dữ liệu, nhưng cần gửi thêm dữ liệu trên transport TCP bên dưới trước khi có thể hoàn tất yêu cầu.
 
    .. versionadded:: 3.3
 
 .. exception:: SSLSyscallError
 
-   A subclass of :exc:`SSLError` raised when a system error was encountered
-   while trying to fulfill an operation on a SSL socket.  Unfortunately,
-   there is no easy way to inspect the original errno number.
+   Một lớp con của :exc:`SSLError` được phát sinh khi gặp lỗi hệ thống trong lúc cố gắng thực hiện một thao tác trên socket SSL. Đáng tiếc là không có cách dễ dàng nào để kiểm tra số errno ban đầu.
 
    .. versionadded:: 3.3
 
 .. exception:: SSLEOFError
 
-   A subclass of :exc:`SSLError` raised when the SSL connection has been
-   terminated abruptly.  Generally, you shouldn't try to reuse the underlying
-   transport when this error is encountered.
+   Một lớp con của :exc:`SSLError` được phát sinh khi kết nối SSL bị chấm dứt đột ngột. Nhìn chung, bạn không nên cố gắng sử dụng lại transport bên dưới khi gặp lỗi này.
 
    .. versionadded:: 3.3
 
 .. exception:: SSLCertVerificationError
 
-   A subclass of :exc:`SSLError` raised when certificate validation has
-   failed.
+   Một lớp con của :exc:`SSLError` được phát sinh khi việc xác thực chứng chỉ không thành công.
 
    .. versionadded:: 3.7
 
    .. attribute:: verify_code
 
-      A numeric error number that denotes the verification error.
+      Một số lỗi dạng số biểu thị lỗi xác minh.
 
    .. attribute:: verify_message
 
-      A human readable string of the verification error.
+      Chuỗi dễ đọc đối với con người của lỗi xác minh.
 
 .. exception:: CertificateError
 
-   An alias for :exc:`SSLCertVerificationError`.
+   Bí danh của :exc:`SSLCertVerificationError`.
 
    .. versionchanged:: 3.7
-      The exception is now an alias for :exc:`SSLCertVerificationError`.
+      Ngoại lệ này hiện là bí danh của :exc:`SSLCertVerificationError`.
 
 
-Random generation
-^^^^^^^^^^^^^^^^^
+Sinh ngẫu nhiên
+^^^^^^^^^^^^^^^
 
 .. function:: RAND_bytes(num, /)
 
-   Return *num* cryptographically strong pseudo-random bytes. Raises an
-   :class:`SSLError` if the PRNG has not been seeded with enough data or if the
-   operation is not supported by the current RAND method. :func:`RAND_status`
-   can be used to check the status of the PRNG and :func:`RAND_add` can be used
-   to seed the PRNG.
+   Trả về *num* byte giả ngẫu nhiên có độ mạnh mật mã. Phát sinh một
+   :class:`SSLError` nếu PRNG chưa được khởi tạo bằng đủ dữ liệu hoặc nếu thao tác này không được phương thức RAND hiện tại hỗ trợ. Có thể dùng :func:`RAND_status` để kiểm tra trạng thái của PRNG và dùng :func:`RAND_add` để khởi tạo PRNG.
 
-   For almost all applications :func:`os.urandom` is preferable.
+   Đối với gần như mọi ứng dụng, :func:`os.urandom` được ưu tiên.
 
-   Read the Wikipedia article, `Cryptographically secure pseudorandom number
-   generator (CSPRNG)
-   <https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator>`_,
-   to get the requirements of a cryptographically strong generator.
+   Đọc bài viết Wikipedia, `Bộ tạo số giả ngẫu nhiên an toàn về mặt mật mã (CSPRNG) <https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator>`_, để biết các yêu cầu đối với một bộ tạo mạnh về mặt mật mã.
 
    .. versionadded:: 3.3
 
 .. function:: RAND_status()
 
-   Return ``True`` if the SSL pseudo-random number generator has been seeded
-   with 'enough' randomness, and ``False`` otherwise.  You can use
-   :func:`ssl.RAND_egd` and :func:`ssl.RAND_add` to increase the randomness of
-   the pseudo-random number generator.
+   Trả về ``True`` nếu bộ tạo số giả ngẫu nhiên SSL đã được khởi tạo bằng đủ tính ngẫu nhiên, và ``False`` trong trường hợp ngược lại. Bạn có thể sử dụng
+   :func:`ssl.RAND_egd` và :func:`ssl.RAND_add` để tăng tính ngẫu nhiên của bộ tạo số giả ngẫu nhiên.
 
 .. function:: RAND_add(bytes, entropy, /)
 
-   Mix the given *bytes* into the SSL pseudo-random number generator.  The
-   parameter *entropy* (a float) is a lower bound on the entropy contained in
-   string (so you can always use ``0.0``).  See :rfc:`1750` for more
-   information on sources of entropy.
+   Trộn *bytes* đã cho vào bộ tạo số giả ngẫu nhiên SSL. Tham số *entropy* (một số thực) là cận dưới của entropy chứa trong chuỗi (vì vậy bạn luôn có thể sử dụng ``0.0``). Xem :rfc:`1750` để biết thêm thông tin về các nguồn entropy.
 
    .. versionchanged:: 3.5
-      Writable :term:`bytes-like object` is now accepted.
+      :term:`bytes-like object` có thể ghi hiện đã được chấp nhận.
 
-Certificate handling
-^^^^^^^^^^^^^^^^^^^^
+Xử lý chứng chỉ
+^^^^^^^^^^^^^^^
 
 .. testsetup::
 
@@ -359,12 +279,9 @@ Certificate handling
 
 .. function:: cert_time_to_seconds(cert_time)
 
-   Return the time in seconds since the epoch, given the ``cert_time``
-   string representing the "notBefore" or "notAfter" date from a
-   certificate in ``"%b %d %H:%M:%S %Y %Z"`` strptime format (C
-   locale).
+   Trả về thời gian tính bằng giây kể từ epoch, với ``cert_time`` là chuỗi biểu diễn ngày "notBefore" hoặc "notAfter" từ một chứng chỉ theo định dạng strptime của ``"%b %d %H:%M:%S %Y %Z"`` (locale C).
 
-   Here's an example:
+   Dưới đây là một ví dụ:
 
    .. doctest:: newcontext
 
@@ -376,78 +293,58 @@ Certificate handling
       >>> print(dt.datetime.fromtimestamp(timestamp, dt.UTC))  # doctest: +SKIP
       2018-01-05 09:34:43+00:00
 
-   "notBefore" or "notAfter" dates must use GMT (:rfc:`5280`).
+   Ngày "notBefore" hoặc "notAfter" phải sử dụng GMT (:rfc:`5280`).
 
    .. versionchanged:: 3.5
-      Interpret the input time as a time in UTC as specified by 'GMT'
-      timezone in the input string. Local timezone was used
-      previously. Return an integer (no fractions of a second in the
-      input format)
+      Diễn giải thời gian đầu vào là thời gian theo UTC như được chỉ định bởi múi giờ 'GMT' trong chuỗi đầu vào. Trước đây, múi giờ cục bộ đã được sử dụng. Trả về một số nguyên (định dạng đầu vào không có phần lẻ của giây)
 
 .. function:: get_server_certificate(addr, ssl_version=PROTOCOL_TLS_CLIENT, \
                                      ca_certs=None[, timeout])
 
-   Given the address ``addr`` of an SSL-protected server, as a (*hostname*,
-   *port-number*) pair, fetches the server's certificate, and returns it as a
-   PEM-encoded string.  If ``ssl_version`` is specified, uses that version of
-   the SSL protocol to attempt to connect to the server.  If *ca_certs* is
-   specified, it should be a file containing a list of root certificates, the
-   same format as used for the *cafile* parameter in
-   :meth:`SSLContext.load_verify_locations`.  The call will attempt to validate the
-   server certificate against that set of root certificates, and will fail
-   if the validation attempt fails.  A timeout can be specified with the
-   ``timeout`` parameter.
+   Với địa chỉ ``addr`` của một server được bảo vệ bằng SSL, dưới dạng một cặp (*hostname*, *port-number*), hàm này lấy certificate của server và trả về certificate đó dưới dạng chuỗi được mã hóa PEM. Nếu ``ssl_version`` được chỉ định, hàm sẽ sử dụng phiên bản đó của giao thức SSL để thử kết nối với server. Nếu *ca_certs* được chỉ định, giá trị này phải là một tệp chứa danh sách các root certificate, có cùng định dạng như định dạng được sử dụng cho tham số *cafile* trong
+   :meth:`SSLContext.load_verify_locations`. Lệnh gọi sẽ cố gắng xác thực chứng chỉ máy chủ dựa trên tập hợp chứng chỉ gốc đó và sẽ thất bại nếu quá trình xác thực không thành công. Có thể chỉ định thời gian chờ bằng tham số ``timeout``.
 
    .. versionchanged:: 3.3
-      This function is now IPv6-compatible.
+      Hàm này hiện tương thích với IPv6.
 
    .. versionchanged:: 3.5
-      The default *ssl_version* is changed from :data:`PROTOCOL_SSLv3` to
-      :data:`PROTOCOL_TLS` for maximum compatibility with modern servers.
+      Giá trị mặc định của *ssl_version* được thay đổi từ :data:`PROTOCOL_SSLv3` thành
+      :data:`PROTOCOL_TLS` để đạt khả năng tương thích tối đa với các máy chủ hiện đại.
 
    .. versionchanged:: 3.10
-      The *timeout* parameter was added.
+      Đã thêm tham số *timeout*.
 
 .. function:: DER_cert_to_PEM_cert(der_cert_bytes)
 
-   Given a certificate as a DER-encoded blob of bytes, returns a PEM-encoded
-   string version of the same certificate.
+   Với một chứng chỉ ở dạng blob byte được mã hóa DER, trả về phiên bản chuỗi được mã hóa PEM của chính chứng chỉ đó.
 
 .. function:: PEM_cert_to_DER_cert(pem_cert_string)
 
-   Given a certificate as an ASCII PEM string, returns a DER-encoded sequence of
-   bytes for that same certificate.
+   Với một chứng chỉ ở dạng chuỗi ASCII PEM, trả về một chuỗi byte được mã hóa DER cho chính chứng chỉ đó.
 
 .. function:: get_default_verify_paths()
 
-   Returns a named tuple with paths to OpenSSL's default cafile and capath.
-   The paths are the same as used by
-   :meth:`SSLContext.set_default_verify_paths`. The return value is a
+   Trả về một named tuple chứa các đường dẫn đến cafile và capath mặc định của OpenSSL. Các đường dẫn này giống với những đường dẫn được sử dụng bởi
+   :meth:`SSLContext.set_default_verify_paths`. Giá trị trả về là một
    :term:`named tuple` ``DefaultVerifyPaths``:
 
-   * :attr:`cafile` - resolved path to cafile or ``None`` if the file doesn't exist,
-   * :attr:`capath` - resolved path to capath or ``None`` if the directory doesn't exist,
-   * :attr:`openssl_cafile_env` - OpenSSL's environment key that points to a cafile,
-   * :attr:`openssl_cafile` - hard coded path to a cafile,
-   * :attr:`openssl_capath_env` - OpenSSL's environment key that points to a capath,
-   * :attr:`openssl_capath` - hard coded path to a capath directory
+   * :attr:`cafile` - đường dẫn đã được phân giải đến cafile hoặc ``None`` nếu tệp không tồn tại,
+   * :attr:`capath` - đường dẫn đã được phân giải đến capath hoặc ``None`` nếu thư mục không tồn tại,
+   * :attr:`openssl_cafile_env` - khóa môi trường của OpenSSL trỏ đến một cafile,
+   * :attr:`openssl_cafile` - đường dẫn được hard-code đến một cafile,
+   * :attr:`openssl_capath_env` - khóa môi trường của OpenSSL trỏ đến một capath,
+   * :attr:`openssl_capath` - đường dẫn được ghi cứng tới thư mục capath
 
    .. versionadded:: 3.4
 
 .. function:: enum_certificates(store_name)
 
-   Retrieve certificates from Windows' system cert store. *store_name* may be
-   one of ``CA``, ``ROOT`` or ``MY``. Windows may provide additional cert
-   stores, too.
+   Lấy chứng chỉ từ kho chứng chỉ hệ thống của Windows. *store_name* có thể là một trong các giá trị ``CA``, ``ROOT`` hoặc ``MY``. Windows cũng có thể cung cấp thêm các kho chứng chỉ khác.
 
-   The function returns a list of (cert_bytes, encoding_type, trust) tuples.
-   The encoding_type specifies the encoding of cert_bytes. It is either
-   :const:`x509_asn` for X.509 ASN.1 data or :const:`pkcs_7_asn` for
-   PKCS#7 ASN.1 data. Trust specifies the purpose of the certificate as a set
-   of OIDS or exactly ``True`` if the certificate is trustworthy for all
-   purposes.
+   Hàm trả về một danh sách các tuple (cert_bytes, encoding_type, trust). encoding_type chỉ định kiểu mã hóa của cert_bytes. Giá trị này có thể là
+   :const:`x509_asn` cho dữ liệu X.509 ASN.1 hoặc :const:`pkcs_7_asn` cho dữ liệu PKCS#7 ASN.1. trust chỉ định mục đích của chứng chỉ dưới dạng một tập hợp các OIDS hoặc chính xác là ``True`` nếu chứng chỉ đáng tin cậy cho mọi mục đích.
 
-   Example::
+   Ví dụ::
 
       >>> ssl.enum_certificates("CA")
       [(b'data...', 'x509_asn', {'1.3.6.1.5.5.7.3.1', '1.3.6.1.5.5.7.3.2'}),
@@ -459,499 +356,404 @@ Certificate handling
 
 .. function:: enum_crls(store_name)
 
-   Retrieve CRLs from Windows' system cert store. *store_name* may be
-   one of ``CA``, ``ROOT`` or ``MY``. Windows may provide additional cert
-   stores, too.
+   Lấy CRL từ kho chứng chỉ hệ thống của Windows. *store_name* có thể là một trong các giá trị ``CA``, ``ROOT`` hoặc ``MY``. Windows cũng có thể cung cấp thêm các kho chứng chỉ khác.
 
-   The function returns a list of (cert_bytes, encoding_type, trust) tuples.
-   The encoding_type specifies the encoding of cert_bytes. It is either
-   :const:`x509_asn` for X.509 ASN.1 data or :const:`pkcs_7_asn` for
-   PKCS#7 ASN.1 data.
+   Hàm trả về một danh sách các tuple (cert_bytes, encoding_type, trust). encoding_type chỉ định kiểu mã hóa của cert_bytes. Giá trị này có thể là
+   :const:`x509_asn` cho dữ liệu ASN.1 X.509 hoặc :const:`pkcs_7_asn` cho dữ liệu ASN.1 PKCS#7.
 
    .. availability:: Windows.
 
    .. versionadded:: 3.4
 
 
-Constants
-^^^^^^^^^
+Hằng số
+^^^^^^^
 
-   All constants are now :class:`enum.IntEnum` or :class:`enum.IntFlag` collections.
+   Tất cả các hằng số hiện là các collection :class:`enum.IntEnum` hoặc :class:`enum.IntFlag`.
 
    .. versionadded:: 3.6
 
 .. data:: CERT_NONE
 
-   Possible value for :attr:`SSLContext.verify_mode`.
-   Except for :const:`PROTOCOL_TLS_CLIENT`,
-   it is the default mode.  With client-side sockets, just about any
-   cert is accepted.  Validation errors, such as untrusted or expired cert,
-   are ignored and do not abort the TLS/SSL handshake.
+   Giá trị có thể có cho :attr:`SSLContext.verify_mode`. Ngoại trừ :const:`PROTOCOL_TLS_CLIENT`, đây là chế độ mặc định. Với socket phía client, gần như mọi certificate đều được chấp nhận. Các lỗi validation, chẳng hạn như certificate không đáng tin cậy hoặc đã hết hạn, sẽ bị bỏ qua và không hủy quá trình TLS/SSL handshake.
 
-   In server mode, no certificate is requested from the client, so the client
-   does not send any for client cert authentication.
+   Ở chế độ server, không có certificate nào được yêu cầu từ client, vì vậy client không gửi certificate nào để xác thực client cert.
 
-   See the discussion of :ref:`ssl-security` below.
+   Xem phần thảo luận về :ref:`ssl-security` bên dưới.
 
 .. data:: CERT_OPTIONAL
 
-   Possible value for :attr:`SSLContext.verify_mode`.
-   In client mode, :const:`CERT_OPTIONAL`
-   has the same meaning as :const:`CERT_REQUIRED`. It is recommended to
-   use :const:`CERT_REQUIRED` for client-side sockets instead.
+   Giá trị có thể có cho :attr:`SSLContext.verify_mode`. Ở chế độ client, :const:`CERT_OPTIONAL` có cùng ý nghĩa với :const:`CERT_REQUIRED`. Thay vào đó, nên sử dụng :const:`CERT_REQUIRED` cho socket phía client.
 
-   In server mode, a client certificate request is sent to the client.  The
-   client may either ignore the request or send a certificate in order
-   perform TLS client cert authentication.  If the client chooses to send
-   a certificate, it is verified.  Any verification error immediately aborts
-   the TLS handshake.
+   Ở chế độ server, một yêu cầu chứng chỉ client được gửi đến client. Client có thể bỏ qua yêu cầu hoặc gửi chứng chỉ để thực hiện xác thực chứng chỉ client TLS. Nếu client chọn gửi chứng chỉ, chứng chỉ đó sẽ được xác minh. Bất kỳ lỗi xác minh nào cũng lập tức hủy quá trình bắt tay TLS.
 
-   Use of this setting requires a valid set of CA certificates to
-   be passed to :meth:`SSLContext.load_verify_locations`.
+   Việc sử dụng cài đặt này yêu cầu truyền một tập hợp chứng chỉ CA hợp lệ vào :meth:`SSLContext.load_verify_locations`.
 
 .. data:: CERT_REQUIRED
 
-   Possible value for :attr:`SSLContext.verify_mode`.
-   In this mode, certificates are
-   required from the other side of the socket connection; an :class:`SSLError`
-   will be raised if no certificate is provided, or if its validation fails.
-   This mode is **not** sufficient to verify a certificate in client mode as
-   it does not match hostnames.  :attr:`~SSLContext.check_hostname` must be
-   enabled as well to verify the authenticity of a cert.
-   :const:`PROTOCOL_TLS_CLIENT` uses :const:`CERT_REQUIRED` and
-   enables :attr:`~SSLContext.check_hostname` by default.
+   Giá trị khả dụng cho :attr:`SSLContext.verify_mode`. Ở chế độ này, chứng chỉ được yêu cầu từ phía bên kia của kết nối socket; một :class:`SSLError` sẽ được phát sinh nếu không cung cấp chứng chỉ hoặc nếu việc xác thực chứng chỉ không thành công. Chế độ này **không** đủ để xác minh chứng chỉ ở chế độ client vì không đối chiếu tên máy chủ. Cũng phải bật :attr:`~SSLContext.check_hostname` để xác minh tính xác thực của chứng chỉ.
+   :const:`PROTOCOL_TLS_CLIENT` sử dụng :const:`CERT_REQUIRED` và bật :attr:`~SSLContext.check_hostname` theo mặc định.
 
-   With server socket, this mode provides mandatory TLS client cert
-   authentication.  A client certificate request is sent to the client and
-   the client must provide a valid and trusted certificate.
+   Với socket server, chế độ này cung cấp khả năng xác thực chứng chỉ client TLS bắt buộc. Một yêu cầu chứng chỉ client được gửi đến client và client phải cung cấp một chứng chỉ hợp lệ, đáng tin cậy.
 
-   Use of this setting requires a valid set of CA certificates to
-   be passed to :meth:`SSLContext.load_verify_locations`.
+   Việc sử dụng cài đặt này yêu cầu truyền một tập hợp chứng chỉ CA hợp lệ vào :meth:`SSLContext.load_verify_locations`.
 
 .. class:: VerifyMode
 
-   :class:`enum.IntEnum` collection of CERT_* constants.
+   Tập hợp các hằng số CERT_* của :class:`enum.IntEnum`.
 
    .. versionadded:: 3.6
 
 .. data:: VERIFY_DEFAULT
 
-   Possible value for :attr:`SSLContext.verify_flags`. In this mode, certificate
-   revocation lists (CRLs) are not checked. By default OpenSSL does neither
-   require nor verify CRLs.
+   Giá trị có thể có cho :attr:`SSLContext.verify_flags`. Ở chế độ này, danh sách thu hồi chứng chỉ (CRL) không được kiểm tra. Theo mặc định, OpenSSL không yêu cầu cũng không xác minh CRL.
 
    .. versionadded:: 3.4
 
 .. data:: VERIFY_CRL_CHECK_LEAF
 
-   Possible value for :attr:`SSLContext.verify_flags`. In this mode, only the
-   peer cert is checked but none of the intermediate CA certificates. The mode
-   requires a valid CRL that is signed by the peer cert's issuer (its direct
-   ancestor CA). If no proper CRL has been loaded with
-   :attr:`SSLContext.load_verify_locations`, validation will fail.
+   Giá trị có thể có cho :attr:`SSLContext.verify_flags`. Ở chế độ này, chỉ chứng chỉ của peer được kiểm tra, còn các chứng chỉ CA trung gian thì không. Chế độ này yêu cầu một CRL hợp lệ được ký bởi bên phát hành chứng chỉ của peer (CA cấp trực tiếp). Nếu chưa tải CRL phù hợp bằng
+   :attr:`SSLContext.load_verify_locations`, việc xác thực sẽ thất bại.
 
    .. versionadded:: 3.4
 
 .. data:: VERIFY_CRL_CHECK_CHAIN
 
-   Possible value for :attr:`SSLContext.verify_flags`. In this mode, CRLs of
-   all certificates in the peer cert chain are checked.
+   Giá trị có thể có cho :attr:`SSLContext.verify_flags`. Ở chế độ này, CRL của tất cả chứng chỉ trong chuỗi chứng chỉ của peer đều được kiểm tra.
 
    .. versionadded:: 3.4
 
 .. data:: VERIFY_X509_STRICT
 
-   Possible value for :attr:`SSLContext.verify_flags` to disable workarounds
-   for broken X.509 certificates.
+   Giá trị có thể có cho :attr:`SSLContext.verify_flags` để tắt các biện pháp khắc phục dành cho chứng chỉ X.509 bị lỗi.
 
    .. versionadded:: 3.4
 
 .. data:: VERIFY_ALLOW_PROXY_CERTS
 
-   Possible value for :attr:`SSLContext.verify_flags` to enables proxy
-   certificate verification.
+   Giá trị có thể có cho :attr:`SSLContext.verify_flags` để bật tính năng xác minh chứng chỉ proxy.
 
    .. versionadded:: 3.10
 
 .. data:: VERIFY_X509_TRUSTED_FIRST
 
-   Possible value for :attr:`SSLContext.verify_flags`. It instructs OpenSSL to
-   prefer trusted certificates when building the trust chain to validate a
-   certificate. This flag is enabled by default.
+   Giá trị có thể có cho :attr:`SSLContext.verify_flags`. Giá trị này yêu cầu OpenSSL ưu tiên các chứng chỉ đáng tin cậy khi xây dựng chuỗi tin cậy để xác thực một chứng chỉ. Cờ này được bật theo mặc định.
 
    .. versionadded:: 3.4.4
 
 .. data:: VERIFY_X509_PARTIAL_CHAIN
 
-   Possible value for :attr:`SSLContext.verify_flags`. It instructs OpenSSL to
-   accept intermediate CAs in the trust store to be treated as trust-anchors,
-   in the same way as the self-signed root CA certificates. This makes it
-   possible to trust certificates issued by an intermediate CA without having
-   to trust its ancestor root CA.
+   Giá trị khả dĩ của :attr:`SSLContext.verify_flags`. Giá trị này hướng dẫn OpenSSL coi các CA trung gian trong kho lưu trữ tin cậy là các trust anchor, tương tự như các chứng chỉ CA gốc tự ký. Nhờ đó, bạn có thể tin cậy các chứng chỉ do CA trung gian cấp mà không cần tin cậy CA gốc tổ tiên của CA đó.
 
    .. versionadded:: 3.10
 
 
 .. class:: VerifyFlags
 
-   :class:`enum.IntFlag` collection of VERIFY_* constants.
+   :class:`enum.IntFlag` tập hợp các hằng số VERIFY_*.
 
    .. versionadded:: 3.6
 
 .. data:: PROTOCOL_TLS
 
-   Selects the highest protocol version that both the client and server support.
-   Despite the name, this option can select both "SSL" and "TLS" protocols.
+   Chọn phiên bản giao thức cao nhất mà cả client và server đều hỗ trợ. Mặc dù có tên như vậy, tùy chọn này có thể chọn cả giao thức "SSL" và "TLS".
 
    .. versionadded:: 3.6
 
    .. deprecated:: 3.10
 
-      TLS clients and servers require different default settings for secure
-      communication. The generic TLS protocol constant is deprecated in
-      favor of :data:`PROTOCOL_TLS_CLIENT` and :data:`PROTOCOL_TLS_SERVER`.
+      Client và server TLS yêu cầu các thiết lập mặc định khác nhau để giao tiếp an toàn. Hằng số giao thức TLS chung đã không còn được dùng và được thay thế bằng :data:`PROTOCOL_TLS_CLIENT` và :data:`PROTOCOL_TLS_SERVER`.
 
 .. data:: PROTOCOL_TLS_CLIENT
 
-   Auto-negotiate the highest protocol version that both the client and
-   server support, and configure the context client-side connections. The
-   protocol enables :data:`CERT_REQUIRED` and
-   :attr:`~SSLContext.check_hostname` by default.
+   Tự động thương lượng phiên bản giao thức cao nhất mà cả client và server đều hỗ trợ, đồng thời cấu hình context cho các kết nối phía client. Giao thức này bật :data:`CERT_REQUIRED` và
+   :attr:`~SSLContext.check_hostname` theo mặc định.
 
    .. versionadded:: 3.6
 
 .. data:: PROTOCOL_TLS_SERVER
 
-   Auto-negotiate the highest protocol version that both the client and
-   server support, and configure the context server-side connections.
+   Tự động thương lượng phiên bản giao thức cao nhất mà cả client và server đều hỗ trợ, đồng thời cấu hình context cho các kết nối phía server.
 
    .. versionadded:: 3.6
 
 .. data:: PROTOCOL_SSLv23
 
-   Alias for :data:`PROTOCOL_TLS`.
+   Bí danh của :data:`PROTOCOL_TLS`.
 
    .. deprecated:: 3.6
 
-      Use :data:`PROTOCOL_TLS` instead.
+      Thay vào đó, hãy sử dụng :data:`PROTOCOL_TLS`.
 
 .. data:: PROTOCOL_SSLv3
 
-   Selects SSL version 3 as the channel encryption protocol.
+   Chọn SSL phiên bản 3 làm giao thức mã hóa kênh.
 
-   This protocol is not available if OpenSSL is compiled with the
-   ``no-ssl3`` option.
+   Giao thức này không khả dụng nếu OpenSSL được biên dịch với tùy chọn ``no-ssl3``.
 
    .. warning::
 
-      SSL version 3 is insecure.  Its use is highly discouraged.
+      SSL phiên bản 3 không an toàn.  Rất không nên sử dụng giao thức này.
 
    .. deprecated:: 3.6
 
-      OpenSSL has deprecated all version specific protocols. Use the default
-      protocol :data:`PROTOCOL_TLS_SERVER` or :data:`PROTOCOL_TLS_CLIENT`
-      with :attr:`SSLContext.minimum_version` and
-      :attr:`SSLContext.maximum_version` instead.
+      OpenSSL đã loại bỏ tất cả các giao thức dành riêng cho từng phiên bản. Sử dụng giao thức mặc định :data:`PROTOCOL_TLS_SERVER` hoặc :data:`PROTOCOL_TLS_CLIENT` với :attr:`SSLContext.minimum_version` và
+      :attr:`SSLContext.maximum_version` thay vào đó.
 
 
 .. data:: PROTOCOL_TLSv1
 
-   Selects TLS version 1.0 as the channel encryption protocol.
+   Chọn TLS phiên bản 1.0 làm giao thức mã hóa kênh.
 
    .. deprecated:: 3.6
 
-      OpenSSL has deprecated all version specific protocols.
+      OpenSSL đã loại bỏ tất cả các giao thức dành riêng cho từng phiên bản.
 
 .. data:: PROTOCOL_TLSv1_1
 
-   Selects TLS version 1.1 as the channel encryption protocol.
-   Available only with openssl version 1.0.1+.
+   Chọn TLS phiên bản 1.1 làm giao thức mã hóa kênh. Chỉ khả dụng với openssl phiên bản 1.0.1 trở lên.
 
    .. versionadded:: 3.4
 
    .. deprecated:: 3.6
 
-      OpenSSL has deprecated all version specific protocols.
+      OpenSSL đã loại bỏ tất cả các giao thức dành riêng cho từng phiên bản.
 
 .. data:: PROTOCOL_TLSv1_2
 
-   Selects TLS version 1.2 as the channel encryption protocol.
-   Available only with openssl version 1.0.1+.
+   Chọn TLS phiên bản 1.2 làm giao thức mã hóa kênh. Chỉ khả dụng với openssl phiên bản 1.0.1 trở lên.
 
    .. versionadded:: 3.4
 
    .. deprecated:: 3.6
 
-      OpenSSL has deprecated all version specific protocols.
+      OpenSSL đã loại bỏ tất cả các giao thức dành riêng cho từng phiên bản.
 
 .. data:: OP_ALL
 
-   Enables workarounds for various bugs present in other SSL implementations.
-   This option is set by default.  It does not necessarily set the same
-   flags as OpenSSL's ``SSL_OP_ALL`` constant.
+   Bật các biện pháp khắc phục cho nhiều lỗi hiện diện trong những triển khai SSL khác. Tùy chọn này được đặt theo mặc định. Tùy chọn này không nhất thiết đặt các cờ giống với hằng số ``SSL_OP_ALL`` của OpenSSL.
 
    .. versionadded:: 3.2
 
 .. data:: OP_NO_SSLv2
 
-   Prevents an SSLv2 connection.  This option is only applicable in
-   conjunction with :const:`PROTOCOL_TLS`.  It prevents the peers from
-   choosing SSLv2 as the protocol version.
+   Ngăn kết nối SSLv2. Tùy chọn này chỉ áp dụng khi kết hợp với :const:`PROTOCOL_TLS`. Tùy chọn này ngăn các peer chọn SSLv2 làm phiên bản giao thức.
 
    .. versionadded:: 3.2
 
    .. deprecated:: 3.6
 
-      SSLv2 is deprecated
+      SSLv2 không được dùng nữa
 
 .. data:: OP_NO_SSLv3
 
-   Prevents an SSLv3 connection.  This option is only applicable in
-   conjunction with :const:`PROTOCOL_TLS`.  It prevents the peers from
-   choosing SSLv3 as the protocol version.
+   Ngăn kết nối SSLv3. Tùy chọn này chỉ áp dụng khi kết hợp với :const:`PROTOCOL_TLS`. Tùy chọn này ngăn các peer chọn SSLv3 làm phiên bản giao thức.
 
    .. versionadded:: 3.2
 
    .. deprecated:: 3.6
 
-      SSLv3 is deprecated
+      SSLv3 không được dùng nữa
 
 .. data:: OP_NO_TLSv1
 
-   Prevents a TLSv1 connection.  This option is only applicable in
-   conjunction with :const:`PROTOCOL_TLS`.  It prevents the peers from
-   choosing TLSv1 as the protocol version.
+   Ngăn kết nối TLSv1. Tùy chọn này chỉ áp dụng khi kết hợp với :const:`PROTOCOL_TLS`. Tùy chọn này ngăn các peer chọn TLSv1 làm phiên bản giao thức.
 
    .. versionadded:: 3.2
 
    .. deprecated:: 3.7
-      The option is deprecated since OpenSSL 1.1.0, use the new
-      :attr:`SSLContext.minimum_version` and
-      :attr:`SSLContext.maximum_version` instead.
+      Tùy chọn này không còn được dùng kể từ OpenSSL 1.1.0, hãy sử dụng tùy chọn mới
+      :attr:`SSLContext.minimum_version` và
+      :attr:`SSLContext.maximum_version` thay vào đó.
 
 .. data:: OP_NO_TLSv1_1
 
-   Prevents a TLSv1.1 connection. This option is only applicable in conjunction
-   with :const:`PROTOCOL_TLS`. It prevents the peers from choosing TLSv1.1 as
-   the protocol version. Available only with openssl version 1.0.1+.
+   Ngăn kết nối TLSv1.1. Tùy chọn này chỉ áp dụng khi kết hợp với :const:`PROTOCOL_TLS`. Tùy chọn này ngăn các phía chọn TLSv1.1 làm phiên bản giao thức. Chỉ khả dụng với openssl phiên bản 1.0.1 trở lên.
 
    .. versionadded:: 3.4
 
    .. deprecated:: 3.7
-      The option is deprecated since OpenSSL 1.1.0.
+      Tùy chọn này không còn được khuyến nghị kể từ OpenSSL 1.1.0.
 
 .. data:: OP_NO_TLSv1_2
 
-   Prevents a TLSv1.2 connection. This option is only applicable in conjunction
-   with :const:`PROTOCOL_TLS`. It prevents the peers from choosing TLSv1.2 as
-   the protocol version. Available only with openssl version 1.0.1+.
+   Ngăn kết nối TLSv1.2. Tùy chọn này chỉ áp dụng khi kết hợp với :const:`PROTOCOL_TLS`. Tùy chọn này ngăn các phía chọn TLSv1.2 làm phiên bản giao thức. Chỉ khả dụng với openssl phiên bản 1.0.1 trở lên.
 
    .. versionadded:: 3.4
 
    .. deprecated:: 3.7
-      The option is deprecated since OpenSSL 1.1.0.
+      Tùy chọn này không còn được khuyến nghị kể từ OpenSSL 1.1.0.
 
 .. data:: OP_NO_TLSv1_3
 
-   Prevents a TLSv1.3 connection. This option is only applicable in conjunction
-   with :const:`PROTOCOL_TLS`. It prevents the peers from choosing TLSv1.3 as
-   the protocol version. TLS 1.3 is available with OpenSSL 1.1.1 or later.
-   When Python has been compiled against an older version of OpenSSL, the
-   flag defaults to *0*.
+   Ngăn kết nối TLSv1.3. Tùy chọn này chỉ áp dụng khi kết hợp với :const:`PROTOCOL_TLS`. Tùy chọn này ngăn các phía chọn TLSv1.3 làm phiên bản giao thức. TLS 1.3 khả dụng với OpenSSL 1.1.1 trở lên. Khi Python được biên dịch với phiên bản OpenSSL cũ hơn, cờ này mặc định là *0*.
 
    .. versionadded:: 3.6.3
 
    .. deprecated:: 3.7
-      The option is deprecated since OpenSSL 1.1.0. It was added to 2.7.15 and
-      3.6.3 for backwards compatibility with OpenSSL 1.0.2.
+      Tùy chọn này không còn được khuyến nghị kể từ OpenSSL 1.1.0. Tùy chọn này được thêm vào 2.7.15 và 3.6.3 để đảm bảo khả năng tương thích ngược với OpenSSL 1.0.2.
 
 .. data:: OP_NO_RENEGOTIATION
 
-   Disable all renegotiation in TLSv1.2 and earlier. Do not send
-   HelloRequest messages, and ignore renegotiation requests via ClientHello.
+   Tắt mọi hoạt động thương lượng lại trong TLSv1.2 và các phiên bản cũ hơn. Không gửi các thông báo HelloRequest và bỏ qua các yêu cầu thương lượng lại qua ClientHello.
 
-   This option is only available with OpenSSL 1.1.0h and later.
+   Tùy chọn này chỉ khả dụng với OpenSSL 1.1.0h trở lên.
 
    .. versionadded:: 3.7
 
 .. data:: OP_CIPHER_SERVER_PREFERENCE
 
-   Use the server's cipher ordering preference, rather than the client's.
-   This option has no effect on client sockets and SSLv2 server sockets.
+   Sử dụng thứ tự ưu tiên cipher của server thay vì của client. Tùy chọn này không có tác dụng trên các client socket và server socket SSLv2.
 
    .. versionadded:: 3.3
 
 .. data:: OP_SINGLE_DH_USE
 
-   Prevents reuse of the same DH key for distinct SSL sessions.  This
-   improves forward secrecy but requires more computational resources.
-   This option only applies to server sockets.
+   Ngăn việc sử dụng lại cùng một khóa DH cho các phiên SSL riêng biệt. Điều này cải thiện tính bảo mật chuyển tiếp (forward secrecy) nhưng yêu cầu nhiều tài nguyên tính toán hơn. Tùy chọn này chỉ áp dụng cho server socket.
 
    .. versionadded:: 3.3
 
 .. data:: OP_SINGLE_ECDH_USE
 
-   Prevents reuse of the same ECDH key for distinct SSL sessions.  This
-   improves forward secrecy but requires more computational resources.
-   This option only applies to server sockets.
+   Ngăn việc sử dụng lại cùng một khóa ECDH cho các phiên SSL riêng biệt. Điều này cải thiện tính bảo mật chuyển tiếp (forward secrecy) nhưng yêu cầu nhiều tài nguyên tính toán hơn. Tùy chọn này chỉ áp dụng cho server socket.
 
    .. versionadded:: 3.3
 
 .. data:: OP_ENABLE_MIDDLEBOX_COMPAT
 
-   Send dummy Change Cipher Spec (CCS) messages in TLS 1.3 handshake to make
-   a TLS 1.3 connection look more like a TLS 1.2 connection.
+   Gửi các thông báo Change Cipher Spec (CCS) giả trong quá trình bắt tay TLS 1.3 để khiến một kết nối TLS 1.3 trông giống một kết nối TLS 1.2 hơn.
 
-   This option is only available with OpenSSL 1.1.1 and later.
+   Tùy chọn này chỉ khả dụng với OpenSSL 1.1.1 trở lên.
 
    .. versionadded:: 3.8
 
 .. data:: OP_NO_COMPRESSION
 
-   Disable compression on the SSL channel.  This is useful if the application
-   protocol supports its own compression scheme.
+   Tắt tính năng nén trên kênh SSL. Tính năng này hữu ích nếu giao thức ứng dụng hỗ trợ cơ chế nén riêng.
 
    .. versionadded:: 3.3
 
 .. class:: Options
 
-   :class:`enum.IntFlag` collection of OP_* constants.
+   :class:`enum.IntFlag` tập hợp các hằng số OP_*.
 
 .. data:: OP_NO_TICKET
 
-   Prevent client side from requesting a session ticket.
+   Ngăn phía client yêu cầu session ticket.
 
    .. versionadded:: 3.6
 
 .. data:: OP_IGNORE_UNEXPECTED_EOF
 
-   Ignore unexpected shutdown of TLS connections.
+   Bỏ qua việc đóng bất ngờ các kết nối TLS.
 
-   This option is only available with OpenSSL 3.0.0 and later.
+   Tùy chọn này chỉ khả dụng với OpenSSL 3.0.0 trở lên.
 
    .. versionadded:: 3.10
 
 .. data:: OP_ENABLE_KTLS
 
-   Enable the use of the kernel TLS. To benefit from the feature, OpenSSL must
-   have been compiled with support for it, and the negotiated cipher suites and
-   extensions must be supported by it (a list of supported ones may vary by
-   platform and kernel version).
+   Bật việc sử dụng kernel TLS. Để tận dụng tính năng này, OpenSSL phải được biên dịch với hỗ trợ cho tính năng đó, đồng thời các cipher suite và extension đã thương lượng cũng phải được tính năng này hỗ trợ (danh sách các thành phần được hỗ trợ có thể thay đổi tùy theo nền tảng và phiên bản kernel).
 
-   Note that with enabled kernel TLS some cryptographic operations are
-   performed by the kernel directly and not via any available OpenSSL
-   Providers. This might be undesirable if, for example, the application
-   requires all cryptographic operations to be performed by the FIPS provider.
+   Lưu ý rằng khi bật kernel TLS, một số thao tác mật mã được kernel thực hiện trực tiếp thay vì thông qua bất kỳ OpenSSL Provider nào khả dụng. Điều này có thể không mong muốn nếu, chẳng hạn, ứng dụng yêu cầu mọi thao tác mật mã đều được thực hiện bởi FIPS provider.
 
-   This option is only available with OpenSSL 3.0.0 and later.
+   Tùy chọn này chỉ khả dụng với OpenSSL 3.0.0 trở lên.
 
    .. versionadded:: 3.12
 
 .. data:: OP_LEGACY_SERVER_CONNECT
 
-   Allow legacy insecure renegotiation between OpenSSL and unpatched servers
-   only.
+   Chỉ cho phép cơ chế thương lượng lại không an toàn kiểu cũ giữa OpenSSL và các máy chủ chưa được vá.
 
    .. versionadded:: 3.12
 
 .. data:: HAS_ALPN
 
-   Whether the OpenSSL library has built-in support for the *Application-Layer
-   Protocol Negotiation* TLS extension as described in :rfc:`7301`.
+   Liệu thư viện OpenSSL có tích hợp sẵn hỗ trợ cho phần mở rộng TLS *Application-Layer Protocol Negotiation* như được mô tả trong :rfc:`7301` hay không.
 
    .. versionadded:: 3.5
 
 .. data:: HAS_NEVER_CHECK_COMMON_NAME
 
-   Whether the OpenSSL library has built-in support not checking subject
-   common name and :attr:`SSLContext.hostname_checks_common_name` is
-   writeable.
+   Liệu thư viện OpenSSL có tích hợp sẵn hỗ trợ không kiểm tra common name của subject và :attr:`SSLContext.hostname_checks_common_name` có thể ghi hay không.
 
    .. versionadded:: 3.7
 
 .. data:: HAS_ECDH
 
-   Whether the OpenSSL library has built-in support for the Elliptic Curve-based
-   Diffie-Hellman key exchange.  This should be true unless the feature was
-   explicitly disabled by the distributor.
+   Liệu thư viện OpenSSL có tích hợp sẵn hỗ trợ cho việc trao đổi khóa Diffie-Hellman dựa trên đường cong elliptic hay không. Giá trị này phải là true, trừ khi tính năng đã bị nhà phân phối vô hiệu hóa rõ ràng.
 
    .. versionadded:: 3.3
 
 .. data:: HAS_SNI
 
-   Whether the OpenSSL library has built-in support for the *Server Name
-   Indication* extension (as defined in :rfc:`6066`).
+   Liệu thư viện OpenSSL có tích hợp sẵn hỗ trợ cho phần mở rộng *Server Name Indication* (như được định nghĩa trong :rfc:`6066`) hay không.
 
    .. versionadded:: 3.2
 
 .. data:: HAS_NPN
 
-   Whether the OpenSSL library has built-in support for the *Next Protocol
-   Negotiation* as described in the `Application Layer Protocol
-   Negotiation <https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation>`_.
-   When true, you can use the :meth:`SSLContext.set_npn_protocols` method to advertise
-   which protocols you want to support.
+   Liệu thư viện OpenSSL có tích hợp sẵn hỗ trợ cho *Next Protocol Negotiation* như được mô tả trong `Application Layer Protocol Negotiation <https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation>`_ hay không. Khi là true, bạn có thể sử dụng phương thức :meth:`SSLContext.set_npn_protocols` để thông báo các protocol mà bạn muốn hỗ trợ.
 
    .. versionadded:: 3.3
 
 .. data:: HAS_SSLv2
 
-   Whether the OpenSSL library has built-in support for the SSL 2.0 protocol.
+   Thư viện OpenSSL có hỗ trợ tích hợp sẵn cho giao thức SSL 2.0 hay không.
 
    .. versionadded:: 3.7
 
 .. data:: HAS_SSLv3
 
-   Whether the OpenSSL library has built-in support for the SSL 3.0 protocol.
+   Thư viện OpenSSL có hỗ trợ tích hợp sẵn cho giao thức SSL 3.0 hay không.
 
    .. versionadded:: 3.7
 
 .. data:: HAS_TLSv1
 
-   Whether the OpenSSL library has built-in support for the TLS 1.0 protocol.
+   Thư viện OpenSSL có hỗ trợ tích hợp sẵn cho giao thức TLS 1.0 hay không.
 
    .. versionadded:: 3.7
 
 .. data:: HAS_TLSv1_1
 
-   Whether the OpenSSL library has built-in support for the TLS 1.1 protocol.
+   Thư viện OpenSSL có hỗ trợ tích hợp sẵn cho giao thức TLS 1.1 hay không.
 
    .. versionadded:: 3.7
 
 .. data:: HAS_TLSv1_2
 
-   Whether the OpenSSL library has built-in support for the TLS 1.2 protocol.
+   Thư viện OpenSSL có hỗ trợ tích hợp sẵn cho giao thức TLS 1.2 hay không.
 
    .. versionadded:: 3.7
 
 .. data:: HAS_TLSv1_3
 
-   Whether the OpenSSL library has built-in support for the TLS 1.3 protocol.
+   Thư viện OpenSSL có hỗ trợ tích hợp sẵn cho giao thức TLS 1.3 hay không.
 
    .. versionadded:: 3.7
 
 .. data:: HAS_PSK
 
-   Whether the OpenSSL library has built-in support for TLS-PSK.
+   Thư viện OpenSSL có hỗ trợ tích hợp sẵn cho TLS-PSK hay không.
 
    .. versionadded:: 3.13
 
 .. data:: HAS_PHA
 
-   Whether the OpenSSL library has built-in support for TLS-PHA.
+   Thư viện OpenSSL có hỗ trợ tích hợp sẵn cho TLS-PHA hay không.
 
    .. versionadded:: 3.14
 
 .. data:: CHANNEL_BINDING_TYPES
 
-   List of supported TLS channel binding types.  Strings in this list
-   can be used as arguments to :meth:`SSLSocket.get_channel_binding`.
+   Danh sách các loại liên kết kênh TLS được hỗ trợ. Các chuỗi trong danh sách này có thể được dùng làm đối số cho :meth:`SSLSocket.get_channel_binding`.
 
    .. versionadded:: 3.3
 
 .. data:: OPENSSL_VERSION
 
-   The version string of the OpenSSL library loaded by the interpreter::
+   Chuỗi phiên bản của thư viện OpenSSL được trình thông dịch nạp::
 
     >>> ssl.OPENSSL_VERSION
     'OpenSSL 1.0.2k  26 Jan 2017'
@@ -960,8 +762,7 @@ Constants
 
 .. data:: OPENSSL_VERSION_INFO
 
-   A tuple of five integers representing version information about the
-   OpenSSL library::
+   Một tuple gồm năm số nguyên đại diện cho thông tin phiên bản về thư viện OpenSSL::
 
     >>> ssl.OPENSSL_VERSION_INFO
     (1, 0, 2, 11, 15)
@@ -970,7 +771,7 @@ Constants
 
 .. data:: OPENSSL_VERSION_NUMBER
 
-   The raw version number of the OpenSSL library, as a single integer::
+   Số phiên bản thô của thư viện OpenSSL, dưới dạng một số nguyên duy nhất::
 
     >>> ssl.OPENSSL_VERSION_NUMBER
     268443839
@@ -980,61 +781,52 @@ Constants
    .. versionadded:: 3.2
 
 .. data:: ALERT_DESCRIPTION_HANDSHAKE_FAILURE
-          ALERT_DESCRIPTION_INTERNAL_ERROR
-          ALERT_DESCRIPTION_*
+          ALERT_DESCRIPTION_INTERNAL_ERROR ALERT_DESCRIPTION_*
 
-   Alert Descriptions from :rfc:`5246` and others. The `IANA TLS Alert Registry
-   <https://www.iana.org/assignments/tls-parameters/tls-parameters.xml#tls-parameters-6>`_
-   contains this list and references to the RFCs where their meaning is defined.
+   Các mô tả cảnh báo từ :rfc:`5246` và các nguồn khác. `IANA TLS Alert Registry <https://www.iana.org/assignments/tls-parameters/tls-parameters.xml#tls-parameters-6>`_ chứa danh sách này cùng các tham chiếu đến những RFC định nghĩa ý nghĩa của chúng.
 
-   Used as the return value of the callback function in
+   Được dùng làm giá trị trả về của hàm callback trong
    :meth:`SSLContext.set_servername_callback`.
 
    .. versionadded:: 3.4
 
 .. class:: AlertDescription
 
-   :class:`enum.IntEnum` collection of ALERT_DESCRIPTION_* constants.
+   Tập hợp :class:`enum.IntEnum` các hằng số ALERT_DESCRIPTION_*.
 
    .. versionadded:: 3.6
 
 .. data:: Purpose.SERVER_AUTH
 
-   Option for :func:`create_default_context` and
-   :meth:`SSLContext.load_default_certs`.  This value indicates that the
-   context may be used to authenticate web servers (therefore, it will
-   be used to create client-side sockets).
+   Tùy chọn cho :func:`create_default_context` và
+   :meth:`SSLContext.load_default_certs`. Giá trị này cho biết ngữ cảnh có thể được dùng để xác thực các web server (do đó, nó sẽ được dùng để tạo các socket phía client).
 
    .. versionadded:: 3.4
 
 .. data:: Purpose.CLIENT_AUTH
 
-   Option for :func:`create_default_context` and
-   :meth:`SSLContext.load_default_certs`.  This value indicates that the
-   context may be used to authenticate web clients (therefore, it will
-   be used to create server-side sockets).
+   Tùy chọn cho :func:`create_default_context` và
+   :meth:`SSLContext.load_default_certs`. Giá trị này cho biết ngữ cảnh có thể được dùng để xác thực các web client (do đó, nó sẽ được dùng để tạo các socket phía server).
 
    .. versionadded:: 3.4
 
 .. class:: SSLErrorNumber
 
-   :class:`enum.IntEnum` collection of SSL_ERROR_* constants.
+   Tập hợp :class:`enum.IntEnum` các hằng số SSL_ERROR_*.
 
    .. versionadded:: 3.6
 
 .. class:: TLSVersion
 
-   :class:`enum.IntEnum` collection of SSL and TLS versions for
-   :attr:`SSLContext.maximum_version` and :attr:`SSLContext.minimum_version`.
+   :class:`enum.IntEnum` tập hợp các phiên bản SSL và TLS của
+   :attr:`SSLContext.maximum_version` và :attr:`SSLContext.minimum_version`.
 
    .. versionadded:: 3.7
 
 .. attribute:: TLSVersion.MINIMUM_SUPPORTED
 .. attribute:: TLSVersion.MAXIMUM_SUPPORTED
 
-   The minimum or maximum supported SSL or TLS version. These are magic
-   constants. Their values don't reflect the lowest and highest available
-   TLS/SSL versions.
+   Phiên bản SSL hoặc TLS tối thiểu hoặc tối đa được hỗ trợ. Đây là các hằng số đặc biệt. Giá trị của chúng không phản ánh các phiên bản TLS/SSL thấp nhất và cao nhất hiện có.
 
 .. attribute:: TLSVersion.SSLv3
 .. attribute:: TLSVersion.TLSv1
@@ -1042,20 +834,20 @@ Constants
 .. attribute:: TLSVersion.TLSv1_2
 .. attribute:: TLSVersion.TLSv1_3
 
-   SSL 3.0 to TLS 1.3.
+   SSL 3.0 đến TLS 1.3.
 
    .. deprecated:: 3.10
 
-      All :class:`TLSVersion` members except :attr:`TLSVersion.TLSv1_2` and
-      :attr:`TLSVersion.TLSv1_3` are deprecated.
+      Tất cả thành viên :class:`TLSVersion` ngoại trừ :attr:`TLSVersion.TLSv1_2` và
+      :attr:`TLSVersion.TLSv1_3` đều đã lỗi thời.
 
 
-SSL sockets
------------
+Socket SSL
+----------
 
 .. class:: SSLSocket(socket.socket)
 
-   SSL sockets provide the following methods of :ref:`socket-objects`:
+   SSL sockets cung cấp các phương thức sau đây của :ref:`socket-objects`:
 
    - :meth:`~socket.socket.accept`
    - :meth:`~socket.socket.bind`
@@ -1069,138 +861,100 @@ SSL sockets
      :meth:`~socket.socket.setblocking`
    - :meth:`~socket.socket.listen`
    - :meth:`~socket.socket.makefile`
-   - :meth:`~socket.socket.recv`, :meth:`~socket.socket.recv_into`
-     (but passing a non-zero ``flags`` argument is not allowed)
-   - :meth:`~socket.socket.send`, :meth:`~socket.socket.sendall` (with
-     the same limitation)
-   - :meth:`~socket.socket.sendfile` (but :mod:`os.sendfile` will be used
-     for plain-text sockets only, else :meth:`~socket.socket.send` will be used)
+   - :meth:`~socket.socket.recv`, :meth:`~socket.socket.recv_into` (nhưng không được truyền đối số ``flags`` khác 0)
+   - :meth:`~socket.socket.send`, :meth:`~socket.socket.sendall` (với cùng hạn chế)
+   - :meth:`~socket.socket.sendfile` (nhưng :mod:`os.sendfile` sẽ chỉ được sử dụng cho các socket văn bản thuần túy, nếu không thì sẽ sử dụng :meth:`~socket.socket.send`)
    - :meth:`~socket.socket.shutdown`
 
-   However, since the SSL (and TLS) protocol has its own framing atop
-   of TCP, the SSL sockets abstraction can, in certain respects, diverge from
-   the specification of normal, OS-level sockets.  See especially the
-   :ref:`notes on non-blocking sockets <ssl-nonblocking>`.
+   Tuy nhiên, vì giao thức SSL (và TLS) có cơ chế framing riêng ở trên TCP, lớp trừu tượng SSL sockets trong một số trường hợp có thể khác với đặc tả của các socket thông thường ở cấp hệ điều hành. Đặc biệt, hãy xem
+   :ref:`ghi chú về các socket không chặn <ssl-nonblocking>`.
 
-   Instances of :class:`SSLSocket` must be created using the
-   :meth:`SSLContext.wrap_socket` method.
+   Các instance của :class:`SSLSocket` phải được tạo bằng cách sử dụng
+   phương thức :meth:`SSLContext.wrap_socket`.
 
    .. versionchanged:: 3.5
-      The :meth:`sendfile` method was added.
+      Phương thức :meth:`sendfile` đã được thêm vào.
 
    .. versionchanged:: 3.5
-      The :meth:`shutdown` does not reset the socket timeout each time bytes
-      are received or sent. The socket timeout is now the maximum total duration
-      of the shutdown.
+      :meth:`shutdown` không đặt lại thời gian chờ của socket mỗi khi nhận hoặc gửi byte. Thời gian chờ của socket hiện là tổng thời lượng tối đa của quá trình tắt.
 
    .. deprecated:: 3.6
-      It is deprecated to create a :class:`SSLSocket` instance directly, use
-      :meth:`SSLContext.wrap_socket` to wrap a socket.
+      Không nên tạo trực tiếp một thực thể :class:`SSLSocket`, hãy sử dụng
+      :meth:`SSLContext.wrap_socket` để bọc một socket.
 
    .. versionchanged:: 3.7
       :class:`SSLSocket` instances must be created with
       :meth:`~SSLContext.wrap_socket`. In earlier versions, it was possible
-      to create instances directly. This was never documented or officially
-      supported.
+      để tạo các thực thể trực tiếp. Điều này chưa bao giờ được ghi lại tài liệu hoặc được hỗ trợ chính thức.
 
    .. versionchanged:: 3.10
-      Python now uses ``SSL_read_ex`` and ``SSL_write_ex`` internally. The
-      functions support reading and writing of data larger than 2 GB. Writing
-      zero-length data no longer fails with a protocol violation error.
+      Python hiện sử dụng ``SSL_read_ex`` và ``SSL_write_ex`` internally. Các hàm này hỗ trợ đọc và ghi dữ liệu lớn hơn 2 GB. Việc ghi dữ liệu có độ dài bằng 0 không còn thất bại với lỗi vi phạm giao thức.
 
-SSL sockets also have the following additional methods and attributes:
+SSL socket cũng có các phương thức và thuộc tính bổ sung sau:
 
 .. method:: SSLSocket.read(len=1024, buffer=None)
 
-   Read up to *len* bytes of data from the SSL socket and return the result as
-   a ``bytes`` instance. If *buffer* is specified, then read into the buffer
-   instead, and return the number of bytes read.
+   Đọc tối đa *len* byte dữ liệu từ SSL socket và trả về kết quả dưới dạng một instance ``bytes``. Nếu chỉ định *buffer*, dữ liệu sẽ được đọc vào buffer thay thế và trả về số byte đã đọc.
 
-   Raise :exc:`SSLWantReadError` or :exc:`SSLWantWriteError` if the socket is
-   :ref:`non-blocking <ssl-nonblocking>` and the read would block.
+   Phát sinh :exc:`SSLWantReadError` hoặc :exc:`SSLWantWriteError` nếu socket ở trạng thái
+   :ref:`non-blocking <ssl-nonblocking>` và thao tác đọc sẽ bị chặn.
 
-   As at any time a re-negotiation is possible, a call to :meth:`read` can also
-   cause write operations.
+   Vì việc tái thương lượng có thể xảy ra bất kỳ lúc nào, một lệnh gọi đến :meth:`read` cũng có thể gây ra các thao tác ghi.
 
    .. versionchanged:: 3.5
-      The socket timeout is no longer reset each time bytes are received or sent.
-      The socket timeout is now the maximum total duration to read up to *len*
-      bytes.
+      Thời gian chờ của socket không còn được đặt lại mỗi khi nhận hoặc gửi byte. Thời gian chờ của socket hiện là tổng thời lượng tối đa để đọc tối đa *len* byte.
 
    .. deprecated:: 3.6
-      Use :meth:`~SSLSocket.recv` instead of :meth:`~SSLSocket.read`.
+      Sử dụng :meth:`~SSLSocket.recv` thay vì :meth:`~SSLSocket.read`.
 
 .. method:: SSLSocket.write(data)
 
-   Write *data* to the SSL socket and return the number of bytes written. The
-   *data* argument must be an object supporting the buffer interface.
+   Ghi *data* vào socket SSL và trả về số byte đã ghi. Đối số *data* phải là một đối tượng hỗ trợ buffer interface.
 
-   Raise :exc:`SSLWantReadError` or :exc:`SSLWantWriteError` if the socket is
-   :ref:`non-blocking <ssl-nonblocking>` and the write would block.
+   Phát sinh :exc:`SSLWantReadError` hoặc :exc:`SSLWantWriteError` nếu socket ở trạng thái
+   :ref:`non-blocking <ssl-nonblocking>` và thao tác ghi sẽ bị chặn.
 
-   As at any time a re-negotiation is possible, a call to :meth:`write` can
-   also cause read operations.
+   Vì việc thương lượng lại có thể xảy ra bất cứ lúc nào, một lệnh gọi đến :meth:`write` cũng có thể gây ra các thao tác đọc.
 
    .. versionchanged:: 3.5
-      The socket timeout is no longer reset each time bytes are received or sent.
-      The socket timeout is now the maximum total duration to write *data*.
+      Thời gian chờ của socket không còn được đặt lại mỗi khi nhận hoặc gửi byte. Thời gian chờ của socket hiện là tổng thời lượng tối đa để ghi *data*.
 
    .. deprecated:: 3.6
-      Use :meth:`~SSLSocket.send` instead of :meth:`~SSLSocket.write`.
+      Sử dụng :meth:`~SSLSocket.send` thay cho :meth:`~SSLSocket.write`.
 
 .. note::
 
-   The :meth:`~SSLSocket.read` and :meth:`~SSLSocket.write` methods are the
-   low-level methods that read and write unencrypted, application-level data
-   and decrypt/encrypt it to encrypted, wire-level data. These methods
-   require an active SSL connection, i.e. the handshake was completed and
-   :meth:`SSLSocket.unwrap` was not called.
+   Các phương thức :meth:`~SSLSocket.read` và :meth:`~SSLSocket.write` là những phương thức cấp thấp dùng để đọc và ghi dữ liệu cấp ứng dụng chưa mã hóa, đồng thời giải mã/mã hóa dữ liệu đó thành dữ liệu cấp đường truyền đã mã hóa. Các phương thức này yêu cầu một kết nối SSL đang hoạt động, tức là quá trình bắt tay đã hoàn tất và
+   :meth:`SSLSocket.unwrap` không được gọi.
 
-   Normally you should use the socket API methods like
-   :meth:`~socket.socket.recv` and :meth:`~socket.socket.send` instead of these
-   methods.
+   Thông thường, bạn nên sử dụng các phương thức socket API như
+   :meth:`~socket.socket.recv` và :meth:`~socket.socket.send` thay cho các phương thức này.
 
 .. method:: SSLSocket.do_handshake(block=False)
 
-   Perform the SSL setup handshake.
+   Thực hiện handshake thiết lập SSL.
 
-   If *block* is true and the timeout obtained by :meth:`~socket.socket.gettimeout`
-   is zero, the socket is set in blocking mode until the handshake is performed.
+   Nếu *block* là true và thời gian chờ nhận được từ :meth:`~socket.socket.gettimeout` bằng 0, socket sẽ được đặt ở chế độ blocking cho đến khi handshake được thực hiện.
 
    .. versionchanged:: 3.4
-      The handshake method also performs :func:`!match_hostname` when the
-      :attr:`~SSLContext.check_hostname` attribute of the socket's
-      :attr:`~SSLSocket.context` is true.
+      Phương thức handshake cũng thực hiện :func:`!match_hostname` khi
+      thuộc tính :attr:`~SSLContext.check_hostname` của socket
+      :attr:`~SSLSocket.context` là true.
 
    .. versionchanged:: 3.5
-      The socket timeout is no longer reset each time bytes are received or sent.
-      The socket timeout is now the maximum total duration of the handshake.
+      Thời gian chờ của socket không còn được đặt lại mỗi khi nhận hoặc gửi byte. Thời gian chờ của socket hiện là tổng thời lượng tối đa của quá trình handshake.
 
    .. versionchanged:: 3.7
-      Hostname or IP address is matched by OpenSSL during handshake. The
-      function :func:`!match_hostname` is no longer used. In case OpenSSL
-      refuses a hostname or IP address, the handshake is aborted early and
-      a TLS alert message is sent to the peer.
+      Tên máy chủ hoặc địa chỉ IP được OpenSSL đối chiếu trong quá trình handshake. Hàm :func:`!match_hostname` không còn được sử dụng. Nếu OpenSSL từ chối tên máy chủ hoặc địa chỉ IP, quá trình handshake sẽ bị hủy sớm và một thông báo cảnh báo TLS được gửi đến peer.
 
 .. method:: SSLSocket.getpeercert(binary_form=False)
 
-   If there is no certificate for the peer on the other end of the connection,
-   return ``None``.  If the SSL handshake hasn't been done yet, raise
+   Nếu không có chứng chỉ cho peer ở đầu kia của kết nối, trả về ``None``. Nếu SSL handshake chưa được thực hiện, hãy raise
    :exc:`ValueError`.
 
-   If the ``binary_form`` parameter is :const:`False`, and a certificate was
-   received from the peer, this method returns a :class:`dict` instance.  If the
-   certificate was not validated, the dict is empty.  If the certificate was
-   validated, it returns a dict with several keys, amongst them ``subject``
-   (the principal for which the certificate was issued) and ``issuer``
-   (the principal issuing the certificate).  If a certificate contains an
-   instance of the *Subject Alternative Name* extension (see :rfc:`3280`),
-   there will also be a ``subjectAltName`` key in the dictionary.
+   Nếu tham số ``binary_form`` là :const:`False` và đã nhận được chứng chỉ từ peer, phương thức này trả về một đối tượng :class:`dict`. Nếu chứng chỉ chưa được xác thực, dict sẽ trống. Nếu chứng chỉ đã được xác thực, phương thức trả về một dict với nhiều key, trong đó có ``subject`` (principal được cấp chứng chỉ) và ``issuer`` (principal cấp chứng chỉ). Nếu chứng chỉ chứa một extension *Subject Alternative Name* (xem :rfc:`3280`), dict cũng sẽ có key ``subjectAltName``.
 
-   The ``subject`` and ``issuer`` fields are tuples containing the sequence
-   of relative distinguished names (RDNs) given in the certificate's data
-   structure for the respective fields, and each RDN is a sequence of
-   name-value pairs.  Here is a real-world example::
+   Các trường ``subject`` và ``issuer`` là các tuple chứa chuỗi distinguished name tương đối (RDN) được cung cấp trong cấu trúc dữ liệu của chứng chỉ cho các trường tương ứng, và mỗi RDN là một chuỗi các cặp name-value. Dưới đây là một ví dụ thực tế::
 
       {'issuer': ((('countryName', 'IL'),),
                   (('organizationName', 'StartCom Ltd.'),),
@@ -1221,188 +975,138 @@ SSL sockets also have the following additional methods and attributes:
        'subjectAltName': (('DNS', '*.eff.org'), ('DNS', 'eff.org')),
        'version': 3}
 
-   If the ``binary_form`` parameter is :const:`True`, and a certificate was
-   provided, this method returns the DER-encoded form of the entire certificate
-   as a sequence of bytes, or :const:`None` if the peer did not provide a
-   certificate.  Whether the peer provides a certificate depends on the SSL
-   socket's role:
+   Nếu tham số ``binary_form`` là :const:`True` và đã cung cấp chứng chỉ, phương thức này trả về toàn bộ chứng chỉ ở dạng được mã hóa DER dưới dạng một chuỗi byte, hoặc :const:`None` nếu peer không cung cấp chứng chỉ. Việc peer có cung cấp chứng chỉ hay không phụ thuộc vào vai trò của SSL socket:
 
-   * for a client SSL socket, the server will always provide a certificate,
-     regardless of whether validation was required;
+   * đối với socket SSL của client, server sẽ luôn cung cấp một certificate, bất kể có yêu cầu validation hay không;
 
-   * for a server SSL socket, the client will only provide a certificate
-     when requested by the server; therefore :meth:`getpeercert` will return
-     :const:`None` if you used :const:`CERT_NONE` (rather than
-     :const:`CERT_OPTIONAL` or :const:`CERT_REQUIRED`).
+   * đối với socket SSL của server, client chỉ cung cấp certificate khi server yêu cầu; do đó :meth:`getpeercert` sẽ trả về
+     :const:`None` nếu bạn đã sử dụng :const:`CERT_NONE` (thay vì
+     :const:`CERT_OPTIONAL` hoặc :const:`CERT_REQUIRED`).
 
-   See also :attr:`SSLContext.check_hostname`.
+   Xem thêm :attr:`SSLContext.check_hostname`.
 
    .. versionchanged:: 3.2
-      The returned dictionary includes additional items such as ``issuer``
-      and ``notBefore``.
+      Dictionary được trả về bao gồm các mục bổ sung như ``issuer`` và ``notBefore``.
 
    .. versionchanged:: 3.4
       :exc:`ValueError` is raised when the handshake isn't done.
-      The returned dictionary includes additional X509v3 extension items
-        such as ``crlDistributionPoints``, ``caIssuers`` and ``OCSP`` URIs.
+      Dictionary được trả về bao gồm các mục mở rộng X509v3 bổ sung
+        chẳng hạn như các URI ``crlDistributionPoints``, ``caIssuers`` và ``OCSP``.
 
    .. versionchanged:: 3.9
-      IPv6 address strings no longer have a trailing new line.
+      Các chuỗi địa chỉ IPv6 không còn có ký tự xuống dòng ở cuối.
 
 .. method:: SSLSocket.get_verified_chain()
 
-   Returns verified certificate chain provided by the other
-   end of the SSL channel as a list of DER-encoded bytes.
-   If certificate verification was disabled method acts the same as
+   Trả về chuỗi chứng chỉ đã được xác minh do đầu bên kia của kênh SSL cung cấp dưới dạng danh sách các byte được mã hóa DER. Nếu việc xác minh chứng chỉ bị vô hiệu hóa, phương thức sẽ hoạt động giống như
    :meth:`~SSLSocket.get_unverified_chain`.
 
    .. versionadded:: 3.13
 
 .. method:: SSLSocket.get_unverified_chain()
 
-   Returns raw certificate chain provided by the other
-   end of the SSL channel as a list of DER-encoded bytes.
+   Trả về chuỗi chứng chỉ thô do đầu bên kia của kênh SSL cung cấp dưới dạng danh sách các byte được mã hóa DER.
 
    .. versionadded:: 3.13
 
 .. method:: SSLSocket.cipher()
 
-   Returns a three-value tuple containing the name of the cipher being used, the
-   version of the SSL protocol that defines its use, and the number of secret
-   bits being used.  If no connection has been established, returns ``None``.
+   Trả về một tuple gồm ba giá trị, chứa tên của cipher đang được sử dụng, phiên bản của giao thức SSL quy định việc sử dụng cipher đó và số bit bí mật đang được sử dụng. Nếu chưa thiết lập kết nối, trả về ``None``.
 
 .. method:: SSLSocket.shared_ciphers()
 
-   Return the list of ciphers available in both the client and server.  Each
-   entry of the returned list is a three-value tuple containing the name of the
-   cipher, the version of the SSL protocol that defines its use, and the number
-   of secret bits the cipher uses.  :meth:`~SSLSocket.shared_ciphers` returns
-   ``None`` if no connection has been established or the socket is a client
-   socket.
+   Trả về danh sách các cipher có sẵn ở cả client và server. Mỗi mục trong danh sách trả về là một tuple gồm ba giá trị, chứa tên của cipher, phiên bản của giao thức SSL quy định việc sử dụng cipher đó và số bit bí mật mà cipher sử dụng. :meth:`~SSLSocket.shared_ciphers` trả về ``None`` nếu chưa thiết lập kết nối hoặc socket là socket client.
 
    .. versionadded:: 3.5
 
 .. method:: SSLSocket.compression()
 
-   Return the compression algorithm being used as a string, or ``None``
-   if the connection isn't compressed.
+   Trả về thuật toán nén đang được sử dụng dưới dạng chuỗi hoặc ``None`` nếu kết nối không được nén.
 
-   If the higher-level protocol supports its own compression mechanism,
-   you can use :data:`OP_NO_COMPRESSION` to disable SSL-level compression.
+   Nếu giao thức cấp cao hơn hỗ trợ cơ chế nén riêng, bạn có thể sử dụng :data:`OP_NO_COMPRESSION` để tắt tính năng nén ở cấp SSL.
 
    .. versionadded:: 3.3
 
 .. method:: SSLSocket.get_channel_binding(cb_type="tls-unique")
 
-   Get channel binding data for current connection, as a bytes object.  Returns
-   ``None`` if not connected or the handshake has not been completed.
+   Lấy dữ liệu channel binding cho kết nối hiện tại dưới dạng đối tượng bytes. Trả về ``None`` nếu chưa kết nối hoặc quá trình handshake chưa hoàn tất.
 
-   The *cb_type* parameter allow selection of the desired channel binding
-   type. Valid channel binding types are listed in the
-   :data:`CHANNEL_BINDING_TYPES` list.  Currently only the 'tls-unique' channel
-   binding, defined by :rfc:`5929`, is supported.  :exc:`ValueError` will be
-   raised if an unsupported channel binding type is requested.
+   Tham số *cb_type* cho phép chọn kiểu channel binding mong muốn. Các kiểu channel binding hợp lệ được liệt kê trong
+   :data:`CHANNEL_BINDING_TYPES` list. Hiện tại chỉ hỗ trợ channel binding 'tls-unique', được định nghĩa bởi :rfc:`5929`. :exc:`ValueError` sẽ được phát sinh nếu yêu cầu một kiểu channel binding không được hỗ trợ.
 
    .. versionadded:: 3.3
 
 .. method:: SSLSocket.selected_alpn_protocol()
 
-   Return the protocol that was selected during the TLS handshake.  If
-   :meth:`SSLContext.set_alpn_protocols` was not called, if the other party does
-   not support ALPN, if this socket does not support any of the client's
-   proposed protocols, or if the handshake has not happened yet, ``None`` is
-   returned.
+   Trả về giao thức được chọn trong quá trình TLS handshake. Nếu
+   :meth:`SSLContext.set_alpn_protocols` chưa được gọi, nếu bên kia không hỗ trợ ALPN, nếu socket này không hỗ trợ bất kỳ giao thức nào do client đề xuất hoặc nếu handshake chưa diễn ra, thì ``None`` sẽ được trả về.
 
    .. versionadded:: 3.5
 
 .. method:: SSLSocket.selected_npn_protocol()
 
-   Return the higher-level protocol that was selected during the TLS/SSL
-   handshake. If :meth:`SSLContext.set_npn_protocols` was not called, or
-   if the other party does not support NPN, or if the handshake has not yet
-   happened, this will return ``None``.
+   Trả về giao thức cấp cao hơn được chọn trong quá trình TLS/SSL handshake. Nếu :meth:`SSLContext.set_npn_protocols` chưa được gọi, nếu bên kia không hỗ trợ NPN hoặc nếu handshake chưa diễn ra, phương thức này sẽ trả về ``None``.
 
    .. versionadded:: 3.3
 
    .. deprecated:: 3.10
 
-      NPN has been superseded by ALPN
+      NPN đã được thay thế bằng ALPN
 
 .. method:: SSLSocket.unwrap()
 
-   Performs the SSL shutdown handshake, which removes the TLS layer from the
-   underlying socket, and returns the underlying socket object.  This can be
-   used to go from encrypted operation over a connection to unencrypted.  The
-   returned socket should always be used for further communication with the
-   other side of the connection, rather than the original socket.
+   Thực hiện quá trình bắt tay tắt SSL, thao tác này loại bỏ lớp TLS khỏi socket bên dưới và trả về đối tượng socket bên dưới. Có thể sử dụng thao tác này để chuyển từ hoạt động được mã hóa trên một kết nối sang hoạt động không mã hóa. Luôn sử dụng socket được trả về cho các giao tiếp tiếp theo với phía bên kia của kết nối, thay vì socket ban đầu.
 
 .. method:: SSLSocket.verify_client_post_handshake()
 
-   Requests post-handshake authentication (PHA) from a TLS 1.3 client. PHA
-   can only be initiated for a TLS 1.3 connection from a server-side socket,
-   after the initial TLS handshake and with PHA enabled on both sides, see
+   Yêu cầu xác thực sau bắt tay (PHA) từ một client TLS 1.3. PHA chỉ có thể được khởi tạo cho một kết nối TLS 1.3 từ socket phía server, sau quá trình bắt tay TLS ban đầu và khi PHA đã được bật ở cả hai phía, xem
    :attr:`SSLContext.post_handshake_auth`.
 
-   The method does not perform a cert exchange immediately. The server-side
-   sends a CertificateRequest during the next write event and expects the
-   client to respond with a certificate on the next read event.
+   Phương thức này không thực hiện trao đổi chứng chỉ ngay lập tức. Phía server sẽ gửi CertificateRequest trong sự kiện ghi tiếp theo và mong đợi client phản hồi bằng một chứng chỉ trong sự kiện đọc tiếp theo.
 
-   If any precondition isn't met (e.g. not TLS 1.3, PHA not enabled), an
-   :exc:`SSLError` is raised.
+   Nếu bất kỳ điều kiện tiên quyết nào không được đáp ứng (ví dụ: không phải TLS 1.3, PHA chưa được bật), thì
+   :exc:`SSLError` sẽ được phát sinh.
 
    .. note::
-      Only available with OpenSSL 1.1.1 and TLS 1.3 enabled. Without TLS 1.3
-      support, the method raises :exc:`NotImplementedError`.
+      Chỉ khả dụng với OpenSSL 1.1.1 và khi TLS 1.3 được bật. Nếu không hỗ trợ TLS 1.3, phương thức sẽ phát sinh :exc:`NotImplementedError`.
 
    .. versionadded:: 3.8
 
 .. method:: SSLSocket.version()
 
-   Return the actual SSL protocol version negotiated by the connection
-   as a string, or ``None`` if no secure connection is established.
-   As of this writing, possible return values include ``"SSLv2"``,
-   ``"SSLv3"``, ``"TLSv1"``, ``"TLSv1.1"`` and ``"TLSv1.2"``.
-   Recent OpenSSL versions may define more return values.
+   Trả về phiên bản giao thức SSL thực tế được thỏa thuận bởi kết nối dưới dạng chuỗi hoặc ``None`` nếu không thiết lập kết nối bảo mật. Tại thời điểm viết tài liệu này, các giá trị trả về có thể bao gồm ``"SSLv2"``, ``"SSLv3"``, ``"TLSv1"``, ``"TLSv1.1"`` và ``"TLSv1.2"``. Các phiên bản OpenSSL gần đây có thể định nghĩa thêm các giá trị trả về.
 
    .. versionadded:: 3.5
 
 .. method:: SSLSocket.pending()
 
-   Returns the number of already decrypted bytes available for read, pending on
-   the connection.
+   Trả về số byte đã được giải mã và hiện có thể đọc, đang chờ trên kết nối.
 
 .. attribute:: SSLSocket.context
 
-   The :class:`SSLContext` object this SSL socket is tied to.
+   Đối tượng :class:`SSLContext` mà SSL socket này được liên kết.
 
    .. versionadded:: 3.2
 
 .. attribute:: SSLSocket.server_side
 
-   A boolean which is ``True`` for server-side sockets and ``False`` for
-   client-side sockets.
+   Một giá trị boolean là ``True`` đối với socket phía máy chủ và ``False`` đối với socket phía máy khách.
 
    .. versionadded:: 3.2
 
 .. attribute:: SSLSocket.server_hostname
 
-   Hostname of the server: :class:`str` type, or ``None`` for server-side
-   socket or if the hostname was not specified in the constructor.
+   Tên máy chủ: kiểu :class:`str`, hoặc ``None`` đối với socket phía máy chủ hoặc khi tên máy chủ không được chỉ định trong hàm khởi tạo.
 
    .. versionadded:: 3.2
 
    .. versionchanged:: 3.7
-      The attribute is now always ASCII text. When ``server_hostname`` is
-      an internationalized domain name (IDN), this attribute now stores the
-      A-label form (``"xn--pythn-mua.org"``), rather than the U-label form
-      (``"pythön.org"``).
+      Thuộc tính này hiện luôn là văn bản ASCII. Khi ``server_hostname`` là một tên miền quốc tế hóa (IDN), thuộc tính này hiện lưu dạng A-label (``"xn--pythn-mua.org"``) thay vì dạng U-label (``"pythön.org"``).
 
 .. attribute:: SSLSocket.session
 
-   The :class:`SSLSession` for this SSL connection. The session is available
-   for client and server side sockets after the TLS handshake has been
-   performed. For client sockets the session can be set before
-   :meth:`~SSLSocket.do_handshake` has been called to reuse a session.
+   :class:`SSLSession` cho kết nối SSL này. Session khả dụng cho socket phía máy khách và phía máy chủ sau khi quá trình bắt tay TLS được thực hiện. Đối với socket phía máy khách, session có thể được thiết lập trước
+   :meth:`~SSLSocket.do_handshake` đã được gọi để tái sử dụng một session.
 
    .. versionadded:: 3.6
 
@@ -1411,101 +1115,80 @@ SSL sockets also have the following additional methods and attributes:
    .. versionadded:: 3.6
 
 
-SSL contexts
+Ngữ cảnh SSL
 ------------
 
 .. versionadded:: 3.2
 
-An SSL context holds various data longer-lived than single SSL connections,
-such as SSL configuration options, certificate(s) and private key(s).
-It also manages a cache of SSL sessions for server-side sockets, in order
-to speed up repeated connections from the same clients.
+Một ngữ cảnh SSL chứa nhiều dữ liệu có thời gian tồn tại lâu hơn các kết nối SSL riêng lẻ, chẳng hạn như các tùy chọn cấu hình SSL, (các) certificate và (các) private key. Ngữ cảnh này cũng quản lý một cache các SSL session cho socket phía server nhằm tăng tốc các kết nối lặp lại từ cùng một client.
 
 .. class:: SSLContext(protocol=None)
 
-   Create a new SSL context.  You may pass *protocol* which must be one
-   of the ``PROTOCOL_*`` constants defined in this module.  The parameter
-   specifies which version of the SSL protocol to use.  Typically, the
-   server chooses a particular protocol version, and the client must adapt
-   to the server's choice.  Most of the versions are not interoperable
-   with the other versions.  If not specified, the default is
-   :data:`PROTOCOL_TLS`; it provides the most compatibility with other
-   versions.
+   Tạo một ngữ cảnh SSL mới. Bạn có thể truyền *protocol*, giá trị này phải là một trong các hằng số ``PROTOCOL_*`` được định nghĩa trong module này. Tham số này chỉ định phiên bản giao thức SSL sẽ sử dụng. Thông thường, server chọn một phiên bản giao thức cụ thể và client phải thích ứng với lựa chọn của server. Hầu hết các phiên bản không tương thích với những phiên bản khác. Nếu không được chỉ định, giá trị mặc định là
+   :data:`PROTOCOL_TLS`; giá trị này cung cấp khả năng tương thích cao nhất với các phiên bản khác.
 
-   Here's a table showing which versions in a client (down the side) can connect
-   to which versions in a server (along the top):
+   Dưới đây là bảng cho biết những phiên bản trong client (theo chiều dọc) có thể kết nối với những phiên bản trong server (theo chiều ngang):
 
    .. table::
 
-      ========================  ============  ============  =============  =========  ===========  ===========
-       *client* / **server**    **SSLv2**     **SSLv3**     **TLS** [3]_   **TLSv1**  **TLSv1.1**  **TLSv1.2**
-      ------------------------  ------------  ------------  -------------  ---------  -----------  -----------
-       *SSLv2*                    yes           no            no [1]_        no         no         no
-       *SSLv3*                    no            yes           no [2]_        no         no         no
-       *TLS* (*SSLv23*) [3]_      no [1]_       no [2]_       yes            yes        yes        yes
-       *TLSv1*                    no            no            yes            yes        no         no
-       *TLSv1.1*                  no            no            yes            no         yes        no
-       *TLSv1.2*                  no            no            yes            no         no         yes
-      ========================  ============  ============  =============  =========  ===========  ===========
+      +-----------------------+------------+------------+--------------+-----------+-------------+-------------+
+      | *client* / **server** | **SSLv2**  | **SSLv3**  | **TLS** [3]_ | **TLSv1** | **TLSv1.1** | **TLSv1.2** |
+      +-----------------------+------------+------------+--------------+-----------+-------------+-------------+
+      | *SSLv2*               | có         | không      | không [1]_   | không     | không       | không       |
+      +-----------------------+------------+------------+--------------+-----------+-------------+-------------+
+      | *SSLv3*               | không      | có         | không [2]_   | không     | không       | không       |
+      +-----------------------+------------+------------+--------------+-----------+-------------+-------------+
+      | *TLS* (*SSLv23*) [3]_ | không [1]_ | không [2]_ | có           | có        | có          | có          |
+      +-----------------------+------------+------------+--------------+-----------+-------------+-------------+
+      | *TLSv1*               | không      | không      | có           | có        | không       | không       |
+      +-----------------------+------------+------------+--------------+-----------+-------------+-------------+
+      | *TLSv1.1*             | không      | không      | có           | không     | có          | không       |
+      +-----------------------+------------+------------+--------------+-----------+-------------+-------------+
+      | *TLSv1.2*             | không      | không      | có           | không     | không       | có          |
+      +-----------------------+------------+------------+--------------+-----------+-------------+-------------+
 
-   .. rubric:: Footnotes
-   .. [1] :class:`SSLContext` disables SSLv2 with :data:`OP_NO_SSLv2` by default.
-   .. [2] :class:`SSLContext` disables SSLv3 with :data:`OP_NO_SSLv3` by default.
-   .. [3] TLS 1.3 protocol will be available with :data:`PROTOCOL_TLS` in
-      OpenSSL >= 1.1.1. There is no dedicated PROTOCOL constant for just
-      TLS 1.3.
+   .. rubric:: Chú thích
+   .. [1] :class:`SSLContext` mặc định vô hiệu hóa SSLv2 bằng :data:`OP_NO_SSLv2`.
+   .. [2] :class:`SSLContext` mặc định vô hiệu hóa SSLv3 bằng :data:`OP_NO_SSLv3`.
+   .. [3] Giao thức TLS 1.3 sẽ khả dụng với :data:`PROTOCOL_TLS` trong OpenSSL >= 1.1.1. Không có hằng số PROTOCOL riêng chỉ dành cho TLS 1.3.
 
    .. seealso::
       :func:`create_default_context` lets the :mod:`!ssl` module choose
-      security settings for a given purpose.
+      các thiết lập bảo mật cho một mục đích nhất định.
 
    .. versionchanged:: 3.6
 
-      The context is created with secure default values. The options
+      Context được tạo với các giá trị mặc định an toàn. Các tùy chọn
       :data:`OP_NO_COMPRESSION`, :data:`OP_CIPHER_SERVER_PREFERENCE`,
       :data:`OP_SINGLE_DH_USE`, :data:`OP_SINGLE_ECDH_USE`,
-      :data:`OP_NO_SSLv2`,
-      and :data:`OP_NO_SSLv3` (except for :data:`PROTOCOL_SSLv3`) are
-      set by default. The initial cipher suite list contains only ``HIGH``
-      ciphers, no ``NULL`` ciphers and no ``MD5`` ciphers.
+      :data:`OP_NO_SSLv2`, và :data:`OP_NO_SSLv3` (ngoại trừ :data:`PROTOCOL_SSLv3`) được thiết lập theo mặc định. Danh sách bộ cipher ban đầu chỉ chứa các cipher ``HIGH``, không chứa cipher ``NULL`` và không chứa cipher ``MD5``.
 
    .. deprecated:: 3.10
 
-      :class:`SSLContext` without protocol argument is deprecated. The
-      context class will either require :data:`PROTOCOL_TLS_CLIENT` or
-      :data:`PROTOCOL_TLS_SERVER` protocol in the future.
+      :class:`SSLContext` không có đối số protocol đã lỗi thời. Lớp context sẽ yêu cầu :data:`PROTOCOL_TLS_CLIENT` hoặc
+      giao thức :data:`PROTOCOL_TLS_SERVER` trong tương lai.
 
    .. versionchanged:: 3.10
 
-      The default cipher suites now include only secure AES and ChaCha20
-      ciphers with forward secrecy and security level 2. RSA and DH keys with
-      less than 2048 bits and ECC keys with less than 224 bits are prohibited.
-      :data:`PROTOCOL_TLS`, :data:`PROTOCOL_TLS_CLIENT`, and
-      :data:`PROTOCOL_TLS_SERVER` use TLS 1.2 as minimum TLS version.
+      Các bộ mã hóa mặc định hiện chỉ bao gồm các bộ mã hóa AES và ChaCha20 an toàn với tính bảo mật chuyển tiếp và cấp độ bảo mật 2. Các khóa RSA và DH có độ dài dưới 2048 bit và các khóa ECC có độ dài dưới 224 bit đều bị cấm.
+      :data:`PROTOCOL_TLS`, :data:`PROTOCOL_TLS_CLIENT`, và
+      :data:`PROTOCOL_TLS_SERVER` sử dụng TLS 1.2 làm phiên bản TLS tối thiểu.
 
    .. note::
 
-      :class:`SSLContext` only supports limited mutation once it has been used
-      by a connection. Adding new certificates to the internal trust store is
-      allowed, but changing ciphers, verification settings, or mTLS
-      certificates may result in surprising behavior.
+      :class:`SSLContext` chỉ hỗ trợ thay đổi ở mức hạn chế sau khi đã được một kết nối sử dụng. Bạn có thể thêm chứng chỉ mới vào kho tin cậy nội bộ, nhưng việc thay đổi bộ mã hóa, cài đặt xác minh hoặc chứng chỉ mTLS có thể dẫn đến hành vi bất ngờ.
 
    .. note::
 
-      :class:`SSLContext` is designed to be shared and used by multiple
-      connections.
-      Thus, it is thread-safe as long as it is not reconfigured after being
-      used by a connection.
+      :class:`SSLContext` được thiết kế để dùng chung và được nhiều kết nối sử dụng. Do đó, đối tượng này an toàn với thread miễn là không được cấu hình lại sau khi đã được một kết nối sử dụng.
 
-:class:`SSLContext` objects have the following methods and attributes:
+Các đối tượng :class:`SSLContext` có các phương thức và thuộc tính sau:
 
 .. method:: SSLContext.cert_store_stats()
 
-   Get statistics about quantities of loaded X.509 certificates, count of
-   X.509 certificates flagged as CA certificates and certificate revocation
-   lists as dictionary.
+   Lấy số liệu thống kê dưới dạng từ điển về số lượng chứng chỉ X.509 đã tải, số lượng chứng chỉ X.509 được đánh dấu là chứng chỉ CA và các danh sách thu hồi chứng chỉ.
 
-   Example for a context with one CA cert and one other cert::
+   Ví dụ về một context có một chứng chỉ CA và một chứng chỉ khác::
 
       >>> context.cert_store_stats()
       {'crl': 0, 'x509_ca': 1, 'x509': 2}
@@ -1515,99 +1198,58 @@ to speed up repeated connections from the same clients.
 
 .. method:: SSLContext.load_cert_chain(certfile, keyfile=None, password=None)
 
-   Load a private key and the corresponding certificate.  The *certfile*
-   string must be the path to a single file in PEM format containing the
-   certificate as well as any number of CA certificates needed to establish
-   the certificate's authenticity.  The *keyfile* string, if present, must
-   point to a file containing the private key.  Otherwise the private
-   key will be taken from *certfile* as well.  See the discussion of
-   :ref:`ssl-certificates` for more information on how the certificate
-   is stored in the *certfile*.
+   Tải khóa riêng và chứng chỉ tương ứng. Chuỗi *certfile* phải là đường dẫn đến một tệp duy nhất ở định dạng PEM, chứa chứng chỉ cùng với bất kỳ số lượng chứng chỉ CA nào cần thiết để xác thực chứng chỉ. Nếu có chuỗi *keyfile*, chuỗi này phải trỏ đến một tệp chứa khóa riêng. Nếu không, khóa riêng cũng sẽ được lấy từ *certfile*. Xem phần thảo luận về
+   :ref:`ssl-certificates` để biết thêm thông tin về cách chứng chỉ được lưu trong *certfile*.
 
-   The *password* argument may be a function to call to get the password for
-   decrypting the private key.  It will only be called if the private key is
-   encrypted and a password is necessary.  It will be called with no arguments,
-   and it should return a string, bytes, or bytearray.  If the return value is
-   a string it will be encoded as UTF-8 before using it to decrypt the key.
-   Alternatively a string, bytes, or bytearray value may be supplied directly
-   as the *password* argument.  It will be ignored if the private key is not
-   encrypted and no password is needed.
+   Đối số *password* có thể là một hàm được gọi để lấy mật khẩu giải mã khóa riêng. Hàm này chỉ được gọi khi khóa riêng được mã hóa và cần mật khẩu. Hàm sẽ được gọi không có đối số và phải trả về một chuỗi, bytes hoặc bytearray. Nếu giá trị trả về là một chuỗi, chuỗi đó sẽ được mã hóa bằng UTF-8 trước khi được dùng để giải mã khóa. Ngoài ra, có thể cung cấp trực tiếp một giá trị kiểu chuỗi, bytes hoặc bytearray làm đối số *password*. Giá trị này sẽ bị bỏ qua nếu khóa riêng không được mã hóa và không cần mật khẩu.
 
-   If the *password* argument is not specified and a password is required,
-   OpenSSL's built-in password prompting mechanism will be used to
-   interactively prompt the user for a password.
+   Nếu không chỉ định đối số *password* và cần mật khẩu, cơ chế nhắc nhập mật khẩu tích hợp của OpenSSL sẽ được sử dụng để tương tác yêu cầu người dùng nhập mật khẩu.
 
-   An :class:`SSLError` is raised if the private key doesn't
-   match with the certificate.
+   Một :class:`SSLError` sẽ được phát sinh nếu khóa riêng không khớp với chứng chỉ.
 
    .. versionchanged:: 3.3
-      New optional argument *password*.
+      Đối số tùy chọn mới *password*.
 
 .. method:: SSLContext.load_default_certs(purpose=Purpose.SERVER_AUTH)
 
-   Load a set of default "certification authority" (CA) certificates from
-   default locations. On Windows it loads CA certs from the ``CA`` and
-   ``ROOT`` system stores. On all systems it calls
-   :meth:`SSLContext.set_default_verify_paths`. In the future the method may
-   load CA certificates from other locations, too.
+   Tải một tập hợp chứng chỉ "cơ quan cấp chứng chỉ" (CA) mặc định từ các vị trí mặc định. Trên Windows, hàm này tải chứng chỉ CA từ các kho hệ thống ``CA`` và ``ROOT``. Trên tất cả các hệ thống, hàm này gọi
+   :meth:`SSLContext.set_default_verify_paths`. Trong tương lai, phương thức này cũng có thể tải chứng chỉ CA từ các vị trí khác.
 
-   The *purpose* flag specifies what kind of CA certificates are loaded. The
-   default settings :const:`Purpose.SERVER_AUTH` loads certificates, that are
-   flagged and trusted for TLS web server authentication (client side
-   sockets). :const:`Purpose.CLIENT_AUTH` loads CA certificates for client
-   certificate verification on the server side.
+   Cờ *purpose* chỉ định loại chứng chỉ CA được tải. Thiết lập mặc định :const:`Purpose.SERVER_AUTH` tải các chứng chỉ được đánh dấu và tin cậy để xác thực máy chủ web TLS (socket phía client). :const:`Purpose.CLIENT_AUTH` tải các chứng chỉ CA để xác minh chứng chỉ client ở phía máy chủ.
 
    .. versionadded:: 3.4
 
 .. method:: SSLContext.load_verify_locations(cafile=None, capath=None, cadata=None)
 
-   Load a set of "certification authority" (CA) certificates used to validate
-   other peers' certificates when :data:`verify_mode` is other than
-   :data:`CERT_NONE`.  At least one of *cafile* or *capath* must be specified.
+   Tải một tập hợp chứng chỉ "cơ quan cấp chứng chỉ" (CA) được dùng để xác thực chứng chỉ của các peer khác khi :data:`verify_mode` khác với
+   :data:`CERT_NONE`. Phải chỉ định ít nhất một trong *cafile* hoặc *capath*.
 
-   This method can also load certification revocation lists (CRLs) in PEM or
-   DER format. In order to make use of CRLs, :attr:`SSLContext.verify_flags`
-   must be configured properly.
+   Phương thức này cũng có thể tải các danh sách thu hồi chứng chỉ (CRL) ở định dạng PEM hoặc DER. Để sử dụng CRL, :attr:`SSLContext.verify_flags` phải được cấu hình đúng cách.
 
-   The *cafile* string, if present, is the path to a file of concatenated
-   CA certificates in PEM format. See the discussion of
-   :ref:`ssl-certificates` for more information about how to arrange the
-   certificates in this file.
+   Chuỗi *cafile*, nếu có, là đường dẫn đến một tệp chứa các chứng chỉ CA được nối tiếp ở định dạng PEM. Xem phần thảo luận về
+   :ref:`ssl-certificates` để biết thêm thông tin về cách sắp xếp các chứng chỉ trong tệp này.
 
-   The *capath* string, if present, is
-   the path to a directory containing several CA certificates in PEM format,
-   following an `OpenSSL specific layout
-   <https://docs.openssl.org/master/man3/SSL_CTX_load_verify_locations/>`_.
+   Chuỗi *capath*, nếu có, là đường dẫn đến một thư mục chứa một số chứng chỉ CA ở định dạng PEM, theo `bố cục dành riêng cho OpenSSL <https://docs.openssl.org/master/man3/SSL_CTX_load_verify_locations/>`_.
 
-   The *cadata* object, if present, is either an ASCII string of one or more
-   PEM-encoded certificates or a :term:`bytes-like object` of DER-encoded
-   certificates. Like with *capath* extra lines around PEM-encoded
-   certificates are ignored but at least one certificate must be present.
+   Đối tượng *cadata*, nếu có, là một chuỗi ASCII chứa một hoặc nhiều chứng chỉ được mã hóa PEM hoặc một :term:`bytes-like object` chứa các chứng chỉ được mã hóa DER. Tương tự như với *capath*, các dòng bổ sung xung quanh những chứng chỉ được mã hóa PEM sẽ bị bỏ qua, nhưng phải có ít nhất một chứng chỉ.
 
    .. versionchanged:: 3.4
-      New optional argument *cadata*
+      Đối số tùy chọn mới *cadata*
 
 .. method:: SSLContext.get_ca_certs(binary_form=False)
 
-   Get a list of loaded "certification authority" (CA) certificates. If the
-   ``binary_form`` parameter is :const:`False` each list
-   entry is a dict like the output of :meth:`SSLSocket.getpeercert`. Otherwise
-   the method returns a list of DER-encoded certificates. The returned list
-   does not contain certificates from *capath* unless a certificate was
-   requested and loaded by a SSL connection.
+   Lấy danh sách các chứng chỉ của "cơ quan cấp chứng chỉ" (CA) đã được tải. Nếu tham số ``binary_form`` là :const:`False`, mỗi mục trong danh sách là một dict tương tự như đầu ra của :meth:`SSLSocket.getpeercert`. Nếu không, phương thức trả về danh sách các chứng chỉ được mã hóa DER. Danh sách được trả về không chứa các chứng chỉ từ *capath* trừ khi một chứng chỉ đã được yêu cầu và tải bởi một kết nối SSL.
 
    .. note::
-      Certificates in a capath directory aren't loaded unless they have
-      been used at least once.
+      Các chứng chỉ trong thư mục capath sẽ không được tải trừ khi chúng đã được sử dụng ít nhất một lần.
 
    .. versionadded:: 3.4
 
 .. method:: SSLContext.get_ciphers()
 
-   Get a list of enabled ciphers. The list is in order of cipher priority.
-   See :meth:`SSLContext.set_ciphers`.
+   Lấy danh sách các cipher đã bật. Danh sách được sắp xếp theo độ ưu tiên của cipher. Xem :meth:`SSLContext.set_ciphers`.
 
-   Example::
+   Ví dụ::
 
        >>> ctx = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
        >>> ctx.set_ciphers('ECDHE+AESGCM:!ECDSA')
@@ -1641,160 +1283,96 @@ to speed up repeated connections from the same clients.
 
 .. method:: SSLContext.set_default_verify_paths()
 
-   Load a set of default "certification authority" (CA) certificates from
-   a filesystem path defined when building the OpenSSL library.  Unfortunately,
-   there's no easy way to know whether this method succeeds: no error is
-   returned if no certificates are to be found.  When the OpenSSL library is
-   provided as part of the operating system, though, it is likely to be
-   configured properly.
+   Tải một tập hợp chứng chỉ "cơ quan cấp chứng chỉ" (CA) mặc định từ đường dẫn hệ thống tệp được xác định khi xây dựng thư viện OpenSSL. Đáng tiếc là không có cách dễ dàng nào để biết phương thức này có thành công hay không: sẽ không có lỗi nào được trả về nếu không tìm thấy chứng chỉ. Tuy nhiên, khi thư viện OpenSSL được cung cấp như một phần của hệ điều hành, thư viện này có khả năng đã được cấu hình đúng.
 
 .. method:: SSLContext.set_ciphers(ciphers, /)
 
-   Set the available ciphers for sockets created with this context.
-   It should be a string in the `OpenSSL cipher list format
-   <https://docs.openssl.org/master/man1/ciphers/>`_.
-   If no cipher can be selected (because compile-time options or other
-   configuration forbids use of all the specified ciphers), an
-   :class:`SSLError` will be raised.
+   Đặt các cipher khả dụng cho những socket được tạo bằng context này. Giá trị phải là một chuỗi theo `định dạng danh sách cipher của OpenSSL <https://docs.openssl.org/master/man1/ciphers/>`_. Nếu không thể chọn cipher nào (do các tùy chọn tại thời điểm biên dịch hoặc cấu hình khác ngăn việc sử dụng tất cả các cipher đã chỉ định), một
+   :class:`SSLError` sẽ được phát sinh.
 
    .. note::
-      when connected, the :meth:`SSLSocket.cipher` method of SSL sockets will
-      give the currently selected cipher.
+      khi được kết nối, phương thức :meth:`SSLSocket.cipher` của các socket SSL sẽ cung cấp cipher hiện đang được chọn.
 
-      TLS 1.3 cipher suites cannot be disabled with
+      Không thể vô hiệu hóa các bộ cipher TLS 1.3 bằng
       :meth:`~SSLContext.set_ciphers`.
 
 .. method:: SSLContext.set_alpn_protocols(alpn_protocols)
 
-   Specify which protocols the socket should advertise during the SSL/TLS
-   handshake. It should be a list of ASCII strings, like ``['http/1.1',
-   'spdy/2']``, ordered by preference. The selection of a protocol will happen
-   during the handshake, and will play out according to :rfc:`7301`. After a
-   successful handshake, the :meth:`SSLSocket.selected_alpn_protocol` method will
-   return the agreed-upon protocol.
+   Chỉ định các giao thức mà socket nên quảng bá trong quá trình bắt tay SSL/TLS. Đây phải là một danh sách các chuỗi ASCII, chẳng hạn như ``['http/1.1', 'spdy/2']``, được sắp xếp theo thứ tự ưu tiên. Việc lựa chọn giao thức sẽ diễn ra trong quá trình bắt tay và tuân theo :rfc:`7301`. Sau khi bắt tay thành công, phương thức :meth:`SSLSocket.selected_alpn_protocol` sẽ trả về giao thức đã thỏa thuận.
 
-   This method will raise :exc:`NotImplementedError` if :data:`HAS_ALPN` is
-   ``False``.
+   Phương thức này sẽ phát sinh :exc:`NotImplementedError` nếu :data:`HAS_ALPN` là ``False``.
 
    .. versionadded:: 3.5
 
 .. method:: SSLContext.set_npn_protocols(npn_protocols)
 
-   Specify which protocols the socket should advertise during the SSL/TLS
-   handshake. It should be a list of strings, like ``['http/1.1', 'spdy/2']``,
-   ordered by preference. The selection of a protocol will happen during the
-   handshake, and will play out according to the `Application Layer Protocol Negotiation
-   <https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation>`_. After a
-   successful handshake, the :meth:`SSLSocket.selected_npn_protocol` method will
-   return the agreed-upon protocol.
+   Chỉ định các giao thức mà socket nên quảng bá trong quá trình bắt tay SSL/TLS. Đây phải là một danh sách các chuỗi, chẳng hạn như ``['http/1.1', 'spdy/2']``, được sắp xếp theo thứ tự ưu tiên. Việc lựa chọn giao thức sẽ diễn ra trong quá trình bắt tay và tuân theo `Application Layer Protocol Negotiation <https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation>`_. Sau khi bắt tay thành công, phương thức :meth:`SSLSocket.selected_npn_protocol` sẽ trả về giao thức đã thỏa thuận.
 
-   This method will raise :exc:`NotImplementedError` if :data:`HAS_NPN` is
-   ``False``.
+   Phương thức này sẽ phát sinh :exc:`NotImplementedError` nếu :data:`HAS_NPN` là ``False``.
 
    .. versionadded:: 3.3
 
    .. deprecated:: 3.10
 
-      NPN has been superseded by ALPN
+      NPN đã được thay thế bởi ALPN
 
 .. attribute:: SSLContext.sni_callback
 
-   Register a callback function that will be called after the TLS Client Hello
-   handshake message has been received by the SSL/TLS server when the TLS client
-   specifies a server name indication. The server name indication mechanism
-   is specified in :rfc:`6066` section 3 - Server Name Indication.
+   Đăng ký một hàm callback sẽ được gọi sau khi máy chủ SSL/TLS nhận được thông báo bắt tay TLS Client Hello, khi máy khách TLS chỉ định chỉ báo tên máy chủ. Cơ chế chỉ báo tên máy chủ được quy định trong :rfc:`6066` mục 3 - Server Name Indication.
 
-   Only one callback can be set per ``SSLContext``.  If *sni_callback*
-   is set to ``None`` then the callback is disabled. Calling this function a
-   subsequent time will disable the previously registered callback.
+   Mỗi ``SSLContext`` chỉ có thể đặt một callback. Nếu *sni_callback* được đặt thành ``None`` thì callback sẽ bị vô hiệu hóa. Việc gọi hàm này lần tiếp theo sẽ vô hiệu hóa callback đã đăng ký trước đó.
 
-   The callback function will be called with three
-   arguments; the first being the :class:`ssl.SSLSocket`, the second is a string
-   that represents the server name that the client is intending to communicate
-   (or :const:`None` if the TLS Client Hello does not contain a server name)
-   and the third argument is the original :class:`SSLContext`. The server name
-   argument is text. For internationalized domain name, the server
-   name is an IDN A-label (``"xn--pythn-mua.org"``).
+   Hàm callback sẽ được gọi với ba đối số; đối số đầu tiên là :class:`ssl.SSLSocket`, đối số thứ hai là một chuỗi biểu thị tên máy chủ mà client dự định giao tiếp (hoặc :const:`None` nếu TLS Client Hello không chứa tên máy chủ), còn đối số thứ ba là :class:`SSLContext` ban đầu. Đối số tên máy chủ là văn bản. Đối với tên miền quốc tế hóa, tên máy chủ là một IDN A-label (``"xn--pythn-mua.org"``).
 
-   A typical use of this callback is to change the :class:`ssl.SSLSocket`'s
-   :attr:`SSLSocket.context` attribute to a new object of type
-   :class:`SSLContext` representing a certificate chain that matches the server
-   name.
+   Một cách sử dụng điển hình của callback này là thay đổi :class:`ssl.SSLSocket`'s
+   :attr:`SSLSocket.context` attribute thành một đối tượng mới thuộc kiểu
+   :class:`SSLContext` biểu thị một chuỗi chứng chỉ phù hợp với tên máy chủ.
 
-   If the callback assigns a new context to :attr:`SSLSocket.context`, any
-   further ClientHello message on the same connection (for example after a
-   TLS 1.3 HelloRetryRequest) is dispatched to the new context's
-   *sni_callback*, if it has one; the original callback is not called again
-   for that connection.
+   Với việc diễn ra trong giai đoạn thương lượng sớm của kết nối TLS, nếu callback gán một context mới cho :attr:`SSLSocket.context`, mọi thông báo ClientHello tiếp theo trên cùng kết nối (ví dụ sau TLS 1.3 HelloRetryRequest) sẽ được chuyển đến *sni_callback* của context mới, nếu có; callback ban đầu sẽ không được gọi lại cho kết nối đó.
 
-   Due to the early negotiation phase of the TLS connection, only limited
-   methods and attributes are usable like
-   :meth:`SSLSocket.selected_alpn_protocol` and :attr:`SSLSocket.context`.
-   The :meth:`SSLSocket.getpeercert`, :meth:`SSLSocket.get_verified_chain`,
-   :meth:`SSLSocket.get_unverified_chain` :meth:`SSLSocket.cipher`
-   and :meth:`SSLSocket.compression` methods require that
-   the TLS connection has progressed beyond the TLS Client Hello and therefore
-   will not return meaningful values nor can they be called safely.
+   Do giai đoạn thương lượng sớm của kết nối TLS, chỉ có một số phương thức và thuộc tính hạn chế có thể sử dụng, chẳng hạn như
+   :meth:`SSLSocket.selected_alpn_protocol` và :attr:`SSLSocket.context`. :meth:`SSLSocket.getpeercert`, :meth:`SSLSocket.get_verified_chain`,
+   Các phương thức :meth:`SSLSocket.get_unverified_chain` :meth:`SSLSocket.cipher` và :meth:`SSLSocket.compression` yêu cầu kết nối TLS đã tiến triển vượt qua TLS Client Hello, do đó sẽ không trả về các giá trị có ý nghĩa và cũng không thể được gọi một cách an toàn.
 
-   The *sni_callback* function must return ``None`` to allow the
-   TLS negotiation to continue.  If a TLS failure is required, a constant
-   :const:`ALERT_DESCRIPTION_* <ALERT_DESCRIPTION_INTERNAL_ERROR>` can be
-   returned.  Other return values will result in a TLS fatal error with
+   Hàm *sni_callback* phải trả về ``None`` để cho phép quá trình thương lượng TLS tiếp tục. Nếu cần xảy ra lỗi TLS, một hằng số
+   :const:`ALERT_DESCRIPTION_* <ALERT_DESCRIPTION_INTERNAL_ERROR>` có thể được trả về. Các giá trị trả về khác sẽ dẫn đến lỗi nghiêm trọng TLS với
    :const:`ALERT_DESCRIPTION_INTERNAL_ERROR`.
 
-   If an exception is raised from the *sni_callback* function the TLS
-   connection will terminate with a fatal TLS alert message
+   Nếu một ngoại lệ được phát sinh từ hàm *sni_callback*, kết nối TLS sẽ kết thúc cùng một thông báo cảnh báo TLS nghiêm trọng
    :const:`ALERT_DESCRIPTION_HANDSHAKE_FAILURE`.
 
-   This method will raise :exc:`NotImplementedError` if the OpenSSL library
-   had OPENSSL_NO_TLSEXT defined when it was built.
+   Phương thức này sẽ phát sinh :exc:`NotImplementedError` nếu thư viện OpenSSL được xây dựng với OPENSSL_NO_TLSEXT được định nghĩa.
 
    .. versionadded:: 3.7
 
    .. versionchanged:: 3.14.8
-      After the callback assigns a new :attr:`SSLSocket.context`, later
-      ClientHello messages on the connection are dispatched to the new
-      context's *sni_callback*.
+      Sau khi callback gán một :attr:`SSLSocket.context` mới, các thông báo ClientHello tiếp theo trên kết nối sẽ được chuyển đến *sni_callback* của context mới.
 
 .. method:: SSLContext.set_servername_callback(server_name_callback)
 
-   This is a legacy API retained for backwards compatibility. When possible,
-   you should use :attr:`sni_callback` instead. The given *server_name_callback*
-   is similar to *sni_callback*, except that when the server hostname is an
-   IDN-encoded internationalized domain name, the *server_name_callback*
-   receives a decoded U-label (``"pythön.org"``).
+   Đây là một API cũ được giữ lại để tương thích ngược. Khi có thể, bạn nên sử dụng :attr:`sni_callback` thay thế. *server_name_callback* đã cho tương tự như *sni_callback*, ngoại trừ khi hostname của máy chủ là một tên miền quốc tế hóa được mã hóa IDN, *server_name_callback* sẽ nhận một U-label đã giải mã (``"pythön.org"``).
 
-   If there is a decoding error on the server name, the TLS connection will
-   terminate with an :const:`ALERT_DESCRIPTION_INTERNAL_ERROR` fatal TLS
-   alert message to the client.
+   Nếu xảy ra lỗi giải mã tên máy chủ, kết nối TLS sẽ kết thúc bằng thông báo cảnh báo TLS nghiêm trọng :const:`ALERT_DESCRIPTION_INTERNAL_ERROR` gửi đến máy khách.
 
    .. versionadded:: 3.4
 
 .. method:: SSLContext.load_dh_params(dhfile, /)
 
-   Load the key generation parameters for Diffie-Hellman (DH) key exchange.
-   Using DH key exchange improves forward secrecy at the expense of
-   computational resources (both on the server and on the client).
-   The *dhfile* parameter should be the path to a file containing DH
-   parameters in PEM format.
+   Tải các tham số tạo khóa cho quá trình trao đổi khóa Diffie-Hellman (DH). Sử dụng trao đổi khóa DH giúp cải thiện tính bí mật chuyển tiếp, nhưng tiêu tốn thêm tài nguyên tính toán (cả trên máy chủ và máy khách). Tham số *dhfile* phải là đường dẫn đến một tệp chứa các tham số DH ở định dạng PEM.
 
-   This setting doesn't apply to client sockets.  You can also use the
-   :data:`OP_SINGLE_DH_USE` option to further improve security.
+   Thiết lập này không áp dụng cho client sockets. Bạn cũng có thể sử dụng
+   :data:`OP_SINGLE_DH_USE` tùy chọn để tăng cường bảo mật hơn nữa.
 
    .. versionadded:: 3.3
 
 .. method:: SSLContext.set_ecdh_curve(curve_name, /)
 
-   Set the curve name for Elliptic Curve-based Diffie-Hellman (ECDH) key
-   exchange.  ECDH is significantly faster than regular DH while arguably
-   as secure.  The *curve_name* parameter should be a string describing
-   a well-known elliptic curve, for example ``prime256v1`` for a widely
-   supported curve.
+   Đặt tên đường cong cho quá trình trao đổi khóa Diffie-Hellman dựa trên đường cong elip (ECDH). ECDH nhanh hơn đáng kể so với DH thông thường nhưng được cho là có mức độ bảo mật tương đương. Tham số *curve_name* phải là một chuỗi mô tả một đường cong elip phổ biến, chẳng hạn như ``prime256v1`` cho một đường cong được hỗ trợ rộng rãi.
 
-   This setting doesn't apply to client sockets.  You can also use the
-   :data:`OP_SINGLE_ECDH_USE` option to further improve security.
+   Thiết lập này không áp dụng cho client sockets. Bạn cũng có thể sử dụng
+   :data:`OP_SINGLE_ECDH_USE` tùy chọn để tăng cường bảo mật hơn nữa.
 
-   This method is not available if :data:`HAS_ECDH` is ``False``.
+   Phương thức này không khả dụng nếu :data:`HAS_ECDH` là ``False``.
 
    .. versionadded:: 3.3
 
@@ -1803,67 +1381,44 @@ to speed up repeated connections from the same clients.
          Vincent Bernat.
 
 .. method:: SSLContext.wrap_socket(sock, server_side=False, \
-      do_handshake_on_connect=True, suppress_ragged_eofs=True, \
-      server_hostname=None, session=None)
+      do_handshake_on_connect=True, suppress_ragged_eofs=True, \ server_hostname=None, session=None)
 
-   Wrap an existing Python socket *sock* and return an instance of
-   :attr:`SSLContext.sslsocket_class` (default :class:`SSLSocket`). The
-   returned SSL socket is tied to the context, its settings and certificates.
-   *sock* must be a :const:`~socket.SOCK_STREAM` socket; other
-   socket types are unsupported.
+   Bọc một socket Python hiện có *sock* và trả về một instance của
+   :attr:`SSLContext.sslsocket_class` (mặc định :class:`SSLSocket`). SSL socket được trả về gắn với context, các thiết lập và chứng chỉ của context đó. *sock* phải là một socket :const:`~socket.SOCK_STREAM`; các loại socket khác không được hỗ trợ.
 
-   The parameter ``server_side`` is a boolean which identifies whether
-   server-side or client-side behavior is desired from this socket.
+   Tham số ``server_side`` là một boolean xác định socket này sẽ hoạt động theo phía máy chủ hay phía máy khách.
 
-   For client-side sockets, the context construction is lazy; if the
-   underlying socket isn't connected yet, the context construction will be
-   performed after :meth:`connect` is called on the socket.  For
-   server-side sockets, if the socket has no remote peer, it is assumed
-   to be a listening socket, and the server-side SSL wrapping is
-   automatically performed on client connections accepted via the
-   :meth:`accept` method. The method may raise :exc:`SSLError`.
+   Đối với các socket phía client, việc xây dựng context được thực hiện một cách lazy; nếu socket nền tảng chưa được kết nối, việc xây dựng context sẽ được thực hiện sau khi gọi :meth:`connect` trên socket. Đối với các socket phía server, nếu socket không có peer từ xa, socket đó được giả định là socket đang lắng nghe, và việc bọc SSL phía server sẽ tự động được thực hiện trên các kết nối client được chấp nhận thông qua
+   phương thức :meth:`accept`. Phương thức này có thể phát sinh :exc:`SSLError`.
 
-   On client connections, the optional parameter *server_hostname* specifies
-   the hostname of the service which we are connecting to.  This allows a
-   single server to host multiple SSL-based services with distinct certificates,
-   quite similarly to HTTP virtual hosts. Specifying *server_hostname* will
-   raise a :exc:`ValueError` if *server_side* is true.
+   Trên các kết nối client, tham số tùy chọn *server_hostname* chỉ định hostname của dịch vụ mà chúng ta đang kết nối đến. Điều này cho phép một server duy nhất lưu trữ nhiều dịch vụ dựa trên SSL với các certificate riêng biệt, khá tương tự như các virtual host HTTP. Việc chỉ định *server_hostname* sẽ phát sinh một :exc:`ValueError` nếu *server_side* là true.
 
-   The parameter ``do_handshake_on_connect`` specifies whether to do the SSL
-   handshake automatically after doing a :meth:`socket.connect`, or whether the
-   application program will call it explicitly, by invoking the
-   :meth:`SSLSocket.do_handshake` method.  Calling
-   :meth:`SSLSocket.do_handshake` explicitly gives the program control over the
-   blocking behavior of the socket I/O involved in the handshake.
+   Tham số ``do_handshake_on_connect`` chỉ định có thực hiện SSL handshake tự động sau khi thực hiện :meth:`socket.connect` hay để chương trình ứng dụng gọi nó một cách rõ ràng bằng cách gọi
+   phương thức :meth:`SSLSocket.do_handshake`. Việc gọi
+   :meth:`SSLSocket.do_handshake` một cách rõ ràng cho phép chương trình kiểm soát hành vi blocking của thao tác I/O trên socket liên quan đến quá trình handshake.
 
-   The parameter ``suppress_ragged_eofs`` specifies how the
-   :meth:`SSLSocket.recv` method should signal unexpected EOF from the other end
-   of the connection.  If specified as :const:`True` (the default), it returns a
-   normal EOF (an empty bytes object) in response to unexpected EOF errors
-   raised from the underlying socket; if :const:`False`, it will raise the
-   exceptions back to the caller.
+   Tham số ``suppress_ragged_eofs`` chỉ định cách thức mà
+   Phương thức :meth:`SSLSocket.recv` phải báo hiệu EOF bất ngờ từ đầu bên kia của kết nối. Nếu được chỉ định là :const:`True` (giá trị mặc định), phương thức trả về EOF bình thường (một đối tượng bytes rỗng) khi gặp các lỗi EOF bất ngờ do socket bên dưới phát sinh; nếu là :const:`False`, phương thức sẽ ném lại các ngoại lệ cho caller.
 
-   *session*, see :attr:`~SSLSocket.session`.
+   *session*, xem :attr:`~SSLSocket.session`.
 
-   To wrap an :class:`SSLSocket` in another :class:`SSLSocket`, use
+   Để bọc một :class:`SSLSocket` trong một :class:`SSLSocket` khác, hãy sử dụng
    :meth:`SSLContext.wrap_bio`.
 
    .. versionchanged:: 3.5
-      Always allow a server_hostname to be passed, even if OpenSSL does not
-      have SNI.
+      Luôn cho phép truyền server_hostname, ngay cả khi OpenSSL không có SNI.
 
    .. versionchanged:: 3.6
-      *session* argument was added.
+      Đã bổ sung đối số *session*.
 
    .. versionchanged:: 3.7
-      The method returns an instance of :attr:`SSLContext.sslsocket_class`
-      instead of hard-coded :class:`SSLSocket`.
+      Phương thức trả về một instance của :attr:`SSLContext.sslsocket_class` thay vì :class:`SSLSocket` được hard-code.
 
 .. attribute:: SSLContext.sslsocket_class
 
-   The return type of :meth:`SSLContext.wrap_socket`, defaults to
-   :class:`SSLSocket`. The attribute can be assigned to on instances of
-   :class:`SSLContext` in order to return a custom subclass of
+   Kiểu trả về của :meth:`SSLContext.wrap_socket`, mặc định là
+   :class:`SSLSocket`. Thuộc tính này có thể được gán cho các instance của
+   :class:`SSLContext` để trả về một subclass tùy chỉnh của
    :class:`SSLSocket`.
 
    .. versionadded:: 3.7
@@ -1871,46 +1426,31 @@ to speed up repeated connections from the same clients.
 .. method:: SSLContext.wrap_bio(incoming, outgoing, server_side=False, \
                                 server_hostname=None, session=None)
 
-   Wrap the BIO objects *incoming* and *outgoing* and return an instance of
-   :attr:`SSLContext.sslobject_class` (default :class:`SSLObject`). The SSL
-   routines will read input data from the incoming BIO and write data to the
-   outgoing BIO.
+   Bọc các đối tượng BIO *incoming* và *outgoing*, rồi trả về một instance của
+   :attr:`SSLContext.sslobject_class` (mặc định là :class:`SSLObject`). Các routine SSL sẽ đọc dữ liệu đầu vào từ BIO incoming và ghi dữ liệu vào BIO outgoing.
 
-   The *server_side*, *server_hostname* and *session* parameters have the
-   same meaning as in :meth:`SSLContext.wrap_socket`, and are validated in
-   the same way: in particular a :exc:`ValueError` is raised when
-   :attr:`~SSLContext.check_hostname` is enabled but no *server_hostname* is
-   given, since there would be no name to match the peer's certificate
-   against.
+   Các tham số *server_side*, *server_hostname* và *session* có cùng ý nghĩa như trong :meth:`SSLContext.wrap_socket` và được kiểm tra theo cùng cách: cụ thể, một :exc:`ValueError` sẽ được đưa ra khi
+   :attr:`~SSLContext.check_hostname` được bật nhưng không cung cấp *server_hostname*, vì khi đó sẽ không có tên nào để đối chiếu với chứng chỉ của peer.
 
    .. versionchanged:: 3.6
-      *session* argument was added.
+      Đã bổ sung đối số *session*.
 
    .. versionchanged:: 3.7
-      The method returns an instance of :attr:`SSLContext.sslobject_class`
-      instead of hard-coded :class:`SSLObject`.
+      Phương thức này trả về một thực thể của :attr:`SSLContext.sslobject_class` thay vì :class:`SSLObject` được ghi cứng.
 
    .. versionchanged:: 3.14.8
-      The *server_side*, *server_hostname* and *session* parameters are now
-      validated as :meth:`SSLContext.wrap_socket` validates them. Previously
-      a context with :attr:`~SSLContext.check_hostname` enabled and no
-      *server_hostname* was accepted, and verified the certificate chain but
-      never the peer's identity.
+      Các tham số *server_side*, *server_hostname* và *session* hiện được xác thực giống như cách :meth:`SSLContext.wrap_socket` xác thực chúng. Trước đây, một context bật :attr:`~SSLContext.check_hostname` nhưng không có *server_hostname* vẫn được chấp nhận và xác minh chuỗi chứng chỉ, nhưng không bao giờ xác minh danh tính của peer.
 
 .. attribute:: SSLContext.sslobject_class
 
-   The return type of :meth:`SSLContext.wrap_bio`, defaults to
-   :class:`SSLObject`. The attribute can be overridden on instance of class
-   in order to return a custom subclass of :class:`SSLObject`.
+   Kiểu trả về của :meth:`SSLContext.wrap_bio` mặc định là
+   :class:`SSLObject`. Có thể ghi đè thuộc tính này trên một instance của class để trả về một subclass tùy chỉnh của :class:`SSLObject`.
 
    .. versionadded:: 3.7
 
 .. method:: SSLContext.session_stats()
 
-   Get statistics about the SSL sessions created or managed by this context.
-   A dictionary is returned which maps the names of each `piece of information <https://docs.openssl.org/1.1.1/man3/SSL_CTX_sess_number/>`_ to their
-   numeric values.  For example, here is the total number of hits and misses
-   in the session cache since the context was created::
+   Lấy số liệu thống kê về các SSL session do context này tạo hoặc quản lý. Một dictionary được trả về, ánh xạ tên của từng `mục thông tin <https://docs.openssl.org/1.1.1/man3/SSL_CTX_sess_number/>`_ với các giá trị số tương ứng. Ví dụ: sau đây là tổng số lượt truy cập và bỏ lỡ trong session cache kể từ khi context được tạo::
 
       >>> stats = context.session_stats()
       >>> stats['hits'], stats['misses']
@@ -1918,18 +1458,16 @@ to speed up repeated connections from the same clients.
 
 .. attribute:: SSLContext.check_hostname
 
-   Whether to match the peer cert's hostname in
-   :meth:`SSLSocket.do_handshake`. The context's
-   :attr:`~SSLContext.verify_mode` must be set to :data:`CERT_OPTIONAL` or
-   :data:`CERT_REQUIRED`, and you must pass *server_hostname* to
-   :meth:`~SSLContext.wrap_socket` in order to match the hostname.  Enabling
-   hostname checking automatically sets :attr:`~SSLContext.verify_mode` from
-   :data:`CERT_NONE` to :data:`CERT_REQUIRED`.  It cannot be set back to
-   :data:`CERT_NONE` as long as hostname checking is enabled. The
-   :data:`PROTOCOL_TLS_CLIENT` protocol enables hostname checking by default.
-   With other protocols, hostname checking must be enabled explicitly.
+   Có khớp hostname của chứng chỉ peer trong
+   :meth:`SSLSocket.do_handshake`. Thuộc tính của context
+   :attr:`~SSLContext.verify_mode` phải được đặt thành :data:`CERT_OPTIONAL` hoặc
+   :data:`CERT_REQUIRED`, và bạn phải truyền *server_hostname* vào
+   :meth:`~SSLContext.wrap_socket` để khớp với hostname. Việc bật kiểm tra hostname sẽ tự động đặt :attr:`~SSLContext.verify_mode` từ
+   :data:`CERT_NONE` thành :data:`CERT_REQUIRED`. Không thể đặt lại thành
+   :data:`CERT_NONE` chừng nào việc kiểm tra hostname còn được bật. Giao thức
+   :data:`PROTOCOL_TLS_CLIENT` bật kiểm tra hostname theo mặc định. Với các giao thức khác, phải bật kiểm tra hostname một cách tường minh.
 
-   Example::
+   Ví dụ::
 
       import socket, ssl
 
@@ -1946,59 +1484,44 @@ to speed up repeated connections from the same clients.
 
    .. versionchanged:: 3.7
 
-      :attr:`~SSLContext.verify_mode` is now automatically changed
-      to :data:`CERT_REQUIRED`  when hostname checking is enabled and
-      :attr:`~SSLContext.verify_mode` is :data:`CERT_NONE`. Previously
-      the same operation would have failed with a :exc:`ValueError`.
+      :attr:`~SSLContext.verify_mode` hiện được tự động thay đổi thành :data:`CERT_REQUIRED` khi tính năng kiểm tra hostname được bật và
+      :attr:`~SSLContext.verify_mode` là :data:`CERT_NONE`. Trước đây, thao tác tương tự sẽ thất bại với :exc:`ValueError`.
 
 .. attribute:: SSLContext.keylog_filename
 
-   Write TLS keys to a keylog file, whenever key material is generated or
-   received. The keylog file is designed for debugging purposes only. The
-   file format is specified by NSS and used by many traffic analyzers such
-   as Wireshark. The log file is opened in append-only mode. Writes are
-   synchronized between threads, but not between processes.
+   Ghi các khóa TLS vào tệp keylog bất cứ khi nào key material được tạo hoặc nhận. Tệp keylog chỉ được thiết kế cho mục đích debug. Định dạng tệp do NSS quy định và được nhiều traffic analyzer như Wireshark sử dụng. Tệp log được mở ở chế độ chỉ ghi nối tiếp. Các thao tác ghi được đồng bộ giữa các thread, nhưng không được đồng bộ giữa các process.
 
    .. versionadded:: 3.8
 
 .. attribute:: SSLContext.maximum_version
 
-   A :class:`TLSVersion` enum member representing the highest supported
-   TLS version. The value defaults to :attr:`TLSVersion.MAXIMUM_SUPPORTED`.
-   The attribute is read-only for protocols other than :const:`PROTOCOL_TLS`,
-   :const:`PROTOCOL_TLS_CLIENT`, and :const:`PROTOCOL_TLS_SERVER`.
+   Một thành viên enum :class:`TLSVersion` đại diện cho phiên bản TLS được hỗ trợ cao nhất. Giá trị mặc định là :attr:`TLSVersion.MAXIMUM_SUPPORTED`. Thuộc tính này ở chế độ chỉ đọc đối với các protocol khác với :const:`PROTOCOL_TLS`,
+   :const:`PROTOCOL_TLS_CLIENT`, và :const:`PROTOCOL_TLS_SERVER`.
 
-   The attributes :attr:`~SSLContext.maximum_version`,
-   :attr:`~SSLContext.minimum_version` and
-   :attr:`SSLContext.options` all affect the supported SSL
-   and TLS versions of the context. The implementation does not prevent
-   invalid combinations. For example a context with
-   :attr:`OP_NO_TLSv1_2` in :attr:`~SSLContext.options` and
-   :attr:`~SSLContext.maximum_version` set to :attr:`TLSVersion.TLSv1_2`
-   will not be able to establish a TLS 1.2 connection.
+   Các thuộc tính :attr:`~SSLContext.maximum_version`,
+   :attr:`~SSLContext.minimum_version` và
+   :attr:`SSLContext.options` tất cả đều ảnh hưởng đến các phiên bản SSL và TLS được context hỗ trợ. Phần triển khai không ngăn chặn các tổ hợp không hợp lệ. Ví dụ: một context có
+   :attr:`OP_NO_TLSv1_2` trong :attr:`~SSLContext.options` và
+   :attr:`~SSLContext.maximum_version` được đặt thành :attr:`TLSVersion.TLSv1_2` sẽ không thể thiết lập kết nối TLS 1.2.
 
    .. versionadded:: 3.7
 
 .. attribute:: SSLContext.minimum_version
 
-   Like :attr:`SSLContext.maximum_version` except it is the lowest
-   supported version or :attr:`TLSVersion.MINIMUM_SUPPORTED`.
+   Tương tự như :attr:`SSLContext.maximum_version`, ngoại trừ đây là phiên bản được hỗ trợ thấp nhất hoặc :attr:`TLSVersion.MINIMUM_SUPPORTED`.
 
    .. versionadded:: 3.7
 
 .. attribute:: SSLContext.num_tickets
 
-   Control the number of TLS 1.3 session tickets of a
-   :const:`PROTOCOL_TLS_SERVER` context. The setting has no impact on TLS
-   1.0 to 1.2 connections.
+   Điều khiển số lượng session ticket TLS 1.3 của một
+   :const:`PROTOCOL_TLS_SERVER` context. Thiết lập này không ảnh hưởng đến các kết nối TLS 1.0 đến 1.2.
 
    .. versionadded:: 3.8
 
 .. attribute:: SSLContext.options
 
-   An integer representing the set of SSL options enabled on this context.
-   The default value is :data:`OP_ALL`, but you can specify other options
-   such as :data:`OP_NO_SSLv2` by ORing them together.
+   Một số nguyên biểu thị tập hợp các tùy chọn SSL được bật trên ngữ cảnh này. Giá trị mặc định là :data:`OP_ALL`, nhưng bạn có thể chỉ định các tùy chọn khác như :data:`OP_NO_SSLv2` bằng cách OR chúng với nhau.
 
    .. versionchanged:: 3.6
       :attr:`SSLContext.options` returns :class:`Options` flags:
@@ -2008,59 +1531,44 @@ to speed up repeated connections from the same clients.
 
    .. deprecated:: 3.7
 
-      All ``OP_NO_SSL*`` and ``OP_NO_TLS*`` options have been deprecated since
-      Python 3.7. Use :attr:`SSLContext.minimum_version` and
-      :attr:`SSLContext.maximum_version` instead.
+      Tất cả các tùy chọn ``OP_NO_SSL*`` và ``OP_NO_TLS*`` đã bị deprecated kể từ Python 3.7. Hãy sử dụng :attr:`SSLContext.minimum_version` và
+      :attr:`SSLContext.maximum_version` thay thế.
 
 .. attribute:: SSLContext.post_handshake_auth
 
-   Enable TLS 1.3 post-handshake client authentication. Post-handshake auth
-   is disabled by default and a server can only request a TLS client
-   certificate during the initial handshake. When enabled, a server may
-   request a TLS client certificate at any time after the handshake.
+   Bật xác thực client sau handshake TLS 1.3. Xác thực sau handshake bị tắt theo mặc định và server chỉ có thể yêu cầu chứng chỉ client TLS trong handshake ban đầu. Khi được bật, server có thể yêu cầu chứng chỉ client TLS vào bất kỳ thời điểm nào sau handshake.
 
-   When enabled on client-side sockets, the client signals the server that
-   it supports post-handshake authentication.
+   Khi được bật trên các socket phía client, client sẽ báo hiệu cho server rằng nó hỗ trợ xác thực sau handshake.
 
-   When enabled on server-side sockets, :attr:`SSLContext.verify_mode` must
-   be set to :data:`CERT_OPTIONAL` or :data:`CERT_REQUIRED`, too. The
-   actual client cert exchange is delayed until
-   :meth:`SSLSocket.verify_client_post_handshake` is called and some I/O is
-   performed.
+   Khi được bật trên các socket phía server, :attr:`SSLContext.verify_mode` cũng phải được đặt thành :data:`CERT_OPTIONAL` hoặc :data:`CERT_REQUIRED`. Việc trao đổi chứng chỉ client thực tế được trì hoãn cho đến khi
+   :meth:`SSLSocket.verify_client_post_handshake` được gọi và một số thao tác I/O được thực hiện.
 
    .. versionadded:: 3.8
 
 .. attribute:: SSLContext.protocol
 
-   The protocol version chosen when constructing the context.  This attribute
-   is read-only.
+   Phiên bản giao thức được chọn khi xây dựng context. Thuộc tính này chỉ có thể đọc.
 
 .. attribute:: SSLContext.hostname_checks_common_name
 
-   Whether :attr:`~SSLContext.check_hostname` falls back to verify the cert's
-   subject common name in the absence of a subject alternative name
-   extension (default: true).
+   Liệu :attr:`~SSLContext.check_hostname` có chuyển sang xác minh common name của subject trong cert khi không có phần mở rộng subject alternative name hay không (mặc định: true).
 
    .. versionadded:: 3.7
 
    .. versionchanged:: 3.10
 
-      The flag had no effect with OpenSSL before version 1.1.1l. Python 3.8.9,
-      3.9.3, and 3.10 include workarounds for previous versions.
+      Cờ này không có tác dụng với OpenSSL trước phiên bản 1.1.1l. Python 3.8.9, 3.9.3 và 3.10 có các giải pháp khắc phục cho những phiên bản trước đó.
 
 .. attribute:: SSLContext.security_level
 
-   An integer representing the `security level
-   <https://docs.openssl.org/master/man3/SSL_CTX_get_security_level/>`_
-   for the context. This attribute is read-only.
+   Một số nguyên biểu thị `security level <https://docs.openssl.org/master/man3/SSL_CTX_get_security_level/>`_ cho context. Thuộc tính này chỉ có thể đọc.
 
    .. versionadded:: 3.10
 
 .. attribute:: SSLContext.verify_flags
 
-   The flags for certificate verification operations. You can set flags like
-   :data:`VERIFY_CRL_CHECK_LEAF` by ORing them together. By default OpenSSL
-   does neither require nor verify certificate revocation lists (CRLs).
+   Các cờ cho những thao tác xác minh chứng chỉ. Bạn có thể đặt các cờ như
+   :data:`VERIFY_CRL_CHECK_LEAF` bằng cách OR chúng với nhau. Theo mặc định, OpenSSL không yêu cầu cũng không xác minh danh sách thu hồi chứng chỉ (CRL).
 
    .. versionadded:: 3.4
 
@@ -2072,9 +1580,8 @@ to speed up repeated connections from the same clients.
 
 .. attribute:: SSLContext.verify_mode
 
-   Whether to try to verify other peers' certificates and how to behave
-   if verification fails.  This attribute must be one of
-   :data:`CERT_NONE`, :data:`CERT_OPTIONAL` or :data:`CERT_REQUIRED`.
+   Liệu có thử xác minh chứng chỉ của các peer khác hay không và sẽ xử lý thế nào nếu việc xác minh thất bại. Thuộc tính này phải là một trong các giá trị
+   :data:`CERT_NONE`, :data:`CERT_OPTIONAL` hoặc :data:`CERT_REQUIRED`.
 
    .. versionchanged:: 3.6
       :attr:`SSLContext.verify_mode` returns :class:`VerifyMode` enum:
@@ -2084,29 +1591,22 @@ to speed up repeated connections from the same clients.
 
 .. method:: SSLContext.set_psk_client_callback(callback)
 
-   Enables TLS-PSK (pre-shared key) authentication on a client-side connection.
+   Bật xác thực TLS-PSK (khóa chia sẻ trước) trên kết nối phía client.
 
-   In general, certificate based authentication should be preferred over this method.
+   Nhìn chung, nên ưu tiên xác thực dựa trên certificate hơn phương thức này.
 
-   The parameter ``callback`` is a callable object with the signature:
-   ``def callback(hint: str | None) -> tuple[str | None, bytes]``.
-   The ``hint`` parameter is an optional identity hint sent by the server.
-   The return value is a tuple in the form (client-identity, psk).
-   Client-identity is an optional string which may be used by the server to
-   select a corresponding PSK for the client. The string must be less than or
-   equal to ``256`` octets when UTF-8 encoded. PSK is a
-   :term:`bytes-like object` representing the pre-shared key. Return a zero
-   length PSK to reject the connection.
+   Tham số ``callback`` là một đối tượng callable có chữ ký: ``def callback(hint: str | None) -> tuple[str | None, bytes]``. Tham số ``hint`` là gợi ý identity tùy chọn được server gửi. Giá trị trả về là một tuple có dạng (client-identity, psk). Client-identity là một chuỗi tùy chọn mà server có thể dùng để chọn PSK tương ứng cho client. Chuỗi này phải có độ dài nhỏ hơn hoặc bằng ``256`` octet khi được mã hóa bằng UTF-8. PSK là một
+   :term:`bytes-like object` đại diện cho khóa chia sẻ trước. Trả về PSK có độ dài bằng 0 để từ chối kết nối.
 
-   Setting ``callback`` to :const:`None` removes any existing callback.
+   Đặt ``callback`` thành :const:`None` sẽ xóa mọi callback hiện có.
 
    .. note::
-      When using TLS 1.3:
+      Khi sử dụng TLS 1.3:
 
-      - the ``hint`` parameter is always :const:`None`.
-      - client-identity must be a non-empty string.
+      - tham số ``hint`` luôn là :const:`None`.
+      - client-identity phải là một chuỗi không rỗng.
 
-   Example usage::
+   Ví dụ sử dụng::
 
       context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
       context.check_hostname = False
@@ -2114,11 +1614,11 @@ to speed up repeated connections from the same clients.
       context.maximum_version = ssl.TLSVersion.TLSv1_2
       context.set_ciphers('PSK')
 
-      # A simple lambda:
+      # Một lambda đơn giản:
       psk = bytes.fromhex('c0ffee')
       context.set_psk_client_callback(lambda hint: (None, psk))
 
-      # A table using the hint from the server:
+      # Một bảng sử dụng gợi ý từ server:
       psk_table = { 'ServerId_1': bytes.fromhex('c0ffee'),
                     'ServerId_2': bytes.fromhex('facade')
       }
@@ -2126,44 +1626,36 @@ to speed up repeated connections from the same clients.
           return 'ClientId_1', psk_table.get(hint, b'')
       context.set_psk_client_callback(callback)
 
-   This method will raise :exc:`NotImplementedError` if :data:`HAS_PSK` is
-   ``False``.
+   Phương thức này sẽ phát sinh :exc:`NotImplementedError` nếu :data:`HAS_PSK` là ``False``.
 
    .. versionadded:: 3.13
 
 .. method:: SSLContext.set_psk_server_callback(callback, identity_hint=None)
 
-   Enables TLS-PSK (pre-shared key) authentication on a server-side connection.
+   Bật xác thực TLS-PSK (pre-shared key) trên kết nối phía server.
 
-   In general, certificate based authentication should be preferred over this method.
+   Nhìn chung, nên ưu tiên xác thực dựa trên certificate hơn phương thức này.
 
-   The parameter ``callback`` is a callable object with the signature:
-   ``def callback(identity: str | None) -> bytes``.
-   The ``identity`` parameter is an optional identity sent by the client which can
-   be used to select a corresponding PSK.
-   The return value is a :term:`bytes-like object` representing the pre-shared key.
-   Return a zero length PSK to reject the connection.
+   Tham số ``callback`` là một đối tượng có thể gọi với signature: ``def callback(identity: str | None) -> bytes``. Tham số ``identity`` là một identity tùy chọn do client gửi, có thể được dùng để chọn PSK tương ứng. Giá trị trả về là một :term:`bytes-like object` đại diện cho khóa được chia sẻ trước. Trả về PSK có độ dài bằng 0 để từ chối kết nối.
 
-   Setting ``callback`` to :const:`None` removes any existing callback.
+   Đặt ``callback`` thành :const:`None` sẽ xóa mọi callback hiện có.
 
-   The parameter ``identity_hint`` is an optional identity hint string sent to
-   the client. The string must be less than or equal to ``256`` octets when
-   UTF-8 encoded.
+   Tham số ``identity_hint`` là một chuỗi gợi ý identity tùy chọn được gửi đến client. Chuỗi này phải có độ dài nhỏ hơn hoặc bằng ``256`` octet khi được mã hóa bằng UTF-8.
 
    .. note::
-      When using TLS 1.3 the ``identity_hint`` parameter is not sent to the client.
+      Khi sử dụng TLS 1.3, tham số ``identity_hint`` không được gửi đến client.
 
-   Example usage::
+   Ví dụ sử dụng::
 
       context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
       context.maximum_version = ssl.TLSVersion.TLSv1_2
       context.set_ciphers('PSK')
 
-      # A simple lambda:
+      # Một lambda đơn giản:
       psk = bytes.fromhex('c0ffee')
       context.set_psk_server_callback(lambda identity: psk)
 
-      # A table using the identity of the client:
+      # Một bảng sử dụng danh tính của client:
       psk_table = { 'ClientId_1': bytes.fromhex('c0ffee'),
                     'ClientId_2': bytes.fromhex('facade')
       }
@@ -2171,8 +1663,7 @@ to speed up repeated connections from the same clients.
           return psk_table.get(identity, b'')
       context.set_psk_server_callback(callback, 'ServerId_1')
 
-   This method will raise :exc:`NotImplementedError` if :data:`HAS_PSK` is
-   ``False``.
+   Phương thức này sẽ phát sinh :exc:`NotImplementedError` nếu :data:`HAS_PSK` là ``False``.
 
    .. versionadded:: 3.13
 
@@ -2182,60 +1673,25 @@ to speed up repeated connections from the same clients.
 
 .. _ssl-certificates:
 
-Certificates
-------------
+Chứng chỉ
+---------
 
-Certificates in general are part of a public-key / private-key system.  In this
-system, each *principal*, (which may be a machine, or a person, or an
-organization) is assigned a unique two-part encryption key.  One part of the key
-is public, and is called the *public key*; the other part is kept secret, and is
-called the *private key*.  The two parts are related, in that if you encrypt a
-message with one of the parts, you can decrypt it with the other part, and
-**only** with the other part.
+Chứng chỉ nói chung là một phần của hệ thống khóa công khai / khóa riêng tư. Trong hệ thống này, mỗi *principal* (có thể là máy, cá nhân hoặc tổ chức) được gán một khóa mã hóa gồm hai phần duy nhất. Một phần của khóa được công khai và gọi là *public key*; phần còn lại được giữ bí mật và gọi là *private key*. Hai phần này có mối liên hệ với nhau: nếu bạn mã hóa một thông điệp bằng một phần, bạn có thể giải mã thông điệp đó bằng phần còn lại, và **chỉ** bằng phần còn lại.
 
-A certificate contains information about two principals.  It contains the name
-of a *subject*, and the subject's public key.  It also contains a statement by a
-second principal, the *issuer*, that the subject is who they claim to be, and
-that this is indeed the subject's public key.  The issuer's statement is signed
-with the issuer's private key, which only the issuer knows.  However, anyone can
-verify the issuer's statement by finding the issuer's public key, decrypting the
-statement with it, and comparing it to the other information in the certificate.
-The certificate also contains information about the time period over which it is
-valid.  This is expressed as two fields, called "notBefore" and "notAfter".
+Một chứng chỉ chứa thông tin về hai principal. Chứng chỉ chứa tên của *subject* và public key của subject. Chứng chỉ cũng chứa một tuyên bố của principal thứ hai, *issuer*, rằng subject đúng là người mà họ tự nhận và đây thực sự là public key của subject. Tuyên bố của issuer được ký bằng private key của issuer, chỉ issuer biết khóa này. Tuy nhiên, bất kỳ ai cũng có thể xác minh tuyên bố của issuer bằng cách tìm public key của issuer, giải mã tuyên bố bằng khóa đó rồi so sánh với các thông tin khác trong chứng chỉ. Chứng chỉ cũng chứa thông tin về khoảng thời gian chứng chỉ có hiệu lực. Khoảng thời gian này được thể hiện bằng hai trường có tên là "notBefore" và "notAfter".
 
-In the Python use of certificates, a client or server can use a certificate to
-prove who they are.  The other side of a network connection can also be required
-to produce a certificate, and that certificate can be validated to the
-satisfaction of the client or server that requires such validation.  The
-connection attempt can be set to raise an exception if the validation fails.
-Validation is done automatically, by the underlying OpenSSL framework; the
-application need not concern itself with its mechanics.  But the application
-does usually need to provide sets of certificates to allow this process to take
-place.
+Trong Python, client hoặc server có thể dùng chứng chỉ để chứng minh danh tính của mình. Phía bên kia của kết nối mạng cũng có thể được yêu cầu cung cấp chứng chỉ, và chứng chỉ đó có thể được xác thực theo yêu cầu của client hoặc server thực hiện việc xác thực. Có thể thiết lập để lần thử kết nối phát sinh một exception nếu quá trình xác thực thất bại. Việc xác thực được thực hiện tự động bởi framework OpenSSL bên dưới; ứng dụng không cần quan tâm đến cơ chế này. Tuy nhiên, ứng dụng thường cần cung cấp các bộ chứng chỉ để quá trình này có thể diễn ra.
 
-Python uses files to contain certificates.  They should be formatted as "PEM"
-(see :rfc:`1422`), which is a base-64 encoded form wrapped with a header line
-and a footer line::
+Python sử dụng các tệp để chứa chứng chỉ. Các tệp này phải được định dạng dưới dạng "PEM" (xem :rfc:`1422`), đây là dạng mã hóa base-64 được bao quanh bởi một dòng tiêu đề và một dòng chân trang::
 
       -----BEGIN CERTIFICATE-----
       ... (certificate in base64 PEM encoding) ...
       -----END CERTIFICATE-----
 
-Certificate chains
-^^^^^^^^^^^^^^^^^^
+Chuỗi chứng chỉ
+^^^^^^^^^^^^^^^
 
-The Python files which contain certificates can contain a sequence of
-certificates, sometimes called a *certificate chain*.  This chain should start
-with the specific certificate for the principal who "is" the client or server,
-and then the certificate for the issuer of that certificate, and then the
-certificate for the issuer of *that* certificate, and so on up the chain till
-you get to a certificate which is *self-signed*, that is, a certificate which
-has the same subject and issuer, sometimes called a *root certificate*.  The
-certificates should just be concatenated together in the certificate file.  For
-example, suppose we had a three certificate chain, from our server certificate
-to the certificate of the certification authority that signed our server
-certificate, to the root certificate of the agency which issued the
-certification authority's certificate::
+Các tệp Python chứa chứng chỉ có thể chứa một chuỗi chứng chỉ, đôi khi được gọi là *chuỗi chứng chỉ*. Chuỗi này nên bắt đầu bằng chứng chỉ cụ thể của principal "là" client hoặc server, tiếp theo là chứng chỉ của bên cấp chứng chỉ đó, rồi đến chứng chỉ của bên cấp *chứng chỉ đó*, cứ tiếp tục như vậy lên chuỗi cho đến khi gặp một chứng chỉ *tự ký*, tức là chứng chỉ có subject và issuer giống nhau, đôi khi được gọi là *chứng chỉ gốc*. Các chứng chỉ chỉ cần được nối liên tiếp trong tệp chứng chỉ. Ví dụ, giả sử chúng ta có một chuỗi gồm ba chứng chỉ, từ chứng chỉ máy chủ đến chứng chỉ của certification authority đã ký chứng chỉ máy chủ, rồi đến chứng chỉ gốc của cơ quan đã cấp chứng chỉ cho certification authority đó::
 
       -----BEGIN CERTIFICATE-----
       ... (certificate for your server)...
@@ -2247,25 +1703,15 @@ certification authority's certificate::
       ... (the root certificate for the CA's issuer)...
       -----END CERTIFICATE-----
 
-CA certificates
-^^^^^^^^^^^^^^^
+Chứng chỉ CA
+^^^^^^^^^^^^
 
-If you are going to require validation of the other side of the connection's
-certificate, you need to provide a "CA certs" file, filled with the certificate
-chains for each issuer you are willing to trust.  Again, this file just contains
-these chains concatenated together.  For validation, Python will use the first
-chain it finds in the file which matches.  The platform's certificates file can
-be used by calling :meth:`SSLContext.load_default_certs`, this is done
-automatically with :func:`.create_default_context`.
+Nếu bạn yêu cầu xác thực chứng chỉ của phía bên kia kết nối, bạn cần cung cấp một tệp "CA certs", chứa các chuỗi chứng chỉ cho từng bên cấp chứng chỉ mà bạn sẵn sàng tin cậy. Một lần nữa, tệp này chỉ chứa các chuỗi đó được nối liên tiếp với nhau. Để xác thực, Python sẽ sử dụng chuỗi đầu tiên trong tệp khớp với yêu cầu. Có thể sử dụng tệp chứng chỉ của nền tảng bằng cách gọi :meth:`SSLContext.load_default_certs`; thao tác này được thực hiện tự động với :func:`.create_default_context`.
 
-Combined key and certificate
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Khóa và chứng chỉ kết hợp
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Often the private key is stored in the same file as the certificate; in this
-case, only the ``certfile`` parameter to :meth:`SSLContext.load_cert_chain`
-needs to be passed.  If the private key is stored
-with the certificate, it should come before the first certificate in
-the certificate chain::
+Thông thường, khóa riêng được lưu trong cùng tệp với chứng chỉ; trong trường hợp này, chỉ cần truyền tham số ``certfile`` cho :meth:`SSLContext.load_cert_chain`. Nếu khóa riêng được lưu cùng chứng chỉ, khóa riêng phải nằm trước chứng chỉ đầu tiên trong chuỗi chứng chỉ::
 
    -----BEGIN RSA PRIVATE KEY-----
    ... (private key in base64 encoding) ...
@@ -2274,15 +1720,10 @@ the certificate chain::
    ... (certificate in base64 PEM encoding) ...
    -----END CERTIFICATE-----
 
-Self-signed certificates
-^^^^^^^^^^^^^^^^^^^^^^^^
+Chứng chỉ tự ký
+^^^^^^^^^^^^^^^
 
-If you are going to create a server that provides SSL-encrypted connection
-services, you will need to acquire a certificate for that service.  There are
-many ways of acquiring appropriate certificates, such as buying one from a
-certification authority.  Another common practice is to generate a self-signed
-certificate.  The simplest way to do this is with the OpenSSL package, using
-something like the following::
+Nếu bạn định tạo một server cung cấp các dịch vụ kết nối được mã hóa bằng SSL, bạn sẽ cần có chứng chỉ cho dịch vụ đó. Có nhiều cách để có được chứng chỉ phù hợp, chẳng hạn như mua chứng chỉ từ một certification authority. Một cách phổ biến khác là tạo chứng chỉ tự ký. Cách đơn giản nhất để thực hiện việc này là dùng gói OpenSSL, với nội dung tương tự như sau::
 
   % openssl req -new -x509 -days 365 -nodes -out cert.pem -keyout cert.pem
   Generating a 1024 bit RSA private key
@@ -2306,67 +1747,51 @@ something like the following::
   Email Address []:ops@myserver.mygroup.myorganization.com
   %
 
-The disadvantage of a self-signed certificate is that it is its own root
-certificate, and no one else will have it in their cache of known (and trusted)
-root certificates.
+Nhược điểm của chứng chỉ tự ký là nó chính là root certificate của chính nó, và không ai khác có chứng chỉ này trong bộ nhớ đệm các root certificate đã biết (và đáng tin cậy) của họ.
 
 
-Examples
---------
+Ví dụ
+-----
 
-Testing for SSL support
-^^^^^^^^^^^^^^^^^^^^^^^
+Kiểm tra khả năng hỗ trợ SSL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To test for the presence of SSL support in a Python installation, user code
-should use the following idiom::
+Để kiểm tra sự hiện diện của khả năng hỗ trợ SSL trong một bản cài đặt Python, code của người dùng nên sử dụng cách viết sau::
 
    try:
        import ssl
    except ImportError:
        pass
    else:
-       ...  # do something that requires SSL support
+       ...  # thực hiện thao tác yêu cầu hỗ trợ SSL
 
-Client-side operation
-^^^^^^^^^^^^^^^^^^^^^
+Thao tác phía client
+^^^^^^^^^^^^^^^^^^^^
 
-This example creates a SSL context with the recommended security settings
-for client sockets, including automatic certificate verification::
+Ví dụ này tạo một ngữ cảnh SSL với các thiết lập bảo mật được khuyến nghị cho socket máy khách, bao gồm cả việc tự động xác minh chứng chỉ::
 
    >>> context = ssl.create_default_context()
 
-If you prefer to tune security settings yourself, you might create
-a context from scratch (but beware that you might not get the settings
-right)::
+Nếu muốn tự điều chỉnh các thiết lập bảo mật, bạn có thể tạo một ngữ cảnh từ đầu (nhưng hãy lưu ý rằng bạn có thể thiết lập không đúng)::
 
    >>> context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
    >>> context.load_verify_locations("/etc/ssl/certs/ca-bundle.crt")
 
-(this snippet assumes your operating system places a bundle of all CA
-certificates in ``/etc/ssl/certs/ca-bundle.crt``; if not, you'll get an
-error and have to adjust the location)
+(đoạn mã này giả định hệ điều hành của bạn đặt một gói chứa tất cả chứng chỉ CA tại ``/etc/ssl/certs/ca-bundle.crt``; nếu không, bạn sẽ gặp lỗi và phải điều chỉnh vị trí này)
 
-The :data:`PROTOCOL_TLS_CLIENT` protocol configures the context for cert
-validation and hostname verification. :attr:`~SSLContext.verify_mode` is
-set to :data:`CERT_REQUIRED` and :attr:`~SSLContext.check_hostname` is set
-to ``True``. All other protocols create SSL contexts with insecure defaults.
+Giao thức :data:`PROTOCOL_TLS_CLIENT` cấu hình ngữ cảnh để xác thực chứng chỉ và xác minh hostname. :attr:`~SSLContext.verify_mode` được đặt thành :data:`CERT_REQUIRED` và :attr:`~SSLContext.check_hostname` được đặt thành ``True``. Tất cả các giao thức khác đều tạo ngữ cảnh SSL với các giá trị mặc định không an toàn.
 
-When you use the context to connect to a server, :const:`CERT_REQUIRED`
-and :attr:`~SSLContext.check_hostname` validate the server certificate: it
-ensures that the server certificate was signed with one of the CA
-certificates, checks the signature for correctness, and verifies other
-properties like validity and identity of the hostname::
+Khi sử dụng ngữ cảnh để kết nối với máy chủ, :const:`CERT_REQUIRED` và :attr:`~SSLContext.check_hostname` sẽ xác thực chứng chỉ máy chủ: chúng đảm bảo chứng chỉ máy chủ được ký bằng một trong các chứng chỉ CA, kiểm tra tính chính xác của chữ ký và xác minh các thuộc tính khác như thời hạn hiệu lực và danh tính của hostname::
 
    >>> conn = context.wrap_socket(socket.socket(socket.AF_INET),
    ...                            server_hostname="www.python.org")
    >>> conn.connect(("www.python.org", 443))
 
-You may then fetch the certificate::
+Sau đó, bạn có thể lấy chứng chỉ::
 
    >>> cert = conn.getpeercert()
 
-Visual inspection shows that the certificate does identify the desired service
-(that is, the HTTPS host ``www.python.org``)::
+Kiểm tra trực quan cho thấy chứng chỉ thực sự xác định đúng dịch vụ mong muốn (tức là máy chủ HTTPS ``www.python.org``)::
 
    >>> pprint.pprint(cert)
    {'OCSP': ('http://ocsp.digicert.com',),
@@ -2408,8 +1833,7 @@ Visual inspection shows that the certificate does identify the desired service
                        ('DNS', 'id.python.org')),
     'version': 3}
 
-Now the SSL channel is established and the certificate verified, you can
-proceed to talk with the server::
+Bây giờ kênh SSL đã được thiết lập và chứng chỉ đã được xác minh, bạn có thể tiếp tục trao đổi với máy chủ::
 
    >>> conn.sendall(b"HEAD / HTTP/1.0\r\nHost: linuxfr.org\r\n\r\n")
    >>> pprint.pprint(conn.recv(1024).split(b"\r\n"))
@@ -2431,17 +1855,13 @@ proceed to talk with the server::
     b'',
     b'']
 
-See the discussion of :ref:`ssl-security` below.
+Xem phần thảo luận về :ref:`ssl-security` bên dưới.
 
 
-Server-side operation
+Thao tác phía máy chủ
 ^^^^^^^^^^^^^^^^^^^^^
 
-For server operation, typically you'll need to have a server certificate, and
-private key, each in a file.  You'll first create a context holding the key
-and the certificate, so that clients can check your authenticity.  Then
-you'll open a socket, bind it to a port, call :meth:`listen` on it, and start
-waiting for clients to connect::
+Để vận hành phía máy chủ, thông thường bạn sẽ cần một chứng chỉ máy chủ và khóa riêng, mỗi thứ nằm trong một tệp. Trước tiên, bạn sẽ tạo một context chứa khóa và chứng chỉ để các client có thể kiểm tra tính xác thực của bạn. Sau đó, bạn sẽ mở một socket, liên kết nó với một cổng, gọi :meth:`listen` trên đó và bắt đầu chờ các client kết nối::
 
    import socket, ssl
 
@@ -2452,9 +1872,7 @@ waiting for clients to connect::
    bindsocket.bind(('myaddr.example.com', 10023))
    bindsocket.listen(5)
 
-When a client connects, you'll call :meth:`accept` on the socket to get the
-new socket from the other end, and use the context's :meth:`SSLContext.wrap_socket`
-method to create a server-side SSL socket for the connection::
+Khi một client kết nối, bạn sẽ gọi :meth:`accept` trên socket để lấy socket mới từ phía bên kia, rồi sử dụng phương thức :meth:`SSLContext.wrap_socket` của context để tạo một socket SSL phía máy chủ cho kết nối đó::
 
    while True:
        newsocket, fromaddr = bindsocket.accept()
@@ -2465,70 +1883,49 @@ method to create a server-side SSL socket for the connection::
            connstream.shutdown(socket.SHUT_RDWR)
            connstream.close()
 
-Then you'll read data from the ``connstream`` and do something with it till you
-are finished with the client (or the client is finished with you)::
+Sau đó, bạn sẽ đọc dữ liệu từ ``connstream`` và xử lý dữ liệu đó cho đến khi bạn hoàn tất với client (hoặc client hoàn tất với bạn)::
 
    def deal_with_client(connstream):
        data = connstream.recv(1024)
-       # empty data means the client is finished with us
+       # dữ liệu rỗng nghĩa là client đã hoàn tất với chúng ta
        while data:
            if not do_something(connstream, data):
-               # we'll assume do_something returns False
-               # when we're finished with client
+               # giả sử do_something trả về False
+               # khi chúng ta hoàn tất với client
                break
            data = connstream.recv(1024)
-       # finished with client
+       # đã hoàn tất với client
 
-And go back to listening for new client connections (of course, a real server
-would probably handle each client connection in a separate thread, or put
-the sockets in :ref:`non-blocking mode <ssl-nonblocking>` and use an event loop).
+Và quay lại chờ các kết nối client mới (tất nhiên, một server thực tế có thể sẽ xử lý từng kết nối client trong một thread riêng, hoặc đặt các socket ở :ref:`chế độ non-blocking <ssl-nonblocking>` và sử dụng một event loop).
 
 
 .. _ssl-nonblocking:
 
-Notes on non-blocking sockets
------------------------------
+Lưu ý về socket non-blocking
+----------------------------
 
-SSL sockets behave slightly different than regular sockets in
-non-blocking mode. When working with non-blocking sockets, there are
-thus several things you need to be aware of:
+Socket SSL hoạt động hơi khác so với socket thông thường ở chế độ non-blocking. Vì vậy, khi làm việc với socket non-blocking, bạn cần lưu ý một số điều sau:
 
-- Most :class:`SSLSocket` methods will raise either
-  :exc:`SSLWantWriteError` or :exc:`SSLWantReadError` instead of
-  :exc:`BlockingIOError` if an I/O operation would
-  block. :exc:`SSLWantReadError` will be raised if a read operation on
-  the underlying socket is necessary, and :exc:`SSLWantWriteError` for
-  a write operation on the underlying socket. Note that attempts to
-  *write* to an SSL socket may require *reading* from the underlying
-  socket first, and attempts to *read* from the SSL socket may require
-  a prior *write* to the underlying socket.
+- Hầu hết :class:`SSLSocket` các phương thức sẽ raise một trong hai
+  :exc:`SSLWantWriteError` hoặc :exc:`SSLWantReadError` thay vì
+  :exc:`BlockingIOError` nếu một thao tác I/O có thể bị block. :exc:`SSLWantReadError` sẽ được phát sinh nếu cần thực hiện thao tác đọc trên socket bên dưới, và :exc:`SSLWantWriteError` nếu cần thực hiện thao tác ghi trên socket bên dưới. Lưu ý rằng các lần thử *write* vào một SSL socket có thể yêu cầu *reading* từ socket bên dưới trước, và các lần thử *read* từ SSL socket có thể yêu cầu thực hiện *write* trước đó vào socket bên dưới.
 
   .. versionchanged:: 3.5
 
-     In earlier Python versions, the :meth:`!SSLSocket.send` method
-     returned zero instead of raising :exc:`SSLWantWriteError` or
+     Trong các phiên bản Python trước đây, phương thức :meth:`!SSLSocket.send` trả về giá trị 0 thay vì phát sinh :exc:`SSLWantWriteError` hoặc
      :exc:`SSLWantReadError`.
 
-- Calling :func:`~select.select` tells you that the OS-level socket can be
-  read from (or written to), but it does not imply that there is sufficient
-  data at the upper SSL layer.  For example, only part of an SSL frame might
-  have arrived.  Therefore, you must be ready to handle :meth:`SSLSocket.recv`
-  and :meth:`SSLSocket.send` failures, and retry after another call to
+- Việc gọi :func:`~select.select` cho biết socket ở cấp hệ điều hành có thể được đọc (hoặc ghi), nhưng không có nghĩa là có đủ dữ liệu ở lớp SSL bên trên. Ví dụ: chỉ một phần của SSL frame có thể đã đến. Do đó, bạn phải sẵn sàng xử lý các lỗi :meth:`SSLSocket.recv` và :meth:`SSLSocket.send`, rồi thử lại sau một lần gọi khác đến
   :func:`~select.select`.
 
-- Conversely, since the SSL layer has its own framing, a SSL socket may
-  still have data available for reading without :func:`~select.select`
-  being aware of it.  Therefore, you should first call
-  :meth:`SSLSocket.recv` to drain any potentially available data, and then
-  only block on a :func:`~select.select` call if still necessary.
+- Ngược lại, vì lớp SSL có cơ chế framing riêng, một SSL socket vẫn có thể còn dữ liệu để đọc mà :func:`~select.select` không biết. Do đó, trước tiên bạn nên gọi
+  :meth:`SSLSocket.recv` để lấy hết mọi dữ liệu có thể đang sẵn có, rồi chỉ block trên một lần gọi :func:`~select.select` nếu vẫn cần thiết.
 
-  (of course, similar provisions apply when using other primitives such as
-  :func:`~select.poll`, or those in the :mod:`selectors` module)
+  (dĩ nhiên, các quy định tương tự cũng áp dụng khi sử dụng những primitive khác như
+  :func:`~select.poll`, hoặc những socket trong module :mod:`selectors`)
 
-- The SSL handshake itself will be non-blocking: the
-  :meth:`SSLSocket.do_handshake` method has to be retried until it returns
-  successfully.  Here is a synopsis using :func:`~select.select` to wait for
-  the socket's readiness::
+- Bản thân quá trình bắt tay SSL sẽ không chặn:
+  Phương thức :meth:`SSLSocket.do_handshake` phải được thử lại cho đến khi trả về thành công. Sau đây là phần tóm lược sử dụng :func:`~select.select` để chờ socket sẵn sàng::
 
     while True:
         try:
@@ -2541,59 +1938,33 @@ thus several things you need to be aware of:
 
 .. seealso::
 
-   The :mod:`asyncio` module supports :ref:`non-blocking SSL sockets
-   <ssl-nonblocking>` and provides a higher level :ref:`Streams API <asyncio-streams>`.
-   It polls for events using the :mod:`selectors` module and
-   handles :exc:`SSLWantWriteError`, :exc:`SSLWantReadError` and
-   :exc:`BlockingIOError` exceptions. It runs the SSL handshake asynchronously
-   as well.
+   Module :mod:`asyncio` hỗ trợ :ref:`các socket SSL không chặn <ssl-nonblocking>` và cung cấp :ref:`Streams API <asyncio-streams>` ở cấp độ cao hơn. Module này thăm dò các sự kiện bằng module :mod:`selectors` và xử lý :exc:`SSLWantWriteError`, :exc:`SSLWantReadError` và
+   :exc:`BlockingIOError` ngoại lệ. Nó cũng thực hiện bắt tay SSL một cách bất đồng bộ.
 
 
-Memory BIO support
-------------------
+Hỗ trợ Memory BIO
+-----------------
 
 .. versionadded:: 3.5
 
-Ever since the SSL module was introduced in Python 2.6, the :class:`SSLSocket`
-class has provided two related but distinct areas of functionality:
+Kể từ khi mô-đun SSL được giới thiệu trong Python 2.6, lớp :class:`SSLSocket` đã cung cấp hai lĩnh vực chức năng có liên quan nhưng khác biệt:
 
-- SSL protocol handling
-- Network IO
+- Xử lý giao thức SSL
+- I/O mạng
 
-The network IO API is identical to that provided by :class:`socket.socket`,
-from which :class:`SSLSocket` also inherits. This allows an SSL socket to be
-used as a drop-in replacement for a regular socket, making it very easy to add
-SSL support to an existing application.
+API I/O mạng giống hệt API do :class:`socket.socket` cung cấp, từ đó :class:`SSLSocket` cũng kế thừa. Điều này cho phép sử dụng một SSL socket để thay thế trực tiếp cho socket thông thường, nhờ đó việc thêm hỗ trợ SSL vào một ứng dụng hiện có trở nên rất dễ dàng.
 
-Combining SSL protocol handling and network IO usually works well, but there
-are some cases where it doesn't. An example is async IO frameworks that want to
-use a different IO multiplexing model than the "select/poll on a file
-descriptor" (readiness based) model that is assumed by :class:`socket.socket`
-and by the internal OpenSSL socket IO routines. This is mostly relevant for
-platforms like Windows where this model is not efficient. For this purpose, a
-reduced scope variant of :class:`SSLSocket` called :class:`SSLObject` is
-provided.
+Việc kết hợp xử lý giao thức SSL và I/O mạng thường hoạt động tốt, nhưng có một số trường hợp không như vậy. Một ví dụ là các framework async IO muốn sử dụng mô hình ghép kênh I/O khác với mô hình "select/poll trên một file descriptor" (dựa trên trạng thái sẵn sàng) mà :class:`socket.socket` và các routine I/O socket nội bộ của OpenSSL giả định. Điều này đặc biệt liên quan đến các nền tảng như Windows, nơi mô hình này không hiệu quả. Vì mục đích này, một biến thể có phạm vi chức năng thu gọn của :class:`SSLSocket` có tên là :class:`SSLObject` được cung cấp.
 
 .. class:: SSLObject
 
-   A reduced-scope variant of :class:`SSLSocket` representing an SSL protocol
-   instance that does not contain any network IO methods. This class is
-   typically used by framework authors that want to implement asynchronous IO
-   for SSL through memory buffers.
+   Một biến thể có phạm vi chức năng thu gọn của :class:`SSLSocket`, đại diện cho một thực thể giao thức SSL không chứa bất kỳ phương thức I/O mạng nào. Lớp này thường được các tác giả framework sử dụng khi muốn triển khai I/O bất đồng bộ cho SSL thông qua các bộ đệm bộ nhớ.
 
-   This class implements an interface on top of a low-level SSL object as
-   implemented by OpenSSL. This object captures the state of an SSL connection
-   but does not provide any network IO itself. IO needs to be performed through
-   separate "BIO" objects which are OpenSSL's IO abstraction layer.
+   Lớp này triển khai một interface trên một đối tượng SSL cấp thấp do OpenSSL triển khai. Đối tượng này lưu giữ trạng thái của một kết nối SSL nhưng bản thân không cung cấp I/O mạng. I/O cần được thực hiện thông qua các đối tượng "BIO" riêng biệt, là lớp trừu tượng I/O của OpenSSL.
 
-   This class has no public constructor.  An :class:`SSLObject` instance
-   must be created using the :meth:`~SSLContext.wrap_bio` method. This
-   method will create the :class:`SSLObject` instance and bind it to a
-   pair of BIOs. The *incoming* BIO is used to pass data from Python to the
-   SSL protocol instance, while the *outgoing* BIO is used to pass data the
-   other way around.
+   Lớp này không có constructor công khai. Một instance :class:`SSLObject` phải được tạo bằng phương thức :meth:`~SSLContext.wrap_bio`. Phương thức này sẽ tạo instance :class:`SSLObject` và liên kết nó với một cặp BIO. BIO *incoming* được dùng để truyền dữ liệu từ Python đến thực thể giao thức SSL, trong khi BIO *outgoing* được dùng để truyền dữ liệu theo chiều ngược lại.
 
-   The following methods are available:
+   Các phương thức sau đây khả dụng:
 
    - :attr:`~SSLSocket.context`
    - :attr:`~SSLSocket.server_side`
@@ -2617,85 +1988,67 @@ provided.
    - :meth:`~SSLSocket.get_channel_binding`
    - :meth:`~SSLSocket.version`
 
-   When compared to :class:`SSLSocket`, this object lacks the following
-   features:
+   So với :class:`SSLSocket`, đối tượng này thiếu các tính năng sau:
 
-   - Any form of network IO; ``recv()`` and ``send()`` read and write only to
-     the underlying :class:`MemoryBIO` buffers.
+   - Không có bất kỳ dạng I/O mạng nào; ``recv()`` và ``send()`` chỉ đọc và ghi vào các bộ đệm :class:`MemoryBIO` bên dưới.
 
-   - There is no *do_handshake_on_connect* machinery. You must always manually
-     call :meth:`~SSLSocket.do_handshake` to start the handshake.
+   - Không có cơ chế *do_handshake_on_connect*. Bạn luôn phải tự gọi :meth:`~SSLSocket.do_handshake` để bắt đầu handshake.
 
-   - There is no handling of *suppress_ragged_eofs*. All end-of-file conditions
-     that are in violation of the protocol are reported via the
+   - Không có cơ chế xử lý *suppress_ragged_eofs*. Mọi điều kiện kết thúc tệp vi phạm giao thức đều được báo cáo thông qua
      :exc:`SSLEOFError` exception.
 
-   - The method :meth:`~SSLSocket.unwrap` call does not return anything,
-     unlike for an SSL socket where it returns the underlying socket.
+   - Lệnh gọi phương thức :meth:`~SSLSocket.unwrap` không trả về gì cả, không giống như đối với một SSL socket, khi nó trả về socket bên dưới.
 
-   - The *server_name_callback* callback passed to
-     :meth:`SSLContext.set_servername_callback` will get an :class:`SSLObject`
-     instance instead of a :class:`SSLSocket` instance as its first parameter.
+   - Callback *server_name_callback* được truyền vào
+     :meth:`SSLContext.set_servername_callback` sẽ nhận một instance :class:`SSLObject` thay vì một instance :class:`SSLSocket` làm tham số đầu tiên.
 
-   Some notes related to the use of :class:`SSLObject`:
+   Một số lưu ý liên quan đến việc sử dụng :class:`SSLObject`:
 
-   - All IO on an :class:`SSLObject` is :ref:`non-blocking <ssl-nonblocking>`.
-     This means that for example :meth:`~SSLSocket.read` will raise an
-     :exc:`SSLWantReadError` if it needs more data than the incoming BIO has
-     available.
+   - Mọi thao tác IO trên :class:`SSLObject` đều :ref:`không chặn <ssl-nonblocking>`. Điều này có nghĩa là, chẳng hạn, :meth:`~SSLSocket.read` sẽ gây ra một
+     :exc:`SSLWantReadError` nếu nó cần nhiều dữ liệu hơn lượng dữ liệu BIO đầu vào hiện có.
 
    .. versionchanged:: 3.7
       :class:`SSLObject` instances must be created with
       :meth:`~SSLContext.wrap_bio`. In earlier versions, it was possible to
-      create instances directly. This was never documented or officially
-      supported.
+      tạo trực tiếp các instance. Điều này chưa bao giờ được ghi lại trong tài liệu hoặc được hỗ trợ chính thức.
 
-An SSLObject communicates with the outside world using memory buffers. The
-class :class:`MemoryBIO` provides a memory buffer that can be used for this
-purpose.  It wraps an OpenSSL memory BIO (Basic IO) object:
+Một SSLObject giao tiếp với thế giới bên ngoài bằng các bộ đệm bộ nhớ. Lớp :class:`MemoryBIO` cung cấp một bộ đệm bộ nhớ có thể được sử dụng cho mục đích này. Nó bao bọc một đối tượng BIO bộ nhớ OpenSSL (Basic IO):
 
 .. class:: MemoryBIO
 
-   A memory buffer that can be used to pass data between Python and an SSL
-   protocol instance.
+   Một bộ đệm bộ nhớ có thể được sử dụng để truyền dữ liệu giữa Python và một phiên bản giao thức SSL.
 
    .. attribute:: MemoryBIO.pending
 
-      Return the number of bytes currently in the memory buffer.
+      Trả về số byte hiện có trong bộ đệm bộ nhớ.
 
    .. attribute:: MemoryBIO.eof
 
-      A boolean indicating whether the memory BIO is current at the end-of-file
-      position.
+      Một giá trị boolean cho biết BIO bộ nhớ hiện đang ở vị trí cuối tệp hay không.
 
    .. method:: MemoryBIO.read(n=-1, /)
 
-      Read up to *n* bytes from the memory buffer. If *n* is not specified or
-      negative, all bytes are returned.
+      Đọc tối đa *n* byte từ bộ đệm bộ nhớ. Nếu không chỉ định *n* hoặc giá trị này là số âm, tất cả byte sẽ được trả về.
 
    .. method:: MemoryBIO.write(buf, /)
 
-      Write the bytes from *buf* to the memory BIO. The *buf* argument must be an
-      object supporting the buffer protocol.
+      Ghi các byte từ *buf* vào BIO bộ nhớ. Đối số *buf* phải là một đối tượng hỗ trợ buffer protocol.
 
-      The return value is the number of bytes written, which is always equal to
-      the length of *buf*.
+      Giá trị trả về là số byte đã ghi, luôn bằng độ dài của *buf*.
 
    .. method:: MemoryBIO.write_eof()
 
-      Write an EOF marker to the memory BIO. After this method has been called, it
-      is illegal to call :meth:`~MemoryBIO.write`. The attribute :attr:`eof` will
-      become true after all data currently in the buffer has been read.
+      Ghi một dấu EOF vào BIO bộ nhớ. Sau khi phương thức này được gọi, việc gọi :meth:`~MemoryBIO.write` là không hợp lệ. Thuộc tính :attr:`eof` sẽ trở thành true sau khi tất cả dữ liệu hiện có trong bộ đệm đã được đọc.
 
 
-SSL session
------------
+phiên SSL
+---------
 
 .. versionadded:: 3.6
 
 .. class:: SSLSession
 
-   Session object used by :attr:`~SSLSocket.session`.
+   Đối tượng phiên được :attr:`~SSLSocket.session` sử dụng.
 
    .. attribute:: id
    .. attribute:: time
@@ -2706,21 +2059,16 @@ SSL session
 
 .. _ssl-security:
 
-Security considerations
------------------------
+Các vấn đề về bảo mật
+---------------------
 
-Best defaults
-^^^^^^^^^^^^^
+Các thiết lập mặc định tốt nhất
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For **client use**, if you don't have any special requirements for your
-security policy, it is highly recommended that you use the
-:func:`create_default_context` function to create your SSL context.
-It will load the system's trusted CA certificates, enable certificate
-validation and hostname checking, and try to choose reasonably secure
-protocol and cipher settings.
+Để sử dụng **client use**, nếu bạn không có yêu cầu đặc biệt nào đối với chính sách bảo mật, bạn rất nên sử dụng
+hàm :func:`create_default_context`. Hàm này sẽ tải các chứng chỉ CA đáng tin cậy của hệ thống, bật tính năng xác thực chứng chỉ và kiểm tra hostname, đồng thời cố gắng chọn các thiết lập giao thức và cipher tương đối an toàn.
 
-For example, here is how you would use the :class:`smtplib.SMTP` class to
-create a trusted, secure connection to a SMTP server::
+Ví dụ: sau đây là cách bạn sử dụng lớp :class:`smtplib.SMTP` để tạo một kết nối đáng tin cậy và an toàn tới máy chủ SMTP::
 
    >>> import ssl, smtplib
    >>> smtp = smtplib.SMTP("mail.python.org", port=587)
@@ -2728,49 +2076,35 @@ create a trusted, secure connection to a SMTP server::
    >>> smtp.starttls(context=context)
    (220, b'2.0.0 Ready to start TLS')
 
-If a client certificate is needed for the connection, it can be added with
+Nếu cần chứng chỉ client cho kết nối, bạn có thể thêm chứng chỉ này bằng
 :meth:`SSLContext.load_cert_chain`.
 
-By contrast, if you create the SSL context by calling the :class:`SSLContext`
-constructor yourself, it will not have certificate validation nor hostname
-checking enabled by default.  If you do so, please read the paragraphs below
-to achieve a good security level.
+Ngược lại, nếu bạn tự tạo SSL context bằng cách gọi constructor :class:`SSLContext`, theo mặc định, context này sẽ không bật tính năng xác thực chứng chỉ hoặc kiểm tra hostname. Nếu làm như vậy, hãy đọc các đoạn bên dưới để đạt được mức bảo mật tốt.
 
-Manual settings
-^^^^^^^^^^^^^^^
+Cài đặt thủ công
+^^^^^^^^^^^^^^^^
 
-Verifying certificates
-''''''''''''''''''''''
+Xác minh chứng chỉ
+''''''''''''''''''
 
-When calling the :class:`SSLContext` constructor directly,
-:const:`CERT_NONE` is the default.  Since it does not authenticate the other
-peer, it can be insecure, especially in client mode where most of the time you
-would like to ensure the authenticity of the server you're talking to.
-Therefore, when in client mode, it is highly recommended to use
-:const:`CERT_REQUIRED`.  However, it is in itself not sufficient; you also
-have to check that the server certificate, which can be obtained by calling
-:meth:`SSLSocket.getpeercert`, matches the desired service.  For many
-protocols and applications, the service can be identified by the hostname.
-This common check is automatically performed when
-:attr:`SSLContext.check_hostname` is enabled.
+Khi gọi trực tiếp constructor :class:`SSLContext`,
+:const:`CERT_NONE` là giá trị mặc định. Vì không xác thực peer còn lại, tùy chọn này có thể không an toàn, đặc biệt ở client mode, khi phần lớn thời gian bạn muốn đảm bảo tính xác thực của server mà mình đang kết nối. Do đó, khi ở client mode, bạn rất nên sử dụng
+:const:`CERT_REQUIRED`. Tuy nhiên, chỉ riêng tùy chọn này vẫn chưa đủ; bạn cũng phải kiểm tra chứng chỉ server, có thể lấy được bằng cách gọi
+:meth:`SSLSocket.getpeercert`, khớp với dịch vụ mong muốn. Đối với nhiều giao thức và ứng dụng, dịch vụ có thể được xác định bằng hostname. Kiểm tra phổ biến này được tự động thực hiện khi
+:attr:`SSLContext.check_hostname` được bật.
 
 .. versionchanged:: 3.7
-   Hostname matchings is now performed by OpenSSL. Python no longer uses
+   Việc đối sánh hostname hiện do OpenSSL thực hiện. Python không còn sử dụng
    :func:`!match_hostname`.
 
-In server mode, if you want to authenticate your clients using the SSL layer
-(rather than using a higher-level authentication mechanism), you'll also have
-to specify :const:`CERT_REQUIRED` and similarly check the client certificate.
+Ở chế độ máy chủ, nếu bạn muốn xác thực các client bằng lớp SSL (thay vì sử dụng cơ chế xác thực cấp cao hơn), bạn cũng sẽ phải chỉ định :const:`CERT_REQUIRED` và tương tự kiểm tra certificate của client.
 
 
-Protocol versions
-'''''''''''''''''
+Các phiên bản giao thức
+'''''''''''''''''''''''
 
-SSL versions 2 and 3 are considered insecure and are therefore dangerous to
-use.  If you want maximum compatibility between clients and servers, it is
-recommended to use :const:`PROTOCOL_TLS_CLIENT` or
-:const:`PROTOCOL_TLS_SERVER` as the protocol version. SSLv2 and SSLv3 are
-disabled by default.
+SSL phiên bản 2 và 3 được xem là không an toàn và do đó rất nguy hiểm khi sử dụng. Nếu bạn muốn đạt khả năng tương thích tối đa giữa client và máy chủ, nên sử dụng :const:`PROTOCOL_TLS_CLIENT` hoặc
+:const:`PROTOCOL_TLS_SERVER` làm phiên bản giao thức. SSLv2 và SSLv3 bị tắt theo mặc định.
 
 ::
 
@@ -2779,35 +2113,20 @@ disabled by default.
    >>> client_context.maximum_version = ssl.TLSVersion.TLSv1_3
 
 
-The SSL client context created above will only allow TLSv1.2 and TLSv1.3 (if
-supported by your system) connections to a server. :const:`PROTOCOL_TLS_CLIENT`
-implies certificate validation and hostname checks by default. You have to
-load certificates into the context.
+Ngữ cảnh SSL client được tạo ở trên sẽ chỉ cho phép các kết nối TLSv1.2 và TLSv1.3 (nếu hệ thống của bạn hỗ trợ) đến máy chủ. :const:`PROTOCOL_TLS_CLIENT` mặc định bao hàm việc xác thực chứng chỉ và kiểm tra hostname. Bạn phải tải các chứng chỉ vào ngữ cảnh.
 
 
-Cipher selection
-''''''''''''''''
+Lựa chọn cipher
+'''''''''''''''
 
-If you have advanced security requirements, fine-tuning of the ciphers
-enabled when negotiating a SSL session is possible through the
-:meth:`SSLContext.set_ciphers` method.  Starting from Python 3.2.3, the
-ssl module disables certain weak ciphers by default, but you may want
-to further restrict the cipher choice. Be sure to read OpenSSL's documentation
-about the `cipher list format <https://docs.openssl.org/1.1.1/man1/ciphers/#cipher-list-format>`_.
-If you want to check which ciphers are enabled by a given cipher list, use
-:meth:`SSLContext.get_ciphers` or the ``openssl ciphers`` command on your
-system.
+Nếu bạn có các yêu cầu bảo mật nâng cao, có thể tinh chỉnh các cipher được bật khi thương lượng một phiên SSL thông qua
+phương thức :meth:`SSLContext.set_ciphers`. Kể từ Python 3.2.3, mô-đun ssl mặc định vô hiệu hóa một số cipher yếu, nhưng bạn có thể muốn hạn chế thêm lựa chọn cipher. Hãy đọc tài liệu của OpenSSL về định dạng danh sách cipher `cipher list format <https://docs.openssl.org/1.1.1/man1/ciphers/#cipher-list-format>`_. Nếu muốn kiểm tra những cipher nào được bật bởi một danh sách cipher cụ thể, hãy sử dụng
+:meth:`SSLContext.get_ciphers` hoặc lệnh ``openssl ciphers`` trên hệ thống của bạn.
 
-Multi-processing
-^^^^^^^^^^^^^^^^
+Đa tiến trình
+^^^^^^^^^^^^^
 
-If using this module as part of a multi-processed application (using,
-for example the :mod:`multiprocessing` or :mod:`concurrent.futures` modules),
-be aware that OpenSSL's internal random number generator does not properly
-handle forked processes.  Applications must change the PRNG state of the
-parent process if they use any SSL feature with :func:`os.fork`.  Any
-successful call of :func:`~ssl.RAND_add` or :func:`~ssl.RAND_bytes` is
-sufficient.
+Nếu sử dụng mô-đun này trong một ứng dụng đa tiến trình (chẳng hạn như sử dụng các mô-đun :mod:`multiprocessing` hoặc :mod:`concurrent.futures`), hãy lưu ý rằng trình tạo số ngẫu nhiên nội bộ của OpenSSL không xử lý đúng các tiến trình được tạo bằng fork. Ứng dụng phải thay đổi trạng thái PRNG của tiến trình cha nếu sử dụng bất kỳ tính năng SSL nào với :func:`os.fork`. Mọi lần gọi thành công :func:`~ssl.RAND_add` hoặc :func:`~ssl.RAND_bytes` đều đáp ứng yêu cầu.
 
 
 .. _ssl-tlsv1_3:
@@ -2817,31 +2136,22 @@ TLS 1.3
 
 .. versionadded:: 3.7
 
-The TLS 1.3 protocol behaves slightly differently than previous version
-of TLS/SSL. Some new TLS 1.3 features are not yet available.
+Giao thức TLS 1.3 hoạt động hơi khác so với các phiên bản TLS/SSL trước đây. Một số tính năng mới của TLS 1.3 hiện chưa khả dụng.
 
-- TLS 1.3 uses a disjunct set of cipher suites. All AES-GCM and
-  ChaCha20 cipher suites are enabled by default.  The method
-  :meth:`SSLContext.set_ciphers` cannot enable or disable any TLS 1.3
-  ciphers yet, but :meth:`SSLContext.get_ciphers` returns them.
-- Session tickets are no longer sent as part of the initial handshake and
-  are handled differently.  :attr:`SSLSocket.session` and :class:`SSLSession`
-  are not compatible with TLS 1.3.
-- Client-side certificates are also no longer verified during the initial
-  handshake.  A server can request a certificate at any time.  Clients
-  process certificate requests while they send or receive application data
-  from the server.
-- TLS 1.3 features like early data, deferred TLS client cert request,
-  signature algorithm configuration, and rekeying are not supported yet.
+- TLS 1.3 sử dụng một nhóm cipher suite riêng. Tất cả cipher suite AES-GCM và ChaCha20 đều được bật theo mặc định. Phương thức
+  :meth:`SSLContext.set_ciphers` hiện chưa thể bật hoặc tắt bất kỳ cipher TLS 1.3 nào, nhưng :meth:`SSLContext.get_ciphers` sẽ trả về chúng.
+- Session ticket không còn được gửi trong quá trình bắt tay ban đầu và được xử lý theo cách khác. :attr:`SSLSocket.session` và :class:`SSLSession` không tương thích với TLS 1.3.
+- Certificate phía client cũng không còn được xác minh trong quá trình bắt tay ban đầu. Server có thể yêu cầu certificate bất kỳ lúc nào. Client xử lý các yêu cầu certificate trong khi gửi hoặc nhận dữ liệu ứng dụng từ server.
+- Các tính năng TLS 1.3 như dữ liệu sớm, yêu cầu certificate client TLS trì hoãn, cấu hình thuật toán chữ ký và rekeying hiện chưa được hỗ trợ.
 
 
 .. seealso::
 
-   Class :class:`socket.socket`
-       Documentation of underlying :mod:`socket` class
+   Lớp :class:`socket.socket`
+       Tài liệu về lớp nền tảng :mod:`socket`
 
-   `SSL/TLS Strong Encryption: An Introduction <https://httpd.apache.org/docs/trunk/en/ssl/ssl_intro.html>`_
-       Intro from the Apache HTTP Server documentation
+   `Mã hóa mạnh SSL/TLS: Giới thiệu <https://httpd.apache.org/docs/trunk/en/ssl/ssl_intro.html>`_
+       Phần giới thiệu từ tài liệu Apache HTTP Server
 
    :rfc:`RFC 1422: Privacy Enhancement for Internet Electronic Mail: Part II: Certificate-Based Key Management <1422>`
        Steve Kent
@@ -2850,19 +2160,33 @@ of TLS/SSL. Some new TLS 1.3 features are not yet available.
        Donald E. Eastlake, Jeffrey I. Schiller, Steve Crocker
 
    :rfc:`RFC 5280: Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile <5280>`
-       David Cooper et al.
+       David Cooper và cộng sự
 
    :rfc:`RFC 5246: The Transport Layer Security (TLS) Protocol Version 1.2 <5246>`
-       Tim Dierks and Eric Rescorla.
+       Tim Dierks và Eric Rescorla.
 
    :rfc:`RFC 6066: Transport Layer Security (TLS) Extensions <6066>`
        Donald E. Eastlake
 
-   `IANA TLS: Transport Layer Security (TLS) Parameters <https://www.iana.org/assignments/tls-parameters/tls-parameters.xml>`_
+   `Các tham số IANA TLS: Bảo mật tầng truyền tải (TLS) <https://www.iana.org/assignments/tls-parameters/tls-parameters.xml>`_
        IANA
 
    :rfc:`RFC 7525: Recommendations for Secure Use of Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS) <7525>`
        IETF
 
-   `Mozilla's Server Side TLS recommendations <https://wiki.mozilla.org/Security/Server_Side_TLS>`_
+   `Các khuyến nghị TLS phía máy chủ của Mozilla <https://wiki.mozilla.org/Security/Server_Side_TLS>`_
        Mozilla
+
+.. _`completely broken`: https://en.wikipedia.org/wiki/POODLE
+.. _`Cryptographically secure pseudorandom number generator (CSPRNG)`: https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator
+.. _`Application Layer Protocol Negotiation`: https://en.wikipedia.org/wiki/Application-Layer_Protocol_Negotiation
+.. _`IANA TLS Alert Registry`: https://www.iana.org/assignments/tls-parameters/tls-parameters.xml#tls-parameters-6
+.. _`OpenSSL specific layout`: https://docs.openssl.org/master/man3/SSL_CTX_load_verify_locations/
+.. _`OpenSSL cipher list format`: https://docs.openssl.org/master/man1/ciphers/
+.. _`SSL/TLS & Perfect Forward Secrecy`: https://vincent.bernat.ch/en/blog/2011-ssl-perfect-forward-secrecy
+.. _`piece of information`: https://docs.openssl.org/1.1.1/man3/SSL_CTX_sess_number/
+.. _`security level`: https://docs.openssl.org/master/man3/SSL_CTX_get_security_level/
+.. _`cipher list format`: https://docs.openssl.org/1.1.1/man1/ciphers/#cipher-list-format
+.. _`SSL/TLS Strong Encryption: An Introduction`: https://httpd.apache.org/docs/trunk/en/ssl/ssl_intro.html
+.. _`IANA TLS: Transport Layer Security (TLS) Parameters`: https://www.iana.org/assignments/tls-parameters/tls-parameters.xml
+.. _`Mozilla's Server Side TLS recommendations`: https://wiki.mozilla.org/Security/Server_Side_TLS

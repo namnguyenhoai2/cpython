@@ -1,116 +1,81 @@
-:mod:`!zlib` --- Compression compatible with :program:`gzip`
-============================================================
+:mod:`!zlib` --- Nén tương thích với :program:`gzip`
+====================================================
 
 .. module:: zlib
-   :synopsis: Low-level interface to compression and decompression routines
-              compatible with gzip.
+   :synopsis: Giao diện cấp thấp cho các routine nén và giải nén tương thích với gzip.
 
 --------------
 
-For applications that require data compression, the functions in this module
-allow compression and decompression, using the `zlib library <https://www.zlib.net>`_.
+Đối với các ứng dụng yêu cầu nén dữ liệu, các hàm trong module này cho phép nén và giải nén bằng thư viện `zlib <https://www.zlib.net>`_.
 
 .. include:: ../includes/optional-module.rst
 
-zlib's functions have many options and often need to be used in a particular
-order.  This documentation doesn't attempt to cover all of the permutations;
-consult the `zlib manual <https://www.zlib.net/manual.html>`_ for authoritative
-information.
+Các hàm của zlib có nhiều tùy chọn và thường cần được sử dụng theo một thứ tự cụ thể. Tài liệu này không cố gắng trình bày tất cả các tổ hợp; hãy tham khảo `sổ tay zlib <https://www.zlib.net/manual.html>`_ để biết thông tin chính thức.
 
-For reading and writing ``.gz`` files see the :mod:`gzip` module.
+Để đọc và ghi các tệp ``.gz``, hãy xem module :mod:`gzip`.
 
-The available exception and functions in this module are:
+Các exception và hàm có sẵn trong module này gồm:
 
 
 .. exception:: error
 
-   Exception raised on compression and decompression errors.
+   Exception được phát sinh khi xảy ra lỗi nén và giải nén.
 
 
 .. function:: adler32(data, value=1, /)
 
-   Computes an Adler-32 checksum of *data*.  (An Adler-32 checksum is almost as
-   reliable as a CRC32 but can be computed much more quickly.)  The result
-   is an unsigned 32-bit integer.  If *value* is present, it is used as
-   the starting value of the checksum; otherwise, a default value of 1
-   is used.  Passing in *value* allows computing a running checksum over the
-   concatenation of several inputs.  The algorithm is not cryptographically
-   strong, and should not be used for authentication or digital signatures.  Since
-   the algorithm is designed for use as a checksum algorithm, it is not suitable
-   for use as a general hash algorithm.
+   Tính checksum Adler-32 của *data*. (Checksum Adler-32 gần đáng tin cậy như CRC32 nhưng có thể được tính nhanh hơn nhiều.) Kết quả là một số nguyên 32-bit không dấu. Nếu *value* được cung cấp, giá trị này sẽ được dùng làm giá trị bắt đầu của checksum; nếu không, giá trị mặc định là 1 sẽ được sử dụng. Việc truyền *value* cho phép tính checksum liên tục trên phần nối của nhiều đầu vào. Thuật toán này không đủ mạnh về mặt mật mã và không nên được dùng cho xác thực hoặc chữ ký số. Vì thuật toán được thiết kế để dùng làm thuật toán checksum nên không phù hợp để sử dụng như một thuật toán hash nói chung.
 
    .. versionchanged:: 3.0
-      The result is always unsigned.
+      Kết quả luôn là số không dấu.
 
 .. function:: compress(data, /, level=Z_DEFAULT_COMPRESSION, wbits=MAX_WBITS)
 
-   Compresses the bytes in *data*, returning a bytes object containing compressed data.
-   *level* is an integer from ``0`` to ``9`` or ``-1`` controlling the level of compression;
-   See :const:`Z_BEST_SPEED` (``1``), :const:`Z_BEST_COMPRESSION` (``9``),
-   :const:`Z_NO_COMPRESSION` (``0``), and the default,
-   :const:`Z_DEFAULT_COMPRESSION` (``-1``) for more information about these values.
+   Nén các byte trong *data*, trả về một đối tượng bytes chứa dữ liệu đã nén. *level* là một số nguyên từ ``0`` đến ``9`` hoặc ``-1``, dùng để điều khiển mức độ nén; xem :const:`Z_BEST_SPEED` (``1``), :const:`Z_BEST_COMPRESSION` (``9``),
+   :const:`Z_NO_COMPRESSION` (``0``), và giá trị mặc định,
+   :const:`Z_DEFAULT_COMPRESSION` (``-1``) để biết thêm thông tin về các giá trị này.
 
    .. _compress-wbits:
 
-   The *wbits* argument controls the size of the history buffer (or the
-   "window size") used when compressing data, and whether a header and
-   trailer is included in the output.  It can take several ranges of values,
-   defaulting to ``15`` (:const:`MAX_WBITS`):
+   Đối số *wbits* điều khiển kích thước của bộ đệm lịch sử (hay "kích thước cửa sổ") được sử dụng khi nén dữ liệu, cũng như việc có đưa header và trailer vào đầu ra hay không. Đối số này có thể nhận một số khoảng giá trị, với giá trị mặc định là ``15`` (:const:`MAX_WBITS`):
 
-   * +9 to +15: The base-two logarithm of the window size, which
-     therefore ranges between 512 and 32768.  Larger values produce
-     better compression at the expense of greater memory usage.  The
-     resulting output will include a zlib-specific header and trailer.
+   * +9 đến +15: Logarit cơ số hai của kích thước cửa sổ, do đó kích thước này nằm trong khoảng từ 512 đến 32768. Giá trị lớn hơn tạo ra mức nén tốt hơn nhưng phải đánh đổi bằng việc sử dụng nhiều bộ nhớ hơn. Đầu ra thu được sẽ bao gồm header và trailer dành riêng cho zlib.
 
-   * −9 to −15: Uses the absolute value of *wbits* as the
-     window size logarithm, while producing a raw output stream with no
-     header or trailing checksum.
+   * −9 đến −15: Sử dụng giá trị tuyệt đối của *wbits* làm logarit kích thước cửa sổ, đồng thời tạo luồng đầu ra thô không có phần đầu hoặc checksum ở cuối.
 
-   * +25 to +31 = 16 + (9 to 15): Uses the low 4 bits of the value as the
-     window size logarithm, while including a basic :program:`gzip` header
-     and trailing checksum in the output.
+   * +25 đến +31 = 16 + (9 đến 15): Sử dụng 4 bit thấp của giá trị làm logarit kích thước cửa sổ, đồng thời bao gồm phần đầu :program:`gzip` cơ bản và checksum ở cuối trong đầu ra.
 
-   Raises the :exc:`error` exception if any error occurs.
+   Tăng ngoại lệ :exc:`error` nếu xảy ra bất kỳ lỗi nào.
 
    .. versionchanged:: 3.6
-      *level* can now be used as a keyword parameter.
+      *level* hiện có thể được sử dụng làm tham số từ khóa.
 
    .. versionchanged:: 3.11
-      The *wbits* parameter is now available to set window bits and
-      compression type.
+      Tham số *wbits* hiện có sẵn để thiết lập số bit của cửa sổ và kiểu nén.
 
 .. function:: compressobj(level=Z_DEFAULT_COMPRESSION, method=DEFLATED, wbits=MAX_WBITS, memLevel=DEF_MEM_LEVEL, strategy=Z_DEFAULT_STRATEGY[, zdict])
 
-   Returns a compression object, to be used for compressing data streams that won't
-   fit into memory at once.
+   Trả về một đối tượng nén, được dùng để nén các luồng dữ liệu không thể vừa vào bộ nhớ cùng một lúc.
 
-   *level* is the compression level -- an integer from ``0`` to ``9`` or ``-1``.
-   See :const:`Z_BEST_SPEED` (``1``), :const:`Z_BEST_COMPRESSION` (``9``),
-   :const:`Z_NO_COMPRESSION` (``0``), and the default,
-   :const:`Z_DEFAULT_COMPRESSION` (``-1``) for more information about these values.
+   *level* là mức nén -- một số nguyên từ ``0`` đến ``9`` hoặc ``-1``. Xem :const:`Z_BEST_SPEED` (``1``), :const:`Z_BEST_COMPRESSION` (``9``),
+   :const:`Z_NO_COMPRESSION` (``0``), và giá trị mặc định,
+   :const:`Z_DEFAULT_COMPRESSION` (``-1``) để biết thêm thông tin về các giá trị này.
 
-   *method* is the compression algorithm. Currently, the only supported value is
+   *method* là thuật toán nén. Hiện tại, giá trị duy nhất được hỗ trợ là
    :const:`DEFLATED`.
 
-   The *wbits* parameter controls the size of the history buffer (or the
-   "window size"), and what header and trailer format will be used. It has
-   the same meaning as `described for compress() <#compress-wbits>`__.
+   Tham số *wbits* kiểm soát kích thước của bộ đệm lịch sử (hay "kích thước cửa sổ"), cũng như định dạng header và trailer sẽ được sử dụng. Tham số này có cùng ý nghĩa với `described for compress() <#compress-wbits>`__.
 
-   The *memLevel* argument controls the amount of memory used for the
-   internal compression state. Valid values range from ``1`` to ``9``.
-   Higher values use more memory, but are faster and produce smaller output.
+   Đối số *memLevel* kiểm soát lượng bộ nhớ được sử dụng cho trạng thái nén nội bộ. Các giá trị hợp lệ nằm trong khoảng từ ``1`` đến ``9``. Giá trị cao hơn sử dụng nhiều bộ nhớ hơn, nhưng nhanh hơn và tạo ra đầu ra nhỏ hơn.
 
-   *strategy* is used to tune the compression algorithm. Possible values are
+   *strategy* được dùng để tinh chỉnh thuật toán nén. Các giá trị có thể có là
    :const:`Z_DEFAULT_STRATEGY`, :const:`Z_FILTERED`, :const:`Z_HUFFMAN_ONLY`,
-   :const:`Z_RLE` and :const:`Z_FIXED`.
+   :const:`Z_RLE` và :const:`Z_FIXED`.
 
-   *zdict* is a predefined compression dictionary. This is a sequence of bytes
-   (such as a :class:`bytes` object) containing subsequences that are expected
-   to occur frequently in the data that is to be compressed. Those subsequences
-   that are expected to be most common should come at the end of the dictionary.
+   *zdict* là một từ điển nén được định nghĩa sẵn. Đây là một chuỗi byte (chẳng hạn như một đối tượng :class:`bytes`) chứa các chuỗi con được dự đoán là sẽ thường xuyên xuất hiện trong dữ liệu cần nén. Các chuỗi con được dự đoán là phổ biến nhất nên nằm ở cuối từ điển.
 
    .. versionchanged:: 3.3
-      Added the *zdict* parameter and keyword argument support.
+      Đã bổ sung tham số *zdict* và hỗ trợ đối số keyword.
 
 
 .. function:: crc32(data, value=0, /)
@@ -119,368 +84,291 @@ The available exception and functions in this module are:
       single: Cyclic Redundancy Check
       single: checksum; Cyclic Redundancy Check
 
-   Computes a CRC (Cyclic Redundancy Check) checksum of *data*. The
-   result is an unsigned 32-bit integer. If *value* is present, it is used
-   as the starting value of the checksum; otherwise, a default value of 0
-   is used.  Passing in *value* allows computing a running checksum over the
-   concatenation of several inputs.  The algorithm is not cryptographically
-   strong, and should not be used for authentication or digital signatures.  Since
-   the algorithm is designed for use as a checksum algorithm, it is not suitable
-   for use as a general hash algorithm.
+   Tính checksum CRC (Cyclic Redundancy Check) của *data*. Kết quả là một số nguyên 32 bit không dấu. Nếu có *value*, giá trị này được dùng làm giá trị khởi đầu của checksum; nếu không, giá trị mặc định 0 sẽ được sử dụng. Việc truyền *value* cho phép tính checksum liên tục trên phần nối của nhiều đầu vào. Thuật toán này không đủ mạnh về mặt mật mã và không nên được sử dụng cho xác thực hoặc chữ ký số. Vì thuật toán được thiết kế để dùng làm thuật toán checksum, nó không phù hợp để sử dụng như một thuật toán hash tổng quát.
 
    .. versionchanged:: 3.0
-      The result is always unsigned.
+      Kết quả luôn là số không dấu.
 
 .. function:: decompress(data, /, wbits=MAX_WBITS, bufsize=DEF_BUF_SIZE)
 
-   Decompresses the bytes in *data*, returning a bytes object containing the
-   uncompressed data.  The *wbits* parameter depends on
-   the format of *data*, and is discussed further below.
-   If *bufsize* is given, it is used as the initial size of the output
-   buffer.  Raises the :exc:`error` exception if any error occurs.
+   Giải nén các byte trong *data*, trả về một đối tượng bytes chứa dữ liệu chưa nén. Tham số *wbits* phụ thuộc vào định dạng của *data* và sẽ được thảo luận thêm bên dưới. Nếu cung cấp *bufsize*, giá trị này được dùng làm kích thước ban đầu của bộ đệm đầu ra. Phát sinh ngoại lệ :exc:`error` nếu xảy ra bất kỳ lỗi nào.
 
    .. _decompress-wbits:
 
-   The *wbits* parameter controls the size of the history buffer
-   (or "window size"), and what header and trailer format is expected.
-   It is similar to the parameter for :func:`compressobj`, but accepts
-   more ranges of values:
+   Tham số *wbits* kiểm soát kích thước của bộ đệm lịch sử (hay "kích thước cửa sổ") và định dạng header và trailer được mong đợi. Tham số này tương tự tham số của :func:`compressobj`, nhưng chấp nhận nhiều khoảng giá trị hơn:
 
-   * +8 to +15: The base-two logarithm of the window size.  The input
-     must include a zlib header and trailer.
+   * +8 đến +15: Logarit cơ số hai của kích thước cửa sổ. Đầu vào phải bao gồm header và trailer của zlib.
 
-   * 0: Automatically determine the window size from the zlib header.
-     Only supported since zlib 1.2.3.5.
+   * 0: Tự động xác định kích thước cửa sổ từ header của zlib. Chỉ được hỗ trợ kể từ zlib 1.2.3.5.
 
-   * −8 to −15: Uses the absolute value of *wbits* as the window size
-     logarithm.  The input must be a raw stream with no header or trailer.
+   * −8 đến −15: Sử dụng giá trị tuyệt đối của *wbits* làm logarit kích thước cửa sổ. Dữ liệu đầu vào phải là một raw stream không có header hoặc trailer.
 
-   * +24 to +31 = 16 + (8 to 15): Uses the low 4 bits of the value as
-     the window size logarithm.  The input must include a gzip header and
-     trailer.
+   * +24 đến +31 = 16 + (8 đến 15): Sử dụng 4 bit thấp của giá trị làm logarit kích thước cửa sổ. Dữ liệu đầu vào phải bao gồm header và trailer của gzip.
 
-   * +40 to +47 = 32 + (8 to 15): Uses the low 4 bits of the value as
-     the window size logarithm, and automatically accepts either
-     the zlib or gzip format.
+   * +40 đến +47 = 32 + (8 đến 15): Sử dụng 4 bit thấp của giá trị làm logarit kích thước cửa sổ và tự động chấp nhận định dạng zlib hoặc gzip.
 
-   When decompressing a stream, the window size must not be smaller
-   than the size originally used to compress the stream; using a too-small
-   value may result in an :exc:`error` exception. The default *wbits* value
-   corresponds to the largest window size and requires a zlib header and
-   trailer to be included.
+   Khi giải nén một stream, kích thước cửa sổ không được nhỏ hơn kích thước ban đầu được dùng để nén stream; sử dụng giá trị quá nhỏ có thể dẫn đến ngoại lệ :exc:`error` . Giá trị *wbits* mặc định tương ứng với kích thước cửa sổ lớn nhất và yêu cầu phải bao gồm header và trailer của zlib.
 
-   *bufsize* is the initial size of the buffer used to hold decompressed data.  If
-   more space is required, the buffer size will be increased as needed, so you
-   don't have to get this value exactly right; tuning it will only save a few calls
-   to :c:func:`malloc`.
+   *bufsize* là kích thước ban đầu của bộ đệm dùng để chứa dữ liệu đã giải nén. Nếu cần thêm không gian, kích thước bộ đệm sẽ được tăng lên khi cần, vì vậy bạn không cần phải xác định chính xác giá trị này; việc tinh chỉnh nó chỉ giúp giảm vài lần gọi đến :c:func:`malloc`.
 
    .. versionchanged:: 3.6
-      *wbits* and *bufsize* can be used as keyword arguments.
+      *wbits* và *bufsize* có thể được sử dụng làm keyword arguments.
 
 .. function:: decompressobj(wbits=MAX_WBITS, zdict=b'')
 
-   Returns a decompression object, to be used for decompressing data streams that
-   won't fit into memory at once.
+   Trả về một đối tượng giải nén, được dùng để giải nén các luồng dữ liệu không thể vừa vào bộ nhớ cùng một lúc.
 
-   The *wbits* parameter controls the size of the history buffer (or the
-   "window size"), and what header and trailer format is expected.  It has
-   the same meaning as `described for decompress() <#decompress-wbits>`__.
+   Tham số *wbits* kiểm soát kích thước bộ đệm lịch sử (hay "kích thước cửa sổ") và định dạng header và trailer được mong đợi. Nó có cùng ý nghĩa như `described for decompress() <#decompress-wbits>`__.
 
-   The *zdict* parameter specifies a predefined compression dictionary. If
-   provided, this must be the same dictionary as was used by the compressor that
-   produced the data that is to be decompressed.
+   Tham số *zdict* chỉ định một từ điển nén được xác định trước. Nếu được cung cấp, đây phải là cùng một từ điển đã được bộ nén sử dụng để tạo ra dữ liệu cần giải nén.
 
    .. note::
 
-      If *zdict* is a mutable object (such as a :class:`bytearray`), you must not
-      modify its contents between the call to :func:`decompressobj` and the first
-      call to the decompressor's ``decompress()`` method.
+      Nếu *zdict* là một đối tượng có thể thay đổi (chẳng hạn như :class:`bytearray`), bạn không được sửa đổi nội dung của nó giữa lần gọi :func:`decompressobj` và lần gọi đầu tiên đến phương thức ``decompress()`` của bộ giải nén.
 
    .. versionchanged:: 3.3
-      Added the *zdict* parameter.
+      Đã thêm tham số *zdict*.
 
 
-Compression objects support the following methods:
+Các đối tượng nén hỗ trợ các phương thức sau:
 
 
 .. method:: Compress.compress(data, /)
 
-   Compress *data*, returning a bytes object containing compressed data for at least
-   part of the data in *data*.  This data should be concatenated to the output
-   produced by any preceding calls to the :meth:`compress` method.  Some input may
-   be kept in internal buffers for later processing.
+   Nén *data*, trả về một đối tượng bytes chứa dữ liệu đã nén cho ít nhất một phần dữ liệu trong *data*. Dữ liệu này nên được nối vào đầu ra do mọi lần gọi trước đó đến phương thức :meth:`compress` tạo ra. Một phần dữ liệu đầu vào có thể được giữ trong các bộ đệm nội bộ để xử lý sau.
 
 
 .. method:: Compress.flush(mode=Z_FINISH, /)
 
-   All pending input is processed, and a bytes object containing the remaining compressed
-   output is returned.  *mode* can be selected from the constants
+   Toàn bộ dữ liệu đầu vào đang chờ được xử lý và một đối tượng bytes chứa phần đầu ra đã nén còn lại được trả về. Có thể chọn *mode* từ các hằng số
    :const:`Z_NO_FLUSH`, :const:`Z_PARTIAL_FLUSH`, :const:`Z_SYNC_FLUSH`,
-   :const:`Z_FULL_FLUSH`, :const:`Z_BLOCK`, or :const:`Z_FINISH`,
-   defaulting to :const:`Z_FINISH`.  Except :const:`Z_FINISH`, all constants
-   allow compressing further bytestrings of data, while :const:`Z_FINISH` finishes the
-   compressed stream and prevents compressing any more data.  After calling :meth:`flush`
-   with *mode* set to :const:`Z_FINISH`, the :meth:`compress` method cannot be called again;
-   the only realistic action is to delete the object.
+   :const:`Z_FULL_FLUSH`, :const:`Z_BLOCK` hoặc :const:`Z_FINISH`, mặc định là :const:`Z_FINISH`. Ngoại trừ :const:`Z_FINISH`, tất cả các hằng số đều cho phép tiếp tục nén các bytestring dữ liệu khác, trong khi :const:`Z_FINISH` hoàn tất luồng đã nén và ngăn không cho nén thêm dữ liệu. Sau khi gọi :meth:`flush` với *mode* được đặt thành :const:`Z_FINISH`, không thể gọi lại phương thức :meth:`compress`; hành động thực tế duy nhất là xóa đối tượng.
 
 
 .. method:: Compress.copy()
 
-   Returns a copy of the compression object.  This can be used to efficiently
-   compress a set of data that share a common initial prefix.
+   Trả về một bản sao của đối tượng nén. Có thể dùng bản sao này để nén hiệu quả một tập dữ liệu có cùng tiền tố ban đầu.
 
 
 .. versionchanged:: 3.8
-   Added :func:`copy.copy` and :func:`copy.deepcopy` support to compression
-   objects.
+   Đã thêm hỗ trợ :func:`copy.copy` và :func:`copy.deepcopy` cho các đối tượng nén.
 
 
-Decompression objects support the following methods and attributes:
+Các đối tượng giải nén hỗ trợ những phương thức và thuộc tính sau:
 
 
 .. attribute:: Decompress.unused_data
 
-   A bytes object which contains any bytes past the end of the compressed data. That is,
-   this remains ``b""`` until the last byte that contains compression data is
-   available.  If the whole bytestring turned out to contain compressed data, this is
-   ``b""``, an empty bytes object.
+   Một đối tượng bytes chứa mọi byte nằm sau phần cuối của dữ liệu đã nén. Nghĩa là, giá trị này vẫn là ``b""`` cho đến khi có sẵn byte cuối cùng chứa dữ liệu nén. Nếu toàn bộ bytestring hóa ra đều chứa dữ liệu đã nén thì giá trị này là ``b""``, một đối tượng bytes rỗng.
 
 
 .. attribute:: Decompress.unconsumed_tail
 
-   A bytes object that contains any data that was not consumed by the last
-   :meth:`decompress` call because it exceeded the limit for the uncompressed data
-   buffer.  This data has not yet been seen by the zlib machinery, so you must feed
-   it (possibly with further data concatenated to it) back to a subsequent
-   :meth:`decompress` method call in order to get correct output.
+   Một đối tượng bytes chứa mọi dữ liệu chưa được tiêu thụ bởi lần gọi trước đó
+   lệnh gọi :meth:`decompress` vì nó đã vượt quá giới hạn của bộ đệm dữ liệu chưa nén. Dữ liệu này vẫn chưa được bộ máy zlib xử lý, vì vậy bạn phải truyền dữ liệu đó (có thể nối thêm dữ liệu khác vào) trở lại cho một lệnh gọi tiếp theo
+   lệnh gọi phương thức :meth:`decompress` để nhận được kết quả chính xác.
 
 
 .. attribute:: Decompress.eof
 
-   A boolean indicating whether the end of the compressed data stream has been
-   reached.
+   Một giá trị boolean cho biết đã đến cuối luồng dữ liệu nén hay chưa.
 
-   This makes it possible to distinguish between a properly formed compressed
-   stream, and an incomplete or truncated one.
+   Điều này giúp phân biệt giữa một luồng dữ liệu nén được tạo đúng định dạng và một luồng chưa hoàn chỉnh hoặc bị cắt ngắn.
 
    .. versionadded:: 3.3
 
 
 .. method:: Decompress.decompress(data, /, max_length=0)
 
-   Decompress *data*, returning a bytes object containing the uncompressed data
-   corresponding to at least part of the data in *string*.  This data should be
-   concatenated to the output produced by any preceding calls to the
-   :meth:`decompress` method.  Some of the input data may be preserved in internal
-   buffers for later processing.
+   Giải nén *data*, trả về một đối tượng bytes chứa dữ liệu chưa nén tương ứng với ít nhất một phần dữ liệu trong *string*. Dữ liệu này phải được nối vào kết quả do bất kỳ lệnh gọi nào trước đó tới
+   phương thức :meth:`decompress`. Một phần dữ liệu đầu vào có thể được giữ lại trong các bộ đệm nội bộ để xử lý sau.
 
-   If the optional parameter *max_length* is non-zero then the return value will be
-   no longer than *max_length*. This may mean that not all of the compressed input
-   can be processed; and unconsumed data will be stored in the attribute
-   :attr:`unconsumed_tail`. This bytestring must be passed to a subsequent call to
-   :meth:`decompress` if decompression is to continue.  If *max_length* is zero
-   then the whole input is decompressed, and :attr:`unconsumed_tail` is empty.
+   Nếu tham số tùy chọn *max_length* khác không thì giá trị trả về sẽ không dài hơn *max_length*. Điều này có thể có nghĩa là không phải toàn bộ dữ liệu đầu vào đã nén đều được xử lý; dữ liệu chưa được sử dụng sẽ được lưu trong thuộc tính
+   :attr:`unconsumed_tail`. Chuỗi byte này phải được truyền vào một lần gọi tiếp theo tới
+   :meth:`decompress` nếu muốn tiếp tục giải nén. Nếu *max_length* bằng không thì toàn bộ đầu vào sẽ được giải nén và :attr:`unconsumed_tail` là rỗng.
 
    .. versionchanged:: 3.6
-      *max_length* can be used as a keyword argument.
+      *max_length* có thể được sử dụng làm đối số từ khóa.
 
 
 .. method:: Decompress.flush(length=DEF_BUF_SIZE, /)
 
-   All pending input is processed, and a bytes object containing the remaining
-   uncompressed output is returned.  After calling :meth:`flush`, the
-   :meth:`decompress` method cannot be called again; the only realistic action is
-   to delete the object.
+   Tất cả dữ liệu đầu vào đang chờ được xử lý và một đối tượng bytes chứa phần đầu ra chưa nén còn lại được trả về. Sau khi gọi :meth:`flush`,
+   không thể gọi lại phương thức :meth:`decompress`; hành động thực tế duy nhất là xóa đối tượng.
 
-   The optional parameter *length* sets the initial size of the output buffer.
+   Tham số tùy chọn *length* đặt kích thước ban đầu của bộ đệm đầu ra.
 
 
 .. method:: Decompress.copy()
 
-   Returns a copy of the decompression object.  This can be used to save the state
-   of the decompressor midway through the data stream in order to speed up random
-   seeks into the stream at a future point.
+   Trả về một bản sao của đối tượng giải nén. Có thể sử dụng bản sao này để lưu trạng thái của bộ giải nén ở giữa luồng dữ liệu, nhằm tăng tốc việc tìm kiếm ngẫu nhiên trong luồng tại một thời điểm sau đó.
 
 
 .. versionchanged:: 3.8
-   Added :func:`copy.copy` and :func:`copy.deepcopy` support to decompression
-   objects.
+   Đã bổ sung hỗ trợ :func:`copy.copy` và :func:`copy.deepcopy` cho các đối tượng giải nén.
 
 
-The following constants are available to configure compression and decompression
-behavior:
+Có thể sử dụng các hằng số sau để cấu hình hoạt động nén và giải nén:
 
 .. data:: DEFLATED
 
-   The deflate compression method.
+   Phương thức nén deflate.
 
 
 .. data:: MAX_WBITS
 
-   The maximum window size, expressed as a power of 2.
-   For example, if :const:`!MAX_WBITS` is ``15`` it results in a window size
-   of ``32 KiB``.
+   Kích thước cửa sổ tối đa, được biểu thị dưới dạng lũy thừa của 2. Ví dụ: nếu :const:`!MAX_WBITS` là ``15`` thì kích thước cửa sổ sẽ là ``32 KiB``.
 
 
 .. data:: DEF_MEM_LEVEL
 
-   The default memory level for compression objects.
+   Cấp bộ nhớ mặc định cho các đối tượng nén.
 
 
 .. data:: DEF_BUF_SIZE
 
-   The default buffer size for decompression operations.
+   Kích thước bộ đệm mặc định cho các thao tác giải nén.
 
 
 .. data:: Z_NO_COMPRESSION
 
-   Compression level ``0``; no compression.
+   Cấp độ nén ``0``; không nén.
 
    .. versionadded:: 3.6
 
 
 .. data:: Z_BEST_SPEED
 
-   Compression level ``1``; fastest and produces the least compression.
+   Cấp độ nén ``1``; nhanh nhất và cho mức nén thấp nhất.
 
 
 .. data:: Z_BEST_COMPRESSION
 
-   Compression level ``9``; slowest and produces the most compression.
+   Cấp độ nén ``9``; chậm nhất và cho mức nén cao nhất.
 
 
 .. data:: Z_DEFAULT_COMPRESSION
 
-   Default compression level (``-1``); a compromise between speed and
-   compression. Currently equivalent to compression level ``6``.
+   Cấp độ nén mặc định (``-1``); là sự cân bằng giữa tốc độ và mức nén. Hiện tương đương với cấp độ nén ``6``.
 
 
 .. data:: Z_DEFAULT_STRATEGY
 
-   Default compression strategy, for normal data.
+   Chiến lược nén mặc định dành cho dữ liệu thông thường.
 
 
 .. data:: Z_FILTERED
 
-   Compression strategy for data produced by a filter (or predictor).
+   Chiến lược nén dành cho dữ liệu do một bộ lọc (hoặc bộ dự đoán) tạo ra.
 
 
 .. data:: Z_HUFFMAN_ONLY
 
-   Compression strategy that forces Huffman coding only.
+   Chiến lược nén chỉ sử dụng mã hóa Huffman.
 
 
 .. data:: Z_RLE
 
-   Compression strategy that limits match distances to one (run-length encoding).
+   Chiến lược nén giới hạn khoảng cách khớp ở mức một (mã hóa độ dài chạy).
 
-   This constant is only available if Python was compiled with zlib
-   1.2.0.1 or greater.
+   Hằng số này chỉ khả dụng nếu Python được biên dịch với zlib 1.2.0.1 hoặc mới hơn.
 
    .. versionadded:: 3.6
 
 
 .. data:: Z_FIXED
 
-   Compression strategy that prevents the use of dynamic Huffman codes.
+   Chiến lược nén ngăn việc sử dụng các mã Huffman động.
 
-   This constant is only available if Python was compiled with zlib
-   1.2.2.2 or greater.
+   Hằng số này chỉ khả dụng nếu Python được biên dịch với zlib 1.2.2.2 hoặc mới hơn.
 
    .. versionadded:: 3.6
 
 
 .. data:: Z_NO_FLUSH
 
-   Flush mode ``0``. No special flushing behavior.
+   Chế độ flush ``0``. Không có hành vi flush đặc biệt.
 
    .. versionadded:: 3.6
 
 
 .. data:: Z_PARTIAL_FLUSH
 
-   Flush mode ``1``. Flush as much output as possible.
+   Chế độ flush ``1``. Flush nhiều dữ liệu đầu ra nhất có thể.
 
 
 .. data:: Z_SYNC_FLUSH
 
-   Flush mode ``2``. All output is flushed and the output is aligned to a byte boundary.
+   Chế độ flush ``2``. Toàn bộ dữ liệu đầu ra được flush và được căn chỉnh theo ranh giới byte.
 
 
 .. data:: Z_FULL_FLUSH
 
-   Flush mode ``3``. All output is flushed and the compression state is reset.
+   Chế độ flush ``3``. Toàn bộ dữ liệu đầu ra được flush và trạng thái nén được đặt lại.
 
 
 .. data:: Z_FINISH
 
-   Flush mode ``4``. All pending input is processed, no more input is expected.
+   Chế độ flush ``4``. Tất cả dữ liệu đầu vào đang chờ được xử lý và không có thêm dữ liệu đầu vào nào được mong đợi.
 
 
 .. data:: Z_BLOCK
 
-   Flush mode ``5``. A deflate block is completed and emitted.
+   Chế độ flush ``5``. Một khối deflate được hoàn tất và phát ra.
 
-   This constant is only available if Python was compiled with zlib
-   1.2.2.2 or greater.
+   Hằng số này chỉ khả dụng nếu Python được biên dịch với zlib 1.2.2.2 hoặc mới hơn.
 
    .. versionadded:: 3.6
 
 
 .. data:: Z_TREES
 
-   Flush mode ``6``, for inflate operations. Instructs inflate to return when
-   it gets to the next deflate block boundary.
+   Chế độ flush ``6`` dành cho các thao tác inflate. Hướng dẫn inflate trả về khi đạt đến ranh giới khối deflate tiếp theo.
 
-   This constant is only available if Python was compiled with zlib
-   1.2.3.4 or greater.
+   Hằng số này chỉ khả dụng nếu Python được biên dịch với zlib 1.2.3.4 hoặc mới hơn.
 
    .. versionadded:: 3.6
 
 
-Information about the version of the zlib library in use is available through
-the following constants:
+Thông tin về phiên bản của thư viện zlib đang được sử dụng có sẵn thông qua các hằng số sau:
 
 
 .. data:: ZLIB_VERSION
 
-   The version string of the zlib library that was used for building the module.
-   This may be different from the zlib library actually used at runtime, which
-   is available as :const:`ZLIB_RUNTIME_VERSION`.
+   Chuỗi phiên bản của thư viện zlib được sử dụng để xây dựng module. Chuỗi này có thể khác với thư viện zlib thực sự được sử dụng trong runtime, có sẵn dưới dạng :const:`ZLIB_RUNTIME_VERSION`.
 
 
 .. data:: ZLIB_RUNTIME_VERSION
 
-   The version string of the zlib library actually loaded by the interpreter.
+   Chuỗi phiên bản của thư viện zlib thực sự được interpreter tải.
 
    .. versionadded:: 3.3
 
 
 .. data:: ZLIBNG_VERSION
 
-   The version string of the zlib-ng library that was used for building the
-   module if zlib-ng was used. When present, the :data:`ZLIB_VERSION` and
-   :data:`ZLIB_RUNTIME_VERSION` constants reflect the version of the zlib API
-   provided by zlib-ng.
+   Chuỗi phiên bản của thư viện zlib-ng được sử dụng để xây dựng mô-đun nếu zlib-ng được sử dụng. Khi có mặt, :data:`ZLIB_VERSION` và
+   các hằng số :data:`ZLIB_RUNTIME_VERSION` phản ánh phiên bản của API zlib do zlib-ng cung cấp.
 
-   If zlib-ng was not used to build the module, this constant will be absent.
+   Nếu zlib-ng không được sử dụng để xây dựng mô-đun, hằng số này sẽ không tồn tại.
 
    .. versionadded:: 3.14
 
 
 .. seealso::
 
-   Module :mod:`gzip`
-      Reading and writing :program:`gzip`\ -format files.
+   Mô-đun :mod:`gzip`
+      Đọc và ghi các tệp định dạng :program:`gzip`\ -.
 
    https://www.zlib.net
-      The zlib library home page.
+      Trang chủ của thư viện zlib.
 
    https://www.zlib.net/manual.html
-      The zlib manual explains  the semantics and usage of the library's many
-      functions.
+      Tài liệu hướng dẫn zlib giải thích ngữ nghĩa và cách sử dụng nhiều hàm của thư viện.
 
-   In case gzip (de)compression is a bottleneck, the `python-isal`_
-   package speeds up (de)compression with a mostly compatible API.
+   Trong trường hợp quá trình nén và giải nén bằng gzip là nút thắt cổ chai, package `python-isal`_ sẽ tăng tốc quá trình nén và giải nén với API hầu như tương thích.
 
    .. _python-isal: https://github.com/pycompression/python-isal
+
+.. _`zlib library`: https://www.zlib.net
+.. _`zlib manual`: https://www.zlib.net/manual.html

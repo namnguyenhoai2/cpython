@@ -1,1692 +1,1291 @@
-:mod:`!mailbox` --- Manipulate mailboxes in various formats
-===========================================================
+:mod:`!mailbox` --- Thao tác với mailbox ở nhiều định dạng khác nhau
+====================================================================
 
 .. module:: mailbox
-   :synopsis: Manipulate mailboxes in various formats
+   :synopsis: Thao tác với mailbox ở nhiều định dạng khác nhau
 
 .. moduleauthor:: Gregory K. Johnson <gkj@gregorykjohnson.com>
 .. sectionauthor:: Gregory K. Johnson <gkj@gregorykjohnson.com>
 
-**Source code:** :source:`Lib/mailbox.py`
+**Mã nguồn:** :source:`Lib/mailbox.py`
 
 --------------
 
-This module defines two classes, :class:`Mailbox` and :class:`Message`, for
-accessing and manipulating on-disk mailboxes and the messages they contain.
-:class:`!Mailbox` offers a dictionary-like mapping from keys to messages.
-:class:`!Message` extends the :mod:`email.message` module's
-:class:`~email.message.Message` class with format-specific state and behavior.
-Supported mailbox formats are Maildir, mbox, MH, Babyl, and MMDF.
+Mô-đun này định nghĩa hai lớp, :class:`Mailbox` và :class:`Message`, để truy cập và thao tác với các mailbox trên đĩa cùng những message chứa trong đó.
+:class:`!Mailbox` cung cấp ánh xạ giống dictionary từ các key đến các message.
+:class:`!Message` mở rộng mô-đun :mod:`email.message`
+lớp :class:`~email.message.Message` bằng trạng thái và hành vi dành riêng cho từng định dạng. Các định dạng mailbox được hỗ trợ gồm Maildir, mbox, MH, Babyl và MMDF.
 
 
 .. seealso::
 
-   Module :mod:`email`
-      Represent and manipulate messages.
+   Mô-đun :mod:`email`
+      Biểu diễn và thao tác với các thư.
 
 
 .. _mailbox-objects:
 
-:class:`!Mailbox` objects
--------------------------
+Các đối tượng :class:`!Mailbox`
+-------------------------------
 
 .. class:: Mailbox
 
-   A mailbox, which may be inspected and modified.
+   Một mailbox có thể được kiểm tra và sửa đổi.
 
-   The :class:`!Mailbox` class defines an interface and is not intended to be
-   instantiated.  Instead, format-specific subclasses should inherit from
-   :class:`!Mailbox` and your code should instantiate a particular subclass.
+   Lớp :class:`!Mailbox` định nghĩa một interface và không предназначена để được khởi tạo. Thay vào đó, các lớp con dành riêng cho từng định dạng nên kế thừa từ
+   :class:`!Mailbox` và code của bạn nên khởi tạo một lớp con cụ thể.
 
-   The :class:`!Mailbox` interface is dictionary-like, with small keys
-   corresponding to messages. Keys are issued by the :class:`!Mailbox` instance
-   with which they will be used and are only meaningful to that :class:`!Mailbox`
-   instance. A key continues to identify a message even if the corresponding
-   message is modified, such as by replacing it with another message.
+   Interface :class:`!Mailbox` có dạng giống dictionary, với các key nhỏ tương ứng với các message. Các key được instance :class:`!Mailbox` cấp và chỉ có ý nghĩa đối với instance :class:`!Mailbox` đó. Một key tiếp tục xác định một message ngay cả khi message tương ứng được sửa đổi, chẳng hạn như bằng cách thay thế message đó bằng một message khác.
 
-   Messages may be added to a :class:`!Mailbox` instance using the set-like
-   method :meth:`add` and removed using a ``del`` statement or the set-like
-   methods :meth:`remove` and :meth:`discard`.
+   Có thể thêm thư vào một instance :class:`!Mailbox` bằng phương thức giống set :meth:`add` và xóa thư bằng câu lệnh ``del`` hoặc các phương thức giống set :meth:`remove` và :meth:`discard`.
 
-   :class:`!Mailbox` interface semantics differ from dictionary semantics in some
-   noteworthy ways. Each time a message is requested, a new representation
-   (typically a :class:`Message` instance) is generated based upon the current
-   state of the mailbox. Similarly, when a message is added to a
-   :class:`!Mailbox` instance, the provided message representation's contents are
-   copied. In neither case is a reference to the message representation kept by
-   the :class:`!Mailbox` instance.
+   Ngữ nghĩa của interface :class:`!Mailbox` khác với ngữ nghĩa của dictionary theo một số cách đáng chú ý. Mỗi khi một thư được yêu cầu, một biểu diễn mới (thường là một instance :class:`Message`) sẽ được tạo dựa trên trạng thái hiện tại của mailbox. Tương tự, khi một thư được thêm vào
+   instance :class:`!Mailbox`, nội dung của biểu diễn thư được cung cấp sẽ được sao chép. Trong cả hai trường hợp, instance :class:`!Mailbox` không giữ tham chiếu đến biểu diễn thư.
 
-   The default :class:`!Mailbox` :term:`iterator` iterates over message
-   representations, not keys as the default :class:`dictionary <dict>`
-   iterator does. Moreover, modification of a
-   mailbox during iteration is safe and well-defined. Messages added to the
-   mailbox after an iterator is created will not be seen by the
-   iterator. Messages removed from the mailbox before the iterator yields them
-   will be silently skipped, though using a key from an iterator may result in a
-   :exc:`KeyError` exception if the corresponding message is subsequently
-   removed.
+   :class:`!Mailbox` :term:`iterator` mặc định lặp qua các biểu diễn thư, không phải các khóa như iterator :class:`dictionary <dict>` mặc định. Ngoài ra, việc sửa đổi mailbox trong khi lặp là an toàn và có hành vi được xác định rõ. Các thư được thêm vào mailbox sau khi iterator được tạo sẽ không được iterator nhìn thấy. Các thư bị xóa khỏi mailbox trước khi iterator trả về chúng sẽ bị bỏ qua một cách im lặng, mặc dù việc sử dụng một khóa từ iterator có thể dẫn đến
+   ngoại lệ :exc:`KeyError` nếu thư tương ứng sau đó bị xóa.
 
    .. warning::
 
-      Be very cautious when modifying mailboxes that might be simultaneously
-      changed by some other process.  The safest mailbox format to use for such
-      tasks is :class:`Maildir`; try to avoid using single-file formats such as
-      :class:`mbox` for
-      concurrent writing.  If you're modifying a mailbox, you *must* lock it by
-      calling the :meth:`lock` and :meth:`unlock` methods *before* reading any
-      messages in the file or making any changes by adding or deleting a
-      message.  Failing to lock the mailbox runs the risk of losing messages or
-      corrupting the entire mailbox.
+      Hãy hết sức thận trọng khi sửa đổi các mailbox có thể đồng thời bị một tiến trình khác thay đổi. Định dạng mailbox an toàn nhất để sử dụng cho những tác vụ như vậy là :class:`Maildir`; hãy cố tránh sử dụng các định dạng một tệp như
+      :class:`mbox` cho việc ghi đồng thời. Nếu bạn đang sửa đổi một mailbox, bạn *phải* khóa nó bằng cách gọi các phương thức :meth:`lock` và :meth:`unlock` *trước khi* đọc bất kỳ thư nào trong tệp hoặc thực hiện thay đổi bằng cách thêm hoặc xóa thư. Không khóa mailbox có nguy cơ làm mất thư hoặc làm hỏng toàn bộ mailbox.
 
-   :class:`!Mailbox` instances have the following methods:
+   Các instance :class:`!Mailbox` có những phương thức sau:
 
 
    .. method:: add(message)
 
-      Add *message* to the mailbox and return the key that has been assigned to
-      it.
+      Thêm *message* vào mailbox và trả về khóa đã được gán cho nó.
 
-      Parameter *message* may be a :class:`Message` instance, an
-      :class:`email.message.Message` instance, a string, a byte string, or a
-      file-like object (which should be open in binary mode). If *message* is
-      an instance of the
-      appropriate format-specific :class:`Message` subclass (e.g., if it's an
-      :class:`mboxMessage` instance and this is an :class:`mbox` instance), its
-      format-specific information is used. Otherwise, reasonable defaults for
-      format-specific information are used.
+      Tham số *message* có thể là một instance :class:`Message`, một
+      instance :class:`email.message.Message`, một chuỗi, một chuỗi byte hoặc một đối tượng giống tệp (đối tượng này phải được mở ở chế độ nhị phân). Nếu *message* là một instance của lớp con :class:`Message` dành riêng cho định dạng tương ứng (ví dụ: nếu đó là một
+      instance :class:`mboxMessage` và đây là một instance :class:`mbox`), thông tin dành riêng cho định dạng của nó sẽ được sử dụng. Nếu không, các giá trị mặc định hợp lý cho thông tin dành riêng cho định dạng sẽ được sử dụng.
 
       .. versionchanged:: 3.2
-         Support for binary input was added.
+         Đã bổ sung hỗ trợ cho đầu vào nhị phân.
 
 
    .. method:: remove(key)
-               __delitem__(key)
-               discard(key)
+               __delitem__(key) discard(key)
 
-      Delete the message corresponding to *key* from the mailbox.
+      Xóa thư tương ứng với *key* khỏi hộp thư.
 
-      If no such message exists, a :exc:`KeyError` exception is raised if the
-      method was called as :meth:`remove` or :meth:`__delitem__` but no
-      exception is raised if the method was called as :meth:`discard`. The
-      behavior of :meth:`discard` may be preferred if the underlying mailbox
-      format supports concurrent modification by other processes.
+      Nếu không tồn tại thư như vậy, một ngoại lệ :exc:`KeyError` sẽ được phát sinh nếu phương thức được gọi dưới dạng :meth:`remove` hoặc :meth:`__delitem__`, nhưng sẽ không phát sinh ngoại lệ nếu phương thức được gọi dưới dạng :meth:`discard`. Hành vi của :meth:`discard` có thể được ưu tiên nếu định dạng hộp thư bên dưới hỗ trợ việc sửa đổi đồng thời bởi các tiến trình khác.
 
 
    .. method:: __setitem__(key, message)
 
-      Replace the message corresponding to *key* with *message*. Raise a
-      :exc:`KeyError` exception if no message already corresponds to *key*.
+      Thay thế thư tương ứng với *key* bằng *message*. Phát sinh một
+      :exc:`KeyError` ngoại lệ nếu chưa có thư nào tương ứng với *key*.
 
-      As with :meth:`add`, parameter *message* may be a :class:`Message`
-      instance, an :class:`email.message.Message` instance, a string, a byte
-      string, or a file-like object (which should be open in binary mode). If
-      *message* is an
-      instance of the appropriate format-specific :class:`Message` subclass
-      (e.g., if it's an :class:`mboxMessage` instance and this is an
-      :class:`mbox` instance), its format-specific information is
-      used. Otherwise, the format-specific information of the message that
-      currently corresponds to *key* is left unchanged.
+      Tương tự như :meth:`add`, tham số *message* có thể là một :class:`Message` instance, một :class:`email.message.Message` instance, một chuỗi, một chuỗi byte hoặc một đối tượng dạng tệp (đối tượng này phải được mở ở chế độ nhị phân). Nếu *message* là một instance của lớp con :class:`Message` dành riêng cho định dạng tương ứng (ví dụ: nếu đó là một :class:`mboxMessage` instance và đây là một
+      :class:`mbox` instance), thông tin dành riêng cho định dạng đó sẽ được sử dụng. Nếu không, thông tin dành riêng cho định dạng của thư hiện đang tương ứng với *key* sẽ được giữ nguyên.
 
 
    .. method:: iterkeys()
 
-      Return an :term:`iterator` over all keys
+      Trả về một :term:`iterator` trên tất cả các key
 
 
    .. method:: keys()
 
-      The same as :meth:`iterkeys`, except that a :class:`list` is returned
-      rather than an :term:`iterator`
+      Giống như :meth:`iterkeys`, ngoại trừ việc một :class:`list` được trả về thay vì một :term:`iterator`
 
 
    .. method:: itervalues()
                __iter__()
 
-      Return an :term:`iterator` over representations of all messages.
-      The messages are represented
-      as instances of the appropriate format-specific :class:`Message` subclass
-      unless a custom message factory was specified when the :class:`!Mailbox`
-      instance was initialized.
+      Trả về một :term:`iterator` chứa các biểu diễn của tất cả thư. Các thư được biểu diễn dưới dạng các thực thể thuộc lớp con :class:`Message` dành riêng cho định dạng tương ứng, trừ khi một message factory tùy chỉnh được chỉ định khi khởi tạo thực thể :class:`!Mailbox`.
 
       .. note::
 
-         The behavior of :meth:`__iter__` is unlike that of dictionaries, which
-         iterate over keys.
+         Cách hoạt động của :meth:`__iter__` khác với dictionary, vốn lặp qua các khóa.
 
 
    .. method:: values()
 
-      The same as :meth:`itervalues`, except that a :class:`list` is returned
-      rather than an :term:`iterator`
+      Giống như :meth:`itervalues`, ngoại trừ việc một :class:`list` được trả về thay vì một :term:`iterator`
 
 
    .. method:: iteritems()
 
-      Return an :term:`iterator` over (*key*, *message*) pairs, where *key* is
-      a key and *message* is a message representation. The messages are
-      represented as instances of the appropriate format-specific
-      :class:`Message` subclass unless a custom message factory was specified
-      when the :class:`!Mailbox` instance was initialized.
+      Trả về một :term:`iterator` chứa các cặp (*key*, *message*), trong đó *key* là một khóa và *message* là một biểu diễn thư. Các thư được biểu diễn dưới dạng các thực thể thuộc lớp con dành riêng cho định dạng tương ứng
+      :class:`Message`, trừ khi một message factory tùy chỉnh được chỉ định khi khởi tạo thực thể :class:`!Mailbox`.
 
 
    .. method:: items()
 
-      The same as :meth:`iteritems`, except that a :class:`list` of pairs is
-      returned rather than an :term:`iterator` of pairs.
+      Giống như :meth:`iteritems`, ngoại trừ việc trả về một :class:`list` các cặp thay vì một :term:`iterator` các cặp.
 
 
    .. method:: get(key, default=None)
                __getitem__(key)
 
-      Return a representation of the message corresponding to *key*. If no such
-      message exists, *default* is returned if the method was called as
-      :meth:`get` and a :exc:`KeyError` exception is raised if the method was
-      called as :meth:`!__getitem__`. The message is represented as an instance
-      of the appropriate format-specific :class:`Message` subclass unless a
-      custom message factory was specified when the :class:`!Mailbox` instance
-      was initialized.
+      Trả về biểu diễn của thư tương ứng với *key*. Nếu không tồn tại thư như vậy, *default* sẽ được trả về nếu phương thức được gọi như sau
+      :meth:`get` và một ngoại lệ :exc:`KeyError` sẽ được phát sinh nếu phương thức được gọi như :meth:`!__getitem__`. Thư được biểu diễn dưới dạng một instance của lớp con :class:`Message` dành riêng cho định dạng tương ứng, trừ khi một message factory tùy chỉnh được chỉ định khi khởi tạo instance :class:`!Mailbox`.
 
 
    .. method:: get_message(key)
 
-      Return a representation of the message corresponding to *key* as an
-      instance of the appropriate format-specific :class:`Message` subclass, or
-      raise a :exc:`KeyError` exception if no such message exists.
+      Trả về biểu diễn của thư tương ứng với *key* dưới dạng một instance của lớp con :class:`Message` dành riêng cho định dạng tương ứng, hoặc phát sinh ngoại lệ :exc:`KeyError` nếu không tồn tại thư như vậy.
 
 
    .. method:: get_bytes(key)
 
-      Return a byte representation of the message corresponding to *key*, or
-      raise a :exc:`KeyError` exception if no such message exists.
+      Trả về biểu diễn dạng byte của thư tương ứng với *key*, hoặc phát sinh ngoại lệ :exc:`KeyError` nếu không tồn tại thư như vậy.
 
       .. versionadded:: 3.2
 
 
    .. method:: get_string(key)
 
-      Return a string representation of the message corresponding to *key*, or
-      raise a :exc:`KeyError` exception if no such message exists.  The
-      message is processed through :class:`email.message.Message` to
-      convert it to a 7bit clean representation.
+      Trả về biểu diễn dạng chuỗi của thư tương ứng với *key*, hoặc phát sinh ngoại lệ :exc:`KeyError` nếu không tồn tại thư như vậy. Thư được xử lý thông qua :class:`email.message.Message` để chuyển đổi thành biểu diễn 7bit sạch.
 
 
    .. method:: get_file(key)
 
-      Return a :term:`file-like <file-like object>` representation of the
-      message corresponding to *key*,
-      or raise a :exc:`KeyError` exception if no such message exists.  The
-      file-like object behaves as if open in binary mode.  This file should be
-      closed once it is no longer needed.
+      Trả về một biểu diễn :term:`file-like <file-like object>` của thông điệp tương ứng với *key*, hoặc phát sinh một :exc:`KeyError` ngoại lệ nếu không tồn tại thông điệp đó. Đối tượng dạng tệp này hoạt động như thể được mở ở chế độ nhị phân. Cần đóng tệp này khi không còn cần đến nó nữa.
 
       .. versionchanged:: 3.2
-         The file object really is a :term:`binary file`; previously it was
-         incorrectly returned in text mode.  Also, the :term:`file-like object`
-         now supports the :term:`context manager` protocol: you can use a
-         :keyword:`with` statement to automatically close it.
+         Đối tượng tệp thực sự là một :term:`binary file`; trước đây nó đã bị trả về không đúng ở chế độ văn bản. Ngoài ra, :term:`file-like object` hiện hỗ trợ giao thức :term:`context manager`: bạn có thể sử dụng một
+         :keyword:`with` câu lệnh để tự động đóng nó.
 
       .. note::
 
-         Unlike other representations of messages,
-         :term:`file-like <file-like object>` representations are not
-         necessarily independent of the :class:`!Mailbox` instance that
-         created them or of the underlying mailbox.  More specific documentation
-         is provided by each subclass.
+         Không giống các cách biểu diễn thông điệp khác,
+         Các biểu diễn :term:`file-like <file-like object>` không nhất thiết độc lập với thực thể :class:`!Mailbox` đã tạo ra chúng hoặc với mailbox bên dưới. Mỗi lớp con đều có tài liệu cụ thể hơn.
 
 
    .. method:: __contains__(key)
 
-      Return ``True`` if *key* corresponds to a message, ``False`` otherwise.
+      Trả về ``True`` nếu *key* tương ứng với một thông điệp, và ``False`` nếu không.
 
 
    .. method:: __len__()
 
-      Return a count of messages in the mailbox.
+      Trả về số lượng thông điệp trong mailbox.
 
 
    .. method:: clear()
 
-      Delete all messages from the mailbox.
+      Xóa tất cả thư khỏi hộp thư.
 
 
    .. method:: pop(key, default=None)
 
-      Return a representation of the message corresponding to *key* and delete
-      the message. If no such message exists, return *default*. The message is
-      represented as an instance of the appropriate format-specific
-      :class:`Message` subclass unless a custom message factory was specified
-      when the :class:`!Mailbox` instance was initialized.
+      Trả về biểu diễn của thư tương ứng với *key* và xóa thư đó. Nếu không tồn tại thư như vậy, trả về *default*. Thư được biểu diễn dưới dạng một instance của định dạng cụ thể phù hợp
+      :class:`Message`, trừ khi một message factory tùy chỉnh được chỉ định khi khởi tạo thực thể :class:`!Mailbox`.
 
 
    .. method:: popitem()
 
-      Return an arbitrary (*key*, *message*) pair, where *key* is a key and
-      *message* is a message representation, and delete the corresponding
-      message. If the mailbox is empty, raise a :exc:`KeyError` exception. The
-      message is represented as an instance of the appropriate format-specific
-      :class:`Message` subclass unless a custom message factory was specified
-      when the :class:`!Mailbox` instance was initialized.
+      Trả về một cặp (*key*, *message*) bất kỳ, trong đó *key* là một key và *message* là biểu diễn của một thư, đồng thời xóa thư tương ứng. Nếu hộp thư trống, raise một :exc:`KeyError` exception. Thư được biểu diễn dưới dạng một instance của định dạng cụ thể phù hợp
+      :class:`Message`, trừ khi một message factory tùy chỉnh được chỉ định khi khởi tạo thực thể :class:`!Mailbox`.
 
 
    .. method:: update(arg)
 
-      Parameter *arg* should be a *key*-to-*message* mapping or an iterable of
-      (*key*, *message*) pairs. Updates the mailbox so that, for each given
-      *key* and *message*, the message corresponding to *key* is set to
-      *message* as if by using :meth:`__setitem__`. As with :meth:`__setitem__`,
-      each *key* must already correspond to a message in the mailbox or else a
-      :exc:`KeyError` exception will be raised, so in general it is incorrect
-      for *arg* to be a :class:`!Mailbox` instance.
+      Tham số *arg* phải là một ánh xạ từ *key* tới *message* hoặc một iterable gồm các cặp (*key*, *message*). Cập nhật hộp thư sao cho, với mỗi *key* và *message* đã cho, thư tương ứng với *key* được đặt thành *message* như thể sử dụng :meth:`__setitem__`. Tương tự :meth:`__setitem__`, mỗi *key* phải tương ứng với một thư đã có trong hộp thư; nếu không thì một
+      :exc:`KeyError` exception sẽ được raise, vì vậy nhìn chung *arg* không nên là một instance của :class:`!Mailbox`.
 
       .. note::
 
-         Unlike with dictionaries, keyword arguments are not supported.
+         Không giống như với dictionary, keyword arguments không được hỗ trợ.
 
 
    .. method:: flush()
 
-      Write any pending changes to the filesystem. For some :class:`Mailbox`
-      subclasses, changes are always written immediately and :meth:`!flush` does
-      nothing, but you should still make a habit of calling this method.
+      Ghi mọi thay đổi đang chờ vào filesystem. Đối với một số lớp con của :class:`Mailbox`, các thay đổi luôn được ghi ngay lập tức và :meth:`!flush` không thực hiện thao tác nào, nhưng bạn vẫn nên tạo thói quen gọi phương thức này.
 
 
    .. method:: lock()
 
-      Acquire an exclusive advisory lock on the mailbox so that other processes
-      know not to modify it. An :exc:`ExternalClashError` is raised if the lock
-      is not available. The particular locking mechanisms used depend upon the
-      mailbox format.  You should *always* lock the mailbox before making any
-      modifications to its contents.
+      Có được exclusive advisory lock trên mailbox để các tiến trình khác biết không được sửa đổi nó. Một :exc:`ExternalClashError` sẽ được phát sinh nếu không thể lấy lock. Cơ chế locking cụ thể được sử dụng phụ thuộc vào định dạng mailbox. Bạn *luôn luôn* nên lock mailbox trước khi thực hiện bất kỳ sửa đổi nào đối với nội dung của nó.
 
 
    .. method:: unlock()
 
-      Release the lock on the mailbox, if any.
+      Giải phóng lock trên mailbox, nếu có.
 
 
    .. method:: close()
 
-      Flush the mailbox, unlock it if necessary, and close any open files. For
-      some :class:`!Mailbox` subclasses, this method does nothing.
+      Flush mailbox, mở khóa nếu cần và đóng mọi tệp đang mở. Đối với một số lớp con của :class:`!Mailbox`, phương thức này không thực hiện thao tác nào.
 
 
 .. _mailbox-maildir:
 
-:class:`!Maildir` objects
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Các đối tượng :class:`!Maildir`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. class:: Maildir(dirname, factory=None, create=True)
 
-   A subclass of :class:`Mailbox` for mailboxes in Maildir format. Parameter
-   *factory* is a callable object that accepts a file-like message representation
-   (which behaves as if opened in binary mode) and returns a custom representation.
-   If *factory* is ``None``, :class:`MaildirMessage` is used as the default message
-   representation. If *create* is ``True``, the mailbox is created if it does not
-   exist.
+   Một lớp con của :class:`Mailbox` dành cho các mailbox ở định dạng Maildir. Tham số *factory* là một đối tượng callable chấp nhận một biểu diễn message dạng tệp (hoạt động như thể được mở ở chế độ binary) và trả về một biểu diễn tùy chỉnh. Nếu *factory* là ``None``, :class:`MaildirMessage` được dùng làm biểu diễn message mặc định. Nếu *create* là ``True``, mailbox sẽ được tạo nếu chưa tồn tại.
 
-   If *create* is ``True`` and the *dirname* path exists, it will be treated as
-   an existing maildir without attempting to verify its directory layout.
+   Nếu *create* là ``True`` và đường dẫn *dirname* tồn tại, đường dẫn này sẽ được coi là maildir hiện có mà không cần thử xác minh bố cục thư mục.
 
-   It is for historical reasons that *dirname* is named as such rather than *path*.
+   *dirname* được đặt tên như vậy vì lý do lịch sử, thay vì *path*.
 
-   Maildir is a directory-based mailbox format invented for the qmail mail
-   transfer agent and now widely supported by other programs. Messages in a
-   Maildir mailbox are stored in separate files within a common directory
-   structure. This design allows Maildir mailboxes to be accessed and modified
-   by multiple unrelated programs without data corruption, so file locking is
-   unnecessary.
+   Maildir là định dạng hộp thư dựa trên thư mục, được phát minh cho mail transfer agent qmail và hiện được nhiều chương trình khác hỗ trợ rộng rãi. Các thư trong hộp thư Maildir được lưu trong những tệp riêng biệt bên trong một cấu trúc thư mục chung. Thiết kế này cho phép nhiều chương trình không liên quan truy cập và sửa đổi các hộp thư Maildir mà không làm hỏng dữ liệu, vì vậy không cần khóa tệp.
 
-   Maildir mailboxes contain three subdirectories, namely: :file:`tmp`,
-   :file:`new`, and :file:`cur`. Messages are created momentarily in the
-   :file:`tmp` subdirectory and then moved to the :file:`new` subdirectory to
-   finalize delivery. A mail user agent may subsequently move the message to the
-   :file:`cur` subdirectory and store information about the state of the message
-   in a special "info" section appended to its file name.
+   Hộp thư Maildir chứa ba thư mục con, cụ thể là: :file:`tmp`,
+   :file:`new`, và :file:`cur`. Thư được tạo tạm thời trong thư mục con
+   :file:`tmp`, sau đó được chuyển đến thư mục con :file:`new` để hoàn tất việc chuyển thư. Sau đó, mail user agent có thể chuyển thư đến thư mục con
+   :file:`cur` và lưu thông tin về trạng thái của thư trong một phần "info" đặc biệt được nối vào tên tệp của thư.
 
-   Folders of the style introduced by the Courier mail transfer agent are also
-   supported. Any subdirectory of the main mailbox is considered a folder if
-   ``'.'`` is the first character in its name. Folder names are represented by
-   :class:`!Maildir` without the leading ``'.'``. Each folder is itself a Maildir
-   mailbox but should not contain other folders. Instead, a logical nesting is
-   indicated using ``'.'`` to delimit levels, e.g., "Archived.2005.07".
+   Các thư mục theo kiểu do tác nhân truyền thư Courier giới thiệu cũng được hỗ trợ. Mọi thư mục con của hộp thư chính đều được xem là một thư mục nếu ``'.'`` là ký tự đầu tiên trong tên của nó. Tên thư mục được biểu diễn bằng
+   :class:`!Maildir` mà không có ``'.'`` ở đầu. Mỗi thư mục tự nó là một hộp thư Maildir nhưng không được chứa các thư mục khác. Thay vào đó, cấu trúc lồng nhau logic được biểu thị bằng ``'.'`` để phân tách các cấp, ví dụ: "Archived.2005.07".
 
    .. attribute:: Maildir.colon
 
-      The Maildir specification requires the use of a colon (``':'``) in certain
-      message file names. However, some operating systems do not permit this
-      character in file names, If you wish to use a Maildir-like format on such
-      an operating system, you should specify another character to use
-      instead. The exclamation point (``'!'``) is a popular choice. For
-      example::
+      Đặc tả Maildir yêu cầu sử dụng dấu hai chấm (``':'``) trong một số tên tệp thư nhất định. Tuy nhiên, một số hệ điều hành không cho phép ký tự này trong tên tệp. Nếu muốn sử dụng định dạng giống Maildir trên một hệ điều hành như vậy, bạn nên chỉ định một ký tự khác để thay thế. Dấu chấm than (``'!'``) là một lựa chọn phổ biến. Ví dụ::
 
          import mailbox
          mailbox.Maildir.colon = '!'
 
-      The :attr:`!colon` attribute may also be set on a per-instance basis.
+      Thuộc tính :attr:`!colon` cũng có thể được thiết lập cho từng instance.
 
    .. versionchanged:: 3.13
       :class:`Maildir` now ignores files with a leading dot.
 
-   :class:`!Maildir` instances have all of the methods of :class:`Mailbox` in
-   addition to the following:
+   Các instance :class:`!Maildir` có tất cả các phương thức của :class:`Mailbox` cùng với những phương thức sau:
 
 
    .. method:: list_folders()
 
-      Return a list of the names of all folders.
+      Trả về danh sách tên của tất cả các thư mục.
 
 
    .. method:: get_folder(folder)
 
-      Return a :class:`!Maildir` instance representing the folder whose name is
-      *folder*. A :exc:`NoSuchMailboxError` exception is raised if the folder
-      does not exist.
+      Trả về một instance :class:`!Maildir` đại diện cho thư mục có tên là *folder*. Một ngoại lệ :exc:`NoSuchMailboxError` sẽ được phát sinh nếu thư mục không tồn tại.
 
 
    .. method:: add_folder(folder)
 
-      Create a folder whose name is *folder* and return a :class:`!Maildir`
-      instance representing it.
+      Tạo một thư mục có tên là *folder* và trả về một instance :class:`!Maildir` đại diện cho thư mục đó.
 
 
    .. method:: remove_folder(folder)
 
-      Delete the folder whose name is *folder*. If the folder contains any
-      messages, a :exc:`NotEmptyError` exception will be raised and the folder
-      will not be deleted.
+      Xóa thư mục có tên là *folder*. Nếu thư mục chứa bất kỳ thư nào, một ngoại lệ :exc:`NotEmptyError` sẽ được nêu ra và thư mục sẽ không bị xóa.
 
 
    .. method:: clean()
 
-      Delete temporary files from the mailbox that have not been accessed in the
-      last 36 hours. The Maildir specification says that mail-reading programs
-      should do this occasionally.
+      Xóa các tệp tạm thời khỏi mailbox chưa được truy cập trong 36 giờ qua. Đặc tả Maildir quy định rằng các chương trình đọc thư nên thỉnh thoảng thực hiện việc này.
 
 
    .. method:: get_flags(key)
 
-      Return as a string the flags that are set on the message
-      corresponding to *key*.
-      This is the same as ``get_message(key).get_flags()`` but much
-      faster, because it does not open the message file.
-      Use this method when iterating over the keys to determine which
-      messages are interesting to get.
+      Trả về dưới dạng chuỗi các cờ được thiết lập trên thư tương ứng với *key*. Kết quả này giống với ``get_message(key).get_flags()`` nhưng nhanh hơn nhiều vì không mở tệp thư. Sử dụng phương thức này khi lặp qua các key để xác định những thư cần lấy.
 
-      If you do have a :class:`MaildirMessage` object, use
-      its :meth:`~MaildirMessage.get_flags` method instead, because
-      changes made by the message's :meth:`~MaildirMessage.set_flags`,
-      :meth:`~MaildirMessage.add_flag` and :meth:`~MaildirMessage.remove_flag`
-      methods are not reflected here until the mailbox's
-      :meth:`__setitem__` method is called.
+      Nếu bạn có một đối tượng :class:`MaildirMessage`, hãy sử dụng phương thức :meth:`~MaildirMessage.get_flags` của đối tượng đó thay thế, vì những thay đổi do :meth:`~MaildirMessage.set_flags` của thư thực hiện,
+      Các phương thức :meth:`~MaildirMessage.add_flag` và :meth:`~MaildirMessage.remove_flag` không được phản ánh ở đây cho đến khi phương thức
+      :meth:`__setitem__` của mailbox được gọi.
 
       .. versionadded:: 3.13
 
 
    .. method:: set_flags(key, flags)
 
-      On the message corresponding to *key*, set the flags specified
-      by *flags* and unset all others.
-      Calling ``some_mailbox.set_flags(key, flags)`` is similar to ::
+      Đối với thư tương ứng với *key*, đặt các cờ được chỉ định bởi *flags* và bỏ đặt tất cả các cờ khác. Việc gọi ``some_mailbox.set_flags(key, flags)`` tương tự như::
 
          one_message = some_mailbox.get_message(key)
          one_message.set_flags(flags)
          some_mailbox[key] = one_message
 
-      but faster, because it does not open the message file.
+      nhưng nhanh hơn vì không mở tệp thư.
 
-      If you do have a :class:`MaildirMessage` object, use
-      its :meth:`~MaildirMessage.set_flags` method instead, because
-      changes made with this mailbox method will not be visible to the
-      message object's method, :meth:`~MaildirMessage.get_flags`.
+      Nếu bạn có một đối tượng :class:`MaildirMessage`, hãy sử dụng phương thức :meth:`~MaildirMessage.set_flags` của đối tượng đó thay thế, vì các thay đổi được thực hiện bằng phương thức mailbox này sẽ không hiển thị trong phương thức của đối tượng thư, :meth:`~MaildirMessage.get_flags`.
 
       .. versionadded:: 3.13
 
 
    .. method:: add_flag(key, flag)
 
-      On the message corresponding to *key*, set the flags specified
-      by *flag* without changing other flags. To add more than one
-      flag at a time, *flag* may be a string of more than one character.
+      Đối với thư tương ứng với *key*, đặt các cờ được chỉ định bởi *flag* mà không thay đổi các cờ khác. Để thêm nhiều cờ cùng lúc, *flag* có thể là một chuỗi gồm nhiều ký tự.
 
-      Considerations for using this method versus the message object's
-      :meth:`~MaildirMessage.add_flag` method are similar to
-      those for :meth:`set_flags`; see the discussion there.
+      Các điểm cần cân nhắc khi sử dụng phương thức này thay vì phương thức của đối tượng thư
+      :meth:`~MaildirMessage.add_flag` tương tự như các điểm cần cân nhắc đối với :meth:`set_flags`; xem phần thảo luận ở đó.
 
       .. versionadded:: 3.13
 
 
    .. method:: remove_flag(key, flag)
 
-      On the message corresponding to *key*, unset the flags specified
-      by *flag* without changing other flags. To remove more than one
-      flag at a time, *flag* may be a string of more than one character.
+      Đối với thư tương ứng với *key*, bỏ đặt các cờ được chỉ định bởi *flag* mà không thay đổi các cờ khác. Để xóa nhiều cờ cùng lúc, *flag* có thể là một chuỗi gồm nhiều ký tự.
 
-      Considerations for using this method versus the message object's
-      :meth:`~MaildirMessage.remove_flag` method are similar to
-      those for :meth:`set_flags`; see the discussion there.
+      Các điểm cần cân nhắc khi sử dụng phương thức này thay vì phương thức của đối tượng thư
+      Các phương thức :meth:`~MaildirMessage.remove_flag` tương tự như các phương thức dành cho :meth:`set_flags`; xem phần thảo luận ở đó.
 
       .. versionadded:: 3.13
 
 
    .. method:: get_info(key)
 
-      Return a string containing the info for the message
-      corresponding to *key*.
-      This is the same as ``get_message(key).get_info()`` but much
-      faster, because it does not open the message file.
-      Use this method when iterating over the keys to determine which
-      messages are interesting to get.
+      Trả về một chuỗi chứa thông tin của thư tương ứng với *key*. Phương thức này tương tự như ``get_message(key).get_info()`` nhưng nhanh hơn nhiều vì không mở tệp thư. Hãy sử dụng phương thức này khi lặp qua các khóa để xác định những thư cần lấy thông tin.
 
-      If you do have a :class:`MaildirMessage` object, use
-      its :meth:`~MaildirMessage.get_info` method instead, because
-      changes made by the message's :meth:`~MaildirMessage.set_info` method
-      are not reflected here until the mailbox's :meth:`__setitem__` method
-      is called.
+      Nếu bạn có một đối tượng :class:`MaildirMessage`, hãy sử dụng phương thức :meth:`~MaildirMessage.get_info` của đối tượng đó, vì các thay đổi do phương thức :meth:`~MaildirMessage.set_info` của thư thực hiện sẽ không được phản ánh ở đây cho đến khi phương thức :meth:`__setitem__` của mailbox được gọi.
 
       .. versionadded:: 3.13
 
 
    .. method:: set_info(key, info)
 
-      Set the info of the message corresponding to *key* to *info*.
-      Calling ``some_mailbox.set_info(key, flags)`` is similar to ::
+      Đặt thông tin của thư tương ứng với *key* thành *info*. Việc gọi ``some_mailbox.set_info(key, flags)`` tương tự như::
 
          one_message = some_mailbox.get_message(key)
          one_message.set_info(info)
          some_mailbox[key] = one_message
 
-      but faster, because it does not open the message file.
+      nhưng nhanh hơn vì không mở tệp thư.
 
-      If you do have a :class:`MaildirMessage` object, use
-      its :meth:`~MaildirMessage.set_info` method instead, because
-      changes made with this mailbox method will not be visible to the
-      message object's method, :meth:`~MaildirMessage.get_info`.
+      Nếu bạn có một đối tượng :class:`MaildirMessage`, hãy sử dụng phương thức :meth:`~MaildirMessage.set_info` của đối tượng đó, vì các thay đổi được thực hiện bằng phương thức của mailbox này sẽ không hiển thị trong phương thức của đối tượng thư, :meth:`~MaildirMessage.get_info`.
 
       .. versionadded:: 3.13
 
-   Some :class:`Mailbox` methods implemented by :class:`!Maildir` deserve special
-   remarks:
+   Một số phương thức :class:`Mailbox` được triển khai bởi :class:`!Maildir` cần được lưu ý đặc biệt:
 
 
    .. method:: add(message)
-               __setitem__(key, message)
-               update(arg)
+               __setitem__(key, message) update(arg)
 
       .. warning::
 
-         These methods generate unique file names based upon the current process
-         ID. When using multiple threads, undetected name clashes may occur and
-         cause corruption of the mailbox unless threads are coordinated to avoid
-         using these methods to manipulate the same mailbox simultaneously.
+         Các phương thức này tạo tên tệp duy nhất dựa trên process hiện tại
+         ID. Khi sử dụng nhiều thread, có thể xảy ra xung đột tên không được phát hiện và
+         gây hỏng mailbox trừ khi các thread được phối hợp để tránh sử dụng các phương thức này nhằm thao tác đồng thời trên cùng một mailbox.
 
 
    .. method:: flush()
 
-      All changes to Maildir mailboxes are immediately applied, so this method
-      does nothing.
+      Mọi thay đổi đối với mailbox Maildir đều được áp dụng ngay lập tức, vì vậy phương thức này không thực hiện thao tác nào.
 
 
    .. method:: lock()
                unlock()
 
-      Maildir mailboxes do not support (or require) locking, so these methods do
-      nothing.
+      Các mailbox Maildir không hỗ trợ (hoặc không yêu cầu) việc khóa, vì vậy các phương thức này không làm gì cả.
 
 
    .. method:: close()
 
-      :class:`!Maildir` instances do not keep any open files and the underlying
-      mailboxes do not support locking, so this method does nothing.
+      Các đối tượng :class:`!Maildir` không giữ bất kỳ tệp nào đang mở và các mailbox bên dưới không hỗ trợ khóa, vì vậy phương thức này không làm gì cả.
 
 
    .. method:: get_file(key)
 
-      Depending upon the host platform, it may not be possible to modify or
-      remove the underlying message while the returned file remains open.
+      Tùy thuộc vào nền tảng máy chủ, bạn có thể không sửa đổi hoặc xóa được thông báo bên dưới trong khi tệp được trả về vẫn đang mở.
 
 
 .. seealso::
 
-   `maildir man page from Courier <https://www.courier-mta.org/maildir.html>`_
-      A specification of the format. Describes a common extension for
-      supporting folders.
+   `Trang hướng dẫn sử dụng maildir của Courier <https://www.courier-mta.org/maildir.html>`_
+      Đặc tả về định dạng này. Mô tả một phần mở rộng phổ biến để hỗ trợ các thư mục.
 
-   `Using maildir format <https://cr.yp.to/proto/maildir.html>`_
-      Notes on Maildir by its inventor. Includes an updated name-creation scheme and
-      details on "info" semantics.
+   `Sử dụng định dạng maildir <https://cr.yp.to/proto/maildir.html>`_
+      Các ghi chú về Maildir của người phát minh ra nó. Bao gồm lược đồ tạo tên được cập nhật và thông tin chi tiết về ngữ nghĩa của "info".
 
 
 .. _mailbox-mbox:
 
-:class:`!mbox` objects
-^^^^^^^^^^^^^^^^^^^^^^
+các đối tượng :class:`!mbox`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. class:: mbox(path, factory=None, create=True)
 
-   A subclass of :class:`Mailbox` for mailboxes in mbox format. Parameter *factory*
-   is a callable object that accepts a file-like message representation (which
-   behaves as if opened in binary mode) and returns a custom representation. If
-   *factory* is ``None``, :class:`mboxMessage` is used as the default message
-   representation. If *create* is ``True``, the mailbox is created if it does not
-   exist.
+   Một lớp con của :class:`Mailbox` dành cho các mailbox ở định dạng mbox. Tham số *factory* là một đối tượng có thể gọi, chấp nhận biểu diễn thư bằng tệp (hoạt động như thể được mở ở chế độ nhị phân) và trả về một biểu diễn tùy chỉnh. Nếu *factory* là ``None``, :class:`mboxMessage` được dùng làm biểu diễn thư mặc định. Nếu *create* là ``True``, mailbox sẽ được tạo nếu chưa tồn tại.
 
-   The mbox format is the classic format for storing mail on Unix systems. All
-   messages in an mbox mailbox are stored in a single file with the beginning of
-   each message indicated by a line whose first five characters are "From ".
+   Định dạng mbox là định dạng kinh điển để lưu trữ thư trên các hệ thống Unix. Tất cả thư trong một mailbox mbox được lưu trong một tệp duy nhất; phần bắt đầu của mỗi thư được đánh dấu bằng một dòng có năm ký tự đầu tiên là "From ".
 
-   Several variations of the mbox format exist to address perceived shortcomings in
-   the original. In the interest of compatibility, :class:`!mbox` implements the
-   original format, which is sometimes referred to as :dfn:`mboxo`. This means that
-   the :mailheader:`Content-Length` header, if present, is ignored and that any
-   occurrences of "From " at the beginning of a line in a message body are
-   transformed to ">From " when storing the message, although occurrences of ">From
-   " are not transformed to "From " when reading the message.
+   Có một số biến thể của định dạng mbox nhằm khắc phục những hạn chế được cho là tồn tại trong định dạng ban đầu. Để đảm bảo khả năng tương thích, :class:`!mbox` triển khai định dạng ban đầu, đôi khi được gọi là :dfn:`mboxo`. Điều này có nghĩa là header :mailheader:`Content-Length`, nếu có, sẽ bị bỏ qua và mọi chuỗi "From " xuất hiện ở đầu dòng trong phần thân thư sẽ được chuyển thành ">From " khi lưu thư, mặc dù các chuỗi ">From " sẽ không được chuyển thành "From " khi đọc thư.
 
-   Some :class:`Mailbox` methods implemented by :class:`!mbox` deserve special
-   remarks:
+   Một số phương thức :class:`Mailbox` được :class:`!mbox` triển khai cần được lưu ý riêng:
 
 
    .. method:: get_bytes(key, from_=False)
 
-      Note: This method has an extra parameter (*from_*) compared with other classes.
-      The first line of an mbox file entry is the Unix "From " line.
-      If *from_* is False, the first line of the file is dropped.
+      Lưu ý: Phương thức này có thêm một tham số (*from_*) so với các lớp khác. Dòng đầu tiên của một mục trong tệp mbox là dòng Unix "From ". Nếu *from_* là False, dòng đầu tiên của tệp sẽ bị loại bỏ.
 
    .. method:: get_file(key, from_=False)
 
-      Using the file after calling :meth:`~Mailbox.flush` or
-      :meth:`~Mailbox.close` on the :class:`!mbox` instance may yield
-      unpredictable results or raise an exception.
+      Sử dụng tệp sau khi gọi :meth:`~Mailbox.flush` hoặc
+      Việc :meth:`~Mailbox.close` trên instance :class:`!mbox` có thể cho kết quả không dự đoán được hoặc gây ra ngoại lệ.
 
-      Note: This method has an extra parameter (*from_*) compared with other classes.
-      The first line of an mbox file entry is the Unix "From " line.
-      If *from_* is False, the first line of the file is dropped.
+      Lưu ý: Phương thức này có thêm một tham số (*from_*) so với các lớp khác. Dòng đầu tiên của một mục trong tệp mbox là dòng Unix "From ". Nếu *from_* là False, dòng đầu tiên của tệp sẽ bị loại bỏ.
 
    .. method:: get_string(key, from_=False)
 
-      Note: This method has an extra parameter (*from_*) compared with other classes.
-      The first line of an mbox file entry is the Unix "From " line.
-      If *from_* is False, the first line of the file is dropped.
+      Lưu ý: Phương thức này có thêm một tham số (*from_*) so với các lớp khác. Dòng đầu tiên của một mục trong tệp mbox là dòng Unix "From ". Nếu *from_* là False, dòng đầu tiên của tệp sẽ bị loại bỏ.
 
    .. method:: lock()
                unlock()
 
-      Three locking mechanisms are used---dot locking and, if available, the
-      :c:func:`!flock` and :c:func:`!lockf` system calls.
+      Có ba cơ chế khóa được sử dụng---khóa bằng tệp dot và, nếu có,
+      các lệnh gọi hệ thống :c:func:`!flock` và :c:func:`!lockf`.
 
 
 .. seealso::
 
-   `mbox man page from tin <http://www.tin.org/bin/man.cgi?section=5&topic=mbox>`_
-      A specification of the format, with details on locking.
+   `Trang hướng dẫn mbox từ tin <http://www.tin.org/bin/man.cgi?section=5&topic=mbox>`_
+      Đặc tả về định dạng, kèm chi tiết về việc khóa.
 
-   `Configuring Netscape Mail on Unix: Why The Content-Length Format is Bad <https://www.jwz.org/doc/content-length.html>`_
-      An argument for using the original mbox format rather than a variation.
+   `Định cấu hình Netscape Mail trên Unix: Vì sao định dạng Content-Length không tốt <https://www.jwz.org/doc/content-length.html>`_
+      Lập luận ủng hộ việc sử dụng định dạng mbox nguyên bản thay vì một biến thể.
 
-   `"mbox" is a family of several mutually incompatible mailbox formats <https://www.loc.gov/preservation/digital/formats/fdd/fdd000383.shtml>`_
-      A history of mbox variations.
+   `"mbox" là một họ gồm nhiều định dạng hộp thư không tương thích với nhau <https://www.loc.gov/preservation/digital/formats/fdd/fdd000383.shtml>`_
+      Lịch sử của các biến thể mbox.
 
 
 .. _mailbox-mh:
 
-:class:`!MH` objects
-^^^^^^^^^^^^^^^^^^^^
+:class:`!MH` đối tượng
+^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. class:: MH(path, factory=None, create=True)
 
-   A subclass of :class:`Mailbox` for mailboxes in MH format. Parameter *factory*
-   is a callable object that accepts a file-like message representation (which
-   behaves as if opened in binary mode) and returns a custom representation. If
-   *factory* is ``None``, :class:`MHMessage` is used as the default message
-   representation. If *create* is ``True``, the mailbox is created if it does not
-   exist.
+   Một lớp con của :class:`Mailbox` dành cho các hộp thư ở định dạng MH. Tham số *factory* là một đối tượng có thể gọi, chấp nhận biểu diễn thư dạng tệp (hoạt động như thể được mở ở chế độ nhị phân) và trả về một biểu diễn tùy chỉnh. Nếu *factory* là ``None``, :class:`MHMessage` được dùng làm biểu diễn thư mặc định. Nếu *create* là ``True``, hộp thư sẽ được tạo nếu chưa tồn tại.
 
-   MH is a directory-based mailbox format invented for the MH Message Handling
-   System, a mail user agent. Each message in an MH mailbox resides in its own
-   file. An MH mailbox may contain other MH mailboxes (called :dfn:`folders`) in
-   addition to messages. Folders may be nested indefinitely. MH mailboxes also
-   support :dfn:`sequences`, which are named lists used to logically group
-   messages without moving them to sub-folders. Sequences are defined in a file
-   called :file:`.mh_sequences` in each folder.
+   MH là một định dạng mailbox dựa trên thư mục, được phát minh cho MH Message Handling System, một mail user agent. Mỗi thư trong mailbox MH nằm trong một tệp riêng. Một mailbox MH có thể chứa các mailbox MH khác (được gọi là :dfn:`folder`) bên cạnh các thư. Các folder có thể được lồng nhau vô hạn. Mailbox MH cũng hỗ trợ :dfn:`sequence`, là các danh sách có tên được dùng để nhóm các thư theo logic mà không di chuyển chúng vào các thư mục con. Các sequence được định nghĩa trong một tệp có tên :file:`.mh_sequences` trong mỗi folder.
 
-   The :class:`!MH` class manipulates MH mailboxes, but it does not attempt to
-   emulate all of :program:`mh`'s behaviors. In particular, it does not modify
-   and is not affected by the :file:`context` or :file:`.mh_profile` files that
-   are used by :program:`mh` to store its state and configuration.
+   Lớp :class:`!MH` thao tác với các mailbox MH, nhưng không cố gắng mô phỏng tất cả hành vi của :program:`mh`. Cụ thể, lớp này không sửa đổi và cũng không bị ảnh hưởng bởi các tệp :file:`context` hoặc :file:`.mh_profile` được :program:`mh` sử dụng để lưu trạng thái và cấu hình của nó.
 
-   :class:`!MH` instances have all of the methods of :class:`Mailbox` in addition
-   to the following:
+   Các đối tượng :class:`!MH` có tất cả các phương thức của :class:`Mailbox`, ngoài ra còn có những phương thức sau:
 
    .. versionchanged:: 3.13
 
-      Supported folders that don't contain a :file:`.mh_sequences` file.
+      Các folder được hỗ trợ không chứa tệp :file:`.mh_sequences`.
 
 
    .. method:: list_folders()
 
-      Return a list of the names of all folders.
+      Trả về danh sách tên của tất cả các folder.
 
 
    .. method:: get_folder(folder)
 
-      Return an :class:`!MH` instance representing the folder whose name is
-      *folder*. A :exc:`NoSuchMailboxError` exception is raised if the folder
-      does not exist.
+      Trả về một thực thể :class:`!MH` đại diện cho folder có tên là *folder*. Một ngoại lệ :exc:`NoSuchMailboxError` được phát sinh nếu folder không tồn tại.
 
 
    .. method:: add_folder(folder)
 
-      Create a folder whose name is *folder* and return an :class:`!MH` instance
-      representing it.
+      Tạo một folder có tên là *folder* và trả về một thực thể :class:`!MH` đại diện cho folder đó.
 
 
    .. method:: remove_folder(folder)
 
-      Delete the folder whose name is *folder*. If the folder contains any
-      messages, a :exc:`NotEmptyError` exception will be raised and the folder
-      will not be deleted.
+      Xóa thư mục có tên là *folder*. Nếu thư mục chứa bất kỳ thư nào, một ngoại lệ :exc:`NotEmptyError` sẽ được phát sinh và thư mục sẽ không bị xóa.
 
 
    .. method:: get_sequences()
 
-      Return a dictionary of sequence names mapped to key lists. If there are no
-      sequences, the empty dictionary is returned.
+      Trả về một dictionary ánh xạ tên các sequence tới danh sách key. Nếu không có sequence nào, một dictionary rỗng sẽ được trả về.
 
 
    .. method:: set_sequences(sequences)
 
-      Re-define the sequences that exist in the mailbox based upon *sequences*,
-      a dictionary of names mapped to key lists, like returned by
+      Định nghĩa lại các sequence tồn tại trong mailbox dựa trên *sequences*, một dictionary ánh xạ tên tới danh sách key, giống như được trả về bởi
       :meth:`get_sequences`.
 
 
    .. method:: pack()
 
-      Rename messages in the mailbox as necessary to eliminate gaps in
-      numbering.  Entries in the sequences list are updated correspondingly.
+      Đổi tên các thư trong mailbox nếu cần để loại bỏ các khoảng trống trong việc đánh số. Các mục trong danh sách sequence cũng được cập nhật tương ứng.
 
       .. note::
 
-         Already-issued keys are invalidated by this operation and should not be
-         subsequently used.
+         Các key đã được cấp sẽ bị vô hiệu hóa bởi thao tác này và không nên được sử dụng sau đó.
 
-   Some :class:`Mailbox` methods implemented by :class:`!MH` deserve special
-   remarks:
+   Một số :class:`Mailbox` phương thức được triển khai bởi :class:`!MH` đáng được lưu ý đặc biệt:
 
 
    .. method:: remove(key)
-               __delitem__(key)
-               discard(key)
+               __delitem__(key) discard(key)
 
-      These methods immediately delete the message. The MH convention of marking
-      a message for deletion by prepending a comma to its name is not used.
+      Các phương thức này ngay lập tức xóa thư. Quy ước của MH về việc đánh dấu một thư để xóa bằng cách thêm dấu phẩy vào trước tên thư không được sử dụng.
 
 
    .. method:: lock()
                unlock()
 
-      Three locking mechanisms are used---dot locking and, if available, the
-      :c:func:`!flock` and :c:func:`!lockf` system calls. For MH mailboxes, locking
-      the mailbox means locking the :file:`.mh_sequences` file and, only for the
-      duration of any operations that affect them, locking individual message
-      files.
+      Ba cơ chế khóa được sử dụng---khóa bằng dot và, nếu khả dụng, các
+      :c:func:`!flock` và :c:func:`!lockf` system call. Đối với mailbox MH, khóa mailbox nghĩa là khóa tệp :file:`.mh_sequences` và chỉ khóa các tệp thư riêng lẻ trong khoảng thời gian thực hiện những thao tác ảnh hưởng đến chúng.
 
 
    .. method:: get_file(key)
 
-      Depending upon the host platform, it may not be possible to remove the
-      underlying message while the returned file remains open.
+      Tùy thuộc vào nền tảng máy chủ, có thể không thể xóa thư bên dưới trong khi tệp được trả về vẫn đang mở.
 
 
    .. method:: flush()
 
-      All changes to MH mailboxes are immediately applied, so this method does
-      nothing.
+      Mọi thay đổi đối với mailbox MH đều được áp dụng ngay lập tức, vì vậy phương thức này không thực hiện thao tác nào.
 
 
    .. method:: close()
 
-      :class:`!MH` instances do not keep any open files, so this method is
-      equivalent to :meth:`unlock`.
+      Các instance :class:`!MH` không giữ tệp nào đang mở, vì vậy phương thức này tương đương với :meth:`unlock`.
 
 
 .. seealso::
 
-   `nmh - Message Handling System <https://www.nongnu.org/nmh/>`_
-      Home page of :program:`nmh`, an updated version of the original :program:`mh`.
+   `nmh - Hệ thống xử lý thư <https://www.nongnu.org/nmh/>`_
+      Trang chủ của :program:`nmh`, một phiên bản cập nhật của :program:`mh` ban đầu.
 
-   `MH & nmh: Email for Users & Programmers <https://rand-mh.sourceforge.io/book/>`_
-      A GPL-licensed book on :program:`mh` and :program:`nmh`, with some information
-      on the mailbox format.
+   `MH & nmh: Email dành cho người dùng và lập trình viên <https://rand-mh.sourceforge.io/book/>`_
+      Một cuốn sách được cấp phép GPL về :program:`mh` và :program:`nmh`, kèm một số thông tin về định dạng mailbox.
 
 
 .. _mailbox-babyl:
 
-:class:`!Babyl` objects
-^^^^^^^^^^^^^^^^^^^^^^^
+:class:`!Babyl` các đối tượng
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. class:: Babyl(path, factory=None, create=True)
 
-   A subclass of :class:`Mailbox` for mailboxes in Babyl format. Parameter
-   *factory* is a callable object that accepts a file-like message representation
-   (which behaves as if opened in binary mode) and returns a custom representation.
-   If *factory* is ``None``, :class:`BabylMessage` is used as the default message
-   representation. If *create* is ``True``, the mailbox is created if it does not
-   exist.
+   Một lớp con của :class:`Mailbox` dành cho các mailbox ở định dạng Babyl. Tham số *factory* là một đối tượng callable chấp nhận biểu diễn thư dạng file (hoạt động như thể được mở ở chế độ nhị phân) và trả về một biểu diễn tùy chỉnh. Nếu *factory* là ``None``, :class:`BabylMessage` được dùng làm biểu diễn thư mặc định. Nếu *create* là ``True``, mailbox sẽ được tạo nếu chưa tồn tại.
 
-   Babyl is a single-file mailbox format used by the Rmail mail user agent
-   included with Emacs. The beginning of a message is indicated by a line
-   containing the two characters Control-Underscore (``'\037'``) and Control-L
-   (``'\014'``). The end of a message is indicated by the start of the next
-   message or, in the case of the last message, a line containing a
-   Control-Underscore (``'\037'``) character.
+   Babyl là một định dạng mailbox trong một tệp, được sử dụng bởi mail user agent Rmail đi kèm với Emacs. Phần đầu của một thư được biểu thị bằng một dòng chứa hai ký tự Control-Underscore (``'\037'``) và Control-L (``'\014'``). Phần cuối của một thư được biểu thị bằng phần bắt đầu của thư tiếp theo hoặc, trong trường hợp là thư cuối cùng, bằng một dòng chứa ký tự Control-Underscore (``'\037'``).
 
-   Messages in a Babyl mailbox have two sets of headers, original headers and
-   so-called visible headers. Visible headers are typically a subset of the
-   original headers that have been reformatted or abridged to be more
-   attractive. Each message in a Babyl mailbox also has an accompanying list of
-   :dfn:`labels`, or short strings that record extra information about the
-   message, and a list of all user-defined labels found in the mailbox is kept
-   in the Babyl options section.
+   Các thư trong một Babyl mailbox có hai tập header: header gốc và header được gọi là header hiển thị. Header hiển thị thường là một tập con của header gốc đã được định dạng lại hoặc rút gọn để trông hấp dẫn hơn. Mỗi thư trong Babyl mailbox cũng có một danh sách đi kèm gồm
+   :dfn:`nhãn`, hoặc các chuỗi ngắn ghi lại thông tin bổ sung về thư, và một danh sách tất cả nhãn do người dùng định nghĩa được tìm thấy trong mailbox được lưu trong phần tùy chọn Babyl.
 
-   :class:`!Babyl` instances have all of the methods of :class:`Mailbox` in
-   addition to the following:
+   Các instance :class:`!Babyl` có tất cả các phương thức của :class:`Mailbox` cùng với các phương thức sau:
 
 
    .. method:: get_labels()
 
-      Return a list of the names of all user-defined labels used in the mailbox.
+      Trả về danh sách tên của tất cả nhãn do người dùng định nghĩa được sử dụng trong mailbox.
 
       .. note::
 
-         The actual messages are inspected to determine which labels exist in
-         the mailbox rather than consulting the list of labels in the Babyl
-         options section, but the Babyl section is updated whenever the mailbox
-         is modified.
+         Các thư thực tế được kiểm tra để xác định những nhãn nào tồn tại trong mailbox thay vì tham chiếu danh sách nhãn trong phần tùy chọn Babyl, nhưng phần Babyl được cập nhật mỗi khi mailbox được sửa đổi.
 
-   Some :class:`Mailbox` methods implemented by :class:`!Babyl` deserve special
-   remarks:
+   Một số phương thức :class:`Mailbox` được :class:`!Babyl` triển khai cần được lưu ý đặc biệt:
 
 
    .. method:: get_file(key)
 
-      In Babyl mailboxes, the headers of a message are not stored contiguously
-      with the body of the message. To generate a file-like representation, the
-      headers and body are copied together into an :class:`io.BytesIO` instance,
-      which has an API identical to that of a
-      file. As a result, the file-like object is truly independent of the
-      underlying mailbox but does not save memory compared to a string
-      representation.
+      Trong các Babyl mailbox, header của một thư không được lưu liên tục cùng với phần nội dung thư. Để tạo một biểu diễn giống tệp, header và phần nội dung được sao chép vào một instance :class:`io.BytesIO`, có API giống hệt API của một tệp. Do đó, đối tượng giống tệp này hoàn toàn độc lập với mailbox bên dưới, nhưng không tiết kiệm bộ nhớ hơn so với biểu diễn bằng chuỗi.
 
 
    .. method:: lock()
                unlock()
 
-      Three locking mechanisms are used---dot locking and, if available, the
-      :c:func:`!flock` and :c:func:`!lockf` system calls.
+      Ba cơ chế khóa được sử dụng---khóa bằng tệp dot và, nếu có,
+      :c:func:`!flock` và :c:func:`!lockf` system call.
 
 
 .. seealso::
 
    `Format of Version 5 Babyl Files <https://quimby.gnus.org/notes/BABYL>`_
-      A specification of the Babyl format.
+      Đặc tả về định dạng Babyl.
 
    `Reading Mail with Rmail <https://www.gnu.org/software/emacs/manual/html_node/emacs/Rmail.html>`_
-      The Rmail manual, with some information on Babyl semantics.
+      Tài liệu hướng dẫn về Rmail, kèm một số thông tin về ngữ nghĩa của Babyl.
 
 
 .. _mailbox-mmdf:
 
-:class:`!MMDF` objects
-^^^^^^^^^^^^^^^^^^^^^^
+Các đối tượng :class:`!MMDF`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. class:: MMDF(path, factory=None, create=True)
 
-   A subclass of :class:`Mailbox` for mailboxes in MMDF format. Parameter *factory*
-   is a callable object that accepts a file-like message representation (which
-   behaves as if opened in binary mode) and returns a custom representation. If
-   *factory* is ``None``, :class:`MMDFMessage` is used as the default message
-   representation. If *create* is ``True``, the mailbox is created if it does not
-   exist.
+   Một lớp con của :class:`Mailbox` dành cho các hộp thư ở định dạng MMDF. Tham số *factory* là một đối tượng có thể gọi, chấp nhận một biểu diễn thư dạng tệp (hoạt động như thể được mở ở chế độ nhị phân) và trả về một biểu diễn tùy chỉnh. Nếu *factory* là ``None``, :class:`MMDFMessage` được dùng làm biểu diễn thư mặc định. Nếu *create* là ``True``, hộp thư sẽ được tạo nếu chưa tồn tại.
 
-   MMDF is a single-file mailbox format invented for the Multichannel Memorandum
-   Distribution Facility, a mail transfer agent. Each message is in the same
-   form as an mbox message but is bracketed before and after by lines containing
-   four Control-A (``'\001'``) characters. As with the mbox format, the
-   beginning of each message is indicated by a line whose first five characters
-   are "From ", but additional occurrences of "From " are not transformed to
-   ">From " when storing messages because the extra message separator lines
-   prevent mistaking such occurrences for the starts of subsequent messages.
+   MMDF là một định dạng hộp thư trong một tệp duy nhất, được phát minh cho Multichannel Memorandum Distribution Facility, một mail transfer agent. Mỗi thư có cùng dạng với một thư mbox nhưng được đặt trước và sau bởi các dòng chứa bốn ký tự Control-A (``'\001'``). Cũng như với định dạng mbox, phần đầu mỗi thư được biểu thị bằng một dòng có năm ký tự đầu tiên là "From ", nhưng các lần xuất hiện thêm của "From " không được chuyển thành ">From " khi lưu thư, vì các dòng phân cách thư bổ sung ngăn việc nhầm những lần xuất hiện đó với phần bắt đầu của các thư tiếp theo.
 
-   Some :class:`Mailbox` methods implemented by :class:`!MMDF` deserve special
-   remarks:
+   Một số phương thức :class:`Mailbox` do :class:`!MMDF` triển khai cần được lưu ý đặc biệt:
 
 
    .. method:: get_bytes(key, from_=False)
 
-      Note: This method has an extra parameter (*from_*) compared with other classes.
-      The first line of an mbox file entry is the Unix "From " line.
-      If *from_* is False, the first line of the file is dropped.
+      Lưu ý: Phương thức này có thêm một tham số (*from_*) so với các lớp khác. Dòng đầu tiên của một mục trong tệp mbox là dòng Unix "From ". Nếu *from_* là False, dòng đầu tiên của tệp sẽ bị loại bỏ.
 
    .. method:: get_file(key, from_=False)
 
-      Using the file after calling :meth:`~Mailbox.flush` or
-      :meth:`~Mailbox.close` on the :class:`!MMDF` instance may yield
-      unpredictable results or raise an exception.
+      Việc sử dụng tệp sau khi gọi :meth:`~Mailbox.flush` hoặc
+      :meth:`~Mailbox.close` trên đối tượng :class:`!MMDF` có thể cho kết quả không thể dự đoán hoặc gây ra một exception.
 
-      Note: This method has an extra parameter (*from_*) compared with other classes.
-      The first line of an mbox file entry is the Unix "From " line.
-      If *from_* is False, the first line of the file is dropped.
+      Lưu ý: Phương thức này có thêm một tham số (*from_*) so với các lớp khác. Dòng đầu tiên của một mục trong tệp mbox là dòng Unix "From ". Nếu *from_* là False, dòng đầu tiên của tệp sẽ bị loại bỏ.
 
 
    .. method:: lock()
                unlock()
 
-      Three locking mechanisms are used---dot locking and, if available, the
-      :c:func:`!flock` and :c:func:`!lockf` system calls.
+      Ba cơ chế khóa được sử dụng---khóa bằng dấu chấm và, nếu có,
+      :c:func:`!flock` và các lệnh gọi hệ thống :c:func:`!lockf`.
 
 
 .. seealso::
 
-   `mmdf man page from tin <http://www.tin.org/bin/man.cgi?section=5&topic=mmdf>`_
-      A specification of MMDF format from the documentation of tin, a newsreader.
+   `trang man mmdf từ tin <http://www.tin.org/bin/man.cgi?section=5&topic=mmdf>`_
+      Đặc tả về định dạng MMDF trong tài liệu của tin, một trình đọc tin tức.
 
    `MMDF <https://en.wikipedia.org/wiki/MMDF>`_
-      A Wikipedia article describing the Multichannel Memorandum Distribution
-      Facility.
+      Một bài viết trên Wikipedia mô tả Multichannel Memorandum Distribution Facility.
 
 
 .. _mailbox-message-objects:
 
-:class:`!Message` objects
--------------------------
+Các đối tượng :class:`!Message`
+-------------------------------
 
 
 .. class:: Message(message=None)
 
-   A subclass of the :mod:`email.message` module's
-   :class:`~email.message.Message`. Subclasses of :class:`!mailbox.Message` add
-   mailbox-format-specific state and behavior.
+   Một lớp con của module :mod:`email.message`
+   :class:`~email.message.Message`. Các lớp con của :class:`!mailbox.Message` bổ sung trạng thái và hành vi dành riêng cho định dạng hộp thư.
 
-   If *message* is omitted, the new instance is created in a default, empty state.
-   If *message* is an :class:`email.message.Message` instance, its contents are
-   copied; furthermore, any format-specific information is converted insofar as
-   possible if *message* is a :class:`!Message` instance. If *message* is a string,
-   a byte string,
-   or a file, it should contain an :rfc:`5322`\ -compliant message, which is read
-   and parsed.  Files should be open in binary mode, but text mode files
-   are accepted for backward compatibility.
+   Nếu *message* được bỏ qua, thực thể mới sẽ được tạo ở trạng thái mặc định, trống. Nếu *message* là một thực thể :class:`email.message.Message`, nội dung của nó sẽ được sao chép; hơn nữa, mọi thông tin dành riêng cho định dạng sẽ được chuyển đổi trong phạm vi có thể nếu *message* là một thực thể :class:`!Message`. Nếu *message* là một chuỗi, chuỗi byte hoặc tệp, nó phải chứa một thư :rfc:`5322`\  hợp lệ, và thư này sẽ được đọc rồi phân tích cú pháp. Các tệp nên được mở ở chế độ nhị phân, nhưng các tệp ở chế độ văn bản vẫn được chấp nhận để tương thích ngược.
 
-   The format-specific state and behaviors offered by subclasses vary, but in
-   general it is only the properties that are not specific to a particular
-   mailbox that are supported (although presumably the properties are specific
-   to a particular mailbox format). For example, file offsets for single-file
-   mailbox formats and file names for directory-based mailbox formats are not
-   retained, because they are only applicable to the original mailbox. But state
-   such as whether a message has been read by the user or marked as important is
-   retained, because it applies to the message itself.
+   Trạng thái và hành vi dành riêng cho định dạng do các lớp con cung cấp có thể khác nhau, nhưng nhìn chung chỉ những thuộc tính không dành riêng cho một hộp thư cụ thể mới được hỗ trợ (mặc dù về nguyên tắc, các thuộc tính này dành riêng cho một định dạng hộp thư cụ thể). Ví dụ: vị trí trong tệp đối với các định dạng hộp thư dùng một tệp và tên tệp đối với các định dạng hộp thư dựa trên thư mục không được giữ lại, vì chúng chỉ áp dụng cho hộp thư ban đầu. Tuy nhiên, các trạng thái như việc người dùng đã đọc thư hay thư đã được đánh dấu là quan trọng vẫn được giữ lại, vì chúng áp dụng cho chính thư đó.
 
-   There is no requirement that :class:`!Message` instances be used to represent
-   messages retrieved using :class:`Mailbox` instances. In some situations, the
-   time and memory required to generate :class:`!Message` representations might
-   not be acceptable. For such situations, :class:`!Mailbox` instances also
-   offer string and file-like representations, and a custom message factory may
-   be specified when a :class:`!Mailbox` instance is initialized.
+   Không bắt buộc phải sử dụng các thực thể :class:`!Message` để biểu diễn những thư được truy xuất bằng các thực thể :class:`Mailbox`. Trong một số tình huống, thời gian và bộ nhớ cần thiết để tạo các biểu diễn :class:`!Message` có thể không chấp nhận được. Trong những tình huống đó, các thực thể :class:`!Mailbox` cũng cung cấp các biểu diễn dạng chuỗi và giống tệp, đồng thời có thể chỉ định một message factory tùy chỉnh khi khởi tạo một thực thể :class:`!Mailbox`.
 
 
 .. _mailbox-maildirmessage:
 
-:class:`!MaildirMessage` objects
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+:class:`!MaildirMessage` đối tượng
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. class:: MaildirMessage(message=None)
 
-   A message with Maildir-specific behaviors. Parameter *message* has the same
-   meaning as with the :class:`Message` constructor.
+   Một thư có các hành vi riêng của Maildir. Tham số *message* có cùng ý nghĩa như trong hàm khởi tạo :class:`Message`.
 
-   Typically, a mail user agent application moves all of the messages in the
-   :file:`new` subdirectory to the :file:`cur` subdirectory after the first time
-   the user opens and closes the mailbox, recording that the messages are old
-   whether or not they've actually been read. Each message in :file:`cur` has an
-   "info" section added to its file name to store information about its state.
-   (Some mail readers may also add an "info" section to messages in
-   :file:`new`.)  The "info" section may take one of two forms: it may contain
-   "2," followed by a list of standardized flags (e.g., "2,FR") or it may
-   contain "1," followed by so-called experimental information. Standard flags
-   for Maildir messages are as follows:
+   Thông thường, một ứng dụng mail user agent sẽ di chuyển tất cả thư trong
+   thư mục con :file:`new` sang thư mục con :file:`cur` sau lần đầu người dùng mở và đóng hộp thư, ghi nhận rằng các thư đã cũ bất kể chúng đã thực sự được đọc hay chưa. Mỗi thư trong :file:`cur` được thêm một phần "info" vào tên tệp để lưu thông tin về trạng thái của thư. (Một số trình đọc thư cũng có thể thêm phần "info" vào các thư trong
+   :file:`new`.)  Phần "info" có thể có một trong hai dạng: nó có thể chứa "2," theo sau là một danh sách các cờ chuẩn hóa (ví dụ: "2,FR"), hoặc có thể chứa "1," theo sau là thông tin được gọi là thử nghiệm. Các cờ chuẩn cho thư Maildir như sau:
 
-   +------+---------+--------------------------------+
-   | Flag | Meaning | Explanation                    |
-   +======+=========+================================+
-   | D    | Draft   | Under composition              |
-   +------+---------+--------------------------------+
-   | F    | Flagged | Marked as important            |
-   +------+---------+--------------------------------+
-   | P    | Passed  | Forwarded, resent, or bounced  |
-   +------+---------+--------------------------------+
-   | R    | Replied | Replied to                     |
-   +------+---------+--------------------------------+
-   | S    | Seen    | Read                           |
-   +------+---------+--------------------------------+
-   | T    | Trashed | Marked for subsequent deletion |
-   +------+---------+--------------------------------+
+   +----+-------------------------+---------------------------------------+
+   | Cờ | Ý nghĩa                 | Giải thích                            |
+   +====+=========================+=======================================+
+   | D  | Bản nháp                | Đang soạn                             |
+   +----+-------------------------+---------------------------------------+
+   | F  | Đã gắn cờ               | Được đánh dấu là quan trọng           |
+   +----+-------------------------+---------------------------------------+
+   | P  | Đã chuyển               | Đã chuyển tiếp, gửi lại hoặc hoàn trả |
+   +----+-------------------------+---------------------------------------+
+   | R  | Đã trả lời              | Đã trả lời                            |
+   +----+-------------------------+---------------------------------------+
+   | S  | Đã xem                  | Đã đọc                                |
+   +----+-------------------------+---------------------------------------+
+   | T  | Đã chuyển vào thùng rác | Được đánh dấu để xóa sau              |
+   +----+-------------------------+---------------------------------------+
 
-   :class:`!MaildirMessage` instances offer the following methods:
+   Các instance của :class:`!MaildirMessage` cung cấp các phương thức sau:
 
 
    .. method:: get_subdir()
 
-      Return either "new" (if the message should be stored in the :file:`new`
-      subdirectory) or "cur" (if the message should be stored in the :file:`cur`
-      subdirectory).
+      Trả về "new" (nếu thư cần được lưu trong thư mục con :file:`new`) hoặc "cur" (nếu thư cần được lưu trong thư mục con :file:`cur`).
 
       .. note::
 
-         A message is typically moved from :file:`new` to :file:`cur` after its
-         mailbox has been accessed, whether or not the message has been
-         read. A message ``msg`` has been read if ``"S" in msg.get_flags()`` is
-         ``True``.
+         Một thư thường được chuyển từ :file:`new` sang :file:`cur` sau khi hộp thư của thư đó được truy cập, bất kể thư đã được đọc hay chưa. Một thư ``msg`` đã được đọc nếu ``"S" in msg.get_flags()`` là ``True``.
 
 
    .. method:: set_subdir(subdir)
 
-      Set the subdirectory the message should be stored in. Parameter *subdir*
-      must be either "new" or "cur".
+      Đặt thư mục con nơi thư sẽ được lưu trữ. Tham số *subdir* phải là "new" hoặc "cur".
 
 
    .. method:: get_flags()
 
-      Return a string specifying the flags that are currently set. If the
-      message complies with the standard Maildir format, the result is the
-      concatenation in alphabetical order of zero or one occurrence of each of
-      ``'D'``, ``'F'``, ``'P'``, ``'R'``, ``'S'``, and ``'T'``. The empty string
-      is returned if no flags are set or if "info" contains experimental
-      semantics.
+      Trả về một chuỗi chỉ định các flag hiện đang được đặt. Nếu thư tuân theo định dạng Maildir chuẩn, kết quả là phép nối theo thứ tự bảng chữ cái của không hoặc một lần xuất hiện của từng flag trong ``'D'``, ``'F'``, ``'P'``, ``'R'``, ``'S'`` và ``'T'``. Chuỗi rỗng được trả về nếu không có flag nào được đặt hoặc nếu "info" chứa ngữ nghĩa thử nghiệm.
 
 
    .. method:: set_flags(flags)
 
-      Set the flags specified by *flags* and unset all others.
+      Đặt các flag được chỉ định bởi *flags* và bỏ đặt tất cả các flag khác.
 
 
    .. method:: add_flag(flag)
 
-      Set the flag(s) specified by *flag* without changing other flags. To add
-      more than one flag at a time, *flag* may be a string of more than one
-      character. The current "info" is overwritten whether or not it contains
-      experimental information rather than flags.
+      Đặt các flag được chỉ định bởi *flag* mà không thay đổi các flag khác. Để thêm nhiều flag cùng lúc, *flag* có thể là một chuỗi gồm nhiều hơn một ký tự. "info" hiện tại sẽ bị ghi đè bất kể nó có chứa thông tin thử nghiệm thay vì các flag hay không.
 
 
    .. method:: remove_flag(flag)
 
-      Unset the flag(s) specified by *flag* without changing other flags. To
-      remove more than one flag at a time, *flag* may be a string of more than
-      one character.  If "info" contains experimental information rather than
-      flags, the current "info" is not modified.
+      Bỏ đặt các flag được chỉ định bởi *flag* mà không thay đổi các flag khác. Để xóa nhiều flag cùng lúc, *flag* có thể là một chuỗi gồm nhiều hơn một ký tự. Nếu "info" chứa thông tin thử nghiệm thay vì các flag, "info" hiện tại sẽ không bị sửa đổi.
 
 
    .. method:: get_date()
 
-      Return the delivery date of the message as a floating-point number
-      representing seconds since the epoch.
+      Trả về ngày gửi thư dưới dạng số dấu phẩy động biểu thị số giây kể từ kỷ nguyên.
 
 
    .. method:: set_date(date)
 
-      Set the delivery date of the message to *date*, a floating-point number
-      representing seconds since the epoch.
+      Đặt ngày gửi của thư thành *date*, một số dấu phẩy động biểu thị số giây kể từ epoch.
 
 
    .. method:: get_info()
 
-      Return a string containing the "info" for a message. This is useful for
-      accessing and modifying "info" that is experimental (i.e., not a list of
-      flags).
+      Trả về một chuỗi chứa "info" của thư. Điều này hữu ích khi truy cập và sửa đổi "info" mang tính thử nghiệm (tức là không phải danh sách các cờ).
 
 
    .. method:: set_info(info)
 
-      Set "info" to *info*, which should be a string.
+      Đặt "info" thành *info*, giá trị này phải là một chuỗi.
 
-When a :class:`!MaildirMessage` instance is created based upon an
-:class:`mboxMessage` or :class:`MMDFMessage` instance, the :mailheader:`Status`
-and :mailheader:`X-Status` headers are omitted and the following conversions
-take place:
+Khi một thực thể :class:`!MaildirMessage` được tạo dựa trên một
+thực thể :class:`mboxMessage` hoặc :class:`MMDFMessage`, các header :mailheader:`Status` và :mailheader:`X-Status` sẽ bị lược bỏ và các chuyển đổi sau được thực hiện:
 
-+--------------------+----------------------------------------------+
-| Resulting state    | :class:`mboxMessage` or :class:`MMDFMessage` |
-|                    | state                                        |
-+====================+==============================================+
-| "cur" subdirectory | O flag                                       |
-+--------------------+----------------------------------------------+
-| F flag             | F flag                                       |
-+--------------------+----------------------------------------------+
-| R flag             | A flag                                       |
-+--------------------+----------------------------------------------+
-| S flag             | R flag                                       |
-+--------------------+----------------------------------------------+
-| T flag             | D flag                                       |
-+--------------------+----------------------------------------------+
++--------------------+---------------------------------------------------------------+
+| Trạng thái kết quả | Trạng thái của :class:`mboxMessage` hoặc :class:`MMDFMessage` |
++====================+===============================================================+
+| thư mục con "cur"  | cờ O                                                          |
++--------------------+---------------------------------------------------------------+
+| cờ F               | cờ F                                                          |
++--------------------+---------------------------------------------------------------+
+| cờ R               | cờ A                                                          |
++--------------------+---------------------------------------------------------------+
+| cờ S               | cờ R                                                          |
++--------------------+---------------------------------------------------------------+
+| cờ T               | cờ D                                                          |
++--------------------+---------------------------------------------------------------+
 
-When a :class:`!MaildirMessage` instance is created based upon an
-:class:`MHMessage` instance, the following conversions take place:
+Khi một thực thể :class:`!MaildirMessage` được tạo dựa trên một
+Với một instance :class:`MHMessage`, các chuyển đổi sau sẽ diễn ra:
 
-+-------------------------------+--------------------------+
-| Resulting state               | :class:`MHMessage` state |
-+===============================+==========================+
-| "cur" subdirectory            | "unseen" sequence        |
-+-------------------------------+--------------------------+
-| "cur" subdirectory and S flag | no "unseen" sequence     |
-+-------------------------------+--------------------------+
-| F flag                        | "flagged" sequence       |
-+-------------------------------+--------------------------+
-| R flag                        | "replied" sequence       |
-+-------------------------------+--------------------------+
++---------------------------+-------------------------------+
+| Trạng thái kết quả        | trạng thái :class:`MHMessage` |
++===========================+===============================+
+| thư mục con "cur"         | chuỗi "unseen"                |
++---------------------------+-------------------------------+
+| thư mục con "cur" và cờ S | không có chuỗi "unseen"       |
++---------------------------+-------------------------------+
+| cờ F                      | chuỗi "flagged"               |
++---------------------------+-------------------------------+
+| cờ R                      | chuỗi "replied"               |
++---------------------------+-------------------------------+
 
-When a :class:`!MaildirMessage` instance is created based upon a
-:class:`BabylMessage` instance, the following conversions take place:
+Khi một instance :class:`!MaildirMessage` được tạo dựa trên một
+instance :class:`BabylMessage`, các chuyển đổi sau sẽ diễn ra:
 
-+-------------------------------+-------------------------------+
-| Resulting state               | :class:`BabylMessage` state   |
-+===============================+===============================+
-| "cur" subdirectory            | "unseen" label                |
-+-------------------------------+-------------------------------+
-| "cur" subdirectory and S flag | no "unseen" label             |
-+-------------------------------+-------------------------------+
-| P flag                        | "forwarded" or "resent" label |
-+-------------------------------+-------------------------------+
-| R flag                        | "answered" label              |
-+-------------------------------+-------------------------------+
-| T flag                        | "deleted" label               |
-+-------------------------------+-------------------------------+
++---------------------------+----------------------------------+
+| Trạng thái kết quả        | trạng thái :class:`BabylMessage` |
++===========================+==================================+
+| thư mục con "cur"         | nhãn "unseen"                    |
++---------------------------+----------------------------------+
+| thư mục con "cur" và cờ S | không có nhãn "unseen"           |
++---------------------------+----------------------------------+
+| cờ P                      | nhãn "forwarded" hoặc "resent"   |
++---------------------------+----------------------------------+
+| cờ R                      | nhãn "answered"                  |
++---------------------------+----------------------------------+
+| cờ T                      | nhãn "deleted"                   |
++---------------------------+----------------------------------+
 
 
 .. _mailbox-mboxmessage:
 
-:class:`!mboxMessage` objects
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+các đối tượng :class:`!mboxMessage`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. class:: mboxMessage(message=None)
 
-   A message with mbox-specific behaviors. Parameter *message* has the same meaning
-   as with the :class:`Message` constructor.
+   Một message có các hành vi đặc thù của mbox. Tham số *message* có cùng ý nghĩa như với hàm khởi tạo :class:`Message`.
 
-   Messages in an mbox mailbox are stored together in a single file. The
-   sender's envelope address and the time of delivery are typically stored in a
-   line beginning with "From " that is used to indicate the start of a message,
-   though there is considerable variation in the exact format of this data among
-   mbox implementations. Flags that indicate the state of the message, such as
-   whether it has been read or marked as important, are typically stored in
-   :mailheader:`Status` and :mailheader:`X-Status` headers.
+   Các message trong một mailbox mbox được lưu cùng nhau trong một tệp duy nhất. Địa chỉ phong bì của người gửi và thời điểm gửi thường được lưu trong một dòng bắt đầu bằng "From ", được dùng để chỉ phần bắt đầu của một message, mặc dù định dạng chính xác của dữ liệu này có sự khác biệt đáng kể giữa các cách triển khai mbox. Các cờ cho biết trạng thái của message, chẳng hạn như message đã được đọc hay được đánh dấu là quan trọng, thường được lưu trong
+   các header :mailheader:`Status` và :mailheader:`X-Status`.
 
-   Conventional flags for mbox messages are as follows:
+   Các cờ quy ước cho message mbox như sau:
 
-   +------+----------+--------------------------------+
-   | Flag | Meaning  | Explanation                    |
-   +======+==========+================================+
-   | R    | Read     | Read                           |
-   +------+----------+--------------------------------+
-   | O    | Old      | Previously detected by MUA     |
-   +------+----------+--------------------------------+
-   | D    | Deleted  | Marked for subsequent deletion |
-   +------+----------+--------------------------------+
-   | F    | Flagged  | Marked as important            |
-   +------+----------+--------------------------------+
-   | A    | Answered | Replied to                     |
-   +------+----------+--------------------------------+
+   +----+------------+--------------------------------+
+   | Cờ | Ý nghĩa    | Giải thích                     |
+   +====+============+================================+
+   | R  | Đã đọc     | Đã đọc                         |
+   +----+------------+--------------------------------+
+   | O  | Cũ         | Trước đó đã được MUA phát hiện |
+   +----+------------+--------------------------------+
+   | D  | Đã xóa     | Được đánh dấu để xóa sau       |
+   +----+------------+--------------------------------+
+   | F  | Đã gắn cờ  | Được đánh dấu là quan trọng    |
+   +----+------------+--------------------------------+
+   | A  | Đã trả lời | Đã hồi đáp                     |
+   +----+------------+--------------------------------+
 
-   The "R" and "O" flags are stored in the :mailheader:`Status` header, and the
-   "D", "F", and "A" flags are stored in the :mailheader:`X-Status` header. The
-   flags and headers typically appear in the order mentioned.
+   Các cờ "R" và "O" được lưu trong header :mailheader:`Status`, còn các cờ "D", "F" và "A" được lưu trong header :mailheader:`X-Status`. Các cờ và header thường xuất hiện theo thứ tự được đề cập.
 
-   :class:`!mboxMessage` instances offer the following methods:
+   Các instance :class:`!mboxMessage` cung cấp các phương thức sau:
 
 
    .. method:: get_from()
 
-      Return a string representing the "From " line that marks the start of the
-      message in an mbox mailbox. The leading "From " and the trailing newline
-      are excluded.
+      Trả về một chuỗi biểu diễn dòng "From " đánh dấu phần bắt đầu của thư trong mailbox mbox. Phần "From " ở đầu và ký tự xuống dòng ở cuối không được bao gồm.
 
 
    .. method:: set_from(from_, time_=None)
 
-      Set the "From " line to *from_*, which should be specified without a
-      leading "From " or trailing newline. For convenience, *time_* may be
-      specified and will be formatted appropriately and appended to *from_*. If
-      *time_* is specified, it should be a :class:`time.struct_time` instance, a
-      tuple suitable for passing to :func:`time.strftime`, or ``True`` (to use
+      Đặt dòng "From " thành *from_*, giá trị này phải được chỉ định mà không có "From " ở đầu hoặc ký tự xuống dòng ở cuối. Để thuận tiện, có thể chỉ định *time_*, giá trị này sẽ được định dạng phù hợp và nối vào *from_*. Nếu *time_* được chỉ định, giá trị đó phải là một instance :class:`time.struct_time`, một tuple phù hợp để truyền vào :func:`time.strftime`, hoặc ``True`` (để sử dụng
       :func:`time.gmtime`).
 
 
    .. method:: get_flags()
 
-      Return a string specifying the flags that are currently set. If the
-      message complies with the conventional format, the result is the
-      concatenation in the following order of zero or one occurrence of each of
-      ``'R'``, ``'O'``, ``'D'``, ``'F'``, and ``'A'``.
+      Trả về một chuỗi chỉ định các flag hiện đang được thiết lập. Nếu message tuân thủ định dạng quy ước, kết quả là phép nối theo thứ tự sau của không hoặc một lần xuất hiện của mỗi ``'R'``, ``'O'``, ``'D'``, ``'F'`` và ``'A'``.
 
 
    .. method:: set_flags(flags)
 
-      Set the flags specified by *flags* and unset all others. Parameter *flags*
-      should be the concatenation in any order of zero or more occurrences of
-      each of ``'R'``, ``'O'``, ``'D'``, ``'F'``, and ``'A'``.
+      Thiết lập các flag được chỉ định bởi *flags* và bỏ thiết lập tất cả các flag khác. Tham số *flags* phải là phép nối theo bất kỳ thứ tự nào của không hoặc nhiều lần xuất hiện của mỗi ``'R'``, ``'O'``, ``'D'``, ``'F'`` và ``'A'``.
 
 
    .. method:: add_flag(flag)
 
-      Set the flag(s) specified by *flag* without changing other flags. To add
-      more than one flag at a time, *flag* may be a string of more than one
-      character.
+      Thiết lập các flag được chỉ định bởi *flag* mà không thay đổi các flag khác. Để thêm nhiều flag cùng lúc, *flag* có thể là một chuỗi gồm nhiều hơn một ký tự.
 
 
    .. method:: remove_flag(flag)
 
-      Unset the flag(s) specified by *flag* without changing other flags. To
-      remove more than one flag at a time, *flag* may be a string of more than
-      one character.
+      Bỏ thiết lập các flag được chỉ định bởi *flag* mà không thay đổi các flag khác. Để xóa nhiều flag cùng lúc, *flag* có thể là một chuỗi gồm nhiều hơn một ký tự.
 
-When an :class:`!mboxMessage` instance is created based upon a
-:class:`MaildirMessage` instance, a "From " line is generated based upon the
-:class:`MaildirMessage` instance's delivery date, and the following conversions
-take place:
+Khi một instance :class:`!mboxMessage` được tạo dựa trên một
+instance :class:`MaildirMessage`, một dòng "From " được tạo dựa trên
+ngày gửi của instance :class:`MaildirMessage` và các chuyển đổi sau được thực hiện:
 
-+-----------------+-------------------------------+
-| Resulting state | :class:`MaildirMessage` state |
-+=================+===============================+
-| R flag          | S flag                        |
-+-----------------+-------------------------------+
-| O flag          | "cur" subdirectory            |
-+-----------------+-------------------------------+
-| D flag          | T flag                        |
-+-----------------+-------------------------------+
-| F flag          | F flag                        |
-+-----------------+-------------------------------+
-| A flag          | R flag                        |
-+-----------------+-------------------------------+
++--------------------+------------------------------------+
+| Trạng thái kết quả | :class:`MaildirMessage` trạng thái |
++====================+====================================+
+| cờ R               | cờ S                               |
++--------------------+------------------------------------+
+| cờ O               | thư mục con "cur"                  |
++--------------------+------------------------------------+
+| cờ D               | Cờ T                               |
++--------------------+------------------------------------+
+| Cờ F               | Cờ F                               |
++--------------------+------------------------------------+
+| Cờ A               | Cờ R                               |
++--------------------+------------------------------------+
 
-When an :class:`!mboxMessage` instance is created based upon an
-:class:`MHMessage` instance, the following conversions take place:
+Khi một đối tượng :class:`!mboxMessage` được tạo dựa trên một
+đối tượng :class:`MHMessage`, các chuyển đổi sau sẽ diễn ra:
 
-+-------------------+--------------------------+
-| Resulting state   | :class:`MHMessage` state |
-+===================+==========================+
-| R flag and O flag | no "unseen" sequence     |
-+-------------------+--------------------------+
-| O flag            | "unseen" sequence        |
-+-------------------+--------------------------+
-| F flag            | "flagged" sequence       |
-+-------------------+--------------------------+
-| A flag            | "replied" sequence       |
-+-------------------+--------------------------+
++--------------------+-------------------------------+
+| Trạng thái kết quả | trạng thái :class:`MHMessage` |
++====================+===============================+
+| cờ R và cờ O       | không có sequence "unseen"    |
++--------------------+-------------------------------+
+| cờ O               | sequence "unseen"             |
++--------------------+-------------------------------+
+| cờ F               | chuỗi "flagged"               |
++--------------------+-------------------------------+
+| Một cờ             | chuỗi "replied"               |
++--------------------+-------------------------------+
 
-When an :class:`!mboxMessage` instance is created based upon a
-:class:`BabylMessage` instance, the following conversions take place:
+Khi một instance :class:`!mboxMessage` được tạo dựa trên một
+:class:`BabylMessage` instance, các chuyển đổi sau sẽ diễn ra:
 
-+-------------------+-----------------------------+
-| Resulting state   | :class:`BabylMessage` state |
-+===================+=============================+
-| R flag and O flag | no "unseen" label           |
-+-------------------+-----------------------------+
-| O flag            | "unseen" label              |
-+-------------------+-----------------------------+
-| D flag            | "deleted" label             |
-+-------------------+-----------------------------+
-| A flag            | "answered" label            |
-+-------------------+-----------------------------+
++--------------------+----------------------------------+
+| Trạng thái kết quả | trạng thái :class:`BabylMessage` |
++====================+==================================+
+| cờ R và cờ O       | không có nhãn "unseen"           |
++--------------------+----------------------------------+
+| cờ O               | nhãn "unseen"                    |
++--------------------+----------------------------------+
+| cờ D               | nhãn "deleted"                   |
++--------------------+----------------------------------+
+| Một cờ             | nhãn "answered"                  |
++--------------------+----------------------------------+
 
-When a :class:`!mboxMessage` instance is created based upon an
-:class:`MMDFMessage`
-instance, the "From " line is copied and all flags directly correspond:
+Khi một instance :class:`!mboxMessage` được tạo dựa trên một
+instance :class:`MMDFMessage`, dòng "From " được sao chép và tất cả các cờ tương ứng trực tiếp:
 
-+-----------------+----------------------------+
-| Resulting state | :class:`MMDFMessage` state |
-+=================+============================+
-| R flag          | R flag                     |
-+-----------------+----------------------------+
-| O flag          | O flag                     |
-+-----------------+----------------------------+
-| D flag          | D flag                     |
-+-----------------+----------------------------+
-| F flag          | F flag                     |
-+-----------------+----------------------------+
-| A flag          | A flag                     |
-+-----------------+----------------------------+
++--------------------+---------------------------------+
+| Trạng thái kết quả | trạng thái :class:`MMDFMessage` |
++====================+=================================+
+| cờ R               | cờ R                            |
++--------------------+---------------------------------+
+| cờ O               | Cờ O                            |
++--------------------+---------------------------------+
+| cờ D               | Cờ D                            |
++--------------------+---------------------------------+
+| Cờ F               | Cờ F                            |
++--------------------+---------------------------------+
+| Cờ A               | Một cờ                          |
++--------------------+---------------------------------+
 
 
 .. _mailbox-mhmessage:
 
-:class:`!MHMessage` objects
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Các đối tượng :class:`!MHMessage`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. class:: MHMessage(message=None)
 
-   A message with MH-specific behaviors. Parameter *message* has the same meaning
-   as with the :class:`Message` constructor.
+   Một message với các hành vi dành riêng cho MH. Tham số *message* có cùng ý nghĩa như với hàm khởi tạo :class:`Message`.
 
-   MH messages do not support marks or flags in the traditional sense, but they
-   do support sequences, which are logical groupings of arbitrary messages. Some
-   mail reading programs (although not the standard :program:`mh` and
-   :program:`nmh`) use sequences in much the same way flags are used with other
-   formats, as follows:
+   Các message MH không hỗ trợ mark hoặc flag theo nghĩa truyền thống, nhưng hỗ trợ sequence, tức các nhóm logic gồm những message tùy ý. Một số chương trình đọc thư (mặc dù không phải :program:`mh` tiêu chuẩn và
+   :program:`nmh`) sử dụng sequence gần như cách flag được sử dụng với các định dạng khác, như sau:
 
-   +----------+------------------------------------------+
-   | Sequence | Explanation                              |
-   +==========+==========================================+
-   | unseen   | Not read, but previously detected by MUA |
-   +----------+------------------------------------------+
-   | replied  | Replied to                               |
-   +----------+------------------------------------------+
-   | flagged  | Marked as important                      |
-   +----------+------------------------------------------+
+   +-------------+-----------------------------------------------+
+   | Sequence    | Giải thích                                    |
+   +=============+===============================================+
+   | chưa xem    | Chưa đọc nhưng trước đó đã được MUA phát hiện |
+   +-------------+-----------------------------------------------+
+   | đã trả lời  | Đã trả lời                                    |
+   +-------------+-----------------------------------------------+
+   | đã đánh dấu | Được đánh dấu là quan trọng                   |
+   +-------------+-----------------------------------------------+
 
-   :class:`!MHMessage` instances offer the following methods:
+   Các đối tượng :class:`!MHMessage` cung cấp các phương thức sau:
 
 
    .. method:: get_sequences()
 
-      Return a list of the names of sequences that include this message.
+      Trả về danh sách tên của các sequence có chứa message này.
 
 
    .. method:: set_sequences(sequences)
 
-      Set the list of sequences that include this message.
+      Đặt danh sách các sequence có chứa message này.
 
 
    .. method:: add_sequence(sequence)
 
-      Add *sequence* to the list of sequences that include this message.
+      Thêm *sequence* vào danh sách các sequence có chứa message này.
 
 
    .. method:: remove_sequence(sequence)
 
-      Remove *sequence* from the list of sequences that include this message.
+      Xóa *sequence* khỏi danh sách các sequence có chứa message này.
 
-When an :class:`!MHMessage` instance is created based upon a
-:class:`MaildirMessage` instance, the following conversions take place:
+Khi một instance :class:`!MHMessage` được tạo dựa trên một
+instance :class:`MaildirMessage`, các chuyển đổi sau sẽ diễn ra:
 
-+--------------------+-------------------------------+
-| Resulting state    | :class:`MaildirMessage` state |
-+====================+===============================+
-| "unseen" sequence  | no S flag                     |
-+--------------------+-------------------------------+
-| "replied" sequence | R flag                        |
-+--------------------+-------------------------------+
-| "flagged" sequence | F flag                        |
-+--------------------+-------------------------------+
++--------------------+------------------------------------+
+| Trạng thái kết quả | trạng thái :class:`MaildirMessage` |
++====================+====================================+
+| sequence "unseen"  | không có flag S                    |
++--------------------+------------------------------------+
+| sequence "replied" | flag R                             |
++--------------------+------------------------------------+
+| sequence "flagged" | flag F                             |
++--------------------+------------------------------------+
 
-When an :class:`!MHMessage` instance is created based upon an
-:class:`mboxMessage` or :class:`MMDFMessage` instance, the :mailheader:`Status`
-and :mailheader:`X-Status` headers are omitted and the following conversions
-take place:
+Khi một thể hiện :class:`!MHMessage` được tạo dựa trên một
+thể hiện :class:`mboxMessage` hoặc :class:`MMDFMessage`, các header :mailheader:`Status` và :mailheader:`X-Status` bị bỏ qua và các chuyển đổi sau đây diễn ra:
 
-+--------------------+----------------------------------------------+
-| Resulting state    | :class:`mboxMessage` or :class:`MMDFMessage` |
-|                    | state                                        |
-+====================+==============================================+
-| "unseen" sequence  | no R flag                                    |
-+--------------------+----------------------------------------------+
-| "replied" sequence | A flag                                       |
-+--------------------+----------------------------------------------+
-| "flagged" sequence | F flag                                       |
-+--------------------+----------------------------------------------+
++--------------------+---------------------------------------------------------------+
+| Trạng thái kết quả | trạng thái của :class:`mboxMessage` hoặc :class:`MMDFMessage` |
++====================+===============================================================+
+| sequence "unseen"  | không có cờ R                                                 |
++--------------------+---------------------------------------------------------------+
+| sequence "replied" | Cờ A                                                          |
++--------------------+---------------------------------------------------------------+
+| sequence "flagged" | Cờ F                                                          |
++--------------------+---------------------------------------------------------------+
 
-When an :class:`!MHMessage` instance is created based upon a
-:class:`BabylMessage` instance, the following conversions take place:
+Khi một instance :class:`!MHMessage` được tạo dựa trên một
+Đối với một :class:`BabylMessage` instance, các chuyển đổi sau sẽ diễn ra:
 
-+--------------------+-----------------------------+
-| Resulting state    | :class:`BabylMessage` state |
-+====================+=============================+
-| "unseen" sequence  | "unseen" label              |
-+--------------------+-----------------------------+
-| "replied" sequence | "answered" label            |
-+--------------------+-----------------------------+
++--------------------+----------------------------------+
+| Trạng thái kết quả | trạng thái :class:`BabylMessage` |
++====================+==================================+
+| sequence "unseen"  | nhãn "unseen"                    |
++--------------------+----------------------------------+
+| sequence "replied" | nhãn "answered"                  |
++--------------------+----------------------------------+
 
 
 .. _mailbox-babylmessage:
 
-:class:`!BabylMessage` objects
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+đối tượng :class:`!BabylMessage`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. class:: BabylMessage(message=None)
 
-   A message with Babyl-specific behaviors. Parameter *message* has the same
-   meaning as with the :class:`Message` constructor.
+   Một message có các hành vi riêng của Babyl. Tham số *message* có cùng ý nghĩa như trong constructor :class:`Message`.
 
-   Certain message labels, called :dfn:`attributes`, are defined by convention
-   to have special meanings. The attributes are as follows:
+   Một số nhãn message, được gọi là :dfn:`attributes`, được quy ước để có những ý nghĩa đặc biệt. Các attributes như sau:
 
-   +-----------+------------------------------------------+
-   | Label     | Explanation                              |
-   +===========+==========================================+
-   | unseen    | Not read, but previously detected by MUA |
-   +-----------+------------------------------------------+
-   | deleted   | Marked for subsequent deletion           |
-   +-----------+------------------------------------------+
-   | filed     | Copied to another file or mailbox        |
-   +-----------+------------------------------------------+
-   | answered  | Replied to                               |
-   +-----------+------------------------------------------+
-   | forwarded | Forwarded                                |
-   +-----------+------------------------------------------+
-   | edited    | Modified by the user                     |
-   +-----------+------------------------------------------+
-   | resent    | Resent                                   |
-   +-----------+------------------------------------------+
+   +----------------+-----------------------------------------------+
+   | Nhãn           | Giải thích                                    |
+   +================+===============================================+
+   | chưa xem       | Chưa đọc nhưng trước đó đã được MUA phát hiện |
+   +----------------+-----------------------------------------------+
+   | đã xóa         | Được đánh dấu để xóa sau                      |
+   +----------------+-----------------------------------------------+
+   | đã lưu         | Đã sao chép sang tệp hoặc hộp thư khác        |
+   +----------------+-----------------------------------------------+
+   | đã trả lời     | Đã trả lời                                    |
+   +----------------+-----------------------------------------------+
+   | đã chuyển tiếp | Đã chuyển tiếp                                |
+   +----------------+-----------------------------------------------+
+   | đã chỉnh sửa   | Được người dùng sửa đổi                       |
+   +----------------+-----------------------------------------------+
+   | đã gửi lại     | Đã gửi lại                                    |
+   +----------------+-----------------------------------------------+
 
-   By default, Rmail displays only visible headers. The :class:`!BabylMessage`
-   class, though, uses the original headers because they are more
-   complete. Visible headers may be accessed explicitly if desired.
+   Theo mặc định, Rmail chỉ hiển thị các header hiển thị. Tuy nhiên, lớp :class:`!BabylMessage` sử dụng các header gốc vì chúng đầy đủ hơn. Nếu muốn, bạn có thể truy cập rõ ràng các header hiển thị.
 
-   :class:`!BabylMessage` instances offer the following methods:
+   Các đối tượng :class:`!BabylMessage` cung cấp những phương thức sau:
 
 
    .. method:: get_labels()
 
-      Return a list of labels on the message.
+      Trả về danh sách các nhãn trên thư.
 
 
    .. method:: set_labels(labels)
 
-      Set the list of labels on the message to *labels*.
+      Đặt danh sách nhãn trên thư thành *labels*.
 
 
    .. method:: add_label(label)
 
-      Add *label* to the list of labels on the message.
+      Thêm *label* vào danh sách các nhãn trên thư.
 
 
    .. method:: remove_label(label)
 
-      Remove *label* from the list of labels on the message.
+      Xóa *label* khỏi danh sách nhãn trên thư.
 
 
    .. method:: get_visible()
 
-      Return a :class:`Message` instance whose headers are the message's
-      visible headers and whose body is empty.
+      Trả về một instance :class:`Message` có các header là những header hiển thị của thư và phần thân rỗng.
 
 
    .. method:: set_visible(visible)
 
-      Set the message's visible headers to be the same as the headers in
-      *message*.  Parameter *visible* should be a :class:`Message` instance, an
-      :class:`email.message.Message` instance, a string, or a file-like object
-      (which should be open in text mode).
+      Đặt các header hiển thị của thư giống với các header trong *message*. Tham số *visible* phải là một instance :class:`Message`, một
+      instance :class:`email.message.Message`, một chuỗi hoặc một đối tượng giống tệp (đối tượng này phải được mở ở chế độ văn bản).
 
 
    .. method:: update_visible()
 
-      When a :class:`!BabylMessage` instance's original headers are modified, the
-      visible headers are not automatically modified to correspond. This method
-      updates the visible headers as follows: each visible header with a
-      corresponding original header is set to the value of the original header,
-      each visible header without a corresponding original header is removed,
-      and any of :mailheader:`Date`, :mailheader:`From`, :mailheader:`Reply-To`,
-      :mailheader:`To`, :mailheader:`CC`, and :mailheader:`Subject` that are
-      present in the original headers but not the visible headers are added to
-      the visible headers.
+      Khi các header gốc của một instance :class:`!BabylMessage` được sửa đổi, các header hiển thị không tự động được sửa đổi tương ứng. Phương thức này cập nhật các header hiển thị như sau: mỗi header hiển thị có header gốc tương ứng được đặt thành giá trị của header gốc, mỗi header hiển thị không có header gốc tương ứng sẽ bị xóa, và bất kỳ :mailheader:`Date`, :mailheader:`From`, :mailheader:`Reply-To` nào
+      :mailheader:`To`, :mailheader:`CC` và :mailheader:`Subject` xuất hiện trong các header gốc nhưng không có trong các header hiển thị sẽ được thêm vào các header hiển thị.
 
-When a :class:`!BabylMessage` instance is created based upon a
-:class:`MaildirMessage` instance, the following conversions take place:
+Khi một instance :class:`!BabylMessage` được tạo dựa trên một
+Đối với một thể hiện :class:`MaildirMessage`, các chuyển đổi sau diễn ra:
 
-+-------------------+-------------------------------+
-| Resulting state   | :class:`MaildirMessage` state |
-+===================+===============================+
-| "unseen" label    | no S flag                     |
-+-------------------+-------------------------------+
-| "deleted" label   | T flag                        |
-+-------------------+-------------------------------+
-| "answered" label  | R flag                        |
-+-------------------+-------------------------------+
-| "forwarded" label | P flag                        |
-+-------------------+-------------------------------+
++--------------------+------------------------------------+
+| Trạng thái kết quả | Trạng thái :class:`MaildirMessage` |
++====================+====================================+
+| nhãn "chưa xem"    | không có cờ S                      |
++--------------------+------------------------------------+
+| nhãn "đã xóa"      | cờ T                               |
++--------------------+------------------------------------+
+| nhãn "answered"    | cờ R                               |
++--------------------+------------------------------------+
+| nhãn "forwarded"   | cờ P                               |
++--------------------+------------------------------------+
 
-When a :class:`!BabylMessage` instance is created based upon an
-:class:`mboxMessage` or :class:`MMDFMessage` instance, the :mailheader:`Status`
-and :mailheader:`X-Status` headers are omitted and the following conversions
-take place:
+Khi một thực thể :class:`!BabylMessage` được tạo dựa trên một
+thực thể :class:`mboxMessage` hoặc :class:`MMDFMessage`, các header :mailheader:`Status` và :mailheader:`X-Status` sẽ bị lược bỏ và các chuyển đổi sau sẽ diễn ra:
 
-+------------------+----------------------------------------------+
-| Resulting state  | :class:`mboxMessage` or :class:`MMDFMessage` |
-|                  | state                                        |
-+==================+==============================================+
-| "unseen" label   | no R flag                                    |
-+------------------+----------------------------------------------+
-| "deleted" label  | D flag                                       |
-+------------------+----------------------------------------------+
-| "answered" label | A flag                                       |
-+------------------+----------------------------------------------+
++--------------------+-----------------------------------------------------------+
+| Trạng thái kết quả | trạng thái :class:`mboxMessage` hoặc :class:`MMDFMessage` |
++====================+===========================================================+
+| nhãn "chưa xem"    | không có cờ R                                             |
++--------------------+-----------------------------------------------------------+
+| nhãn "đã xóa"      | cờ D                                                      |
++--------------------+-----------------------------------------------------------+
+| nhãn "answered"    | cờ A                                                      |
++--------------------+-----------------------------------------------------------+
 
-When a :class:`!BabylMessage` instance is created based upon an
-:class:`MHMessage` instance, the following conversions take place:
+Khi một thực thể :class:`!BabylMessage` được tạo dựa trên một
+instance :class:`MHMessage`, các chuyển đổi sau diễn ra:
 
-+------------------+--------------------------+
-| Resulting state  | :class:`MHMessage` state |
-+==================+==========================+
-| "unseen" label   | "unseen" sequence        |
-+------------------+--------------------------+
-| "answered" label | "replied" sequence       |
-+------------------+--------------------------+
++--------------------+-------------------------------+
+| Trạng thái kết quả | trạng thái :class:`MHMessage` |
++====================+===============================+
+| nhãn "chưa xem"    | chuỗi "unseen"                |
++--------------------+-------------------------------+
+| nhãn "answered"    | chuỗi "replied"               |
++--------------------+-------------------------------+
 
 
 .. _mailbox-mmdfmessage:
 
-:class:`!MMDFMessage` objects
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+các đối tượng :class:`!MMDFMessage`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 .. class:: MMDFMessage(message=None)
 
-   A message with MMDF-specific behaviors. Parameter *message* has the same meaning
-   as with the :class:`Message` constructor.
+   Một message với các hành vi dành riêng cho MMDF. Tham số *message* có cùng ý nghĩa như với hàm khởi tạo :class:`Message`.
 
-   As with message in an mbox mailbox, MMDF messages are stored with the
-   sender's address and the delivery date in an initial line beginning with
-   "From ".  Likewise, flags that indicate the state of the message are
-   typically stored in :mailheader:`Status` and :mailheader:`X-Status` headers.
+   Tương tự message trong mailbox mbox, các message MMDF được lưu trữ cùng với địa chỉ người gửi và ngày gửi trong một dòng mở đầu bắt đầu bằng "From ". Tương tự, các cờ cho biết trạng thái của message thường được lưu trong các header :mailheader:`Status` và :mailheader:`X-Status`.
 
-   Conventional flags for MMDF messages are identical to those of mbox message
-   and are as follows:
+   Các cờ quy ước cho message MMDF giống hệt các cờ của message mbox và như sau:
 
-   +------+----------+--------------------------------+
-   | Flag | Meaning  | Explanation                    |
-   +======+==========+================================+
-   | R    | Read     | Read                           |
-   +------+----------+--------------------------------+
-   | O    | Old      | Previously detected by MUA     |
-   +------+----------+--------------------------------+
-   | D    | Deleted  | Marked for subsequent deletion |
-   +------+----------+--------------------------------+
-   | F    | Flagged  | Marked as important            |
-   +------+----------+--------------------------------+
-   | A    | Answered | Replied to                     |
-   +------+----------+--------------------------------+
+   +----+-------------+---------------------------------+
+   | Cờ | Ý nghĩa     | Giải thích                      |
+   +====+=============+=================================+
+   | R  | Đã đọc      | Đã đọc                          |
+   +----+-------------+---------------------------------+
+   | O  | Cũ          | Trước đây đã được MUA phát hiện |
+   +----+-------------+---------------------------------+
+   | D  | Đã xóa      | Được đánh dấu để xóa sau        |
+   +----+-------------+---------------------------------+
+   | F  | Được gắn cờ | Được đánh dấu là quan trọng     |
+   +----+-------------+---------------------------------+
+   | A  | Đã trả lời  | Đã trả lời cho                  |
+   +----+-------------+---------------------------------+
 
-   The "R" and "O" flags are stored in the :mailheader:`Status` header, and the
-   "D", "F", and "A" flags are stored in the :mailheader:`X-Status` header. The
-   flags and headers typically appear in the order mentioned.
+   Các cờ "R" và "O" được lưu trong header :mailheader:`Status`, còn các cờ "D", "F" và "A" được lưu trong header :mailheader:`X-Status`. Các cờ và header thường xuất hiện theo thứ tự được đề cập.
 
-   :class:`!MMDFMessage` instances offer the following methods, which are
-   identical to those offered by :class:`mboxMessage`:
+   Các instance :class:`!MMDFMessage` cung cấp những phương thức sau, giống hệt các phương thức được cung cấp bởi :class:`mboxMessage`:
 
 
    .. method:: get_from()
 
-      Return a string representing the "From " line that marks the start of the
-      message in an mbox mailbox. The leading "From " and the trailing newline
-      are excluded.
+      Trả về một chuỗi biểu diễn dòng "From " đánh dấu phần đầu của thư trong mailbox mbox. Phần "From " ở đầu và ký tự xuống dòng ở cuối không được bao gồm.
 
 
    .. method:: set_from(from_, time_=None)
 
-      Set the "From " line to *from_*, which should be specified without a
-      leading "From " or trailing newline. For convenience, *time_* may be
-      specified and will be formatted appropriately and appended to *from_*. If
-      *time_* is specified, it should be a :class:`time.struct_time` instance, a
-      tuple suitable for passing to :func:`time.strftime`, or ``True`` (to use
+      Đặt dòng "From " thành *from_*, giá trị này phải được chỉ định mà không có "From " ở đầu hoặc ký tự xuống dòng ở cuối. Để thuận tiện, có thể chỉ định *time_*; giá trị này sẽ được định dạng thích hợp và nối vào *from_*. Nếu chỉ định *time_*, giá trị đó phải là một instance :class:`time.struct_time`, một tuple phù hợp để truyền vào :func:`time.strftime`, hoặc ``True`` (để sử dụng
       :func:`time.gmtime`).
 
 
    .. method:: get_flags()
 
-      Return a string specifying the flags that are currently set. If the
-      message complies with the conventional format, the result is the
-      concatenation in the following order of zero or one occurrence of each of
-      ``'R'``, ``'O'``, ``'D'``, ``'F'``, and ``'A'``.
+      Trả về một chuỗi chỉ định các cờ hiện đang được thiết lập. Nếu thư tuân theo định dạng quy ước, kết quả là phép nối, theo thứ tự sau, của không hoặc một lần xuất hiện của từng cờ trong ``'R'``, ``'O'``, ``'D'``, ``'F'`` và ``'A'``.
 
 
    .. method:: set_flags(flags)
 
-      Set the flags specified by *flags* and unset all others. Parameter *flags*
-      should be the concatenation in any order of zero or more occurrences of
-      each of ``'R'``, ``'O'``, ``'D'``, ``'F'``, and ``'A'``.
+      Đặt các cờ được chỉ định bởi *flags* và bỏ đặt tất cả các cờ khác. Tham số *flags* phải là phép nối, theo bất kỳ thứ tự nào, của không hoặc nhiều lần xuất hiện của từng cờ trong số ``'R'``, ``'O'``, ``'D'``, ``'F'`` và ``'A'``.
 
 
    .. method:: add_flag(flag)
 
-      Set the flag(s) specified by *flag* without changing other flags. To add
-      more than one flag at a time, *flag* may be a string of more than one
-      character.
+      Đặt (các) cờ được chỉ định bởi *flag* mà không thay đổi các cờ khác. Để thêm nhiều cờ cùng lúc, *flag* có thể là một chuỗi gồm nhiều hơn một ký tự.
 
 
    .. method:: remove_flag(flag)
 
-      Unset the flag(s) specified by *flag* without changing other flags. To
-      remove more than one flag at a time, *flag* may be a string of more than
-      one character.
+      Bỏ đặt (các) cờ được chỉ định bởi *flag* mà không thay đổi các cờ khác. Để xóa nhiều cờ cùng lúc, *flag* có thể là một chuỗi gồm nhiều hơn một ký tự.
 
-When an :class:`!MMDFMessage` instance is created based upon a
-:class:`MaildirMessage` instance, a "From " line is generated based upon the
-:class:`MaildirMessage` instance's delivery date, and the following conversions
-take place:
+Khi một thực thể :class:`!MMDFMessage` được tạo dựa trên một
+thực thể :class:`MaildirMessage`, một dòng "From " được tạo dựa trên
+ngày gửi của thực thể :class:`MaildirMessage` và các chuyển đổi sau được thực hiện:
 
-+-----------------+-------------------------------+
-| Resulting state | :class:`MaildirMessage` state |
-+=================+===============================+
-| R flag          | S flag                        |
-+-----------------+-------------------------------+
-| O flag          | "cur" subdirectory            |
-+-----------------+-------------------------------+
-| D flag          | T flag                        |
-+-----------------+-------------------------------+
-| F flag          | F flag                        |
-+-----------------+-------------------------------+
-| A flag          | R flag                        |
-+-----------------+-------------------------------+
++---------------------+------------------------------------+
+| Trạng thái sau cùng | :class:`MaildirMessage` trạng thái |
++=====================+====================================+
+| cờ R                | cờ S                               |
++---------------------+------------------------------------+
+| cờ O                | thư mục con "cur"                  |
++---------------------+------------------------------------+
+| cờ D                | cờ T                               |
++---------------------+------------------------------------+
+| Cờ F                | Cờ F                               |
++---------------------+------------------------------------+
+| Cờ A                | Cờ R                               |
++---------------------+------------------------------------+
 
-When an :class:`!MMDFMessage` instance is created based upon an
-:class:`MHMessage` instance, the following conversions take place:
+Khi một thể hiện :class:`!MMDFMessage` được tạo dựa trên một
+thể hiện :class:`MHMessage`, các chuyển đổi sau sẽ diễn ra:
 
-+-------------------+--------------------------+
-| Resulting state   | :class:`MHMessage` state |
-+===================+==========================+
-| R flag and O flag | no "unseen" sequence     |
-+-------------------+--------------------------+
-| O flag            | "unseen" sequence        |
-+-------------------+--------------------------+
-| F flag            | "flagged" sequence       |
-+-------------------+--------------------------+
-| A flag            | "replied" sequence       |
-+-------------------+--------------------------+
++---------------------+-------------------------------+
+| Trạng thái sau cùng | trạng thái :class:`MHMessage` |
++=====================+===============================+
+| cờ R và cờ O        | không có sequence "unseen"    |
++---------------------+-------------------------------+
+| cờ O                | sequence "unseen"             |
++---------------------+-------------------------------+
+| cờ F                | sequence "flagged"            |
++---------------------+-------------------------------+
+| Một cờ              | chuỗi "replied"               |
++---------------------+-------------------------------+
 
-When an :class:`!MMDFMessage` instance is created based upon a
-:class:`BabylMessage` instance, the following conversions take place:
+Khi một thực thể :class:`!MMDFMessage` được tạo dựa trên một
+Đối với instance :class:`BabylMessage`, các chuyển đổi sau sẽ diễn ra:
 
-+-------------------+-----------------------------+
-| Resulting state   | :class:`BabylMessage` state |
-+===================+=============================+
-| R flag and O flag | no "unseen" label           |
-+-------------------+-----------------------------+
-| O flag            | "unseen" label              |
-+-------------------+-----------------------------+
-| D flag            | "deleted" label             |
-+-------------------+-----------------------------+
-| A flag            | "answered" label            |
-+-------------------+-----------------------------+
++---------------------+----------------------------------+
+| Trạng thái sau cùng | trạng thái :class:`BabylMessage` |
++=====================+==================================+
+| cờ R và cờ O        | không có nhãn "unseen"           |
++---------------------+----------------------------------+
+| cờ O                | nhãn "unseen"                    |
++---------------------+----------------------------------+
+| cờ D                | nhãn "deleted"                   |
++---------------------+----------------------------------+
+| Một cờ              | nhãn "answered"                  |
++---------------------+----------------------------------+
 
-When an :class:`!MMDFMessage` instance is created based upon an
-:class:`mboxMessage` instance, the "From " line is copied and all flags directly
-correspond:
+Khi một thể hiện :class:`!MMDFMessage` được tạo dựa trên một
+Trong một :class:`mboxMessage` instance, dòng "From " được sao chép và tất cả các flag đều tương ứng trực tiếp:
 
-+-----------------+----------------------------+
-| Resulting state | :class:`mboxMessage` state |
-+=================+============================+
-| R flag          | R flag                     |
-+-----------------+----------------------------+
-| O flag          | O flag                     |
-+-----------------+----------------------------+
-| D flag          | D flag                     |
-+-----------------+----------------------------+
-| F flag          | F flag                     |
-+-----------------+----------------------------+
-| A flag          | A flag                     |
-+-----------------+----------------------------+
++---------------------+---------------------------------+
+| Trạng thái sau cùng | trạng thái :class:`mboxMessage` |
++=====================+=================================+
+| cờ R                | Cờ R                            |
++---------------------+---------------------------------+
+| cờ O                | Cờ O                            |
++---------------------+---------------------------------+
+| cờ D                | Cờ D                            |
++---------------------+---------------------------------+
+| Cờ F                | Cờ F                            |
++---------------------+---------------------------------+
+| Cờ A                | Cờ A                            |
++---------------------+---------------------------------+
 
 
-Exceptions
-----------
+Ngoại lệ
+--------
 
-The following exception classes are defined in the :mod:`!mailbox` module:
+Các lớp ngoại lệ sau được định nghĩa trong module :mod:`!mailbox`:
 
 
 .. exception:: Error()
 
-   The base class for all other module-specific exceptions.
+   Lớp cơ sở cho tất cả các ngoại lệ khác dành riêng cho module.
 
 
 .. exception:: NoSuchMailboxError()
 
-   Raised when a mailbox is expected but is not found, such as when instantiating a
-   :class:`Mailbox` subclass with a path that does not exist (and with the *create*
-   parameter set to ``False``), or when opening a folder that does not exist.
+   Được phát sinh khi dự kiến sẽ có một mailbox nhưng không tìm thấy, chẳng hạn như khi khởi tạo một
+   lớp con :class:`Mailbox` với đường dẫn không tồn tại (và tham số *create* được đặt thành ``False``), hoặc khi mở một thư mục không tồn tại.
 
 
 .. exception:: NotEmptyError()
 
-   Raised when a mailbox is not empty but is expected to be, such as when deleting
-   a folder that contains messages.
+   Được phát sinh khi một mailbox không trống nhưng được dự kiến là phải trống, chẳng hạn như khi xóa một thư mục chứa thư.
 
 
 .. exception:: ExternalClashError()
 
-   Raised when some mailbox-related condition beyond the control of the program
-   causes it to be unable to proceed, such as when failing to acquire a lock that
-   another program already holds, or when a uniquely generated file name
-   already exists.
+   Được phát sinh khi một điều kiện liên quan đến mailbox nằm ngoài tầm kiểm soát của chương trình khiến chương trình không thể tiếp tục, chẳng hạn như khi không thể lấy được một lock mà chương trình khác đang giữ, hoặc khi một tên tệp được tạo duy nhất đã tồn tại.
 
 
 .. exception:: FormatError()
 
-   Raised when the data in a file cannot be parsed, such as when an :class:`MH`
-   instance attempts to read a corrupted :file:`.mh_sequences` file.
+   Được phát sinh khi dữ liệu trong một tệp không thể được phân tích cú pháp, chẳng hạn khi một thực thể :class:`MH` cố đọc một tệp :file:`.mh_sequences` bị hỏng.
 
 
 .. _mailbox-examples:
 
-Examples
---------
+Ví dụ
+-----
 
-A simple example of printing the subjects of all messages in a mailbox that seem
-interesting::
+Một ví dụ đơn giản về việc in tiêu đề của tất cả thư trong một mailbox có vẻ đáng chú ý::
 
    import mailbox
    for message in mailbox.mbox('~/mbox'):
-       subject = message['subject']       # Could possibly be None.
+       subject = message['subject']       # Có thể là None.
        if subject and 'python' in subject.lower():
            print(subject)
 
-To copy all mail from a Babyl mailbox to an MH mailbox, converting all of the
-format-specific information that can be converted::
+Để sao chép tất cả thư từ một mailbox Babyl sang một mailbox MH, đồng thời chuyển đổi mọi thông tin đặc thù của định dạng có thể chuyển đổi::
 
    import mailbox
    destination = mailbox.MH('~/Mail')
@@ -1696,10 +1295,7 @@ format-specific information that can be converted::
    destination.flush()
    destination.unlock()
 
-This example sorts mail from several mailing lists into different mailboxes,
-being careful to avoid mail corruption due to concurrent modification by other
-programs, mail loss due to interruption of the program, or premature termination
-due to malformed messages in the mailbox::
+Ví dụ này sắp xếp thư từ một số mailing list vào các mailbox khác nhau, đồng thời cẩn thận tránh làm hỏng thư do các chương trình khác sửa đổi đồng thời, tránh mất thư do chương trình bị gián đoạn hoặc kết thúc sớm do các thư không đúng định dạng trong mailbox::
 
    import mailbox
    import email.errors
@@ -1713,29 +1309,40 @@ due to malformed messages in the mailbox::
        try:
            message = inbox[key]
        except email.errors.MessageParseError:
-           continue                # The message is malformed. Just leave it.
+           continue                # Thư không đúng định dạng. Cứ để nguyên.
 
        for name in list_names:
            list_id = message['list-id']
            if list_id and name in list_id:
-               # Get mailbox to use
+               # Lấy mailbox để sử dụng
                box = boxes[name]
 
-               # Write copy to disk before removing original.
+               # Ghi bản sao vào đĩa trước khi xóa bản gốc.
                # If there's a crash, you might duplicate a message, but
-               # that's better than losing a message completely.
+               # điều đó vẫn tốt hơn là mất hoàn toàn một message.
                box.lock()
                box.add(message)
                box.flush()
                box.unlock()
 
-               # Remove original message
+               # Xóa message gốc
                inbox.lock()
                inbox.discard(key)
                inbox.flush()
                inbox.unlock()
-               break               # Found destination, so stop looking.
+               break               # Đã tìm thấy đích nên dừng tìm kiếm.
 
    for box in boxes.itervalues():
        box.close()
 
+.. _`maildir man page from Courier`: https://www.courier-mta.org/maildir.html
+.. _`Using maildir format`: https://cr.yp.to/proto/maildir.html
+.. _`mbox man page from tin`: http://www.tin.org/bin/man.cgi?section=5&topic=mbox
+.. _`Configuring Netscape Mail on Unix: Why The Content-Length Format is Bad`: https://www.jwz.org/doc/content-length.html
+.. _`"mbox" is a family of several mutually incompatible mailbox formats`: https://www.loc.gov/preservation/digital/formats/fdd/fdd000383.shtml
+.. _`nmh - Message Handling System`: https://www.nongnu.org/nmh/
+.. _`MH & nmh: Email for Users & Programmers`: https://rand-mh.sourceforge.io/book/
+.. _`Format of Version 5 Babyl Files`: https://quimby.gnus.org/notes/BABYL
+.. _`Reading Mail with Rmail`: https://www.gnu.org/software/emacs/manual/html_node/emacs/Rmail.html
+.. _`mmdf man page from tin`: http://www.tin.org/bin/man.cgi?section=5&topic=mmdf
+.. _`MMDF`: https://en.wikipedia.org/wiki/MMDF

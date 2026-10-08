@@ -2,12 +2,12 @@
 
 .. _frameworks:
 
-******************
-Program frameworks
-******************
+***********************
+Các framework lập trình
+***********************
 
-This chapter is no longer maintained, and the modules it contained have been moved to their respective topical documentation.
+Chương này không còn được duy trì và các module từng được chứa trong đó đã được chuyển đến tài liệu tương ứng theo từng chủ đề.
 
-* :mod:`cmd` — :doc:`Command Line Interface Libraries <./cmdlinelibs>`
-* :mod:`shlex` — :doc:`Unix Specific Services <./unix>`
-* :mod:`turtle` — :doc:`Graphical User Interfaces with Tk <./tk>`
+* :mod:`cmd` — :doc:`Thư viện Command Line Interface <./cmdlinelibs>`
+* :mod:`shlex` — :doc:`Dịch vụ dành riêng cho Unix <./unix>`
+* :mod:`turtle` — :doc:`Giao diện người dùng đồ họa với Tk <./tk>`

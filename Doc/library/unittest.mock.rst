@@ -1,44 +1,35 @@
-:mod:`!unittest.mock` --- mock object library
-=============================================
+:mod:`!unittest.mock` --- thư viện đối tượng mock
+=================================================
 
 .. module:: unittest.mock
-   :synopsis: Mock object library.
+   :synopsis: Thư viện đối tượng mock.
 
 .. moduleauthor:: Michael Foord <michael@python.org>
 .. currentmodule:: unittest.mock
 
 .. versionadded:: 3.3
 
-**Source code:** :source:`Lib/unittest/mock.py`
+**Mã nguồn:** :source:`Lib/unittest/mock.py`
 
 --------------
 
-:mod:`!unittest.mock` is a library for testing in Python. It allows you to
-replace parts of your system under test with mock objects and make assertions
-about how they have been used.
+:mod:`!unittest.mock` là một thư viện dùng để kiểm thử trong Python. Thư viện này cho phép bạn thay thế các phần của hệ thống đang được kiểm thử bằng các đối tượng mock và đưa ra các assertion về cách chúng đã được sử dụng.
 
-:mod:`!unittest.mock` provides a core :class:`Mock` class removing the need to
-create a host of stubs throughout your test suite. After performing an
-action, you can make assertions about which methods / attributes were used
-and arguments they were called with. You can also specify return values and
-set needed attributes in the normal way.
+:mod:`!unittest.mock` cung cấp một lớp :class:`Mock` cốt lõi, loại bỏ nhu cầu tạo hàng loạt stub trong toàn bộ bộ kiểm thử của bạn. Sau khi thực hiện một hành động, bạn có thể đưa ra các assertion về những phương thức / thuộc tính nào đã được sử dụng và các đối số mà chúng được gọi với. Bạn cũng có thể chỉ định các giá trị trả về và thiết lập các thuộc tính cần thiết theo cách thông thường.
 
-Additionally, mock provides a :func:`patch` decorator that handles patching
-module and class level attributes within the scope of a test, along with
-:const:`sentinel` for creating unique objects. See the `quick guide`_ for
-some examples of how to use :class:`Mock`, :class:`MagicMock` and
+Ngoài ra, mock cung cấp một decorator :func:`patch` xử lý việc patch các thuộc tính ở cấp mô-đun và cấp lớp trong phạm vi của một bài kiểm thử, cùng với
+:const:`sentinel` để tạo các đối tượng duy nhất. Xem `hướng dẫn nhanh <quick guide_>`_ để biết một số ví dụ về cách sử dụng :class:`Mock`, :class:`MagicMock` và
 :func:`patch`.
 
-Mock is designed for use with :mod:`unittest` and
-is based on the 'action -> assertion' pattern instead of 'record -> replay'
-used by many mocking frameworks.
+Mock được thiết kế để sử dụng với :mod:`unittest` và dựa trên mẫu 'action -> assertion' thay vì mẫu 'record -> replay' được nhiều mocking framework sử dụng.
 
-There is a backport of :mod:`!unittest.mock` for earlier versions of Python,
-available as :pypi:`mock` on PyPI.
+Có một bản backport của :mod:`!unittest.mock` dành cho các phiên bản Python cũ hơn, có sẵn trên PyPI dưới dạng :pypi:`mock`.
 
 
-Quick Guide
------------
+.. _`Quick Guide`:
+
+Hướng dẫn nhanh
+---------------
 
 .. testsetup::
 
@@ -56,10 +47,7 @@ Quick Guide
             return args
 
 
-:class:`Mock` and :class:`MagicMock` objects create all attributes and
-methods as you access them and store details of how they have been used. You
-can configure them, to specify return values or limit what attributes are
-available, and then make assertions about how they have been used:
+Các đối tượng :class:`Mock` và :class:`MagicMock` tạo tất cả thuộc tính và phương thức khi bạn truy cập chúng, đồng thời lưu lại chi tiết về cách chúng đã được sử dụng. Bạn có thể cấu hình chúng để chỉ định giá trị trả về hoặc giới hạn các thuộc tính khả dụng, sau đó đưa ra các assertion về cách chúng đã được sử dụng:
 
     >>> from unittest.mock import MagicMock
     >>> thing = ProductionClass()
@@ -68,8 +56,7 @@ available, and then make assertions about how they have been used:
     3
     >>> thing.method.assert_called_with(3, 4, 5, key='value')
 
-:attr:`~Mock.side_effect` allows you to perform side effects, including raising an
-exception when a mock is called:
+:attr:`~Mock.side_effect` cho phép bạn thực hiện các side effect, bao gồm cả việc phát sinh exception khi mock được gọi:
 
    >>> from unittest.mock import Mock
    >>> mock = Mock(side_effect=KeyError('foo'))
@@ -89,14 +76,9 @@ exception when a mock is called:
    >>> mock(), mock(), mock()
    (5, 4, 3)
 
-Mock has many other ways you can configure it and control its behaviour. For
-example the *spec* argument configures the mock to take its specification
-from another object. Attempting to access attributes or methods on the mock
-that don't exist on the spec will fail with an :exc:`AttributeError`.
+Mock có nhiều cách khác để bạn cấu hình và kiểm soát hành vi của nó. Ví dụ, đối số *spec* cấu hình mock để lấy specification từ một đối tượng khác. Việc cố gắng truy cập các thuộc tính hoặc phương thức không tồn tại trong spec trên mock sẽ thất bại với một :exc:`AttributeError`.
 
-The :func:`patch` decorator / context manager makes it easy to mock classes or
-objects in a module under test. The object you specify will be replaced with a
-mock (or other object) during the test and restored when the test ends::
+Decorator / context manager :func:`patch` giúp bạn dễ dàng mock các class hoặc object trong module đang được kiểm thử. Đối tượng bạn chỉ định sẽ được thay thế bằng một mock (hoặc object khác) trong suốt quá trình kiểm thử và được khôi phục khi kiểm thử kết thúc::
 
     >>> from unittest.mock import patch
     >>> @patch('module.ClassName2')
@@ -113,17 +95,11 @@ mock (or other object) during the test and restored when the test ends::
 
 .. note::
 
-   When you nest patch decorators the mocks are passed in to the decorated
-   function in the same order they applied (the normal *Python* order that
-   decorators are applied). This means from the bottom up, so in the example
-   above the mock for ``module.ClassName1`` is passed in first.
+   Khi lồng các decorator patch, các mock được truyền vào hàm đã được trang trí theo đúng thứ tự mà chúng được áp dụng (theo thứ tự *Python* thông thường khi áp dụng decorator). Điều này có nghĩa là theo thứ tự từ dưới lên, vì vậy trong ví dụ trên, mock cho ``module.ClassName1`` được truyền vào trước tiên.
 
-   With :func:`patch` it matters that you patch objects in the namespace where they
-   are looked up. This is normally straightforward, but for a quick guide
-   read :ref:`where to patch <where-to-patch>`.
+   Với :func:`patch`, điều quan trọng là bạn phải patch các đối tượng trong namespace nơi chúng được tra cứu. Điều này thường khá đơn giản, nhưng để xem hướng dẫn nhanh, hãy đọc :ref:`where to patch <where-to-patch>`.
 
-As well as a decorator :func:`patch` can be used as a context manager in a with
-statement:
+Ngoài việc được dùng như một decorator, :func:`patch` còn có thể được dùng như một context manager trong câu lệnh with:
 
     >>> with patch.object(ProductionClass, 'method', return_value=None) as mock_method:
     ...     thing = ProductionClass()
@@ -132,9 +108,7 @@ statement:
     >>> mock_method.assert_called_once_with(1, 2, 3)
 
 
-There is also :func:`patch.dict` for setting values in a dictionary just
-during a scope and restoring the dictionary to its original state when the test
-ends:
+Ngoài ra còn có :func:`patch.dict` để thiết lập các giá trị trong một dictionary chỉ trong một phạm vi và khôi phục dictionary về trạng thái ban đầu khi test kết thúc:
 
    >>> foo = {'key': 'value'}
    >>> original = foo.copy()
@@ -143,9 +117,7 @@ ends:
    ...
    >>> assert foo == original
 
-Mock supports the mocking of Python :ref:`magic methods <magic-methods>`. The
-easiest way of using magic methods is with the :class:`MagicMock` class. It
-allows you to do things like:
+Mock hỗ trợ việc mock các :ref:`magic methods <magic-methods>` của Python. Cách dễ nhất để sử dụng magic methods là dùng class :class:`MagicMock`. Class này cho phép bạn thực hiện những việc như sau:
 
     >>> mock = MagicMock()
     >>> mock.__str__.return_value = 'foobarbaz'
@@ -153,29 +125,19 @@ allows you to do things like:
     'foobarbaz'
     >>> mock.__str__.assert_called_with()
 
-Mock allows you to assign functions (or other Mock instances) to magic methods
-and they will be called appropriately. The :class:`MagicMock` class is just a Mock
-variant that has all of the magic methods pre-created for you (well, all the
-useful ones anyway).
+Mock cho phép bạn gán các hàm (hoặc các instance Mock khác) cho magic methods và chúng sẽ được gọi một cách thích hợp. Class :class:`MagicMock` chỉ là một biến thể của Mock, trong đó tất cả magic methods đã được tạo sẵn cho bạn (ít nhất là tất cả những phương thức hữu ích).
 
-The following is an example of using magic methods with the ordinary Mock
-class:
+Sau đây là một ví dụ về cách sử dụng magic methods với class Mock thông thường:
 
     >>> mock = Mock()
     >>> mock.__str__ = Mock(return_value='wheeeeee')
     >>> str(mock)
     'wheeeeee'
 
-For ensuring that the mock objects in your tests have the same api as the
-objects they are replacing, you can use :ref:`auto-speccing <auto-speccing>`.
-Auto-speccing can be done through the *autospec* argument to patch, or the
-:func:`create_autospec` function. Auto-speccing creates mock objects that
-have the same attributes and methods as the objects they are replacing, and
-any functions and methods (including constructors) have the same call
-signature as the real object.
+Để đảm bảo các mock object trong những bài kiểm thử của bạn có cùng API với các object mà chúng thay thế, bạn có thể sử dụng :ref:`auto-speccing <auto-speccing>`. Có thể thực hiện auto-speccing thông qua đối số *autospec* của patch, hoặc
+:func:`create_autospec` function. Auto-speccing tạo ra các mock object có cùng thuộc tính và phương thức với các object mà chúng thay thế, đồng thời mọi function và method (bao gồm cả constructor) đều có cùng chữ ký lời gọi như object thực.
 
-This ensures that your mocks will fail in the same way as your production
-code if they are used incorrectly:
+Điều này đảm bảo rằng các mock của bạn sẽ thất bại theo cùng cách với code production nếu được sử dụng không đúng cách:
 
    >>> from unittest.mock import create_autospec
    >>> def function(a, b, c):
@@ -190,14 +152,12 @@ code if they are used incorrectly:
     ...
    TypeError: missing a required argument: 'b'
 
-:func:`create_autospec` can also be used on classes, where it copies the signature of
-the ``__init__`` method, and on callable objects where it copies the signature of
-the ``__call__`` method.
+:func:`create_autospec` cũng có thể được sử dụng trên các class, trong đó nó sao chép chữ ký của phương thức ``__init__``, và trên các callable object, trong đó nó sao chép chữ ký của phương thức ``__call__``.
 
 
 
-The Mock Class
---------------
+Lớp Mock
+--------
 
 .. testsetup::
 
@@ -210,88 +170,53 @@ The Mock Class
     from unittest.mock import ThreadingMock
     from unittest.mock import mock_open
 
-:class:`Mock` is a flexible mock object intended to replace the use of stubs and
-test doubles throughout your code. Mocks are callable and create attributes as
-new mocks when you access them [#]_. Accessing the same attribute will always
-return the same mock. Mocks record how you use them, allowing you to make
-assertions about what your code has done to them.
+:class:`Mock` là một mock object linh hoạt, được dùng để thay thế stub và test double trong toàn bộ code của bạn. Mock có thể được gọi và tạo các thuộc tính dưới dạng mock mới khi bạn truy cập chúng [#]_. Việc truy cập cùng một thuộc tính sẽ luôn trả về cùng một mock. Mock ghi lại cách bạn sử dụng chúng, cho phép bạn đưa ra các assertion về những gì code của bạn đã thực hiện với chúng.
 
-:class:`MagicMock` is a subclass of :class:`Mock` with all the magic methods
-pre-created and ready to use. There are also non-callable variants, useful
-when you are mocking out objects that aren't callable:
-:class:`NonCallableMock` and :class:`NonCallableMagicMock`
+:class:`MagicMock` là một lớp con của :class:`Mock` với tất cả magic method được tạo sẵn và sẵn sàng sử dụng. Ngoài ra còn có các biến thể không thể gọi, hữu ích khi bạn mock các object không thể gọi:
+:class:`NonCallableMock` và :class:`NonCallableMagicMock`
 
-The :func:`patch` decorators makes it easy to temporarily replace classes
-in a particular module with a :class:`Mock` object. By default :func:`patch` will create
-a :class:`MagicMock` for you. You can specify an alternative class of :class:`Mock` using
-the *new_callable* argument to :func:`patch`.
+Các decorator :func:`patch` giúp dễ dàng tạm thời thay thế các class trong một module cụ thể bằng một đối tượng :class:`Mock`. Theo mặc định, :func:`patch` sẽ tạo một :class:`MagicMock` cho bạn. Bạn có thể chỉ định một class :class:`Mock` thay thế bằng cách sử dụng đối số *new_callable* cho :func:`patch`.
 
 
 .. class:: Mock(spec=None, side_effect=None, return_value=DEFAULT, wraps=None, name=None, spec_set=None, unsafe=False, **kwargs)
 
-    Create a new :class:`Mock` object. :class:`Mock` takes several optional arguments
-    that specify the behaviour of the Mock object:
+    Tạo một đối tượng :class:`Mock` mới. :class:`Mock` nhận một số đối số tùy chọn để chỉ định hành vi của đối tượng Mock:
 
-    * *spec*: This can be either a list of strings or an existing object (a
-      class or instance) that acts as the specification for the mock object. If
-      you pass in an object then a list of strings is formed by calling dir on
-      the object (excluding unsupported magic attributes and methods).
-      Accessing any attribute not in this list will raise an :exc:`AttributeError`.
+    * *spec*: Có thể là một danh sách chuỗi hoặc một object hiện có (một class hoặc instance) đóng vai trò là đặc tả cho mock object. Nếu truyền vào một object, một danh sách chuỗi sẽ được tạo bằng cách gọi dir trên object đó (không bao gồm các magic attribute và method không được hỗ trợ). Việc truy cập bất kỳ attribute nào không có trong danh sách này sẽ gây ra :exc:`AttributeError`.
 
-      If *spec* is an object (rather than a list of strings) then
-      :attr:`~object.__class__` returns the class of the spec object. This
-      allows mocks to pass :func:`isinstance` tests.
+      Nếu *spec* là một object (thay vì một danh sách chuỗi) thì
+      :attr:`~object.__class__` trả về class của spec object. Điều này cho phép các mock vượt qua các bài kiểm tra :func:`isinstance`.
 
-    * *spec_set*: A stricter variant of *spec*. If used, attempting to *set*
-      or get an attribute on the mock that isn't on the object passed as
-      *spec_set* will raise an :exc:`AttributeError`.
+    * *spec_set*: Một biến thể nghiêm ngặt hơn của *spec*. Nếu được sử dụng, việc *set* hoặc lấy một attribute trên mock không có trong object được truyền vào *spec_set* sẽ gây ra :exc:`AttributeError`.
 
-    * *side_effect*: A function to be called whenever the Mock is called. See
-      the :attr:`~Mock.side_effect` attribute. Useful for raising exceptions or
-      dynamically changing return values. The function is called with the same
-      arguments as the mock, and unless it returns :data:`DEFAULT`, the return
-      value of this function is used as the return value.
+    * *side_effect*: Một hàm được gọi mỗi khi Mock được gọi. Xem thuộc tính :attr:`~Mock.side_effect`. Hữu ích để ném ngoại lệ hoặc thay đổi động các giá trị trả về. Hàm được gọi với cùng các đối số như mock và trừ khi hàm này trả về :data:`DEFAULT`, giá trị trả về của hàm sẽ được dùng làm giá trị trả về.
 
-      Alternatively *side_effect* can be an exception class or instance. In
-      this case the exception will be raised when the mock is called.
+      Ngoài ra, *side_effect* có thể là một lớp hoặc một thực thể ngoại lệ. Trong trường hợp này, ngoại lệ sẽ được ném ra khi mock được gọi.
 
-      If *side_effect* is an iterable then each call to the mock will return
-      the next value from the iterable.
+      Nếu *side_effect* là một iterable, thì mỗi lần gọi mock sẽ trả về giá trị tiếp theo từ iterable.
 
-      A *side_effect* can be cleared by setting it to ``None``.
+      Có thể xóa *side_effect* bằng cách đặt nó thành ``None``.
 
-    * *return_value*: The value returned when the mock is called. By default
-      this is a new Mock (created on first access). See the
-      :attr:`return_value` attribute.
+    * *return_value*: Giá trị được trả về khi mock được gọi. Theo mặc định, đây là một Mock mới (được tạo trong lần truy cập đầu tiên). Xem
+      thuộc tính :attr:`return_value`.
 
-    * *unsafe*: By default, accessing any attribute whose name starts with
-      *assert*, *assret*, *asert*, *aseert* or *assrt* will raise an
-      :exc:`AttributeError`. Passing ``unsafe=True`` will allow access to
-      these attributes.
+    * *unsafe*: Theo mặc định, việc truy cập bất kỳ thuộc tính nào có tên bắt đầu bằng *assert*, *assret*, *asert*, *aseert* hoặc *assrt* sẽ ném ra một
+      :exc:`AttributeError`. Việc truyền ``unsafe=True`` sẽ cho phép truy cập các thuộc tính này.
 
       .. versionadded:: 3.5
 
-    * *wraps*: Item for the mock object to wrap. If *wraps* is not ``None`` then
-      calling the Mock will pass the call through to the wrapped object
-      (returning the real result). Attribute access on the mock will return a
-      Mock object that wraps the corresponding attribute of the wrapped
-      object (so attempting to access an attribute that doesn't exist will
-      raise an :exc:`AttributeError`).
+    * *wraps*: Đối tượng để mock bọc. Nếu *wraps* không phải là ``None`` thì việc gọi Mock sẽ chuyển tiếp lời gọi đến đối tượng được bọc (trả về kết quả thực). Việc truy cập thuộc tính trên mock sẽ trả về một đối tượng Mock bọc thuộc tính tương ứng của đối tượng được bọc (vì vậy, việc cố truy cập một thuộc tính không tồn tại sẽ gây ra :exc:`AttributeError`).
 
-      If the mock has an explicit *return_value* set then calls are not passed
-      to the wrapped object and the *return_value* is returned instead.
+      Nếu mock đã được thiết lập *return_value* rõ ràng thì các lệnh gọi sẽ không được chuyển đến đối tượng được bọc, mà *return_value* sẽ được trả về.
 
-    * *name*: If the mock has a name then it will be used in the repr of the
-      mock. This can be useful for debugging. The name is propagated to child
-      mocks.
+    * *name*: Nếu mock có tên thì tên đó sẽ được sử dụng trong biểu diễn repr của mock. Điều này có thể hữu ích khi debug. Tên được truyền cho các mock con.
 
-    Mocks can also be called with arbitrary keyword arguments. These will be
-    used to set attributes on the mock after it is created. See the
-    :meth:`configure_mock` method for details.
+    Mock cũng có thể được gọi với các keyword argument tùy ý. Các đối số này sẽ được dùng để thiết lập thuộc tính trên mock sau khi mock được tạo. Xem
+    :meth:`configure_mock` method để biết chi tiết.
 
     .. method:: assert_called()
 
-        Assert that the mock was called at least once.
+        Xác nhận rằng mock đã được gọi ít nhất một lần.
 
             >>> mock = Mock()
             >>> mock.method()
@@ -302,7 +227,7 @@ the *new_callable* argument to :func:`patch`.
 
     .. method:: assert_called_once()
 
-        Assert that the mock was called exactly once.
+        Xác nhận rằng mock đã được gọi đúng một lần.
 
             >>> mock = Mock()
             >>> mock.method()
@@ -321,8 +246,7 @@ the *new_callable* argument to :func:`patch`.
 
     .. method:: assert_called_with(*args, **kwargs)
 
-        This method is a convenient way of asserting that the last call has been
-        made in a particular way:
+        Phương thức này là một cách thuận tiện để xác nhận rằng lần gọi cuối cùng được thực hiện theo một cách cụ thể:
 
             >>> mock = Mock()
             >>> mock.method(1, 2, 3, test='wow')
@@ -331,8 +255,7 @@ the *new_callable* argument to :func:`patch`.
 
     .. method:: assert_called_once_with(*args, **kwargs)
 
-       Assert that the mock was called exactly once and that call was with the
-       specified arguments.
+       Xác nhận rằng mock đã được gọi đúng một lần và lần gọi đó sử dụng các đối số được chỉ định.
 
             >>> mock = Mock(return_value=None)
             >>> mock('foo', bar='baz')
@@ -346,12 +269,11 @@ the *new_callable* argument to :func:`patch`.
 
     .. method:: assert_any_call(*args, **kwargs)
 
-        assert the mock has been called with the specified arguments.
+        Xác nhận rằng mock đã được gọi với các đối số được chỉ định.
 
-        The assert passes if the mock has *ever* been called, unlike
-        :meth:`assert_called_with` and :meth:`assert_called_once_with` that
-        only pass if the call is the most recent one, and in the case of
-        :meth:`assert_called_once_with` it must also be the only call.
+        Phép xác nhận thành công nếu mock đã *ever* được gọi, không giống
+        :meth:`assert_called_with` và :meth:`assert_called_once_with` chỉ thành công nếu lần gọi đó là lần gọi gần nhất, còn trong trường hợp
+        :meth:`assert_called_once_with` thì đó cũng phải là lần gọi duy nhất.
 
             >>> mock = Mock(return_value=None)
             >>> mock(1, 2, arg='thing')
@@ -361,15 +283,11 @@ the *new_callable* argument to :func:`patch`.
 
     .. method:: assert_has_calls(calls, any_order=False)
 
-        assert the mock has been called with the specified calls.
-        The :attr:`mock_calls` list is checked for the calls.
+        xác nhận rằng mock đã được gọi với các lệnh gọi được chỉ định. Danh sách :attr:`mock_calls` được kiểm tra để tìm các lệnh gọi đó.
 
-        If *any_order* is false then the calls must be
-        sequential. There can be extra calls before or after the
-        specified calls.
+        Nếu *any_order* là false thì các lệnh gọi phải theo thứ tự tuần tự. Có thể có các lệnh gọi bổ sung trước hoặc sau những lệnh gọi được chỉ định.
 
-        If *any_order* is true then the calls can be in any order, but
-        they must all appear in :attr:`mock_calls`.
+        Nếu *any_order* là true thì các lệnh gọi có thể theo bất kỳ thứ tự nào, nhưng tất cả chúng phải xuất hiện trong :attr:`mock_calls`.
 
             >>> mock = Mock(return_value=None)
             >>> mock(1)
@@ -383,7 +301,7 @@ the *new_callable* argument to :func:`patch`.
 
     .. method:: assert_not_called()
 
-        Assert the mock was never called.
+        Xác nhận rằng mock chưa bao giờ được gọi.
 
             >>> m = Mock()
             >>> m.hello.assert_not_called()
@@ -399,7 +317,7 @@ the *new_callable* argument to :func:`patch`.
 
     .. method:: reset_mock(*, return_value=False, side_effect=False)
 
-        The reset_mock method resets all the call attributes on a mock object:
+        Phương thức reset_mock đặt lại tất cả các thuộc tính lệnh gọi trên một đối tượng mock:
 
         .. doctest::
 
@@ -411,10 +329,9 @@ the *new_callable* argument to :func:`patch`.
             >>> mock.called
             False
 
-        This can be useful where you want to make a series of assertions that
-        reuse the same object.
+        Điều này hữu ích khi bạn muốn thực hiện một loạt xác nhận sử dụng lại cùng một đối tượng.
 
-        *return_value* parameter when set to ``True`` resets :attr:`return_value`:
+        Tham số *return_value* khi được đặt thành ``True`` sẽ đặt lại :attr:`return_value`:
 
         .. doctest::
 
@@ -425,7 +342,7 @@ the *new_callable* argument to :func:`patch`.
             >>> mock('hello')  # doctest: +ELLIPSIS
             <Mock name='mock()' id='...'>
 
-        *side_effect* parameter when set to ``True`` resets :attr:`side_effect`:
+        tham số *side_effect* khi được đặt thành ``True`` sẽ đặt lại :attr:`side_effect`:
 
         .. doctest::
 
@@ -438,38 +355,32 @@ the *new_callable* argument to :func:`patch`.
             >>> mock('hello')  # doctest: +ELLIPSIS
             <Mock name='mock()' id='...'>
 
-        Note that :meth:`reset_mock` *doesn't* clear the
-        :attr:`return_value`, :attr:`side_effect` or any child attributes you have
-        set using normal assignment by default.
+        Lưu ý rằng :meth:`reset_mock` *không* xóa
+        :attr:`return_value`, :attr:`side_effect` hoặc bất kỳ thuộc tính con nào mà bạn đã đặt bằng phép gán thông thường theo mặc định.
 
-        Child mocks are reset as well.
+        Các mock con cũng được đặt lại.
 
         .. versionchanged:: 3.6
-           Added two keyword-only arguments to the reset_mock function.
+           Đã thêm hai đối số chỉ dùng từ khóa vào hàm reset_mock.
 
     .. method:: mock_add_spec(spec, spec_set=False)
 
-        Add a spec to a mock. *spec* can either be an object or a
-        list of strings. Only attributes on the *spec* can be fetched as
-        attributes from the mock.
+        Thêm một spec vào mock. *spec* có thể là một object hoặc một danh sách các chuỗi. Chỉ các thuộc tính trên *spec* mới có thể được truy xuất dưới dạng thuộc tính từ mock.
 
-        If *spec_set* is true then only attributes on the spec can be set.
+        Nếu *spec_set* là true thì chỉ các thuộc tính trên spec mới có thể được thiết lập.
 
 
     .. method:: attach_mock(mock, attribute)
 
-        Attach a mock as an attribute of this one, replacing its name and
-        parent. Calls to the attached mock will be recorded in the
-        :attr:`method_calls` and :attr:`mock_calls` attributes of this one.
+        Gắn một mock làm thuộc tính của mock này, thay thế name và parent của nó. Các lệnh gọi đến mock được gắn sẽ được ghi lại trong
+        :attr:`method_calls` và :attr:`mock_calls` thuộc tính của mock này.
 
 
     .. method:: configure_mock(**kwargs)
 
-        Set attributes on the mock through keyword arguments.
+        Thiết lập các thuộc tính trên mock thông qua các đối số từ khóa.
 
-        Attributes plus return values and side effects can be set on child
-        mocks using standard dot notation and unpacking a dictionary in the
-        method call:
+        Có thể thiết lập các thuộc tính, cùng với giá trị trả về và side effect, trên các mock con bằng cách sử dụng ký hiệu dấu chấm tiêu chuẩn và giải nén một dictionary trong lời gọi phương thức:
 
             >>> mock = Mock()
             >>> attrs = {'method.return_value': 3, 'other.side_effect': KeyError}
@@ -481,7 +392,7 @@ the *new_callable* argument to :func:`patch`.
               ...
             KeyError
 
-        The same thing can be achieved in the constructor call to mocks:
+        Điều tương tự có thể được thực hiện trong lời gọi hàm khởi tạo của các mock:
 
             >>> attrs = {'method.return_value': 3, 'other.side_effect': KeyError}
             >>> mock = Mock(some_attribute='eggs', **attrs)
@@ -494,34 +405,26 @@ the *new_callable* argument to :func:`patch`.
               ...
             KeyError
 
-        :meth:`configure_mock` exists to make it easier to do configuration
-        after the mock has been created.
+        :meth:`configure_mock` tồn tại để giúp việc cấu hình sau khi mock được tạo trở nên dễ dàng hơn.
 
 
     .. method:: __dir__()
 
-        :class:`Mock` objects limit the results of ``dir(some_mock)`` to useful results.
-        For mocks with a *spec* this includes all the permitted attributes
-        for the mock.
+        Các đối tượng :class:`Mock` giới hạn kết quả của ``dir(some_mock)`` ở những kết quả hữu ích. Đối với các mock có *spec*, các kết quả này bao gồm tất cả thuộc tính được phép của mock.
 
-        See :data:`FILTER_DIR` for what this filtering does, and how to
-        switch it off.
+        Xem :data:`FILTER_DIR` để biết bộ lọc này thực hiện những gì và cách tắt nó.
 
 
     .. method:: _get_child_mock(**kw)
 
-        Create the child mocks for attributes and return value.
-        By default child mocks will be the same type as the parent.
-        Subclasses of Mock may want to override this to customize the way
-        child mocks are made.
+        Tạo các mock con cho các thuộc tính và giá trị trả về. Theo mặc định, các mock con sẽ có cùng kiểu với mock cha. Các lớp con của Mock có thể muốn ghi đè điều này để tùy chỉnh cách tạo mock con.
 
-        For non-callable mocks the callable variant will be used (rather than
-        any custom subclass).
+        Đối với các mock không thể gọi, biến thể có thể gọi sẽ được sử dụng (thay vì bất kỳ lớp con tùy chỉnh nào).
 
 
     .. attribute:: called
 
-        A boolean representing whether or not the mock object has been called:
+        Một giá trị boolean cho biết đối tượng mock đã được gọi hay chưa:
 
             >>> mock = Mock(return_value=None)
             >>> mock.called
@@ -532,7 +435,7 @@ the *new_callable* argument to :func:`patch`.
 
     .. attribute:: call_count
 
-        An integer telling you how many times the mock object has been called:
+        Một số nguyên cho biết đối tượng mock đã được gọi bao nhiêu lần:
 
             >>> mock = Mock(return_value=None)
             >>> mock.call_count
@@ -544,15 +447,14 @@ the *new_callable* argument to :func:`patch`.
 
     .. attribute:: return_value
 
-        Set this to configure the value returned by calling the mock:
+        Thiết lập giá trị được trả về khi gọi mock:
 
             >>> mock = Mock()
             >>> mock.return_value = 'fish'
             >>> mock()
             'fish'
 
-        The default return value is a mock object and you can configure it in
-        the normal way:
+        Giá trị trả về mặc định là một đối tượng mock và bạn có thể cấu hình đối tượng này theo cách thông thường:
 
             >>> mock = Mock()
             >>> mock.return_value.attribute = sentinel.Attribute
@@ -560,7 +462,7 @@ the *new_callable* argument to :func:`patch`.
             <Mock name='mock()()' id='...'>
             >>> mock.return_value.assert_called_with()
 
-        :attr:`return_value` can also be set in the constructor:
+        :attr:`return_value` cũng có thể được thiết lập trong constructor:
 
             >>> mock = Mock(return_value=3)
             >>> mock.return_value
@@ -571,22 +473,13 @@ the *new_callable* argument to :func:`patch`.
 
     .. attribute:: side_effect
 
-        This can either be a function to be called when the mock is called,
-        an iterable or an exception (class or instance) to be raised.
+        Giá trị này có thể là một hàm được gọi khi mock được gọi, một iterable hoặc một exception (class hoặc instance) sẽ được raise.
 
-        If you pass in a function it will be called with same arguments as the
-        mock and unless the function returns the :data:`DEFAULT` singleton the
-        call to the mock will then return whatever the function returns. If the
-        function returns :data:`DEFAULT` then the mock will return its normal
-        value (from the :attr:`return_value`).
+        Nếu bạn truyền vào một hàm, hàm đó sẽ được gọi với cùng các đối số như mock và trừ khi hàm trả về singleton :data:`DEFAULT`, lệnh gọi mock sau đó sẽ trả về bất kỳ giá trị nào mà hàm trả về. Nếu hàm trả về :data:`DEFAULT` thì mock sẽ trả về giá trị thông thường của nó (từ :attr:`return_value`).
 
-        If you pass in an iterable, it is used to retrieve an iterator which
-        must yield a value on every call.  This value can either be an exception
-        instance to be raised, or a value to be returned from the call to the
-        mock (:data:`DEFAULT` handling is identical to the function case).
+        Nếu bạn truyền vào một iterable, iterable đó sẽ được dùng để lấy một iterator, và iterator này phải yield một giá trị trong mỗi lần gọi. Giá trị này có thể là một exception instance cần được raise hoặc một giá trị được trả về từ lần gọi mock (:data:`DEFAULT` được xử lý giống hệt trường hợp hàm).
 
-        An example of a mock that raises an exception (to test exception
-        handling of an API):
+        Ví dụ về một mock raise exception (để kiểm thử việc xử lý exception của một API):
 
             >>> mock = Mock()
             >>> mock.side_effect = Exception('Boom!')
@@ -595,14 +488,14 @@ the *new_callable* argument to :func:`patch`.
               ...
             Exception: Boom!
 
-        Using :attr:`side_effect` to return a sequence of values:
+        Sử dụng :attr:`side_effect` để trả về một chuỗi giá trị:
 
             >>> mock = Mock()
             >>> mock.side_effect = [3, 2, 1]
             >>> mock(), mock(), mock()
             (3, 2, 1)
 
-        Using a callable:
+        Sử dụng một đối tượng có thể gọi (callable):
 
             >>> mock = Mock(return_value=3)
             >>> def side_effect(*args, **kwargs):
@@ -612,8 +505,7 @@ the *new_callable* argument to :func:`patch`.
             >>> mock()
             3
 
-        :attr:`side_effect` can be set in the constructor. Here's an example that
-        adds one to the value the mock is called with and returns it:
+        :attr:`side_effect` có thể được thiết lập trong hàm khởi tạo. Dưới đây là một ví dụ cộng thêm một vào giá trị mà mock được gọi với và trả về kết quả đó:
 
             >>> side_effect = lambda value: value + 1
             >>> mock = Mock(side_effect=side_effect)
@@ -622,7 +514,7 @@ the *new_callable* argument to :func:`patch`.
             >>> mock(-8)
             -7
 
-        Setting :attr:`side_effect` to ``None`` clears it:
+        Đặt :attr:`side_effect` thành ``None`` sẽ xóa giá trị này:
 
             >>> m = Mock(side_effect=KeyError, return_value=3)
             >>> m()
@@ -636,13 +528,7 @@ the *new_callable* argument to :func:`patch`.
 
     .. attribute:: call_args
 
-        This is either ``None`` (if the mock hasn't been called), or the
-        arguments that the mock was last called with. This will be in the
-        form of a tuple: the first member, which can also be accessed through
-        the ``args`` property, is any positional arguments the mock was
-        called with (or an empty tuple) and the second member, which can
-        also be accessed through the ``kwargs`` property, is any keyword
-        arguments (or an empty dictionary).
+        Đây là ``None`` (nếu mock chưa được gọi) hoặc các đối số mà mock được gọi lần cuối với chúng. Giá trị này có dạng một tuple: phần tử đầu tiên, cũng có thể được truy cập thông qua thuộc tính ``args``, là mọi đối số vị trí mà mock được gọi với (hoặc một tuple rỗng), còn phần tử thứ hai, cũng có thể được truy cập thông qua thuộc tính ``kwargs``, là mọi đối số từ khóa (hoặc một từ điển rỗng).
 
             >>> mock = Mock(return_value=None)
             >>> print(mock.call_args)
@@ -669,23 +555,18 @@ the *new_callable* argument to :func:`patch`.
             >>> mock.call_args.kwargs
             {'key': 'fish', 'next': 'w00t!'}
 
-        :attr:`call_args`, along with members of the lists :attr:`call_args_list`,
-        :attr:`method_calls` and :attr:`mock_calls` are :data:`call` objects.
-        These are tuples, so they can be unpacked to get at the individual
-        arguments and make more complex assertions. See
-        :ref:`calls as tuples <calls-as-tuples>`.
+        :attr:`call_args`, cùng với các thành viên của các danh sách :attr:`call_args_list`,
+        :attr:`method_calls` và :attr:`mock_calls` là các đối tượng :data:`call`. Đây là các tuple, vì vậy bạn có thể giải nén chúng để lấy từng đối số riêng lẻ và thực hiện các assertion phức tạp hơn. Xem
+        :ref:`các lần gọi dưới dạng tuple <calls-as-tuples>`.
 
         .. versionchanged:: 3.8
-           Added ``args`` and ``kwargs`` properties.
+           Đã thêm các thuộc tính ``args`` và ``kwargs``.
 
 
     .. attribute:: call_args_list
 
-        This is a list of all the calls made to the mock object in sequence
-        (so the length of the list is the number of times it has been
-        called). Before any calls have been made it is an empty list. The
-        :data:`call` object can be used for conveniently constructing lists of
-        calls to compare with :attr:`call_args_list`.
+        Đây là danh sách tất cả các lần gọi được thực hiện đến đối tượng mock theo thứ tự (vì vậy độ dài của danh sách là số lần đối tượng đó được gọi). Trước khi có bất kỳ lần gọi nào, đây là một danh sách rỗng. Đối tượng
+        :data:`call` có thể được dùng để thuận tiện tạo các danh sách các lần gọi nhằm so sánh với :attr:`call_args_list`.
 
             >>> mock = Mock(return_value=None)
             >>> mock()
@@ -697,15 +578,13 @@ the *new_callable* argument to :func:`patch`.
             >>> mock.call_args_list == expected
             True
 
-        Members of :attr:`call_args_list` are :data:`call` objects. These can be
-        unpacked as tuples to get at the individual arguments. See
-        :ref:`calls as tuples <calls-as-tuples>`.
+        Các phần tử của :attr:`call_args_list` là các đối tượng :data:`call`. Có thể giải nén chúng dưới dạng tuple để lấy từng đối số riêng lẻ. Xem
+        :ref:`các lần gọi dưới dạng tuple <calls-as-tuples>`.
 
 
     .. attribute:: method_calls
 
-        As well as tracking calls to themselves, mocks also track calls to
-        methods and attributes, and *their* methods and attributes:
+        Ngoài việc theo dõi các lần gọi đến chính chúng, các mock còn theo dõi các lần gọi đến phương thức và thuộc tính, cũng như các phương thức và thuộc tính *của chúng*:
 
             >>> mock = Mock()
             >>> mock.method()
@@ -715,15 +594,13 @@ the *new_callable* argument to :func:`patch`.
             >>> mock.method_calls
             [call.method(), call.property.method.attribute()]
 
-        Members of :attr:`method_calls` are :data:`call` objects. These can be
-        unpacked as tuples to get at the individual arguments. See
-        :ref:`calls as tuples <calls-as-tuples>`.
+        Các thành viên của :attr:`method_calls` là các đối tượng :data:`call`. Có thể giải nén chúng dưới dạng tuple để truy cập từng đối số riêng lẻ. Xem
+        :ref:`các lần gọi dưới dạng tuple <calls-as-tuples>`.
 
 
     .. attribute:: mock_calls
 
-        :attr:`mock_calls` records *all* calls to the mock object, its methods,
-        magic methods *and* return value mocks.
+        :attr:`mock_calls` ghi lại *all* lần gọi đến đối tượng mock, các phương thức của nó, các phương thức magic *and* các mock giá trị trả về.
 
             >>> mock = MagicMock()
             >>> result = mock(1, 2, 3)
@@ -740,15 +617,12 @@ the *new_callable* argument to :func:`patch`.
             >>> mock.mock_calls == expected
             True
 
-        Members of :attr:`mock_calls` are :data:`call` objects. These can be
-        unpacked as tuples to get at the individual arguments. See
-        :ref:`calls as tuples <calls-as-tuples>`.
+        Các thành viên của :attr:`mock_calls` là các đối tượng :data:`call`. Có thể giải nén chúng dưới dạng tuple để truy cập từng đối số riêng lẻ. Xem
+        :ref:`các lần gọi dưới dạng tuple <calls-as-tuples>`.
 
         .. note::
 
-            The way :attr:`mock_calls` are recorded means that where nested
-            calls are made, the parameters of ancestor calls are not recorded
-            and so will always compare equal:
+            Cách :attr:`mock_calls` được ghi lại có nghĩa là khi thực hiện các lần gọi lồng nhau, các tham số của những lần gọi cấp cao hơn không được ghi lại và vì vậy sẽ luôn được xem là bằng nhau:
 
                 >>> mock = MagicMock()
                 >>> mock.top(a=3).bottom()
@@ -760,17 +634,14 @@ the *new_callable* argument to :func:`patch`.
 
     .. attribute:: __class__
 
-        Normally the :attr:`!__class__` attribute of an object will return its type.
-        For a mock object with a :attr:`!spec`, :attr:`!__class__` returns the spec class
-        instead. This allows mock objects to pass :func:`isinstance` tests for the
-        object they are replacing / masquerading as:
+        Thông thường, thuộc tính :attr:`!__class__` của một đối tượng sẽ trả về kiểu của đối tượng đó. Đối với một đối tượng mock có :attr:`!spec`, :attr:`!__class__` sẽ trả về lớp spec thay thế. Điều này cho phép các đối tượng mock vượt qua các phép kiểm tra :func:`isinstance` đối với đối tượng mà chúng đang thay thế hoặc giả lập:
 
             >>> mock = Mock(spec=3)
             >>> isinstance(mock, int)
             True
 
-        :attr:`!__class__` is assignable to, this allows a mock to pass an
-        :func:`isinstance` check without forcing you to use a spec:
+        :attr:`!__class__` có thể được gán cho, điều này cho phép một mock vượt qua một
+        :func:`isinstance` kiểm tra mà không buộc bạn phải sử dụng spec:
 
             >>> mock = Mock()
             >>> mock.__class__ = dict
@@ -779,12 +650,10 @@ the *new_callable* argument to :func:`patch`.
 
 .. class:: NonCallableMock(spec=None, wraps=None, name=None, spec_set=None, **kwargs)
 
-    A non-callable version of :class:`Mock`. The constructor parameters have the same
-    meaning of :class:`Mock`, with the exception of *return_value* and *side_effect*
-    which have no meaning on a non-callable mock.
+    Một phiên bản không thể gọi của :class:`Mock`. Các tham số constructor có cùng ý nghĩa với :class:`Mock`, ngoại trừ *return_value* và *side_effect* không có ý nghĩa đối với một mock không thể gọi.
 
-Mock objects that use a class or an instance as a :attr:`!spec` or
-:attr:`!spec_set` are able to pass :func:`isinstance` tests:
+Các đối tượng mock sử dụng một class hoặc một instance làm :attr:`!spec` hoặc
+:attr:`!spec_set` có thể vượt qua các bài kiểm tra :func:`isinstance`:
 
     >>> mock = Mock(spec=SomeClass)
     >>> isinstance(mock, SomeClass)
@@ -793,13 +662,9 @@ Mock objects that use a class or an instance as a :attr:`!spec` or
     >>> isinstance(mock, SomeClass)
     True
 
-The :class:`Mock` classes have support for mocking magic methods. See :ref:`magic
-methods <magic-methods>` for the full details.
+Các class :class:`Mock` hỗ trợ mock các magic method. Xem :ref:`magic methods <magic-methods>` để biết đầy đủ chi tiết.
 
-The mock classes and the :func:`patch` decorators all take arbitrary keyword
-arguments for configuration. For the :func:`patch` decorators the keywords are
-passed to the constructor of the mock being created. The keyword arguments
-are for configuring attributes of the mock:
+Các class mock và các decorator :func:`patch` đều nhận các đối số từ khóa tùy ý để cấu hình. Đối với các decorator :func:`patch`, các từ khóa được truyền vào constructor của mock được tạo. Các đối số từ khóa dùng để cấu hình các thuộc tính của mock:
 
         >>> m = MagicMock(attribute=3, other='fish')
         >>> m.attribute
@@ -807,9 +672,7 @@ are for configuring attributes of the mock:
         >>> m.other
         'fish'
 
-The return value and side effect of child mocks can be set in the same way,
-using dotted notation. As you can't use dotted names directly in a call you
-have to create a dictionary and unpack it using ``**``:
+Giá trị trả về và side effect của các mock con có thể được thiết lập theo cùng một cách, bằng cách sử dụng ký hiệu dấu chấm. Vì bạn không thể sử dụng trực tiếp tên có dấu chấm trong một lời gọi, bạn phải tạo một dictionary rồi unpack nó bằng ``**``:.
 
     >>> attrs = {'method.return_value': 3, 'other.side_effect': KeyError}
     >>> mock = Mock(some_attribute='eggs', **attrs)
@@ -822,10 +685,7 @@ have to create a dictionary and unpack it using ``**``:
       ...
     KeyError
 
-A callable mock which was created with a *spec* (or a *spec_set*) will
-introspect the specification object's signature when matching calls to
-the mock.  Therefore, it can match the actual call's arguments regardless
-of whether they were passed positionally or by name::
+Một mock có thể gọi được được tạo với *spec* (hoặc *spec_set*) sẽ kiểm tra introspection chữ ký của đối tượng đặc tả khi đối chiếu các lời gọi với mock. Do đó, nó có thể đối chiếu các đối số của lời gọi thực tế bất kể chúng được truyền theo vị trí hay theo tên::
 
    >>> def f(a, b, c): pass
    ...
@@ -835,24 +695,21 @@ of whether they were passed positionally or by name::
    >>> mock.assert_called_with(1, 2, 3)
    >>> mock.assert_called_with(a=1, b=2, c=3)
 
-This applies to :meth:`~Mock.assert_called_with`,
-:meth:`~Mock.assert_called_once_with`, :meth:`~Mock.assert_has_calls` and
-:meth:`~Mock.assert_any_call`.  When :ref:`auto-speccing`, it will also
-apply to method calls on the mock object.
+Điều này áp dụng cho :meth:`~Mock.assert_called_with`,
+:meth:`~Mock.assert_called_once_with`, :meth:`~Mock.assert_has_calls` và
+:meth:`~Mock.assert_any_call`. Khi :ref:`auto-speccing`, điều này cũng sẽ áp dụng cho các lời gọi phương thức trên đối tượng mock.
 
 .. versionchanged:: 3.4
-   Added signature introspection on specced and autospecced mock objects.
+   Đã bổ sung khả năng kiểm tra introspection chữ ký trên các đối tượng mock có spec và autospec.
 
 
 .. class:: PropertyMock(*args, **kwargs)
 
-   A mock intended to be used as a :class:`property`, or other
-   :term:`descriptor`, on a class. :class:`PropertyMock` provides
-   :meth:`~object.__get__` and :meth:`~object.__set__` methods
-   so you can specify a return value when it is fetched.
+   Một mock được dùng làm :class:`property`, hoặc làm một đối tượng khác
+   :term:`descriptor`, trên một class. :class:`PropertyMock` cung cấp
+   các phương thức :meth:`~object.__get__` và :meth:`~object.__set__` để bạn có thể chỉ định giá trị trả về khi lấy nó.
 
-   Fetching a :class:`PropertyMock` instance from an object calls the mock, with
-   no args. Setting it calls the mock with the value being set. ::
+   Việc lấy một instance :class:`PropertyMock` từ một đối tượng sẽ gọi mock mà không có đối số. Việc thiết lập nó sẽ gọi mock với giá trị đang được thiết lập.::
 
         >>> class Foo:
         ...     @property
@@ -872,9 +729,8 @@ apply to method calls on the mock object.
         >>> mock_foo.mock_calls
         [call(), call(6)]
 
-Because of the way mock attributes are stored you can't directly attach a
-:class:`PropertyMock` to a mock object. Instead you can attach it to the mock type
-object::
+Do cách các thuộc tính mock được lưu trữ, bạn không thể trực tiếp gắn một
+:class:`PropertyMock` vào một đối tượng mock. Thay vào đó, bạn có thể gắn nó vào đối tượng kiểu mock::
 
     >>> m = MagicMock()
     >>> p = PropertyMock(return_value=3)
@@ -885,9 +741,8 @@ object::
 
 .. caution::
 
-    If an :exc:`AttributeError` is raised by :class:`PropertyMock`,
-    it will be interpreted as a missing descriptor and
-    :meth:`~object.__getattr__` will be called on the parent mock::
+    Nếu một :exc:`AttributeError` được :class:`PropertyMock` đưa ra, nó sẽ được hiểu là một descriptor bị thiếu và
+    :meth:`~object.__getattr__` sẽ được gọi trên mock cha::
 
         >>> m = MagicMock()
         >>> no_attribute = PropertyMock(side_effect=AttributeError)
@@ -895,14 +750,12 @@ object::
         >>> m.my_property
         <MagicMock name='mock.my_property' id='140165240345424'>
 
-    See :meth:`~object.__getattr__` for details.
+    Xem :meth:`~object.__getattr__` để biết chi tiết.
 
 
 .. class:: AsyncMock(spec=None, side_effect=None, return_value=DEFAULT, wraps=None, name=None, spec_set=None, unsafe=False, **kwargs)
 
-  An asynchronous version of :class:`MagicMock`. The :class:`AsyncMock` object will
-  behave so the object is recognized as an async function, and the result of a
-  call is an awaitable.
+  Một phiên bản bất đồng bộ của :class:`MagicMock`. Đối tượng :class:`AsyncMock` sẽ hoạt động sao cho được nhận diện là một hàm async và kết quả của một lần gọi là một awaitable.
 
     >>> mock = AsyncMock()
     >>> inspect.iscoroutinefunction(mock)
@@ -910,23 +763,16 @@ object::
     >>> inspect.isawaitable(mock())  # doctest: +SKIP
     True
 
-  The result of ``mock()`` is an async function which will have the outcome
-  of ``side_effect`` or ``return_value`` after it has been awaited:
+  Kết quả của ``mock()`` là một hàm async, hàm này sẽ có kết quả là ``side_effect`` hoặc ``return_value`` sau khi được await:
 
-  - if ``side_effect`` is a function, the async function will return the
-    result of that function,
-  - if ``side_effect`` is an exception, the async function will raise the
-    exception,
-  - if ``side_effect`` is an iterable, the async function will return the
-    next value of the iterable, however, if the sequence of result is
-    :term:`exhausted`, ``StopAsyncIteration`` is raised immediately,
-  - if ``side_effect`` is not defined, the async function will return the
-    value defined by ``return_value``, hence, by default, the async function
-    returns a new :class:`AsyncMock` object.
+  - nếu ``side_effect`` là một hàm, hàm async sẽ trả về kết quả của hàm đó,
+  - nếu ``side_effect`` là một exception, hàm async sẽ raise exception đó,
+  - nếu ``side_effect`` là một iterable, hàm async sẽ trả về giá trị tiếp theo của iterable; tuy nhiên, nếu chuỗi kết quả là
+    :term:`exhausted`, ``StopAsyncIteration`` được phát sinh ngay lập tức,
+  - nếu ``side_effect`` chưa được định nghĩa, async function sẽ trả về giá trị được định nghĩa bởi ``return_value``, do đó, theo mặc định, async function trả về một đối tượng :class:`AsyncMock` mới.
 
 
-  Setting the *spec* of a :class:`Mock` or :class:`MagicMock` to an async function
-  will result in a coroutine object being returned after calling.
+  Việc đặt *spec* của một :class:`Mock` hoặc :class:`MagicMock` thành một async function sẽ khiến một đối tượng coroutine được trả về sau khi gọi.
 
     >>> async def async_func(): pass
     ...
@@ -937,11 +783,7 @@ object::
     <coroutine object AsyncMockMixin._mock_call at ...>
 
 
-  Setting the *spec* of a :class:`Mock`, :class:`MagicMock`, or :class:`AsyncMock`
-  to a class with asynchronous and synchronous functions will automatically
-  detect the synchronous functions and set them as :class:`MagicMock` (if the
-  parent mock is :class:`AsyncMock` or :class:`MagicMock`) or :class:`Mock` (if
-  the parent mock is :class:`Mock`). All asynchronous functions will be
+  Việc đặt *spec* của một :class:`Mock`, :class:`MagicMock` hoặc :class:`AsyncMock` thành một lớp có các function bất đồng bộ và đồng bộ sẽ tự động phát hiện các function đồng bộ và đặt chúng thành :class:`MagicMock` (nếu mock cha là :class:`AsyncMock` hoặc :class:`MagicMock`) hoặc :class:`Mock` (nếu mock cha là :class:`Mock`). Tất cả các function bất đồng bộ sẽ được
   :class:`AsyncMock`.
 
   >>> class ExampleClass:
@@ -965,8 +807,7 @@ object::
 
   .. method:: assert_awaited()
 
-      Assert that the mock was awaited at least once. Note that this is separate
-      from the object having been called, the ``await`` keyword must be used:
+      Khẳng định rằng mock đã được await ít nhất một lần. Lưu ý rằng điều này khác với việc đối tượng đã được gọi; phải sử dụng keyword ``await``:
 
           >>> mock = AsyncMock()
           >>> async def main(coroutine_mock):
@@ -984,7 +825,7 @@ object::
 
   .. method:: assert_awaited_once()
 
-      Assert that the mock was awaited exactly once.
+      Khẳng định rằng mock đã được await chính xác một lần.
 
         >>> mock = AsyncMock()
         >>> async def main():
@@ -1000,7 +841,7 @@ object::
 
   .. method:: assert_awaited_with(*args, **kwargs)
 
-      Assert that the last await was with the specified arguments.
+      Xác nhận rằng lần await cuối cùng sử dụng các đối số được chỉ định.
 
         >>> mock = AsyncMock()
         >>> async def main(*args, **kwargs):
@@ -1017,8 +858,7 @@ object::
 
   .. method:: assert_awaited_once_with(*args, **kwargs)
 
-      Assert that the mock was awaited exactly once and with the specified
-      arguments.
+      Xác nhận rằng mock đã được await chính xác một lần và với các đối số được chỉ định.
 
         >>> mock = AsyncMock()
         >>> async def main(*args, **kwargs):
@@ -1034,7 +874,7 @@ object::
 
   .. method:: assert_any_await(*args, **kwargs)
 
-      Assert the mock has ever been awaited with the specified arguments.
+      Xác nhận rằng mock đã từng được await với các đối số được chỉ định.
 
         >>> mock = AsyncMock()
         >>> async def main(*args, **kwargs):
@@ -1050,15 +890,11 @@ object::
 
   .. method:: assert_has_awaits(calls, any_order=False)
 
-      Assert the mock has been awaited with the specified calls.
-      The :attr:`await_args_list` list is checked for the awaits.
+      Xác nhận rằng mock đã được await với các lời gọi được chỉ định. Danh sách :attr:`await_args_list` được kiểm tra để xác nhận các lần await.
 
-      If *any_order* is false then the awaits must be
-      sequential. There can be extra calls before or after the
-      specified awaits.
+      Nếu *any_order* là false thì các lần await phải diễn ra tuần tự. Có thể có các lời gọi bổ sung trước hoặc sau những lần await được chỉ định.
 
-      If *any_order* is true then the awaits can be in any order, but
-      they must all appear in :attr:`await_args_list`.
+      Nếu *any_order* là true thì các lần await có thể diễn ra theo bất kỳ thứ tự nào, nhưng tất cả phải xuất hiện trong :attr:`await_args_list`.
 
         >>> mock = AsyncMock()
         >>> async def main(*args, **kwargs):
@@ -1077,19 +913,19 @@ object::
 
   .. method:: assert_not_awaited()
 
-    Assert that the mock was never awaited.
+    Xác nhận rằng mock chưa bao giờ được await.
 
         >>> mock = AsyncMock()
         >>> mock.assert_not_awaited()
 
   .. method:: reset_mock(*args, **kwargs)
 
-    See :func:`Mock.reset_mock`. Also sets :attr:`await_count` to 0,
-    :attr:`await_args` to None, and clears the :attr:`await_args_list`.
+    Xem :func:`Mock.reset_mock`. Đồng thời đặt :attr:`await_count` thành 0,
+    :attr:`await_args` thành None và xóa :attr:`await_args_list`.
 
   .. attribute:: await_count
 
-    An integer keeping track of how many times the mock object has been awaited.
+    Một số nguyên theo dõi số lần đối tượng mock đã được await.
 
       >>> mock = AsyncMock()
       >>> async def main():
@@ -1104,8 +940,7 @@ object::
 
   .. attribute:: await_args
 
-    This is either ``None`` (if the mock hasn’t been awaited), or the arguments that
-    the mock was last awaited with. Functions the same as :attr:`Mock.call_args`.
+    Đây là ``None`` (nếu mock chưa được await), hoặc các đối số mà mock được await lần cuối cùng với. Hoạt động giống :attr:`Mock.call_args`.
 
       >>> mock = AsyncMock()
       >>> async def main(*args):
@@ -1122,9 +957,7 @@ object::
 
   .. attribute:: await_args_list
 
-    This is a list of all the awaits made to the mock object in sequence (so the
-    length of the list is the number of times it has been awaited). Before any
-    awaits have been made it is an empty list.
+    Đây là danh sách tất cả các lần await đối tượng mock theo thứ tự (vì vậy độ dài của danh sách là số lần đối tượng đã được await). Trước khi có bất kỳ lần await nào, đây là một danh sách rỗng.
 
       >>> mock = AsyncMock()
       >>> async def main(*args):
@@ -1142,22 +975,20 @@ object::
 
 .. class:: ThreadingMock(spec=None, side_effect=None, return_value=DEFAULT, wraps=None, name=None, spec_set=None, unsafe=False, *, timeout=UNSET, **kwargs)
 
-  A version of :class:`MagicMock` for multithreading tests. The
-  :class:`ThreadingMock` object provides extra methods to wait for a call to
-  be invoked, rather than assert on it immediately.
+  Một phiên bản của :class:`MagicMock` dành cho các bài kiểm thử đa luồng. Đối tượng
+  :class:`ThreadingMock` cung cấp các phương thức bổ sung để chờ một lệnh gọi được thực thi, thay vì xác nhận ngay lập tức.
 
-  The default timeout is specified by the ``timeout`` argument, or if unset by the
-  :attr:`ThreadingMock.DEFAULT_TIMEOUT` attribute, which defaults to blocking (``None``).
+  Thời gian chờ mặc định được chỉ định bởi đối số ``timeout``, hoặc nếu chưa được đặt thì bởi
+  thuộc tính :attr:`ThreadingMock.DEFAULT_TIMEOUT`, thuộc tính này mặc định là blocking (``None``).
 
-  You can configure the global default timeout by setting :attr:`ThreadingMock.DEFAULT_TIMEOUT`.
+  Bạn có thể cấu hình thời gian chờ mặc định toàn cục bằng cách đặt :attr:`ThreadingMock.DEFAULT_TIMEOUT`.
 
   .. method:: wait_until_called(*, timeout=UNSET)
 
-      Waits until the mock is called.
+      Chờ cho đến khi mock được gọi.
 
-      If a timeout was passed at the creation of the mock or if a timeout
-      argument is passed to this function, the function raises an
-      :exc:`AssertionError` if the call is not performed in time.
+      Nếu một thời gian chờ được truyền khi tạo mock hoặc một đối số thời gian chờ được truyền cho hàm này, hàm sẽ phát sinh một
+      :exc:`AssertionError` nếu lệnh gọi không được thực hiện kịp thời.
 
         >>> mock = ThreadingMock()
         >>> thread = threading.Thread(target=mock)
@@ -1167,10 +998,9 @@ object::
 
   .. method:: wait_until_any_call_with(*args, **kwargs)
 
-      Waits until the mock is called with the specified arguments.
+      Chờ cho đến khi mock được gọi với các đối số đã chỉ định.
 
-      If a timeout was passed at the creation of the mock
-      the function raises an :exc:`AssertionError` if the call is not performed in time.
+      Nếu một timeout được truyền vào khi tạo mock, hàm sẽ phát sinh một :exc:`AssertionError` nếu lệnh gọi không được thực hiện kịp thời.
 
         >>> mock = ThreadingMock()
         >>> thread = threading.Thread(target=mock, args=("arg1", "arg2",), kwargs={"arg": "thing"})
@@ -1180,29 +1010,23 @@ object::
 
   .. attribute:: DEFAULT_TIMEOUT
 
-    Global default timeout in seconds to create instances of :class:`ThreadingMock`.
+    Timeout mặc định toàn cục tính bằng giây để tạo các instance của :class:`ThreadingMock`.
 
   .. versionadded:: 3.13
 
 
-Calling
-~~~~~~~
+Gọi
+~~~
 
-Mock objects are callable. The call will return the value set as the
-:attr:`~Mock.return_value` attribute. The default return value is a new Mock
-object; it is created the first time the return value is accessed (either
-explicitly or by calling the Mock) - but it is stored and the same one
-returned each time.
+Các đối tượng Mock có thể được gọi. Lệnh gọi sẽ trả về giá trị được thiết lập làm
+thuộc tính :attr:`~Mock.return_value`. Giá trị trả về mặc định là một đối tượng Mock mới; đối tượng này được tạo lần đầu tiên khi giá trị trả về được truy cập (dù là truy cập rõ ràng hay bằng cách gọi Mock), nhưng được lưu lại và cùng một đối tượng sẽ được trả về mỗi lần.
 
-Calls made to the object will be recorded in the attributes
-like :attr:`~Mock.call_args` and :attr:`~Mock.call_args_list`.
+Các lệnh gọi được thực hiện trên đối tượng sẽ được ghi lại trong những thuộc tính như :attr:`~Mock.call_args` và :attr:`~Mock.call_args_list`.
 
-If :attr:`~Mock.side_effect` is set then it will be called after the call has
-been recorded, so if :attr:`!side_effect` raises an exception the call is still
-recorded.
+Nếu :attr:`~Mock.side_effect` được thiết lập thì nó sẽ được gọi sau khi lệnh gọi đã được ghi lại, vì vậy nếu :attr:`!side_effect` phát sinh một ngoại lệ thì lệnh gọi vẫn được ghi lại.
 
-The simplest way to make a mock raise an exception when called is to make
-:attr:`~Mock.side_effect` an exception class or instance:
+Cách đơn giản nhất để khiến một mock phát sinh ngoại lệ khi được gọi là đặt
+:attr:`~Mock.side_effect` thành một lớp hoặc thực thể ngoại lệ:
 
         >>> m = MagicMock(side_effect=IndexError)
         >>> m(1, 2, 3)
@@ -1219,10 +1043,7 @@ The simplest way to make a mock raise an exception when called is to make
         >>> m.mock_calls
         [call(1, 2, 3), call('two', 'three', 'four')]
 
-If :attr:`~Mock.side_effect` is a function then whatever that function returns is what
-calls to the mock return. The :attr:`!side_effect` function is called with the
-same arguments as the mock. This allows you to vary the return value of the
-call dynamically, based on the input:
+Nếu :attr:`~Mock.side_effect` là một hàm thì giá trị mà hàm đó trả về sẽ là giá trị mà các lần gọi mock trả về. Hàm :attr:`!side_effect` được gọi với cùng các đối số như mock. Điều này cho phép bạn thay đổi linh động giá trị trả về của lệnh gọi dựa trên đầu vào:
 
         >>> def side_effect(value):
         ...     return value + 1
@@ -1235,9 +1056,8 @@ call dynamically, based on the input:
         >>> m.mock_calls
         [call(1), call(2)]
 
-If you want the mock to still return the default return value (a new mock), or
-any set return value, then there are two ways of doing this. Either return
-:attr:`~Mock.return_value` from inside :attr:`~Mock.side_effect`, or return :data:`DEFAULT`:
+Nếu muốn mock vẫn trả về giá trị trả về mặc định (một mock mới) hoặc bất kỳ giá trị trả về nào đã được thiết lập, có hai cách để thực hiện việc này. Hoặc trả về
+:attr:`~Mock.return_value` từ bên trong :attr:`~Mock.side_effect`, hoặc trả về :data:`DEFAULT`:
 
         >>> m = MagicMock()
         >>> def side_effect(*args, **kwargs):
@@ -1254,8 +1074,8 @@ any set return value, then there are two ways of doing this. Either return
         >>> m()
         3
 
-To remove a :attr:`~Mock.side_effect`, and return to the default behaviour, set the
-:attr:`!side_effect` to ``None``:
+Để xóa :attr:`~Mock.side_effect` và trở về hành vi mặc định, hãy đặt
+:attr:`!side_effect` thành ``None``:
 
         >>> m = MagicMock(return_value=6)
         >>> def side_effect(*args, **kwargs):
@@ -1268,9 +1088,7 @@ To remove a :attr:`~Mock.side_effect`, and return to the default behaviour, set 
         >>> m()
         6
 
-The :attr:`~Mock.side_effect` can also be any iterable object. Repeated calls to the mock
-will return values from the iterable (until the iterable is :term:`exhausted` and
-a :exc:`StopIteration` is raised):
+:attr:`~Mock.side_effect` cũng có thể là bất kỳ đối tượng iterable nào. Các lần gọi mock lặp lại sẽ trả về các giá trị từ iterable đó (cho đến khi iterable :term:`exhausted` và một :exc:`StopIteration` được phát sinh):
 
         >>> m = MagicMock(side_effect=[1, 2, 3])
         >>> m()
@@ -1284,8 +1102,7 @@ a :exc:`StopIteration` is raised):
           ...
         StopIteration
 
-If any members of the iterable are exceptions they will be raised instead of
-returned::
+Nếu bất kỳ phần tử nào của iterable là exception, chúng sẽ được phát sinh thay vì được trả về::
 
         >>> iterable = (33, ValueError, 66)
         >>> m = MagicMock(side_effect=iterable)
@@ -1301,18 +1118,15 @@ returned::
 
 .. _deleting-attributes:
 
-Deleting Attributes
-~~~~~~~~~~~~~~~~~~~
+Xóa thuộc tính
+~~~~~~~~~~~~~~
 
-Mock objects create attributes on demand. This allows them to pretend to be
-objects of any type.
+Các đối tượng Mock tạo thuộc tính theo yêu cầu. Điều này cho phép chúng giả lập các đối tượng thuộc bất kỳ kiểu nào.
 
-You may want a mock object to return ``False`` to a :func:`hasattr` call, or raise an
-:exc:`AttributeError` when an attribute is fetched. You can do this by providing
-an object as a :attr:`!spec` for a mock, but that isn't always convenient.
+Bạn có thể muốn một đối tượng mock trả về ``False`` cho một lời gọi :func:`hasattr`, hoặc phát sinh một
+:exc:`AttributeError` khi một thuộc tính được truy xuất. Bạn có thể thực hiện việc này bằng cách cung cấp một đối tượng làm :attr:`!spec` cho một mock, nhưng cách đó không phải lúc nào cũng thuận tiện.
 
-You "block" attributes by deleting them. Once deleted, accessing an attribute
-will raise an :exc:`AttributeError`.
+Bạn "chặn" các thuộc tính bằng cách xóa chúng. Sau khi bị xóa, việc truy cập một thuộc tính sẽ phát sinh một :exc:`AttributeError`.
 
     >>> mock = MagicMock()
     >>> hasattr(mock, 'm')
@@ -1327,12 +1141,10 @@ will raise an :exc:`AttributeError`.
     AttributeError: f
 
 
-Mock names and the name attribute
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Tên mock và thuộc tính name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Since "name" is an argument to the :class:`Mock` constructor, if you want your
-mock object to have a "name" attribute you can't just pass it in at creation
-time. There are two alternatives. One option is to use
+Vì "name" là một đối số của constructor :class:`Mock`, nếu muốn đối tượng mock của bạn có thuộc tính "name", bạn không thể chỉ truyền thuộc tính này vào khi tạo. Có hai lựa chọn. Một lựa chọn là sử dụng
 :meth:`~Mock.configure_mock`::
 
     >>> mock = MagicMock()
@@ -1340,22 +1152,16 @@ time. There are two alternatives. One option is to use
     >>> mock.name
     'my_name'
 
-A simpler option is to simply set the "name" attribute after mock creation::
+Một lựa chọn đơn giản hơn là chỉ cần đặt thuộc tính "name" sau khi tạo mock::
 
     >>> mock = MagicMock()
     >>> mock.name = "foo"
 
 
-Attaching Mocks as Attributes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Đính kèm Mock dưới dạng thuộc tính
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When you attach a mock as an attribute of another mock (or as the return
-value) it becomes a "child" of that mock. Calls to the child are recorded in
-the :attr:`~Mock.method_calls` and :attr:`~Mock.mock_calls` attributes of the
-parent. This is useful for configuring child mocks and then attaching them to
-the parent, or for attaching mocks to a parent that records all calls to the
-children and allows you to make assertions about the order of calls between
-mocks:
+Khi bạn đính kèm một mock làm thuộc tính của một mock khác (hoặc làm giá trị trả về), nó sẽ trở thành một "child" của mock đó. Các lần gọi đến child được ghi lại trong các thuộc tính :attr:`~Mock.method_calls` và :attr:`~Mock.mock_calls` của parent. Điều này hữu ích khi cấu hình các child mock rồi đính kèm chúng vào parent, hoặc khi đính kèm các mock vào một parent ghi lại tất cả các lần gọi đến các child và cho phép bạn kiểm tra thứ tự gọi giữa các mock:
 
     >>> parent = MagicMock()
     >>> child1 = MagicMock(return_value=None)
@@ -1367,8 +1173,7 @@ mocks:
     >>> parent.mock_calls
     [call.child1(1), call.child2(2)]
 
-The exception to this is if the mock has a name. This allows you to prevent
-the "parenting" if for some reason you don't want it to happen.
+Ngoại lệ là khi mock có tên. Điều này cho phép bạn ngăn việc "parenting" nếu vì lý do nào đó bạn không muốn việc này xảy ra.
 
     >>> mock = MagicMock()
     >>> not_a_child = MagicMock(name='not-a-child')
@@ -1378,9 +1183,7 @@ the "parenting" if for some reason you don't want it to happen.
     >>> mock.mock_calls
     []
 
-Mocks created for you by :func:`patch` are automatically given names. To
-attach mocks that have names to a parent you use the :meth:`~Mock.attach_mock`
-method::
+Các mock được :func:`patch` tạo cho bạn sẽ tự động được đặt tên. Để đính kèm các mock có tên vào một parent, bạn sử dụng phương thức :meth:`~Mock.attach_mock`::
 
     >>> thing1 = object()
     >>> thing2 = object()
@@ -1396,21 +1199,13 @@ method::
     [call.child1('one'), call.child2('two')]
 
 
-.. [#] The only exceptions are magic methods and attributes (those that have
-       leading and trailing double underscores). Mock doesn't create these but
-       instead raises an :exc:`AttributeError`. This is because the interpreter
-       will often implicitly request these methods, and gets *very* confused to
-       get a new Mock object when it expects a magic method. If you need magic
-       method support see :ref:`magic methods <magic-methods>`.
+.. [#] Các ngoại lệ duy nhất là magic methods và attributes (những phương thức và thuộc tính có hai dấu gạch dưới ở đầu và cuối). Mock không tạo các đối tượng này mà thay vào đó sẽ phát sinh :exc:`AttributeError`. Điều này là do interpreter thường sẽ ngầm yêu cầu các phương thức này và sẽ *rất* bối rối khi tạo một đối tượng Mock mới trong lúc nó mong đợi một magic method. Nếu cần hỗ trợ magic method, hãy xem :ref:`magic methods <magic-methods>`.
 
 
-The patchers
-------------
+Các patcher
+-----------
 
-The patch decorators are used for patching objects only within the scope of
-the function they decorate. They automatically handle the unpatching for you,
-even if exceptions are raised. All of these functions can also be used in with
-statements or as class decorators.
+Các patch decorator được dùng để patch các đối tượng chỉ trong phạm vi của hàm mà chúng decorate. Chúng tự động xử lý việc bỏ patch cho bạn, ngay cả khi có exception xảy ra. Tất cả các hàm này cũng có thể được dùng trong các câu lệnh with hoặc làm class decorator.
 
 
 patch
@@ -1418,87 +1213,46 @@ patch
 
 .. note::
 
-    The key is to do the patching in the right namespace. See the section `where to patch`_.
+    Điều quan trọng là thực hiện patch trong đúng namespace. Xem phần `where to patch <where to patch_>`_.
 
 .. function:: patch(target, new=DEFAULT, spec=None, create=False, spec_set=None, autospec=None, new_callable=None, **kwargs)
 
-    :func:`patch` acts as a function decorator, class decorator or a context
-    manager. Inside the body of the function or with statement, the *target*
-    is patched with a *new* object. When the function/with statement exits
-    the patch is undone.
+    :func:`patch` hoạt động như một function decorator, class decorator hoặc context manager. Bên trong phần thân của hàm hoặc câu lệnh with, *target* được patch bằng một đối tượng *new*. Khi hàm/câu lệnh with kết thúc, patch sẽ được hoàn tác.
 
-    If *new* is omitted, then the target is replaced with an
-    :class:`AsyncMock` if the patched object is an async function or
-    a :class:`MagicMock` otherwise.
-    If :func:`patch` is used as a decorator and *new* is
-    omitted, the created mock is passed in as an extra argument to the
-    decorated function. If :func:`patch` is used as a context manager the created
-    mock is returned by the context manager.
+    Nếu *new* bị bỏ qua, target sẽ được thay thế bằng một
+    :class:`AsyncMock` nếu đối tượng được patch là một hàm async, hoặc :class:`MagicMock` nếu không phải. Nếu :func:`patch` được dùng làm decorator và *new* bị bỏ qua, mock được tạo sẽ được truyền vào làm đối số bổ sung cho hàm được trang trí. Nếu :func:`patch` được dùng làm context manager, mock được tạo sẽ được context manager trả về.
 
-    *target* should be a string in the form ``'package.module.ClassName'``. The
-    *target* is imported and the specified object replaced with the *new*
-    object, so the *target* must be importable from the environment you are
-    calling :func:`patch` from. The target is imported when the decorated function
-    is executed, not at decoration time.
+    *target* phải là một chuỗi có dạng ``'package.module.ClassName'``. *target* được import và đối tượng được chỉ định sẽ được thay thế bằng đối tượng *new*, vì vậy *target* phải có thể import được từ môi trường nơi bạn gọi :func:`patch`. Target được import khi hàm được trang trí thực thi, không phải tại thời điểm áp dụng decorator.
 
-    The *spec* and *spec_set* keyword arguments are passed to the :class:`MagicMock`
-    if patch is creating one for you.
+    Các đối số từ khóa *spec* và *spec_set* sẽ được truyền cho :class:`MagicMock` nếu patch tạo đối tượng này giúp bạn.
 
-    In addition you can pass ``spec=True`` or ``spec_set=True``, which causes
-    patch to pass in the object being mocked as the spec/spec_set object.
+    Ngoài ra, bạn có thể truyền ``spec=True`` hoặc ``spec_set=True``, khiến patch truyền đối tượng đang được mock làm đối tượng spec/spec_set.
 
-    *new_callable* allows you to specify a different class, or callable object,
-    that will be called to create the *new* object. By default :class:`AsyncMock`
-    is used for async functions and :class:`MagicMock` for the rest.
+    *new_callable* cho phép bạn chỉ định một class hoặc đối tượng callable khác, đối tượng này sẽ được gọi để tạo đối tượng *new*. Theo mặc định, :class:`AsyncMock` được dùng cho các hàm async và :class:`MagicMock` được dùng cho các trường hợp còn lại.
 
-    A more powerful form of *spec* is *autospec*. If you set ``autospec=True``
-    then the mock will be created with a spec from the object being replaced.
-    All attributes of the mock will also have the spec of the corresponding
-    attribute of the object being replaced. Methods and functions being mocked
-    will have their arguments checked and will raise a :exc:`TypeError` if they are
-    called with the wrong signature. For mocks
-    replacing a class, their return value (the 'instance') will have the same
-    spec as the class. See the :func:`create_autospec` function and
+    Một dạng mạnh hơn của *spec* là *autospec*. Nếu bạn đặt ``autospec=True``, mock sẽ được tạo với spec lấy từ đối tượng đang được thay thế. Tất cả thuộc tính của mock cũng sẽ có spec của thuộc tính tương ứng trên đối tượng đang được thay thế. Các method và hàm đang được mock sẽ được kiểm tra các đối số và sẽ phát sinh :exc:`TypeError` nếu được gọi với signature không đúng. Đối với mock thay thế một class, giá trị trả về của chúng ("instance") sẽ có cùng spec với class đó. Xem hàm :func:`create_autospec` và
     :ref:`auto-speccing`.
 
-    Instead of ``autospec=True`` you can pass ``autospec=some_object`` to use an
-    arbitrary object as the spec instead of the one being replaced.
+    Thay vì ``autospec=True``, bạn có thể truyền ``autospec=some_object`` để dùng một đối tượng tùy ý làm spec thay cho đối tượng đang được thay thế.
 
-    By default :func:`patch` will fail to replace attributes that don't exist.
-    If you pass in ``create=True``, and the attribute doesn't exist, patch will
-    create the attribute for you when the patched function is called, and delete
-    it again after the patched function has exited. This is useful for writing
-    tests against attributes that your production code creates at runtime. It is
-    off by default because it can be dangerous. With it switched on you can
-    write passing tests against APIs that don't actually exist!
+    Theo mặc định, :func:`patch` sẽ không thay thế các attribute không tồn tại. Nếu bạn truyền ``create=True``, và attribute đó không tồn tại, patch sẽ tạo attribute đó cho bạn khi hàm được patch được gọi, rồi xóa nó sau khi hàm được patch kết thúc. Điều này hữu ích khi viết test cho các attribute mà code production của bạn tạo ra trong runtime. Tùy chọn này mặc định bị tắt vì có thể gây nguy hiểm. Khi bật tùy chọn này, bạn có thể viết các test thành công cho những API thực tế không tồn tại!
 
     .. note::
 
        .. versionchanged:: 3.5
-          If you are patching builtins in a module then you don't
-          need to pass ``create=True``, it will be added by default.
+          Nếu bạn đang patch builtins trong một module thì không cần truyền ``create=True``; nó sẽ được tự động thêm vào.
 
-    Patch can be used as a :class:`~unittest.TestCase` class decorator. It works by
-    decorating each test method in the class. This reduces the boilerplate
-    code when your test methods share a common patchings set. :func:`patch` finds
-    tests by looking for method names that start with ``patch.TEST_PREFIX``.
-    By default this is ``'test'``, which matches the way :mod:`unittest` finds tests.
-    You can specify an alternative prefix by setting ``patch.TEST_PREFIX``.
+    Patch có thể được dùng làm decorator cho class :class:`~unittest.TestCase`. Nó hoạt động bằng cách áp dụng decorator cho từng phương thức test trong class. Điều này giúp giảm phần code dư thừa khi các phương thức test của bạn dùng chung một tập patching. :func:`patch` tìm các test bằng cách tìm những tên phương thức bắt đầu bằng ``patch.TEST_PREFIX``. Theo mặc định, tiền tố này là ``'test'``, phù hợp với cách :mod:`unittest` tìm các test. Bạn có thể chỉ định tiền tố khác bằng cách đặt ``patch.TEST_PREFIX``.
 
-    Patch can be used as a context manager, with the with statement. Here the
-    patching applies to the indented block after the with statement. If you
-    use "as" then the patched object will be bound to the name after the
-    "as"; very useful if :func:`patch` is creating a mock object for you.
+    Patch có thể được dùng như một context manager với câu lệnh with. Trong trường hợp này, việc patching được áp dụng cho block thụt lề sau câu lệnh with. Nếu bạn dùng "as", đối tượng đã được patch sẽ được liên kết với tên đứng sau "as"; điều này rất hữu ích nếu :func:`patch` đang tạo một mock object cho bạn.
 
-    :func:`patch` takes arbitrary keyword arguments. These will be passed to
-    :class:`AsyncMock` if the patched object is asynchronous, to
-    :class:`MagicMock` otherwise or to *new_callable* if specified.
+    :func:`patch` nhận các keyword argument tùy ý. Những đối số này sẽ được truyền cho
+    :class:`AsyncMock` nếu đối tượng được patch là bất đồng bộ (asynchronous), cho
+    :class:`MagicMock` trong các trường hợp khác hoặc cho *new_callable* nếu được chỉ định.
 
-    ``patch.dict(...)``, ``patch.multiple(...)`` and ``patch.object(...)`` are
-    available for alternate use-cases.
+    ``patch.dict(...)``, ``patch.multiple(...)`` và ``patch.object(...)`` có sẵn cho các trường hợp sử dụng thay thế.
 
-:func:`patch` as function decorator, creating the mock for you and passing it into
-the decorated function::
+:func:`patch` dưới dạng function decorator, tự tạo mock cho bạn và truyền mock đó vào hàm được trang trí::
 
     >>> @patch('__main__.SomeClass')
     ... def function(normal_argument, mock_class):
@@ -1507,16 +1261,13 @@ the decorated function::
     >>> function(None)
     True
 
-Patching a class replaces the class with a :class:`MagicMock` *instance*. If the
-class is instantiated in the code under test then it will be the
-:attr:`~Mock.return_value` of the mock that will be used.
+Việc patch một class sẽ thay thế class đó bằng một :class:`MagicMock` *instance*. Nếu class được khởi tạo trong code đang được kiểm thử thì đó sẽ là
+:attr:`~Mock.return_value` của mock được sử dụng.
 
-If the class is instantiated multiple times you could use
-:attr:`~Mock.side_effect` to return a new mock each time. Alternatively you
-can set the *return_value* to be anything you want.
+Nếu class được khởi tạo nhiều lần, bạn có thể dùng
+:attr:`~Mock.side_effect` để trả về một mock mới mỗi lần. Ngoài ra, bạn có thể đặt *return_value* thành bất kỳ giá trị nào bạn muốn.
 
-To configure return values on methods of *instances* on the patched class
-you must do this on the :attr:`~Mock.return_value`. For example::
+Để cấu hình các giá trị trả về trên các phương thức của *instances* trên class đã được patch, bạn phải thực hiện việc này trên :attr:`~Mock.return_value`. Ví dụ::
 
     >>> class Class:
     ...     def method(self):
@@ -1529,8 +1280,7 @@ you must do this on the :attr:`~Mock.return_value`. For example::
     ...     assert Class().method() == 'foo'
     ...
 
-If you use *spec* or *spec_set* and :func:`patch` is replacing a *class*, then the
-return value of the created mock will have the same spec. ::
+Nếu bạn sử dụng *spec* hoặc *spec_set* và :func:`patch` đang thay thế một *class*, thì giá trị trả về của mock được tạo sẽ có cùng spec.::
 
     >>> Original = Class
     >>> patcher = patch('__main__.Class', spec=True)
@@ -1539,9 +1289,7 @@ return value of the created mock will have the same spec. ::
     >>> assert isinstance(instance, Original)
     >>> patcher.stop()
 
-The *new_callable* argument is useful where you want to use an alternative
-class to the default :class:`MagicMock` for the created mock. For example, if
-you wanted a :class:`NonCallableMock` to be used::
+Đối số *new_callable* hữu ích khi bạn muốn sử dụng một class thay thế cho :class:`MagicMock` mặc định của mock được tạo. Ví dụ, nếu bạn muốn sử dụng một :class:`NonCallableMock`::
 
     >>> thing = object()
     >>> with patch('__main__.thing', new_callable=NonCallableMock) as mock_thing:
@@ -1552,7 +1300,7 @@ you wanted a :class:`NonCallableMock` to be used::
       ...
     TypeError: 'NonCallableMock' object is not callable
 
-Another use case might be to replace an object with an :class:`io.StringIO` instance::
+Một trường hợp sử dụng khác có thể là thay thế một đối tượng bằng một instance :class:`io.StringIO`::
 
     >>> from io import StringIO
     >>> def foo():
@@ -1565,10 +1313,7 @@ Another use case might be to replace an object with an :class:`io.StringIO` inst
     ...
     >>> test()
 
-When :func:`patch` is creating a mock for you, it is common that the first thing
-you need to do is to configure the mock. Some of that configuration can be done
-in the call to patch. Any arbitrary keywords you pass into the call will be
-used to set attributes on the created mock::
+Khi :func:`patch` tạo mock cho bạn, việc đầu tiên bạn thường cần làm là cấu hình mock. Một phần cấu hình đó có thể được thực hiện trong lời gọi patch. Mọi keyword tùy ý bạn truyền vào lời gọi sẽ được dùng để thiết lập các thuộc tính trên mock được tạo::
 
     >>> patcher = patch('__main__.thing', first='one', second='two')
     >>> mock_thing = patcher.start()
@@ -1577,11 +1322,8 @@ used to set attributes on the created mock::
     >>> mock_thing.second
     'two'
 
-As well as attributes on the created mock attributes, like the
-:attr:`~Mock.return_value` and :attr:`~Mock.side_effect`, of child mocks can
-also be configured. These aren't syntactically valid to pass in directly as
-keyword arguments, but a dictionary with these as keys can still be expanded
-into a :func:`patch` call using ``**``::
+Ngoài các thuộc tính trên mock được tạo, các thuộc tính như
+:attr:`~Mock.return_value` và :attr:`~Mock.side_effect` của các mock con cũng có thể được cấu hình. Về mặt cú pháp, không thể truyền trực tiếp các thuộc tính này dưới dạng keyword argument, nhưng vẫn có thể mở rộng một dictionary có các thuộc tính này làm key vào lời gọi :func:`patch` bằng cách sử dụng ``**``::
 
     >>> config = {'method.return_value': 3, 'other.side_effect': KeyError}
     >>> patcher = patch('__main__.thing', **config)
@@ -1593,8 +1335,7 @@ into a :func:`patch` call using ``**``::
       ...
     KeyError
 
-By default, attempting to patch a function in a module (or a method or an
-attribute in a class) that does not exist will fail with :exc:`AttributeError`::
+Theo mặc định, việc cố gắng patch một function trong một module (hoặc một method hay một attribute trong một class) không tồn tại sẽ thất bại với :exc:`AttributeError`::
 
     >>> @patch('sys.non_existing_attribute', 42)
     ... def test():
@@ -1605,8 +1346,7 @@ attribute in a class) that does not exist will fail with :exc:`AttributeError`::
       ...
     AttributeError: <module 'sys' (built-in)> does not have the attribute 'non_existing_attribute'
 
-but adding ``create=True`` in the call to :func:`patch` will make the previous example
-work as expected::
+nhưng thêm ``create=True`` vào lệnh gọi :func:`patch` sẽ khiến ví dụ trước hoạt động như mong đợi::
 
     >>> @patch('sys.non_existing_attribute', 42, create=True)
     ... def test(mock_stdout):
@@ -1616,7 +1356,7 @@ work as expected::
 
 .. versionchanged:: 3.8
 
-    :func:`patch` now returns an :class:`AsyncMock` if the target is an async function.
+    :func:`patch` giờ đây trả về một :class:`AsyncMock` nếu target là một hàm async.
 
 
 patch.object
@@ -1624,25 +1364,16 @@ patch.object
 
 .. function:: patch.object(target, attribute, new=DEFAULT, spec=None, create=False, spec_set=None, autospec=None, new_callable=None, **kwargs)
 
-    patch the named member (*attribute*) on an object (*target*) with a mock
-    object.
+    patch thành viên có tên (*attribute*) trên một đối tượng (*target*) bằng một mock object.
 
-    :func:`patch.object` can be used as a decorator, class decorator or a context
-    manager. Arguments *new*, *spec*, *create*, *spec_set*, *autospec* and
-    *new_callable* have the same meaning as for :func:`patch`. Like :func:`patch`,
-    :func:`patch.object` takes arbitrary keyword arguments for configuring the mock
-    object it creates.
+    :func:`patch.object` có thể được dùng làm decorator, class decorator hoặc context manager. Các đối số *new*, *spec*, *create*, *spec_set*, *autospec* và *new_callable* có cùng ý nghĩa như đối với :func:`patch`. Giống như :func:`patch`,
+    :func:`patch.object` nhận các keyword argument tùy ý để cấu hình mock object mà nó tạo ra.
 
-    When used as a class decorator :func:`patch.object` honours ``patch.TEST_PREFIX``
-    for choosing which methods to wrap.
+    Khi được dùng làm class decorator, :func:`patch.object` tuân theo ``patch.TEST_PREFIX`` để chọn các phương thức cần bọc.
 
-You can either call :func:`patch.object` with three arguments or two arguments. The
-three argument form takes the object to be patched, the attribute name and the
-object to replace the attribute with.
+Bạn có thể gọi :func:`patch.object` với ba đối số hoặc hai đối số. Dạng ba đối số nhận đối tượng cần patch, tên thuộc tính và đối tượng dùng để thay thế thuộc tính đó.
 
-When calling with the two argument form you omit the replacement object, and a
-mock is created for you and passed in as an extra argument to the decorated
-function:
+Khi gọi bằng dạng hai đối số, bạn bỏ qua đối tượng thay thế; một mock sẽ được tạo cho bạn và truyền vào hàm được trang trí dưới dạng một đối số bổ sung:
 
     >>> @patch.object(SomeClass, 'class_method')
     ... def test(mock_method):
@@ -1651,8 +1382,7 @@ function:
     ...
     >>> test()
 
-*spec*, *create* and the other arguments to :func:`patch.object` have the same
-meaning as they do for :func:`patch`.
+*spec*, *create* và các đối số khác của :func:`patch.object` có cùng ý nghĩa như trong :func:`patch`.
 
 
 patch.dict
@@ -1660,33 +1390,23 @@ patch.dict
 
 .. function:: patch.dict(in_dict, values=(), clear=False, **kwargs)
 
-    Patch a dictionary, or dictionary like object, and restore the dictionary
-    to its original state after the test, where the restored dictionary is a
-    copy of the dictionary as it was before the test.
+    Patch một dictionary hoặc đối tượng tương tự dictionary, rồi khôi phục dictionary về trạng thái ban đầu sau khi kiểm thử; dictionary được khôi phục là bản sao của dictionary trước khi kiểm thử.
 
-    *in_dict* can be a dictionary or a mapping like container. If it is a
-    mapping then it must at least support getting, setting and deleting items
-    plus iterating over keys.
+    *in_dict* có thể là một dictionary hoặc container tương tự mapping. Nếu là một mapping, nó phải hỗ trợ tối thiểu việc lấy, đặt và xóa các mục, cũng như lặp qua các khóa.
 
-    *in_dict* can also be a string specifying the name of the dictionary, which
-    will then be fetched by importing it.
+    *in_dict* cũng có thể là một chuỗi chỉ định tên của dictionary; khi đó dictionary sẽ được lấy bằng cách import.
 
-    *values* can be a dictionary of values to set in the dictionary. *values*
-    can also be an iterable of ``(key, value)`` pairs.
+    *các giá trị* có thể là một dictionary chứa các giá trị cần thiết lập trong dictionary. *các giá trị* cũng có thể là một iterable gồm các ``(key, value)`` cặp.
 
-    If *clear* is true then the dictionary will be cleared before the new
-    values are set.
+    Nếu *clear* là true thì dictionary sẽ được xóa trước khi các giá trị mới được thiết lập.
 
-    :func:`patch.dict` can also be called with arbitrary keyword arguments to set
-    values in the dictionary.
+    :func:`patch.dict` cũng có thể được gọi với các keyword argument tùy ý để thiết lập các giá trị trong dictionary.
 
     .. versionchanged:: 3.8
 
-        :func:`patch.dict` now returns the patched dictionary when used as a context
-        manager.
+        :func:`patch.dict` hiện trả về dictionary đã được patch khi được sử dụng như một context manager.
 
-:func:`patch.dict` can be used as a context manager, decorator or class
-decorator:
+:func:`patch.dict` có thể được sử dụng như một context manager, decorator hoặc class decorator:
 
     >>> foo = {}
     >>> @patch.dict(foo, {'newkey': 'newvalue'})
@@ -1696,8 +1416,7 @@ decorator:
     >>> test()
     >>> assert foo == {}
 
-When used as a class decorator :func:`patch.dict` honours
-``patch.TEST_PREFIX`` (default to ``'test'``) for choosing which methods to wrap:
+Khi được sử dụng như một class decorator, :func:`patch.dict` tuân theo ``patch.TEST_PREFIX`` (mặc định là ``'test'``) để chọn các phương thức cần wrap:
 
     >>> import os
     >>> import unittest
@@ -1707,19 +1426,15 @@ When used as a class decorator :func:`patch.dict` honours
     ...     def test_sample(self):
     ...         self.assertEqual(os.environ['newkey'], 'newvalue')
 
-If you want to use a different prefix for your test, you can inform the
-patchers of the different prefix by setting ``patch.TEST_PREFIX``. For
-more details about how to change the value of see :ref:`test-prefix`.
+Nếu bạn muốn sử dụng một prefix khác cho test của mình, bạn có thể thông báo cho các patcher về prefix khác đó bằng cách thiết lập ``patch.TEST_PREFIX``. Để biết thêm chi tiết về cách thay đổi giá trị này, hãy xem :ref:`test-prefix`.
 
-:func:`patch.dict` can be used to add members to a dictionary, or simply let a test
-change a dictionary, and ensure the dictionary is restored when the test
-ends.
+:func:`patch.dict` có thể được dùng để thêm các phần tử vào một dictionary, hoặc đơn giản là cho phép một test thay đổi dictionary, đồng thời đảm bảo dictionary được khôi phục khi test kết thúc.
 
     >>> foo = {}
     >>> with patch.dict(foo, {'newkey': 'newvalue'}) as patched_foo:
     ...     assert foo == {'newkey': 'newvalue'}
     ...     assert patched_foo == {'newkey': 'newvalue'}
-    ...     # You can add, update or delete keys of foo (or patched_foo, it's the same dict)
+    ...     # Bạn có thể thêm, cập nhật hoặc xóa các key của foo (hoặc patched_foo, chúng là cùng một dict)
     ...     patched_foo['spam'] = 'eggs'
     ...
     >>> assert foo == {}
@@ -1732,7 +1447,7 @@ ends.
     newvalue
     >>> assert 'newkey' not in os.environ
 
-Keywords can be used in the :func:`patch.dict` call to set values in the dictionary:
+Có thể sử dụng các keyword trong lệnh gọi :func:`patch.dict` để thiết lập các giá trị trong dictionary:
 
     >>> mymodule = MagicMock()
     >>> mymodule.function.return_value = 'fish'
@@ -1742,11 +1457,8 @@ Keywords can be used in the :func:`patch.dict` call to set values in the diction
     ...
     'fish'
 
-:func:`patch.dict` can be used with dictionary like objects that aren't actually
-dictionaries. At the very minimum they must support item getting, setting,
-deleting and either iteration or membership test. This corresponds to the
-magic methods :meth:`~object.__getitem__`, :meth:`~object.__setitem__`,
-:meth:`~object.__delitem__` and either :meth:`~container.__iter__` or
+:func:`patch.dict` có thể được dùng với các đối tượng tương tự dictionary nhưng thực tế không phải là dictionary. Tối thiểu, chúng phải hỗ trợ việc lấy, thiết lập và xóa item, cùng với việc lặp hoặc kiểm tra thành viên. Điều này tương ứng với các magic method :meth:`~object.__getitem__`, :meth:`~object.__setitem__`,
+:meth:`~object.__delitem__` và một trong hai :meth:`~container.__iter__` hoặc
 :meth:`~object.__contains__`.
 
     >>> class Container:
@@ -1776,29 +1488,19 @@ patch.multiple
 
 .. function:: patch.multiple(target, spec=None, create=False, spec_set=None, autospec=None, new_callable=None, **kwargs)
 
-    Perform multiple patches in a single call. It takes the object to be
-    patched (either as an object or a string to fetch the object by importing)
-    and keyword arguments for the patches::
+    Thực hiện nhiều bản patch trong một lần gọi. Nó nhận đối tượng cần patch (dưới dạng đối tượng hoặc chuỗi để lấy đối tượng bằng cách import) và các keyword argument cho những bản patch::
 
         with patch.multiple(settings, FIRST_PATCH='one', SECOND_PATCH='two'):
             ...
 
-    Use :data:`DEFAULT` as the value if you want :func:`patch.multiple` to create
-    mocks for you. In this case the created mocks are passed into a decorated
-    function by keyword, and a dictionary is returned when :func:`patch.multiple` is
-    used as a context manager.
+    Sử dụng :data:`DEFAULT` làm giá trị nếu bạn muốn :func:`patch.multiple` tạo mock cho mình. Trong trường hợp này, các mock được tạo sẽ được truyền vào hàm đã được trang trí bằng keyword, và một dictionary sẽ được trả về khi :func:`patch.multiple` được sử dụng làm context manager.
 
-    :func:`patch.multiple` can be used as a decorator, class decorator or a context
-    manager. The arguments *spec*, *spec_set*, *create*, *autospec* and
-    *new_callable* have the same meaning as for :func:`patch`. These arguments will
-    be applied to *all* patches done by :func:`patch.multiple`.
+    :func:`patch.multiple` có thể được sử dụng làm decorator, class decorator hoặc context manager. Các đối số *spec*, *spec_set*, *create*, *autospec* và *new_callable* có cùng ý nghĩa như đối với :func:`patch`. Các đối số này sẽ được áp dụng cho *all* patch được thực hiện bởi :func:`patch.multiple`.
 
-    When used as a class decorator :func:`patch.multiple` honours ``patch.TEST_PREFIX``
-    for choosing which methods to wrap.
+    Khi được sử dụng làm class decorator, :func:`patch.multiple` tuân theo ``patch.TEST_PREFIX`` để chọn các phương thức cần bọc.
 
-If you want :func:`patch.multiple` to create mocks for you, then you can use
-:data:`DEFAULT` as the value. If you use :func:`patch.multiple` as a decorator
-then the created mocks are passed into the decorated function by keyword. ::
+Nếu bạn muốn :func:`patch.multiple` tạo mock cho mình, bạn có thể sử dụng
+:data:`DEFAULT` làm giá trị. Nếu bạn sử dụng :func:`patch.multiple` làm decorator, các mock được tạo sẽ được truyền vào hàm đã được trang trí bằng keyword.::
 
     >>> thing = object()
     >>> other = object()
@@ -1810,8 +1512,7 @@ then the created mocks are passed into the decorated function by keyword. ::
     ...
     >>> test_function()
 
-:func:`patch.multiple` can be nested with other ``patch`` decorators, but put arguments
-passed by keyword *after* any of the standard arguments created by :func:`patch`::
+:func:`patch.multiple` có thể được lồng với các decorator ``patch`` khác, nhưng hãy đặt các đối số được truyền bằng keyword *after* sau bất kỳ đối số tiêu chuẩn nào được tạo bởi :func:`patch`::
 
     >>> @patch('sys.exit')
     ... @patch.multiple('__main__', thing=DEFAULT, other=DEFAULT)
@@ -1822,8 +1523,7 @@ passed by keyword *after* any of the standard arguments created by :func:`patch`
     ...
     >>> test_function()
 
-If :func:`patch.multiple` is used as a context manager, the value returned by the
-context manager is a dictionary where created mocks are keyed by name::
+Nếu :func:`patch.multiple` được sử dụng làm context manager, giá trị do context manager trả về là một dictionary trong đó các mock được tạo được lập chỉ mục theo tên::
 
     >>> with patch.multiple('__main__', thing=DEFAULT, other=DEFAULT) as values:
     ...     assert 'other' in repr(values['other'])
@@ -1835,19 +1535,14 @@ context manager is a dictionary where created mocks are keyed by name::
 
 .. _start-and-stop:
 
-patch methods: start and stop
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+các phương thức patch: start và stop
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-All the patchers have :meth:`!start` and :meth:`!stop` methods. These make it simpler to do
-patching in ``setUp`` methods or where you want to do multiple patches without
-nesting decorators or with statements.
+Tất cả các patcher đều có các phương thức :meth:`!start` và :meth:`!stop`. Các phương thức này giúp việc patch trong các phương thức ``setUp`` hoặc khi bạn muốn thực hiện nhiều patch mà không phải lồng các decorator hoặc các câu lệnh with trở nên đơn giản hơn.
 
-To use them call :func:`patch`, :func:`patch.object` or :func:`patch.dict` as
-normal and keep a reference to the returned ``patcher`` object. You can then
-call :meth:`!start` to put the patch in place and :meth:`!stop` to undo it.
+Để sử dụng, hãy gọi :func:`patch`, :func:`patch.object` hoặc :func:`patch.dict` như bình thường và giữ một tham chiếu đến đối tượng ``patcher`` được trả về. Sau đó, bạn có thể gọi :meth:`!start` để áp dụng patch và :meth:`!stop` để hoàn tác.
 
-If you are using :func:`patch` to create a mock for you then it will be returned by
-the call to ``patcher.start``. ::
+Nếu bạn sử dụng :func:`patch` để tạo một mock thì mock đó sẽ được trả về bởi lệnh gọi đến ``patcher.start``.::
 
     >>> patcher = patch('package.module.ClassName')
     >>> from package import module
@@ -1860,8 +1555,7 @@ the call to ``patcher.start``. ::
     >>> assert module.ClassName is not new_mock
 
 
-A typical use case for this might be for doing multiple patches in the ``setUp``
-method of a :class:`~unittest.TestCase`::
+Một trường hợp sử dụng điển hình là thực hiện nhiều patch trong phương thức ``setUp`` của một :class:`~unittest.TestCase`::
 
     >>> class MyTest(unittest.TestCase):
     ...     def setUp(self):
@@ -1882,10 +1576,8 @@ method of a :class:`~unittest.TestCase`::
 
 .. caution::
 
-    If you use this technique you must ensure that the patching is "undone" by
-    calling ``stop``. This can be fiddlier than you might think, because if an
-    exception is raised in the ``setUp`` then ``tearDown`` is not called.
-    :meth:`unittest.TestCase.addCleanup` makes this easier::
+    Nếu sử dụng kỹ thuật này, bạn phải đảm bảo patch được "hoàn tác" bằng cách gọi ``stop``. Việc này có thể phức tạp hơn bạn nghĩ, vì nếu một exception được phát sinh trong ``setUp`` thì ``tearDown`` sẽ không được gọi.
+    :meth:`unittest.TestCase.addCleanup` giúp việc này dễ dàng hơn::
 
         >>> class MyTest(unittest.TestCase):
         ...     def setUp(self):
@@ -1897,23 +1589,21 @@ method of a :class:`~unittest.TestCase`::
         ...         assert package.module.Class is self.MockClass
         ...
 
-    As an added bonus you no longer need to keep a reference to the ``patcher``
-    object.
+    Ngoài ra, bạn không còn cần giữ tham chiếu đến đối tượng ``patcher`` nữa.
 
-It is also possible to stop all patches which have been started by using
+Bạn cũng có thể dừng tất cả các patch đã được khởi động bằng cách sử dụng
 :func:`patch.stopall`.
 
 .. function:: patch.stopall
 
-    Stop all active patches. Only stops patches started with ``start``.
+    Dừng tất cả các patch đang hoạt động. Chỉ dừng những patch được khởi động bằng ``start``.
 
 
 .. _patch-builtins:
 
 patch builtins
 ~~~~~~~~~~~~~~
-You can patch any builtins within a module. The following example patches
-builtin :func:`ord`::
+Bạn có thể patch bất kỳ builtins nào trong một module. Ví dụ sau đây patch builtin :func:`ord`::
 
     >>> @patch('__main__.ord')
     ... def test(mock_ord):
@@ -1929,13 +1619,10 @@ builtin :func:`ord`::
 TEST_PREFIX
 ~~~~~~~~~~~
 
-All of the patchers can be used as class decorators. When used in this way
-they wrap every test method on the class. The patchers recognise methods that
-start with ``'test'`` as being test methods. This is the same way that the
-:class:`unittest.TestLoader` finds test methods by default.
+Tất cả patcher đều có thể được sử dụng làm class decorator. Khi được sử dụng theo cách này, chúng bọc mọi phương thức kiểm thử trong class. Các patcher nhận diện những phương thức bắt đầu bằng ``'test'`` là phương thức kiểm thử. Đây cũng là cách mà
+:class:`unittest.TestLoader` mặc định tìm các phương thức kiểm thử.
 
-It is possible that you want to use a different prefix for your tests. You can
-inform the patchers of the different prefix by setting ``patch.TEST_PREFIX``::
+Có thể bạn muốn sử dụng một tiền tố khác cho các bài kiểm thử của mình. Bạn có thể thông báo cho patcher về tiền tố khác này bằng cách đặt ``patch.TEST_PREFIX``::
 
     >>> patch.TEST_PREFIX = 'foo'
     >>> value = 3
@@ -1956,13 +1643,12 @@ inform the patchers of the different prefix by setting ``patch.TEST_PREFIX``::
     3
 
 
-Nesting Patch Decorators
-~~~~~~~~~~~~~~~~~~~~~~~~
+Lồng ghép các patch decorator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you want to perform multiple patches then you can simply stack up the
-decorators.
+Nếu muốn thực hiện nhiều bản patch, bạn chỉ cần xếp chồng các decorator lên nhau.
 
-You can stack up multiple patch decorators using this pattern:
+Bạn có thể xếp chồng nhiều patch decorator bằng mẫu sau:
 
     >>> @patch.object(SomeClass, 'class_method')
     ... @patch.object(SomeClass, 'static_method')
@@ -1978,26 +1664,21 @@ You can stack up multiple patch decorators using this pattern:
     >>> mock2.assert_called_once_with('bar')
 
 
-Note that the decorators are applied from the bottom upwards. This is the
-standard way that Python applies decorators. The order of the created mocks
-passed into your test function matches this order.
+Lưu ý rằng các decorator được áp dụng từ dưới lên trên. Đây là cách Python áp dụng decorator theo tiêu chuẩn. Thứ tự của các mock được tạo và truyền vào hàm kiểm thử của bạn khớp với thứ tự này.
 
 
 .. _where-to-patch:
 
-Where to patch
-~~~~~~~~~~~~~~
+.. _`Where to patch`:
 
-:func:`patch` works by (temporarily) changing the object that a *name* points to with
-another one. There can be many names pointing to any individual object, so
-for patching to work you must ensure that you patch the name used by the system
-under test.
+Vị trí cần patch
+~~~~~~~~~~~~~~~~
 
-The basic principle is that you patch where an object is *looked up*, which
-is not necessarily the same place as where it is defined. A couple of
-examples will help to clarify this.
+:func:`patch` hoạt động bằng cách (tạm thời) thay đổi đối tượng mà *name* trỏ tới thành một đối tượng khác. Có thể có nhiều name trỏ tới cùng một đối tượng, vì vậy để patch hoạt động, bạn phải đảm bảo rằng mình patch name được hệ thống đang kiểm thử sử dụng.
 
-Imagine we have a project that we want to test with the following structure::
+Nguyên tắc cơ bản là bạn patch tại nơi một đối tượng được *tra cứu*, nơi này không nhất thiết giống với nơi đối tượng được định nghĩa. Một vài ví dụ sẽ giúp làm rõ điều này.
+
+Hãy tưởng tượng chúng ta có một project muốn kiểm thử với cấu trúc sau::
 
     a.py
         -> Defines SomeClass
@@ -2006,57 +1687,38 @@ Imagine we have a project that we want to test with the following structure::
         -> from a import SomeClass
         -> some_function instantiates SomeClass
 
-Now we want to test ``some_function`` but we want to mock out ``SomeClass`` using
-:func:`patch`. The problem is that when we import module b, which we will have to
-do when it imports ``SomeClass`` from module a. If we use :func:`patch` to mock out
-``a.SomeClass`` then it will have no effect on our test; module b already has a
-reference to the *real* ``SomeClass`` and it looks like our patching had no
-effect.
+Bây giờ chúng ta muốn kiểm thử ``some_function`` nhưng muốn mock ``SomeClass`` bằng cách sử dụng
+:func:`patch`. Vấn đề là khi import module b, việc chúng ta sẽ phải làm vì module này import ``SomeClass`` từ module a. Nếu sử dụng :func:`patch` để mock ``a.SomeClass``, việc đó sẽ không có tác dụng với bài kiểm thử của chúng ta; module b đã có một tham chiếu tới *thực* ``SomeClass`` và có vẻ như việc patch của chúng ta không có tác dụng.
 
-The key is to patch out ``SomeClass`` where it is used (or where it is looked up).
-In this case ``some_function`` will actually look up ``SomeClass`` in module b,
-where we have imported it. The patching should look like::
+Điểm mấu chốt là patch ``SomeClass`` tại nơi nó được sử dụng (hoặc nơi nó được tra cứu). Trong trường hợp này, ``some_function`` thực sự sẽ tra cứu ``SomeClass`` trong module b, nơi chúng ta đã import nó. Việc patch nên được thực hiện như sau::
 
     @patch('b.SomeClass')
 
-However, consider the alternative scenario where instead of ``from a import
-SomeClass`` module b does ``import a`` and ``some_function`` uses ``a.SomeClass``. Both
-of these import forms are common. In this case the class we want to patch is
-being looked up in the module and so we have to patch ``a.SomeClass`` instead::
+Tuy nhiên, hãy xem xét kịch bản thay thế, trong đó thay vì ``from a import SomeClass``, module b thực hiện ``import a`` và ``some_function`` sử dụng ``a.SomeClass``. Cả hai dạng import này đều phổ biến. Trong trường hợp này, class chúng ta muốn patch được tra cứu trong module, vì vậy thay vào đó chúng ta phải patch ``a.SomeClass``::
 
     @patch('a.SomeClass')
 
 
-Patching Descriptors and Proxy Objects
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Patching Descriptor và Proxy Object
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Both patch_ and patch.object_ correctly patch and restore descriptors: class
-methods, static methods and properties. You should patch these on the *class*
-rather than an instance. They also work with *some* objects
-that proxy attribute access, like the `django settings object
-<https://web.archive.org/web/20200603181648/http://www.voidspace.org.uk/python/weblog/arch_d7_2010_12_04.shtml#e1198>`_.
+Cả patch_ và patch.object_ đều patch và khôi phục descriptor chính xác: class method, static method và property. Bạn nên patch các đối tượng này trên *class* thay vì trên một instance. Chúng cũng hoạt động với *some* object proxy quyền truy cập thuộc tính, chẳng hạn như `django settings object <https://web.archive.org/web/20200603181648/http://www.voidspace.org.uk/python/weblog/arch_d7_2010_12_04.shtml#e1198>`_.
 
 
-MagicMock and magic method support
-----------------------------------
+Hỗ trợ MagicMock và magic method
+--------------------------------
 
 .. _magic-methods:
 
-Mocking Magic Methods
-~~~~~~~~~~~~~~~~~~~~~
+Mock Magic Method
+~~~~~~~~~~~~~~~~~
 
-:class:`Mock` supports mocking the Python protocol methods, also known as
-:term:`"magic methods" <magic method>`. This allows mock objects to replace
-containers or other objects that implement Python protocols.
+:class:`Mock` hỗ trợ mock các phương thức protocol của Python, còn được gọi là
+:term:`"magic method" <magic method>`. Điều này cho phép các mock object thay thế container hoặc các object khác triển khai protocol của Python.
 
-Because magic methods are looked up differently from normal methods [#]_, this
-support has been specially implemented. This means that only specific magic
-methods are supported. The supported list includes *almost* all of them. If
-there are any missing that you need please let us know.
+Vì magic method được tra cứu khác với method thông thường [#]_, nên tính năng hỗ trợ này được triển khai đặc biệt. Điều này có nghĩa là chỉ một số magic method cụ thể được hỗ trợ. Danh sách được hỗ trợ bao gồm *almost* tất cả các magic method. Nếu có phương thức nào còn thiếu mà bạn cần, vui lòng cho chúng tôi biết.
 
-You mock magic methods by setting the method you are interested in to a function
-or a mock instance. If you are using a function then it *must* take ``self`` as
-the first argument [#]_.
+Bạn mock các magic method bằng cách gán method mà bạn quan tâm cho một function hoặc một mock instance. Nếu sử dụng function thì function đó *must* nhận ``self`` làm đối số đầu tiên [#]_.
 
    >>> def __str__(self):
    ...     return 'fooble'
@@ -2077,8 +1739,8 @@ the first argument [#]_.
    >>> list(mock)
    []
 
-One use case for this is for mocking objects used as context managers in a
-:keyword:`with` statement:
+Một trường hợp sử dụng của việc này là mock các object được dùng làm context manager trong một
+:keyword:`with` câu lệnh:
 
    >>> mock = Mock()
    >>> mock.__enter__ = Mock(return_value='foo')
@@ -2089,49 +1751,38 @@ One use case for this is for mocking objects used as context managers in a
    >>> mock.__enter__.assert_called_with()
    >>> mock.__exit__.assert_called_with(None, None, None)
 
-Calls to magic methods do not appear in :attr:`~Mock.method_calls`, but they
-are recorded in :attr:`~Mock.mock_calls`.
+Các lời gọi đến magic method không xuất hiện trong :attr:`~Mock.method_calls`, nhưng được ghi lại trong :attr:`~Mock.mock_calls`.
 
 .. note::
 
-   If you use the *spec* keyword argument to create a mock then attempting to
-   set a magic method that isn't in the spec will raise an :exc:`AttributeError`.
+   Nếu sử dụng đối số từ khóa *spec* để tạo mock, việc cố gắng thiết lập một magic method không có trong spec sẽ gây ra :exc:`AttributeError`.
 
-The full list of supported magic methods is:
+Danh sách đầy đủ các magic method được hỗ trợ là:
 
-* ``__hash__``, ``__sizeof__``, ``__repr__`` and ``__str__``
-* ``__dir__``, ``__format__`` and ``__subclasses__``
-* ``__round__``, ``__floor__``, ``__trunc__`` and ``__ceil__``
-* Comparisons: ``__lt__``, ``__gt__``, ``__le__``, ``__ge__``,
-  ``__eq__`` and ``__ne__``
-* Container methods: ``__getitem__``, ``__setitem__``, ``__delitem__``,
-  ``__contains__``, ``__len__``, ``__iter__``, ``__reversed__``
-  and ``__missing__``
-* Context manager: ``__enter__``, ``__exit__``, ``__aenter__`` and ``__aexit__``
-* Unary numeric methods: ``__neg__``, ``__pos__`` and ``__invert__``
-* The numeric methods (including right hand and in-place variants):
-  ``__add__``, ``__sub__``, ``__mul__``, ``__matmul__``, ``__truediv__``,
-  ``__floordiv__``, ``__mod__``, ``__divmod__``, ``__lshift__``,
-  ``__rshift__``, ``__and__``, ``__xor__``, ``__or__``, and ``__pow__``
-* Numeric conversion methods: ``__complex__``, ``__int__``, ``__float__``
-  and ``__index__``
-* Descriptor methods: ``__get__``, ``__set__`` and ``__delete__``
-* Pickling: ``__reduce__``, ``__reduce_ex__``, ``__getinitargs__``,
-  ``__getnewargs__``, ``__getstate__`` and ``__setstate__``
-* File system path representation: ``__fspath__``
-* Asynchronous iteration methods: ``__aiter__`` and ``__anext__``
+* ``__hash__``, ``__sizeof__``, ``__repr__`` và ``__str__``
+* ``__dir__``, ``__format__`` và ``__subclasses__``
+* ``__round__``, ``__floor__``, ``__trunc__`` và ``__ceil__``
+* Các phép so sánh: ``__lt__``, ``__gt__``, ``__le__``, ``__ge__``, ``__eq__`` và ``__ne__``
+* Các phương thức container: ``__getitem__``, ``__setitem__``, ``__delitem__``, ``__contains__``, ``__len__``, ``__iter__``, ``__reversed__`` và ``__missing__``
+* Trình quản lý ngữ cảnh: ``__enter__``, ``__exit__``, ``__aenter__`` và ``__aexit__``
+* Các phương thức số một ngôi: ``__neg__``, ``__pos__`` và ``__invert__``
+* Các phương thức số (bao gồm các biến thể right hand và in-place): ``__add__``, ``__sub__``, ``__mul__``, ``__matmul__``, ``__truediv__``, ``__floordiv__``, ``__mod__``, ``__divmod__``, ``__lshift__``, ``__rshift__``, ``__and__``, ``__xor__``, ``__or__`` và ``__pow__``
+* Các phương thức chuyển đổi số: ``__complex__``, ``__int__``, ``__float__`` và ``__index__``
+* Các phương thức descriptor: ``__get__``, ``__set__`` và ``__delete__``
+* Pickling: ``__reduce__``, ``__reduce_ex__``, ``__getinitargs__``, ``__getnewargs__``, ``__getstate__`` và ``__setstate__``
+* Biểu diễn đường dẫn hệ thống tệp: ``__fspath__``
+* Các phương thức lặp bất đồng bộ: ``__aiter__`` và ``__anext__``
 
 .. versionchanged:: 3.8
-   Added support for :func:`os.PathLike.__fspath__`.
+   Đã thêm hỗ trợ cho :func:`os.PathLike.__fspath__`.
 
 .. versionchanged:: 3.8
-   Added support for ``__aenter__``, ``__aexit__``, ``__aiter__`` and ``__anext__``.
+   Đã thêm hỗ trợ cho ``__aenter__``, ``__aexit__``, ``__aiter__`` và ``__anext__``.
 
 
-The following methods exist but are *not* supported as they are either in use
-by mock, can't be set dynamically, or can cause problems:
+Các phương thức sau tồn tại nhưng *không* được hỗ trợ vì chúng đang được mock sử dụng, không thể thiết lập một cách động hoặc có thể gây ra sự cố:
 
-* ``__getattr__``, ``__setattr__``, ``__init__`` and ``__new__``
+* ``__getattr__``, ``__setattr__``, ``__init__`` và ``__new__``
 * ``__prepare__``, ``__instancecheck__``, ``__subclasscheck__``, ``__del__``
 
 
@@ -2139,31 +1790,26 @@ by mock, can't be set dynamically, or can cause problems:
 Magic Mock
 ~~~~~~~~~~
 
-There are two ``MagicMock`` variants: :class:`MagicMock` and :class:`NonCallableMagicMock`.
+Có hai biến thể ``MagicMock``: :class:`MagicMock` và :class:`NonCallableMagicMock`.
 
 
 .. class:: MagicMock(*args, **kw)
 
-   ``MagicMock`` is a subclass of :class:`Mock` with default implementations
-   of most of the :term:`magic methods <magic method>`. You can use
-   ``MagicMock`` without having to configure the magic methods yourself.
+   ``MagicMock`` là một lớp con của :class:`Mock`, cung cấp các triển khai mặc định cho hầu hết :term:`magic methods <magic method>`. Bạn có thể sử dụng ``MagicMock`` mà không cần tự cấu hình các magic methods.
 
-   The constructor parameters have the same meaning as for :class:`Mock`.
+   Các tham số của hàm khởi tạo có ý nghĩa giống như đối với :class:`Mock`.
 
-   If you use the *spec* or *spec_set* arguments then *only* magic methods
-   that exist in the spec will be created.
+   Nếu bạn sử dụng các đối số *spec* hoặc *spec_set* thì *chỉ* các magic methods tồn tại trong spec mới được tạo.
 
 
 .. class:: NonCallableMagicMock(*args, **kw)
 
-    A non-callable version of :class:`MagicMock`.
+    Phiên bản không thể gọi của :class:`MagicMock`.
 
-    The constructor parameters have the same meaning as for
-    :class:`MagicMock`, with the exception of *return_value* and
-    *side_effect* which have no meaning on a non-callable mock.
+    Các tham số của hàm khởi tạo có cùng ý nghĩa như đối với
+    :class:`MagicMock`, ngoại trừ *return_value* và *side_effect* không có ý nghĩa đối với mock không thể gọi.
 
-The magic methods are setup with :class:`MagicMock` objects, so you can configure them
-and use them in the usual way:
+Các magic method được thiết lập bằng các đối tượng :class:`MagicMock`, vì vậy bạn có thể cấu hình và sử dụng chúng theo cách thông thường:
 
    >>> mock = MagicMock()
    >>> mock[3] = 'fish'
@@ -2172,13 +1818,9 @@ and use them in the usual way:
    >>> mock[2]
    'result'
 
-By default many of the protocol methods are required to return objects of a
-specific type. These methods are preconfigured with a default return value, so
-that they can be used without you having to do anything if you aren't interested
-in the return value. You can still *set* the return value manually if you want
-to change the default.
+Theo mặc định, nhiều phương thức giao thức phải trả về các đối tượng thuộc một kiểu cụ thể. Các phương thức này được cấu hình sẵn với một giá trị trả về mặc định, để bạn có thể sử dụng chúng mà không cần làm gì nếu không quan tâm đến giá trị trả về. Bạn vẫn có thể *set* giá trị trả về theo cách thủ công nếu muốn thay đổi giá trị mặc định.
 
-Methods and their defaults:
+Các phương thức và giá trị mặc định của chúng:
 
 * ``__lt__``: :data:`NotImplemented`
 * ``__gt__``: :data:`!NotImplemented`
@@ -2194,11 +1836,11 @@ Methods and their defaults:
 * ``__float__``: ``1.0``
 * ``__bool__``: ``True``
 * ``__index__``: ``1``
-* ``__hash__``: default hash for the mock
-* ``__str__``: default str for the mock
-* ``__sizeof__``: default sizeof for the mock
+* ``__hash__``: mã băm mặc định cho mock
+* ``__str__``: str mặc định cho mock
+* ``__sizeof__``: sizeof mặc định cho mock
 
-For example:
+Ví dụ:
 
    >>> mock = MagicMock()
    >>> int(mock)
@@ -2210,10 +1852,8 @@ For example:
    >>> object() in mock
    False
 
-The two equality methods, :meth:`!__eq__` and :meth:`!__ne__`, are special.
-They do the default equality comparison on identity, using the
-:attr:`~Mock.side_effect` attribute, unless you change their return value to
-return something else::
+Hai phương thức so sánh bằng, :meth:`!__eq__` và :meth:`!__ne__`, là các phương thức đặc biệt. Theo mặc định, chúng thực hiện phép so sánh bằng dựa trên identity, sử dụng
+thuộc tính :attr:`~Mock.side_effect`, trừ khi bạn thay đổi giá trị trả về của chúng để trả về một giá trị khác::
 
    >>> MagicMock() == 3
    False
@@ -2224,8 +1864,7 @@ return something else::
    >>> mock == 3
    True
 
-The return value of :meth:`!__iter__` can be any iterable object and isn't
-required to be an iterator:
+Giá trị trả về của :meth:`!__iter__` có thể là bất kỳ đối tượng iterable nào và không bắt buộc phải là một iterator:
 
    >>> mock = MagicMock()
    >>> mock.__iter__.return_value = ['a', 'b', 'c']
@@ -2234,8 +1873,7 @@ required to be an iterator:
    >>> list(mock)
    ['a', 'b', 'c']
 
-If the return value *is* an iterator, then iterating over it once will consume
-it and subsequent iterations will result in an empty list:
+Nếu giá trị trả về *is* một iterator, thì việc lặp qua nó một lần sẽ tiêu thụ nó và các lần lặp tiếp theo sẽ cho ra một danh sách rỗng:
 
    >>> mock.__iter__.return_value = iter(['a', 'b', 'c'])
    >>> list(mock)
@@ -2243,55 +1881,43 @@ it and subsequent iterations will result in an empty list:
    >>> list(mock)
    []
 
-``MagicMock`` has all of the supported magic methods configured except for some
-of the obscure and obsolete ones. You can still set these up if you want.
+``MagicMock`` đã được cấu hình với tất cả các magic method được hỗ trợ, ngoại trừ một số phương thức tối nghĩa và lỗi thời. Bạn vẫn có thể thiết lập chúng nếu muốn.
 
-Magic methods that are supported but not setup by default in ``MagicMock`` are:
+Các magic method được hỗ trợ nhưng không được thiết lập mặc định trong ``MagicMock`` là:
 
 * ``__subclasses__``
 * ``__dir__``
 * ``__format__``
-* ``__get__``, ``__set__`` and ``__delete__``
-* ``__reversed__`` and ``__missing__``
-* ``__reduce__``, ``__reduce_ex__``, ``__getinitargs__``, ``__getnewargs__``,
-  ``__getstate__`` and ``__setstate__``
+* ``__get__``, ``__set__`` và ``__delete__``
+* ``__reversed__`` và ``__missing__``
+* ``__reduce__``, ``__reduce_ex__``, ``__getinitargs__``, ``__getnewargs__``, ``__getstate__`` và ``__setstate__``
 * ``__getformat__``
 
 
 
-.. [#] Magic methods *should* be looked up on the class rather than the
-   instance. Different versions of Python are inconsistent about applying this
-   rule. The supported protocol methods should work with all supported versions
-   of Python.
-.. [#] The function is basically hooked up to the class, but each ``Mock``
-   instance is kept isolated from the others.
+.. [#] Các magic method *nên* được tra cứu trên class thay vì instance. Các phiên bản Python khác nhau không nhất quán trong việc áp dụng quy tắc này. Các phương thức protocol được hỗ trợ sẽ hoạt động với mọi phiên bản Python được hỗ trợ.
+.. [#] Về cơ bản, hàm được liên kết với class, nhưng mỗi instance ``Mock`` được giữ tách biệt với các instance khác.
 
 
-Helpers
--------
+Các hàm trợ giúp
+----------------
 
 sentinel
 ~~~~~~~~
 
 .. data:: sentinel
 
-   The ``sentinel`` object provides a convenient way of providing unique
-   objects for your tests.
+   Đối tượng ``sentinel`` cung cấp một cách thuận tiện để tạo các đối tượng duy nhất cho các bài kiểm thử của bạn.
 
-   Attributes are created on demand when you access them by name. Accessing
-   the same attribute will always return the same object. The objects
-   returned have a sensible repr so that test failure messages are readable.
+   Các thuộc tính được tạo theo yêu cầu khi bạn truy cập chúng bằng tên. Việc truy cập cùng một thuộc tính sẽ luôn trả về cùng một đối tượng. Các đối tượng được trả về có biểu diễn repr hợp lý, nhờ đó thông báo lỗi kiểm thử dễ đọc.
 
    .. versionchanged:: 3.7
-      The ``sentinel`` attributes now preserve their identity when they are
-      :mod:`copied <copy>` or :mod:`pickled <pickle>`.
+      Các thuộc tính ``sentinel`` giờ đây bảo toàn danh tính của chúng khi được
+      :mod:`copied <copy>` hoặc :mod:`pickled <pickle>`.
 
-Sometimes when testing you need to test that a specific object is passed as an
-argument to another method, or returned. It can be common to create named
-sentinel objects to test this. :data:`sentinel` provides a convenient way of
-creating and testing the identity of objects like this.
+Đôi khi, khi kiểm thử, bạn cần kiểm tra rằng một đối tượng cụ thể được truyền làm đối số cho một phương thức khác hoặc được trả về. Việc tạo các đối tượng sentinel có tên để kiểm thử điều này là khá phổ biến. :data:`sentinel` cung cấp một cách thuận tiện để tạo và kiểm tra danh tính của các đối tượng như vậy.
 
-In this example we monkey patch ``method`` to return ``sentinel.some_object``:
+Trong ví dụ này, chúng ta monkey patch ``method`` để trả về ``sentinel.some_object``:
 
     >>> real = ProductionClass()
     >>> real.method = Mock(name="method")
@@ -2308,9 +1934,7 @@ DEFAULT
 
 .. data:: DEFAULT
 
-    The :data:`DEFAULT` object is a pre-created sentinel (actually
-    ``sentinel.DEFAULT``). It can be used by :attr:`~Mock.side_effect`
-    functions to indicate that the normal return value should be used.
+    Đối tượng :data:`DEFAULT` là một sentinel được tạo sẵn (thực ra là ``sentinel.DEFAULT``). Nó có thể được các hàm :attr:`~Mock.side_effect` sử dụng để cho biết rằng nên dùng giá trị trả về thông thường.
 
 
 call
@@ -2318,10 +1942,9 @@ call
 
 .. function:: call(*args, **kwargs)
 
-    :func:`call` is a helper object for making simpler assertions, for comparing with
+    :func:`call` là một đối tượng trợ giúp để tạo các phép kiểm tra đơn giản hơn, dùng để so sánh với
     :attr:`~Mock.call_args`, :attr:`~Mock.call_args_list`,
-    :attr:`~Mock.mock_calls` and :attr:`~Mock.method_calls`. :func:`call` can also be
-    used with :meth:`~Mock.assert_has_calls`.
+    :attr:`~Mock.mock_calls` và :attr:`~Mock.method_calls`. :func:`call` cũng có thể được sử dụng với :meth:`~Mock.assert_has_calls`.
 
         >>> m = MagicMock(return_value=None)
         >>> m(1, 2, a='foo', b='bar')
@@ -2331,17 +1954,11 @@ call
 
 .. method:: call.call_list()
 
-    For a call object that represents multiple calls, :meth:`call_list`
-    returns a list of all the intermediate calls as well as the
-    final call.
+    Đối với một đối tượng call biểu diễn nhiều lần gọi, :meth:`call_list` trả về danh sách gồm tất cả các lần gọi trung gian cũng như lần gọi cuối cùng.
 
-``call_list`` is particularly useful for making assertions on "chained calls". A
-chained call is multiple calls on a single line of code. This results in
-multiple entries in :attr:`~Mock.mock_calls` on a mock. Manually constructing
-the sequence of calls can be tedious.
+``call_list`` đặc biệt hữu ích khi thực hiện các assertion trên "lệnh gọi nối tiếp". Một lệnh gọi nối tiếp là nhiều lệnh gọi trên cùng một dòng mã. Điều này tạo ra nhiều mục trong :attr:`~Mock.mock_calls` trên một mock. Việc tự xây dựng chuỗi lệnh gọi có thể khá tẻ nhạt.
 
-:meth:`~call.call_list` can construct the sequence of calls from the same
-chained call:
+:meth:`~call.call_list` có thể xây dựng chuỗi lệnh gọi từ cùng một lệnh gọi nối tiếp:
 
     >>> m = MagicMock()
     >>> m(1).method(arg='foo').other('bar')(2.0)
@@ -2357,22 +1974,12 @@ chained call:
 
 .. _calls-as-tuples:
 
-A ``call`` object is either a tuple of (positional args, keyword args) or
-(name, positional args, keyword args) depending on how it was constructed. When
-you construct them yourself this isn't particularly interesting, but the ``call``
-objects that are in the :attr:`Mock.call_args`, :attr:`Mock.call_args_list` and
-:attr:`Mock.mock_calls` attributes can be introspected to get at the individual
-arguments they contain.
+Một đối tượng ``call`` là một tuple gồm (đối số vị trí, đối số từ khóa) hoặc (tên, đối số vị trí, đối số từ khóa), tùy thuộc vào cách đối tượng được tạo. Khi tự tạo chúng, điều này không quá đáng chú ý, nhưng các đối tượng ``call`` nằm trong :attr:`Mock.call_args`, :attr:`Mock.call_args_list` và
+các thuộc tính :attr:`Mock.mock_calls` có thể được introspect để truy cập từng đối số mà chúng chứa.
 
-The ``call`` objects in :attr:`Mock.call_args` and :attr:`Mock.call_args_list`
-are two-tuples of (positional args, keyword args) whereas the ``call`` objects
-in :attr:`Mock.mock_calls`, along with ones you construct yourself, are
-three-tuples of (name, positional args, keyword args).
+Các đối tượng ``call`` trong :attr:`Mock.call_args` và :attr:`Mock.call_args_list` là các bộ hai phần tử gồm (đối số vị trí, đối số từ khóa), trong khi các đối tượng ``call`` trong :attr:`Mock.mock_calls`, cùng với những đối tượng bạn tự tạo, là các bộ ba phần tử gồm (tên, đối số vị trí, đối số từ khóa).
 
-You can use their "tupleness" to pull out the individual arguments for more
-complex introspection and assertions. The positional arguments are a tuple
-(an empty tuple if there are no positional arguments) and the keyword
-arguments are a dictionary:
+Bạn có thể sử dụng "tính chất tuple" của chúng để lấy ra từng đối số nhằm thực hiện introspection và assertion phức tạp hơn. Các đối số vị trí là một tuple (tuple rỗng nếu không có đối số vị trí), còn các đối số từ khóa là một dictionary:
 
     >>> m = MagicMock(return_value=None)
     >>> m(1, 2, 3, arg='one', arg2='two')
@@ -2406,32 +2013,23 @@ create_autospec
 
 .. function:: create_autospec(spec, spec_set=False, instance=False, **kwargs)
 
-    Create a mock object using another object as a spec. Attributes on the
-    mock will use the corresponding attribute on the *spec* object as their
-    spec.
+    Tạo một đối tượng mock bằng cách sử dụng một đối tượng khác làm spec. Các thuộc tính trên mock sẽ sử dụng thuộc tính tương ứng trên đối tượng *spec* làm spec.
 
-    Functions or methods being mocked will have their arguments checked to
-    ensure that they are called with the correct signature.
+    Các function hoặc method được mock sẽ được kiểm tra các đối số để đảm bảo rằng chúng được gọi với signature chính xác.
 
-    If *spec_set* is ``True`` then attempting to set attributes that don't exist
-    on the spec object will raise an :exc:`AttributeError`.
+    Nếu *spec_set* là ``True`` thì việc cố gắng đặt các thuộc tính không tồn tại trên đối tượng spec sẽ phát sinh :exc:`AttributeError`.
 
-    If a class is used as a spec then the return value of the mock (the
-    instance of the class) will have the same spec. You can use a class as the
-    spec for an instance object by passing ``instance=True``. The returned mock
-    will only be callable if instances of the mock are callable.
+    Nếu một class được sử dụng làm spec thì giá trị trả về của mock (instance của class) sẽ có cùng spec. Bạn có thể sử dụng một class làm spec cho một đối tượng instance bằng cách truyền ``instance=True``. Mock được trả về sẽ chỉ có thể được gọi nếu các instance của mock có thể gọi được.
 
-    :func:`create_autospec` also takes arbitrary keyword arguments that are passed to
-    the constructor of the created mock.
+    :func:`create_autospec` cũng nhận các đối số keyword tùy ý được truyền đến constructor của mock được tạo.
 
-See :ref:`auto-speccing` for examples of how to use auto-speccing with
-:func:`create_autospec` and the *autospec* argument to :func:`patch`.
+Xem :ref:`auto-speccing` để biết các ví dụ về cách sử dụng auto-speccing với
+:func:`create_autospec` và đối số *autospec* của :func:`patch`.
 
 
 .. versionchanged:: 3.8
 
-    :func:`create_autospec` now returns an :class:`AsyncMock` if the target is
-    an async function.
+    :func:`create_autospec` hiện trả về một :class:`AsyncMock` nếu target là một async function.
 
 
 ANY
@@ -2439,21 +2037,16 @@ ANY
 
 .. data:: ANY
 
-Sometimes you may need to make assertions about *some* of the arguments in a
-call to mock, but either not care about some of the arguments or want to pull
-them individually out of :attr:`~Mock.call_args` and make more complex
-assertions on them.
+Đôi khi bạn có thể cần đưa ra các assertion về *một số* đối số trong một lần gọi đến mock, nhưng либо không quan tâm đến một số đối số, hoặc muốn lấy riêng từng đối số từ :attr:`~Mock.call_args` và đưa ra các assertion phức tạp hơn cho chúng.
 
-To ignore certain arguments you can pass in objects that compare equal to
-*everything*. Calls to :meth:`~Mock.assert_called_with` and
-:meth:`~Mock.assert_called_once_with` will then succeed no matter what was
-passed in.
+Để bỏ qua một số đối số nhất định, bạn có thể truyền vào các object so sánh bằng với *mọi thứ*. Các lần gọi đến :meth:`~Mock.assert_called_with` và
+:meth:`~Mock.assert_called_once_with` sau đó sẽ thành công bất kể giá trị được truyền vào là gì.
 
     >>> mock = Mock(return_value=None)
     >>> mock('foo', bar=object())
     >>> mock.assert_called_once_with('foo', bar=ANY)
 
-:data:`ANY` can also be used in comparisons with call lists like
+:data:`ANY` cũng có thể được sử dụng để so sánh với các danh sách call như
 :attr:`~Mock.mock_calls`:
 
     >>> m = MagicMock(return_value=None)
@@ -2463,8 +2056,7 @@ passed in.
     >>> m.mock_calls == [call(1), call(1, 2), ANY]
     True
 
-:data:`ANY` is not limited to comparisons with call objects and so
-can also be used in test assertions::
+:data:`ANY` không bị giới hạn trong việc so sánh với các object call, vì vậy cũng có thể được sử dụng trong các assertion kiểm thử::
 
     class TestStringMethods(unittest.TestCase):
 
@@ -2478,17 +2070,9 @@ FILTER_DIR
 
 .. data:: FILTER_DIR
 
-:data:`FILTER_DIR` is a module level variable that controls the way mock objects
-respond to :func:`dir`. The default is ``True``,
-which uses the filtering described below, to only show useful members. If you
-dislike this filtering, or need to switch it off for diagnostic purposes, then
-set ``mock.FILTER_DIR = False``.
+:data:`FILTER_DIR` là một biến cấp mô-đun kiểm soát cách các mock object phản hồi với :func:`dir`. Giá trị mặc định là ``True``, sử dụng cơ chế lọc được mô tả dưới đây để chỉ hiển thị các thành phần hữu ích. Nếu bạn không thích cơ chế lọc này hoặc cần tắt nó cho mục đích chẩn đoán, hãy đặt ``mock.FILTER_DIR = False``.
 
-With filtering on, ``dir(some_mock)`` shows only useful attributes and will
-include any dynamically created attributes that wouldn't normally be shown.
-If the mock was created with a *spec* (or *autospec* of course) then all the
-attributes from the original are shown, even if they haven't been accessed
-yet:
+Khi bật tính năng lọc, ``dir(some_mock)`` chỉ hiển thị các thuộc tính hữu ích và sẽ bao gồm mọi thuộc tính được tạo động vốn thường không được hiển thị. Nếu mock được tạo bằng *spec* (hoặc tất nhiên là *autospec*), thì tất cả thuộc tính từ đối tượng gốc đều được hiển thị, ngay cả khi chúng chưa được truy cập:
 
 .. doctest::
     :options: +ELLIPSIS,+NORMALIZE_WHITESPACE
@@ -2511,10 +2095,7 @@ yet:
      'BaseHandler',
      ...
 
-Many of the not-very-useful (private to :class:`Mock` rather than the thing being
-mocked) underscore and double underscore prefixed attributes have been
-filtered from the result of calling :func:`dir` on a :class:`Mock`. If you dislike this
-behaviour you can switch it off by setting the module level switch
+Nhiều thuộc tính bắt đầu bằng dấu gạch dưới và hai dấu gạch dưới không thực sự hữu ích (là thuộc tính private của :class:`Mock` thay vì của đối tượng đang được mock) đã được lọc khỏi kết quả gọi :func:`dir` trên một :class:`Mock`. Nếu bạn không thích hành vi này, bạn có thể tắt nó bằng cách đặt công tắc cấp mô-đun
 :data:`FILTER_DIR`:
 
 .. doctest::
@@ -2532,8 +2113,7 @@ behaviour you can switch it off by setting the module level switch
      '__class__',
      ...
 
-Alternatively you can just use ``vars(my_mock)`` (instance members) and
-``dir(type(my_mock))`` (type members) to bypass the filtering irrespective of
+Ngoài ra, bạn chỉ cần sử dụng ``vars(my_mock)`` (các thành viên của instance) và ``dir(type(my_mock))`` (các thành viên của type) để bỏ qua cơ chế lọc, bất kể
 :const:`FILTER_DIR`.
 
 
@@ -2542,47 +2122,31 @@ mock_open
 
 .. function:: mock_open(mock=None, read_data='')
 
-   A helper function to create a mock to replace the use of :func:`open`. It works
-   for :func:`open` called directly or used as a context manager.
+   Một hàm trợ giúp để tạo một mock thay thế việc sử dụng :func:`open`. Hàm này hoạt động khi :func:`open` được gọi trực tiếp hoặc được sử dụng như một context manager.
 
-   The *mock* argument is the mock object to configure. If ``None`` (the
-   default) then a :class:`MagicMock` will be created for you, with the API limited
-   to methods or attributes available on standard file handles.
+   Đối số *mock* là đối tượng mock cần cấu hình. Nếu ``None`` (giá trị mặc định), một :class:`MagicMock` sẽ được tạo cho bạn, với API chỉ giới hạn ở các phương thức hoặc thuộc tính có trên các file handle tiêu chuẩn.
 
-   *read_data* is a string for the :meth:`~io.RawIOBase.read`,
-   :meth:`~io.IOBase.readline`, and :meth:`~io.IOBase.readlines` methods
-   of the file handle to return.  Calls to those methods will take data from
-   *read_data* until it is depleted.  The mock of these methods is pretty
-   simplistic: every time the *mock* is called, the *read_data* is rewound to
-   the start.  If you need more control over the data that you are feeding to
-   the tested code you will need to customize this mock for yourself.  When that
-   is insufficient, one of the in-memory filesystem packages on `PyPI
-   <https://pypi.org>`_ can offer a realistic filesystem for testing.
+   *read_data* là một chuỗi để các phương thức :meth:`~io.RawIOBase.read` trả về,
+   :meth:`~io.IOBase.readline`, và :meth:`~io.IOBase.readlines` của file handle. Các lần gọi những phương thức đó sẽ lấy dữ liệu từ *read_data* cho đến khi dữ liệu được dùng hết. Mock của các phương thức này khá đơn giản: mỗi lần *mock* được gọi, *read_data* sẽ được tua lại về đầu. Nếu cần kiểm soát nhiều hơn đối với dữ liệu cung cấp cho code được kiểm thử, bạn sẽ cần tự tùy chỉnh mock này. Khi cách đó vẫn chưa đủ, một trong các package filesystem trong bộ nhớ trên `PyPI <https://pypi.org>`_ có thể cung cấp một filesystem thực tế để kiểm thử.
 
    .. versionchanged:: 3.4
-      Added :meth:`~io.IOBase.readline` and :meth:`~io.IOBase.readlines` support.
-      The mock of :meth:`~io.RawIOBase.read` changed to consume *read_data* rather
-      than returning it on each call.
+      Đã bổ sung hỗ trợ :meth:`~io.IOBase.readline` và :meth:`~io.IOBase.readlines`. Mock của :meth:`~io.RawIOBase.read` đã được thay đổi để dùng hết *read_data* thay vì trả về dữ liệu đó trong mỗi lần gọi.
 
    .. versionchanged:: 3.5
-      *read_data* is now reset on each call to the *mock*.
+      *read_data* hiện được đặt lại sau mỗi lần gọi *mock*.
 
    .. versionchanged:: 3.8
-      Added :meth:`~container.__iter__` to implementation so that iteration
-      (such as in for loops) correctly consumes *read_data*.
+      Đã bổ sung :meth:`~container.__iter__` vào phần triển khai để phép lặp (chẳng hạn như trong vòng lặp for) sử dụng hết *read_data* một cách chính xác.
 
-Using :func:`open` as a context manager is a great way to ensure your file handles
-are closed properly and is becoming common::
+Sử dụng :func:`open` làm context manager là một cách tuyệt vời để bảo đảm các file handle của bạn được đóng đúng cách và đang trở nên phổ biến::
 
     with open('/some/path', 'w') as f:
         f.write('something')
 
-The issue is that even if you mock out the call to :func:`open` it is the
-*returned object* that is used as a context manager (and has :meth:`~object.__enter__` and
-:meth:`~object.__exit__` called).
+Vấn đề là ngay cả khi bạn mock lời gọi đến :func:`open` thì chính *đối tượng được trả về* mới được dùng làm context manager (và có :meth:`~object.__enter__` và
+:meth:`~object.__exit__` được gọi).
 
-Mocking context managers with a :class:`MagicMock` is common enough and fiddly
-enough that a helper function is useful. ::
+Việc mock các context manager bằng một :class:`MagicMock` đủ phổ biến và đủ rắc rối để một hàm trợ giúp trở nên hữu ích.::
 
     >>> m = mock_open()
     >>> with patch('__main__.open', m):
@@ -2598,7 +2162,7 @@ enough that a helper function is useful. ::
     >>> handle = m()
     >>> handle.write.assert_called_once_with('some stuff')
 
-And for reading files::
+Và để đọc tệp::
 
     >>> with patch('__main__.open', mock_open(read_data='bibble')) as m:
     ...     with open('foo') as h:
@@ -2613,61 +2177,39 @@ And for reading files::
 Autospeccing
 ~~~~~~~~~~~~
 
-Autospeccing is based on the existing :attr:`!spec` feature of mock. It limits the
-api of mocks to the api of an original object (the spec), but it is recursive
-(implemented lazily) so that attributes of mocks only have the same api as
-the attributes of the spec. In addition mocked functions / methods have the
-same call signature as the original so they raise a :exc:`TypeError` if they are
-called incorrectly.
+Autospeccing dựa trên tính năng :attr:`!spec` hiện có của mock. Tính năng này giới hạn API của các mock ở API của một đối tượng gốc (spec), nhưng hoạt động đệ quy (được triển khai một cách lazy), sodass các thuộc tính của mock chỉ có cùng API với các thuộc tính của spec. Ngoài ra, các hàm / phương thức được mock có cùng chữ ký lời gọi như bản gốc, vì vậy chúng sẽ raise một :exc:`TypeError` nếu được gọi không đúng cách.
 
-Before I explain how auto-speccing works, here's why it is needed.
+Trước khi giải thích cách auto-speccing hoạt động, hãy xem vì sao nó cần thiết.
 
-:class:`Mock` is a very powerful and flexible object, but it suffers from a flaw which
-is general to mocking. If you refactor some of your code, rename members and so on, any
-tests for code that is still using the *old api* but uses mocks instead of the real
-objects will still pass. This means your tests can all pass even though your code is
-broken.
+:class:`Mock` là một đối tượng rất mạnh mẽ và linh hoạt, nhưng nó mắc phải một nhược điểm phổ biến đối với việc mocking. Nếu bạn refactor một phần code, đổi tên member, v.v., mọi test cho code vẫn đang sử dụng *old api* nhưng dùng mock thay vì đối tượng thật vẫn sẽ pass. Điều này có nghĩa là tất cả test của bạn có thể pass dù code của bạn đã bị lỗi.
 
 .. versionchanged:: 3.5
 
-    Before 3.5, tests with a typo in the word assert would silently pass when they should
-    raise an error. You can still achieve this behavior by passing ``unsafe=True`` to Mock.
+    Trước phiên bản 3.5, các test có lỗi chính tả trong từ assert sẽ âm thầm pass trong khi đáng lẽ phải phát sinh lỗi. Bạn vẫn có thể đạt được hành vi này bằng cách truyền ``unsafe=True`` cho Mock.
 
-Note that this is another reason why you need integration tests as well as
-unit tests. Testing everything in isolation is all fine and dandy, but if you
-don't test how your units are "wired together" there is still lots of room
-for bugs that tests might have caught.
+Lưu ý rằng đây là một lý do khác cho thấy bạn cần cả integration test lẫn unit test. Việc test mọi thứ trong isolation hoàn toàn ổn, nhưng nếu bạn không test cách các unit được "kết nối với nhau" thì vẫn còn rất nhiều chỗ cho những bug mà test có thể phát hiện.
 
-:mod:`!unittest.mock` already provides a feature to help with this, called speccing. If you
-use a class or instance as the :attr:`!spec` for a mock then you can only access
-attributes on the mock that exist on the real class:
+:mod:`!unittest.mock` đã cung cấp một tính năng giúp giải quyết vấn đề này, gọi là speccing. Nếu bạn sử dụng một class hoặc instance làm :attr:`!spec` cho mock thì bạn chỉ có thể truy cập các attribute trên mock vốn tồn tại trên class thật:
 
     >>> from urllib import request
     >>> mock = Mock(spec=request.Request)
-    >>> mock.assret_called_with  # Intentional typo!
+    >>> mock.assret_called_with  # Cố ý viết sai chính tả!
     Traceback (most recent call last):
      ...
     AttributeError: Mock object has no attribute 'assret_called_with'
 
-The spec only applies to the mock itself, so we still have the same issue
-with any methods on the mock:
+spec chỉ áp dụng cho chính mock, vì vậy chúng ta vẫn gặp vấn đề tương tự với mọi method trên mock:
 
 .. code-block:: pycon
 
     >>> mock.header_items()
     <mock.Mock object at 0x...>
-    >>> mock.header_items.assret_called_with()  # Intentional typo!
+    >>> mock.header_items.assret_called_with()  # Cố ý viết sai chính tả!
 
-Auto-speccing solves this problem. You can either pass ``autospec=True`` to
-:func:`patch` / :func:`patch.object` or use the :func:`create_autospec` function to create a
-mock with a spec. If you use the ``autospec=True`` argument to :func:`patch` then the
-object that is being replaced will be used as the spec object. Because the
-speccing is done "lazily" (the spec is created as attributes on the mock are
-accessed) you can use it with very complex or deeply nested objects (like
-modules that import modules that import modules) without a big performance
-hit.
+Tự động tạo spec giải quyết vấn đề này. Bạn có thể truyền ``autospec=True`` cho
+:func:`patch` / :func:`patch.object` hoặc sử dụng hàm :func:`create_autospec` để tạo một mock có spec. Nếu bạn sử dụng đối số ``autospec=True`` cho :func:`patch` thì đối tượng đang được thay thế sẽ được dùng làm đối tượng spec. Vì việc tạo spec được thực hiện "lazily" (spec được tạo khi các thuộc tính trên mock được truy cập), bạn có thể dùng cách này với các đối tượng rất phức tạp hoặc lồng nhau sâu (chẳng hạn như các module import các module khác, rồi các module đó lại import các module khác) mà không gây ảnh hưởng lớn đến hiệu năng.
 
-Here's an example of it in use::
+Dưới đây là một ví dụ về cách sử dụng::
 
     >>> from urllib import request
     >>> patcher = patch('__main__.request', autospec=True)
@@ -2677,59 +2219,43 @@ Here's an example of it in use::
     >>> mock_request.Request
     <MagicMock name='request.Request' spec='Request' id='...'>
 
-You can see that :class:`!request.Request` has a spec. :class:`!request.Request` takes two
-arguments in the constructor (one of which is *self*). Here's what happens if
-we try to call it incorrectly::
+Bạn có thể thấy rằng :class:`!request.Request` có một spec. :class:`!request.Request` nhận hai đối số trong hàm khởi tạo (một trong số đó là *self*). Đây là điều xảy ra nếu chúng ta thử gọi nó không đúng cách::
 
     >>> req = request.Request()
     Traceback (most recent call last):
      ...
     TypeError: <lambda>() takes at least 2 arguments (1 given)
 
-The spec also applies to instantiated classes (i.e. the return value of
-specced mocks)::
+Spec cũng áp dụng cho các class đã được khởi tạo (tức là giá trị trả về của các mock có spec)::
 
     >>> req = request.Request('foo')
     >>> req
     <NonCallableMagicMock name='request.Request()' spec='Request' id='...'>
 
-:class:`!Request` objects are not callable, so the return value of instantiating our
-mocked out :class:`!request.Request` is a non-callable mock. With the spec in place
-any typos in our asserts will raise the correct error::
+Các đối tượng :class:`!Request` không thể được gọi, vì vậy giá trị trả về khi khởi tạo :class:`!request.Request` đã được mock là một mock không thể gọi. Khi đã có spec, mọi lỗi đánh máy trong các câu lệnh assert của chúng ta sẽ phát sinh lỗi chính xác::
 
     >>> req.add_header('spam', 'eggs')
     <MagicMock name='request.Request().add_header()' id='...'>
-    >>> req.add_header.assret_called_with  # Intentional typo!
+    >>> req.add_header.assret_called_with  # Lỗi đánh máy có chủ ý!
     Traceback (most recent call last):
      ...
     AttributeError: Mock object has no attribute 'assret_called_with'
     >>> req.add_header.assert_called_with('spam', 'eggs')
 
-In many cases you will just be able to add ``autospec=True`` to your existing
-:func:`patch` calls and then be protected against bugs due to typos and api
-changes.
+Trong nhiều trường hợp, bạn chỉ cần thêm ``autospec=True`` vào các lệnh gọi hiện có
+:func:`patch` rồi sẽ được bảo vệ khỏi các lỗi do gõ sai và thay đổi API.
 
-As well as using *autospec* through :func:`patch` there is a
-:func:`create_autospec` for creating autospecced mocks directly:
+Ngoài việc sử dụng *autospec* thông qua :func:`patch`, còn có một
+:func:`create_autospec` để trực tiếp tạo các mock có autospec:
 
     >>> from urllib import request
     >>> mock_request = create_autospec(request)
     >>> mock_request.Request('foo', 'bar')
     <NonCallableMagicMock name='mock.Request()' spec='Request' id='...'>
 
-This isn't without caveats and limitations however, which is why it is not
-the default behaviour. In order to know what attributes are available on the
-spec object, autospec has to introspect (access attributes) the spec. As you
-traverse attributes on the mock a corresponding traversal of the original
-object is happening under the hood. If any of your specced objects have
-properties or descriptors that can trigger code execution then you may not be
-able to use autospec. On the other hand it is much better to design your
-objects so that introspection is safe [#]_.
+Tuy nhiên, cách này không phải không có những điểm cần lưu ý và hạn chế, đó là lý do nó không phải là hành vi mặc định. Để biết những thuộc tính nào có sẵn trên đối tượng spec, autospec phải thực hiện introspection (truy cập các thuộc tính) đối với spec. Khi bạn duyệt qua các thuộc tính trên mock, việc duyệt tương ứng trên đối tượng gốc cũng đang diễn ra ngầm bên dưới. Nếu bất kỳ đối tượng nào được áp dụng spec của bạn có các property hoặc descriptor có thể kích hoạt thực thi code, bạn có thể không sử dụng được autospec. Mặt khác, tốt hơn nhiều nếu thiết kế các đối tượng sao cho việc introspection an toàn [#]_.
 
-A more serious problem is that it is common for instance attributes to be
-created in the :meth:`~object.__init__` method and not to exist on the class at all.
-*autospec* can't know about any dynamically created attributes and restricts
-the api to visible attributes. ::
+Một vấn đề nghiêm trọng hơn là các thuộc tính của instance thường được tạo trong phương thức :meth:`~object.__init__` và hoàn toàn không tồn tại trên class. *autospec* không thể biết về bất kỳ thuộc tính nào được tạo động và giới hạn API ở các thuộc tính hiển thị.::
 
     >>> class Something:
     ...   def __init__(self):
@@ -2743,21 +2269,14 @@ the api to visible attributes. ::
       ...
     AttributeError: Mock object has no attribute 'a'
 
-There are a few different ways of resolving this problem. The easiest, but
-not necessarily the least annoying, way is to simply set the required
-attributes on the mock after creation. Just because *autospec* doesn't allow
-you to fetch attributes that don't exist on the spec it doesn't prevent you
-setting them::
+Có một vài cách khác nhau để giải quyết vấn đề này. Cách dễ nhất, nhưng không nhất thiết là ít gây phiền toái nhất, là chỉ cần đặt các thuộc tính cần thiết trên mock sau khi tạo. Việc *autospec* không cho phép bạn lấy các thuộc tính không tồn tại trên spec không ngăn bạn thiết lập chúng::
 
     >>> with patch('__main__.Something', autospec=True):
     ...   thing = Something()
     ...   thing.a = 33
     ...
 
-There is a more aggressive version of both *spec* and *autospec* that *does*
-prevent you setting non-existent attributes. This is useful if you want to
-ensure your code only *sets* valid attributes too, but obviously it prevents
-this particular scenario:
+Có một phiên bản chặt chẽ hơn của cả *spec* và *autospec*, phiên bản này *does* ngăn bạn thiết lập các thuộc tính không tồn tại. Điều này hữu ích nếu bạn muốn đảm bảo mã của mình cũng chỉ *sets* các thuộc tính hợp lệ, nhưng rõ ràng nó ngăn cản tình huống cụ thể này:
 
     >>> with patch('__main__.Something', autospec=True, spec_set=True):
     ...   thing = Something()
@@ -2767,24 +2286,14 @@ this particular scenario:
      ...
     AttributeError: Mock object has no attribute 'a'
 
-Probably the best way of solving the problem is to add class attributes as
-default values for instance members initialised in :meth:`~object.__init__`.
-Note that if
-you are only setting default attributes in :meth:`!__init__` then providing them via
-class attributes (shared between instances of course) is faster too. e.g.
+Có lẽ cách tốt nhất để giải quyết vấn đề là thêm các thuộc tính lớp làm giá trị mặc định cho những thành viên thể hiện được khởi tạo trong :meth:`~object.__init__`. Lưu ý rằng nếu bạn chỉ thiết lập các thuộc tính mặc định trong :meth:`!__init__` thì việc cung cấp chúng thông qua các thuộc tính lớp (tất nhiên là được chia sẻ giữa các thể hiện) cũng nhanh hơn. Ví dụ:
 
 .. code-block:: python
 
     class Something:
         a = 33
 
-This brings up another issue. It is relatively common to provide a default
-value of ``None`` for members that will later be an object of a different type.
-``None`` would be useless as a spec because it wouldn't let you access *any*
-attributes or methods on it. As ``None`` is *never* going to be useful as a
-spec, and probably indicates a member that will normally of some other type,
-autospec doesn't use a spec for members that are set to ``None``. These will
-just be ordinary mocks (well - MagicMocks):
+Điều này dẫn đến một vấn đề khác. Việc cung cấp giá trị mặc định là ``None`` cho các thành viên mà sau đó sẽ là một đối tượng thuộc kiểu khác là khá phổ biến. ``None`` sẽ vô dụng khi làm spec vì nó sẽ không cho phép bạn truy cập *any* thuộc tính hoặc phương thức nào trên đó. Vì ``None`` là *never* hữu ích khi làm spec và có lẽ biểu thị một thành viên thường sẽ thuộc một kiểu khác, autospec không sử dụng spec cho các thành viên được đặt thành ``None``. Những thành viên này sẽ chỉ là các mock thông thường (thực ra là MagicMocks):
 
     >>> class Something:
     ...     member = None
@@ -2793,13 +2302,7 @@ just be ordinary mocks (well - MagicMocks):
     >>> mock.member.foo.bar.baz()
     <MagicMock name='mock.member.foo.bar.baz()' id='...'>
 
-If modifying your production classes to add defaults isn't to your liking
-then there are more options. One of these is simply to use an instance as the
-spec rather than the class. The other is to create a subclass of the
-production class and add the defaults to the subclass without affecting the
-production class. Both of these require you to use an alternative object as
-the spec. Thankfully :func:`patch` supports this - you can simply pass the
-alternative object as the *autospec* argument::
+Nếu bạn không muốn sửa đổi các lớp production để thêm giá trị mặc định thì vẫn còn những lựa chọn khác. Một trong số đó là chỉ cần sử dụng một thể hiện làm spec thay vì lớp. Lựa chọn còn lại là tạo một lớp con của lớp production và thêm các giá trị mặc định vào lớp con mà không ảnh hưởng đến lớp production. Cả hai cách này đều yêu cầu bạn sử dụng một đối tượng thay thế làm spec. May mắn là :func:`patch` hỗ trợ việc này - bạn chỉ cần truyền đối tượng thay thế làm đối số *autospec*::
 
     >>> class Something:
     ...   def __init__(self):
@@ -2814,12 +2317,10 @@ alternative object as the *autospec* argument::
     <NonCallableMagicMock name='Something.a' spec='int' id='...'>
 
 
-.. [#] This only applies to classes or already instantiated objects. Calling
-   a mocked class to create a mock instance *does not* create a real instance.
-   It is only attribute lookups - along with calls to :func:`dir` - that are done.
+.. [#] Điều này chỉ áp dụng cho các lớp hoặc các đối tượng đã được khởi tạo. Việc gọi một lớp đã được mock để tạo một mock instance *does not* tạo ra một instance thực. Chỉ có các thao tác tra cứu thuộc tính - cùng với các lệnh gọi đến :func:`dir` - được thực hiện.
 
-Sealing mocks
-~~~~~~~~~~~~~
+Niêm phong các mock
+~~~~~~~~~~~~~~~~~~~
 
 
 .. testsetup::
@@ -2828,38 +2329,31 @@ Sealing mocks
 
 .. function:: seal(mock)
 
-    Seal will disable the automatic creation of mocks when accessing an attribute of
-    the mock being sealed or any of its attributes that are already mocks recursively.
+    Seal sẽ vô hiệu hóa việc tự động tạo mock khi truy cập một thuộc tính của mock đang được niêm phong hoặc bất kỳ thuộc tính nào của nó vốn đã là mock, theo cách đệ quy.
 
-    If a mock instance with a name or a spec is assigned to an attribute
-    it won't be considered in the sealing chain. This allows one to prevent seal from
-    fixing part of the mock object. ::
+    Nếu một mock instance có tên hoặc spec được gán cho một thuộc tính, nó sẽ không được xem xét trong chuỗi sealing. Điều này cho phép ngăn seal cố định một phần của mock object.::
 
         >>> mock = Mock()
         >>> mock.submock.attribute1 = 2
         >>> mock.not_submock = mock.Mock(name="sample_name")
         >>> seal(mock)
-        >>> mock.new_attribute  # This will raise AttributeError.
-        >>> mock.submock.attribute2  # This will raise AttributeError.
-        >>> mock.not_submock.attribute2  # This won't raise.
+        >>> mock.new_attribute  # Sẽ gây ra AttributeError.
+        >>> mock.submock.attribute2  # Sẽ gây ra AttributeError.
+        >>> mock.not_submock.attribute2  # Sẽ không gây ra lỗi.
 
     .. versionadded:: 3.7
 
 
-Order of precedence of :attr:`!side_effect`, :attr:`!return_value` and *wraps*
-------------------------------------------------------------------------------
+Thứ tự ưu tiên của :attr:`!side_effect`, :attr:`!return_value` và *wraps*
+-------------------------------------------------------------------------
 
-The order of their precedence is:
+Thứ tự ưu tiên của chúng là:
 
 1. :attr:`~Mock.side_effect`
 2. :attr:`~Mock.return_value`
 3. *wraps*
 
-If all three are set, mock will return the value from :attr:`~Mock.side_effect`,
-ignoring :attr:`~Mock.return_value` and the wrapped object altogether. If any
-two are set, the one with the higher precedence will return the value.
-Regardless of the order of which was set first, the order of precedence
-remains unchanged.
+Nếu cả ba đều được thiết lập, mock sẽ trả về giá trị từ :attr:`~Mock.side_effect`, bỏ qua :attr:`~Mock.return_value` và hoàn toàn bỏ qua object được bọc. Nếu bất kỳ hai giá trị nào được thiết lập, giá trị có mức độ ưu tiên cao hơn sẽ được trả về. Bất kể giá trị nào được thiết lập trước, thứ tự ưu tiên vẫn không thay đổi.
 
     >>> from unittest.mock import Mock
     >>> class Order:
@@ -2873,26 +2367,23 @@ remains unchanged.
     >>> order_mock.get_value()
     'first'
 
-As ``None`` is the default value of :attr:`~Mock.side_effect`, if you reassign
-its value back to ``None``, the order of precedence will be checked between
-:attr:`~Mock.return_value` and the wrapped object, ignoring
+Vì ``None`` là giá trị mặc định của :attr:`~Mock.side_effect`, nếu bạn gán lại giá trị của nó thành ``None``, thứ tự ưu tiên sẽ được kiểm tra giữa
+:attr:`~Mock.return_value` và object được bọc, bỏ qua
 :attr:`~Mock.side_effect`.
 
     >>> order_mock.get_value.side_effect = None
     >>> order_mock.get_value()
     'second'
 
-If the value being returned by :attr:`~Mock.side_effect` is :data:`DEFAULT`,
-it is ignored and the order of precedence moves to the successor to obtain the
-value to return.
+Nếu giá trị được :attr:`~Mock.side_effect` trả về là :data:`DEFAULT`, giá trị đó sẽ bị bỏ qua và thứ tự ưu tiên chuyển sang phần tử kế tiếp để lấy giá trị cần trả về.
 
     >>> from unittest.mock import DEFAULT
     >>> order_mock.get_value.side_effect = [DEFAULT]
     >>> order_mock.get_value()
     'second'
 
-When :class:`Mock` wraps an object, the default value of
-:attr:`~Mock.return_value` will be :data:`DEFAULT`.
+Khi :class:`Mock` bọc một object, giá trị mặc định của
+:attr:`~Mock.return_value` sẽ là :data:`DEFAULT`.
 
     >>> order_mock = Mock(spec=Order, wraps=Order)
     >>> order_mock.return_value
@@ -2900,12 +2391,9 @@ When :class:`Mock` wraps an object, the default value of
     >>> order_mock.get_value.return_value
     sentinel.DEFAULT
 
-The order of precedence will ignore this value and it will move to the last
-successor which is the wrapped object.
+Thứ tự ưu tiên sẽ bỏ qua giá trị này và chuyển đến phần tử kế tiếp cuối cùng, tức là object được bọc.
 
-As the real call is being made to the wrapped object, creating an instance of
-this mock will return the real instance of the class. The positional arguments,
-if any, required by the wrapped object must be passed.
+Vì lệnh gọi thực tế được thực hiện trên đối tượng được bọc, việc tạo một instance của mock này sẽ trả về instance thực của class. Phải truyền các đối số vị trí, nếu có, mà đối tượng được bọc yêu cầu.
 
     >>> order_mock_instance = order_mock()
     >>> isinstance(order_mock_instance, Order)
@@ -2921,16 +2409,13 @@ if any, required by the wrapped object must be passed.
     >>> order_mock.get_value()
     'second'
 
-But if you assign ``None`` to it, this will not be ignored as it is an
-explicit assignment. So, the order of precedence will not move to the wrapped
-object.
+Nhưng nếu bạn gán ``None`` cho nó thì việc này sẽ không bị bỏ qua vì đó là một phép gán tường minh. Do đó, thứ tự ưu tiên sẽ không chuyển sang đối tượng được bọc.
 
     >>> order_mock.get_value.return_value = None
     >>> order_mock.get_value() is None
     True
 
-Even if you set all three at once when initializing the mock, the order of
-precedence remains the same:
+Ngay cả khi bạn đặt cả ba giá trị cùng lúc trong lúc khởi tạo mock, thứ tự ưu tiên vẫn giữ nguyên:
 
     >>> order_mock = Mock(spec=Order, wraps=Order,
     ...                   **{"get_value.side_effect": ["first"],
@@ -2946,9 +2431,7 @@ precedence remains the same:
     >>> order_mock.get_value()
     'third'
 
-If :attr:`~Mock.side_effect` is :term:`exhausted`, the order of precedence will not
-cause a value to be obtained from the successors. Instead, ``StopIteration``
-exception is raised.
+Nếu :attr:`~Mock.side_effect` là :term:`exhausted`, thứ tự ưu tiên sẽ không khiến một giá trị được lấy từ các đối tượng kế tiếp. Thay vào đó, ngoại lệ ``StopIteration`` sẽ được ném ra.
 
     >>> order_mock = Mock(spec=Order, wraps=Order)
     >>> order_mock.get_value.side_effect = ["first side effect value",
@@ -2964,3 +2447,6 @@ exception is raised.
     Traceback (most recent call last):
      ...
     StopIteration
+
+.. _`django settings object`: https://web.archive.org/web/20200603181648/http://www.voidspace.org.uk/python/weblog/arch_d7_2010_12_04.shtml#e1198
+.. _`PyPI`: https://pypi.org

@@ -1,10 +1,10 @@
-:mod:`!glob` --- Unix style pathname pattern expansion
-======================================================
+:mod:`!glob` --- Mở rộng mẫu đường dẫn theo kiểu Unix
+=====================================================
 
 .. module:: glob
-   :synopsis: Unix shell style pathname pattern expansion.
+   :synopsis: Mở rộng mẫu đường dẫn theo kiểu Unix shell.
 
-**Source code:** :source:`Lib/glob.py`
+**Mã nguồn:** :source:`Lib/glob.py`
 
 .. index:: single: filenames; pathname expansion
 
@@ -18,132 +18,96 @@
    single: - (minus); in glob-style wildcards
    single: . (dot); in glob-style wildcards
 
-The :mod:`!glob` module finds pathnames
-using pattern matching rules similar to the Unix shell.
-No tilde expansion is done, but ``*``, ``?``, and character
-ranges expressed with ``[]`` will be correctly matched.  This is done by using
-the :func:`os.scandir` and :func:`fnmatch.fnmatch` functions in concert, and
-not by actually invoking a subshell.
+Mô-đun :mod:`!glob` tìm các pathname bằng cách sử dụng các quy tắc khớp mẫu tương tự shell Unix. Không thực hiện mở rộng dấu ngã, nhưng ``*``, ``?`` và các dải ký tự được biểu diễn bằng ``[]`` sẽ được khớp chính xác. Việc này được thực hiện bằng cách phối hợp sử dụng các hàm :func:`os.scandir` và :func:`fnmatch.fnmatch`, chứ không thực sự gọi một subshell.
 
 .. note::
-   The pathnames are returned in no particular order.  If you need a specific
-   order, sort the results.
+   Các pathname được trả về theo thứ tự không cố định. Nếu cần một thứ tự cụ thể, hãy sắp xếp các kết quả.
 
-By default, files beginning with a dot (``.``) can only be matched by
-patterns that also start with a dot,
-unlike :func:`fnmatch.fnmatch` or :func:`pathlib.Path.glob`.
-For tilde and shell variable expansion, use :func:`os.path.expanduser` and
+Theo mặc định, các tệp bắt đầu bằng dấu chấm (``.``) chỉ có thể được khớp bằng các mẫu cũng bắt đầu bằng dấu chấm, không giống như :func:`fnmatch.fnmatch` hoặc :func:`pathlib.Path.glob`. Để mở rộng dấu ngã và biến shell, hãy sử dụng :func:`os.path.expanduser` và
 :func:`os.path.expandvars`.
 
-For a literal match, wrap the meta-characters in brackets.
-For example, ``'[?]'`` matches the character ``'?'``.
+Để khớp theo nghĩa đen, hãy đặt các ký tự meta trong dấu ngoặc vuông. Ví dụ, ``'[?]'`` khớp với ký tự ``'?'``.
 
-The :mod:`!glob` module defines the following functions:
+Mô-đun :mod:`!glob` định nghĩa các hàm sau:
 
 
 .. function:: glob(pathname, *, root_dir=None, dir_fd=None, recursive=False, \
                    include_hidden=False)
 
-   Return a possibly empty list of path names that match *pathname*, which must be
-   a string containing a path specification. *pathname* can be either absolute
-   (like :file:`/usr/src/Python-1.5/Makefile`) or relative (like
-   :file:`../../Tools/\*/\*.gif`), and can contain shell-style wildcards. Broken
-   symlinks are included in the results (as in the shell). Whether or not the
-   results are sorted depends on the file system.  If a file that satisfies
-   conditions is removed or added during the call of this function, whether
-   a path name for that file will be included is unspecified.
+   Trả về một danh sách có thể rỗng gồm các tên đường dẫn khớp với *pathname*, tham số này phải là một chuỗi chứa đặc tả đường dẫn. *pathname* có thể là đường dẫn tuyệt đối (như :file:`/usr/src/Python-1.5/Makefile`) hoặc tương đối (như
+   :file:`../../Tools/\*/\*.gif`), và có thể chứa các ký tự đại diện theo kiểu shell. Các symbolic link bị hỏng cũng được đưa vào kết quả (như trong shell). Việc kết quả có được sắp xếp hay không phụ thuộc vào hệ thống tệp. Nếu một tệp thỏa mãn các điều kiện bị xóa hoặc được thêm vào trong khi hàm này đang được gọi, việc tên đường dẫn của tệp đó có được đưa vào hay không là không xác định.
 
-   If *root_dir* is not ``None``, it should be a :term:`path-like object`
-   specifying the root directory for searching.  It has the same effect on
-   :func:`!glob` as changing the current directory before calling it.  If
-   *pathname* is relative, the result will contain paths relative to
-   *root_dir*.
+   Nếu *root_dir* không phải là ``None``, thì đó phải là một :term:`path-like object` chỉ định thư mục gốc để tìm kiếm. Nó có tác dụng giống như
+   :func:`!glob` khi thay đổi thư mục hiện tại trước khi gọi hàm. Nếu *pathname* là đường dẫn tương đối, kết quả sẽ chứa các đường dẫn tương đối so với *root_dir*.
 
-   This function can support :ref:`paths relative to directory descriptors
-   <dir_fd>` with the *dir_fd* parameter.
+   Hàm này có thể hỗ trợ :ref:`paths relative to directory descriptors <dir_fd>` với tham số *dir_fd*.
 
    .. index::
       single: **; in glob-style wildcards
 
-   If *recursive* is true, the pattern "``**``" will match any files and zero or
-   more directories, subdirectories and symbolic links to directories. If the
-   pattern is followed by an :data:`os.sep` or :data:`os.altsep` then files will not
-   match.
+   Nếu *recursive* là true, mẫu "``**``" sẽ khớp với mọi tệp và không hoặc nhiều thư mục, thư mục con cũng như liên kết tượng trưng đến thư mục. Nếu mẫu được theo sau bởi :data:`os.sep` hoặc :data:`os.altsep` thì các tệp sẽ không khớp.
 
-   If *include_hidden* is true, wildcards can match path segments that
-   begin with a dot (``.``).
+   Nếu *include_hidden* là true, các ký tự đại diện có thể khớp với những thành phần đường dẫn bắt đầu bằng dấu chấm (``.``).
 
    .. audit-event:: glob.glob pathname,recursive glob.glob
    .. audit-event:: glob.glob/2 pathname,recursive,root_dir,dir_fd glob.glob
 
    .. note::
-      Using the "``**``" pattern in large directory trees may consume
-      an inordinate amount of time.
+      Việc sử dụng mẫu "``**``" trong các cây thư mục lớn có thể mất một khoảng thời gian quá lớn.
 
    .. note::
-      This function may return duplicate path names if *pathname*
-      contains multiple "``**``" patterns and *recursive* is true.
+      Hàm này có thể trả về các tên đường dẫn trùng lặp nếu *pathname* chứa nhiều mẫu "``**``" và *recursive* là true.
 
    .. note::
-      Any :exc:`OSError` exceptions raised from scanning the filesystem are
-      suppressed. This includes :exc:`PermissionError` when accessing
-      directories without read permission.
+      Mọi ngoại lệ :exc:`OSError` phát sinh trong quá trình quét hệ thống tệp đều bị bỏ qua. Điều này bao gồm :exc:`PermissionError` khi truy cập các thư mục không có quyền đọc.
 
    .. versionchanged:: 3.5
-      Support for recursive globs using "``**``".
+      Hỗ trợ glob đệ quy bằng cách sử dụng "``**``".
 
    .. versionchanged:: 3.10
-      Added the *root_dir* and *dir_fd* parameters.
+      Đã thêm các tham số *root_dir* và *dir_fd*.
 
    .. versionchanged:: 3.11
-      Added the *include_hidden* parameter.
+      Đã thêm tham số *include_hidden*.
 
 
 .. function:: iglob(pathname, *, root_dir=None, dir_fd=None, recursive=False, \
                     include_hidden=False)
 
-   Return an :term:`iterator` which yields the same values as :func:`glob`
-   without actually storing them all simultaneously.
+   Trả về một :term:`iterator` tạo ra các giá trị giống như :func:`glob` mà không thực sự lưu trữ tất cả chúng cùng lúc.
 
    .. audit-event:: glob.glob pathname,recursive glob.iglob
    .. audit-event:: glob.glob/2 pathname,recursive,root_dir,dir_fd glob.iglob
 
    .. note::
-      This function may return duplicate path names if *pathname*
-      contains multiple "``**``" patterns and *recursive* is true.
+      Hàm này có thể trả về các tên đường dẫn trùng lặp nếu *pathname* chứa nhiều mẫu "``**``" và *recursive* là true.
 
    .. note::
-      Any :exc:`OSError` exceptions raised from scanning the filesystem are
-      suppressed. This includes :exc:`PermissionError` when accessing
-      directories without read permission.
+      Mọi ngoại lệ :exc:`OSError` phát sinh trong quá trình quét hệ thống tệp đều bị bỏ qua. Điều này bao gồm :exc:`PermissionError` khi truy cập các thư mục không có quyền đọc.
 
    .. versionchanged:: 3.5
-      Support for recursive globs using "``**``".
+      Hỗ trợ glob đệ quy bằng cách sử dụng "``**``".
 
    .. versionchanged:: 3.10
-      Added the *root_dir* and *dir_fd* parameters.
+      Đã thêm các tham số *root_dir* và *dir_fd*.
 
    .. versionchanged:: 3.11
-      Added the *include_hidden* parameter.
+      Đã thêm tham số *include_hidden*.
 
 
 .. function:: escape(pathname)
 
-   Escape all special characters (``'?'``, ``'*'`` and ``'['``).
-   This is useful if you want to match an arbitrary literal string that may
-   have special characters in it.  Special characters in drive/UNC
-   sharepoints are not escaped, for example on Windows
-   ``escape('//?/c:/Quo vadis?.txt')`` returns ``'//?/c:/Quo vadis[?].txt'``.
+   Escape tất cả các ký tự đặc biệt (``'?'``, ``'*'`` và ``'['``). Điều này hữu ích nếu bạn muốn khớp với một chuỗi literal tùy ý có thể chứa các ký tự đặc biệt. Các ký tự đặc biệt trong drive/sharepoint UNC không được Escape; ví dụ, trên Windows, ``escape('//?/c:/Quo vadis?.txt')`` trả về ``'//?/c:/Quo vadis[?].txt'``.
 
    .. versionadded:: 3.4
 
 
 .. function:: translate(pathname, *, recursive=False, include_hidden=False, seps=None)
 
-   Convert the given path specification to a regular expression for use with
-   :func:`re.match`. The path specification can contain shell-style wildcards.
+   Chuyển đổi đặc tả đường dẫn đã cho thành một regular expression để sử dụng với
+   :func:`re.match`. Đặc tả đường dẫn có thể chứa các wildcard theo kiểu shell.
 
-   For example:
+   Ví dụ:
 
       >>> import glob, re
       >>>
@@ -154,36 +118,27 @@ The :mod:`!glob` module defines the following functions:
       >>> reobj.match('foo/bar/baz.txt')
       <re.Match object; span=(0, 15), match='foo/bar/baz.txt'>
 
-   Path separators and segments are meaningful to this function, unlike
-   :func:`fnmatch.translate`. By default wildcards do not match path
-   separators, and ``*`` pattern segments match precisely one path segment.
+   Các dấu phân cách và phân đoạn đường dẫn có ý nghĩa đối với hàm này, không giống như
+   :func:`fnmatch.translate`. Theo mặc định, wildcard không khớp với các dấu phân cách đường dẫn, và các phân đoạn mẫu ``*`` khớp chính xác với một phân đoạn đường dẫn.
 
-   If *recursive* is true, the pattern segment "``**``" will match any number
-   of path segments.
+   Nếu *recursive* là true, phân đoạn mẫu "``**``" sẽ khớp với bất kỳ số lượng phân đoạn đường dẫn nào.
 
-   If *include_hidden* is true, wildcards can match path segments that start
-   with a dot (``.``).
+   Nếu *include_hidden* là true, các ký tự đại diện có thể khớp với những phân đoạn đường dẫn bắt đầu bằng dấu chấm (``.``).
 
-   A sequence of path separators may be supplied to the *seps* argument. If
-   not given, :data:`os.sep` and :data:`~os.altsep` (if available) are used.
+   Có thể cung cấp một chuỗi dấu phân cách đường dẫn cho đối số *seps*. Nếu không cung cấp, :data:`os.sep` và :data:`~os.altsep` (nếu có) sẽ được sử dụng.
 
    .. seealso::
 
-     :meth:`pathlib.PurePath.full_match` and :meth:`pathlib.Path.glob`
-     methods, which call this function to implement pattern matching and
-     globbing.
+     Các phương thức :meth:`pathlib.PurePath.full_match` và :meth:`pathlib.Path.glob`, gọi hàm này để triển khai việc khớp mẫu và globbing.
 
    .. versionadded:: 3.13
 
 
-Examples
---------
+Ví dụ
+-----
 
-Consider a directory containing the following files:
-:file:`1.gif`, :file:`2.txt`, :file:`card.gif` and a subdirectory :file:`sub`
-which contains only the file :file:`3.txt`.  :func:`glob` will produce
-the following results.  Notice how any leading components of the path are
-preserved. ::
+Xét một thư mục chứa các tệp sau:
+:file:`1.gif`, :file:`2.txt`, :file:`card.gif` và một thư mục con :file:`sub` chỉ chứa tệp :file:`3.txt`. :func:`glob` sẽ tạo ra các kết quả sau. Lưu ý rằng mọi thành phần đứng đầu của đường dẫn đều được giữ nguyên.::
 
    >>> import glob
    >>> glob.glob('./[0-9].*')
@@ -197,8 +152,7 @@ preserved. ::
    >>> glob.glob('./**/', recursive=True)
    ['./', './sub/']
 
-If the directory contains files starting with ``.`` they won't be matched by
-default. For example, consider a directory containing :file:`card.gif` and
+Nếu thư mục chứa các tệp bắt đầu bằng ``.``, theo mặc định chúng sẽ không được khớp. Ví dụ, hãy xét một thư mục chứa :file:`card.gif` và
 :file:`.card.gif`::
 
    >>> import glob
@@ -208,7 +162,7 @@ default. For example, consider a directory containing :file:`card.gif` and
    ['.card.gif']
 
 .. seealso::
-   The :mod:`fnmatch` module offers shell-style filename (not path) expansion.
+   Mô-đun :mod:`fnmatch` cung cấp chức năng mở rộng tên tệp (không phải đường dẫn) theo kiểu shell.
 
 .. seealso::
-   The :mod:`pathlib` module offers high-level path objects.
+   Mô-đun :mod:`pathlib` cung cấp các đối tượng đường dẫn cấp cao.

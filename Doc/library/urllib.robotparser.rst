@@ -1,13 +1,12 @@
-:mod:`!urllib.robotparser` ---  Parser for robots.txt
-=====================================================
+:mod:`!urllib.robotparser` ---  Trình phân tích robots.txt
+==========================================================
 
 .. module:: urllib.robotparser
-   :synopsis: Load a robots.txt file and answer questions about
-              fetchability of other URLs.
+   :synopsis: Tải tệp robots.txt và trả lời các câu hỏi về khả năng fetch các URL khác.
 
 .. sectionauthor:: Skip Montanaro <skip.montanaro@gmail.com>
 
-**Source code:** :source:`Lib/urllib/robotparser.py`
+**Mã nguồn:** :source:`Lib/urllib/robotparser.py`
 
 .. index::
    single: WWW
@@ -17,77 +16,58 @@
 
 --------------
 
-This module provides a single class, :class:`RobotFileParser`, which answers
-questions about whether or not a particular user agent can fetch a URL on the
-website that published the :file:`robots.txt` file.  For more details on the
-structure of :file:`robots.txt` files, see :rfc:`9309`.
+Module này cung cấp một lớp duy nhất, :class:`RobotFileParser`, dùng để trả lời các câu hỏi về việc một user agent cụ thể có thể fetch một URL trên website đã phát hành tệp :file:`robots.txt` hay không. Để biết thêm chi tiết về cấu trúc của các tệp :file:`robots.txt`, hãy xem :rfc:`9309`.
 
 
 .. class:: RobotFileParser(url='')
 
-   This class provides methods to read, parse and answer questions about the
-   :file:`robots.txt` file at *url*.
+   Lớp này cung cấp các phương thức để đọc, phân tích cú pháp và trả lời các câu hỏi về
+   tệp :file:`robots.txt` tại *url*.
 
    .. method:: set_url(url)
 
-      Sets the URL referring to a :file:`robots.txt` file.
+      Thiết lập URL tham chiếu đến một tệp :file:`robots.txt`.
 
    .. method:: read()
 
-      Reads the :file:`robots.txt` URL and feeds it to the parser.
+      Đọc URL :file:`robots.txt` và truyền URL đó cho parser.
 
    .. method:: parse(lines)
 
-      Parses the lines argument.
+      Phân tích đối số lines.
 
    .. method:: can_fetch(useragent, url)
 
-      Returns ``True`` if the *useragent* is allowed to fetch the *url*
-      according to the rules contained in the parsed :file:`robots.txt`
-      file.
+      Trả về ``True`` nếu *useragent* được phép tải *url* theo các quy tắc có trong tệp :file:`robots.txt` đã được phân tích.
 
    .. method:: mtime()
 
-      Returns the time the ``robots.txt`` file was last fetched.  This is
-      useful for long-running web spiders that need to check for new
-      ``robots.txt`` files periodically.
+      Trả về thời điểm tệp ``robots.txt`` được tải lần cuối. Điều này hữu ích cho các web spider chạy trong thời gian dài, cần định kỳ kiểm tra các tệp ``robots.txt`` mới.
 
    .. method:: modified()
 
-      Sets the time the ``robots.txt`` file was last fetched to the current
-      time.
+      Đặt thời điểm tệp ``robots.txt`` được tải lần cuối thành thời điểm hiện tại.
 
    .. method:: crawl_delay(useragent)
 
-      Returns the value of the ``Crawl-delay`` parameter from ``robots.txt``
-      for the *useragent* in question.  If there is no such parameter or it
-      doesn't apply to the *useragent* specified or the ``robots.txt`` entry
-      for this parameter has invalid syntax, return ``None``.
+      Trả về giá trị của tham số ``Crawl-delay`` từ ``robots.txt`` cho *useragent* đang xét. Nếu không có tham số đó, tham số không áp dụng cho *useragent* được chỉ định hoặc mục ``robots.txt`` của tham số này có cú pháp không hợp lệ, trả về ``None``.
 
       .. versionadded:: 3.6
 
    .. method:: request_rate(useragent)
 
-      Returns the contents of the ``Request-rate`` parameter from
-      ``robots.txt`` as a :term:`named tuple` ``RequestRate(requests, seconds)``.
-      If there is no such parameter or it doesn't apply to the *useragent*
-      specified or the ``robots.txt`` entry for this parameter has invalid
-      syntax, return ``None``.
+      Trả về nội dung của tham số ``Request-rate`` từ ``robots.txt`` dưới dạng :term:`named tuple` ``RequestRate(requests, seconds)``. Nếu không có tham số đó, tham số không áp dụng cho *useragent* được chỉ định hoặc mục ``robots.txt`` của tham số này có cú pháp không hợp lệ, trả về ``None``.
 
       .. versionadded:: 3.6
 
    .. method:: site_maps()
 
-      Returns the contents of the ``Sitemap`` parameter from
-      ``robots.txt`` in the form of a :func:`list`. If there is no such
-      parameter or the ``robots.txt`` entry for this parameter has
-      invalid syntax, return ``None``.
+      Trả về nội dung của tham số ``Sitemap`` từ ``robots.txt`` dưới dạng :func:`list`. Nếu không có tham số đó hoặc mục nhập ``robots.txt`` cho tham số này có cú pháp không hợp lệ, hãy trả về ``None``.
 
       .. versionadded:: 3.8
 
 
-The following example demonstrates basic use of the :class:`RobotFileParser`
-class::
+Ví dụ sau minh họa cách sử dụng cơ bản lớp :class:`RobotFileParser`::
 
    >>> import urllib.robotparser
    >>> rp = urllib.robotparser.RobotFileParser()

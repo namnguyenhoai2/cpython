@@ -1,105 +1,89 @@
-:mod:`!numbers` --- Numeric abstract base classes
-=================================================
+:mod:`!numbers` --- Các lớp cơ sở trừu tượng về số
+==================================================
 
 .. module:: numbers
-   :synopsis: Numeric abstract base classes (Complex, Real, Integral, etc.).
+   :synopsis: Các lớp cơ sở trừu tượng về số (Complex, Real, Integral, v.v.).
 
-**Source code:** :source:`Lib/numbers.py`
+**Mã nguồn:** :source:`Lib/numbers.py`
 
 --------------
 
-The :mod:`!numbers` module (:pep:`3141`) defines a hierarchy of numeric
-:term:`abstract base classes <abstract base class>` which progressively define
-more operations.  None of the types defined in this module are intended to be instantiated.
+Mô-đun :mod:`!numbers` (:pep:`3141`) định nghĩa một hệ phân cấp các kiểu số
+:term:`lớp cơ sở trừu tượng <abstract base class>` lần lượt định nghĩa thêm nhiều phép toán. Không có kiểu nào được định nghĩa trong mô-đun này предназначены để tạo thực thể.
 
 
 .. class:: Number
 
-   The root of the numeric hierarchy. If you just want to check if an argument
-   *x* is a number, without caring what kind, use ``isinstance(x, Number)``.
+   Gốc của hệ phân cấp số. Nếu bạn chỉ muốn kiểm tra xem một đối số *x* có phải là một số hay không mà không quan tâm đến loại số nào, hãy sử dụng ``isinstance(x, Number)``.
 
 
-The numeric tower
------------------
+Hệ phân cấp số
+--------------
 
 .. class:: Complex
 
-   Subclasses of this type describe complex numbers and include the operations
-   that work on the built-in :class:`complex` type. These are: conversions to
-   :class:`complex` and :class:`bool`, :attr:`.real`, :attr:`.imag`, ``+``,
-   ``-``, ``*``, ``/``, ``**``, :func:`abs`, :meth:`conjugate`, ``==``, and
-   ``!=``. All except ``-`` and ``!=`` are abstract.
+   Các lớp con của kiểu này mô tả số phức và bao gồm các phép toán hoạt động trên kiểu :class:`complex` tích hợp sẵn. Các phép toán đó gồm: chuyển đổi sang
+   :class:`complex` và :class:`bool`, :attr:`.real`, :attr:`.imag`, ``+``, ``-``, ``*``, ``/``, ``**``, :func:`abs`, :meth:`conjugate`, ``==`` và ``!=``. Tất cả đều là lớp trừu tượng, ngoại trừ ``-`` và ``!=``.
 
    .. attribute:: real
 
-      Abstract. Retrieves the real component of this number.
+      Trừu tượng. Lấy phần thực của số này.
 
    .. attribute:: imag
 
-      Abstract. Retrieves the imaginary component of this number.
+      Trừu tượng. Lấy phần ảo của số này.
 
    .. method:: conjugate()
       :abstractmethod:
 
-      Abstract. Returns the complex conjugate. For example, ``(1+3j).conjugate()
-      == (1-3j)``.
+      Trừu tượng. Trả về số phức liên hợp. Ví dụ: ``(1+3j).conjugate() == (1-3j)``.
 
 .. class:: Real
 
-   To :class:`Complex`, :class:`!Real` adds the operations that work on real
-   numbers.
+   Để :class:`Complex`, :class:`!Real` bổ sung các phép toán hoạt động trên số thực.
 
-   In short, those are: a conversion to :class:`float`, :func:`math.trunc`,
-   :func:`round`, :func:`math.floor`, :func:`math.ceil`, :func:`divmod`, ``//``,
-   ``%``, ``<``, ``<=``, ``>``, and ``>=``.
+   Tóm lại, các phép toán đó là: chuyển đổi sang :class:`float`, :func:`math.trunc`,
+   :func:`round`, :func:`math.floor`, :func:`math.ceil`, :func:`divmod`, ``//``, ``%``, ``<``, ``<=``, ``>``, và ``>=``.
 
-   Real also provides defaults for :func:`complex`, :attr:`~Complex.real`,
-   :attr:`~Complex.imag`, and :meth:`~Complex.conjugate`.
+   Real cũng cung cấp các giá trị mặc định cho :func:`complex`, :attr:`~Complex.real`,
+   :attr:`~Complex.imag` và :meth:`~Complex.conjugate`.
 
 
 .. class:: Rational
 
-   Subtypes :class:`Real` and adds :attr:`~Rational.numerator` and
-   :attr:`~Rational.denominator` properties. It also provides a default for
+   Kế thừa :class:`Real` và bổ sung các thuộc tính :attr:`~Rational.numerator` và
+   :attr:`~Rational.denominator`. Nó cũng cung cấp giá trị mặc định cho
    :func:`float`.
 
-   The :attr:`~Rational.numerator` and :attr:`~Rational.denominator` values
-   should be instances of :class:`Integral` and should be in lowest terms with
-   :attr:`~Rational.denominator` positive.
+   Các giá trị :attr:`~Rational.numerator` và :attr:`~Rational.denominator` phải là các thực thể của :class:`Integral` và phải ở dạng tối giản, với
+   :attr:`~Rational.denominator` dương.
 
    .. attribute:: numerator
 
-      Abstract.  The numerator of this rational number.
+      Trừu tượng. Tử số của số hữu tỉ này.
 
    .. attribute:: denominator
 
-      Abstract.  The denominator of this rational number.
+      Trừu tượng. Mẫu số của số hữu tỉ này.
 
 
 .. class:: Integral
 
-   Subtypes :class:`Rational` and adds a conversion to :class:`int`.  Provides
-   defaults for :func:`float`, :attr:`~Rational.numerator`, and
-   :attr:`~Rational.denominator`.  Adds abstract methods for :func:`pow` with
-   modulus and bit-string operations: ``<<``, ``>>``, ``&``, ``^``, ``|``,
-   ``~``.
+   Là lớp con của :class:`Rational` và bổ sung khả năng chuyển đổi sang :class:`int`. Cung cấp các giá trị mặc định cho :func:`float`, :attr:`~Rational.numerator`, và
+   :attr:`~Rational.denominator`. Bổ sung các phương thức trừu tượng cho :func:`pow` với các thao tác modulus và chuỗi bit: ``<<``, ``>>``, ``&``, ``^``, ``|``, ``~``.
 
 
-Notes for type implementers
----------------------------
+Lưu ý dành cho bên triển khai kiểu
+----------------------------------
 
-Implementers should be careful to make equal numbers equal and hash
-them to the same values. This may be subtle if there are two different
-extensions of the real numbers. See also :ref:`numeric-hash`.
+Bên triển khai cần cẩn thận để các số bằng nhau có giá trị bằng nhau và được băm thành cùng một giá trị. Điều này có thể tinh tế nếu có hai phần mở rộng khác nhau của các số thực. Xem thêm :ref:`numeric-hash`.
 
 
-Adding More Numeric ABCs
-~~~~~~~~~~~~~~~~~~~~~~~~
+Bổ sung thêm các ABC số học
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are, of course, more possible ABCs for numbers, and this would
-be a poor hierarchy if it precluded the possibility of adding
-those. You can add ``MyFoo`` between :class:`Complex` and
-:class:`Real` with::
+Dĩ nhiên, còn có nhiều ABC khả dĩ khác cho các số, và đây sẽ là một hệ phân cấp tồi nếu nó ngăn cản khả năng bổ sung chúng. Bạn có thể thêm ``MyFoo`` giữa :class:`Complex` và
+:class:`Real` với::
 
     class MyFoo(Complex): ...
     MyFoo.register(Real)
@@ -107,15 +91,10 @@ those. You can add ``MyFoo`` between :class:`Complex` and
 
 .. _implementing-the-arithmetic-operations:
 
-Implementing the arithmetic operations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Triển khai các phép toán số học
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We want to implement the arithmetic operations so that mixed-mode
-operations either call an implementation whose author knew about the
-types of both arguments, or convert both to the nearest built in type
-and do the operation there. For subtypes of :class:`Integral`, this
-means that :meth:`~object.__add__` and :meth:`~object.__radd__` should be
-defined as::
+Chúng ta muốn triển khai các phép toán số học để các phép toán mixed-mode либо gọi một implementation mà tác giả biết kiểu của cả hai đối số, либо chuyển đổi cả hai sang kiểu built-in gần nhất rồi thực hiện phép toán ở đó. Đối với các subtype của :class:`Integral`, điều này có nghĩa là :meth:`~object.__add__` và :meth:`~object.__radd__` nên được định nghĩa như sau::
 
     class MyIntegral(Integral):
 
@@ -142,40 +121,19 @@ defined as::
                 return NotImplemented
 
 
-There are 5 different cases for a mixed-type operation on subclasses
-of :class:`Complex`. I'll refer to all of the above code that doesn't
-refer to ``MyIntegral`` and ``OtherTypeIKnowAbout`` as
-"boilerplate". ``a`` will be an instance of ``A``, which is a subtype
-of :class:`Complex` (``a : A <: Complex``), and ``b : B <:
-Complex``. I'll consider ``a + b``:
+Có 5 trường hợp khác nhau đối với một phép toán mixed-type trên các subclass của :class:`Complex`. Tôi sẽ gọi toàn bộ đoạn code ở trên không tham chiếu đến ``MyIntegral`` và ``OtherTypeIKnowAbout`` là "boilerplate". ``a`` sẽ là một instance của ``A``, vốn là một subtype của :class:`Complex` (``a : A <: Complex``), và ``b : B <: Complex``. Tôi sẽ xét ``a + b``:
 
-1. If ``A`` defines an :meth:`~object.__add__` which accepts ``b``, all is
-   well.
-2. If ``A`` falls back to the boilerplate code, and it were to
-   return a value from :meth:`~object.__add__`, we'd miss the possibility
-   that ``B`` defines a more intelligent :meth:`~object.__radd__`, so the
-   boilerplate should return :data:`NotImplemented` from
-   :meth:`!__add__`. (Or ``A`` may not implement :meth:`!__add__` at
-   all.)
-3. Then ``B``'s :meth:`~object.__radd__` gets a chance. If it accepts
-   ``a``, all is well.
-4. If it falls back to the boilerplate, there are no more possible
-   methods to try, so this is where the default implementation
-   should live.
-5. If ``B <: A``, Python tries ``B.__radd__`` before
-   ``A.__add__``. This is ok, because it was implemented with
-   knowledge of ``A``, so it can handle those instances before
-   delegating to :class:`Complex`.
+1. Nếu ``A`` định nghĩa một :meth:`~object.__add__` chấp nhận ``b``, thì mọi việc đều ổn.
+2. Nếu ``A`` chuyển sang đoạn code boilerplate và trả về một giá trị từ :meth:`~object.__add__`, chúng ta sẽ bỏ lỡ khả năng ``B`` định nghĩa một :meth:`~object.__radd__` thông minh hơn, vì vậy boilerplate nên trả về :data:`NotImplemented` từ
+   :meth:`!__add__`. (Hoặc ``A`` có thể hoàn toàn không triển khai :meth:`!__add__`.)
+3. Sau đó, :meth:`~object.__radd__` của ``B`` có cơ hội được gọi. Nếu nó chấp nhận ``a``, mọi việc đều ổn.
+4. Nếu nó chuyển sang phần boilerplate, thì không còn phương thức khả thi nào khác để thử, vì vậy đây là nơi phần triển khai mặc định nên được đặt.
+5. Nếu ``B <: A``, Python thử ``B.__radd__`` trước ``A.__add__``. Điều này là hợp lý, vì nó được triển khai với hiểu biết về ``A``, nên có thể xử lý các instance đó trước khi ủy quyền cho :class:`Complex`.
 
-If ``A <: Complex`` and ``B <: Real`` without sharing any other knowledge,
-then the appropriate shared operation is the one involving the built
-in :class:`complex`, and both :meth:`~object.__radd__` s land there, so ``a+b
-== b+a``.
+Nếu ``A <: Complex`` và ``B <: Real`` mà không chia sẻ bất kỳ hiểu biết nào khác, thì phép toán chung thích hợp là phép toán liên quan đến :class:`complex` dựng sẵn, và cả hai :meth:`~object.__radd__` đều đi đến đó, vì vậy ``a+b == b+a``.
 
-Because most of the operations on any given type will be very similar,
-it can be useful to define a helper function which generates the
-forward and reverse instances of any given operator. For example,
-:class:`fractions.Fraction` uses::
+Vì hầu hết các phép toán trên bất kỳ kiểu cụ thể nào cũng sẽ rất giống nhau, nên việc định nghĩa một hàm helper để tạo ra các instance xuôi và ngược của bất kỳ toán tử nào cũng có thể hữu ích. Ví dụ:
+:class:`fractions.Fraction` sử dụng::
 
     def _operator_fallbacks(monomorphic_operator, fallback_operator):
         def forward(a, b):
@@ -192,7 +150,7 @@ forward and reverse instances of any given operator. For example,
 
         def reverse(b, a):
             if isinstance(a, Rational):
-                # Includes ints.
+                # Bao gồm các số nguyên.
                 return monomorphic_operator(a, b)
             elif isinstance(a, Real):
                 return fallback_operator(float(a), float(b))

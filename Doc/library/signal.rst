@@ -1,298 +1,259 @@
-:mod:`!signal` --- Set handlers for asynchronous events
-=======================================================
+:mod:`!signal` --- Thiết lập trình xử lý cho các sự kiện bất đồng bộ
+====================================================================
 
 .. module:: signal
-   :synopsis: Set handlers for asynchronous events.
+   :synopsis: Thiết lập trình xử lý cho các sự kiện bất đồng bộ.
 
-**Source code:** :source:`Lib/signal.py`
+**Mã nguồn:** :source:`Lib/signal.py`
 
 --------------
 
-This module provides mechanisms to use signal handlers in Python.
+Mô-đun này cung cấp các cơ chế để sử dụng trình xử lý signal trong Python.
 
 
-General rules
--------------
+Các quy tắc chung
+-----------------
 
-The :func:`signal.signal` function allows defining custom handlers to be
-executed when a signal is received.  A small number of default handlers are
-installed: :const:`SIGPIPE` is ignored (so write errors on pipes and sockets
-can be reported as ordinary Python exceptions) and :const:`SIGINT` is
-translated into a :exc:`KeyboardInterrupt` exception if the parent process
-has not changed it.
+Hàm :func:`signal.signal` cho phép định nghĩa các trình xử lý tùy chỉnh để thực thi khi nhận được một signal. Một số ít trình xử lý mặc định được cài đặt: :const:`SIGPIPE` bị bỏ qua (vì vậy các lỗi ghi vào pipe và socket có thể được báo cáo dưới dạng các ngoại lệ Python thông thường) và :const:`SIGINT` được chuyển thành một ngoại lệ :exc:`KeyboardInterrupt` nếu tiến trình cha chưa thay đổi nó.
 
-A handler for a particular signal, once set, remains installed until it is
-explicitly reset (Python emulates the BSD style interface regardless of the
-underlying implementation), with the exception of the handler for
-:const:`SIGCHLD`, which follows the underlying implementation.
+Trình xử lý cho một signal cụ thể, sau khi được thiết lập, sẽ tiếp tục được cài đặt cho đến khi được đặt lại một cách rõ ràng (Python mô phỏng giao diện kiểu BSD bất kể cách triển khai bên dưới), ngoại trừ trình xử lý cho
+:const:`SIGCHLD`, tuân theo cách triển khai bên dưới.
 
-On WebAssembly platforms, signals are emulated and therefore behave
-differently. Several functions and signals are not available on these
-platforms.
+Trên các nền tảng WebAssembly, các signal được mô phỏng và do đó hoạt động khác đi. Một số hàm và signal không khả dụng trên các nền tảng này.
 
-Execution of Python signal handlers
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Thực thi các signal handler của Python
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A Python signal handler does not get executed inside the low-level (C) signal
-handler.  Instead, the low-level signal handler sets a flag which tells the
-:term:`virtual machine` to execute the corresponding Python signal handler
-at a later point (for example, at the next :term:`bytecode` instruction).
-This has consequences:
+Một signal handler của Python không được thực thi bên trong signal handler cấp thấp (C). Thay vào đó, signal handler cấp thấp đặt một cờ để báo cho
+:term:`virtual machine` thực thi signal handler Python tương ứng vào thời điểm sau đó (ví dụ: tại lệnh :term:`bytecode` tiếp theo). Điều này dẫn đến các hệ quả sau:
 
-* It makes little sense to catch synchronous errors like :const:`SIGFPE` or
-  :const:`SIGSEGV` that are caused by an invalid operation in C code.  Python
-  will return from the signal handler to the C code, which is likely to raise
-  the same signal again, causing Python to apparently hang.  From Python 3.3
-  onwards, you can use the :mod:`faulthandler` module to report on synchronous
-  errors.
+* Việc bắt các lỗi đồng bộ như :const:`SIGFPE` hoặc
+  :const:`SIGSEGV` do một thao tác không hợp lệ trong mã C gây ra là không mấy ý nghĩa. Python sẽ trở về từ signal handler về mã C, và mã này có khả năng sẽ phát sinh lại signal tương tự, khiến Python dường như bị treo. Kể từ Python 3.3, bạn có thể sử dụng module :mod:`faulthandler` để báo cáo các lỗi đồng bộ.
 
-* A long-running calculation implemented purely in C (such as regular
-  expression matching on a large body of text) may run uninterrupted for an
-  arbitrary amount of time, regardless of any signals received.  The Python
-  signal handlers will be called when the calculation finishes.
+* Một phép tính chạy lâu được triển khai hoàn toàn bằng C (chẳng hạn như so khớp biểu thức chính quy trên một lượng lớn văn bản) có thể chạy liên tục trong một khoảng thời gian tùy ý, bất kể đã nhận được tín hiệu nào. Các trình xử lý tín hiệu của Python sẽ được gọi khi phép tính kết thúc.
 
-* If the handler raises an exception, it will be raised "out of thin air" in
-  the main thread. See the :ref:`note below <handlers-and-exceptions>` for a
-  discussion.
+* Nếu trình xử lý phát sinh một ngoại lệ, ngoại lệ đó sẽ xuất hiện "từ hư không" trong luồng chính. Xem :ref:`ghi chú dưới đây <handlers-and-exceptions>` để biết thêm thông tin.
 
 .. _signals-and-threads:
 
 
-Signals and threads
-^^^^^^^^^^^^^^^^^^^
+Tín hiệu và luồng
+^^^^^^^^^^^^^^^^^
 
-Python signal handlers are always executed in the main Python thread of the main interpreter,
-even if the signal was received in another thread.  This means that signals
-can't be used as a means of inter-thread communication.  You can use
-the synchronization primitives from the :mod:`threading` module instead.
+Các trình xử lý tín hiệu của Python luôn được thực thi trong luồng Python chính của trình thông dịch chính, ngay cả khi tín hiệu được nhận trong một luồng khác. Điều này có nghĩa là không thể sử dụng tín hiệu để giao tiếp giữa các luồng. Thay vào đó, bạn có thể sử dụng các primitive đồng bộ hóa từ module :mod:`threading`.
 
-Besides, only the main thread of the main interpreter is allowed to set a new signal handler.
+Ngoài ra, chỉ luồng chính của trình thông dịch chính mới được phép thiết lập một trình xử lý tín hiệu mới.
 
 .. warning::
 
-   Synchronization primitives such as :class:`threading.Lock` should not be used
-   within signal handlers.  Doing so can lead to unexpected deadlocks.
+   Không nên sử dụng các primitive đồng bộ hóa như :class:`threading.Lock` bên trong trình xử lý tín hiệu. Làm như vậy có thể dẫn đến deadlock không mong muốn.
 
 
-Module contents
+Nội dung module
 ---------------
 
 .. versionchanged:: 3.5
-   signal (SIG*), handler (:const:`SIG_DFL`, :const:`SIG_IGN`) and sigmask
-   (:const:`SIG_BLOCK`, :const:`SIG_UNBLOCK`, :const:`SIG_SETMASK`)
-   related constants listed below were turned into
-   :class:`enums <enum.IntEnum>` (:class:`Signals`, :class:`Handlers` and :class:`Sigmasks` respectively).
-   :func:`getsignal`, :func:`pthread_sigmask`, :func:`sigpending` and
-   :func:`sigwait` functions return human-readable
-   :class:`enums <enum.IntEnum>` as :class:`Signals` objects.
+   các hằng số liên quan đến signal (SIG*), handler (:const:`SIG_DFL`, :const:`SIG_IGN`) và sigmask (:const:`SIG_BLOCK`, :const:`SIG_UNBLOCK`, :const:`SIG_SETMASK`) được liệt kê dưới đây đã được chuyển thành
+   :class:`enums <enum.IntEnum>` (:class:`Signals`, :class:`Handlers` và :class:`Sigmasks` tương ứng).
+   :func:`getsignal`, :func:`pthread_sigmask`, :func:`sigpending` và
+   các hàm :func:`sigwait` trả về dạng dễ đọc
+   :class:`enums <enum.IntEnum>` dưới dạng các đối tượng :class:`Signals`.
 
 
-The signal module defines three enums:
+Mô-đun signal định nghĩa ba enum:
 
 .. class:: Signals
 
-   :class:`enum.IntEnum` collection of SIG* constants and the CTRL_* constants.
+   Bộ sưu tập :class:`enum.IntEnum` gồm các hằng số SIG* và các hằng số CTRL_*.
 
    .. versionadded:: 3.5
 
 .. class:: Handlers
 
-   :class:`enum.IntEnum` collection of the constants :const:`SIG_DFL` and :const:`SIG_IGN`.
+   :class:`enum.IntEnum` tập hợp các hằng số :const:`SIG_DFL` và :const:`SIG_IGN`.
 
    .. versionadded:: 3.5
 
 .. class:: Sigmasks
 
-   :class:`enum.IntEnum` collection of the constants :const:`SIG_BLOCK`, :const:`SIG_UNBLOCK` and :const:`SIG_SETMASK`.
+   :class:`enum.IntEnum` tập hợp các hằng số :const:`SIG_BLOCK`, :const:`SIG_UNBLOCK` và :const:`SIG_SETMASK`.
 
    .. availability:: Unix.
 
-      See the man page :manpage:`sigprocmask(2)` and
-      :manpage:`pthread_sigmask(3)` for further information.
+      Xem trang hướng dẫn :manpage:`sigprocmask(2)` và
+      :manpage:`pthread_sigmask(3)` để biết thêm thông tin.
 
    .. versionadded:: 3.5
 
 
-The variables defined in the :mod:`!signal` module are:
+Các biến được định nghĩa trong mô-đun :mod:`!signal` là:
 
 
 .. data:: SIG_DFL
 
-   This is one of two standard signal handling options; it will simply perform
-   the default function for the signal.  For example, on most systems the
-   default action for :const:`SIGQUIT` is to dump core and exit, while the
-   default action for :const:`SIGCHLD` is to simply ignore it.
+   Đây là một trong hai tùy chọn xử lý tín hiệu tiêu chuẩn; tùy chọn này chỉ thực hiện hàm mặc định cho tín hiệu. Ví dụ, trên hầu hết các hệ thống, hành động mặc định cho :const:`SIGQUIT` là kết xuất core rồi thoát, còn hành động mặc định cho :const:`SIGCHLD` là đơn giản bỏ qua tín hiệu đó.
 
 
 .. data:: SIG_IGN
 
-   This is another standard signal handler, which will simply ignore the given
-   signal.
+   Đây là một trình xử lý tín hiệu tiêu chuẩn khác, chỉ đơn giản bỏ qua tín hiệu đã cho.
 
 
 .. data:: SIGABRT
 
-   Abort signal from :manpage:`abort(3)`.
+   Tín hiệu hủy từ :manpage:`abort(3)`.
 
 .. data:: SIGALRM
 
-   Timer signal from :manpage:`alarm(2)`.
+   Tín hiệu bộ hẹn giờ từ :manpage:`alarm(2)`.
 
    .. availability:: Unix.
 
 .. data:: SIGBREAK
 
-   Interrupt from keyboard (CTRL + BREAK).
+   Ngắt từ bàn phím (CTRL + BREAK).
 
    .. availability:: Windows.
 
 .. data:: SIGBUS
 
-   Bus error (bad memory access).
+   Lỗi bus (truy cập bộ nhớ không hợp lệ).
 
    .. availability:: Unix.
 
 .. data:: SIGCHLD
 
-   Child process stopped or terminated.
+   Tiến trình con đã dừng hoặc bị chấm dứt.
 
    .. availability:: Unix.
 
 .. data:: SIGCLD
 
-   Alias to :data:`SIGCHLD`.
+   Bí danh của :data:`SIGCHLD`.
 
    .. availability:: not macOS.
 
 .. data:: SIGCONT
 
-   Continue the process if it is currently stopped
+   Tiếp tục tiến trình nếu tiến trình hiện đang dừng
 
    .. availability:: Unix.
 
 .. data:: SIGFPE
 
-   Floating-point exception. For example, division by zero.
+   Ngoại lệ số thực dấu phẩy động. Ví dụ: phép chia cho không.
 
    .. seealso::
       :exc:`ZeroDivisionError` is raised when the second argument of a division
-      or modulo operation is zero.
+      hoặc phép modulo bằng không.
 
 .. data:: SIGHUP
 
-   Hangup detected on controlling terminal or death of controlling process.
+   Phát hiện tín hiệu ngắt trên terminal điều khiển hoặc tiến trình điều khiển đã kết thúc.
 
    .. availability:: Unix.
 
 .. data:: SIGILL
 
-   Illegal instruction.
+   Lệnh không hợp lệ.
 
 .. data:: SIGINT
 
-   Interrupt from keyboard (CTRL + C).
+   Tín hiệu ngắt từ bàn phím (CTRL + C).
 
-   Default action is to raise :exc:`KeyboardInterrupt`.
+   Hành động mặc định là phát sinh :exc:`KeyboardInterrupt`.
 
 .. data:: SIGKILL
 
-   Kill signal.
+   Tín hiệu kết thúc.
 
-   It cannot be caught, blocked, or ignored.
+   Không thể bắt, chặn hoặc bỏ qua tín hiệu này.
 
    .. availability:: Unix.
 
 .. data:: SIGPIPE
 
-   Broken pipe: write to pipe with no readers.
+   Đường ống bị hỏng: ghi vào đường ống không có trình đọc.
 
-   Default action is to ignore the signal.
+   Hành động mặc định là bỏ qua tín hiệu.
 
    .. availability:: Unix.
 
 .. data:: SIGPROF
 
-   Profiling timer expired.
+   Bộ hẹn giờ profiling đã hết hạn.
 
    .. availability:: Unix.
 
 .. data:: SIGQUIT
 
-   Terminal quit signal.
+   Tín hiệu thoát terminal.
 
    .. availability:: Unix.
 
 .. data:: SIGSEGV
 
-   Segmentation fault: invalid memory reference.
+   Lỗi segmentation fault: tham chiếu bộ nhớ không hợp lệ.
 
 .. data:: SIGSTOP
 
-   Stop executing (cannot be caught or ignored).
+   Dừng thực thi (không thể bắt hoặc bỏ qua).
 
    .. availability:: Unix.
 
 .. data:: SIGSTKFLT
 
-   Stack fault on coprocessor. The Linux kernel does not raise this signal: it
-   can only be raised in user space.
+   Lỗi ngăn xếp trên bộ đồng xử lý. Nhân Linux không phát tín hiệu này: tín hiệu này chỉ có thể được phát trong không gian người dùng.
 
    .. availability:: Linux.
 
-      On architectures where the signal is available. See
-      the man page :manpage:`signal(7)` for further information.
+      Trên các kiến trúc có hỗ trợ tín hiệu này. Xem trang hướng dẫn :manpage:`signal(7)` để biết thêm thông tin.
 
    .. versionadded:: 3.11
 
 .. data:: SIGTERM
 
-   Termination signal.
+   Tín hiệu kết thúc.
 
 .. data:: SIGUSR1
 
-   User-defined signal 1.
+   Tín hiệu do người dùng định nghĩa 1.
 
    .. availability:: Unix.
 
 .. data:: SIGUSR2
 
-   User-defined signal 2.
+   Tín hiệu do người dùng định nghĩa 2.
 
    .. availability:: Unix.
 
 .. data:: SIGVTALRM
 
-   Virtual timer expired.
+   Bộ hẹn giờ ảo đã hết hạn.
 
    .. availability:: Unix.
 
 .. data:: SIGWINCH
 
-   Window resize signal.
+   Tín hiệu thay đổi kích thước cửa sổ.
 
    .. availability:: Unix.
 
 .. data:: SIGXCPU
 
-   CPU time limit exceeded.
+   Đã vượt quá giới hạn thời gian CPU.
 
    .. availability:: Unix.
 
 .. data:: SIG*
 
-   All the signal numbers are defined symbolically.  For example, the hangup signal
-   is defined as :const:`signal.SIGHUP`; the variable names are identical to the
-   names used in C programs, as found in ``<signal.h>``.  The Unix man page for
-   '``signal``' lists the existing signals (on some systems this is
-   :manpage:`signal(2)`, on others the list is in :manpage:`signal(7)`). Note that
-   not all systems define the same set of signal names; only those names defined by
-   the system are defined by this module.
+   Tất cả số hiệu tín hiệu đều được định nghĩa bằng tên tượng trưng. Ví dụ, tín hiệu ngắt kết nối được định nghĩa là :const:`signal.SIGHUP`; tên biến giống hệt tên được sử dụng trong các chương trình C, như được nêu trong ``<signal.h>``. Trang hướng dẫn Unix cho '``signal``' liệt kê các tín hiệu hiện có (trên một số hệ thống, đây là
+   :manpage:`signal(2)`, trên các hệ thống khác, danh sách nằm trong :manpage:`signal(7)`). Lưu ý rằng không phải tất cả hệ thống đều định nghĩa cùng một tập hợp tên tín hiệu; chỉ những tên được hệ thống định nghĩa mới được module này định nghĩa.
 
 
 .. data:: CTRL_C_EVENT
 
-   The signal corresponding to the :kbd:`Ctrl+C` keystroke event. This signal can
-   only be used with :func:`os.kill`.
+   Tín hiệu tương ứng với sự kiện nhấn phím :kbd:`Ctrl+C`. Tín hiệu này chỉ có thể được sử dụng với :func:`os.kill`.
 
    .. availability:: Windows.
 
@@ -301,8 +262,7 @@ The variables defined in the :mod:`!signal` module are:
 
 .. data:: CTRL_BREAK_EVENT
 
-   The signal corresponding to the :kbd:`Ctrl+Break` keystroke event. This signal can
-   only be used with :func:`os.kill`.
+   Tín hiệu tương ứng với sự kiện nhấn phím :kbd:`Ctrl+Break`. Tín hiệu này chỉ có thể được sử dụng với :func:`os.kill`.
 
    .. availability:: Windows.
 
@@ -311,140 +271,112 @@ The variables defined in the :mod:`!signal` module are:
 
 .. data:: NSIG
 
-   One more than the number of the highest signal number.
-   Use :func:`valid_signals` to get valid signal numbers.
+   Lớn hơn số hiệu của tín hiệu cao nhất một đơn vị. Sử dụng :func:`valid_signals` để lấy các số hiệu tín hiệu hợp lệ.
 
 
 .. data:: ITIMER_REAL
 
-   Decrements interval timer in real time, and delivers :const:`SIGALRM` upon
-   expiration.
+   Giảm bộ định thời khoảng thời gian theo thời gian thực và gửi :const:`SIGALRM` khi hết hạn.
 
 
 .. data:: ITIMER_VIRTUAL
 
-   Decrements interval timer only when the process is executing, and delivers
-   SIGVTALRM upon expiration.
+   Giảm bộ hẹn giờ khoảng thời gian chỉ khi tiến trình đang thực thi và gửi SIGVTALRM khi hết hạn.
 
 
 .. data:: ITIMER_PROF
 
-   Decrements interval timer both when the process executes and when the
-   system is executing on behalf of the process. Coupled with ITIMER_VIRTUAL,
-   this timer is usually used to profile the time spent by the application
-   in user and kernel space. SIGPROF is delivered upon expiration.
+   Giảm bộ hẹn giờ khoảng thời gian cả khi tiến trình thực thi và khi hệ thống thực thi thay cho tiến trình. Kết hợp với ITIMER_VIRTUAL, bộ hẹn giờ này thường được dùng để lập hồ sơ thời gian ứng dụng sử dụng trong user space và kernel space. SIGPROF được gửi khi hết hạn.
 
 
 .. data:: SIG_BLOCK
 
-   A possible value for the *how* parameter to :func:`pthread_sigmask`
-   indicating that signals are to be blocked.
+   Một giá trị khả dĩ cho tham số *how* của :func:`pthread_sigmask`, cho biết các signal sẽ bị chặn.
 
    .. versionadded:: 3.3
 
 .. data:: SIG_UNBLOCK
 
-   A possible value for the *how* parameter to :func:`pthread_sigmask`
-   indicating that signals are to be unblocked.
+   Một giá trị khả dĩ cho tham số *how* của :func:`pthread_sigmask`, cho biết các signal sẽ được bỏ chặn.
 
    .. versionadded:: 3.3
 
 .. data:: SIG_SETMASK
 
-   A possible value for the *how* parameter to :func:`pthread_sigmask`
-   indicating that the signal mask is to be replaced.
+   Một giá trị khả dĩ cho tham số *how* của :func:`pthread_sigmask`, cho biết signal mask sẽ được thay thế.
 
    .. versionadded:: 3.3
 
 
-The :mod:`!signal` module defines one exception:
+Module :mod:`!signal` định nghĩa một exception:
 
 .. exception:: ItimerError
 
-   Raised to signal an error from the underlying :func:`setitimer` or
-   :func:`getitimer` implementation. Expect this error if an invalid
-   interval timer or a negative time is passed to :func:`setitimer`.
-   This error is a subtype of :exc:`OSError`.
+   Được nâng lên để báo hiệu lỗi từ :func:`setitimer` bên dưới hoặc
+   Triển khai :func:`getitimer`. Dự kiến lỗi này nếu truyền bộ hẹn giờ theo khoảng thời gian không hợp lệ hoặc thời gian âm cho :func:`setitimer`. Lỗi này là một kiểu con của :exc:`OSError`.
 
    .. versionadded:: 3.3
-      This error used to be a subtype of :exc:`IOError`, which is now an
-      alias of :exc:`OSError`.
+      Lỗi này trước đây là một kiểu con của :exc:`IOError`, hiện đã trở thành bí danh của :exc:`OSError`.
 
 
-The :mod:`!signal` module defines the following functions:
+Mô-đun :mod:`!signal` định nghĩa các hàm sau:
 
 
 .. function:: alarm(time)
 
-   If *time* is non-zero, this function requests that a :const:`SIGALRM` signal be
-   sent to the process in *time* seconds. Any previously scheduled alarm is
-   canceled (only one alarm can be scheduled at any time).  The returned value is
-   then the number of seconds before any previously set alarm was to have been
-   delivered. If *time* is zero, no alarm is scheduled, and any scheduled alarm is
-   canceled.  If the return value is zero, no alarm is currently scheduled.
+   Nếu *time* khác 0, hàm này yêu cầu gửi tín hiệu :const:`SIGALRM` đến tiến trình sau *time* giây. Mọi cảnh báo đã được lên lịch trước đó sẽ bị hủy (tại một thời điểm chỉ có thể lên lịch một cảnh báo). Giá trị trả về là số giây còn lại trước khi cảnh báo được thiết lập trước đó được gửi. Nếu *time* bằng 0, không có cảnh báo nào được lên lịch và mọi cảnh báo đã lên lịch sẽ bị hủy. Nếu giá trị trả về bằng 0, hiện không có cảnh báo nào được lên lịch.
 
    .. availability:: Unix.
 
-      See the man page :manpage:`alarm(2)` for further information.
+      Xem trang hướng dẫn :manpage:`alarm(2)` để biết thêm thông tin.
 
 
 .. function:: getsignal(signalnum)
 
-   Return the current signal handler for the signal *signalnum*. The returned value
-   may be a callable Python object, or one of the special values
-   :const:`signal.SIG_IGN`, :const:`signal.SIG_DFL` or :const:`None`.  Here,
-   :const:`signal.SIG_IGN` means that the signal was previously ignored,
-   :const:`signal.SIG_DFL` means that the default way of handling the signal was
-   previously in use, and ``None`` means that the previous signal handler was not
-   installed from Python.
+   Trả về signal handler hiện tại cho tín hiệu *signalnum*. Giá trị trả về có thể là một đối tượng Python có thể gọi hoặc một trong các giá trị đặc biệt
+   :const:`signal.SIG_IGN`, :const:`signal.SIG_DFL` hoặc :const:`None`. Tại đây,
+   :const:`signal.SIG_IGN` có nghĩa là tín hiệu trước đó đã bị bỏ qua,
+   :const:`signal.SIG_DFL` có nghĩa là cách xử lý mặc định đối với tín hiệu trước đó đang được sử dụng, còn ``None`` có nghĩa là trình xử lý tín hiệu trước đó không được cài đặt từ Python.
 
 
 .. function:: strsignal(signalnum)
 
-   Returns the description of signal *signalnum*, such as "Interrupt"
-   for :const:`SIGINT`. Returns :const:`None` if *signalnum* has no
-   description. Raises :exc:`ValueError` if *signalnum* is invalid.
+   Trả về mô tả của tín hiệu *signalnum*, chẳng hạn như "Interrupt" đối với :const:`SIGINT`. Trả về :const:`None` nếu *signalnum* không có mô tả. Phát sinh :exc:`ValueError` nếu *signalnum* không hợp lệ.
 
    .. versionadded:: 3.8
 
 
 .. function:: valid_signals()
 
-   Return the set of valid signal numbers on this platform.  This can be
-   less than ``range(1, NSIG)`` if some signals are reserved by the system
-   for internal use.
+   Trả về tập hợp các số hiệu tín hiệu hợp lệ trên nền tảng này. Tập hợp này có thể ít hơn ``range(1, NSIG)`` nếu một số tín hiệu được hệ thống dành riêng cho mục đích sử dụng nội bộ.
 
    .. versionadded:: 3.8
 
 
 .. function:: pause()
 
-   Cause the process to sleep until a signal is received; the appropriate handler
-   will then be called.  Returns nothing.
+   Khiến tiến trình tạm dừng cho đến khi nhận được một tín hiệu; sau đó trình xử lý thích hợp sẽ được gọi. Không trả về giá trị nào.
 
    .. availability:: Unix.
 
-      See the man page :manpage:`signal(2)` for further information.
+      Xem trang hướng dẫn :manpage:`signal(2)` để biết thêm thông tin.
 
-   See also :func:`sigwait`, :func:`sigwaitinfo`, :func:`sigtimedwait` and
+   Xem thêm :func:`sigwait`, :func:`sigwaitinfo`, :func:`sigtimedwait` và
    :func:`sigpending`.
 
 
 .. function:: raise_signal(signum)
 
-   Sends a signal to the calling process. Returns nothing.
+   Gửi một tín hiệu đến tiến trình gọi. Không trả về giá trị nào.
 
    .. versionadded:: 3.8
 
 
 .. function:: pidfd_send_signal(pidfd, sig, siginfo=None, flags=0)
 
-   Send signal *sig* to the process referred to by file descriptor *pidfd*.
-   Python does not currently support the *siginfo* parameter; it must be
-   ``None``.  The *flags* argument is provided for future extensions; no flag
-   values are currently defined.
+   Gửi tín hiệu *sig* đến tiến trình được xác định bởi bộ mô tả tệp *pidfd*. Python hiện chưa hỗ trợ tham số *siginfo*; tham số này phải là ``None``. Đối số *flags* được cung cấp cho các phần mở rộng trong tương lai; hiện chưa có giá trị cờ nào được định nghĩa.
 
-   See the :manpage:`pidfd_send_signal(2)` man page for more information.
+   Xem trang hướng dẫn :manpage:`pidfd_send_signal(2)` để biết thêm thông tin.
 
    .. availability:: Linux >= 5.1, Android >= :func:`build-time <sys.getandroidapilevel>` API level 31
    .. versionadded:: 3.9
@@ -452,85 +384,63 @@ The :mod:`!signal` module defines the following functions:
 
 .. function:: pthread_kill(thread_id, signalnum)
 
-   Send the signal *signalnum* to the thread *thread_id*, another thread in the
-   same process as the caller.  The target thread can be executing any code
-   (Python or not).  However, if the target thread is executing the Python
-   interpreter, the Python signal handlers will be :ref:`executed by the main
-   thread of the main interpreter <signals-and-threads>`.  Therefore, the only point of sending a
-   signal to a particular Python thread would be to force a running system call
-   to fail with :exc:`InterruptedError`.
+   Gửi tín hiệu *signalnum* đến luồng *thread_id*, tức một luồng khác trong cùng tiến trình với bên gọi. Luồng đích có thể đang thực thi bất kỳ mã nào (Python hoặc không). Tuy nhiên, nếu luồng đích đang thực thi trình thông dịch Python, các trình xử lý tín hiệu Python sẽ được :ref:`thực thi bởi luồng chính của trình thông dịch chính <signals-and-threads>`. Vì vậy, mục đích duy nhất của việc gửi tín hiệu đến một luồng Python cụ thể là buộc một system call đang chạy thất bại với :exc:`InterruptedError`.
 
-   Use :func:`threading.get_ident` or the :attr:`~threading.Thread.ident`
-   attribute of :class:`threading.Thread` objects to get a suitable value
-   for *thread_id*.
+   Sử dụng :func:`threading.get_ident` hoặc thuộc tính :attr:`~threading.Thread.ident` của các đối tượng :class:`threading.Thread` để lấy giá trị phù hợp cho *thread_id*.
 
-   If *signalnum* is 0, then no signal is sent, but error checking is still
-   performed; this can be used to check if the target thread is still running.
+   Nếu *signalnum* là 0 thì không có tín hiệu nào được gửi, nhưng việc kiểm tra lỗi vẫn được thực hiện; bạn có thể dùng cách này để kiểm tra xem luồng đích còn đang chạy hay không.
 
    .. audit-event:: signal.pthread_kill thread_id,signalnum signal.pthread_kill
 
    .. availability:: Unix.
 
-      See the man page :manpage:`pthread_kill(3)` for further  information.
+      Xem trang hướng dẫn :manpage:`pthread_kill(3)` để biết thêm thông tin.
 
-   See also :func:`os.kill`.
+   Xem thêm :func:`os.kill`.
 
    .. versionadded:: 3.3
 
 
 .. function:: pthread_sigmask(how, mask)
 
-   Fetch and/or change the signal mask of the calling thread.  The signal mask
-   is the set of signals whose delivery is currently blocked for the caller.
-   Return the old signal mask as a set of signals.
+   Lấy và/hoặc thay đổi signal mask của luồng đang gọi. Signal mask là tập hợp các signal mà việc phân phối hiện đang bị chặn đối với bên gọi. Trả về signal mask cũ dưới dạng một tập hợp các signal.
 
-   The behavior of the call is dependent on the value of *how*, as follows.
+   Cách hoạt động của lệnh gọi phụ thuộc vào giá trị của *how*, như sau.
 
-   * :data:`SIG_BLOCK`: The set of blocked signals is the union of the current
-     set and the *mask* argument.
-   * :data:`SIG_UNBLOCK`: The signals in *mask* are removed from the current
-     set of blocked signals.  It is permissible to attempt to unblock a
-     signal which is not blocked.
-   * :data:`SIG_SETMASK`: The set of blocked signals is set to the *mask*
-     argument.
+   * :data:`SIG_BLOCK`: Tập hợp các signal bị chặn là hợp của tập hợp hiện tại và đối số *mask*.
+   * :data:`SIG_UNBLOCK`: Các signal trong *mask* được loại bỏ khỏi tập hợp signal hiện đang bị chặn. Có thể thử bỏ chặn một signal hiện không bị chặn.
+   * :data:`SIG_SETMASK`: Tập hợp các signal bị chặn được đặt thành đối số *mask*.
 
-   *mask* is a set of signal numbers (e.g. {:const:`signal.SIGINT`,
-   :const:`signal.SIGTERM`}). Use :func:`~signal.valid_signals` for a full
-   mask including all signals.
+   *mask* là một tập hợp các số signal (ví dụ: {:const:`signal.SIGINT`,
+   :const:`signal.SIGTERM`}). Sử dụng :func:`~signal.valid_signals` để tạo một mask đầy đủ bao gồm tất cả các signal.
 
-   For example, ``signal.pthread_sigmask(signal.SIG_BLOCK, [])`` reads the
-   signal mask of the calling thread.
+   Ví dụ: ``signal.pthread_sigmask(signal.SIG_BLOCK, [])`` đọc signal mask của thread gọi nó.
 
-   :data:`SIGKILL` and :data:`SIGSTOP` cannot be blocked.
+   Không thể block :data:`SIGKILL` và :data:`SIGSTOP`.
 
    .. availability:: Unix.
 
-      See the man page :manpage:`sigprocmask(2)` and
-      :manpage:`pthread_sigmask(3)` for further information.
+      Xem trang hướng dẫn :manpage:`sigprocmask(2)` và
+      :manpage:`pthread_sigmask(3)` để biết thêm thông tin.
 
-   See also :func:`pause`, :func:`sigpending` and :func:`sigwait`.
+   Xem thêm :func:`pause`, :func:`sigpending` và :func:`sigwait`.
 
    .. versionadded:: 3.3
 
 
 .. function:: setitimer(which, seconds, interval=0.0)
 
-   Sets given interval timer (one of :const:`signal.ITIMER_REAL`,
-   :const:`signal.ITIMER_VIRTUAL` or :const:`signal.ITIMER_PROF`) specified
-   by *which* to fire after *seconds* (float is accepted, different from
-   :func:`alarm`) and after that every *interval* seconds (if *interval*
-   is non-zero). The interval timer specified by *which* can be cleared by
-   setting *seconds* to zero.
+   Thiết lập timer theo khoảng thời gian đã cho (một trong :const:`signal.ITIMER_REAL`,
+   :const:`signal.ITIMER_VIRTUAL` hoặc :const:`signal.ITIMER_PROF`) được chỉ định bởi *which* để kích hoạt sau *seconds* (chấp nhận float, khác với
+   :func:`alarm`) và sau đó cứ mỗi *interval* giây (nếu *interval* khác không). Bộ hẹn giờ interval được chỉ định bởi *which* có thể được hủy bằng cách đặt *seconds* thành 0.
 
-   When an interval timer fires, a signal is sent to the process.
-   The signal sent is dependent on the timer being used;
-   :const:`signal.ITIMER_REAL` will deliver :const:`SIGALRM`,
-   :const:`signal.ITIMER_VIRTUAL` sends :const:`SIGVTALRM`,
-   and :const:`signal.ITIMER_PROF` will deliver :const:`SIGPROF`.
+   Khi interval timer được kích hoạt, một signal sẽ được gửi đến process. Signal được gửi phụ thuộc vào timer đang được sử dụng;
+   :const:`signal.ITIMER_REAL` sẽ gửi :const:`SIGALRM`,
+   :const:`signal.ITIMER_VIRTUAL` gửi :const:`SIGVTALRM`, còn :const:`signal.ITIMER_PROF` sẽ gửi :const:`SIGPROF`.
 
-   The old values are returned as a tuple: (delay, interval).
+   Các giá trị cũ được trả về dưới dạng một tuple: (delay, interval).
 
-   Attempting to pass an invalid interval timer will cause an
+   Việc cố gắng truyền vào một interval timer không hợp lệ sẽ gây ra một
    :exc:`ItimerError`.
 
    .. availability:: Unix.
@@ -538,190 +448,126 @@ The :mod:`!signal` module defines the following functions:
 
 .. function:: getitimer(which)
 
-   Returns current value of a given interval timer specified by *which*.
+   Trả về giá trị hiện tại của bộ hẹn giờ theo khoảng thời gian được chỉ định bởi *which*.
 
    .. availability:: Unix.
 
 
 .. function:: set_wakeup_fd(fd, *, warn_on_full_buffer=True)
 
-   Set the wakeup file descriptor to *fd*.  When a signal your program has
-   registered a signal handler for is received, the signal number is written as
-   a single byte into the fd.  If you haven't registered a signal handler for
-   the signals you care about, then nothing will be written to the wakeup fd.
-   This can be used by a library to wakeup a poll or select call, allowing the
-   signal to be fully processed.
+   Đặt file descriptor đánh thức thành *fd*. Khi nhận được một tín hiệu mà chương trình của bạn đã đăng ký signal handler, số hiệu tín hiệu sẽ được ghi dưới dạng một byte duy nhất vào fd. Nếu bạn chưa đăng ký signal handler cho các tín hiệu mình quan tâm, sẽ không có gì được ghi vào wakeup fd. Thư viện có thể sử dụng cơ chế này để đánh thức một lệnh gọi poll hoặc select, cho phép tín hiệu được xử lý hoàn toàn.
 
-   The old wakeup fd is returned (or -1 if file descriptor wakeup was not
-   enabled).  If *fd* is -1, file descriptor wakeup is disabled.
-   If not -1, *fd* must be non-blocking.  It is up to the library to remove
-   any bytes from *fd* before calling poll or select again.
+   Trả về wakeup fd cũ (hoặc -1 nếu chưa bật cơ chế đánh thức bằng file descriptor). Nếu *fd* là -1, cơ chế đánh thức bằng file descriptor sẽ bị tắt. Nếu không phải -1, *fd* phải ở chế độ non-blocking. Thư viện có trách nhiệm xóa mọi byte khỏi *fd* trước khi gọi lại poll hoặc select.
 
-   When threads are enabled, this function can only be called
-   from :ref:`the main thread of the main interpreter <signals-and-threads>`;
-   attempting to call it from other threads will cause a :exc:`ValueError`
-   exception to be raised.
+   Khi các thread được bật, hàm này chỉ có thể được gọi từ :ref:`thread chính của interpreter chính <signals-and-threads>`; nếu cố gọi từ các thread khác, một ngoại lệ :exc:`ValueError` sẽ được phát sinh.
 
-   There are two common ways to use this function. In both approaches,
-   you use the fd to wake up when a signal arrives, but then they
-   differ in how they determine *which* signal or signals have
-   arrived.
+   Có hai cách phổ biến để sử dụng hàm này. Với cả hai cách, bạn dùng fd để đánh thức khi có tín hiệu đến, nhưng chúng khác nhau ở cách xác định *tín hiệu nào hoặc những tín hiệu nào* đã đến.
 
-   In the first approach, we read the data out of the fd's buffer, and
-   the byte values give you the signal numbers. This is simple, but in
-   rare cases it can run into a problem: generally the fd will have a
-   limited amount of buffer space, and if too many signals arrive too
-   quickly, then the buffer may become full, and some signals may be
-   lost. If you use this approach, then you should set
-   ``warn_on_full_buffer=True``, which will at least cause a warning
-   to be printed to stderr when signals are lost.
+   Trong cách thứ nhất, chúng ta đọc dữ liệu ra khỏi bộ đệm của fd, và các giá trị byte cho biết số hiệu tín hiệu. Cách này đơn giản, nhưng trong một số trường hợp hiếm gặp có thể phát sinh vấn đề: nhìn chung fd sẽ có dung lượng bộ đệm giới hạn, và nếu có quá nhiều tín hiệu đến quá nhanh, bộ đệm có thể bị đầy khiến một số tín hiệu bị mất. Nếu sử dụng cách này, bạn nên đặt ``warn_on_full_buffer=True``, việc này ít nhất sẽ khiến một cảnh báo được in ra stderr khi tín hiệu bị mất.
 
-   In the second approach, we use the wakeup fd *only* for wakeups,
-   and ignore the actual byte values. In this case, all we care about
-   is whether the fd's buffer is empty or non-empty; a full buffer
-   doesn't indicate a problem at all. If you use this approach, then
-   you should set ``warn_on_full_buffer=False``, so that your users
-   are not confused by spurious warning messages.
+   Trong cách thứ hai, chúng ta sử dụng wakeup fd *chỉ* để đánh thức và bỏ qua các giá trị byte thực tế. Trong trường hợp này, điều duy nhất chúng ta quan tâm là bộ đệm của fd trống hay không trống; bộ đệm đầy hoàn toàn không cho thấy có vấn đề. Nếu sử dụng cách này, bạn nên đặt ``warn_on_full_buffer=False``, để người dùng không bị nhầm lẫn bởi các thông báo cảnh báo không cần thiết.
 
    .. versionchanged:: 3.5
-      On Windows, the function now also supports socket handles.
+      Trên Windows, hàm này hiện cũng hỗ trợ các socket handle.
 
    .. versionchanged:: 3.7
-      Added ``warn_on_full_buffer`` parameter.
+      Đã thêm tham số ``warn_on_full_buffer``.
 
 .. function:: siginterrupt(signalnum, flag)
 
-   Change system call restart behaviour: if *flag* is :const:`False`, system
-   calls will be restarted when interrupted by signal *signalnum*, otherwise
-   system calls will be interrupted.  Returns nothing.
+   Thay đổi hành vi khởi động lại system call: nếu *flag* là :const:`False`, system call sẽ được khởi động lại khi bị ngắt bởi signal *signalnum*, nếu không, system call sẽ bị ngắt. Không trả về giá trị nào.
 
    .. availability:: Unix.
 
-      See the man page :manpage:`siginterrupt(3)` for further information.
+      Xem trang hướng dẫn :manpage:`siginterrupt(3)` để biết thêm thông tin.
 
-   Note that installing a signal handler with :func:`signal` will reset the
-   restart behaviour to interruptible by implicitly calling
-   :c:func:`!siginterrupt` with a true *flag* value for the given signal.
+   Lưu ý rằng việc cài đặt signal handler bằng :func:`signal` sẽ đặt lại hành vi khởi động lại thành có thể bị ngắt bằng cách ngầm gọi
+   :c:func:`!siginterrupt` với giá trị *flag* là true cho signal đã cho.
 
 
 .. function:: signal(signalnum, handler)
 
-   Set the handler for signal *signalnum* to the function *handler*.  *handler* can
-   be a callable Python object taking two arguments (see below), or one of the
-   special values :const:`signal.SIG_IGN` or :const:`signal.SIG_DFL`.  The previous
-   signal handler will be returned (see the description of :func:`getsignal`
-   above).  (See the Unix man page :manpage:`signal(2)` for further information.)
+   Đặt handler cho signal *signalnum* thành hàm *handler*. *handler* có thể là một đối tượng Python có thể gọi nhận hai đối số (xem bên dưới), hoặc một trong các giá trị đặc biệt :const:`signal.SIG_IGN` hoặc :const:`signal.SIG_DFL`. Signal handler trước đó sẽ được trả về (xem phần mô tả về :func:`getsignal` ở trên). (Xem trang hướng dẫn Unix :manpage:`signal(2)` để biết thêm thông tin.)
 
-   When threads are enabled, this function can only be called
-   from :ref:`the main thread of the main interpreter <signals-and-threads>`;
-   attempting to call it from other threads will cause a :exc:`ValueError`
-   exception to be raised.
+   Khi các thread được bật, hàm này chỉ có thể được gọi từ :ref:`thread chính của interpreter chính <signals-and-threads>`; nếu cố gọi từ các thread khác, một ngoại lệ :exc:`ValueError` sẽ được phát sinh.
 
-   The *handler* is called with two arguments: the signal number and the current
-   stack frame (``None`` or a frame object; for a description of frame objects,
-   see the :ref:`description in the type hierarchy <frame-objects>` or see the
-   attribute descriptions in the :mod:`inspect` module).
+   *Trình xử lý* được gọi với hai đối số: số hiệu tín hiệu và stack frame hiện tại (``None`` hoặc một đối tượng frame; để xem mô tả về các đối tượng frame, hãy xem :ref:`mô tả trong hệ thống phân cấp kiểu <frame-objects>` hoặc xem mô tả thuộc tính trong mô-đun :mod:`inspect`).
 
-   On Windows, :func:`signal` can only be called with :const:`SIGABRT`,
+   Trên Windows, :func:`signal` chỉ có thể được gọi với :const:`SIGABRT`,
    :const:`SIGFPE`, :const:`SIGILL`, :const:`SIGINT`, :const:`SIGSEGV`,
-   :const:`SIGTERM`, or :const:`SIGBREAK`.
-   A :exc:`ValueError` will be raised in any other case.
-   Note that not all systems define the same set of signal names; an
-   :exc:`AttributeError` will be raised if a signal name is not defined as
-   ``SIG*`` module level constant.
+   :const:`SIGTERM`, hoặc :const:`SIGBREAK`. Một :exc:`ValueError` sẽ được đưa ra trong mọi trường hợp khác. Lưu ý rằng không phải tất cả các hệ thống đều định nghĩa cùng một tập hợp tên tín hiệu;
+   một :exc:`AttributeError` sẽ được đưa ra nếu tên tín hiệu không được định nghĩa dưới dạng hằng số cấp mô-đun ``SIG*``.
 
 
 .. function:: sigpending()
 
-   Examine the set of signals that are pending for delivery to the calling
-   thread (i.e., the signals which have been raised while blocked).  Return the
-   set of the pending signals.
+   Kiểm tra tập hợp các tín hiệu đang chờ được chuyển đến thread đang gọi (tức là các tín hiệu đã được phát sinh trong khi bị chặn). Trả về tập hợp các tín hiệu đang chờ.
 
    .. availability:: Unix.
 
-      See the man page :manpage:`sigpending(2)` for further information.
+      Xem trang hướng dẫn :manpage:`sigpending(2)` để biết thêm thông tin.
 
-   See also :func:`pause`, :func:`pthread_sigmask` and :func:`sigwait`.
+   Xem thêm :func:`pause`, :func:`pthread_sigmask` và :func:`sigwait`.
 
    .. versionadded:: 3.3
 
 
 .. function:: sigwait(sigset)
 
-   Suspend execution of the calling thread until the delivery of one of the
-   signals specified in the signal set *sigset*.  The function accepts the signal
-   (removes it from the pending list of signals), and returns the signal number.
+   Tạm dừng việc thực thi của thread gọi cho đến khi nhận được một trong các tín hiệu được chỉ định trong tập tín hiệu *sigset*. Hàm tiếp nhận tín hiệu (loại tín hiệu đó khỏi danh sách tín hiệu đang chờ) và trả về số hiệu tín hiệu.
 
    .. availability:: Unix.
 
-      See the man page :manpage:`sigwait(3)` for further information.
+      Xem trang hướng dẫn :manpage:`sigwait(3)` để biết thêm thông tin.
 
-   See also :func:`pause`, :func:`pthread_sigmask`, :func:`sigpending`,
-   :func:`sigwaitinfo` and :func:`sigtimedwait`.
+   Xem thêm :func:`pause`, :func:`pthread_sigmask`, :func:`sigpending`,
+   :func:`sigwaitinfo` và :func:`sigtimedwait`.
 
    .. versionadded:: 3.3
 
 
 .. function:: sigwaitinfo(sigset)
 
-   Suspend execution of the calling thread until the delivery of one of the
-   signals specified in the signal set *sigset*.  The function accepts the
-   signal and removes it from the pending list of signals. If one of the
-   signals in *sigset* is already pending for the calling thread, the function
-   will return immediately with information about that signal. The signal
-   handler is not called for the delivered signal. The function raises an
-   :exc:`InterruptedError` if it is interrupted by a signal that is not in
-   *sigset*.
+   Tạm dừng việc thực thi của thread gọi cho đến khi nhận được một trong các tín hiệu được chỉ định trong tập tín hiệu *sigset*. Hàm tiếp nhận tín hiệu và loại tín hiệu đó khỏi danh sách tín hiệu đang chờ. Nếu một trong các tín hiệu trong *sigset* đã ở trạng thái chờ đối với thread gọi, hàm sẽ trả về ngay lập tức cùng thông tin về tín hiệu đó. Trình xử lý tín hiệu không được gọi cho tín hiệu đã được phân phối. Hàm sẽ phát sinh một
+   :exc:`InterruptedError` nếu bị ngắt bởi một tín hiệu không nằm trong *sigset*.
 
-   The return value is an object representing the data contained in the
-   ``siginfo_t`` structure, namely: ``si_signo``, ``si_code``,
-   ``si_errno``, ``si_pid``, ``si_uid``, ``si_status``, ``si_band``.
+   Giá trị trả về là một đối tượng biểu diễn dữ liệu có trong cấu trúc ``siginfo_t``, cụ thể là: ``si_signo``, ``si_code``, ``si_errno``, ``si_pid``, ``si_uid``, ``si_status``, ``si_band``.
 
    .. availability:: Unix.
 
-      See the man page :manpage:`sigwaitinfo(2)` for further information.
+      Xem trang man :manpage:`sigwaitinfo(2)` để biết thêm thông tin.
 
-   See also :func:`pause`, :func:`sigwait` and :func:`sigtimedwait`.
+   Xem thêm :func:`pause`, :func:`sigwait` và :func:`sigtimedwait`.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.5
-      The function is now retried if interrupted by a signal not in *sigset*
-      and the signal handler does not raise an exception (see :pep:`475` for
-      the rationale).
+      Hàm hiện sẽ được thử lại nếu bị gián đoạn bởi một signal không có trong *sigset* và signal handler không phát sinh ngoại lệ (xem :pep:`475` để biết lý do).
 
 
 .. function:: sigtimedwait(sigset, timeout)
 
-   Like :func:`sigwaitinfo`, but takes an additional *timeout* argument
-   specifying a timeout. If *timeout* is specified as ``0``, a poll is
-   performed. Returns :const:`None` if a timeout occurs.
+   Tương tự :func:`sigwaitinfo`, nhưng nhận thêm đối số *timeout* chỉ định thời gian chờ. Nếu *timeout* được chỉ định là ``0``, một poll sẽ được thực hiện. Trả về :const:`None` nếu xảy ra hết thời gian chờ.
 
    .. availability:: Unix.
 
-      See the man page :manpage:`sigtimedwait(2)` for further information.
+      Xem trang man :manpage:`sigtimedwait(2)` để biết thêm thông tin.
 
-   See also :func:`pause`, :func:`sigwait` and :func:`sigwaitinfo`.
+   Xem thêm :func:`pause`, :func:`sigwait` và :func:`sigwaitinfo`.
 
    .. versionadded:: 3.3
 
    .. versionchanged:: 3.5
-      The function is now retried with the recomputed *timeout* if interrupted
-      by a signal not in *sigset* and the signal handler does not raise an
-      exception (see :pep:`475` for the rationale).
+      Hàm hiện được thử lại với *timeout* được tính toán lại nếu bị gián đoạn bởi một tín hiệu không nằm trong *sigset* và trình xử lý tín hiệu không phát sinh ngoại lệ (xem :pep:`475` để biết lý do).
 
 
 .. _signal-example:
 
-Examples
---------
+Ví dụ
+-----
 
-Here is a minimal example program. It uses the :func:`alarm` function to limit
-the time spent waiting to open a file; this is useful if the file is for a
-serial device that may not be turned on, which would normally cause the
-:func:`os.open` to hang indefinitely.  The solution is to set a 5-second alarm
-before opening the file; if the operation takes too long, the alarm signal will
-be sent, and the handler raises an exception. ::
+Sau đây là một chương trình ví dụ tối giản. Chương trình sử dụng hàm :func:`alarm` để giới hạn thời gian chờ mở tệp; điều này hữu ích nếu tệp tương ứng với một thiết bị nối tiếp có thể chưa được bật, vì trong trường hợp bình thường điều đó sẽ khiến
+:func:`os.open` bị treo vô thời hạn. Giải pháp là đặt báo thức 5 giây trước khi mở tệp; nếu thao tác mất quá nhiều thời gian, tín hiệu báo thức sẽ được gửi và trình xử lý sẽ phát sinh một ngoại lệ.::
 
    import signal, os
 
@@ -730,64 +576,51 @@ be sent, and the handler raises an exception. ::
        print(f'Signal handler called with signal {signame} ({signum})')
        raise OSError("Couldn't open device!")
 
-   # Set the signal handler and a 5-second alarm
+   # Thiết lập trình xử lý tín hiệu và báo thức 5 giây
    signal.signal(signal.SIGALRM, handler)
    signal.alarm(5)
 
-   # This open() may hang indefinitely
+   # Lệnh open() này có thể bị treo vô thời hạn
    fd = os.open('/dev/ttyS0', os.O_RDWR)
 
-   signal.alarm(0)          # Disable the alarm
+   signal.alarm(0)          # Tắt báo thức
 
-Note on SIGPIPE
----------------
+Lưu ý về SIGPIPE
+----------------
 
-Piping output of your program to tools like :manpage:`head(1)` will
-cause a :const:`SIGPIPE` signal to be sent to your process when the receiver
-of its standard output closes early.  This results in an exception
-like :code:`BrokenPipeError: [Errno 32] Broken pipe`.  To handle this
-case, wrap your entry point to catch this exception as follows::
+Việc chuyển đầu ra của chương trình bạn vào các công cụ như :manpage:`head(1)` sẽ khiến một tín hiệu :const:`SIGPIPE` được gửi đến tiến trình của bạn khi bên nhận đầu ra tiêu chuẩn đóng sớm. Điều này dẫn đến một ngoại lệ như :code:`BrokenPipeError: [Errno 32] Broken pipe`. Để xử lý trường hợp này, hãy bọc entry point của bạn để bắt ngoại lệ này như sau::
 
     import os
     import sys
 
     def main():
         try:
-            # simulate large output (your code replaces this loop)
+            # mô phỏng đầu ra lớn (code của bạn thay thế vòng lặp này)
             for x in range(10000):
                 print("y")
-            # flush output here to force SIGPIPE to be triggered
-            # while inside this try block.
+            # flush đầu ra ở đây để buộc SIGPIPE được kích hoạt
+            # khi đang ở trong khối try này.
             sys.stdout.flush()
         except BrokenPipeError:
-            # Python flushes standard streams on exit; redirect remaining output
-            # to devnull to avoid another BrokenPipeError at shutdown
+            # Python flush các stream tiêu chuẩn khi thoát; chuyển hướng đầu ra còn lại
+            # sang devnull để tránh một BrokenPipeError khác khi tắt
             devnull = os.open(os.devnull, os.O_WRONLY)
             os.dup2(devnull, sys.stdout.fileno())
-            sys.exit(1)  # Python exits with error code 1 on EPIPE
+            sys.exit(1)  # Python thoát với mã lỗi 1 khi gặp EPIPE
 
     if __name__ == '__main__':
         main()
 
-Do not set :const:`SIGPIPE`'s disposition to :const:`SIG_DFL` in
-order to avoid :exc:`BrokenPipeError`.  Doing that would cause
-your program to exit unexpectedly whenever any socket
-connection is interrupted while your program is still writing to
-it.
+Không đặt cách xử lý của :const:`SIGPIPE` thành :const:`SIG_DFL` để tránh :exc:`BrokenPipeError`. Việc đó sẽ khiến chương trình thoát đột ngột bất cứ khi nào một kết nối socket bị gián đoạn trong lúc chương trình vẫn đang ghi vào đó.
 
 .. _handlers-and-exceptions:
 
-Note on Signal Handlers and Exceptions
---------------------------------------
+Lưu ý về Signal Handler và Exception
+------------------------------------
 
-If a signal handler raises an exception, the exception will be propagated to
-the main thread and may be raised after any :term:`bytecode` instruction. Most
-notably, a :exc:`KeyboardInterrupt` may appear at any point during execution.
-Most Python code, including the standard library, cannot be made robust against
-this, and so a :exc:`KeyboardInterrupt` (or any other exception resulting from
-a signal handler) may on rare occasions put the program in an unexpected state.
+Nếu một signal handler phát sinh exception, exception đó sẽ được truyền đến main thread và có thể phát sinh sau bất kỳ lệnh :term:`bytecode` nào. Đáng chú ý nhất là :exc:`KeyboardInterrupt` có thể xuất hiện tại bất kỳ thời điểm nào trong quá trình thực thi. Hầu hết mã Python, bao gồm cả standard library, không thể được làm cho đủ mạnh để xử lý tình huống này, vì vậy :exc:`KeyboardInterrupt` (hoặc bất kỳ exception nào khác phát sinh từ signal handler) trong một số trường hợp hiếm gặp có thể khiến chương trình rơi vào trạng thái không mong muốn.
 
-To illustrate this issue, consider the following code::
+Để minh họa cho vấn đề này, hãy xem xét đoạn mã sau::
 
     class SpamContext:
         def __init__(self):
@@ -798,18 +631,15 @@ To illustrate this issue, consider the following code::
             self.lock.acquire()
             # If KeyboardInterrupt occurs here, __exit__ will not be called
             ...
-            # KeyboardInterrupt could occur just before the function returns
+            # KeyboardInterrupt có thể xảy ra ngay trước khi hàm trả về
 
         def __exit__(self, exc_type, exc_val, exc_tb):
             ...
             self.lock.release()
 
-For many programs, especially those that merely want to exit on
-:exc:`KeyboardInterrupt`, this is not a problem, but applications that are
-complex or require high reliability should avoid raising exceptions from signal
-handlers. They should also avoid catching :exc:`KeyboardInterrupt` as a means
-of gracefully shutting down.  Instead, they should install their own
-:const:`SIGINT` handler. Below is an example of an HTTP server that avoids
+Đối với nhiều chương trình, đặc biệt là những chương trình chỉ muốn thoát khi
+:exc:`KeyboardInterrupt`, đây không phải là vấn đề, nhưng các ứng dụng phức tạp hoặc yêu cầu độ tin cậy cao nên tránh phát sinh ngoại lệ từ các signal handler. Chúng cũng nên tránh bắt :exc:`KeyboardInterrupt` để tắt ứng dụng một cách an toàn. Thay vào đó, chúng nên cài đặt
+:const:`SIGINT` handler riêng. Dưới đây là một ví dụ về máy chủ HTTP tránh
 :exc:`KeyboardInterrupt`::
 
     import signal

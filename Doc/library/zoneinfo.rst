@@ -1,43 +1,34 @@
-:mod:`!zoneinfo` --- IANA time zone support
-===========================================
+:mod:`!zoneinfo` --- hỗ trợ múi giờ IANA
+========================================
 
 .. module:: zoneinfo
-    :synopsis: IANA time zone support
+    :synopsis: hỗ trợ múi giờ IANA
 
 .. versionadded:: 3.9
 
 .. moduleauthor:: Paul Ganssle <paul@ganssle.io>
 .. sectionauthor:: Paul Ganssle <paul@ganssle.io>
 
-**Source code:** :source:`Lib/zoneinfo`
+**Mã nguồn:** :source:`Lib/zoneinfo`
 
 --------------
 
-The :mod:`!zoneinfo` module provides a concrete time zone implementation to
-support the IANA time zone database as originally specified in :pep:`615`. By
-default, :mod:`!zoneinfo` uses the system's time zone data if available; if no
-system time zone data is available, the library will fall back to using the
-first-party :pypi:`tzdata` package available on PyPI.
+Mô-đun :mod:`!zoneinfo` cung cấp một triển khai múi giờ cụ thể để hỗ trợ cơ sở dữ liệu múi giờ IANA như được đặc tả ban đầu trong :pep:`615`. Theo mặc định, :mod:`!zoneinfo` sử dụng dữ liệu múi giờ của hệ thống nếu có; nếu không có dữ liệu múi giờ của hệ thống, thư viện sẽ chuyển sang sử dụng gói :pypi:`tzdata` chính chủ có trên PyPI.
 
 .. seealso::
 
-    Module: :mod:`datetime`
-        Provides the :class:`~datetime.time` and :class:`~datetime.datetime`
-        types with which the :class:`ZoneInfo` class is designed to be used.
+    Mô-đun: :mod:`datetime`
+        Cung cấp các kiểu :class:`~datetime.time` và :class:`~datetime.datetime`, được thiết kế để sử dụng cùng với lớp :class:`ZoneInfo`.
 
-    Package :pypi:`tzdata`
-        First-party package maintained by the CPython core developers to supply
-        time zone data via PyPI.
+    Gói :pypi:`tzdata`
+        Gói first-party do các nhà phát triển cốt lõi của CPython duy trì để cung cấp dữ liệu múi giờ thông qua PyPI.
 
 .. include:: ../includes/wasm-notavail.rst
 
-Using ``ZoneInfo``
-------------------
+Sử dụng ``ZoneInfo``
+--------------------
 
-:class:`ZoneInfo` is a concrete implementation of the :class:`datetime.tzinfo`
-abstract base class, and is intended to be attached to ``tzinfo``, either via
-the constructor, the :meth:`datetime.replace <datetime.datetime.replace>`
-method or :meth:`datetime.astimezone <datetime.datetime.astimezone>`::
+:class:`ZoneInfo` là một triển khai cụ thể của lớp cơ sở trừu tượng :class:`datetime.tzinfo`, và được thiết kế để gắn vào ``tzinfo``, thông qua hàm khởi tạo, phương thức :meth:`datetime.replace <datetime.datetime.replace>` hoặc :meth:`datetime.astimezone <datetime.datetime.astimezone>`::
 
     >>> from zoneinfo import ZoneInfo
     >>> import datetime as dt
@@ -49,8 +40,7 @@ method or :meth:`datetime.astimezone <datetime.datetime.astimezone>`::
     >>> when.tzname()
     'PDT'
 
-Datetimes constructed in this way are compatible with datetime arithmetic and
-handle daylight saving time transitions with no further intervention::
+Các đối tượng datetime được tạo theo cách này tương thích với phép tính toán datetime và xử lý các quá trình chuyển đổi giờ mùa hè mà không cần can thiệp thêm::
 
     >>> when_add = when + dt.timedelta(days=1)
 
@@ -60,11 +50,7 @@ handle daylight saving time transitions with no further intervention::
     >>> when_add.tzname()
     'PST'
 
-These time zones also support the :attr:`~datetime.datetime.fold` attribute
-introduced in :pep:`495`.  During offset transitions which induce ambiguous
-times (such as a daylight saving time to standard time transition), the offset
-from *before* the transition is used when ``fold=0``, and the offset *after*
-the transition is used when ``fold=1``, for example::
+Các múi giờ này cũng hỗ trợ thuộc tính :attr:`~datetime.datetime.fold` được giới thiệu trong :pep:`495`. Trong các quá trình chuyển đổi độ lệch gây ra thời điểm không rõ ràng (chẳng hạn như quá trình chuyển từ giờ mùa hè sang giờ chuẩn), độ lệch từ *trước* quá trình chuyển đổi được sử dụng khi ``fold=0``, còn độ lệch *sau* quá trình chuyển đổi được sử dụng khi ``fold=1``, chẳng hạn::
 
     >>> when = dt.datetime(2020, 11, 1, 1, tzinfo=ZoneInfo("America/Los_Angeles"))
     >>> print(when)
@@ -73,110 +59,77 @@ the transition is used when ``fold=1``, for example::
     >>> print(when.replace(fold=1))
     2020-11-01 01:00:00-08:00
 
-When converting from another time zone, the fold will be set to the correct
-value::
+Khi chuyển đổi từ một múi giờ khác, fold sẽ được đặt thành giá trị chính xác::
 
     >>> LOS_ANGELES = ZoneInfo("America/Los_Angeles")
     >>> when_utc = dt.datetime(2020, 11, 1, 8, tzinfo=dt.timezone.utc)
 
-    >>> # Before the PDT -> PST transition
+    >>> # Trước quá trình chuyển đổi PDT -> PST
     >>> print(when_utc.astimezone(LOS_ANGELES))
     2020-11-01 01:00:00-07:00
 
-    >>> # After the PDT -> PST transition
+    >>> # Sau khi chuyển từ PDT -> PST
     >>> print((when_utc + dt.timedelta(hours=1)).astimezone(LOS_ANGELES))
     2020-11-01 01:00:00-08:00
 
-Data sources
-------------
+Nguồn dữ liệu
+-------------
 
-The ``zoneinfo`` module does not directly provide time zone data, and instead
-pulls time zone information from the system time zone database or the
-first-party PyPI package :pypi:`tzdata`, if available. Some systems, including
-notably Windows systems, do not have an IANA database available, and so for
-projects targeting cross-platform compatibility that require time zone data, it
-is recommended to declare a dependency on tzdata. If neither system data nor
-tzdata are available, all calls to :class:`ZoneInfo` will raise
+Mô-đun ``zoneinfo`` không trực tiếp cung cấp dữ liệu múi giờ mà lấy thông tin múi giờ từ cơ sở dữ liệu múi giờ của hệ thống hoặc gói PyPI chính thức :pypi:`tzdata`, nếu có. Một số hệ thống, đáng chú ý là các hệ thống Windows, không có sẵn cơ sở dữ liệu IANA, vì vậy đối với các dự án hướng đến khả năng tương thích đa nền tảng và yêu cầu dữ liệu múi giờ, bạn nên khai báo phụ thuộc vào tzdata. Nếu không có dữ liệu hệ thống hoặc tzdata, mọi lệnh gọi đến :class:`ZoneInfo` sẽ phát sinh
 :exc:`ZoneInfoNotFoundError`.
 
 .. _zoneinfo_data_configuration:
 
-Configuring the data sources
-****************************
+Cấu hình nguồn dữ liệu
+**********************
 
-When ``ZoneInfo(key)`` is called, the constructor first searches the
-directories specified in :data:`TZPATH` for a file matching ``key``, and on
-failure looks for a match in the tzdata package. This behavior can be
-configured in three ways:
+Khi ``ZoneInfo(key)`` được gọi, constructor trước tiên tìm kiếm trong các thư mục được chỉ định trong :data:`TZPATH` một tệp khớp với ``key``, và nếu không thành công thì tìm tệp khớp trong gói tzdata. Hành vi này có thể được cấu hình theo ba cách:
 
-1. The default :data:`TZPATH` when not otherwise specified can be configured at
-   :ref:`compile time <zoneinfo_data_compile_time_config>`.
-2. :data:`TZPATH` can be configured using :ref:`an environment variable
-   <zoneinfo_data_environment_var>`.
-3. At :ref:`runtime <zoneinfo_data_runtime_config>`, the search path can be
-   manipulated using the :func:`reset_tzpath` function.
+1. :data:`TZPATH` mặc định khi không được chỉ định theo cách khác có thể được cấu hình tại
+   :ref:`thời điểm biên dịch <zoneinfo_data_compile_time_config>`.
+2. :data:`TZPATH` có thể được cấu hình bằng :ref:`một biến môi trường <zoneinfo_data_environment_var>`.
+3. Tại :ref:`runtime <zoneinfo_data_runtime_config>`, đường dẫn tìm kiếm có thể được điều chỉnh bằng hàm :func:`reset_tzpath`.
 
 .. _zoneinfo_data_compile_time_config:
 
-Compile-time configuration
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Cấu hình tại thời điểm biên dịch
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The default :data:`TZPATH` includes several common deployment locations for the
-time zone database (except on Windows, where there are no "well-known"
-locations for time zone data). On POSIX systems, downstream distributors and
-those building Python from source who know where their system
-time zone data is deployed may change the default time zone path by specifying
-the compile-time option ``TZPATH`` (or, more likely, the :option:`configure
-flag --with-tzpath <--with-tzpath>`), which should be a string delimited by
+:data:`TZPATH` mặc định bao gồm một số vị trí triển khai phổ biến của cơ sở dữ liệu múi giờ (trừ Windows, nơi không có các vị trí "đã biết" cho dữ liệu múi giờ). Trên các hệ thống POSIX, các nhà phân phối và những người xây dựng Python từ mã nguồn biết dữ liệu múi giờ của hệ thống được triển khai ở đâu có thể thay đổi đường dẫn múi giờ mặc định bằng cách chỉ định tùy chọn tại thời điểm biên dịch ``TZPATH`` (hoặc nhiều khả năng hơn là :option:`configure flag --with-tzpath <--with-tzpath>`), tùy chọn này phải là một chuỗi được phân tách bằng
 :data:`os.pathsep`.
 
-On all platforms, the configured value is available as the ``TZPATH`` key in
+Trên tất cả các nền tảng, giá trị được cấu hình có sẵn dưới dạng khóa ``TZPATH`` trong
 :func:`sysconfig.get_config_var`.
 
 .. _zoneinfo_data_environment_var:
 
-Environment configuration
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Cấu hình môi trường
+^^^^^^^^^^^^^^^^^^^
 
-When initializing :data:`TZPATH` (either at import time or whenever
-:func:`reset_tzpath` is called with no arguments), the ``zoneinfo`` module will
-use the environment variable ``PYTHONTZPATH``, if it exists, to set the search
-path.
+Khi khởi tạo :data:`TZPATH` (tại thời điểm import hoặc bất cứ khi nào
+:func:`reset_tzpath` được gọi mà không có đối số), mô-đun ``zoneinfo`` sẽ sử dụng biến môi trường ``PYTHONTZPATH``, nếu biến này tồn tại, để thiết lập đường dẫn tìm kiếm.
 
 .. envvar:: PYTHONTZPATH
 
-    This is an :data:`os.pathsep`-separated string containing the time zone
-    search path to use. It must consist of only absolute rather than relative
-    paths. Relative components specified in ``PYTHONTZPATH`` will not be used,
-    but otherwise the behavior when a relative path is specified is
-    implementation-defined; CPython will raise :exc:`InvalidTZPathWarning`, but
-    other implementations are free to silently ignore the erroneous component
-    or raise an exception.
+    Đây là một chuỗi được phân tách bằng :data:`os.pathsep`, chứa đường dẫn tìm kiếm múi giờ cần sử dụng. Chuỗi này chỉ được chứa các đường dẫn tuyệt đối, không phải đường dẫn tương đối. Các thành phần tương đối được chỉ định trong ``PYTHONTZPATH`` sẽ không được sử dụng, nhưng ngoài điều đó, hành vi khi chỉ định một đường dẫn tương đối là do triển khai quyết định; CPython sẽ phát sinh :exc:`InvalidTZPathWarning`, nhưng các triển khai khác có thể bỏ qua thành phần không hợp lệ một cách im lặng hoặc phát sinh một ngoại lệ.
 
-To set the system to ignore the system data and use the tzdata package
-instead, set ``PYTHONTZPATH=""``.
+Để thiết lập hệ thống bỏ qua dữ liệu hệ thống và sử dụng gói tzdata thay thế, hãy đặt ``PYTHONTZPATH=""``.
 
 .. _zoneinfo_data_runtime_config:
 
-Runtime configuration
-^^^^^^^^^^^^^^^^^^^^^
+Cấu hình runtime
+^^^^^^^^^^^^^^^^
 
-The TZ search path can also be configured at runtime using the
-:func:`reset_tzpath` function. This is generally not an advisable operation,
-though it is reasonable to use it in test functions that require the use of a
-specific time zone path (or require disabling access to the system time zones).
+Bạn cũng có thể cấu hình đường dẫn tìm kiếm TZ tại runtime bằng cách sử dụng
+hàm :func:`reset_tzpath`. Nhìn chung, đây không phải là thao tác được khuyến nghị, mặc dù việc sử dụng hàm này trong các hàm kiểm thử yêu cầu sử dụng một đường dẫn múi giờ cụ thể (hoặc yêu cầu vô hiệu hóa quyền truy cập vào các múi giờ của hệ thống) là hợp lý.
 
 
-The ``ZoneInfo`` class
-----------------------
+Lớp ``ZoneInfo``
+----------------
 
 .. class:: ZoneInfo(key)
 
-    A concrete :class:`datetime.tzinfo` subclass that represents an IANA time
-    zone specified by the string ``key``. Calls to the primary constructor will
-    always return objects that compare identically; put another way, barring
-    cache invalidation via :meth:`ZoneInfo.clear_cache`, for all values of
-    ``key``, the following assertion will always be true:
+    Một lớp con :class:`datetime.tzinfo` cụ thể, đại diện cho múi giờ IANA được chỉ định bằng chuỗi ``key``. Các lệnh gọi đến hàm khởi tạo chính sẽ luôn trả về các đối tượng so sánh giống hệt nhau; nói cách khác, ngoại trừ trường hợp bộ nhớ đệm bị vô hiệu hóa thông qua :meth:`ZoneInfo.clear_cache`, với mọi giá trị của ``key``, assertion sau đây sẽ luôn đúng:
 
     .. code-block:: python
 
@@ -184,95 +137,68 @@ The ``ZoneInfo`` class
         b = ZoneInfo(key)
         assert a is b
 
-    ``key`` must be in the form of a relative, normalized POSIX path, with no
-    up-level references. The constructor will raise :exc:`ValueError` if a
-    non-conforming key is passed.
+    ``key`` phải có dạng đường dẫn POSIX tương đối, đã được chuẩn hóa và không chứa tham chiếu lên cấp trên. Hàm khởi tạo sẽ phát sinh :exc:`ValueError` nếu được truyền một key không phù hợp.
 
-    If no file matching ``key`` is found, the constructor will raise
+    Nếu không tìm thấy tệp nào khớp với ``key``, hàm khởi tạo sẽ phát sinh
     :exc:`ZoneInfoNotFoundError`.
 
 
-The ``ZoneInfo`` class has two alternate constructors:
+Lớp ``ZoneInfo`` có hai hàm khởi tạo thay thế:
 
 .. classmethod:: ZoneInfo.from_file(file_obj, /, key=None)
 
-    Constructs a ``ZoneInfo`` object from a file-like object returning bytes
-    (e.g. a file opened in binary mode or an :class:`io.BytesIO` object).
-    Unlike the primary constructor, this always constructs a new object.
+    Tạo một đối tượng ``ZoneInfo`` từ một đối tượng giống tệp trả về các byte (ví dụ: một tệp được mở ở chế độ nhị phân hoặc một đối tượng :class:`io.BytesIO`). Không giống hàm khởi tạo chính, hàm này luôn tạo một đối tượng mới.
 
-    The ``key`` parameter sets the name of the zone for the purposes of
-    :py:meth:`~object.__str__` and :py:meth:`~object.__repr__`.
+    Tham số ``key`` đặt tên của múi giờ cho mục đích
+    :py:meth:`~object.__str__` và :py:meth:`~object.__repr__`.
 
-    Objects created via this constructor cannot be pickled (see `pickling`_).
+    Các đối tượng được tạo thông qua hàm khởi tạo này không thể được pickle (xem `pickling`_).
 
-    :exc:`ValueError` is raised if the data read from *file_obj* is not a valid
-    TZif file.
+    :exc:`ValueError` được phát sinh nếu dữ liệu đọc từ *file_obj* không phải là tệp TZif hợp lệ.
 
 .. classmethod:: ZoneInfo.no_cache(key)
 
-    An alternate constructor that bypasses the constructor's cache. It is
-    identical to the primary constructor, but returns a new object on each
-    call. This is most likely to be useful for testing or demonstration
-    purposes, but it can also be used to create a system with a different cache
-    invalidation strategy.
+    Một hàm khởi tạo thay thế bỏ qua cache của hàm khởi tạo. Hàm này giống hệt hàm khởi tạo chính, nhưng trả về một đối tượng mới trong mỗi lần gọi. Hàm này có nhiều khả năng hữu ích cho mục đích kiểm thử hoặc minh họa, nhưng cũng có thể được dùng để tạo một hệ thống với chiến lược vô hiệu hóa cache khác.
 
-    Objects created via this constructor will also bypass the cache of a
-    deserializing process when unpickled.
+    Các đối tượng được tạo thông qua hàm khởi tạo này cũng sẽ bỏ qua cache của tiến trình deserializing khi được unpickle.
 
     .. TODO: Add "See `cache_behavior`_" reference when that section is ready.
 
     .. caution::
 
-        Using this constructor may change the semantics of your datetimes in
-        surprising ways, only use it if you know that you need to.
+        Việc sử dụng hàm khởi tạo này có thể làm thay đổi semantics của datetime theo những cách khó lường; chỉ sử dụng nó nếu bạn biết chắc mình cần đến nó.
 
-The following class methods are also available:
+Các phương thức lớp sau đây cũng khả dụng:
 
 .. classmethod:: ZoneInfo.clear_cache(*, only_keys=None)
 
-    A method for invalidating the cache on the ``ZoneInfo`` class. If no
-    arguments are passed, all caches are invalidated and the next call to
-    the primary constructor for each key will return a new instance.
+    Một phương thức dùng để vô hiệu hóa cache trên lớp ``ZoneInfo``. Nếu không truyền đối số nào, tất cả cache sẽ bị vô hiệu hóa và lần gọi tiếp theo đến hàm khởi tạo chính cho mỗi key sẽ trả về một instance mới.
 
-    If an iterable of key names is passed to the ``only_keys`` parameter, only
-    the specified keys will be removed from the cache. Keys passed to
-    ``only_keys`` but not found in the cache are ignored.
+    Nếu truyền một iterable gồm các tên khóa vào tham số ``only_keys``, chỉ những khóa được chỉ định mới bị xóa khỏi cache. Các khóa được truyền vào ``only_keys`` nhưng không được tìm thấy trong cache sẽ bị bỏ qua.
 
     .. TODO: Add "See `cache_behavior`_" reference when that section is ready.
 
     .. warning::
 
-        Invoking this function may change the semantics of datetimes using
-        ``ZoneInfo`` in surprising ways; this modifies module state
-        and thus may have wide-ranging effects. Only use it if you know that you
-        need to.
+        Việc gọi hàm này có thể thay đổi ngữ nghĩa của các datetime sử dụng ``ZoneInfo`` theo những cách khó lường; thao tác này sửa đổi trạng thái của module và do đó có thể gây ra những ảnh hưởng trên phạm vi rộng. Chỉ sử dụng hàm này nếu bạn biết chắc mình cần đến nó.
 
-The class has one attribute:
+Lớp này có một thuộc tính:
 
 .. attribute:: ZoneInfo.key
 
-    This is a read-only :term:`attribute` that returns the value of ``key``
-    passed to the constructor, which should be a lookup key in the IANA time
-    zone database (e.g. ``America/New_York``, ``Europe/Paris`` or
-    ``Asia/Tokyo``).
+    Đây là một :term:`attribute` chỉ đọc, trả về giá trị của ``key`` được truyền vào constructor, giá trị này phải là một khóa tra cứu trong cơ sở dữ liệu múi giờ IANA (ví dụ: ``America/New_York``, ``Europe/Paris`` hoặc ``Asia/Tokyo``).
 
-    For zones constructed from file without specifying a ``key`` parameter,
-    this will be set to ``None``.
+    Đối với các zone được tạo từ tệp mà không chỉ định tham số ``key``, giá trị này sẽ được đặt thành ``None``.
 
     .. note::
 
-        Although it is a somewhat common practice to expose these to end users,
-        these values are designed to be primary keys for representing the
-        relevant zones and not necessarily user-facing elements.  Projects like
-        CLDR (the Unicode Common Locale Data Repository) can be used to get
-        more user-friendly strings from these keys.
+        Mặc dù việc cung cấp các giá trị này cho người dùng cuối là một thực hành khá phổ biến, chúng được thiết kế làm khóa chính để biểu diễn các zone tương ứng và không nhất thiết là các thành phần hướng đến người dùng. Các dự án như CLDR (Unicode Common Locale Data Repository) có thể được sử dụng để lấy các chuỗi thân thiện hơn với người dùng từ những khóa này.
 
-String representations
-**********************
+Biểu diễn chuỗi
+***************
 
-The string representation returned when calling :py:class:`str` on a
-:class:`ZoneInfo` object defaults to using the :attr:`ZoneInfo.key` attribute (see
-the note on usage in the attribute documentation)::
+Biểu diễn chuỗi được trả về khi gọi :py:class:`str` trên một
+đối tượng :class:`ZoneInfo` mặc định sử dụng thuộc tính :attr:`ZoneInfo.key` (xem lưu ý về cách sử dụng trong tài liệu về thuộc tính)::
 
     >>> zone = ZoneInfo("Pacific/Kwajalein")
     >>> str(zone)
@@ -282,29 +208,18 @@ the note on usage in the attribute documentation)::
     >>> f"{when.isoformat()} [{when.tzinfo}]"
     '2020-04-01T03:15:00+12:00 [Pacific/Kwajalein]'
 
-For objects constructed from a file without specifying a ``key`` parameter,
-``str`` falls back to calling :func:`repr`. ``ZoneInfo``'s ``repr`` is
-implementation-defined and not necessarily stable between versions, but it is
-guaranteed not to be a valid ``ZoneInfo`` key.
+Đối với các đối tượng được tạo từ một tệp mà không chỉ định tham số ``key``, ``str`` sẽ chuyển sang gọi :func:`repr`. ``repr`` của ``ZoneInfo`` được xác định theo cách triển khai và không nhất thiết ổn định giữa các phiên bản, nhưng được đảm bảo không phải là một khóa ``ZoneInfo`` hợp lệ.
 
 .. _pickling:
 
-Pickle serialization
-********************
+Tuần tự hóa Pickle
+******************
 
-Rather than serializing all transition data, ``ZoneInfo`` objects are
-serialized by key, and ``ZoneInfo`` objects constructed from files (even those
-with a value for ``key`` specified) cannot be pickled.
+Thay vì tuần tự hóa tất cả dữ liệu chuyển đổi, các đối tượng ``ZoneInfo`` được tuần tự hóa theo khóa, và các đối tượng ``ZoneInfo`` được tạo từ tệp (kể cả những đối tượng có chỉ định giá trị cho ``key``) không thể được pickle.
 
-The behavior of a ``ZoneInfo`` file depends on how it was constructed:
+Hành vi của một tệp ``ZoneInfo`` phụ thuộc vào cách tệp đó được tạo:
 
-1. ``ZoneInfo(key)``: When constructed with the primary constructor, a
-   ``ZoneInfo`` object is serialized by key, and when deserialized, the
-   deserializing process uses the primary and thus it is expected that these
-   are the same object as other references to the same time
-   zone.  For example, if ``europe_berlin_pkl`` is a string containing a pickle
-   constructed from ``ZoneInfo("Europe/Berlin")``, one would expect the
-   following behavior:
+1. ``ZoneInfo(key)``: Khi được tạo bằng hàm khởi tạo chính, một đối tượng ``ZoneInfo`` được tuần tự hóa theo khóa; khi được giải tuần tự, quá trình giải tuần tự sử dụng hàm khởi tạo chính, vì vậy đối tượng này được kỳ vọng là cùng một đối tượng với các tham chiếu khác đến cùng múi giờ. Ví dụ: nếu ``europe_berlin_pkl`` là một chuỗi chứa một pickle được tạo từ ``ZoneInfo("Europe/Berlin")``, ta sẽ kỳ vọng hành vi sau:
 
    .. code-block:: pycon
 
@@ -313,12 +228,7 @@ The behavior of a ``ZoneInfo`` file depends on how it was constructed:
        >>> a is b
        True
 
-2. ``ZoneInfo.no_cache(key)``: When constructed from the cache-bypassing
-   constructor, the ``ZoneInfo`` object is also serialized by key, but when
-   deserialized, the deserializing process uses the cache bypassing
-   constructor. If ``europe_berlin_pkl_nc`` is a string containing a pickle
-   constructed from ``ZoneInfo.no_cache("Europe/Berlin")``, one would expect
-   the following behavior:
+2. ``ZoneInfo.no_cache(key)``: Khi được tạo bằng constructor bỏ qua cache, đối tượng ``ZoneInfo`` cũng được tuần tự hóa theo key, nhưng khi được giải tuần tự hóa, quá trình giải tuần tự hóa sử dụng constructor bỏ qua cache. Nếu ``europe_berlin_pkl_nc`` là một chuỗi chứa một pickle được tạo từ ``ZoneInfo.no_cache("Europe/Berlin")``, ta sẽ kỳ vọng hành vi sau:
 
    .. code-block:: pycon
 
@@ -327,91 +237,61 @@ The behavior of a ``ZoneInfo`` file depends on how it was constructed:
        >>> a is b
        False
 
-3. ``ZoneInfo.from_file(file_obj, /, key=None)``: When constructed from a file, the
-   ``ZoneInfo`` object raises an exception on pickling. If an end user wants to
-   pickle a ``ZoneInfo`` constructed from a file, it is recommended that they
-   use a wrapper type or a custom serialization function: either serializing by
-   key or storing the contents of the file object and serializing that.
+3. ``ZoneInfo.from_file(file_obj, /, key=None)``: Khi được tạo từ một tệp, đối tượng ``ZoneInfo`` sẽ phát sinh ngoại lệ khi pickle. Nếu người dùng cuối muốn pickle một ``ZoneInfo`` được tạo từ một tệp, họ nên sử dụng một kiểu wrapper hoặc một hàm tuần tự hóa tùy chỉnh: либо tuần tự hóa theo key hoặc lưu trữ nội dung của đối tượng tệp rồi tuần tự hóa nội dung đó.
 
-This method of serialization requires that the time zone data for the required
-key be available on both the serializing and deserializing side, similar to the
-way that references to classes and functions are expected to exist in both the
-serializing and deserializing environments. It also means that no guarantees
-are made about the consistency of results when unpickling a ``ZoneInfo``
-pickled in an environment with a different version of the time zone data.
+Phương thức tuần tự hóa này yêu cầu dữ liệu múi giờ cho key bắt buộc phải có ở cả phía tuần tự hóa và phía giải tuần tự hóa, tương tự như cách các tham chiếu đến class và function được yêu cầu phải tồn tại trong cả môi trường tuần tự hóa và giải tuần tự hóa. Điều này cũng có nghĩa là không có bảo đảm nào về tính nhất quán của kết quả khi giải pickle một ``ZoneInfo`` được pickle trong môi trường sử dụng phiên bản dữ liệu múi giờ khác.
 
-Functions
----------
+Các hàm
+-------
 
 .. function:: available_timezones()
 
-    Get a set containing all the valid keys for IANA time zones available
-    anywhere on the time zone path. This is recalculated on every call to the
-    function.
+    Lấy một tập hợp chứa tất cả các key hợp lệ cho múi giờ IANA có ở bất kỳ vị trí nào trên đường dẫn múi giờ. Tập hợp này được tính toán lại trong mỗi lần gọi function.
 
-    This function only includes canonical zone names and does not include
-    "special" zones such as those under the ``posix/`` and ``right/``
-    directories, or the ``posixrules`` zone.
+    Function này chỉ bao gồm các tên vùng chuẩn và không bao gồm các vùng "đặc biệt", chẳng hạn như những vùng nằm trong các thư mục ``posix/`` và ``right/``, hoặc vùng ``posixrules``.
 
     .. caution::
 
-        This function may open a large number of files, as the best way to
-        determine if a file on the time zone path is a valid time zone is to
-        read the "magic string" at the beginning.
+        Function này có thể mở một số lượng lớn tệp, vì cách tốt nhất để xác định một tệp trên đường dẫn múi giờ có phải là múi giờ hợp lệ hay không là đọc "chuỗi ma thuật" ở phần đầu tệp.
 
     .. note::
 
-        These values are not designed to be exposed to end-users; for user
-        facing elements, applications should use something like CLDR (the
-        Unicode Common Locale Data Repository) to get more user-friendly
-        strings. See also the cautionary note on :attr:`ZoneInfo.key`.
+        Các giá trị này không được thiết kế để hiển thị cho người dùng cuối; đối với các phần tử hướng tới người dùng, ứng dụng nên sử dụng một công cụ như CLDR (Unicode Common Locale Data Repository) để lấy các chuỗi thân thiện hơn với người dùng. Xem thêm ghi chú cảnh báo về :attr:`ZoneInfo.key`.
 
 .. function:: reset_tzpath(to=None)
 
-    Sets or resets the time zone search path (:data:`TZPATH`) for the module.
-    When called with no arguments, :data:`TZPATH` is set to the default value.
+    Thiết lập hoặc đặt lại đường dẫn tìm kiếm múi giờ (:data:`TZPATH`) cho module. Khi được gọi mà không có đối số, :data:`TZPATH` được đặt thành giá trị mặc định.
 
-    Calling ``reset_tzpath`` will not invalidate the :class:`ZoneInfo` cache,
-    and so calls to the primary ``ZoneInfo`` constructor will only use the new
-    ``TZPATH`` in the case of a cache miss.
+    Việc gọi ``reset_tzpath`` sẽ không làm mất hiệu lực bộ nhớ đệm :class:`ZoneInfo`, do đó các lệnh gọi đến hàm khởi tạo ``ZoneInfo`` chính chỉ sử dụng ``TZPATH`` mới trong trường hợp bộ nhớ đệm không có mục tương ứng.
 
-    The ``to`` parameter must be a :term:`sequence` of strings or
-    :class:`os.PathLike` and not a string, all of which must be absolute paths.
-    :exc:`ValueError` will be raised if something other than an absolute path
-    is passed.
+    Tham số ``to`` phải là một :term:`sequence` gồm các chuỗi hoặc
+    :class:`os.PathLike` chứ không phải một chuỗi, và tất cả chúng phải là các đường dẫn tuyệt đối.
+    :exc:`ValueError` sẽ được phát sinh nếu truyền vào bất kỳ giá trị nào khác ngoài một đường dẫn tuyệt đối.
 
-Globals
--------
+Biến toàn cục
+-------------
 
 .. data:: TZPATH
 
-    A read-only sequence representing the time zone search path -- when
-    constructing a ``ZoneInfo`` from a key, the key is joined to each entry in
-    the ``TZPATH``, and the first file found is used.
+    Một sequence chỉ đọc biểu diễn search path của múi giờ -- khi tạo một ``ZoneInfo`` từ một key, key được nối vào từng mục trong ``TZPATH``, và file đầu tiên được tìm thấy sẽ được sử dụng.
 
-    ``TZPATH`` may contain only absolute paths, never relative paths,
-    regardless of how it is configured.
+    ``TZPATH`` chỉ có thể chứa các đường dẫn tuyệt đối, không bao giờ chứa đường dẫn tương đối, bất kể được cấu hình như thế nào.
 
-    The object that ``zoneinfo.TZPATH`` points to may change in response to a
-    call to :func:`reset_tzpath`, so it is recommended to use
-    ``zoneinfo.TZPATH`` rather than importing ``TZPATH`` from ``zoneinfo`` or
-    assigning a long-lived variable to ``zoneinfo.TZPATH``.
+    Đối tượng mà ``zoneinfo.TZPATH`` trỏ tới có thể thay đổi khi gọi :func:`reset_tzpath`, vì vậy bạn nên sử dụng ``zoneinfo.TZPATH`` thay vì import ``TZPATH`` từ ``zoneinfo`` hoặc gán ``zoneinfo.TZPATH`` cho một biến tồn tại lâu dài.
 
-    For more information on configuring the time zone search path, see
+    Để biết thêm thông tin về cách cấu hình search path của múi giờ, hãy xem
     :ref:`zoneinfo_data_configuration`.
 
-Exceptions and warnings
------------------------
+Ngoại lệ và cảnh báo
+--------------------
 
 .. exception:: ZoneInfoNotFoundError
 
-    Raised when construction of a :class:`ZoneInfo` object fails because the
-    specified key could not be found on the system. This is a subclass of
+    Được đưa ra khi việc tạo đối tượng :class:`ZoneInfo` thất bại vì không tìm thấy key được chỉ định trên hệ thống. Đây là một lớp con của
     :exc:`KeyError`.
 
 .. exception:: InvalidTZPathWarning
 
-    Raised when :envvar:`PYTHONTZPATH` contains an invalid component that will
-    be filtered out, such as a relative path.
+    Được đưa ra khi :envvar:`PYTHONTZPATH` chứa một thành phần không hợp lệ sẽ bị lọc bỏ, chẳng hạn như một đường dẫn tương đối.
 
 .. Links and references:
