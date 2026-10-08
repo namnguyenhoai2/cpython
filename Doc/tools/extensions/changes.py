@@ -14,6 +14,13 @@ from sphinx.domains.changeset import (
 )
 from sphinx.locale import _ as sphinx_gettext
 
+_VERSION_LABEL_DEFAULTS = {
+    "versionadded": "Đã thêm trong phiên bản %s",
+    "versionchanged": "Đã thay đổi trong phiên bản %s",
+    "versionremoved": "Đã bị loại bỏ trong phiên bản %s",
+    "deprecated": "Không dùng nữa kể từ phiên bản %s",
+}
+
 TYPE_CHECKING = False
 if TYPE_CHECKING:
     from docutils.nodes import Node
@@ -41,13 +48,6 @@ class PyVersionChange(VersionChange):
 class DeprecatedRemoved(VersionChange):
     required_arguments = 2
 
-    _deprecated_label = sphinx_gettext(
-        "Deprecated since version %s, will be removed in version %s"
-    )
-    _removed_label = sphinx_gettext(
-        "Deprecated since version %s, removed in version %s"
-    )
-
     def run(self) -> list[Node]:
         # Replace the first two arguments (deprecated version and removed version)
         # with a single tuple of both versions.
@@ -65,10 +65,10 @@ class DeprecatedRemoved(VersionChange):
         current_version = tuple(map(int, self.config.version.split(".")))
         removed_version = tuple(map(int, version_removed.split(".")))
         if current_version < removed_version:
-            versionlabels[self.name] = self._deprecated_label
+            versionlabels[self.name] = self.config.deprecated_removed_label
             versionlabel_classes[self.name] = "deprecated"
         else:
-            versionlabels[self.name] = self._removed_label
+            versionlabels[self.name] = self.config.deprecated_removed_past_label
             versionlabel_classes[self.name] = "removed"
         try:
             return super().run()
@@ -94,9 +94,7 @@ class SoftDeprecated(PyVersionChange):
     _TERM_RE = re.compile(r":term:`([^`]+)`")
 
     def run(self) -> list[Node]:
-        versionlabels[self.name] = sphinx_gettext(
-            ":term:`Soft deprecated` since version %s"
-        )
+        versionlabels[self.name] = self.config.soft_deprecated_label
         versionlabel_classes[self.name] = "soft-deprecated"
         try:
             result = super().run()
@@ -175,6 +173,27 @@ def _fixup_changesets(app: Sphinx, env: BuildEnvironment) -> None:
 
 
 def setup(app: Sphinx) -> ExtensionMetadata:
+    # Việt hóa các nhãn được tạo cho các directive thay đổi phiên bản.
+    # Cấu hình này khiến Sphinx làm mới môi trường khi nhãn thay đổi.
+    for name, default in _VERSION_LABEL_DEFAULTS.items():
+        app.add_config_value(f"{name}_label", default, "env")
+        versionlabels[name] = getattr(app.config, f"{name}_label")
+    app.add_config_value(
+        "deprecated_removed_label",
+        "Không dùng nữa kể từ phiên bản %s, sẽ bị loại bỏ trong phiên bản %s",
+        "env",
+    )
+    app.add_config_value(
+        "deprecated_removed_past_label",
+        "Không dùng nữa kể từ phiên bản %s, đã bị loại bỏ trong phiên bản %s",
+        "env",
+    )
+    app.add_config_value(
+        "soft_deprecated_label",
+        ":term:`Không dùng nữa một phần` kể từ phiên bản %s",
+        "env",
+    )
+
     # Override Sphinx's directives with support for 'next'
     app.add_directive("versionadded", PyVersionChange, override=True)
     app.add_directive("versionchanged", PyVersionChange, override=True)
